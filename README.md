@@ -34,7 +34,7 @@ which conda
 > *For more information: [tcsh installation](https://github.com/ESMValGroup/ESMValTool/issues/301 "Reference to tcsh conda install")*
 
 ### Creating an isolated conda environment
-TODO This command will need to be updated
+(TODO This command will need to be updated) 
 Run the following commands to create a self-contained dev environment for SpiceRefactor (type `y` to confirm creation):
 ```bash
 conda create -n spiceRefactor 
