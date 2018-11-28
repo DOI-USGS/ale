@@ -1,4 +1,6 @@
 # SpiceRefactor
+[![Build Status](https://travis-ci.org/USGS-Astrogeology/SpiceRefactor.svg?branch=master)](https://travis-ci.org/USGS-Astrogeology/SpiceRefactor)
+[![Coverage Status](https://coveralls.io/repos/github/USGS-Astrogeology/SpiceRefactor/badge.svg?branch=master)](https://coveralls.io/github/USGS-Astrogeology/SpiceRefactor?branch=master)
 
 This library allows for the position, rotation, velocity and rotational velocity tracking of
 multiple bodies in space, especially in relation to one another. It makes extensive use of NAIF's
