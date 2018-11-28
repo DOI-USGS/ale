@@ -8,7 +8,7 @@ class TestObject {
   TestObject();
   ~TestObject();
 
-  static std::string helloWorld() const;
+  static std::string helloWorld();
 };
 
 #endif
