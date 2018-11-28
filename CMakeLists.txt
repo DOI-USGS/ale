@@ -33,7 +33,7 @@ target_include_directories(usgsephem
 
 # Setup for GoogleTest
 find_package (Threads)
-target_link_libraries(usgsephem PRIVATE
+target_link_libraries(usgsephem PUBLIC
                       gtest ${CMAKE_THREAD_LIBS_INIT})
 
 
