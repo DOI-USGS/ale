@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 add_dependencies(usgsephem usgsephem)
 
-file(GLOB test_source "${CMAKE_SOURCE_DIR}/../tests/*.cpp")
+file(GLOB test_source "${CMAKE_SOURCE_DIR}/tests/*.cpp")
 
 # Link runSpiceRefactorTests with what we want to test and the GTest and pthread library
 add_executable(runSpiceRefactorTests
