@@ -31,6 +31,11 @@ target_include_directories(usgsephem
                            "${EPHEM_INCLUDE_DIRS}"
 )
 
+# Setup for GoogleTest
+find_package (Threads)
+target_link_libraries(usgsephem
+                      gtest ${CMAKE_THREAD_LIBS_INIT})
+
 # Setup for code coverage
 # default to off
 set(COVERAGE OFF CACHE BOOL "Coverage")
@@ -38,11 +43,6 @@ if(COVERAGE)
     target_compile_options(usgsephem PRIVATE --coverage -O0)
     target_link_libraries(usgsephem PRIVATE --coverage -O0)
 endif()
-
-# Setup for GoogleTest
-find_package (Threads)
-target_link_libraries(usgsephem
-                      gtest ${CMAKE_THREAD_LIBS_INIT})
 
 # Setup for ctest
 enable_testing()
