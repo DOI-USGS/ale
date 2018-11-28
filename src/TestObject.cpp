@@ -2,6 +2,6 @@
 
 #include <string>
 
-std::string TestObject::helloWorld() const {
+std::string TestObject::helloWorld() {
   return "hello world";
 }
