@@ -1,0 +1,18 @@
+language: cpp
+sudo: false
+
+branches:
+  only:
+    - master
+
+#matrix:
+
+#before_install:
+
+#install:
+
+script:
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
