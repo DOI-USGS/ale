@@ -8,7 +8,7 @@ branches:
 #matrix:
 
 before_install:
-echo "$TRAVIS_PULL_REQUEST"
+  - echo "$TRAVIS_PULL_REQUEST"
 
 install:
   # Install a supported cmake version (>= 3.10)
