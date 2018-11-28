@@ -31,10 +31,9 @@ target_include_directories(usgsephem
                            "${EPHEM_INCLUDE_DIRS}"
 )
 
-
 # Setup for GoogleTest
 find_package (Threads)
-target_link_libraries(usgsephem PUBLIC
+target_link_libraries(usgsephem PRIVATE
                       gtest ${CMAKE_THREAD_LIBS_INIT})
 
 
