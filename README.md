@@ -2,19 +2,19 @@
 
 This library allows for the position, rotation, velocity and rotational velocity tracking of
 multiple bodies in space, especially in relation to one another. It makes extensive use of NAIF's
-SPICE data for such calculations. 
+SPICE data for such calculations.
 
 ## Setting up dependencies with conda (RECOMMENDED)
 
-Install conda (either [Anaconda](https://www.anaconda.com/download/#linux) or 
+Install conda (either [Anaconda](https://www.anaconda.com/download/#linux) or
 [Miniconda](https://conda.io/miniconda.html)) if you do not already have it. Installation
 instructions may be found [here](https://conda.io/docs/user-guide/install/index.html).
 
 ### Creating an isolated conda environment
-(TODO This command will need to be updated) 
+(TODO This command will need to be updated)
 Run the following commands to create a self-contained dev environment for SpiceRefactor (type `y` to confirm creation):
 ```bash
-conda create -n spiceRefactor 
+conda create -n spiceRefactor
 ```
 > *For more information: [conda environments](https://conda.io/docs/user-guide/tasks/manage-environments.html)*
 
@@ -28,7 +28,11 @@ After creating the `spiceRefactor` environment, we need to activate it. The acti
 After you've set up and activated your conda environment, you may then build SpiceRefactor. Inside
 of a cloned fork of the repository, follow these steps:
 
-1. TODO
+```bash
+mkdir build && cd build
+cmake ..
+make
+```
 
 Keep in mind that you will need to clone the repository with the `--recursive` flag in order to
 retrieve the gtest submodule for testing. If you have already cloned without the `--recusive` flag,
