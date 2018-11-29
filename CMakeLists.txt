@@ -1,6 +1,6 @@
 
 #===============================================================================
-#      The main build file for building SpiceRefactor using CMake.
+#      The main build file for building EAL using CMake.
 #===============================================================================
 # CMake initialization
 
