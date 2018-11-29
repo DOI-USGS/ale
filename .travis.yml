@@ -5,10 +5,25 @@ branches:
   only:
     - master
 
-#matrix:
+matrix:
+  include:
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env:
+        - MATRIX_EVAL="CXX=g++-7 && CC=gcc-7"
+    - os: osx
+      osx_image: xcode9.4
+      env: 
+        - MATRIX_EVAL="CXX=clang++ && CC=clang"
 
 before_install:
   - echo "$TRAVIS_PULL_REQUEST"
+  - eval "${MATRIX_EVAL}"
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
       pip install --user cpp-coveralls;
