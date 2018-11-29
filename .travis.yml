@@ -9,6 +9,10 @@ branches:
 
 before_install:
   - echo "$TRAVIS_PULL_REQUEST"
+  - |
+    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+      pip install --user cpp-coveralls;
+    fi
 
 install:
   # Install a supported cmake version (>= 3.10)
@@ -25,5 +29,11 @@ install:
 script:
   - mkdir build
   - cd build
-  - cmake ..
-  - make
+  - cmake -DCOVERAGE=ON ..
+  - cmake --build .
+
+after_success:
+  - |
+    if [ "$TRAVIS_OS_NAME" == linux ]; then
+      coveralls --root $(dirname $PWD) -i src/ --verbose;
+    fi
