@@ -39,11 +39,11 @@ target_link_libraries(usgsephem PUBLIC
 
 # Setup for code coverage
 # default to off
-set(COVERAGE OFF CACHE BOOL "Coverage")
-if(COVERAGE)
-    target_compile_options(usgsephem PRIVATE --coverage -O0)
-    target_link_libraries(usgsephem PRIVATE --coverage -O0)
-endif()
+#set(COVERAGE OFF CACHE BOOL "Coverage")
+#if(COVERAGE)
+#    target_compile_options(usgsephem PRIVATE --coverage -O0)
+#    target_link_libraries(usgsephem PRIVATE --coverage -O0)
+#endif()
 
 
 
