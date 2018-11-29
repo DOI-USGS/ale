@@ -36,6 +36,9 @@ find_package (Threads)
 target_link_libraries(usgsephem PUBLIC
                       gtest ${CMAKE_THREAD_LIBS_INIT})
 
+# Setup for ctest
+enable_testing()
+add_subdirectory(tests)
 
 # Setup for code coverage
 # default to off
@@ -44,12 +47,6 @@ if(COVERAGE)
     target_compile_options(usgsephem PRIVATE --coverage -O0)
     target_link_libraries(usgsephem PRIVATE --coverage -O0)
 endif()
-
-
-
-# Setup for ctest
-enable_testing()
-add_subdirectory(tests)
 
 # Install commands
 install(TARGETS usgsephem LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
