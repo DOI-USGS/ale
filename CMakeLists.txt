@@ -13,6 +13,7 @@ set(CMAKE_CXX_STANDARD 11)
 # Library setup
 add_library(usgsephem SHARED
             src/TestObject.cpp
+            src/eal.cpp
 )
 set_target_properties(usgsephem PROPERTIES
     VERSION ${PROJECT_VERSION}
