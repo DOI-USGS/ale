@@ -1,3 +1,4 @@
 [submodule "googletest"]
 	path = googletest
 	url = https://github.com/abseil/googletest.git
+	branch = release-1.8.1

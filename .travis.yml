@@ -19,7 +19,7 @@ matrix:
     - os: osx
       osx_image: xcode9.4
       env: 
-        - MATRIX_EVAL="CXX=clang++ -std=c++11 && CC=clang"
+        - MATRIX_EVAL="CXX=clang++ && CC=clang"
 
 before_install:
   - echo "$TRAVIS_PULL_REQUEST"
