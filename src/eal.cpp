@@ -11,7 +11,7 @@ using namespace eal;
 
 
 // Parsing the JSON
-std::string constructStateFromIsd(const std::string positionRotationData) {
+json constructStateFromIsd(const std::string positionRotationData) {
    // Parse the position and rotation data from isd
    json isd = json::parse(positionRotationData);
    json state;
@@ -21,7 +21,7 @@ std::string constructStateFromIsd(const std::string positionRotationData) {
    state["m_y"] = isd.at("y");
    state["m_z"] = isd.at("z");
 
-   return state.dump();
+   return state;
  }
 
 // Positional Functions
