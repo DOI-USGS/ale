@@ -1,6 +1,6 @@
 
 #===============================================================================
-#      The main build file for building SpiceRefactor using CMake.
+#      The main build file for building EAL using CMake.
 #===============================================================================
 # CMake initialization
 
@@ -20,6 +20,7 @@ set(CMAKE_CXX_STANDARD 11)
 # Library setup
 add_library(usgsephem SHARED
             src/TestObject.cpp
+            src/eal.cpp
 )
 set_target_properties(usgsephem PROPERTIES
     VERSION ${PROJECT_VERSION}
