@@ -1,12 +1,17 @@
 #ifndef EAL_INCLUDE_EAL_H
 #define EAL_INCLUDE_EAL_H
 
-#include <vector>
+#include <json.hpp>
 #include <string>
+#include <vector>
+
+using json = nlohmann::json;
 
 using namespace std;
 
 namespace eal {
+
+  json constructStateFromIsd(const string positionRotationData);
 
   vector<double> getPosition(vector<vector<double>> coords, vector<double> times,
                              string interp, double time);
