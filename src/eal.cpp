@@ -1,11 +1,13 @@
 
+#include "eal.h"
+
 #include <json.hpp>
+#include <string>
 
 using json = nlohmann::json;
 
 
-std::string eal::constructStateFromIsd(const std::string positionRotationData) const
-{
+std::string eal::constructStateFromIsd(const std::string positionRotationData) const {
    // Parse the position and rotation data from isd
    json isd = json::parse(positionRotationData);
    json state;
