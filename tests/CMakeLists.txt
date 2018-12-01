@@ -7,6 +7,6 @@ add_executable(runEALTests
                TestMain.cpp
                ${test_source})
 
-target_link_libraries(runEALTests usgsephem ${ALLLIBS} ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES} pthread)
+target_link_libraries(runEALTests eal ${ALLLIBS} ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES} pthread)
 
 gtest_discover_tests(runEALTests WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/tests)
