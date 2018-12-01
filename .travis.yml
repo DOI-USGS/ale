@@ -39,7 +39,7 @@ install:
     fi
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
-  - conda create env create -f environment.yml -n eal
+  - conda env create -f environment.yml -n eal
   - source activate eal
 
 script:
