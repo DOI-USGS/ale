@@ -17,6 +17,9 @@ include(CTest)
 
 set(CMAKE_CXX_STANDARD 11)
 
+# Third Party Dependencies
+find_package(GSL)
+
 # Library setup
 add_library(usgsephem SHARED
             src/eal.cpp
@@ -28,13 +31,18 @@ set_target_properties(usgsephem PROPERTIES
 set(EPHEM_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include/"
                        "${CMAKE_CURRENT_SOURCE_DIR}/include/json")
 target_include_directories(usgsephem
+                           PRIVATE
+                           ${GSL_INCLUDE_DIRS}
                            PUBLIC
-                           "${EPHEM_INCLUDE_DIRS}"
+                           ${EPHEM_INCLUDE_DIRS}
 )
 
 # Setup for GoogleTest
 find_package (Threads)
-target_link_libraries(usgsephem PUBLIC
+target_link_libraries(usgsephem
+                      PRIVATE
+                      ${GSL_LIBRARIES}
+                      PUBLIC
                       gtest ${CMAKE_THREAD_LIBS_INIT})
 
 # Setup for ctest
