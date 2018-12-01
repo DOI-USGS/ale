@@ -18,7 +18,7 @@ matrix:
         - MATRIX_EVAL="CXX=g++-7 && CC=gcc-7"
     - os: osx
       osx_image: xcode9.4
-      env: 
+      env:
         - MATRIX_EVAL="CXX=clang++ && CC=clang"
 
 before_install:
@@ -28,6 +28,10 @@ before_install:
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
       pip install --user cpp-coveralls;
     fi
+    - bash miniconda.sh -b -p $HOME/miniconda
+    - export PATH="$HOME/miniconda/bin:$PATH"
+    - conda create env create -f environment.yml -n eal
+    - source activate eal
 
 install:
   # Install a supported cmake version (>= 3.10)
