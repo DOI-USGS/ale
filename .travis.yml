@@ -28,10 +28,6 @@ before_install:
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
       pip install --user cpp-coveralls;
     fi
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - conda create env create -f environment.yml -n eal
-  - source activate eal
 
 install:
   # Install a supported cmake version (>= 3.10)
@@ -43,7 +39,8 @@ install:
     fi
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
-  - conda install -y -c conda-forge cmake
+  - conda create env create -f environment.yml -n eal
+  - source activate eal
 
 script:
   - mkdir build
