@@ -1,11 +1,12 @@
-
 #include "eal.h"
 
 #include <json.hpp>
+
+#include <gsl/gsl_spline.h>
+
 #include <string>
 
 using json = nlohmann::json;
-
 
 using namespace eal;
 

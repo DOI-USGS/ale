@@ -17,6 +17,9 @@ include(CTest)
 
 set(CMAKE_CXX_STANDARD 11)
 
+# Third Party Dependencies
+find_package(GSL)
+
 # Library setup
 add_library(eal SHARED
             src/eal.cpp
@@ -28,13 +31,18 @@ set_target_properties(eal PROPERTIES
 set(EAL_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include/"
                        "${CMAKE_CURRENT_SOURCE_DIR}/include/json")
 target_include_directories(eal
+                           PRIVATE
+                           ${GSL_INCLUDE_DIRS}
                            PUBLIC
-                           "${EAL_INCLUDE_DIRS}"
+                           ${EAL_INCLUDE_DIRS}
 )
 
 # Setup for GoogleTest
 find_package (Threads)
-target_link_libraries(eal PUBLIC
+target_link_libraries(eal
+                      PRIVATE
+                      ${GSL_LIBRARIES}
+                      PUBLIC
                       gtest ${CMAKE_THREAD_LIBS_INIT})
 
 # Setup for ctest
