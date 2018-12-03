@@ -5,10 +5,6 @@
 #include <string>
 #include <vector>
 
-using json = nlohmann::json;
-
-using namespace std;
-
 namespace eal {
 
   enum interpolation {
@@ -16,25 +12,31 @@ namespace eal {
     spline
   };
 
-  json constructStateFromIsd(const string positionRotationData);
+  nlohmann::json constructStateFromIsd(const std::string positionRotationData);
 
-  vector<double> getPosition(vector<vector<double>> coords, vector<double> times,
-                             interpolation interp, double time);
-  vector<double> getVelocity(vector<vector<double>> coords, vector<double> times,
-                             interpolation interp, double time);
+  std::vector<double> getPosition(std::vector<std::vector<double>> coords,
+                                  std::vector<double> times,
+                                  interpolation interp, double time);
+  std::vector<double> getVelocity(std::vector<std::vector<double>> coords,
+                                  std::vector<double> times,
+                                  interpolation interp, double time);
 
-  vector<double> getPosition(vector<double> coeffs, double time);
-  vector<double> getVelocity(vector<double> coeffs, double time);
+  std::vector<double> getPosition(std::vector<double> coeffs, double time);
+  std::vector<double> getVelocity(std::vector<double> coeffs, double time);
 
-  vector<double> getRotation(string from, string to, vector<vector<double>> rotations,
-                             vector<double> times, interpolation interp, double time);
-  vector<double> getAngularVelocity(string from, string to, vector<vector<double>> rotations,
-                                    vector<double> times, interpolation interp, double time);
+  std::vector<double> getRotation(std::string from, std::string to,
+                                  std::vector<std::vector<double>> rotations,
+                                  std::vector<double> times,
+                                  interpolation interp, double time);
+  std::vector<double> getAngularVelocity(std::string from, std::string to,
+                                         std::vector<std::vector<double>> rotations,
+                                         std::vector<double> times,
+                                         interpolation interp, double time);
 
-  vector<double> getRotation(string from, string to, vector<double> coefficients,
-                             double time);
-  vector<double> getAngularVelocity(string from, string to, vector<double> coefficients,
-                                    double time);
+  std::vector<double> getRotation(std::string from, std::string to,
+                                  std::vector<double> coefficients, double time);
+  std::vector<double> getAngularVelocity(std::string from, std::string to,
+                                         std::vector<double> coefficients, double time);
 
 }
 

@@ -8,12 +8,12 @@
 #include <string>
 
 using json = nlohmann::json;
-
+using namespace std;
 using namespace eal;
 
 
 // Parsing the JSON
-json constructStateFromIsd(const std::string positionRotationData) {
+json constructStateFromIsd(const string positionRotationData) {
    // Parse the position and rotation data from isd
    json isd = json::parse(positionRotationData);
    json state;
@@ -125,14 +125,14 @@ vector<double> getAngularVelocity(string from, string to, vector<vector<double>>
 }
 
 // Rotation Function Functions
-vector<double> getRotation(string from, string to, vector<double> coefficients,
-                           double time) {
+vector<double> getRotation(string from, string to,
+                           vector<double> coefficients, double time) {
   vector<double> coordinate = {0.0, 0.0, 0.0};
   return coordinate;
 }
 
-vector<double> getAngularVelocity(string from, string to, vector<double> coefficients,
-                                  double time) {
+vector<double> getAngularVelocity(string from, string to,
+                                  vector<double> coefficients, double time) {
   vector<double> coordinate = {0.0, 0.0, 0.0};
   return coordinate;
 }
