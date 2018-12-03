@@ -41,6 +41,11 @@ install:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - conda env create -f environment.yml -n eal
   - source activate eal
+  - conda list
+  - |
+    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+      ldd $CONDA_PREFIX/lib/libopenblas.so.0
+    fi
 
 script:
   - mkdir build
