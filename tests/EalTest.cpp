@@ -3,7 +3,6 @@
 #include "eal.h"
 
 using namespace std;
-using namespace eal;
 
 class PositionInterpTest : public ::testing::Test {
   protected:
@@ -18,8 +17,8 @@ class PositionInterpTest : public ::testing::Test {
     }
 };
 
-TEST_F (PositionInterpTest, LinearInterp) {
-  vector<double> coordinate = getPosition(data, times, eal::linear, -1.5);
+TEST_F(PositionInterpTest, LinearInterp) {
+  vector<double> coordinate = eal::getPosition(data, times, eal::linear, -1.5);
 
   ASSERT_EQ(3, coordinate.size());
   EXPECT_DOUBLE_EQ(-1.5,    coordinate[0]);
@@ -27,8 +26,8 @@ TEST_F (PositionInterpTest, LinearInterp) {
   EXPECT_DOUBLE_EQ(-4.5, coordinate[2]);
 }
 
-TEST_F (PositionInterpTest, SplineInterp) {
-  vector<double> coordinate = getPosition(data, times, eal::spline, -0.5);
+TEST_F(PositionInterpTest, SplineInterp) {
+  vector<double> coordinate = eal::getPosition(data, times, eal::spline, -0.5);
 
   ASSERT_EQ(3, coordinate.size());
   EXPECT_DOUBLE_EQ(-0.5,      coordinate[0]);
