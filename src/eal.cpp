@@ -6,6 +6,7 @@
 #include <gsl/gsl_spline.h>
 
 #include <string>
+#include <stdexcept>
 
 using json = nlohmann::json;
 using namespace std;
@@ -33,17 +34,17 @@ namespace eal {
                              interpolation interp, double time) {
     // Check that all of the data sizes are okay
     // TODO is there a cleaner way to do this? We're going to have to do this a lot.
-    if (coords.size() < 3) {
-      //exception
+    if (coords.size() != 3) {
+      throw invalid_argument("Invalid input positions, expected three vectors.");
     }
     size_t numPoints = times.size();
-    if (numPoints == 0) {
-      //exception
+    if (numPoints < 2) {
+      throw invalid_argument("At least two positions must be input to interpolate over.");
     }
     if (coords[0].size() != numPoints ||
         coords[1].size() != numPoints ||
         coords[2].size() != numPoints) {
-      //exception
+      throw invalid_argument("Invalid input positions, must have the same number of positions as times.");
     }
 
     // GSL setup
@@ -65,8 +66,7 @@ namespace eal {
         break;
 
       default:
-        //exception
-        return coordinate;
+        throw invalid_argument("Invalid interpolation method.");
         break;
     }
     gsl_interp_init(xInterpolator, &times[0], &coords[0][0], numPoints);
