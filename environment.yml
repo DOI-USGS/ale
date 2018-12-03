@@ -7,3 +7,4 @@ channels:
 dependencies:
   - cmake>=3.10
   - gsl
+  - openblas>=0.3.0

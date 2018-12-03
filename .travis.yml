@@ -42,7 +42,6 @@ install:
   - conda env create -f environment.yml -n eal
   - source activate eal
   - conda list
-  - conda --version
 
 script:
   - mkdir build
