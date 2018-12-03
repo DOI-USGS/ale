@@ -10,10 +10,10 @@ class PositionInterpTest : public ::testing::Test {
     vector<double> times;
 
     void SetUp() override {
-      times = {-2, -1,  0,  1,  2};
-      data = {{-2, -1,  0,  1,  2},  // x = t
-              { 4,  1,  0,  1,  4},  // y = t^2
-              {-8, -1,  0,  1,  8}}; // z = t^3
+      times = { -3, -2, -1,  0,  1,  2};
+      data = {{ -3, -2, -1,  0,  1,  2},  // x = t
+              {  9,  4,  1,  0,  1,  4},  // y = t^2
+              {-27, -8, -1,  0,  1,  8}}; // z = t^3
     }
 };
 
