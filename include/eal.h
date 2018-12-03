@@ -38,6 +38,8 @@ namespace eal {
   std::vector<double> getAngularVelocity(std::string from, std::string to,
                                          std::vector<double> coefficients, double time);
 
+  double linearInterpolate(std::vector<double> points, std::vector<double> times, double time);
+  double splineInterpolate(std::vector<double> points, std::vector<double> times, double time);
 }
 
 #endif // EAL_H

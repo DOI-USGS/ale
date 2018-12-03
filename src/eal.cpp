@@ -37,57 +37,26 @@ namespace eal {
     if (coords.size() != 3) {
       throw invalid_argument("Invalid input positions, expected three vectors.");
     }
-    size_t numPoints = times.size();
-    if (numPoints < 2) {
-      throw invalid_argument("At least two positions must be input to interpolate over.");
-    }
-    if (coords[0].size() != numPoints ||
-        coords[1].size() != numPoints ||
-        coords[2].size() != numPoints) {
-      throw invalid_argument("Invalid input positions, must have the same number of positions as times.");
-    }
 
     // GSL setup
     vector<double> coordinate = {0.0, 0.0, 0.0};
-    gsl_interp *xInterpolator = nullptr;
-    gsl_interp *yInterpolator = nullptr;
-    gsl_interp *zInterpolator = nullptr;
     switch(interp) {
       case linear:
-        xInterpolator = gsl_interp_alloc(gsl_interp_linear, numPoints);
-        yInterpolator = gsl_interp_alloc(gsl_interp_linear, numPoints);
-        zInterpolator = gsl_interp_alloc(gsl_interp_linear, numPoints);
+        coordinate = { linearInterpolate(coords[0], times, time),
+                       linearInterpolate(coords[1], times, time),
+                       linearInterpolate(coords[2], times, time) };
         break;
 
       case spline:
-        xInterpolator = gsl_interp_alloc(gsl_interp_cspline, numPoints);
-        yInterpolator = gsl_interp_alloc(gsl_interp_cspline, numPoints);
-        zInterpolator = gsl_interp_alloc(gsl_interp_cspline, numPoints);
+      coordinate = { splineInterpolate(coords[0], times, time),
+                     splineInterpolate(coords[1], times, time),
+                     splineInterpolate(coords[2], times, time) };
         break;
 
       default:
         throw invalid_argument("Invalid interpolation method.");
         break;
     }
-    gsl_interp_init(xInterpolator, &times[0], &coords[0][0], numPoints);
-    gsl_interp_init(yInterpolator, &times[0], &coords[1][0], numPoints);
-    gsl_interp_init(zInterpolator, &times[0], &coords[2][0], numPoints);
-    gsl_interp_accel *xAcc = gsl_interp_accel_alloc();
-    gsl_interp_accel *yAcc = gsl_interp_accel_alloc();
-    gsl_interp_accel *zAcc = gsl_interp_accel_alloc();
-
-    // Actually evaluate
-    coordinate = { gsl_interp_eval(xInterpolator, &times[0], &coords[0][0], time, xAcc),
-                   gsl_interp_eval(yInterpolator, &times[0], &coords[1][0], time, yAcc),
-                   gsl_interp_eval(zInterpolator, &times[0], &coords[2][0], time, zAcc) };
-
-    // GSL clean up
-    gsl_interp_free(xInterpolator);
-    gsl_interp_free(yInterpolator);
-    gsl_interp_free(zInterpolator);
-    gsl_interp_accel_free(xAcc);
-    gsl_interp_accel_free(yAcc);
-    gsl_interp_accel_free(zAcc);
 
     return coordinate;
   }
@@ -135,6 +104,61 @@ namespace eal {
                                     vector<double> coefficients, double time) {
     vector<double> coordinate = {0.0, 0.0, 0.0};
     return coordinate;
+  }
+
+  // Interpolation helper functions
+  double linearInterpolate(vector<double> points, vector<double> times, double time) {
+    size_t numPoints = points.size();
+    if (numPoints < 2) {
+      throw invalid_argument("At least two points must be input to interpolate over.");
+    }
+    if (points.size() != times.size()) {
+      throw invalid_argument("Invalid interpolation data, must have the same number of points as times.");
+    }
+    if (time < times.front() || time > times.back()) {
+      throw invalid_argument("Invalid interpolation time, outside of input times.");
+    }
+
+    // GSL setup
+    gsl_interp *interpolator = gsl_interp_alloc(gsl_interp_linear, numPoints);
+    gsl_interp_init(interpolator, &times[0], &points[0], numPoints);
+    gsl_interp_accel *acc = gsl_interp_accel_alloc();
+
+    // GSL evaluate
+    double result = gsl_interp_eval(interpolator, &times[0], &points[0], time, acc);
+
+    // GSL clean up
+    gsl_interp_free(interpolator);
+    gsl_interp_accel_free(acc);
+
+    return result;
+  }
+
+  double splineInterpolate(vector<double> points, vector<double> times, double time) {
+    size_t numPoints = points.size();
+    if (numPoints < 2) {
+      throw invalid_argument("Invalid interpolation data, at least two points are required to interpolate.");
+    }
+    if (points.size() != times.size()) {
+      throw invalid_argument("Invalid interpolation data, must have the same number of points as times.");
+    }
+    if (time < times.front() || time > times.back()) {
+      throw invalid_argument("Invalid interpolation time, outside of input times.");
+    }
+
+    // GSL setup
+    gsl_interp *interpolator = gsl_interp_alloc(gsl_interp_cspline, numPoints);
+    gsl_interp_init(interpolator, &times[0], &points[0], numPoints);
+    gsl_interp_accel *acc = gsl_interp_accel_alloc();
+
+    // GSL evaluate
+    double result = gsl_interp_eval(interpolator, &times[0], &points[0], time, acc);
+
+    // GSL clean up
+    gsl_interp_free(interpolator);
+    gsl_interp_accel_free(acc);
+
+    return result;
   }
 
 }
