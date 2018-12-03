@@ -44,8 +44,8 @@ install:
   - conda list
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      conda update openblas
       ldd $CONDA_PREFIX/lib/libopenblas.so.0
+      ls $CONDA_PREFIX/lib/libgfortran.so.3
     fi
 
 script:

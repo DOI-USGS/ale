@@ -2,6 +2,7 @@ name: eal
 
 channels:
   - conda-forge
+  - default
 
 dependencies:
   - cmake>=3.10
