@@ -5,32 +5,41 @@
 #include <string>
 #include <vector>
 
-using json = nlohmann::json;
-
-using namespace std;
-
 namespace eal {
 
-  json constructStateFromIsd(const string positionRotationData);
+  enum interpolation {
+    linear,
+    spline
+  };
 
-  vector<double> getPosition(vector<vector<double>> coords, vector<double> times,
-                             string interp, double time);
-  vector<double> getVelocity(vector<vector<double>> coords, vector<double> times,
-                             string interp, double time, bool interpolation);
+  nlohmann::json constructStateFromIsd(const std::string positionRotationData);
 
-  vector<double> getPosition(vector<double> coeffs, string interp, double time);
-  vector<double> getVelocity(vector<double> coeffs, string interp, double time);
+  std::vector<double> getPosition(std::vector<std::vector<double>> coords,
+                                  std::vector<double> times,
+                                  interpolation interp, double time);
+  std::vector<double> getVelocity(std::vector<std::vector<double>> coords,
+                                  std::vector<double> times,
+                                  interpolation interp, double time);
 
-  vector<double> getRotation(string from, string to, vector<vector<double>> rotations,
-                             vector<double> times, string interp, double time);
-  vector<double> getAngularVelocity(string from, string to, vector<vector<double>> rotations,
-                                    vector<double> times, string interp, double time, bool interpolation);
+  std::vector<double> getPosition(std::vector<double> coeffs, double time);
+  std::vector<double> getVelocity(std::vector<double> coeffs, double time);
 
-  vector<double> getRotation(string from, string to, vector<double> coefficients,
-                             string interp, double time);
-  vector<double> getAngularVelocity(string from, string to, vector<double> coefficients,
-                                    string interp, double time);
+  std::vector<double> getRotation(std::string from, std::string to,
+                                  std::vector<std::vector<double>> rotations,
+                                  std::vector<double> times,
+                                  interpolation interp, double time);
+  std::vector<double> getAngularVelocity(std::string from, std::string to,
+                                         std::vector<std::vector<double>> rotations,
+                                         std::vector<double> times,
+                                         interpolation interp, double time);
 
+  std::vector<double> getRotation(std::string from, std::string to,
+                                  std::vector<double> coefficients, double time);
+  std::vector<double> getAngularVelocity(std::string from, std::string to,
+                                         std::vector<double> coefficients, double time);
+
+  double linearInterpolate(std::vector<double> points, std::vector<double> times, double time);
+  double splineInterpolate(std::vector<double> points, std::vector<double> times, double time);
 }
 
 #endif // EAL_H

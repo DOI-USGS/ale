@@ -2,7 +2,9 @@ name: eal
 
 channels:
   - conda-forge
+  - default
 
 dependencies:
   - cmake>=3.10
   - gsl
+  - openblas>=0.3.0
