@@ -143,7 +143,7 @@ TEST(SplineInterpTest, Extrapolate) {
                invalid_argument);
 }
 
-TEST(PoisitionCoeffTest, InitialTest) {
+TEST(PoisitionCoeffTest, ValidInput) {
   double time = 2.0; 
   vector<vector<double>> coeffs = {{3.0, 2.0, 1.0},
                                    {2.0, 3.0, 1.0},
