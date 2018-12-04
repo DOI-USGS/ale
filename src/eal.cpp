@@ -27,7 +27,6 @@ namespace eal {
      return state;
    }
 
-  // Positional Functions
 
   // Position Data Functions
   vector<double> getPosition(vector<vector<double>> coords, vector<double> times,
@@ -68,12 +67,34 @@ namespace eal {
   }
 
   // Postion Function Functions
-  vector<double> getPosition(vector<double> coeffs, double time) {
+  // vector<double> coeffs = [[cx_n, cx_n-1, cx_n-2, ... cx_0],
+  //                          [cy_n, cy_n-1, cy_n-2, ... cy_0],
+  //                          [cz_n, cz_n-1, cz_n-2, ... cz_0]]
+  // The equations evaluated by this function are:
+  //                x = cx_n * t^n + cx_n-1 * t^(n-1) + ... + cx_0
+  //                y = cy_n * t^n + cy_n-1 * t^(n-1) + ... + cy_0
+  //                z = cz_n * t^n + cz_n-1 * t^(n-1) + ... + cz_0
+  vector<double> getPosition(vector<vector<double>> coeffs, double time) {
+
+    if (coeffs.size() != 3) {
+      throw invalid_argument("Invalid input coeffs, expected three vectors.");
+    }
+
+    // make sure all coeffs sizes are equal, else throw error...
+    int degree = coeffs[0].size() - 1; 
+
     vector<double> coordinate = {0.0, 0.0, 0.0};
+    
+    for (unsigned i=0; i < coeffs[0].size(); i++) {
+      coordinate[0] += coeffs[0][i] * pow(time, (degree-i)); // X 
+      coordinate[1] += coeffs[1][i] * pow(time, (degree-i)); // Y
+      coordinate[2] += coeffs[2][i] * pow(time, (degree-i)); // Z
+    }
+
     return coordinate;
   }
 
-  vector<double> getVelocity(vector<double> coeffs, double time) {
+  vector<double> getVelocity(vector<vector<double>> coeffs, double time) {
     vector<double> coordinate = {0.0, 0.0, 0.0};
     return coordinate;
   }
