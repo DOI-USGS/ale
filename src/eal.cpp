@@ -2,6 +2,7 @@
 
 #include <json.hpp>
 
+#include <iostream>
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_spline.h>
 
@@ -75,12 +76,20 @@ namespace eal {
   //                y = cy_n * t^n + cy_n-1 * t^(n-1) + ... + cy_0
   //                z = cz_n * t^n + cz_n-1 * t^(n-1) + ... + cz_0
   vector<double> getPosition(vector<vector<double>> coeffs, double time) {
+    if ( time < 0.0) {
+      throw invalid_argument("Invalid input time, must be non-negative.");
+    }
 
     if (coeffs.size() != 3) {
       throw invalid_argument("Invalid input coeffs, expected three vectors.");
     }
 
     // make sure all coeffs sizes are equal, else throw error...
+    if ((coeffs[0].size() != coeffs[1].size()) || 
+        (coeffs[1].size() != coeffs[2].size())) {
+      throw invalid_argument("Invalid input coeffs, each must represent the same degree polynomial.");
+    }
+
     int degree = coeffs[0].size() - 1; 
 
     vector<double> coordinate = {0.0, 0.0, 0.0};
@@ -94,8 +103,19 @@ namespace eal {
     return coordinate;
   }
 
+
+  // Velocity Function Functions
+  // vector<double> coeffs = [[cvx_n, cvx_n-1, cvx_n-2, ... cvx_0],
+  //                          [cvy_n, cvy_n-1, cvy_n-2, ... cvy_0],
+  //                          [cvz_n, cvz_n-1, cvz_n-2, ... cvz_0]]
+  // The equations evaluated by this function are:
+  //                v_x = cvx_n * t^n + cvx_n-1 * t^(n-1) + ... + cvx_0
+  //                v_y = cvy_n * t^n + cvy_n-1 * t^(n-1) + ... + cvy_0
+  //                v_z = cvz_n * t^n + cvz_n-1 * t^(n-1) + ... + cvz_0
   vector<double> getVelocity(vector<vector<double>> coeffs, double time) {
-    vector<double> coordinate = {0.0, 0.0, 0.0};
+    // This is the same calculation, for now? A polynomial is a polynomial -- should this be
+    // something else? 
+    vector<double> coordinate = getPosition(coeffs, time);
     return coordinate;
   }
 

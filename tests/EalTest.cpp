@@ -94,22 +94,6 @@ TEST(LinearInterpTest, Extrapolate) {
                invalid_argument);
 }
 
-// New tests
-TEST(PoisitionCoeffTest, InitialTest) {
-  double time = 2.0; 
-  vector<vector<double>> coeffs = {{3.0, 2.0, 1.0},
-                                   {2.0, 3.0, 1.0},
-                                   {1.0, 2.0, 3.0}};
-
-  vector<double> coordinate = eal::getPosition(coeffs, time); 
-
-  ASSERT_EQ(3, coordinate.size());
-  EXPECT_DOUBLE_EQ(17.0,    coordinate[0]);
-  EXPECT_DOUBLE_EQ(15.0,  coordinate[1]);
-  EXPECT_DOUBLE_EQ(11.0, coordinate[2]);
-}
-
-
 TEST(SplineInterpTest, ExampleInterpolation) {
   // From http://www.maths.nuigalway.ie/~niall/teaching/Archive/1617/MA378/2-2-CubicSplines.pdf
   vector<double> times = {0,  1,  2, 3};
@@ -157,4 +141,38 @@ TEST(SplineInterpTest, Extrapolate) {
                invalid_argument);
   EXPECT_THROW(eal::splineInterpolate(data, times, 4.0),
                invalid_argument);
+}
+
+TEST(PoisitionCoeffTest, InitialTest) {
+  double time = 2.0; 
+  vector<vector<double>> coeffs = {{3.0, 2.0, 1.0},
+                                   {2.0, 3.0, 1.0},
+                                   {1.0, 2.0, 3.0}};
+
+  vector<double> coordinate = eal::getPosition(coeffs, time); 
+
+  ASSERT_EQ(3, coordinate.size());
+  EXPECT_DOUBLE_EQ(17.0,    coordinate[0]);
+  EXPECT_DOUBLE_EQ(15.0,  coordinate[1]);
+  EXPECT_DOUBLE_EQ(11.0, coordinate[2]);
+}
+
+TEST(PoisitionCoeffTest, InvalidInput) {
+  double valid_time = 0.0;
+  double invalid_time = -1.0;
+
+  vector<vector<double>> valid_coeffs = {{3.0, 2.0, 1.0},
+                                         {2.0, 3.0, 1.0},
+                                         {1.0, 2.0, 3.0}};
+
+  vector<vector<double>> invalid_coeffs_2d = {{3.0, 2.0, 1.0},
+                                              {2.0, 3.0, 1.0}};
+
+  vector<vector<double>> invalid_coeffs_sizes = {{3.0, 2.0, 1.0},
+                                                 {2.0, 3.0},
+                                                 {1.0, 2.0, 3.0}};
+
+  EXPECT_THROW(eal::getPosition(valid_coeffs, invalid_time), invalid_argument);
+  EXPECT_THROW(eal::getPosition(invalid_coeffs_2d, valid_time), invalid_argument);
+  EXPECT_THROW(eal::getPosition(invalid_coeffs_sizes, valid_time), invalid_argument);
 }
