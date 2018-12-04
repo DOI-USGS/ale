@@ -22,20 +22,17 @@ find_package(GSL)
 
 # Library setup
 add_library(eal SHARED
-            src/eal.cpp
-)
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/eal.cpp)
 set_target_properties(eal PROPERTIES
     VERSION ${PROJECT_VERSION}
-    SOVERSION 1
-)
+    SOVERSION 1)
 set(EAL_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include/"
-                       "${CMAKE_CURRENT_SOURCE_DIR}/include/json")
+                     "${CMAKE_CURRENT_SOURCE_DIR}/include/json")
 target_include_directories(eal
                            PRIVATE
                            ${GSL_INCLUDE_DIRS}
                            PUBLIC
-                           ${EAL_INCLUDE_DIRS}
-)
+                           ${EAL_INCLUDE_DIRS})
 
 # Setup for GoogleTest
 find_package (Threads)
