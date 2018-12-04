@@ -20,8 +20,6 @@ set(CMAKE_CXX_STANDARD 11)
 # Third Party Dependencies
 find_package(GSL)
 
-message(STATUS ${GSL_INCLUDE_DIRS})
-
 # Library setup
 add_library(eal SHARED
             ${CMAKE_CURRENT_SOURCE_DIR}/src/eal.cpp)
