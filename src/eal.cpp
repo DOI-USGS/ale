@@ -4,6 +4,7 @@
 
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_spline.h>
+#include <gsl/gsl_poly.h>
 
 #include <string>
 #include <stdexcept>
@@ -27,7 +28,6 @@ namespace eal {
      return state;
    }
 
-  // Positional Functions
 
   // Position Data Functions
   vector<double> getPosition(vector<vector<double>> coords, vector<double> times, double time,
@@ -67,12 +67,31 @@ namespace eal {
   }
 
   // Postion Function Functions
-  vector<double> getPosition(vector<double> coeffs, double time) {
-    vector<double> coordinate = {0.0, 0.0, 0.0};
+  // vector<double> coeffs = [[cx_0, cx_1, cx_2 ..., cx_n],
+  //                          [cy_0, cy_1, cy_2, ... cy_n],
+  //                          [cz_0, cz_1, cz_2, ... cz_n]]
+  // The equations evaluated by this function are:
+  //                x = cx_n * t^n + cx_n-1 * t^(n-1) + ... + cx_0
+  //                y = cy_n * t^n + cy_n-1 * t^(n-1) + ... + cy_0
+  //                z = cz_n * t^n + cz_n-1 * t^(n-1) + ... + cz_0
+  vector<double> getPosition(vector<vector<double>> coeffs, double time) {
+
+    if (coeffs.size() != 3) {
+      throw invalid_argument("Invalid input coeffs, expected three vectors.");
+    }
+
+    vector<double> coordinate = {0.0, 0.0, 0.0};  
+    coordinate[0] = evaluatePolynomial(coeffs[0], time); // X 
+    coordinate[1] = evaluatePolynomial(coeffs[1], time); // Y
+    coordinate[2] = evaluatePolynomial(coeffs[2], time); // Z
+
     return coordinate;
   }
 
-  vector<double> getVelocity(vector<double> coeffs, double time) {
+
+  // Velocity Function 
+  // Takes the coefficients from the position equation
+  vector<double> getVelocity(vector<vector<double>> coeffs, double time) {
     vector<double> coordinate = {0.0, 0.0, 0.0};
     return coordinate;
   }
@@ -105,6 +124,17 @@ namespace eal {
     return coordinate;
   }
 
+  // Polynomial evaluation helper function
+  // The equation evaluated by this function is:
+  //                x = cx_0 + cx_1 * t^(1) + ... + cx_n * t^n
+  double evaluatePolynomial(vector<double> coeffs, double time){
+    if (coeffs.empty()) {
+      throw invalid_argument("Invalid input coeffs, must be non-empty.");
+    }
+
+    const double *coeffsArray = coeffs.data(); 
+    return gsl_poly_eval(coeffsArray, coeffs.size(), time);
+  }
 
  double interpolate(vector<double> points, vector<double> times, double time, interpolation interp, int d) {
    size_t numPoints = points.size();
