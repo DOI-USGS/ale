@@ -145,9 +145,9 @@ TEST(SplineInterpTest, Extrapolate) {
 
 TEST(PoisitionCoeffTest, ValidInput) {
   double time = 2.0; 
-  vector<vector<double>> coeffs = {{3.0, 2.0, 1.0},
-                                   {2.0, 3.0, 1.0},
-                                   {1.0, 2.0, 3.0}};
+  vector<vector<double>> coeffs = {{1.0, 2.0, 3.0},
+                                   {1.0, 3.0, 2.0},
+                                   {3.0, 2.0, 1.0}};
 
   vector<double> coordinate = eal::getPosition(coeffs, time); 
 
@@ -159,20 +159,13 @@ TEST(PoisitionCoeffTest, ValidInput) {
 
 TEST(PoisitionCoeffTest, InvalidInput) {
   double valid_time = 0.0;
-  double invalid_time = -1.0;
 
   vector<vector<double>> valid_coeffs = {{3.0, 2.0, 1.0},
                                          {2.0, 3.0, 1.0},
                                          {1.0, 2.0, 3.0}};
 
-  vector<vector<double>> invalid_coeffs_2d = {{3.0, 2.0, 1.0},
-                                              {2.0, 3.0, 1.0}};
-
   vector<vector<double>> invalid_coeffs_sizes = {{3.0, 2.0, 1.0},
-                                                 {2.0, 3.0},
                                                  {1.0, 2.0, 3.0}};
 
-  EXPECT_THROW(eal::getPosition(valid_coeffs, invalid_time), invalid_argument);
-  EXPECT_THROW(eal::getPosition(invalid_coeffs_2d, valid_time), invalid_argument);
   EXPECT_THROW(eal::getPosition(invalid_coeffs_sizes, valid_time), invalid_argument);
 }

@@ -4,6 +4,7 @@
 
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_spline.h>
+#include <gsl/gsl_poly.h>
 
 #include <string>
 #include <stdexcept>
@@ -67,54 +68,37 @@ namespace eal {
   }
 
   // Postion Function Functions
-  // vector<double> coeffs = [[cx_n, cx_n-1, cx_n-2, ... cx_0],
-  //                          [cy_n, cy_n-1, cy_n-2, ... cy_0],
-  //                          [cz_n, cz_n-1, cz_n-2, ... cz_0]]
+  // vector<double> coeffs = [[cx_0, cx_1, cx_2 ..., cx_n],
+  //                          [cy_0, cy_1, cy_2, ... cy_n],
+  //                          [cz_0, cz_1, cz_2, ... cz_n]]
   // The equations evaluated by this function are:
   //                x = cx_n * t^n + cx_n-1 * t^(n-1) + ... + cx_0
   //                y = cy_n * t^n + cy_n-1 * t^(n-1) + ... + cy_0
   //                z = cz_n * t^n + cz_n-1 * t^(n-1) + ... + cz_0
   vector<double> getPosition(vector<vector<double>> coeffs, double time) {
-    if ( time < 0.0) {
-      throw invalid_argument("Invalid input time, must be non-negative.");
-    }
 
     if (coeffs.size() != 3) {
       throw invalid_argument("Invalid input coeffs, expected three vectors.");
     }
 
     // make sure all coeffs sizes are equal, else throw error...
-    if ((coeffs[0].size() != coeffs[1].size()) || 
-        (coeffs[1].size() != coeffs[2].size())) {
-      throw invalid_argument("Invalid input coeffs, each must represent the same degree polynomial.");
+    if (coeffs[0].empty() || coeffs[1].empty() || coeffs[2].empty()) {
+      throw invalid_argument("Invalid input coeffs, must include coefficients for x,y,z");
     }
 
-    int degree = coeffs[0].size() - 1; 
-
-    vector<double> coordinate = {0.0, 0.0, 0.0};
-    
-    for (unsigned i=0; i < coeffs[0].size(); i++) {
-      coordinate[0] += coeffs[0][i] * pow(time, (degree-i)); // X 
-      coordinate[1] += coeffs[1][i] * pow(time, (degree-i)); // Y
-      coordinate[2] += coeffs[2][i] * pow(time, (degree-i)); // Z
-    }
+    vector<double> coordinate = {0.0, 0.0, 0.0};  
+    coordinate[0] = evaluatePolynomial(coeffs[0], time); // X 
+    coordinate[1] = evaluatePolynomial(coeffs[1], time); // Y
+    coordinate[2] = evaluatePolynomial(coeffs[2], time); // Z
 
     return coordinate;
   }
 
 
-  // Velocity Function Functions
-  // vector<double> coeffs = [[cvx_n, cvx_n-1, cvx_n-2, ... cvx_0],
-  //                          [cvy_n, cvy_n-1, cvy_n-2, ... cvy_0],
-  //                          [cvz_n, cvz_n-1, cvz_n-2, ... cvz_0]]
-  // The equations evaluated by this function are:
-  //                v_x = cvx_n * t^n + cvx_n-1 * t^(n-1) + ... + cvx_0
-  //                v_y = cvy_n * t^n + cvy_n-1 * t^(n-1) + ... + cvy_0
-  //                v_z = cvz_n * t^n + cvz_n-1 * t^(n-1) + ... + cvz_0
+  // Velocity Function 
+  // Takes the coefficients from the position equation
   vector<double> getVelocity(vector<vector<double>> coeffs, double time) {
-    // This is the same calculation, for now? A polynomial is a polynomial -- should this be
-    // something else? 
-    vector<double> coordinate = getPosition(coeffs, time);
+    vector<double> coordinate = {0.0, 0.0, 0.0};
     return coordinate;
   }
 
@@ -144,6 +128,12 @@ namespace eal {
                                     vector<double> coefficients, double time) {
     vector<double> coordinate = {0.0, 0.0, 0.0};
     return coordinate;
+  }
+
+  // Polynomial evaluation helper function
+  double evaluatePolynomial(vector<double> coeffs, double time){
+    const double *coeffsArray = coeffs.data(); 
+    return gsl_poly_eval(coeffsArray, coeffs.size(), time);
   }
 
   // Interpolation helper functions
