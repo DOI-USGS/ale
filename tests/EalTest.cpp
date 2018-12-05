@@ -136,7 +136,7 @@ TEST(SplineInterpTest, Extrapolate) {
                invalid_argument);
 }
 
-TEST(PoisitionCoeffTest, ValidInput) {
+TEST(PoisitionCoeffTest, SecondOrderPolynomial) {
   double time = 2.0; 
   vector<vector<double>> coeffs = {{1.0, 2.0, 3.0},
                                    {1.0, 3.0, 2.0},
@@ -150,13 +150,37 @@ TEST(PoisitionCoeffTest, ValidInput) {
   EXPECT_DOUBLE_EQ(11.0, coordinate[2]);
 }
 
+TEST(PoisitionCoeffTest, DifferentPolynomialDegrees) {
+  double time = 2.0; 
+  vector<vector<double>> coeffs = {{1.0},
+                                   {1.0, 2.0},
+                                   {1.0, 2.0, 3.0}};
+
+  vector<double> coordinate = eal::getPosition(coeffs, time); 
+
+  ASSERT_EQ(3, coordinate.size());
+  EXPECT_DOUBLE_EQ(1.0,  coordinate[0]);
+  EXPECT_DOUBLE_EQ(5.0,  coordinate[1]);
+  EXPECT_DOUBLE_EQ(17.0, coordinate[2]);
+}
+
+TEST(PoisitionCoeffTest, NegativeInputs) {
+  double time = -2.0; 
+  vector<vector<double>> coeffs = {{-1.0, -2.0, -3.0},
+                                   {1.0, -2.0, 3.0},
+                                   {-1.0, 2.0, -3.0}};
+                                   
+  vector<double> coordinate = eal::getPosition(coeffs, time); 
+
+  ASSERT_EQ(3, coordinate.size());
+  EXPECT_DOUBLE_EQ(-9.0,  coordinate[0]);
+  EXPECT_DOUBLE_EQ(17.0,  coordinate[1]);
+  EXPECT_DOUBLE_EQ(-17.0, coordinate[2]);
+}
+
+
 TEST(PoisitionCoeffTest, InvalidInput) {
   double valid_time = 0.0;
-
-  vector<vector<double>> valid_coeffs = {{3.0, 2.0, 1.0},
-                                         {2.0, 3.0, 1.0},
-                                         {1.0, 2.0, 3.0}};
-
   vector<vector<double>> invalid_coeffs_sizes = {{3.0, 2.0, 1.0},
                                                  {1.0, 2.0, 3.0}};
 

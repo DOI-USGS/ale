@@ -80,11 +80,6 @@ namespace eal {
       throw invalid_argument("Invalid input coeffs, expected three vectors.");
     }
 
-    // make sure all coeffs sizes are equal, else throw error...
-    if (coeffs[0].empty() || coeffs[1].empty() || coeffs[2].empty()) {
-      throw invalid_argument("Invalid input coeffs, must include coefficients for x,y,z");
-    }
-
     vector<double> coordinate = {0.0, 0.0, 0.0};  
     coordinate[0] = evaluatePolynomial(coeffs[0], time); // X 
     coordinate[1] = evaluatePolynomial(coeffs[1], time); // Y
@@ -130,7 +125,13 @@ namespace eal {
   }
 
   // Polynomial evaluation helper function
+  // The equation evaluated by this function is:
+  //                x = cx_0 + cx_1 * t^(1) + ... + cx_n * t^n
   double evaluatePolynomial(vector<double> coeffs, double time){
+    if (coeffs.empty()) {
+      throw invalid_argument("Invalid input coeffs, must be non-empty.");
+    }
+
     const double *coeffsArray = coeffs.data(); 
     return gsl_poly_eval(coeffsArray, coeffs.size(), time);
   }
