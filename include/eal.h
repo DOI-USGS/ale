@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-#include <gsl/gsl_interp.h>
-
 namespace eal {
 
   enum interpolation {

@@ -3,8 +3,6 @@
 #include "eal.h"
 
 #include <stdexcept>
-#include <gsl/gsl_interp.h>
-
 
 using namespace std;
 

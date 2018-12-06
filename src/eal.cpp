@@ -5,6 +5,9 @@
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_spline.h>
 
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+
 #include <string>
 #include <stdexcept>
 
@@ -27,7 +30,6 @@ namespace eal {
      return state;
    }
 
-  // Positional Functions
 
   // Position Data Functions
   vector<double> getPosition(vector<vector<double>> coords, vector<double> times, double time,
@@ -77,16 +79,46 @@ namespace eal {
     return coordinate;
   }
 
-  // Rotation Data Functions
 
   // Rotation Data Functions
-  vector<double> getRotation(string from, string to, vector<vector<double>> rotations,
+  vector<double> getRotation(vector<vector<double>> rotations,
                              vector<double> times, double time,  interpolation interp) {
-    vector<double> coordinate = {0.0, 0.0, 0.0};
+    // Check that all of the data sizes are okay
+    // TODO is there a cleaner way to do this? We're going to have to do this a lot.
+    if (rotations.size() != 4) {
+     throw invalid_argument("Invalid input rotations, expected four vectors.");
+    }
+
+    // Alot of copying and reassignment becuase conflicting data types
+    // probably should rethink our vector situation to guarentee contiguous
+    // memory. Should be easy to switch to a contiguous column-major format
+    // if we stick with Eigen.
+    double data[] = {0,0,0,0};
+    for (size_t i = 0; i<rotations[0].size(); i++) {
+      Eigen::Quaterniond quat(rotations[0][i], rotations[1][i], rotations[2][i], rotations[3][i]);
+      quat.normalize();
+      rotations[0][i] = quat.w();
+      rotations[1][i] = quat.x();
+      rotations[2][i] = quat.y();
+      rotations[3][i] = quat.z();
+    }
+
+    // GSL setup
+    vector<double> coordinate = {0.0, 0.0, 0.0, 0.0};
+
+    coordinate = { interpolate(rotations[0], times, time, interp, 0),
+                   interpolate(rotations[1], times, time, interp, 0),
+                   interpolate(rotations[2], times, time, interp, 0),
+                   interpolate(rotations[2], times, time, interp, 0)};
+
+    Eigen::Quaterniond quat(coordinate.data());
+    quat.normalize();
+
     return coordinate;
+
   }
 
-  vector<double> getAngularVelocity(string from, string to, vector<vector<double>> rotations,
+  vector<double> getAngularVelocity(vector<vector<double>> rotations,
                                     vector<double> times, double time,  interpolation interp) {
     vector<double> coordinate = {0.0, 0.0, 0.0};
     return coordinate;
@@ -99,10 +131,10 @@ namespace eal {
     return coordinate;
   }
 
-  vector<double> getAngularVelocity(string from, string to,
-                                    vector<double> coefficients, double time) {
-    vector<double> coordinate = {0.0, 0.0, 0.0};
-    return coordinate;
+  vector<double> getAngularVelocity(vector<double> coefficients, double time) {
+
+
+    return vector<double>();
   }
 
 
