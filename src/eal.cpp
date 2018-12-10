@@ -10,6 +10,7 @@
 #include <Eigen/Geometry>
 
 #include <string>
+#include <iostream>
 #include <stdexcept>
 
 using json = nlohmann::json;
@@ -113,10 +114,10 @@ namespace eal {
     // probably should rethink our vector situation to guarentee contiguous
     // memory. Should be easy to switch to a contiguous column-major format
     // if we stick with Eigen.
-    double data[] = {0,0,0,0};
     for (size_t i = 0; i<rotations[0].size(); i++) {
       Eigen::Quaterniond quat(rotations[0][i], rotations[1][i], rotations[2][i], rotations[3][i]);
       quat.normalize();
+
       rotations[0][i] = quat.w();
       rotations[1][i] = quat.x();
       rotations[2][i] = quat.y();
@@ -129,11 +130,11 @@ namespace eal {
     coordinate = { interpolate(rotations[0], times, time, interp, 0),
                    interpolate(rotations[1], times, time, interp, 0),
                    interpolate(rotations[2], times, time, interp, 0),
-                   interpolate(rotations[2], times, time, interp, 0)};
+                   interpolate(rotations[3], times, time, interp, 0)};
 
-    Eigen::Quaterniond quat(coordinate.data());
+    // Eigen::Map to ensure the array isn't copied, only the pointer is
+    Eigen::Map<Eigen::MatrixXd> quat(coordinate.data(), 4, 1);
     quat.normalize();
-
     return coordinate;
   }
 
@@ -161,12 +162,12 @@ namespace eal {
     coordinate = { interpolate(rotations[0], times, time, interp, 1),
                    interpolate(rotations[1], times, time, interp, 1),
                    interpolate(rotations[2], times, time, interp, 1),
-                   interpolate(rotations[2], times, time, interp, 1)};
+                   interpolate(rotations[3], times, time, interp, 1)};
 
-    Eigen::Quaterniond quat(coordinate.data());
-    quat.normalize();
-
-    return coordinate;
+     // Eigen::Map to ensure the array isn't copied, only the pointer is
+     Eigen::Map<Eigen::MatrixXd> quat(coordinate.data(), 4, 1);
+     quat.normalize();
+     return coordinate;
   }
 
   // Rotation Function Functions

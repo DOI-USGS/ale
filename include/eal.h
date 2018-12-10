@@ -27,12 +27,10 @@ namespace eal {
   std::vector<double> getPosition(std::vector<std::vector<double>> coeffs, double time);
   std::vector<double> getVelocity(std::vector<std::vector<double>> coeffs, double time);
 
-  std::vector<double> getRotation(std::string from, std::string to,
-                                  std::vector<std::vector<double>> rotations,
+  std::vector<double> getRotation(std::vector<std::vector<double>> rotations,
                                   std::vector<double> times,
                                   double time, interpolation interp);
-  std::vector<double> getAngularVelocity(std::string from, std::string to,
-                                         std::vector<std::vector<double>> rotations,
+  std::vector<double> getAngularVelocity(std::vector<std::vector<double>> rotations,
                                          std::vector<double> times,
                                          double time, interpolation interp);
 

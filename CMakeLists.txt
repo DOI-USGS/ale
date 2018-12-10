@@ -35,7 +35,6 @@ target_include_directories(eal
                            ${GSL_INCLUDE_DIRS}
                            ${EIGEN3_INCLUDE_DIR}
                            PUBLIC
-                           ${EIGEN3_INCLUDE_DIR}
                            ${EAL_INCLUDE_DIRS})
 
 # Setup for GoogleTest
