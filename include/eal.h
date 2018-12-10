@@ -38,7 +38,7 @@ namespace eal {
                                   std::vector<double> coefficients, double time);
   std::vector<double> getAngularVelocity(std::string from, std::string to,
                                          std::vector<double> coefficients, double time);
-  double evaluatePolynomial(std::vector<double> coeffs, double time);
+  double evaluatePolynomial(std::vector<double> coeffs, double time, int d);
   double interpolate(std::vector<double> points, std::vector<double> times, double time, interpolation interp, int d);
 }
 

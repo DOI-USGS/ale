@@ -136,6 +136,17 @@ TEST(SplineInterpTest, Extrapolate) {
                invalid_argument);
 }
 
+TEST(PolynomialTest, Evaluate) {
+  vector<double> coeffs = {1.0, 2.0, 3.0}; // 1 + 2x + 3x^2
+  EXPECT_EQ(2.0, eal::evaluatePolynomial(coeffs, -1, 0));
+}
+
+TEST(PolynomialTest, Derivatives) {
+  vector<double> coeffs = {1.0, 2.0, 3.0}; // 1 + 2x + 3x^2
+  EXPECT_EQ(-4.0, eal::evaluatePolynomial(coeffs, -1, 1));
+  EXPECT_EQ(6.0, eal::evaluatePolynomial(coeffs, -1, 2));
+}
+
 TEST(PoisitionCoeffTest, SecondOrderPolynomial) {
   double time = 2.0;
   vector<vector<double>> coeffs = {{1.0, 2.0, 3.0},
