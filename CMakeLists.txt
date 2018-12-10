@@ -18,7 +18,8 @@ include(CTest)
 set(CMAKE_CXX_STANDARD 11)
 
 # Third Party Dependencies
-find_package(GSL)
+find_package(GSL    REQUIRED)
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 # Library setup
 add_library(eal SHARED
@@ -28,9 +29,11 @@ set_target_properties(eal PROPERTIES
     SOVERSION 1)
 set(EAL_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include/"
                      "${CMAKE_CURRENT_SOURCE_DIR}/include/json")
+
 target_include_directories(eal
                            PRIVATE
                            ${GSL_INCLUDE_DIRS}
+                           ${EIGEN3_INCLUDE_DIR}
                            PUBLIC
                            ${EAL_INCLUDE_DIRS})
 

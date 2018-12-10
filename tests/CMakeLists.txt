@@ -13,4 +13,5 @@ target_include_directories(runEALTests
                            PUBLIC
                            ${EAL_INCLUDE_DIRS})
 
+
 gtest_discover_tests(runEALTests WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/tests)
