@@ -188,7 +188,7 @@ TEST(PoisitionCoeffTest, InvalidInput) {
 }
 
 
-TEST(LinearInterpTest, ExmapleGetPosition) {
+TEST(LinearInterpTest, ExmapleGetRotation) {
   // simple test, only checks if API hit correctly and output is normalized
   vector<double> times = {0,  1,  2, 3};
   vector<vector<double>> rots({{1,1,1,1}, {0,0,0,0}, {1,1,1,1}, {0,0,0,0}});
@@ -201,7 +201,7 @@ TEST(LinearInterpTest, ExmapleGetPosition) {
 }
 
 
-TEST(LinearInterpTest, GetPositionDifferentCounts) {
+TEST(LinearInterpTest, GetRotationDifferentCounts) {
   // incorrect params
   vector<double> times = {0, 1, 2};
   vector<vector<double>> rots({{1,1,1,1}, {0,0,0,0}, {1,1,1,1}, {0,0,0,0}});
