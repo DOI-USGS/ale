@@ -6,7 +6,11 @@
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_poly.h>
 
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+
 #include <string>
+#include <iostream>
 #include <stdexcept>
 
 using json = nlohmann::json;
@@ -80,8 +84,8 @@ namespace eal {
       throw invalid_argument("Invalid input coeffs, expected three vectors.");
     }
 
-    vector<double> coordinate = {0.0, 0.0, 0.0};  
-    coordinate[0] = evaluatePolynomial(coeffs[0], time); // X 
+    vector<double> coordinate = {0.0, 0.0, 0.0};
+    coordinate[0] = evaluatePolynomial(coeffs[0], time); // X
     coordinate[1] = evaluatePolynomial(coeffs[1], time); // Y
     coordinate[2] = evaluatePolynomial(coeffs[2], time); // Z
 
@@ -89,26 +93,81 @@ namespace eal {
   }
 
 
-  // Velocity Function 
+  // Velocity Function
   // Takes the coefficients from the position equation
   vector<double> getVelocity(vector<vector<double>> coeffs, double time) {
     vector<double> coordinate = {0.0, 0.0, 0.0};
     return coordinate;
   }
 
-  // Rotation Data Functions
 
   // Rotation Data Functions
-  vector<double> getRotation(string from, string to, vector<vector<double>> rotations,
+  vector<double> getRotation(vector<vector<double>> rotations,
                              vector<double> times, double time,  interpolation interp) {
-    vector<double> coordinate = {0.0, 0.0, 0.0};
+    // Check that all of the data sizes are okay
+    // TODO is there a cleaner way to do this? We're going to have to do this a lot.
+    if (rotations.size() != 4) {
+     throw invalid_argument("Invalid input rotations, expected four vectors.");
+    }
+
+    // Alot of copying and reassignment becuase conflicting data types
+    // probably should rethink our vector situation to guarentee contiguous
+    // memory. Should be easy to switch to a contiguous column-major format
+    // if we stick with Eigen.
+    for (size_t i = 0; i<rotations[0].size(); i++) {
+      Eigen::Quaterniond quat(rotations[0][i], rotations[1][i], rotations[2][i], rotations[3][i]);
+      quat.normalize();
+
+      rotations[0][i] = quat.w();
+      rotations[1][i] = quat.x();
+      rotations[2][i] = quat.y();
+      rotations[3][i] = quat.z();
+    }
+
+    // GSL setup
+    vector<double> coordinate = {0.0, 0.0, 0.0, 0.0};
+
+    coordinate = { interpolate(rotations[0], times, time, interp, 0),
+                   interpolate(rotations[1], times, time, interp, 0),
+                   interpolate(rotations[2], times, time, interp, 0),
+                   interpolate(rotations[3], times, time, interp, 0)};
+
+    // Eigen::Map to ensure the array isn't copied, only the pointer is
+    Eigen::Map<Eigen::MatrixXd> quat(coordinate.data(), 4, 1);
+    quat.normalize();
     return coordinate;
   }
 
-  vector<double> getAngularVelocity(string from, string to, vector<vector<double>> rotations,
+  vector<double> getAngularVelocity(vector<vector<double>> rotations,
                                     vector<double> times, double time,  interpolation interp) {
-    vector<double> coordinate = {0.0, 0.0, 0.0};
-    return coordinate;
+    // Check that all of the data sizes are okay
+    // TODO is there a cleaner way to do this? We're going to have to do this a lot.
+    if (rotations.size() != 4) {
+     throw invalid_argument("Invalid input rotations, expected four vectors.");
+    }
+
+    double data[] = {0,0,0,0};
+    for (size_t i = 0; i<rotations[0].size(); i++) {
+      Eigen::Quaterniond quat(rotations[0][i], rotations[1][i], rotations[2][i], rotations[3][i]);
+      quat.normalize();
+      rotations[0][i] = quat.w();
+      rotations[1][i] = quat.x();
+      rotations[2][i] = quat.y();
+      rotations[3][i] = quat.z();
+    }
+
+    // GSL setup
+    vector<double> coordinate = {0.0, 0.0, 0.0, 0.0};
+
+    coordinate = { interpolate(rotations[0], times, time, interp, 1),
+                   interpolate(rotations[1], times, time, interp, 1),
+                   interpolate(rotations[2], times, time, interp, 1),
+                   interpolate(rotations[3], times, time, interp, 1)};
+
+     // Eigen::Map to ensure the array isn't copied, only the pointer is
+     Eigen::Map<Eigen::MatrixXd> quat(coordinate.data(), 4, 1);
+     quat.normalize();
+     return coordinate;
   }
 
   // Rotation Function Functions
@@ -132,7 +191,7 @@ namespace eal {
       throw invalid_argument("Invalid input coeffs, must be non-empty.");
     }
 
-    const double *coeffsArray = coeffs.data(); 
+    const double *coeffsArray = coeffs.data();
     return gsl_poly_eval(coeffsArray, coeffs.size(), time);
   }
 

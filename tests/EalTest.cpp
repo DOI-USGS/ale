@@ -137,26 +137,26 @@ TEST(SplineInterpTest, Extrapolate) {
 }
 
 TEST(PoisitionCoeffTest, SecondOrderPolynomial) {
-  double time = 2.0; 
+  double time = 2.0;
   vector<vector<double>> coeffs = {{1.0, 2.0, 3.0},
                                    {1.0, 3.0, 2.0},
                                    {3.0, 2.0, 1.0}};
 
-  vector<double> coordinate = eal::getPosition(coeffs, time); 
+  vector<double> coordinate = eal::getPosition(coeffs, time);
 
   ASSERT_EQ(3, coordinate.size());
-  EXPECT_DOUBLE_EQ(17.0,    coordinate[0]);
-  EXPECT_DOUBLE_EQ(15.0,  coordinate[1]);
+  EXPECT_DOUBLE_EQ(17.0, coordinate[0]);
+  EXPECT_DOUBLE_EQ(15.0, coordinate[1]);
   EXPECT_DOUBLE_EQ(11.0, coordinate[2]);
 }
 
 TEST(PoisitionCoeffTest, DifferentPolynomialDegrees) {
-  double time = 2.0; 
+  double time = 2.0;
   vector<vector<double>> coeffs = {{1.0},
                                    {1.0, 2.0},
                                    {1.0, 2.0, 3.0}};
 
-  vector<double> coordinate = eal::getPosition(coeffs, time); 
+  vector<double> coordinate = eal::getPosition(coeffs, time);
 
   ASSERT_EQ(3, coordinate.size());
   EXPECT_DOUBLE_EQ(1.0,  coordinate[0]);
@@ -165,12 +165,12 @@ TEST(PoisitionCoeffTest, DifferentPolynomialDegrees) {
 }
 
 TEST(PoisitionCoeffTest, NegativeInputs) {
-  double time = -2.0; 
+  double time = -2.0;
   vector<vector<double>> coeffs = {{-1.0, -2.0, -3.0},
                                    {1.0, -2.0, 3.0},
                                    {-1.0, 2.0, -3.0}};
-                                   
-  vector<double> coordinate = eal::getPosition(coeffs, time); 
+
+  vector<double> coordinate = eal::getPosition(coeffs, time);
 
   ASSERT_EQ(3, coordinate.size());
   EXPECT_DOUBLE_EQ(-9.0,  coordinate[0]);
@@ -185,4 +185,26 @@ TEST(PoisitionCoeffTest, InvalidInput) {
                                                  {1.0, 2.0, 3.0}};
 
   EXPECT_THROW(eal::getPosition(invalid_coeffs_sizes, valid_time), invalid_argument);
+}
+
+
+TEST(LinearInterpTest, ExmapleGetRotation) {
+  // simple test, only checks if API hit correctly and output is normalized
+  vector<double> times = {0,  1,  2, 3};
+  vector<vector<double>> rots({{1,1,1,1}, {0,0,0,0}, {1,1,1,1}, {0,0,0,0}});
+  vector<double> r = eal::getRotation(rots, times, 2, eal::linear);
+
+  ASSERT_NEAR(0.707107,  r[0], 0.000001);
+  EXPECT_DOUBLE_EQ(0,  r[1]);
+  ASSERT_NEAR(0.707107, r[2], 0.000001);
+  EXPECT_DOUBLE_EQ(0, r[3]);
+}
+
+
+TEST(LinearInterpTest, GetRotationDifferentCounts) {
+  // incorrect params
+  vector<double> times = {0, 1, 2};
+  vector<vector<double>> rots({{1,1,1,1}, {0,0,0,0}, {1,1,1,1}, {0,0,0,0}});
+  EXPECT_THROW(eal::getRotation(rots, times, 2, eal::linear), invalid_argument);
+
 }
