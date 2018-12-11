@@ -85,9 +85,9 @@ namespace eal {
     }
 
     vector<double> coordinate = {0.0, 0.0, 0.0};
-    coordinate[0] = evaluatePolynomial(coeffs[0], time); // X
-    coordinate[1] = evaluatePolynomial(coeffs[1], time); // Y
-    coordinate[2] = evaluatePolynomial(coeffs[2], time); // Z
+    coordinate[0] = evaluatePolynomial(coeffs[0], time, 0); // X
+    coordinate[1] = evaluatePolynomial(coeffs[1], time, 0); // Y
+    coordinate[2] = evaluatePolynomial(coeffs[2], time, 0); // Z
 
     return coordinate;
   }
@@ -96,7 +96,16 @@ namespace eal {
   // Velocity Function
   // Takes the coefficients from the position equation
   vector<double> getVelocity(vector<vector<double>> coeffs, double time) {
+
+    if (coeffs.size() != 3) {
+      throw invalid_argument("Invalid input coeffs, expected three vectors.");
+    }
+
     vector<double> coordinate = {0.0, 0.0, 0.0};
+    coordinate[0] = evaluatePolynomial(coeffs[0], time, 1); // X
+    coordinate[1] = evaluatePolynomial(coeffs[1], time, 1); // Y
+    coordinate[2] = evaluatePolynomial(coeffs[2], time, 1); // Z
+
     return coordinate;
   }
 
@@ -186,13 +195,25 @@ namespace eal {
   // Polynomial evaluation helper function
   // The equation evaluated by this function is:
   //                x = cx_0 + cx_1 * t^(1) + ... + cx_n * t^n
-  double evaluatePolynomial(vector<double> coeffs, double time){
+  // The d parameter is for which derivative of the polynomial to compute.
+  // Supported options are
+  //   0: no derivative
+  //   1: first derivative
+  //   2: second derivative
+  double evaluatePolynomial(vector<double> coeffs, double time, int d){
     if (coeffs.empty()) {
       throw invalid_argument("Invalid input coeffs, must be non-empty.");
     }
 
-    const double *coeffsArray = coeffs.data();
-    return gsl_poly_eval(coeffsArray, coeffs.size(), time);
+    if (d < 0) {
+      throw invalid_argument("Invalid derivative degree, must be non-negative.");
+    }
+
+    vector<double> derivatives(d + 1);
+    gsl_poly_eval_derivs(coeffs.data(), coeffs.size(), time,
+                         derivatives.data(), derivatives.size());
+
+    return derivatives.back();
   }
 
  double interpolate(vector<double> points, vector<double> times, double time, interpolation interp, int d) {

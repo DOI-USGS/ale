@@ -136,6 +136,27 @@ TEST(SplineInterpTest, Extrapolate) {
                invalid_argument);
 }
 
+TEST(PolynomialTest, Evaluate) {
+  vector<double> coeffs = {1.0, 2.0, 3.0}; // 1 + 2x + 3x^2
+  EXPECT_EQ(2.0, eal::evaluatePolynomial(coeffs, -1, 0));
+}
+
+TEST(PolynomialTest, Derivatives) {
+  vector<double> coeffs = {1.0, 2.0, 3.0}; // 1 + 2x + 3x^2
+  EXPECT_EQ(-4.0, eal::evaluatePolynomial(coeffs, -1, 1));
+  EXPECT_EQ(6.0, eal::evaluatePolynomial(coeffs, -1, 2));
+}
+
+TEST(PolynomialTest, EmptyCoeffs) {
+  vector<double> coeffs = {};
+  EXPECT_THROW(eal::evaluatePolynomial(coeffs, -1, 1), invalid_argument);
+}
+
+TEST(PolynomialTest, BadDerivative) {
+  vector<double> coeffs = {1.0, 2.0, 3.0};
+  EXPECT_THROW(eal::evaluatePolynomial(coeffs, -1, -1), invalid_argument);
+}
+
 TEST(PoisitionCoeffTest, SecondOrderPolynomial) {
   double time = 2.0;
   vector<vector<double>> coeffs = {{1.0, 2.0, 3.0},
@@ -185,6 +206,30 @@ TEST(PoisitionCoeffTest, InvalidInput) {
                                                  {1.0, 2.0, 3.0}};
 
   EXPECT_THROW(eal::getPosition(invalid_coeffs_sizes, valid_time), invalid_argument);
+}
+
+
+TEST(VelocityCoeffTest, SecondOrderPolynomial) {
+  double time = 2.0;
+  vector<vector<double>> coeffs = {{1.0, 2.0, 3.0},
+                                   {1.0, 3.0, 2.0},
+                                   {3.0, 2.0, 1.0}};
+
+  vector<double> coordinate = eal::getVelocity(coeffs, time);
+
+  ASSERT_EQ(3, coordinate.size());
+  EXPECT_DOUBLE_EQ(14.0, coordinate[0]);
+  EXPECT_DOUBLE_EQ(11.0, coordinate[1]);
+  EXPECT_DOUBLE_EQ(6.0, coordinate[2]);
+}
+
+
+TEST(VelocityCoeffTest, InvalidInput) {
+  double valid_time = 0.0;
+  vector<vector<double>> invalid_coeffs_sizes = {{3.0, 2.0, 1.0},
+                                                 {1.0, 2.0, 3.0}};
+
+  EXPECT_THROW(eal::getVelocity(invalid_coeffs_sizes, valid_time), invalid_argument);
 }
 
 
