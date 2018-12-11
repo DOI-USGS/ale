@@ -48,3 +48,6 @@ build
 */build
 install
 */install
+
+# Jupyter ignores
+.ipynb_checkpoints
