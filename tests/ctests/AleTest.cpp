@@ -345,7 +345,7 @@ TEST(LinearInterpTest, FileLoad) {
         "    UNIT                           = \"RAW_INSTRUMENT_COUNT\"\n"
         "    MD5_CHECKSUM                   = \"0fe91f4b2e93083ee0093e7c8d05f3bc\"\n"
         "END_OBJECT                         = IMAGE\n"
-        "END"\n;
+        "END\n";
 
 
   cout << ale::load(test_lro_label) << endl;
