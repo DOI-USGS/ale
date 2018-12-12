@@ -240,6 +240,7 @@ TEST(RotationInterpTest, ExmapleGetRotation) {
   vector<double> times = {0,  1,  2, 3};
   vector<vector<double>> rots({{1,1,1,1}, {0,0,0,0}, {1,1,1,1}, {0,0,0,0}});
   vector<double> r = ale::getRotation(rots, times, 2, ale::linear);
+  Eigen::Quaterniond quat(r[0], r[1], r[2], r[3]);
 
   EXPECT_DOUBLE_EQ(1, quat.norm());
 }
@@ -257,7 +258,7 @@ TEST(RotationInterpTest, GetRotationDifferentCounts) {
 TEST(AngularVelocityInterpTest, ExmapleGetRotation) {
   vector<double> times = {0,  1};
   vector<vector<double>> rots({{0,0}, {1,0}, {0,1}, {0,0}});
-  vector<double> av = eal::getAngularVelocity(rots, times, 0.5, eal::linear);
+  vector<double> av = ale::getAngularVelocity(rots, times, 0.5, ale::linear);
 
   Eigen::Quaterniond quat(0, 1, 1, 0);
   quat = quat.normalized();
