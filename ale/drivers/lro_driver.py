@@ -5,9 +5,9 @@ import numpy as np
 import pvl
 import spiceypy as spice
 
-from minipf.util import get_metakernels
-from minipf.drivers.base import LineScanner
-from minipf.drivers.distortion import RadialDistortion
+from ale.util import get_metakernels
+from ale.drivers.base import LineScanner
+from ale.drivers.distortion import RadialDistortion
 
 class LRO_LROC(LineScanner, RadialDistortion):
 

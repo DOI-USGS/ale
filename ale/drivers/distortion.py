@@ -1,8 +1,6 @@
 from abc import ABC
 import spiceypy as spice
 
-from minipf.models.optical_distortion_transverse import OpticalDistortionTransverse
-
 
 class TransverseDistortion(ABC):
     """
@@ -11,8 +9,8 @@ class TransverseDistortion(ABC):
     @property
     def odtx(self):
         return spice.gdpool('INS{}_OD_T_X'.format(self.ikid),0, 10)
-    
-    @property 
+
+    @property
     def odty(self):
         return spice.gdpool('INS{}_OD_T_Y'.format(self.ikid), 0, 10)
 
