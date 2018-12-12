@@ -8,9 +8,9 @@ add_executable(runEALTests ${test_source})
 target_link_libraries(runEALTests eal ${GSL_LIBRARIES} ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES} pthread)
 
 target_include_directories(runEALTests
-                           PRIVATE
-                           ${GSL_INCLUDE_DIRS}
                            PUBLIC
+                           ${GSL_INCLUDE_DIRS}
+                           ${EIGEN3_INCLUDE_DIR}
                            ${EAL_INCLUDE_DIRS})
 
 
