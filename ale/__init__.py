@@ -1,2 +1,2 @@
 from . import drivers
-from .drivers import load
+from .drivers import load, loads
