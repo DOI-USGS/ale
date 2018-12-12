@@ -4,10 +4,10 @@ import os
 import numpy as np
 import pvl
 import spiceypy as spice
-from minipf import config
+from ale import config
 
-from minipf.drivers.base import LineScanner
-from minipf.drivers.distortion import RadialDistortion
+from ale.drivers.base import LineScanner
+from ale.drivers.distortion import RadialDistortion
 
 class MRO_CTX(LineScanner, RadialDistortion):
     id_lookup = {
@@ -28,7 +28,7 @@ class MRO_CTX(LineScanner, RadialDistortion):
     @property
     def instrument_id(self):
         return self.id_lookup[self.label['INSTRUMENT_NAME']]
-    
+
     @property
     def spacecraft_name(self):
         name_lookup = {

@@ -1,5 +1,5 @@
-#ifndef EAL_INCLUDE_EAL_H
-#define EAL_INCLUDE_EAL_H
+#ifndef ALE_INCLUDE_ALE_H
+#define ALE_INCLUDE_ALE_H
 
 #include <json.hpp>
 #include <string>
@@ -7,7 +7,7 @@
 
 #include <gsl/gsl_interp.h>
 
-namespace eal {
+namespace ale {
 
   enum interpolation {
     linear,
@@ -42,4 +42,4 @@ namespace eal {
   double interpolate(std::vector<double> points, std::vector<double> times, double time, interpolation interp, int d);
 }
 
-#endif // EAL_H
+#endif // ALE_H
