@@ -116,3 +116,5 @@ def test_lro_creation(lro_lroclabel):
     with LRO_LROC(lro_lroclabel) as m:
         d = m.to_dict()
         assert isinstance(d, dict)
+    from ale import load
+    print(load(lro_lroclabel))
