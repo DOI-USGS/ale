@@ -48,6 +48,7 @@ script:
   - cmake -DCOVERAGE=ON ..
   - cmake --build .
   - ctest -VV
+  - pytest tests/pytests
 
 after_success:
   - |
