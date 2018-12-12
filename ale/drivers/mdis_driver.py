@@ -5,9 +5,9 @@ import pvl
 import spiceypy as spice
 import numpy as np
 
-from minipf import config
-from minipf.drivers.base import Framer
-from minipf.drivers.distortion import TransverseDistortion
+from ale import config
+from ale.drivers.base import Framer
+from ale.drivers.distortion import TransverseDistortion
 
 
 class Messenger(Framer, TransverseDistortion):

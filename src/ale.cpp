@@ -1,4 +1,4 @@
-#include "eal.h"
+#include "ale.h"
 
 #include <json.hpp>
 
@@ -16,7 +16,7 @@
 using json = nlohmann::json;
 using namespace std;
 
-namespace eal {
+namespace ale {
 
   // Parsing the JSON
   json constructStateFromIsd(const string positionRotationData) {
