@@ -3,7 +3,7 @@
 import sys
 from setuptools import setup, find_packages
 
-NAME = "minipf"
+NAME = "Ale"
 VERSION = "0.0.1"
 
 # To install the library, run the following
@@ -16,12 +16,12 @@ VERSION = "0.0.1"
 setup(
     name=NAME,
     version=VERSION,
-    description="Barebones version of pfeffernusse",
+    description="Abstraction Layer for Ephemerides",
     author_email="jlaura@usgs.gov",
     url="",
-    keywords=["Pfeffernusse"],
+    keywords=[""],
     packages=find_packages(),
     long_description="""\
-    A SpiceAPI for extracting NAIF Spice Data
+    An Abstraction library for reading, writing and computing ephemeris data
     """
 )

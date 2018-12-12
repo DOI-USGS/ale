@@ -5,8 +5,7 @@ import numpy as np
 import pvl
 import spiceypy as spice
 
-from minipf.drivers import distortion
-from minipf.models.isd200 import ISD200
+from ale.drivers import distortion
 
 class Base(ABC):
     """
@@ -55,10 +54,10 @@ class Base(ABC):
 
     def to_pfeffer_response(self):
         """
-        Parse the data into a valid minipf response
+        Parse the data into a valid ale response
         """
         data = self.to_dict()
-        # Take the flat reponse and create the minipf obj dicts
+        # Take the flat reponse and create the ale obj dicts
         data['detector_center'] = {'line': data['detector_center'][0],
                                 'sample': data['detector_center'][1]}
 
@@ -94,7 +93,7 @@ class Base(ABC):
 
         data['name_platform'] = data['spacecraft_name']
         data['name_sensor'] = data['instrument_id']
-        return ISD200.from_dict(data)
+        return data
 
     def _compute_ephemerides(self):
         """
