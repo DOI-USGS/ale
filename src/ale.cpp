@@ -9,6 +9,9 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include <iostream>
+#include <Python.h>
+
 #include <string>
 #include <iostream>
 #include <stdexcept>
@@ -260,4 +263,50 @@ namespace ale {
    return result;
  }
 
+
+
+std::string load(std::string filename) {
+
+    // Initialize the Python interpreter.
+    Py_Initialize();
+
+    // Import the file as a Python module.
+    PyObject *pModule = PyImport_Import(PyUnicode_FromString("ale"));
+
+    // Create a dictionary for the contents of the module.
+    PyObject *pDict = PyModule_GetDict(pModule);
+
+    // Get the add method from the dictionary.
+    PyObject *pFunc = PyDict_GetItemString(pDict, "load");
+
+    // Create a Python tuple to hold the arguments to the method.
+    PyObject *pArgs = PyTuple_New(1);
+
+    // Set the Python int as the first and second arguments to the method.
+    PyTuple_SetItem(pArgs, 0, PyUnicode_FromString(filename.c_str()));
+
+    // Call the function with the arguments.
+    PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
+
+    // Print a message if calling the method failed.
+    if(pResult == NULL) {
+      throw invalid_argument("Calling the load method failed.");
+    }
+
+    char *cResult = 0;
+    if (PyUnicode_Check(pResult)) {
+      PyObject * temp_bytes = PyUnicode_AsEncodedString(pResult, "UTF-8", "strict"); // Owned reference
+      if (temp_bytes != NULL) {
+          cResult = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
+          cResult = strdup(cResult);
+          Py_DECREF(temp_bytes);
+      } else {
+          // some error handling
+      }
+    }
+
+    Py_Finalize();
+
+    return std::string(cResult);
+}
 }

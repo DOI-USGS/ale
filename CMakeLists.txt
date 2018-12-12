@@ -20,6 +20,7 @@ set(CMAKE_CXX_STANDARD 11)
 # Third Party Dependencies
 find_package(GSL    REQUIRED)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(PythonLibs REQUIRED COMPONENTS Development Interpreter Compiler)
 
 # Library setup
 add_library(ale SHARED
@@ -34,14 +35,16 @@ target_include_directories(ale
                            PRIVATE
                            ${GSL_INCLUDE_DIRS}
                            ${EIGEN3_INCLUDE_DIR}
+                           ${PYTHON_INCLUDE_DIR}
                            PUBLIC
                           ${ALE_INCLUDE_DIRS})
 
 # Setup for GoogleTest
-find_package (Threads)
+find_package(Threads)
 target_link_libraries(ale
                       PRIVATE
                       ${GSL_LIBRARIES}
+                      ${PYTHON_LIBRARY}
                       PUBLIC
                       gtest ${CMAKE_THREAD_LIBS_INIT})
 
