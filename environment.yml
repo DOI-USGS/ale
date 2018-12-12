@@ -12,5 +12,4 @@ dependencies:
   - spiceypy
   - numpy
   - python-dateutil
-  - pip:
-    - pvl
+  - pvl
