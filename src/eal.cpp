@@ -178,9 +178,9 @@ namespace eal {
                              interpolate(rotations[2], times, time, interp, 1),
                              interpolate(rotations[3], times, time, interp, 1));
 
-     Eigen::Quaterniond avQuat = -2 * quat.conjugate() * dQuat;
+     Eigen::Quaterniond avQuat = quat.conjugate() * dQuat;
 
-     vector<double> coordinate = {};
+     vector<double> coordinate = {-2 * avQuat.x(), -2 * avQuat.y(), -2 * avQuat.z()};
      return coordinate;
   }
 
