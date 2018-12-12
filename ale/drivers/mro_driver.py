@@ -28,7 +28,7 @@ class MRO_CTX(LineScanner, RadialDistortion):
     @property
     def instrument_id(self):
         return self.id_lookup[self.label['INSTRUMENT_NAME']]
-    
+
     @property
     def spacecraft_name(self):
         name_lookup = {

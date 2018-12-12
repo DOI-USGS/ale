@@ -9,12 +9,14 @@ from ale.drivers.mdis_driver import Messenger
 
 
 # 'Mock' the spice module where it is imported
-from conftest import SimpleSpice
+from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
 base.spice = simplespice
 mdis_driver.spice = simplespice
 distortion.spice = simplespice
+
+Messenger.metakernel = get_mockkernels
 
 @pytest.fixture
 def mdislabel():

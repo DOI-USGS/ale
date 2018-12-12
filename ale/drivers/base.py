@@ -6,7 +6,6 @@ import pvl
 import spiceypy as spice
 
 from ale.drivers import distortion
-from ale.models.isd200 import ISD200
 
 class Base(ABC):
     """
@@ -94,7 +93,7 @@ class Base(ABC):
 
         data['name_platform'] = data['spacecraft_name']
         data['name_sensor'] = data['instrument_id']
-        return ISD200.from_dict(data)
+        return data
 
     def _compute_ephemerides(self):
         """

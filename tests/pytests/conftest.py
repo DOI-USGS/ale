@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class SimpleSpice():
     def scs2e(self, *args):
         return 0.1

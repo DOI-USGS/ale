@@ -5,13 +5,14 @@ from ale.drivers.mro_driver import MRO_CTX
 from ale.drivers import mro_driver, base, distortion
 
 # 'Mock' the spice module where it is imported
-from conftest import SimpleSpice
+from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
 base.spice = simplespice
 mro_driver.spice = simplespice
 distortion.spice = simplespice
 
+MRO_CTX.metakernel = get_mockkernels
 
 @pytest.fixture
 def mroctx_label():
