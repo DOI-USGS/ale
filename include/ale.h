@@ -40,6 +40,7 @@ namespace ale {
                                          std::vector<double> coefficients, double time);
   double evaluatePolynomial(std::vector<double> coeffs, double time, int d);
   double interpolate(std::vector<double> points, std::vector<double> times, double time, interpolation interp, int d);
+  std::string load(std::string filename);
 }
 
 #endif // ALE_H
