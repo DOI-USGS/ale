@@ -3,6 +3,8 @@
 #include "ale.h"
 
 #include <stdexcept>
+#include <cmath>
+
 #include <gsl/gsl_interp.h>
 
 #include <Eigen/Core>
@@ -235,7 +237,7 @@ TEST(VelocityCoeffTest, InvalidInput) {
 }
 
 
-TEST(RotationInterpTest, ExmapleGetRotation) {
+TEST(RotationInterpTest, ExampleGetRotation) {
   // simple test, only checks if API hit correctly and output is normalized
   vector<double> times = {0,  1,  2, 3};
   vector<vector<double>> rots({{1,1,1,1}, {0,0,0,0}, {1,1,1,1}, {0,0,0,0}});
@@ -255,20 +257,12 @@ TEST(RotationInterpTest, GetRotationDifferentCounts) {
 }
 
 
-TEST(AngularVelocityInterpTest, ExmapleGetRotation) {
+TEST(AngularVelocityInterpTest, ExampleGetRotation) {
   vector<double> times = {0,  1};
   vector<vector<double>> rots({{0,0}, {1,0}, {0,1}, {0,0}});
   vector<double> av = ale::getAngularVelocity(rots, times, 0.5, ale::linear);
 
-  Eigen::Quaterniond quat(0, 1, 1, 0);
-  quat = quat.normalized();
-
-  Eigen::Quaterniond dQuat(0, -1, 1, 0);
-  dQuat = dQuat.normalized();
-
-  Eigen::Quaterniond avQuat = quat.conjugate() * dQuat;
-
-  EXPECT_DOUBLE_EQ(-2 * avQuat.x(), av[0]);
-  EXPECT_DOUBLE_EQ(-2 * avQuat.y(), av[1]);
-  EXPECT_DOUBLE_EQ(-2 * avQuat.z(), av[2]);
+  EXPECT_DOUBLE_EQ(0, av[0]);
+  EXPECT_DOUBLE_EQ(0, av[1]);
+  EXPECT_DOUBLE_EQ(2 * sqrt(2), av[2]);
 }
