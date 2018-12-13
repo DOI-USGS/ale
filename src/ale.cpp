@@ -166,16 +166,22 @@ namespace ale {
     }
 
     // GSL setup
-    vector<double> coordinate = {0.0, 0.0, 0.0, 0.0};
 
-    coordinate = { interpolate(rotations[0], times, time, interp, 1),
-                   interpolate(rotations[1], times, time, interp, 1),
-                   interpolate(rotations[2], times, time, interp, 1),
-                   interpolate(rotations[3], times, time, interp, 1)};
 
-     // Eigen::Map to ensure the array isn't copied, only the pointer is
-     Eigen::Map<Eigen::MatrixXd> quat(coordinate.data(), 4, 1);
-     quat.normalize();
+    Eigen::Quaterniond quat(interpolate(rotations[0], times, time, interp, 0),
+                            interpolate(rotations[1], times, time, interp, 0),
+                            interpolate(rotations[2], times, time, interp, 0),
+                            interpolate(rotations[3], times, time, interp, 0));
+    quat.normalize();
+
+    Eigen::Quaterniond dQuat(interpolate(rotations[0], times, time, interp, 1),
+                             interpolate(rotations[1], times, time, interp, 1),
+                             interpolate(rotations[2], times, time, interp, 1),
+                             interpolate(rotations[3], times, time, interp, 1));
+
+     Eigen::Quaterniond avQuat = quat.conjugate() * dQuat;
+
+     vector<double> coordinate = {-2 * avQuat.x(), -2 * avQuat.y(), -2 * avQuat.z()};
      return coordinate;
   }
 
