@@ -30,7 +30,7 @@ class Messenger(Framer, TransverseDistortion):
 
     @property
     def instrument_id(self):
-        return self.id_lookup[self.label['INSTRUMENT_ID']]
+        return self.id_lookup[self._label['INSTRUMENT_ID']]
 
     @property
     def focal_length(self):
@@ -43,16 +43,16 @@ class Messenger(Framer, TransverseDistortion):
         f_t = np.poly1d(coeffs[::-1])
 
         # eval at the focal_plane_tempature
-        return f_t(self.label['FOCAL_PLANE_TEMPERATURE'].value)
+        return f_t(self._label['FOCAL_PLANE_TEMPERATURE'].value)
 
-    @property 
+    @property
     def focal_epsilon(self):
         return float(spice.gdpool('INS{}_FL_UNCERTAINTY'.format(self.ikid), 0, 1)[0])
 
     @property
     def starting_detector_sample(self):
         return int(spice.gdpool('INS{}_FPUBIN_START_SAMPLE'.format(self.ikid), 0, 1)[0])
-    
+
     @property
     def starting_detector_line(self):
         return int(spice.gdpool('INS{}_FPUBIN_START_LINE'.format(self.ikid), 0, 1)[0])
