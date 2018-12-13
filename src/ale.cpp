@@ -21,21 +21,6 @@ using namespace std;
 
 namespace ale {
 
-  // Parsing the JSON
-  json constructStateFromIsd(const string positionRotationData) {
-     // Parse the position and rotation data from isd
-     json isd = json::parse(positionRotationData);
-     json state;
-
-     state["m_w"] = isd.at("w");
-     state["m_x"] = isd.at("x");
-     state["m_y"] = isd.at("y");
-     state["m_z"] = isd.at("z");
-
-     return state;
-   }
-
-
   // Position Data Functions
   vector<double> getPosition(vector<vector<double>> coords, vector<double> times, double time,
                              interpolation interp) {
