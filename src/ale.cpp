@@ -21,21 +21,6 @@ using namespace std;
 
 namespace ale {
 
-  // Parsing the JSON
-  json constructStateFromIsd(const string positionRotationData) {
-     // Parse the position and rotation data from isd
-     json isd = json::parse(positionRotationData);
-     json state;
-
-     state["m_w"] = isd.at("w");
-     state["m_x"] = isd.at("x");
-     state["m_y"] = isd.at("y");
-     state["m_z"] = isd.at("z");
-
-     return state;
-   }
-
-
   // Position Data Functions
   vector<double> getPosition(vector<vector<double>> coords, vector<double> times, double time,
                              interpolation interp) {
@@ -263,50 +248,55 @@ namespace ale {
    return result;
  }
 
+ std::string load(std::string filename) {
+     static bool first_run = true;
+     if(first_run) {
+         // Initialize the Python interpreter but only once.
+         first_run = !first_run;
+         Py_Initialize();
+         atexit(Py_Finalize);
+     }
 
+     // Import the file as a Python module.
+     PyObject *pModule = PyImport_Import(PyUnicode_FromString("ale"));
 
-std::string load(std::string filename) {
+     // Create a dictionary for the contents of the module.
+     PyObject *pDict = PyModule_GetDict(pModule);
 
-    // Initialize the Python interpreter.
-    Py_Initialize();
+     // Get the add method from the dictionary.
+     PyObject *pFunc = PyDict_GetItemString(pDict, "loads");
 
-    // Import the file as a Python module.
-    PyObject *pModule = PyImport_Import(PyUnicode_FromString("ale"));
+     // Create a Python tuple to hold the arguments to the method.
+     PyObject *pArgs = PyTuple_New(1);
 
-    // Create a dictionary for the contents of the module.
-    PyObject *pDict = PyModule_GetDict(pModule);
+     // Set the Python int as the first and second arguments to the method.
+     PyObject *pString = PyUnicode_FromString(filename.c_str());
+     PyTuple_SetItem(pArgs, 0, pString);
 
-    // Get the add method from the dictionary.
-    PyObject *pFunc = PyDict_GetItemString(pDict, "load");
+     // Call the function with the arguments.
+     PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
 
-    // Create a Python tuple to hold the arguments to the method.
-    PyObject *pArgs = PyTuple_New(1);
+     // Print a message if calling the method failed.
+     if(pResult == NULL) {
+         throw "pResult";
+     }
 
-    // Set the Python int as the first and second arguments to the method.
-    PyTuple_SetItem(pArgs, 0, PyUnicode_FromString(filename.c_str()));
+     std::string cResult;
 
-    // Call the function with the arguments.
-    PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
+     PyObject *temp_bytes = PyUnicode_AsUTF8String(pResult); // Owned reference
+     if (temp_bytes != NULL) {
+       char *temp_str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
+       cResult = temp_str; // copy into std::string
+       Py_DECREF(temp_str);
+     } else {
+       throw "pybytes";
+     }
 
-    // Print a message if calling the method failed.
-    if(pResult == NULL) {
-      throw invalid_argument("Calling the load method failed.");
-    }
+     Py_DECREF(temp_bytes);
+     Py_DECREF(pArgs);
+     Py_DECREF(pModule);
+     Py_DECREF(pString);
 
-    char *cResult = 0;
-    if (PyUnicode_Check(pResult)) {
-      PyObject * temp_bytes = PyUnicode_AsEncodedString(pResult, "UTF-8", "strict"); // Owned reference
-      if (temp_bytes != NULL) {
-          cResult = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
-          cResult = strdup(cResult);
-          Py_DECREF(temp_bytes);
-      } else {
-          // some error handling
-      }
-    }
-
-    Py_Finalize();
-
-    return std::string(cResult);
-}
+     return cResult;
+ }
 }
