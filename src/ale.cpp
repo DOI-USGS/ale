@@ -172,6 +172,7 @@ namespace ale {
                             interpolate(rotations[1], times, time, interp, 0),
                             interpolate(rotations[2], times, time, interp, 0),
                             interpolate(rotations[3], times, time, interp, 0));
+    quat.normalize();
 
     Eigen::Quaterniond dQuat(interpolate(rotations[0], times, time, interp, 1),
                              interpolate(rotations[1], times, time, interp, 1),
