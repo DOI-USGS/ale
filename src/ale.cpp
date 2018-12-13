@@ -262,30 +262,37 @@ namespace ale {
         str = PyBytes_AS_STRING(PyUnicode_AsUTF8String(pystr));
         error_description = strdup(str);
 
-        /* See if we can get a full traceback */
+        // See if we can get a full traceback
         module_name = PyUnicode_FromString("traceback");
         pyth_module = PyImport_Import(module_name);
         Py_DECREF(module_name);
 
         if (pyth_module == NULL) {
-            return "Pyth_Module Empty";
+            throw runtime_error("getPyTraceback - Failed to import Python traceback Library");
         }
 
         pyth_func = PyObject_GetAttrString(pyth_module, "format_exception");
-        if (pyth_func && PyCallable_Check(pyth_func)) {
-            PyObject *pyth_val;
+        PyObject *pyth_val;
+        pyth_val = PyObject_CallFunctionObjArgs(pyth_func, ptype, pvalue, ptraceback, NULL);
 
-            pyth_val = PyObject_CallFunctionObjArgs(pyth_func, ptype, pvalue, ptraceback, NULL);
+        pystr = PyObject_Str(pyth_val);
+        str = PyBytes_AS_STRING(PyUnicode_AsUTF8String(pystr));
+        full_backtrace = strdup(str);
+        Py_DECREF(pyth_val);
 
-            pystr = PyObject_Str(pyth_val);
-            str = PyBytes_AS_STRING(PyUnicode_AsUTF8String(pystr));
-            full_backtrace = strdup(str);
-            Py_DECREF(pyth_val);
-            return std::string(full_backtrace);
-        }
-        return "End of if statement";
+        std::string join_cmd = "trace = ''.join(list(" + std::string(full_backtrace) + "))";
+        PyRun_SimpleString(join_cmd.c_str());
+
+        PyObject *evalModule = PyImport_AddModule( (char*)"__main__" );
+        PyObject *evalDict = PyModule_GetDict( evalModule );
+        PyObject *evalVal = PyDict_GetItemString( evalDict, "trace" );
+        full_backtrace = PyBytes_AS_STRING(PyUnicode_AsUTF8String(evalVal));
+
+        return std::string(error_description) + "\n" + std::string(full_backtrace);
     }
-    return "No Pyerror";
+    
+    // no traceback to return
+    return "";
  }
 
  std::string load(std::string filename) {
@@ -300,9 +307,7 @@ namespace ale {
      // Import the file as a Python module.
      PyObject *pModule = PyImport_Import(PyUnicode_FromString("ale"));
      if(!pModule) {
-       std::cout << "Error in import module " << std::endl;
-
-       throw getPyTraceback();
+       throw runtime_error(getPyTraceback());
      }
      // Create a dictionary for the contents of the module.
      PyObject *pDict = PyModule_GetDict(pModule);
@@ -310,15 +315,17 @@ namespace ale {
      // Get the add method from the dictionary.
      PyObject *pFunc = PyDict_GetItemString(pDict, "loads");
      if(!pFunc) {
-       std::cout << "Error in getting func " << std::endl;
-       return getPyTraceback();
+       // import errors do not set a PyError flag, need to use a custom
+       // error message instead.
+       throw runtime_error("Failed to import ale.loads function from Python."
+                           "This Usually indicates an error in the Ale Python Library."
+                           "Check if Installed correctly and the function ale.loads exists.");
      }
 
      // Create a Python tuple to hold the arguments to the method.
      PyObject *pArgs = PyTuple_New(1);
      if(!pArgs) {
-       std::cout << "Error in creating args " << std::endl;
-       return getPyTraceback();
+       throw runtime_error(getPyTraceback());
      }
 
      // Set the Python int as the first and second arguments to the method.
@@ -328,21 +335,23 @@ namespace ale {
      // Call the function with the arguments.
      PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
      if(!pResult) {
-        std::cout << "Error  in call " << std::endl;
-        return getPyTraceback();
+        throw invalid_argument(getPyTraceback());
      }
 
      std::string cResult;
 
-     PyObject *temp_bytes = PyUnicode_AsUTF8String(pResult); // Owned reference
-     if (temp_bytes != NULL) {
-       char *temp_str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
-       cResult = temp_str; // copy into std::string
-       Py_DECREF(temp_str);
-     } else {
-       return getPyTraceback();
+     // use PyObject_Str to ensure return is always a string
+     PyObject *pResultStr = PyObject_Str(pResult);
+     PyObject *temp_bytes = PyUnicode_AsUTF8String(pResultStr); // Owned reference
+     if(!temp_bytes){
+       throw invalid_argument(getPyTraceback());
      }
 
+     char *temp_str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
+     cResult = temp_str; // copy into std::string
+     Py_DECREF(temp_str);
+
+     Py_DECREF(pResultStr);
      Py_DECREF(temp_bytes);
      Py_DECREF(pArgs);
      Py_DECREF(pModule);
