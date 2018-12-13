@@ -1,5 +1,3 @@
-from abc import ABC, abstractmethod
-
 from dateutil import parser
 import numpy as np
 import pvl
@@ -7,7 +5,7 @@ import spiceypy as spice
 
 from ale.drivers import distortion
 
-class Base(ABC):
+class Base:
     """
     Abstract base class for all PDS label parsing. Implementations should override
     properties where a kernel provider deviates from the most broadly adopted
@@ -26,7 +24,6 @@ class Base(ABC):
         Called when the context is created. This is used
         to get the kernels furnished.
         """
-        print("IN FURNISH")
         if self.metakernel:
             spice.furnsh(self.metakernel)
         return self
@@ -37,7 +34,8 @@ class Base(ABC):
         this is done, the object is out of scope and the
         kernels can be unloaded.
         """
-        spice.unload(self.metakernel)
+        if self.metakernel:
+            spice.unload(self.metakernel)
 
     def __str__(self):
         return str(self.to_dict())
@@ -121,12 +119,10 @@ class Base(ABC):
 
 
     @property
-    @abstractmethod
     def metakernel(self):
         pass
 
     @property
-    @abstractmethod
     def instrument_id(self):
         pass
 
