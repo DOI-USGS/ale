@@ -248,6 +248,46 @@ namespace ale {
    return result;
  }
 
+ std::string getPyTraceback() {
+    PyObject* err = PyErr_Occurred();
+    if (err != NULL) {
+        PyObject *ptype, *pvalue, *ptraceback;
+        PyObject *pystr, *module_name, *pyth_module, *pyth_func;
+        char *str;
+        char *full_backtrace;
+        char *error_description;
+
+        PyErr_Fetch(&ptype, &pvalue, &ptraceback);
+        pystr = PyObject_Str(pvalue);
+        str = PyBytes_AS_STRING(PyUnicode_AsUTF8String(pystr));
+        error_description = strdup(str);
+
+        /* See if we can get a full traceback */
+        module_name = PyUnicode_FromString("traceback");
+        pyth_module = PyImport_Import(module_name);
+        Py_DECREF(module_name);
+
+        if (pyth_module == NULL) {
+            return "Pyth_Module Empty";
+        }
+
+        pyth_func = PyObject_GetAttrString(pyth_module, "format_exception");
+        if (pyth_func && PyCallable_Check(pyth_func)) {
+            PyObject *pyth_val;
+
+            pyth_val = PyObject_CallFunctionObjArgs(pyth_func, ptype, pvalue, ptraceback, NULL);
+
+            pystr = PyObject_Str(pyth_val);
+            str = PyBytes_AS_STRING(PyUnicode_AsUTF8String(pystr));
+            full_backtrace = strdup(str);
+            Py_DECREF(pyth_val);
+            return std::string(full_backtrace);
+        }
+        return "End of if statement";
+    }
+    return "No Pyerror";
+ }
+
  std::string load(std::string filename) {
      static bool first_run = true;
      if(first_run) {
@@ -259,15 +299,27 @@ namespace ale {
 
      // Import the file as a Python module.
      PyObject *pModule = PyImport_Import(PyUnicode_FromString("ale"));
+     if(!pModule) {
+       std::cout << "Error in import module " << std::endl;
 
+       throw getPyTraceback();
+     }
      // Create a dictionary for the contents of the module.
      PyObject *pDict = PyModule_GetDict(pModule);
 
      // Get the add method from the dictionary.
      PyObject *pFunc = PyDict_GetItemString(pDict, "loads");
+     if(!pFunc) {
+       std::cout << "Error in getting func " << std::endl;
+       return getPyTraceback();
+     }
 
      // Create a Python tuple to hold the arguments to the method.
      PyObject *pArgs = PyTuple_New(1);
+     if(!pArgs) {
+       std::cout << "Error in creating args " << std::endl;
+       return getPyTraceback();
+     }
 
      // Set the Python int as the first and second arguments to the method.
      PyObject *pString = PyUnicode_FromString(filename.c_str());
@@ -275,10 +327,9 @@ namespace ale {
 
      // Call the function with the arguments.
      PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
-
-     // Print a message if calling the method failed.
-     if(pResult == NULL) {
-         throw "pResult";
+     if(!pResult) {
+        std::cout << "Error  in call " << std::endl;
+        return getPyTraceback();
      }
 
      std::string cResult;
@@ -289,7 +340,7 @@ namespace ale {
        cResult = temp_str; // copy into std::string
        Py_DECREF(temp_str);
      } else {
-       throw "pybytes";
+       return getPyTraceback();
      }
 
      Py_DECREF(temp_bytes);
