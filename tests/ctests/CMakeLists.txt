@@ -11,6 +11,8 @@ target_include_directories(runAleTests
                            PRIVATE
                            ${GSL_INCLUDE_DIRS}
                            PUBLIC
+                           ${GSL_INCLUDE_DIRS}
+                           ${EIGEN3_INCLUDE_DIR}
                            ${ALE_INCLUDE_DIRS})
 
 
