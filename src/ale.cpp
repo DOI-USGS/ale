@@ -296,7 +296,7 @@ namespace ale {
 
         return std::string(error_description) + "\n" + std::string(full_backtrace);
     }
-    
+
     // no traceback to return
     return "";
  }
@@ -340,6 +340,9 @@ namespace ale {
 
      // Call the function with the arguments.
      PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
+     Py_DECREF(pArgs);
+     Py_DECREF(pFunc);
+     Py_DECREF(pString);
      if(!pResult) {
         throw invalid_argument(getPyTraceback());
      }
@@ -355,13 +358,8 @@ namespace ale {
 
      char *temp_str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
      cResult = temp_str; // copy into std::string
-     Py_DECREF(temp_str);
 
      Py_DECREF(pResultStr);
-     Py_DECREF(temp_bytes);
-     Py_DECREF(pArgs);
-     Py_DECREF(pModule);
-     Py_DECREF(pString);
 
      return cResult;
  }
