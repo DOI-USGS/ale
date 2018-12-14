@@ -13,3 +13,4 @@ dependencies:
   - numpy
   - python-dateutil
   - pvl
+  - quaternion
