@@ -341,7 +341,6 @@ namespace ale {
      // Call the function with the arguments.
      PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
      Py_DECREF(pArgs);
-     Py_DECREF(pFunc);
      Py_DECREF(pString);
      if(!pResult) {
         throw invalid_argument(getPyTraceback());
