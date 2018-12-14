@@ -253,7 +253,11 @@ TEST(RotationInterpTest, GetRotationDifferentCounts) {
   vector<double> times = {0, 1, 2};
   vector<vector<double>> rots({{1,1,1,1}, {0,0,0,0}, {1,1,1,1}, {0,0,0,0}});
   EXPECT_THROW(ale::getRotation(rots, times, 2, ale::linear), invalid_argument);
+}
 
+TEST(PyInterfaceTest, LoadInvalidLabel) {
+  std::string label = "Not a Real Label";
+  EXPECT_THROW(ale::load(label), invalid_argument);
 }
 
 
