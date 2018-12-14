@@ -313,7 +313,7 @@ namespace ale {
      // Import the file as a Python module.
      PyObject *pModule = PyImport_Import(PyUnicode_FromString("ale"));
      if(!pModule) {
-       throw runtime_error(getPyTraceback());
+       throw runtime_error("Failed to import ale. Make sure the ale python library is correctly installed.");
      }
      // Create a dictionary for the contents of the module.
      PyObject *pDict = PyModule_GetDict(pModule);
