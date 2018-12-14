@@ -46,7 +46,8 @@ install:
 
 script:
   - PYTHONPATH=. pytest tests/pytests
-  - mkdir build
+  - python setup.py install # install to use python lib in c code
+  - mkdir -p build
   - cd build
   - cmake -DCOVERAGE=ON ..
   - cmake --build .
