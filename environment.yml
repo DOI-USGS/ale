@@ -11,6 +11,7 @@ dependencies:
   - eigen
   - spiceypy
   - numpy
+  - numba
   - python-dateutil
   - pvl
   - quaternion
