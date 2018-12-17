@@ -6,10 +6,9 @@ import pvl
 import spiceypy as spice
 
 from ale.util import get_metakernels
-from ale.drivers.base import LineScanner
-from ale.drivers.distortion import RadialDistortion
+from ale.drivers.base import LineScanner, RadialDistortion, Spice, PDS3, Isis3
 
-class LRO_LROC(LineScanner, RadialDistortion):
+class LrocSpice(Spice, LineScanner, RadialDistortion):
 
     @property
     def metakernel(self):
@@ -17,6 +16,12 @@ class LRO_LROC(LineScanner, RadialDistortion):
         self._metakernel = metakernels['data'][0]['path']
         return self._metakernel
 
+    @property
+    def spacecraft_name(self):
+        return "LRO"
+
+
+class LroPds3Driver(PDS3, LrocSpice):
     @property
     def instrument_id(self):
         """
@@ -32,7 +37,3 @@ class LRO_LROC(LineScanner, RadialDistortion):
             return "LRO_LROCNACL"
         elif instrument == "LROC" and frame_id == "RIGHT":
             return "LRO_LROCNACR"
-
-    @property
-    def spacecraft_name(self):
-        return "LRO"

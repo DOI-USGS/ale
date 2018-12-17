@@ -6,10 +6,9 @@ import pvl
 import spiceypy as spice
 from ale import config
 
-from ale.drivers.base import LineScanner
-from ale.drivers.distortion import RadialDistortion
+from ale.drivers.base import LineScanner, RadialDistortion, Spice, PDS3, Isis3
 
-class MRO_CTX(LineScanner, RadialDistortion):
+class CtxSpice(Spice, LineScanner, RadialDistortion):
     id_lookup = {
             'CONTEXT CAMERA':'MRO_CTX'
     }
@@ -25,6 +24,9 @@ class MRO_CTX(LineScanner, RadialDistortion):
                     self._metakernel = mk
         return self._metakernel
 
+
+
+class CtxPds3Driver(PDS3, CtxSpice):
     @property
     def instrument_id(self):
         return self.id_lookup[self._label['INSTRUMENT_NAME']]
@@ -35,3 +37,7 @@ class MRO_CTX(LineScanner, RadialDistortion):
             'MARS_RECONNAISSANCE_ORBITER': 'MRO'
         }
         return name_lookup[self._label['SPACECRAFT_NAME']]
+
+    @property
+    def instrument_id(self):
+        return self.id_lookup[self._label['INSTRUMENT_NAME']]

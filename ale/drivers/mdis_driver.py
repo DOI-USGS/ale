@@ -6,11 +6,9 @@ import spiceypy as spice
 import numpy as np
 
 from ale import config
-from ale.drivers.base import Framer
-from ale.drivers.distortion import TransverseDistortion
+from ale.drivers.base import Framer, TransverseDistortion, Spice, PDS3, Isis3
 
-
-class Messenger(Framer, TransverseDistortion):
+class MdisSpice(Spice, Framer, TransverseDistortion):
     id_lookup = {
         'MDIS-WAC': 'MSGR_MDIS_WAC',
         'MDIS-NAC':'MSGR_MDIS_NAC',
@@ -29,10 +27,6 @@ class Messenger(Framer, TransverseDistortion):
         return self._metakernel
 
     @property
-    def instrument_id(self):
-        return self.id_lookup[self._label['INSTRUMENT_ID']]
-
-    @property
     def focal_length(self):
         """
         """
@@ -43,7 +37,7 @@ class Messenger(Framer, TransverseDistortion):
         f_t = np.poly1d(coeffs[::-1])
 
         # eval at the focal_plane_tempature
-        return f_t(self._label['FOCAL_PLANE_TEMPERATURE'].value)
+        return f_t(self.focal_plane_tempature)
 
     @property
     def focal_epsilon(self):
@@ -56,3 +50,33 @@ class Messenger(Framer, TransverseDistortion):
     @property
     def starting_detector_line(self):
         return int(spice.gdpool('INS{}_FPUBIN_START_LINE'.format(self.ikid), 0, 1)[0])
+
+
+class MdisPDS3Driver(PDS3, MdisSpice):
+    @property
+    def instrument_id(self):
+        return self.id_lookup[self._label['INSTRUMENT_ID']]
+
+    @property
+    def focal_plane_tempature(self):
+        return self._label['FOCAL_PLANE_TEMPERATURE'].value
+
+
+class MdisIsis3Driver(Isis3, MdisSpice):
+    @property
+    def metakernel(self):
+        metakernel_dir = config.mdis
+        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
+        if not hasattr(self, '_metakernel'):
+            for mk in mks:
+                if str(self.start_time.year) in os.path.basename(mk):
+                    self._metakernel = mk
+        return self._metakernel
+
+    @property
+    def instrument_id(self):
+        return self.id_lookup[self._label['IsisCube']['Instrument']['InstrumentId']]
+
+    @property
+    def focal_plane_tempature(self):
+        return self._label['IsisCube']['Instrument']['FocalPlaneTemperature'].value

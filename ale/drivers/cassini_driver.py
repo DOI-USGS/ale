@@ -6,8 +6,7 @@ import spiceypy as spice
 import numpy as np
 
 from ale import config
-from ale.drivers.base import Framer
-from ale.drivers.distortion import RadialDistortion
+from ale.drivers.base import Framer, RadialDistortion
 
 
 class CassiniISS(Framer, RadialDistortion):
