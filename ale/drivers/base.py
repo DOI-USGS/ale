@@ -29,7 +29,6 @@ class Base(ABC):
         Called when the context is created. This is used
         to get the kernels furnished.
         """
-        print("IN FURNISH")
         if self.metakernel:
             spice.furnsh(self.metakernel)
         return self
