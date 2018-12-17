@@ -7,6 +7,7 @@ import numpy as np
 
 from ale import config
 from ale.drivers.base import Framer
+from ale.drivers.cube_driver import Cube
 from ale.drivers.distortion import TransverseDistortion
 
 
@@ -127,10 +128,35 @@ class isisMessenger(Framer, TransverseDistortion):
     @property
     def target_name(self):
         return self._label['IsisCube']['Instrument']['TargetName']
-        
+
     @property
     def starting_ephemeris_time(self):
         if not hasattr(self, '_starting_ephemeris_time'):
             sclock = self._label['IsisCube']['Archive']['SpacecraftClockStartCount']
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
         return self._starting_ephemeris_time
+
+class isisSpicedMessenger(Cube, TransverseDistortion):
+    id_lookup = {
+        'MDIS-WAC': 'MSGR_MDIS_WAC',
+        'MDIS-NAC':'MSGR_MDIS_NAC',
+        'MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA':'MSGR_MDIS_NAC',
+        'MERCURY DUAL IMAGING SYSTEM WIDE ANGLE CAMERA':'MSGR_MDIS_WAC'
+    }
+
+    @property
+    def focal_length(self):
+        """
+        """
+        coeffs = self.label['NaifKeywords']['INS{}_FL_TEMP_COEFFS'.format(self.ikid)]
+
+        # reverse coeffs, mdis coeffs are listed a_0, a_1, a_2 ... a_n where
+        # numpy wants them a_n, a_n-1, a_n-2 ... a_0
+        f_t = np.poly1d(coeffs[::-1])
+
+        # eval at the focal_plane_tempature
+        return f_t(label['IsisCube']['Instrument']['FocalPlaneTemperature'].value)
+
+    @property
+    def _exposure_duration(self):
+        return self._label['IsisCube']['Instrument']['ExposureDuration'].value * 0.001 # Scale to seconds
