@@ -26,7 +26,6 @@ class Base(ABC):
         Called when the context is created. This is used
         to get the kernels furnished.
         """
-        print("IN FURNISH")
         if self.metakernel:
             spice.furnsh(self.metakernel)
         return self
@@ -241,17 +240,17 @@ class Base(ABC):
 
     @property
     def semimajor(self):
-        rad = spice.bodvrd(self._label['TARGET_NAME'], 'RADII', 3)
+        rad = spice.bodvrd(self.target_name, 'RADII', 3)
         return rad[1][1]
 
     @property
     def semiminor(self):
-        rad = spice.bodvrd(self._label['TARGET_NAME'], 'RADII', 3)
+        rad = spice.bodvrd(self.target_name, 'RADII', 3)
         return rad[1][0]
 
     @property
     def reference_frame(self):
-        return 'IAU_{}'.format(self._label['TARGET_NAME'])
+        return 'IAU_{}'.format(self.target_name)
 
     @property
     def sun_position(self):
@@ -259,7 +258,7 @@ class Base(ABC):
                                      self.center_ephemeris_time,
                                      self.reference_frame,
                                      'NONE',
-                                     self._label['TARGET_NAME'])
+                                     self.target_name)
 
         return [sun_state[:4].tolist()]
 
@@ -269,7 +268,7 @@ class Base(ABC):
                                      self.center_ephemeris_time,
                                      self.reference_frame,
                                      'NONE',
-                                     self._label['TARGET_NAME'])
+                                     self.target_name)
 
         return [sun_state[3:6].tolist()]
 
