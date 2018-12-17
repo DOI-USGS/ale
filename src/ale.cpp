@@ -9,6 +9,9 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include <iostream>
+#include <Python.h>
+
 #include <string>
 #include <iostream>
 #include <stdexcept>
@@ -17,21 +20,6 @@ using json = nlohmann::json;
 using namespace std;
 
 namespace ale {
-
-  // Parsing the JSON
-  json constructStateFromIsd(const string positionRotationData) {
-     // Parse the position and rotation data from isd
-     json isd = json::parse(positionRotationData);
-     json state;
-
-     state["m_w"] = isd.at("w");
-     state["m_x"] = isd.at("x");
-     state["m_y"] = isd.at("y");
-     state["m_z"] = isd.at("z");
-
-     return state;
-   }
-
 
   // Position Data Functions
   vector<double> getPosition(vector<vector<double>> coords, vector<double> times, double time,
@@ -166,16 +154,22 @@ namespace ale {
     }
 
     // GSL setup
-    vector<double> coordinate = {0.0, 0.0, 0.0, 0.0};
 
-    coordinate = { interpolate(rotations[0], times, time, interp, 1),
-                   interpolate(rotations[1], times, time, interp, 1),
-                   interpolate(rotations[2], times, time, interp, 1),
-                   interpolate(rotations[3], times, time, interp, 1)};
 
-     // Eigen::Map to ensure the array isn't copied, only the pointer is
-     Eigen::Map<Eigen::MatrixXd> quat(coordinate.data(), 4, 1);
-     quat.normalize();
+    Eigen::Quaterniond quat(interpolate(rotations[0], times, time, interp, 0),
+                            interpolate(rotations[1], times, time, interp, 0),
+                            interpolate(rotations[2], times, time, interp, 0),
+                            interpolate(rotations[3], times, time, interp, 0));
+    quat.normalize();
+
+    Eigen::Quaterniond dQuat(interpolate(rotations[0], times, time, interp, 1),
+                             interpolate(rotations[1], times, time, interp, 1),
+                             interpolate(rotations[2], times, time, interp, 1),
+                             interpolate(rotations[3], times, time, interp, 1));
+
+     Eigen::Quaterniond avQuat = quat.conjugate() * dQuat;
+
+     vector<double> coordinate = {-2 * avQuat.x(), -2 * avQuat.y(), -2 * avQuat.z()};
      return coordinate;
   }
 
@@ -260,4 +254,112 @@ namespace ale {
    return result;
  }
 
+ std::string getPyTraceback() {
+    PyObject* err = PyErr_Occurred();
+    if (err != NULL) {
+        PyObject *ptype, *pvalue, *ptraceback;
+        PyObject *pystr, *module_name, *pyth_module, *pyth_func;
+        char *str;
+        char *full_backtrace;
+        char *error_description;
+
+        PyErr_Fetch(&ptype, &pvalue, &ptraceback);
+        pystr = PyObject_Str(pvalue);
+        str = PyBytes_AS_STRING(PyUnicode_AsUTF8String(pystr));
+        error_description = strdup(str);
+
+        // See if we can get a full traceback
+        module_name = PyUnicode_FromString("traceback");
+        pyth_module = PyImport_Import(module_name);
+        Py_DECREF(module_name);
+
+        if (pyth_module == NULL) {
+            throw runtime_error("getPyTraceback - Failed to import Python traceback Library");
+        }
+
+        pyth_func = PyObject_GetAttrString(pyth_module, "format_exception");
+        PyObject *pyth_val;
+        pyth_val = PyObject_CallFunctionObjArgs(pyth_func, ptype, pvalue, ptraceback, NULL);
+
+        pystr = PyObject_Str(pyth_val);
+        str = PyBytes_AS_STRING(PyUnicode_AsUTF8String(pystr));
+        full_backtrace = strdup(str);
+        Py_DECREF(pyth_val);
+
+        std::string join_cmd = "trace = ''.join(list(" + std::string(full_backtrace) + "))";
+        PyRun_SimpleString(join_cmd.c_str());
+
+        PyObject *evalModule = PyImport_AddModule( (char*)"__main__" );
+        PyObject *evalDict = PyModule_GetDict( evalModule );
+        PyObject *evalVal = PyDict_GetItemString( evalDict, "trace" );
+        full_backtrace = PyBytes_AS_STRING(PyUnicode_AsUTF8String(evalVal));
+
+        return std::string(error_description) + "\n" + std::string(full_backtrace);
+    }
+
+    // no traceback to return
+    return "";
+ }
+
+ std::string load(std::string filename) {
+     static bool first_run = true;
+     if(first_run) {
+         // Initialize the Python interpreter but only once.
+         first_run = !first_run;
+         Py_Initialize();
+         atexit(Py_Finalize);
+     }
+
+     // Import the file as a Python module.
+     PyObject *pModule = PyImport_Import(PyUnicode_FromString("ale"));
+     if(!pModule) {
+       throw runtime_error("Failed to import ale. Make sure the ale python library is correctly installed.");
+     }
+     // Create a dictionary for the contents of the module.
+     PyObject *pDict = PyModule_GetDict(pModule);
+
+     // Get the add method from the dictionary.
+     PyObject *pFunc = PyDict_GetItemString(pDict, "loads");
+     if(!pFunc) {
+       // import errors do not set a PyError flag, need to use a custom
+       // error message instead.
+       throw runtime_error("Failed to import ale.loads function from Python."
+                           "This Usually indicates an error in the Ale Python Library."
+                           "Check if Installed correctly and the function ale.loads exists.");
+     }
+
+     // Create a Python tuple to hold the arguments to the method.
+     PyObject *pArgs = PyTuple_New(1);
+     if(!pArgs) {
+       throw runtime_error(getPyTraceback());
+     }
+
+     // Set the Python int as the first and second arguments to the method.
+     PyObject *pString = PyUnicode_FromString(filename.c_str());
+     PyTuple_SetItem(pArgs, 0, pString);
+
+     // Call the function with the arguments.
+     PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
+     Py_DECREF(pArgs);
+     Py_DECREF(pString);
+     if(!pResult) {
+        throw invalid_argument(getPyTraceback());
+     }
+
+     std::string cResult;
+
+     // use PyObject_Str to ensure return is always a string
+     PyObject *pResultStr = PyObject_Str(pResult);
+     PyObject *temp_bytes = PyUnicode_AsUTF8String(pResultStr); // Owned reference
+     if(!temp_bytes){
+       throw invalid_argument(getPyTraceback());
+     }
+
+     char *temp_str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
+     cResult = temp_str; // copy into std::string
+
+     Py_DECREF(pResultStr);
+
+     return cResult;
+ }
 }

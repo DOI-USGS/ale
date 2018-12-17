@@ -17,7 +17,7 @@ class Base:
 
     """
     def __init__(self, label, *args, **kwargs):
-        self.label = pvl.loads(label)
+        self._label = pvl.loads(label, strict=False)
 
     def __enter__(self):
         """
@@ -48,7 +48,7 @@ class Base:
             return False
 
     def to_dict(self):
-        return {p:getattr(self, p) for p in dir(self) if not p.startswith('__') or p.startswith('_')}
+        return {p:getattr(self, p) for p in dir(self) if not p.startswith('_') and not callable(getattr(self,p))}
 
     def to_pfeffer_response(self):
         """
@@ -126,18 +126,17 @@ class Base:
     def instrument_id(self):
         pass
 
-
     @property
     def start_time(self):
-        return self.label['START_TIME']
+        return self._label['START_TIME']
 
     @property
     def image_lines(self):
-        return self.label['IMAGE']['LINES']
+        return self._label['IMAGE']['LINES']
 
     @property
     def image_samples(self):
-        return self.label['IMAGE']['LINE_SAMPLES']
+        return self._label['IMAGE']['LINE_SAMPLES']
 
     @property
     def interpolation_method(self):
@@ -149,26 +148,26 @@ class Base:
 
     @property
     def target_name(self):
-        return self.label['TARGET_NAME']
+        return self._label['TARGET_NAME']
 
     @property
     def _target_id(self):
-        return spice.bodn2c(self.label['TARGET_NAME'])
+        return spice.bodn2c(self._label['TARGET_NAME'])
 
     @property
     def starting_ephemeris_time(self):
         if not hasattr(self, '_starting_ephemeris_time'):
-            sclock = self.label['SPACECRAFT_CLOCK_START_COUNT']
+            sclock = self._label['SPACECRAFT_CLOCK_START_COUNT']
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
         return self._starting_ephemeris_time
 
     @property
     def _exposure_duration(self):
-        return self.label['EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
+        return self._label['EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
 
     @property
     def spacecraft_clock_stop_count(self):
-        sc = self.label.get('SPACECRAFT_CLOCK_STOP_COUNT', None)
+        sc = self._label.get('SPACECRAFT_CLOCK_STOP_COUNT', None)
         if sc == 'N/A':
             sc = None
         return sc
@@ -191,7 +190,7 @@ class Base:
 
     @property
     def spacecraft_name(self):
-        return self.label['MISSION_NAME']
+        return self._label['MISSION_NAME']
 
     @property
     def ikid(self):
@@ -199,7 +198,7 @@ class Base:
 
     @property
     def fikid(self):
-        fn = self.label.get('FILTER_NUMBER', 0)
+        fn = self._label.get('FILTER_NUMBER', 0)
         if fn == 'N/A':
             fn = 0
         return self.ikid - int(fn)
@@ -234,21 +233,21 @@ class Base:
 
     @property
     def detector_line_summing(self):
-        return self.label.get('SAMPLING_FACTOR', 1)
+        return self._label.get('SAMPLING_FACTOR', 1)
 
     @property
     def semimajor(self):
-        rad = spice.bodvrd(self.label['TARGET_NAME'], 'RADII', 3)
+        rad = spice.bodvrd(self.target_name, 'RADII', 3)
         return rad[1][1]
 
     @property
     def semiminor(self):
-        rad = spice.bodvrd(self.label['TARGET_NAME'], 'RADII', 3)
+        rad = spice.bodvrd(self.target_name, 'RADII', 3)
         return rad[1][0]
 
     @property
     def reference_frame(self):
-        return 'IAU_{}'.format(self.label['TARGET_NAME'])
+        return 'IAU_{}'.format(self.target_name)
 
     @property
     def sun_position(self):
@@ -256,7 +255,7 @@ class Base:
                                      self.center_ephemeris_time,
                                      self.reference_frame,
                                      'NONE',
-                                     self.label['TARGET_NAME'])
+                                     self.target_name)
 
         return [sun_state[:4].tolist()]
 
@@ -266,7 +265,7 @@ class Base:
                                      self.center_ephemeris_time,
                                      self.reference_frame,
                                      'NONE',
-                                     self.label['TARGET_NAME'])
+                                     self.target_name)
 
         return [sun_state[3:6].tolist()]
 
@@ -312,7 +311,7 @@ class LineScanner(Base):
 
     @property
     def _exposure_duration(self):
-        return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
+        return self._label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
 
     @property
     def line_scan_rate(self):
@@ -369,7 +368,7 @@ class LineScanner(Base):
 
     @property
     def _exposure_duration(self):
-        return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
+        return self._label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
 
 class Framer(Base):
 

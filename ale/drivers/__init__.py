@@ -7,6 +7,9 @@ import itertools
 from itertools import chain
 import os
 from glob import glob
+import json
+import numpy as np
+from datetime import datetime, date
 
 from abc import ABC
 
@@ -29,3 +32,19 @@ def load(label):
             import traceback
             traceback.print_exc()
     raise Exception('No Such Driver for Label')
+
+def loads(label):
+    class NumpyEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, np.ndarray):
+                return obj.tolist()
+            return json.JSONEncoder.default(self, obj)
+
+    def json_serial(obj):
+        """JSON serializer for objects not serializable by default json code"""
+        if isinstance(obj, (datetime, date)):
+            return obj.isoformat()
+
+    with load(label) as o:
+        s = json.dumps(o.to_dict(), cls=NumpyEncoder, default=json_serial)
+    return s
