@@ -1,6 +1,7 @@
 from glob import glob
 import os
 import struct
+import re
 
 import pvl
 import spiceypy as spice
@@ -96,27 +97,6 @@ class Cube(Base):
             elif table['Name'] == 'SunPosition':
                 self.sun_position_table = read_position_table(table, file)
 
-    def _parse_naif_keywords(self):
-        """
-        Helper function to parse the NaifKeywords object on the cube label.
-        This object contains all values queried from NAIF kernels via g*pool calls.
-        """
-        if 'NaifKeywords' in self.label:
-            self._naif_keywords = self.label['NaifKeywords']
-            for key in self.label['NaifKeywords'].keys():
-                if key.endswith('_RADII'):
-                    self._radii = self.label['NaifKeywords'][key]
-                elif key.endswith('_FOCAL_LENGTH'):
-                    self._focal_length = self.label['NaifKeywords'][key]
-                elif key.endswith('_BORESIGHT_SAMPLE'):
-                    self._boresight_sample = self.label['NaifKeywords'][key]
-                elif key.endswith('_BORESIGHT_LINE'):
-                    self._boresight_line = self.label['NaifKeywords'][key]
-                elif key.endswith('_ITRANSS'):
-                    self._focal2pixels_sample = self.label['NaifKeywords'][key]
-                elif key.endswith('_ITRANSL'):
-                    self._focal2pixels_line = self.label['NaifKeywords'][key]
-
     @property
     def instrument_id(self):
         return self.label['IsisCube']['Instrument']['InstrumentId']
@@ -135,17 +115,15 @@ class Cube(Base):
 
     @property
     def interpolation_method(self):
-        if self._sensor_velocity:
-            return 'hermite'
-        else:
-            return 'linear'
+        return 'hermite'
+
+    @property
+    def number_of_quaternions(self):
+        return len(self.sensor_orientation)
 
     @property
     def number_of_ephemerides(self):
-        if 'Positions' in self.inst_position_table:
-            return epehem_count = self.inst_position_table['Positions']
-        else:
-            pass
+        return len(self.sensor_position)
 
     @property
     def target_name(self):
@@ -153,25 +131,18 @@ class Cube(Base):
 
     @property
     def starting_ephemeris_time(self):
-        if 'Positions' in self.inst_position_table:
-            return epehem_count = self.inst_position_table['Times'][0]
-        else:
-            pass
+        return self.inst_position_table['Times'][0]
 
     @property
     def ending_ephemeris_time(self):
-        if 'Positions' in self.inst_position_table:
-            return epehem_count = self.inst_position_table['Times'][-1]
-        else:
-            pass
+        return self.inst_position_table['Times'][-1]
 
     @property
     def detector_center(self):
-        if not hasattr(self, '_naif_keywords'):
-            self._parse_naif_keywords()
-        if all([hasattr(self, key) for key in ['_boresight_sample','_boresight_line']]):
-            return [self._boresight_line, self._boresight_sample]
-        return [self.image_lines/2, self.image_samples/2]
+        return [
+            self.label['NaifKeywords']['INS{}_BORESIGHT_LINE'.format(self.ikid)],
+            self.label['NaifKeywords']['INS{}_BORESIGHT_SAMPLE'.format(self.ikid)]
+        ]
 
     @property
     def spacecraft_name(self):
@@ -191,48 +162,29 @@ class Cube(Base):
 
     @property
     def focal2pixel_lines(self):
-        if not hasattr(self, '_naif_keywords'):
-            self._parse_naif_keywords()
-        if hasattr(self, '_focal2pixels_line'):
-            return self._focal2pixels_line
-        return [0, 0, 0] #TODO what should be returned here?
+        return self.label['NaifKeywords']['INS{}_ITRANSL'.format(self.ikid)]
 
     @property
     def focal2pixel_samples(self):
-        if not hasattr(self, '_naif_keywords'):
-            self._parse_naif_keywords()
-        if hasattr(self, '_focal2pixels_sample'):
-            return self._focal2pixels_sample
-        return [0, 0, 0] #TODO what should be returned here?
+        return self.label['NaifKeywords']['INS{}_ITRANSS'.format(self.ikid)]
 
     @property
     def focal_length(self):
-        if not hasattr(self, '_naif_keywords'):
-            self._parse_naif_keywords()
-        if hasattr(self, '_focal_length'):
-            return self._focal_length
-        return 0 #TODO what should be returned here?
+        return self.label['NaifKeywords']['INS{}_FOCAL_LENGTH'.format(self.ikid)]
 
     @property
-    def detector_line_summing(self):
-        # This is going to take mission by mission code
-        return 1
+    def body_radii(self):
+        for key in self.label['NaifKeywords']:
+            if re.match('BODY-?\d*_RADII'):
+                return self.label['NaifKeywords'][key]
 
     @property
     def semimajor(self):
-        if not hasattr(self, '_naif_keywords'):
-            self._parse_naif_keywords()
-        if hasattr(self, '_radii'):
-            return self._radii[0]
-        return 0 #TODO what should be returned here?
+        return self.body_radii[0]
 
     @property
     def semiminor(self):
-        if not hasattr(self, '_naif_keywords'):
-            self._parse_naif_keywords()
-        if hasattr(self, '_radii'):
-            return self._radii[2]
-        return 0 #TODO what should be returned here?
+        return self.body_radii[2]
 
     @property
     def reference_frame(self):
