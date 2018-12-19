@@ -5,15 +5,9 @@ import numpy as np
 import pvl
 import spiceypy as spice
 
-class Base(ABC):
+class Driver(ABC):
     """
-    Abstract base class for all PDS label parsing. Implementations should override
-    properties where a kernel provider deviates from the most broadly adopted
-    approach.
-
-    Methods that must be provided:
-    - instrument_id
-    - metakernel
+    Abstract base class for all Drivers.
 
     """
     def __init__(self, label, *args, **kwargs):
@@ -52,50 +46,15 @@ class Base(ABC):
             return False
 
     def to_dict(self):
-        return {p:getattr(self, p) for p in dir(self) if not p.startswith('_') and not callable(getattr(self,p))}
+        keys = set(dir(self)) & self.required_keys
+        print(keys)
+        return {p:getattr(self, p) for p in keys}
 
-    def to_pfeffer_response(self):
-        """
-        Parse the data into a valid ale response
-        """
-        data = self.to_dict()
-        # Take the flat reponse and create the ale obj dicts
-        data['detector_center'] = {'line': data['detector_center'][0],
-                                'sample': data['detector_center'][1]}
 
-        # Parse the distortion object out of the
-
-        if isinstance(self, distortion.RadialDistortion):
-            data['optical_distortion'] = {'radial':{'coefficients':data['odtk']}}
-        elif isinstance(self, distortion.TransverseDistortion):
-            data['optical_distortion'] = {'transverse':{'x':data['odtx'],
-                                                        'y':data['odty']}}
-
-        data['focal_length_model'] = {'focal_length': data['focal_length']}
-        if hasattr(self, 'focal_epsilon'):
-            data['focal_length_model']['focal_epsilon'] = data['focal_epsilon']
-
-        data['reference_height'] = {'minheight': data['reference_height'][0],
-                                    'maxheight': data['reference_height'][1],
-                                    'unit': 'm'}
-
-        data['sensor_position'] = {'unit':'m',
-                                   'velocities': data['sensor_velocity'],
-                                   'positions': data['sensor_position']}
-
-        data['sun_position'] = {'unit': 'm',
-                                'positions': data['sun_position'],
-                                'velocities': data['sun_velocity']}
-
-        data['sensor_orientation'] = {'quaternions':data['sensor_orientation']}
-
-        data['radii'] = {'semimajor':data['semimajor'],
-                         'semiminor':data['semiminor'],
-                         'unit': 'km'}
-
-        data['name_platform'] = data['spacecraft_name']
-        data['name_sensor'] = data['instrument_id']
-        return data
+class LineScanner(Driver):
+    @property
+    def name_model(self):
+        return "USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL"
 
     @property
     def t0_ephemeris(self):
@@ -113,41 +72,43 @@ class Base(ABC):
     def dt_quaternion(self):
         return (self.ending_ephemeris_time - self.starting_ephemeris_time) / self.number_of_ephemerides
 
-class TransverseDistortion(ABC):
-    """
-    Exposes the properties that are used to describe a transverse distortion model.
-    """
     @property
-    @abstractmethod
-    def odtx(self):
-        pass
+    def line_scan_rate(self):
+        """
+        In the form: [start_line, line_time, exposure_duration]
+        The form below is for a fixed rate line scanner.
+        """
+        return [[float(self.starting_detector_line), self.t0_ephemeris, self.line_exposure_duration]]
 
     @property
-    @abstractmethod
-    def odty(self):
-        pass
+    def number_of_ephemerides(self):
+        #TODO: Not make this hardcoded
+        return 909
 
-
-class RadialDistortion(ABC):
-    """
-    Exposes the properties that are used to describe a radial distortion model.
-    """
     @property
-    @abstractmethod
-    def odtk(self):
-        pass
+    def number_of_quaternions(self):
+        #TODO: Not make this hardcoded
+        return 909
 
 
-class LineScanner(Base):
-    @property
-    def name_model(self):
-        return "USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL"
-
-
-class Framer(Base):
+class Framer(Driver):
     @property
     def name_model(self):
         return "USGS_ASTRO_FRAME_SENSOR_MODEL"
+
+    @property
+    def filter_number(self):
+        return self._label.get('FILTER_NUMBER', 0)
+
+    @property
+    def number_of_ephemerides(self):
+        # always one for framers
+        return 1
+
+    @property
+    def number_of_quaternions(self):
+        # always one for framers
+        return 1
 
 
 class PDS3():
@@ -204,10 +165,6 @@ class PDS3():
         return 'lagrange'
 
     @property
-    def number_of_ephemerides(self):
-        return 1
-
-    @property
     def target_name(self):
         return self._label['TARGET_NAME']
 
@@ -228,14 +185,6 @@ class PDS3():
             return self._label['EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
         except:
             return np.nan
-            
-    @property
-    def number_of_ephemerides(self):
-        return 909
-
-    @property
-    def number_of_quaternions(self):
-        return 909
 
     @property
     def spacecraft_clock_stop_count(self):
@@ -246,15 +195,12 @@ class PDS3():
 
     @property
     def ending_ephemeris_time(self):
-        if not hasattr(self, '_ending_ephemeris_time'):
-            self._ending_ephemeris_time = (self.image_lines * self.line_exposure_duration) + self.starting_ephemeris_time
-        return self._ending_ephemeris_time
+        return (self.image_lines * self.line_exposure_duration) + self.starting_ephemeris_time
 
     @property
     def center_ephemeris_time(self):
-        if not hasattr(self, '_center_ephemeris_time'):
-            self._center_ephemeris_time = (self.starting_ephemeris_time + self.ending_ephemeris_time)/2
-        return self._center_ephemeris_time
+        return (self.starting_ephemeris_time + self.ending_ephemeris_time)/2
+
 
     @property
     def detector_center(self):
@@ -280,10 +226,6 @@ class PDS3():
     def detector_line_summing(self):
         return self._label.get('SAMPLING_FACTOR', 1)
 
-    @property
-    def filter_number(self):
-        return self._label.get('FILTER_NUMBER', 0)
-
 
 class Spice():
     @property
@@ -305,13 +247,6 @@ class Spice():
     @property
     def ikid(self):
         return spice.bods2c(self.instrument_id)
-
-    @property
-    def fikid(self):
-        fn = self.filter_number
-        if fn == 'N/A':
-            fn = 0
-        return self.ikid - int(fn)
 
     @property
     def spacecraft_id(self):
@@ -398,14 +333,6 @@ class Spice():
         return 0, 100
 
     @property
-    def line_scan_rate(self):
-        """
-        In the form: [start_line, line_time, exposure_duration]
-        The form below is for a fixed rate line scanner.
-        """
-        return [[float(self.starting_detector_line), self.t0_ephemeris, self.line_exposure_duration]]
-
-    @property
     def detector_center(self):
         if not hasattr(self, '_detector_center'):
             center_line = float(spice.gdpool('INS{}_BORESIGHT_LINE'.format(self.ikid), 0, 1)[0])
@@ -423,6 +350,17 @@ class Spice():
             center_sclock = self.starting_ephemeris_time + halflines * self.line_exposure_duration
             self._center_ephemeris_time = center_sclock
         return self._center_ephemeris_time
+
+    @property
+    def fikid(self):
+        if isinstance(self, Framer):
+            fn = self.filter_number
+            if fn == 'N/A':
+                fn = 0
+        else:
+            fn = 0
+
+        return self.ikid - int(fn)
 
 
 class Isis3():
