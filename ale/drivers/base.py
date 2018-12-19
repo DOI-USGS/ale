@@ -1,11 +1,9 @@
-from abc import ABC, abstractmethod
-
 from dateutil import parser
 import numpy as np
 import pvl
 import spiceypy as spice
 
-class Driver(ABC):
+class Driver():
     """
     Abstract base class for all Drivers.
 
