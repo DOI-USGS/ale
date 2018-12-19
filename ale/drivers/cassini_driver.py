@@ -6,14 +6,17 @@ import spiceypy as spice
 import numpy as np
 
 from ale import config
-from ale.drivers.base import Framer, RadialDistortion
+from ale.drivers.base import Framer
+from ale.drivers import keys
 
 
-class CassiniISS(Framer, RadialDistortion):
+class CassiniISS(Framer):
     id_lookup = {
         "ISSNA" : "CASSINI_ISS_NAC",
         "ISSWA" : "CASSINI_ISS_WAC"
     }
+
+    required_keys = keys.base | keys.framer | keys.radial_distortion
 
     @property
     def metakernel(self):

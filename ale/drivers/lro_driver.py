@@ -6,9 +6,12 @@ import pvl
 import spiceypy as spice
 
 from ale.util import get_metakernels
-from ale.drivers.base import LineScanner, RadialDistortion, Spice, PDS3, Isis3
+from ale.drivers.base import LineScanner, Spice, PDS3, Isis3
+from ale.drivers import keys
 
-class LrocSpice(Spice, LineScanner, RadialDistortion):
+
+class LrocSpice(Spice, LineScanner):
+    required_keys = keys.base | keys.framer
 
     @property
     def metakernel(self):

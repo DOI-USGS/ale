@@ -6,15 +6,19 @@ import spiceypy as spice
 import numpy as np
 
 from ale import config
-from ale.drivers.base import Framer, TransverseDistortion, Spice, PDS3, Isis3
+from ale.drivers.base import Framer, Spice, PDS3, Isis3
+from ale.drivers import keys
 
-class MdisSpice(Spice, Framer, TransverseDistortion):
+
+class MdisSpice(Spice, Framer):
     id_lookup = {
         'MDIS-WAC': 'MSGR_MDIS_WAC',
         'MDIS-NAC':'MSGR_MDIS_NAC',
         'MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA':'MSGR_MDIS_NAC',
         'MERCURY DUAL IMAGING SYSTEM WIDE ANGLE CAMERA':'MSGR_MDIS_WAC'
     }
+
+    required_keys = keys.base | keys.framer | keys.transverse_distortion
 
     @property
     def metakernel(self):
