@@ -174,14 +174,25 @@ namespace ale {
   }
 
   // Rotation Function Functions
-  vector<double> getRotation(string from, string to,
-                             vector<double> coefficients, double time) {
-    vector<double> coordinate = {0.0, 0.0, 0.0};
-    return coordinate;
+  std::vector<double> getRotation(vector<vector<double>> coeffs, double time) {
+    vector<double> rotation = {0.0, 0.0, 0.0};
+
+    rotation[0] = evaluatePolynomial(coeffs[0], time, 0); // X
+    rotation[1] = evaluatePolynomial(coeffs[1], time, 0); // Y
+    rotation[2] = evaluatePolynomial(coeffs[2], time, 0); // Z
+
+    Eigen::Quaterniond quat;
+    quat = Eigen::AngleAxisd(rotation[0] * M_PI / 180, Eigen::Vector3d::UnitZ())
+                * Eigen::AngleAxisd(rotation[1] * M_PI / 180, Eigen::Vector3d::UnitX())
+                * Eigen::AngleAxisd(rotation[2] * M_PI / 180, Eigen::Vector3d::UnitZ());
+
+    quat.normalize();
+
+    vector<double> rotationQ = {quat.w(), quat.x(), quat.y(), quat.z()};
+    return rotationQ;
   }
 
-  vector<double> getAngularVelocity(string from, string to,
-                                    vector<double> coefficients, double time) {
+  vector<double> getAngularVelocity(vector<vector<double>> coefficients, double time) {
     vector<double> coordinate = {0.0, 0.0, 0.0};
     return coordinate;
   }

@@ -236,6 +236,21 @@ TEST(VelocityCoeffTest, InvalidInput) {
   EXPECT_THROW(ale::getVelocity(invalid_coeffs_sizes, valid_time), invalid_argument);
 }
 
+TEST(RotationCoeffTest, ZeroOrderPolynomial) {
+  double time = 1.0;
+  vector<vector<double>> coeffs = {{90},
+                                                            {0},
+                                                            {0}};
+
+  vector<double> coordinate = ale::getRotation(coeffs, time);
+
+  ASSERT_EQ(4, coordinate.size());
+  EXPECT_DOUBLE_EQ(1 / sqrt(2), coordinate[0]);
+  EXPECT_DOUBLE_EQ(0, coordinate[1]);
+  EXPECT_DOUBLE_EQ(0, coordinate[2]);
+  EXPECT_DOUBLE_EQ(1 / sqrt(2), coordinate[3]);
+}
+
 
 TEST(RotationInterpTest, ExampleGetRotation) {
   // simple test, only checks if API hit correctly and output is normalized
