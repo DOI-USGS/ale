@@ -35,7 +35,7 @@ namespace ale {
                                          double time, interpolation interp);
 
   std::vector<double> getRotation(std::vector<std::vector<double>> coeffs, double time);
-  std::vector<double> getAngularVelocity(std::vector<std::vector<double>> coefficients, double time);
+  std::vector<double> getAngularVelocity(std::vector<std::vector<double>> coeffs, double time);
 
   double evaluatePolynomial(std::vector<double> coeffs, double time, int d);
   double interpolate(std::vector<double> points, std::vector<double> times, double time, interpolation interp, int d);
