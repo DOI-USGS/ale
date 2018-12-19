@@ -174,16 +174,52 @@ namespace ale {
   }
 
   // Rotation Function Functions
-  vector<double> getRotation(string from, string to,
-                             vector<double> coefficients, double time) {
-    vector<double> coordinate = {0.0, 0.0, 0.0};
-    return coordinate;
+  std::vector<double> getRotation(vector<vector<double>> coeffs, double time) {
+
+    if (coeffs.size() != 3) {
+      throw invalid_argument("Invalid input coefficients, expected three vectors.");
+    }
+
+    vector<double> rotation = {0.0, 0.0, 0.0};
+
+    rotation[0] = evaluatePolynomial(coeffs[0], time, 0); // X
+    rotation[1] = evaluatePolynomial(coeffs[1], time, 0); // Y
+    rotation[2] = evaluatePolynomial(coeffs[2], time, 0); // Z
+
+    Eigen::Quaterniond quat;
+    quat = Eigen::AngleAxisd(rotation[0] * M_PI / 180, Eigen::Vector3d::UnitZ())
+                * Eigen::AngleAxisd(rotation[1] * M_PI / 180, Eigen::Vector3d::UnitX())
+                * Eigen::AngleAxisd(rotation[2] * M_PI / 180, Eigen::Vector3d::UnitZ());
+
+    quat.normalize();
+
+    vector<double> rotationQ = {quat.w(), quat.x(), quat.y(), quat.z()};
+    return rotationQ;
   }
 
-  vector<double> getAngularVelocity(string from, string to,
-                                    vector<double> coefficients, double time) {
-    vector<double> coordinate = {0.0, 0.0, 0.0};
-    return coordinate;
+  vector<double> getAngularVelocity(vector<vector<double>> coeffs, double time) {
+
+    if (coeffs.size() != 3) {
+      throw invalid_argument("Invalid input coefficients, expected three vectors.");
+    }
+
+    double phi = evaluatePolynomial(coeffs[0], time, 0); // X
+    double theta = evaluatePolynomial(coeffs[1], time, 0); // Y
+    double psi = evaluatePolynomial(coeffs[2], time, 0); // Z
+
+    double phi_dt = evaluatePolynomial(coeffs[0], time, 1);
+    double theta_dt = evaluatePolynomial(coeffs[1], time, 1);
+    double psi_dt = evaluatePolynomial(coeffs[2], time, 1);
+
+    Eigen::Quaterniond quat1, quat2;
+    quat1 = Eigen::AngleAxisd(phi * M_PI / 180, Eigen::Vector3d::UnitZ());
+    quat2 =  Eigen::AngleAxisd(theta * M_PI / 180, Eigen::Vector3d::UnitX());
+
+    Eigen::Vector3d velocity =  phi_dt * Eigen::Vector3d::UnitZ();
+    velocity += theta_dt * (quat1 *  Eigen::Vector3d::UnitX());
+    velocity += psi_dt * (quat1 * quat2 *  Eigen::Vector3d::UnitZ());
+
+    return {velocity[0], velocity[1], velocity[2]};
   }
 
   // Polynomial evaluation helper function
