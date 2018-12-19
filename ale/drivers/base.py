@@ -45,7 +45,6 @@ class Driver():
 
     def to_dict(self):
         keys = set(dir(self)) & self.required_keys
-        print(keys)
         return {p:getattr(self, p) for p in keys}
 
 
