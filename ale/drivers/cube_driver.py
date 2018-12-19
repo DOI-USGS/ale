@@ -11,49 +11,61 @@ import quaternion
 from ale import config
 from ale.drivers.base import Base
 
-def read_table(label, file):
-    data_types = {
-        'Integer' : {'format':'i', 'size':4},
-        'Double'  : {'format':'d', 'size':8},
-        'Real'    : {'format':'f', 'size':4},
-        'Text'    : {'format':'c', 'size':1}
-    }
-
+def read_table_data(table_label, file):
     file.seek(label['StartByte']-1)
-    data = file.read(label['Bytes'])
+    return file.read(label['Bytes'])
 
-    fields = label.getlist('Field')
+def field_size(field_label):
+    data_sizes = {
+        'Integer' : 4,
+        'Double'  : 8,
+        'Real'    : 4,
+        'Text'    : 1
+    }
+    return data_sizes[field_label['Type']] * field_label['Size']
+
+def field_format(field_label):
+    data_formats = {
+        'Integer' : 'i',
+        'Double'  : 'd',
+        'Real'    : 'f'
+    }
+    return data_formats[field_label['Type']] * field_label['Size']
+
+def parse_field(field_label, data):
+    if field_label['Type'] == 'Text':
+        results[field_label['Name']].append(data[:field_label['Size']].decode(encoding='latin_1'))
+    else:
+        data_format = field_format(field_label)
+        field_data = struct.unpack_from(data_format, data)
+        if len(field_data) == 1:
+            field_data = field_data[0]
+    return field_data
+
+def parse_table_data(table_label, data):
+    fields = table_label.getlist('Field')
     results = {field['Name']:[] for field in fields}
     offset = 0
-    for record in range(label['Records']):
+    for record in range(table_label['Records']):
         for field in fields:
-            count = field['Size']
-            if field['Type'] == 'Text':
-                results[field['Name']].append(data[offset:offset+count].decode(encoding='latin_1'))
-            else:
-                data_format = data_types[field['Type']]['format'] * count
-                field_data = struct.unpack_from(data_format, data, offset)
-                if len(field_data) == 1:
-                    results[field['Name']].append(field_data[0])
-                else:
-                    results[field['Name']].append(field_data)
-            offset += data_types[field['Type']]['size'] * count
-
+            field_data = parse_field(field, data[offset:])
+            results[field['Name']].append(field_data)
+            offset += field_size(field)
     return results
 
-def read_rotation_table(label, file):
-    bin_data = read_table(label, file)
+def parse_rotation_table(label, field_data):
     results = {}
-    if all (key in bin_data for key in ('J2000Q0','J2000Q1','J2000Q2','J2000Q3')):
-        results['Rotations'] = quaternion.as_quat_array( [ [q0, q1, q2, q2] for q0, q1, q2, q2 in zip(bin_data['J2000Q0'],bin_data['J2000Q1'],bin_data['J2000Q2'],bin_data['J2000Q3']) ] )
-    if all (key in bin_data for key in ('AV1','AV2','AV3')):
-        results['AngularVelocities'] = np.array( [ [av1, av2, av3] for av1, av2, av3 in zip(bin_data['AV1'],bin_data['AV2'],bin_data['AV3']) ] )
-    if 'ET' in bin_data:
-        results['Times'] = np.array(bin_data['ET'])
-    if all (key in bin_data for key in ('J2000Ang1','J2000Ang2','J2000Ang3')):
-        results['EulerCoefficients'] = np.array([bin_data['J2000Ang1'],bin_data['J2000Ang2'],bin_data['J2000Ang3']])
-        results['BaseTime'] = bin_data['J2000Ang1'][-1]
-        results['TimeScale'] = bin_data['J2000Ang2'][-1]
+    if all (key in field_data for key in ['J2000Q0','J2000Q1','J2000Q2','J2000Q3']):
+        results['Rotations'] = quaternion.as_quat_array( [ [q0, q1, q2, q3] for q0, q1, q2, q3 in zip(field_data['J2000Q0'],field_data['J2000Q1'],field_data['J2000Q2'],field_data['J2000Q3']) ] )
+    if all (key in field_data for key in ('AV1','AV2','AV3')):
+        results['AngularVelocities'] = np.array( [ [av1, av2, av3] for av1, av2, av3 in zip(field_data['AV1'],field_data['AV2'],field_data['AV3']) ] )
+    if 'ET' in field_data:
+        results['Times'] = np.array(field_data['ET'])
+    if all (key in field_data for key in ('J2000Ang1','J2000Ang2','J2000Ang3')):
+        results['EulerCoefficients'] = np.array([field_data['J2000Ang1'],field_data['J2000Ang2'],field_data['J2000Ang3']])
+        results['BaseTime'] = field_data['J2000Ang1'][-1]
+        results['TimeScale'] = field_data['J2000Ang2'][-1]
+
     if 'TimeDependentFrames' in label:
         results['TimeDependentFrames'] = np.array(label['TimeDependentFrames'])
     if all (key in label for key in ('ConstantRotation','ConstantFrames')):
@@ -67,19 +79,18 @@ def read_rotation_table(label, file):
         results['PlanetNutationPrecessionAngleCoefficients'] = np.array( [label['SysNutPrec0'],label['SysNutPrec1']] )
     return results
 
-def read_position_table(label, file):
-    bin_data = read_table(label, file)
+def parse_position_table(field_data):
     results = {}
-    if all (key in bin_data for key in ('J2000X','J2000Y','J2000Z')):
-        results['Positions'] = np.array( [ [x, y, z] for x, y, z in zip(bin_data['J2000X'],bin_data['J2000Y'],bin_data['J2000Z']) ] )
-    if 'ET' in bin_data:
-        results['Times'] = np.array(bin_data['ET'])
-    if all (key in bin_data for key in ('J2000XV','J2000YV','J2000ZV')):
-        results['Velocities'] = np.array( [ [x, y, z] for x, y, z in zip(bin_data['J2000XV'],bin_data['J2000YV'],bin_data['J2000ZV']) ] )
-    if all (key in bin_data for key in ('J2000SVX','J2000SVY','J2000SVZ')):
-        results['PositionCoefficients'] = np.array( [bin_data['J2000SVX'][:-1],bin_data['J2000SVY'][:-1],bin_data['J2000SVZ'][:-1]] )
-        results['BaseTime'] = bin_data['J2000SVX'][-1]
-        results['TimeScale'] = bin_data['J2000SVY'][-1]
+    if all (key in field_data for key in ('J2000X','J2000Y','J2000Z')):
+        results['Positions'] = np.array( [ [x, y, z] for x, y, z in zip(field_data['J2000X'],field_data['J2000Y'],field_data['J2000Z']) ] )
+    if 'ET' in field_data:
+        results['Times'] = np.array(field_data['ET'])
+    if all (key in field_data for key in ('J2000XV','J2000YV','J2000ZV')):
+        results['Velocities'] = np.array( [ [x, y, z] for x, y, z in zip(field_data['J2000XV'],field_data['J2000YV'],field_data['J2000ZV']) ] )
+    if all (key in field_data for key in ('J2000SVX','J2000SVY','J2000SVZ')):
+        results['PositionCoefficients'] = np.array( [field_data['J2000SVX'][:-1],field_data['J2000SVY'][:-1],field_data['J2000SVZ'][:-1]] )
+        results['BaseTime'] = field_data['J2000SVX'][-1]
+        results['TimeScale'] = field_data['J2000SVY'][-1]
     return results
 
 class Cube(Base):
@@ -88,14 +99,16 @@ class Cube(Base):
         super(Cube, self).__init__('')
         self.label = pvl.load(file)
         for table in self.label.getlist('Table'):
+            binary_data = read_table_data(table, file)
+            field_data = parse_table_data(table, binary_data)
             if table['Name'] == 'InstrumentPointing':
-                self.inst_pointing_table = read_rotation_table(table, file)
+                self.inst_pointing_table = parse_rotation_table(table, field_data)
             elif table['Name'] == 'BodyRotation':
-                self.body_orientation_table = read_rotation_table(table, file)
+                self.body_orientation_table = parse_rotation_table(table, field_data)
             elif table['Name'] == 'InstrumentPosition':
-                self.inst_position_table = read_position_table(table, file)
+                self.inst_position_table = parse_position_table(field_data)
             elif table['Name'] == 'SunPosition':
-                self.sun_position_table = read_position_table(table, file)
+                self.sun_position_table = parse_position_table(field_data)
 
     @property
     def instrument_id(self):
@@ -150,15 +163,11 @@ class Cube(Base):
 
     @property
     def ikid(self):
-        return self.label['IsisCube']['Kernels']['NaifFrameCode']
+        return self.label['IsisCube']['Kernels']['NaifIkCode']
 
     @property
     def fikid(self):
         pass
-
-    @property
-    def spacecraft_id(self):
-        return self.label['IsisCube']['Instrument']['SpacecraftId']
 
     @property
     def focal2pixel_lines(self):
@@ -175,8 +184,8 @@ class Cube(Base):
     @property
     def body_radii(self):
         for key in self.label['NaifKeywords']:
-            if re.match('BODY-?\d*_RADII'):
-                return self.label['NaifKeywords'][key]
+            if re.match('BODY-?\d*_RADII', key[0]):
+                return self.label['NaifKeywords'][key[0]]
 
     @property
     def semimajor(self):
