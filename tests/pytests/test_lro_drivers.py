@@ -4,8 +4,8 @@ from unittest import mock
 import pytest
 
 import ale
-from ale.drivers import lro_driver, base, distortion
-from ale.drivers.lro_driver import LRO_LROC
+from ale.drivers import lro_driver, base
+from ale.drivers.lro_driver import LroPds3Driver
 from ale import util
 
 # 'Mock' the spice module where it is imported
@@ -14,9 +14,8 @@ from conftest import SimpleSpice, get_mockkernels
 simplespice = SimpleSpice()
 base.spice = simplespice
 lro_driver.spice = simplespice
-distortion.spice = simplespice
 
-LRO_LROC.metakernel = get_mockkernels
+LroPds3Driver.metakernel = get_mockkernels
 
 @pytest.fixture
 def lro_lroclabel():
@@ -113,6 +112,7 @@ def lro_lroclabel():
         """
 
 def test_lro_creation(lro_lroclabel):
-    with LRO_LROC(lro_lroclabel) as m:
+    with LroPds3Driver(lro_lroclabel) as m:
         d = m.to_dict()
         assert isinstance(d, dict)
+        assert(set(d.keys()) == m.required_keys)
