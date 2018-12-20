@@ -115,3 +115,4 @@ def test_lro_creation(lro_lroclabel):
     with LroPds3Driver(lro_lroclabel) as m:
         d = m.to_dict()
         assert isinstance(d, dict)
+        assert(set(d.keys()) == m.required_keys)

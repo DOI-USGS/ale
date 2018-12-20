@@ -18,7 +18,7 @@ class MdisSpice(Spice, Framer):
         'MERCURY DUAL IMAGING SYSTEM WIDE ANGLE CAMERA':'MSGR_MDIS_WAC'
     }
 
-    required_keys = keys.base | keys.framer | keys.filter | keys.transverse_distortion
+    required_keys = keys.base | keys.framer | keys.filter | keys.transverse_distortion | keys.temp_dep_focal_legth
 
     @property
     def metakernel(self):
@@ -44,10 +44,6 @@ class MdisSpice(Spice, Framer):
         return f_t(self.focal_plane_tempature)
 
     @property
-    def focal_epsilon(self):
-        return float(spice.gdpool('INS{}_FL_UNCERTAINTY'.format(self.ikid), 0, 1)[0])
-
-    @property
     def starting_detector_sample(self):
         return int(spice.gdpool('INS{}_FPUBIN_START_SAMPLE'.format(self.ikid), 0, 1)[0])
 
@@ -59,11 +55,7 @@ class MdisSpice(Spice, Framer):
 class MdisPDS3Driver(PDS3, MdisSpice):
     @property
     def instrument_id(self):
-        return self.id_lookup[self._label['INSTRUMENT_ID']]
-
-    @property
-    def focal_plane_tempature(self):
-        return self._label['FOCAL_PLANE_TEMPERATURE'].value
+        return self.id_lookup[self.label['INSTRUMENT_ID']]
 
 
 class MdisIsis3Driver(Isis3, MdisSpice):
@@ -79,8 +71,8 @@ class MdisIsis3Driver(Isis3, MdisSpice):
 
     @property
     def instrument_id(self):
-        return self.id_lookup[self._label['IsisCube']['Instrument']['InstrumentId']]
+        return self.id_lookup[self.label['IsisCube']['Instrument']['InstrumentId']]
 
     @property
     def focal_plane_tempature(self):
-        return self._label['IsisCube']['Instrument']['FocalPlaneTemperature'].value
+        return self.label['IsisCube']['Instrument']['FocalPlaneTemperature'].value

@@ -11,7 +11,7 @@ from ale.drivers import keys
 
 
 class LrocSpice(Spice, LineScanner):
-    required_keys = keys.base | keys.framer
+    required_keys = keys.base | keys.linescanner
 
     @property
     def metakernel(self):
@@ -31,10 +31,10 @@ class LroPds3Driver(PDS3, LrocSpice):
         Ignores Wide Angle for now
         """
 
-        instrument = self._label.get("INSTRUMENT_ID")
+        instrument = self.label.get("INSTRUMENT_ID")
 
         # should be left or right
-        frame_id = self._label.get("FRAME_ID")
+        frame_id = self.label.get("FRAME_ID")
 
         if instrument == "LROC" and frame_id == "LEFT":
             return "LRO_LROCNACL"

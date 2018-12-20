@@ -1,19 +1,15 @@
 base = {
-    'name_model'
+    'name_model',
     'center_ephemeris_time',
     'detector_center',
     'detector_line_summing',
     'detector_sample_summing',
-    'dt_ephemeris',
-    'dt_quaternion',
     'ending_ephemeris_time',
     'exposure_duration',
     'focal2pixel_lines',
     'focal2pixel_samples',
     'focal_epsilon',
     'focal_length',
-    'focal_plane_tempature',
-    'id_lookup',
     'ikid',
     'image_lines',
     'image_samples',
@@ -55,6 +51,10 @@ radial_distortion = {
 
 framer = {
     'filter_number',
+}
+
+temp_dep_focal_legth = {
+    'focal_plane_tempature'
 }
 
 linescanner = {

@@ -112,6 +112,10 @@ class PDS3():
         self._sensor_position = eph
 
     @property
+    def focal_plane_tempature(self):
+        return self.label['FOCAL_PLANE_TEMPERATURE'].value
+
+    @property
     def label(self):
         if not hasattr(self, "_label"):
             if isinstance(self._file, pvl.PVLModule):
@@ -158,6 +162,10 @@ class PDS3():
     @property
     def _target_id(self):
         return spice.bodn2c(self.label['TARGET_NAME'])
+
+    @property
+    def focal_epsilon(self):
+        return float(spice.gdpool('INS{}_FL_UNCERTAINTY'.format(self.ikid), 0, 1)[0])
 
     @property
     def starting_ephemeris_time(self):

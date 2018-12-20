@@ -32,15 +32,15 @@ class CtxSpice(Spice, LineScanner):
 class CtxPds3Driver(PDS3, CtxSpice):
     @property
     def instrument_id(self):
-        return self.id_lookup[self._label['INSTRUMENT_NAME']]
+        return self.id_lookup[self.label['INSTRUMENT_NAME']]
 
     @property
     def spacecraft_name(self):
         name_lookup = {
             'MARS_RECONNAISSANCE_ORBITER': 'MRO'
         }
-        return name_lookup[self._label['SPACECRAFT_NAME']]
+        return name_lookup[self.label['SPACECRAFT_NAME']]
 
     @property
     def instrument_id(self):
-        return self.id_lookup[self._label['INSTRUMENT_NAME']]
+        return self.id_lookup[self.label['INSTRUMENT_NAME']]
