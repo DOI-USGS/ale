@@ -62,7 +62,8 @@ def mroctx_label():
     END"""
 
 
-def test_get_dict(mroctx_label):
+def test_ctx_creation(mroctx_label):
     with CtxPds3Driver(mroctx_label) as m:
         d = m.to_dict()
     assert isinstance(d, dict)
+    assert(set(d.keys()) == m.required_keys)

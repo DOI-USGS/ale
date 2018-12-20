@@ -30,7 +30,7 @@ class CassiniISS(Framer):
 
     @property
     def instrument_id(self):
-        return self.id_lookup[self._label['INSTRUMENT_ID']]
+        return self.id_lookup[self.label['INSTRUMENT_ID']]
 
     @property
     def focal_epsilon(self):
@@ -54,7 +54,7 @@ class CassiniISS(Framer):
     @property
     def _exposure_duration(self):
         # labels do not specify a unit explicitly
-        return self._label['EXPOSURE_DURATION'] * 0.001  # Scale to seconds
+        return self.label['EXPOSURE_DURATION'] * 0.001  # Scale to seconds
 
     @property
     def odtk(self):
