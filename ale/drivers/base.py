@@ -5,16 +5,11 @@ import spiceypy as spice
 
 class Driver():
     """
-    Abstract base class for all Drivers.
+    Base class for all Drivers.
 
     """
-    def __init__(self, label, *args, **kwargs):
-        if isinstance(label, str):
-            self._label = pvl.loads(label, strict=False)
-        elif isinstance(label, pvl.PVLModule):
-            self._label = label
-        else:
-            self._label = pvl.load(label, strict=False)
+    def __init__(self, file):
+        self._file = file
 
     def __enter__(self):
         """
@@ -95,7 +90,7 @@ class Framer(Driver):
 
     @property
     def filter_number(self):
-        return self._label.get('FILTER_NUMBER', 0)
+        return self.label.get('FILTER_NUMBER', 0)
 
     @property
     def number_of_ephemerides(self):
@@ -133,11 +128,23 @@ class PDS3():
         self._sensor_velocity = eph_rates
         self._sensor_position = eph
 
+    @property
+    def label(self):
+        if not hasattr(self, "_label"):
+            if isinstance(self._file, pvl.PVLModule):
+                self._label = label
+            try:
+                self._label = pvl.loads(self._file, strict=False)
+            except AttributeError:
+                self._label = pvl.load(self._file, strict=False)
+            except:
+                raise Exception("{} is not a valid label".format(label))
+        return self._label
 
     @property
     def line_exposure_duration(self):
         try:
-            return self._label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
+            return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
         except:
             return np.nan
 
@@ -147,15 +154,15 @@ class PDS3():
 
     @property
     def start_time(self):
-        return self._label['START_TIME']
+        return self.label['START_TIME']
 
     @property
     def image_lines(self):
-        return self._label['IMAGE']['LINES']
+        return self.label['IMAGE']['LINES']
 
     @property
     def image_samples(self):
-        return self._label['IMAGE']['LINE_SAMPLES']
+        return self.label['IMAGE']['LINE_SAMPLES']
 
     @property
     def interpolation_method(self):
@@ -163,29 +170,29 @@ class PDS3():
 
     @property
     def target_name(self):
-        return self._label['TARGET_NAME']
+        return self.label['TARGET_NAME']
 
     @property
     def _target_id(self):
-        return spice.bodn2c(self._label['TARGET_NAME'])
+        return spice.bodn2c(self.label['TARGET_NAME'])
 
     @property
     def starting_ephemeris_time(self):
         if not hasattr(self, '_starting_ephemeris_time'):
-            sclock = self._label['SPACECRAFT_CLOCK_START_COUNT']
+            sclock = self.label['SPACECRAFT_CLOCK_START_COUNT']
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
         return self._starting_ephemeris_time
 
     @property
     def exposure_duration(self):
         try:
-            return self._label['EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
+            return self.label['EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
         except:
             return np.nan
 
     @property
     def spacecraft_clock_stop_count(self):
-        sc = self._label.get('SPACECRAFT_CLOCK_STOP_COUNT', None)
+        sc = self.label.get('SPACECRAFT_CLOCK_STOP_COUNT', None)
         if sc == 'N/A':
             sc = None
         return sc
@@ -205,7 +212,7 @@ class PDS3():
 
     @property
     def spacecraft_name(self):
-        return self._label['MISSION_NAME']
+        return self.label['MISSION_NAME']
 
     @property
     def starting_detector_line(self):
@@ -221,7 +228,7 @@ class PDS3():
 
     @property
     def detector_line_summing(self):
-        return self._label.get('SAMPLING_FACTOR', 1)
+        return self.label.get('SAMPLING_FACTOR', 1)
 
 
 class Spice():
@@ -362,32 +369,45 @@ class Spice():
 
 class Isis3():
     @property
+    def label(self):
+        if not hasattr(self, "_label"):
+            if isinstance(self._file, pvl.PVLModule):
+                self._label = label
+            try:
+                self._label = pvl.loads(self._file, strict=False)
+            except AttributeError:
+                self._label = pvl.load(self._file, strict=False)
+            except:
+                raise Exception("{} is not a valid label".format(label))
+        return self._label
+
+    @property
     def start_time(self):
-        return self._label['IsisCube']['Instrument']['StartTime']
+        return self.label['IsisCube']['Instrument']['StartTime']
 
     @property
     def spacecraft_name(self):
-        return self._label['IsisCube']['Instrument']['SpacecraftName']
+        return self.label['IsisCube']['Instrument']['SpacecraftName']
 
     @property
     def image_lines(self):
-        return self._label['IsisCube']['Core']['Dimensions']['Lines']
+        return self.label['IsisCube']['Core']['Dimensions']['Lines']
 
     @property
     def image_samples(self):
-        return self._label['IsisCube']['Core']['Dimensions']['Samples']
+        return self.label['IsisCube']['Core']['Dimensions']['Samples']
 
     @property
     def _exposure_duration(self):
-        return self._label['IsisCube']['Instrument']['ExposureDuration'].value * 0.001 # Scale to seconds
+        return self.label['IsisCube']['Instrument']['ExposureDuration'].value * 0.001 # Scale to seconds
 
     @property
     def target_name(self):
-        return self._label['IsisCube']['Instrument']['TargetName']
+        return self.label['IsisCube']['Instrument']['TargetName']
 
     @property
     def starting_ephemeris_time(self):
         if not hasattr(self, '_starting_ephemeris_time'):
-            sclock = self._label['IsisCube']['Archive']['SpacecraftClockStartCount']
+            sclock = self.label['IsisCube']['Archive']['SpacecraftClockStartCount']
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
         return self._starting_ephemeris_time
