@@ -37,8 +37,11 @@ base = {
     'sun_velocity',
     'target_name',
     'number_of_ephemerides',
-    'fikid',
     'number_of_ephemerides'
+}
+
+filter = {
+    'fikid'
 }
 
 transverse_distortion = {

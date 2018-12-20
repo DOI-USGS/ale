@@ -18,7 +18,7 @@ class MdisSpice(Spice, Framer):
         'MERCURY DUAL IMAGING SYSTEM WIDE ANGLE CAMERA':'MSGR_MDIS_WAC'
     }
 
-    required_keys = keys.base | keys.framer | keys.transverse_distortion
+    required_keys = keys.base | keys.framer | keys.filter | keys.transverse_distortion
 
     @property
     def metakernel(self):
