@@ -1,42 +1,15 @@
-from abc import ABC, abstractmethod
-
 from dateutil import parser
 import numpy as np
 import pvl
 import spiceypy as spice
 
-from ale.drivers import distortion
-
-class Base(ABC):
+class Driver():
     """
-    Abstract base class for all PDS label parsing. Implementations should override
-    properties where a kernel provider deviates from the most broadly adopted
-    approach.
-
-    Methods that must be provided:
-    - instrument_id
-    - metakernel
+    Base class for all Drivers.
 
     """
-    def __init__(self, label, *args, **kwargs):
-        self._label = pvl.loads(label, strict=False)
-
-    def __enter__(self):
-        """
-        Called when the context is created. This is used
-        to get the kernels furnished.
-        """
-        if self.metakernel:
-            spice.furnsh(self.metakernel)
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """
-        Called when the context goes out of scope. Once
-        this is done, the object is out of scope and the
-        kernels can be unloaded.
-        """
-        spice.unload(self.metakernel)
+    def __init__(self, file):
+        self._file = file
 
     def __str__(self):
         return str(self.to_dict())
@@ -49,51 +22,71 @@ class Base(ABC):
             return False
 
     def to_dict(self):
-        return {p:getattr(self, p) for p in dir(self) if not p.startswith('_') and not callable(getattr(self,p))}
+        keys = set(dir(self)) & self.required_keys
+        return {p:getattr(self, p) for p in keys}
 
-    def to_pfeffer_response(self):
+
+class LineScanner(Driver):
+    @property
+    def name_model(self):
+        return "USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL"
+
+    @property
+    def t0_ephemeris(self):
+        return self.starting_ephemeris_time - self.center_ephemeris_time
+
+    @property
+    def t0_quaternion(self):
+        return self.starting_ephemeris_time - self.center_ephemeris_time
+
+    @property
+    def dt_ephemeris(self):
+        return (self.ending_ephemeris_time - self.starting_ephemeris_time) / self.number_of_ephemerides
+
+    @property
+    def dt_quaternion(self):
+        return (self.ending_ephemeris_time - self.starting_ephemeris_time) / self.number_of_ephemerides
+
+    @property
+    def line_scan_rate(self):
         """
-        Parse the data into a valid ale response
+        In the form: [start_line, line_time, exposure_duration]
+        The form below is for a fixed rate line scanner.
         """
-        data = self.to_dict()
-        # Take the flat reponse and create the ale obj dicts
-        data['detector_center'] = {'line': data['detector_center'][0],
-                                'sample': data['detector_center'][1]}
+        return [[float(self.starting_detector_line), self.t0_ephemeris, self.line_exposure_duration]]
 
-        # Parse the distortion object out of the
+    @property
+    def number_of_ephemerides(self):
+        #TODO: Not make this hardcoded
+        return 909
 
-        if isinstance(self, distortion.RadialDistortion):
-            data['optical_distortion'] = {'radial':{'coefficients':data['odtk']}}
-        elif isinstance(self, distortion.TransverseDistortion):
-            data['optical_distortion'] = {'transverse':{'x':data['odtx'],
-                                                        'y':data['odty']}}
+    @property
+    def number_of_quaternions(self):
+        #TODO: Not make this hardcoded
+        return 909
 
-        data['focal_length_model'] = {'focal_length': data['focal_length']}
-        if hasattr(self, 'focal_epsilon'):
-            data['focal_length_model']['focal_epsilon'] = data['focal_epsilon']
 
-        data['reference_height'] = {'minheight': data['reference_height'][0],
-                                    'maxheight': data['reference_height'][1],
-                                    'unit': 'm'}
+class Framer(Driver):
+    @property
+    def name_model(self):
+        return "USGS_ASTRO_FRAME_SENSOR_MODEL"
 
-        data['sensor_position'] = {'unit':'m',
-                                   'velocities': data['sensor_velocity'],
-                                   'positions': data['sensor_position']}
+    @property
+    def filter_number(self):
+        return self.label.get('FILTER_NUMBER', 0)
 
-        data['sun_position'] = {'unit': 'm',
-                                'positions': data['sun_position'],
-                                'velocities': data['sun_velocity']}
+    @property
+    def number_of_ephemerides(self):
+        # always one for framers
+        return 1
 
-        data['sensor_orientation'] = {'quaternions':data['sensor_orientation']}
+    @property
+    def number_of_quaternions(self):
+        # always one for framers
+        return 1
 
-        data['radii'] = {'semimajor':data['semimajor'],
-                         'semiminor':data['semiminor'],
-                         'unit': 'km'}
 
-        data['name_platform'] = data['spacecraft_name']
-        data['name_sensor'] = data['instrument_id']
-        return data
-
+class PDS3():
     def _compute_ephemerides(self):
         """
         Helper function to pull position and velocity in one pass
@@ -118,74 +111,91 @@ class Base(ABC):
         self._sensor_velocity = eph_rates
         self._sensor_position = eph
 
+    @property
+    def focal_plane_tempature(self):
+        return self.label['FOCAL_PLANE_TEMPERATURE'].value
 
     @property
-    @abstractmethod
-    def metakernel(self):
-        pass
+    def label(self):
+        if not hasattr(self, "_label"):
+            if isinstance(self._file, pvl.PVLModule):
+                self._label = label
+            try:
+                self._label = pvl.loads(self._file, strict=False)
+            except AttributeError:
+                self._label = pvl.load(self._file, strict=False)
+            except:
+                raise Exception("{} is not a valid label".format(label))
+        return self._label
 
     @property
-    @abstractmethod
+    def line_exposure_duration(self):
+        try:
+            return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
+        except:
+            return np.nan
+
+    @property
     def instrument_id(self):
         pass
 
     @property
     def start_time(self):
-        return self._label['START_TIME']
+        return self.label['START_TIME']
 
     @property
     def image_lines(self):
-        return self._label['IMAGE']['LINES']
+        return self.label['IMAGE']['LINES']
 
     @property
     def image_samples(self):
-        return self._label['IMAGE']['LINE_SAMPLES']
+        return self.label['IMAGE']['LINE_SAMPLES']
 
     @property
     def interpolation_method(self):
         return 'lagrange'
 
     @property
-    def number_of_ephemerides(self):
-        return 1
-
-    @property
     def target_name(self):
-        return self._label['TARGET_NAME']
+        return self.label['TARGET_NAME']
 
     @property
     def _target_id(self):
-        return spice.bodn2c(self._label['TARGET_NAME'])
+        return spice.bodn2c(self.label['TARGET_NAME'])
+
+    @property
+    def focal_epsilon(self):
+        return float(spice.gdpool('INS{}_FL_UNCERTAINTY'.format(self.ikid), 0, 1)[0])
 
     @property
     def starting_ephemeris_time(self):
         if not hasattr(self, '_starting_ephemeris_time'):
-            sclock = self._label['SPACECRAFT_CLOCK_START_COUNT']
+            sclock = self.label['SPACECRAFT_CLOCK_START_COUNT']
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
         return self._starting_ephemeris_time
 
     @property
-    def _exposure_duration(self):
-        return self._label['EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
+    def exposure_duration(self):
+        try:
+            return self.label['EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
+        except:
+            return np.nan
 
     @property
     def spacecraft_clock_stop_count(self):
-        sc = self._label.get('SPACECRAFT_CLOCK_STOP_COUNT', None)
+        sc = self.label.get('SPACECRAFT_CLOCK_STOP_COUNT', None)
         if sc == 'N/A':
             sc = None
         return sc
 
     @property
     def ending_ephemeris_time(self):
-        if not hasattr(self, '_ending_ephemeris_time'):
-            self._ending_ephemeris_time = (self.image_lines * self._exposure_duration) + self.starting_ephemeris_time
-        return self._ending_ephemeris_time
+        return (self.image_lines * self.line_exposure_duration) + self.starting_ephemeris_time
 
     @property
     def center_ephemeris_time(self):
-        if not hasattr(self, '_center_ephemeris_time'):
-            self._center_ephemeris_time = (self.starting_ephemeris_time + self.ending_ephemeris_time)/2
-        return self._center_ephemeris_time
+        return (self.starting_ephemeris_time + self.ending_ephemeris_time)/2
+
 
     @property
     def detector_center(self):
@@ -193,18 +203,62 @@ class Base(ABC):
 
     @property
     def spacecraft_name(self):
-        return self._label['MISSION_NAME']
+        return self.label['MISSION_NAME']
+
+    @property
+    def starting_detector_line(self):
+        return 1
+
+    @property
+    def starting_detector_sample(self):
+        return 1
+
+    @property
+    def detector_sample_summing(self):
+        return 1
+
+    @property
+    def detector_line_summing(self):
+        return self.label.get('SAMPLING_FACTOR', 1)
+
+
+class Spice():
+    @property
+    def metakernel(self):
+        pass
+
+    def __enter__(self):
+        """
+        Called when the context is created. This is used
+        to get the kernels furnished.
+        """
+        if self.metakernel:
+            spice.furnsh(self.metakernel)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Called when the context goes out of scope. Once
+        this is done, the object is out of scope and the
+        kernels can be unloaded.
+        """
+        spice.unload(self.metakernel)
+
+    @property
+    def odtx(self):
+        return spice.gdpool('INS{}_OD_T_X'.format(self.ikid),0, 10)
+
+    @property
+    def odty(self):
+        return spice.gdpool('INS{}_OD_T_Y'.format(self.ikid), 0, 10)
+
+    @property
+    def odtk(self):
+        return spice.gdpool('INS{}_OD_K'.format(self.ikid),0, 3)
 
     @property
     def ikid(self):
         return spice.bods2c(self.instrument_id)
-
-    @property
-    def fikid(self):
-        fn = self._label.get('FILTER_NUMBER', 0)
-        if fn == 'N/A':
-            fn = 0
-        return self.ikid - int(fn)
 
     @property
     def spacecraft_id(self):
@@ -221,22 +275,6 @@ class Base(ABC):
     @property
     def focal_length(self):
         return float(spice.gdpool('INS{}_FOCAL_LENGTH'.format(self.ikid), 0, 1)[0])
-
-    @property
-    def starting_detector_line(self):
-        return 1
-
-    @property
-    def starting_detector_sample(self):
-        return 1
-
-    @property
-    def detector_sample_summing(self):
-        return 1
-
-    @property
-    def detector_line_summing(self):
-        return self._label.get('SAMPLING_FACTOR', 1)
 
     @property
     def semimajor(self):
@@ -306,24 +344,6 @@ class Base(ABC):
         # TODO: This should be a reasonable #
         return 0, 100
 
-class LineScanner(Base):
-
-    @property
-    def name_model(self):
-        return "USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL"
-
-    @property
-    def _exposure_duration(self):
-        return self._label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
-
-    @property
-    def line_scan_rate(self):
-        """
-        In the form: [start_line, line_time, exposure_duration]
-        The form below is for a fixed rate line scanner.
-        """
-        return [[float(self.starting_detector_line), self.t0_ephemeris, self._exposure_duration]]
-
     @property
     def detector_center(self):
         if not hasattr(self, '_detector_center'):
@@ -339,50 +359,63 @@ class LineScanner(Base):
         """
         if not hasattr(self, '_center_ephemeris_time'):
             halflines = self.image_lines / 2
-            center_sclock = self.starting_ephemeris_time + halflines * self._exposure_duration
+            center_sclock = self.starting_ephemeris_time + halflines * self.line_exposure_duration
             self._center_ephemeris_time = center_sclock
         return self._center_ephemeris_time
 
     @property
-    def t0_ephemeris(self):
-        return self.starting_ephemeris_time - self.center_ephemeris_time
+    def fikid(self):
+        if isinstance(self, Framer):
+            fn = self.filter_number
+            if fn == 'N/A':
+                fn = 0
+        else:
+            fn = 0
+
+        return self.ikid - int(fn)
+
+
+class Isis3():
+    @property
+    def label(self):
+        if not hasattr(self, "_label"):
+            if isinstance(self._file, pvl.PVLModule):
+                self._label = label
+            try:
+                self._label = pvl.loads(self._file, strict=False)
+            except AttributeError:
+                self._label = pvl.load(self._file, strict=False)
+            except:
+                raise Exception("{} is not a valid label".format(label))
+        return self._label
 
     @property
-    def t0_quaternion(self):
-        return self.starting_ephemeris_time - self.center_ephemeris_time
+    def start_time(self):
+        return self.label['IsisCube']['Instrument']['StartTime']
 
     @property
-    def dt_ephemeris(self):
-        return (self.ending_ephemeris_time - self.starting_ephemeris_time) / self.number_of_ephemerides
+    def spacecraft_name(self):
+        return self.label['IsisCube']['Instrument']['SpacecraftName']
 
     @property
-    def dt_quaternion(self):
-        return (self.ending_ephemeris_time - self.starting_ephemeris_time) / self.number_of_ephemerides
+    def image_lines(self):
+        return self.label['IsisCube']['Core']['Dimensions']['Lines']
 
     @property
-    def number_of_ephemerides(self):
-        return 909
-
-    @property
-    def number_of_quaternions(self):
-        return 909
-
-
+    def image_samples(self):
+        return self.label['IsisCube']['Core']['Dimensions']['Samples']
 
     @property
     def _exposure_duration(self):
-        return self._label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
-
-class Framer(Base):
+        return self.label['IsisCube']['Instrument']['ExposureDuration'].value * 0.001 # Scale to seconds
 
     @property
-    def name_model(self):
-        return "USGS_ASTRO_FRAME_SENSOR_MODEL"
+    def target_name(self):
+        return self.label['IsisCube']['Instrument']['TargetName']
 
     @property
-    def number_of_ephemerides(self):
-        return 1
-
-    @property
-    def number_of_quaternions(self):
-        return 1
+    def starting_ephemeris_time(self):
+        if not hasattr(self, '_starting_ephemeris_time'):
+            sclock = self.label['IsisCube']['Archive']['SpacecraftClockStartCount']
+            self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
+        return self._starting_ephemeris_time

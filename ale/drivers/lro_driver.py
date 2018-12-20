@@ -6,10 +6,12 @@ import pvl
 import spiceypy as spice
 
 from ale.util import get_metakernels
-from ale.drivers.base import LineScanner
-from ale.drivers.distortion import RadialDistortion
+from ale.drivers.base import LineScanner, Spice, PDS3, Isis3
+from ale.drivers import keys
 
-class LRO_LROC(LineScanner, RadialDistortion):
+
+class LrocSpice(Spice, LineScanner):
+    required_keys = keys.base | keys.linescanner
 
     @property
     def metakernel(self):
@@ -18,21 +20,23 @@ class LRO_LROC(LineScanner, RadialDistortion):
         return self._metakernel
 
     @property
+    def spacecraft_name(self):
+        return "LRO"
+
+
+class LroPds3Driver(PDS3, LrocSpice):
+    @property
     def instrument_id(self):
         """
         Ignores Wide Angle for now
         """
 
-        instrument = self._label.get("INSTRUMENT_ID")
+        instrument = self.label.get("INSTRUMENT_ID")
 
         # should be left or right
-        frame_id = self._label.get("FRAME_ID")
+        frame_id = self.label.get("FRAME_ID")
 
         if instrument == "LROC" and frame_id == "LEFT":
             return "LRO_LROCNACL"
         elif instrument == "LROC" and frame_id == "RIGHT":
             return "LRO_LROCNACR"
-
-    @property
-    def spacecraft_name(self):
-        return "LRO"

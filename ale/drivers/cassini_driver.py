@@ -7,14 +7,16 @@ import numpy as np
 
 from ale import config
 from ale.drivers.base import Framer
-from ale.drivers.distortion import RadialDistortion
+from ale.drivers import keys
 
 
-class CassiniISS(Framer, RadialDistortion):
+class CassiniISS(Framer):
     id_lookup = {
         "ISSNA" : "CASSINI_ISS_NAC",
         "ISSWA" : "CASSINI_ISS_WAC"
     }
+
+    required_keys = keys.base | keys.framer | keys.radial_distortion
 
     @property
     def metakernel(self):
@@ -28,7 +30,7 @@ class CassiniISS(Framer, RadialDistortion):
 
     @property
     def instrument_id(self):
-        return self.id_lookup[self._label['INSTRUMENT_ID']]
+        return self.id_lookup[self.label['INSTRUMENT_ID']]
 
     @property
     def focal_epsilon(self):
@@ -52,7 +54,7 @@ class CassiniISS(Framer, RadialDistortion):
     @property
     def _exposure_duration(self):
         # labels do not specify a unit explicitly
-        return self._label['EXPOSURE_DURATION'] * 0.001  # Scale to seconds
+        return self.label['EXPOSURE_DURATION'] * 0.001  # Scale to seconds
 
     @property
     def odtk(self):
