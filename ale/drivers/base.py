@@ -11,23 +11,6 @@ class Driver():
     def __init__(self, file):
         self._file = file
 
-    def __enter__(self):
-        """
-        Called when the context is created. This is used
-        to get the kernels furnished.
-        """
-        if self.metakernel:
-            spice.furnsh(self.metakernel)
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """
-        Called when the context goes out of scope. Once
-        this is done, the object is out of scope and the
-        kernels can be unloaded.
-        """
-        spice.unload(self.metakernel)
-
     def __str__(self):
         return str(self.to_dict())
 
@@ -235,6 +218,23 @@ class Spice():
     @property
     def metakernel(self):
         pass
+
+    def __enter__(self):
+        """
+        Called when the context is created. This is used
+        to get the kernels furnished.
+        """
+        if self.metakernel:
+            spice.furnsh(self.metakernel)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Called when the context goes out of scope. Once
+        this is done, the object is out of scope and the
+        kernels can be unloaded.
+        """
+        spice.unload(self.metakernel)
 
     @property
     def odtx(self):
