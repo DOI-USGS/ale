@@ -320,7 +320,7 @@ class Spice():
         : list
           Optical distortion x coefficients
         """
-        return spice.gdpool('INS{}_OD_T_X'.format(self.ikid),0, 10)
+        return spice.gdpool('INS{}_OD_T_X'.format(self.ikid),0, 10).tolist()
 
     @property
     def odty(self):
@@ -330,7 +330,7 @@ class Spice():
         : list
           Optical distortion y coefficients
         """
-        return spice.gdpool('INS{}_OD_T_Y'.format(self.ikid), 0, 10)
+        return spice.gdpool('INS{}_OD_T_Y'.format(self.ikid), 0, 10).tolist()
 
     @property
     def odtk(self):
@@ -340,7 +340,7 @@ class Spice():
         : list
           Radial distortion coefficients
         """
-        return spice.gdpool('INS{}_OD_K'.format(self.ikid),0, 3)
+        return spice.gdpool('INS{}_OD_K'.format(self.ikid),0, 3).tolist()
 
     @property
     def ikid(self):
@@ -358,11 +358,11 @@ class Spice():
 
     @property
     def focal2pixel_lines(self):
-        return spice.gdpool('INS{}_ITRANSL'.format(self.fikid), 0, 3)
+        return list(spice.gdpool('INS{}_ITRANSL'.format(self.fikid), 0, 3))
 
     @property
     def focal2pixel_samples(self):
-        return spice.gdpool('INS{}_ITRANSS'.format(self.fikid), 0, 3)
+        return list(spice.gdpool('INS{}_ITRANSS'.format(self.fikid), 0, 3))
 
     @property
     def focal_length(self):
