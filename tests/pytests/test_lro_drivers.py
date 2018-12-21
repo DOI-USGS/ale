@@ -5,7 +5,7 @@ import pytest
 
 import ale
 from ale.drivers import lro_driver, base
-from ale.drivers.lro_driver import LroPds3Driver
+from ale.drivers.lro_driver import LrocPds3Driver
 from ale import util
 
 # 'Mock' the spice module where it is imported
@@ -15,7 +15,7 @@ simplespice = SimpleSpice()
 base.spice = simplespice
 lro_driver.spice = simplespice
 
-LroPds3Driver.metakernel = get_mockkernels
+LrocPds3Driver.metakernel = get_mockkernels
 
 @pytest.fixture
 def lro_lroclabel():
@@ -112,7 +112,7 @@ def lro_lroclabel():
         """
 
 def test_lro_creation(lro_lroclabel):
-    with LroPds3Driver(lro_lroclabel) as m:
+    with LrocPds3Driver(lro_lroclabel) as m:
         d = m.to_dict()
         assert isinstance(d, dict)
         assert(set(d.keys()) == m.required_keys)

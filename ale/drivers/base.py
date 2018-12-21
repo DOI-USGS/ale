@@ -7,8 +7,18 @@ class Driver():
     """
     Base class for all Drivers.
 
+    Attributes
+    ----------
+    _file : str
+            Reference to file path to be used by mixins for opening.
     """
     def __init__(self, file):
+        """
+        Parameters
+        ----------
+        file : str
+               path to file to be parsed
+        """
         self._file = file
 
     def __str__(self):
@@ -29,6 +39,15 @@ class Driver():
 class LineScanner(Driver):
     @property
     def name_model(self):
+        """
+        Returns Key used to define the sensor type. Primarily
+        used for generating camera models.
+
+        Returns
+        -------
+        : str
+          USGS Frame model
+        """
         return "USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL"
 
     @property
@@ -50,8 +69,10 @@ class LineScanner(Driver):
     @property
     def line_scan_rate(self):
         """
-        In the form: [start_line, line_time, exposure_duration]
-        The form below is for a fixed rate line scanner.
+        Returns
+        -------
+        : list
+          line scan rate in the form: [start_line, line_time, exposure_duration]
         """
         return [[float(self.starting_detector_line), self.t0_ephemeris, self.line_exposure_duration]]
 
@@ -69,6 +90,15 @@ class LineScanner(Driver):
 class Framer(Driver):
     @property
     def name_model(self):
+        """
+        Returns Key used to define the sensor type. Primarily
+        used for generating camera models.
+
+        Returns
+        -------
+        : str
+          USGS Frame model
+        """
         return "USGS_ASTRO_FRAME_SENSOR_MODEL"
 
     @property
@@ -87,6 +117,15 @@ class Framer(Driver):
 
 
 class PDS3():
+    """
+    Mixin for reading from PDS3 Labels.
+
+    Attributes
+    ----------
+    _label : PVLModule
+             Dict-like object with PVL keys
+
+    """
     def _compute_ephemerides(self):
         """
         Helper function to pull position and velocity in one pass
@@ -117,6 +156,14 @@ class PDS3():
 
     @property
     def label(self):
+        """
+        Loads a PVL from from the _file attribute.
+
+        Returns
+        -------
+        : PVLModule
+          Dict-like object with PVL keys
+        """
         if not hasattr(self, "_label"):
             if isinstance(self._file, pvl.PVLModule):
                 self._label = label
