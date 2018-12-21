@@ -204,6 +204,17 @@ class PDS3():
 
     @property
     def target_name(self):
+        """
+        Returns an target name for unquely identifying the instrument, but often
+        piped into Spice Kernels to acquire Ephermis data from Spice. Therefore they
+        the same ID the Spice expects in bodvrd calls.
+
+        Returns
+        -------
+        : str
+          target name
+        """
+
         return self.label['TARGET_NAME']
 
     @property
@@ -250,6 +261,15 @@ class PDS3():
 
     @property
     def spacecraft_name(self):
+        """
+        Spacecraft name used in various Spice calls to acquire
+        ephemeris data.
+
+        Returns
+        -------
+        : str
+          Spacecraft name
+        """
         return self.label['MISSION_NAME']
 
     @property
@@ -270,6 +290,7 @@ class PDS3():
 
 
 class Spice():
+
     @property
     def metakernel(self):
         pass
@@ -293,18 +314,42 @@ class Spice():
 
     @property
     def odtx(self):
+        """
+        Returns
+        -------
+        : list
+          Optical distortion x coefficients
+        """
         return spice.gdpool('INS{}_OD_T_X'.format(self.ikid),0, 10)
 
     @property
     def odty(self):
+        """
+        Returns
+        -------
+        : list
+          Optical distortion y coefficients
+        """
         return spice.gdpool('INS{}_OD_T_Y'.format(self.ikid), 0, 10)
 
     @property
     def odtk(self):
+        """
+        Returns
+        -------
+        : list
+          Radial distortion coefficients
+        """
         return spice.gdpool('INS{}_OD_K'.format(self.ikid),0, 3)
 
     @property
     def ikid(self):
+        """
+        Returns
+        -------
+        : int
+          Naif ID used to for indentifying the instrument in Spice kernels
+        """
         return spice.bods2c(self.instrument_id)
 
     @property
@@ -325,11 +370,23 @@ class Spice():
 
     @property
     def semimajor(self):
+        """
+        Returns
+        -------
+        : double
+          Semimajor axis of the target body
+        """
         rad = spice.bodvrd(self.target_name, 'RADII', 3)
         return rad[1][1]
 
     @property
     def semiminor(self):
+        """
+        Returns
+        -------
+        : double
+          Semiminor axis of the target body
+        """
         rad = spice.bodvrd(self.target_name, 'RADII', 3)
         return rad[1][0]
 
@@ -359,6 +416,7 @@ class Spice():
 
     @property
     def sensor_position(self):
+
         if not hasattr(self, '_sensor_position'):
             self._compute_ephemerides()
         return self._sensor_position.tolist()
@@ -442,14 +500,35 @@ class Isis3():
 
     @property
     def spacecraft_name(self):
+        """
+        Spacecraft name used in various Spice calls to acquire
+        ephemeris data.
+
+        Returns
+        -------
+        : str
+          Spacecraft name
+        """
         return self.label['IsisCube']['Instrument']['SpacecraftName']
 
     @property
     def image_lines(self):
+        """
+        Returns
+        -------
+        : int
+          Number of lines in image
+        """
         return self.label['IsisCube']['Core']['Dimensions']['Lines']
 
     @property
     def image_samples(self):
+        """
+        Returns
+        -------
+        : int
+          Number of samples in image
+        """
         return self.label['IsisCube']['Core']['Dimensions']['Samples']
 
     @property
@@ -458,6 +537,15 @@ class Isis3():
 
     @property
     def target_name(self):
+        """
+        Target name used in various Spice calls to acquire
+        target specific ephemeris data.
+
+        Returns
+        -------
+        : str
+          Target name
+        """
         return self.label['IsisCube']['Instrument']['TargetName']
 
     @property

@@ -35,6 +35,11 @@ class LrocSpice(Spice, LineScanner):
         """
         Spacecraft name used in various Spice calls to acquire
         ephemeris data.
+
+        Returns
+        -------
+        : str
+          Spacecraft name
         """
         return "LRO"
 
