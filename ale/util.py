@@ -1,11 +1,7 @@
-import datetime
 import os
 from glob import glob
 from itertools import filterfalse, groupby
 from os import path
-
-import numpy as np
-import six
 
 from ale import config
 
@@ -51,7 +47,7 @@ def get_metakernels(spice_dir=config.spice_root, missions=set(), years=set(), ve
         'data': []
     }
 
-    mission_dirs = list(filter(os.path.isdir, glob(os.path.join(spice_dir, '*'))))
+    mission_dirs = list(filter(path.isdir, glob(path.join(spice_dir, '*'))))
 
     for md in mission_dirs:
         # Assuming spice root has the same name as the original on NAIF website"

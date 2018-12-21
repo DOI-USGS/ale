@@ -12,9 +12,7 @@ from ale.drivers import keys
 
 class CassiniISS(Framer):
     """
-    Midis mixin class for defining snowflake Spice calls. Since Mdis has unique
-    Spice keys, those are defined here as an intermediate mixin for MDIS drivers
-    that rely on Spice kernels.
+    Cassini mixin class for defining snowflake Spice calls. 
     """
     id_lookup = {
         "ISSNA" : "CASSINI_ISS_NAC",

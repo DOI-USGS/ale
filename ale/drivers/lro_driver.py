@@ -53,7 +53,7 @@ class LrocPds3Driver(PDS3, LrocSpice):
     @property
     def instrument_id(self):
         """
-        Returns an instrument id for unquely identifying the instrument, but often
+        Returns an instrument id for uniquely identifying the instrument, but often
         also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
         the same ID the Spice expects in bods2c calls.
 
