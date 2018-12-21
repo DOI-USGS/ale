@@ -72,7 +72,7 @@ class LineScanner(Driver):
         Returns
         -------
         : list
-          line scan rate in the form: [start_line, line_time, exposure_duration]
+          2d list of scan rates in the form: [[start_line, line_time, exposure_duration], ...]
         """
         return [[float(self.starting_detector_line), self.t0_ephemeris, self.line_exposure_duration]]
 
