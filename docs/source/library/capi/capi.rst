@@ -1,4 +1,4 @@
-:mod:`capi` --- Input/Output Algorithms
+:mod:`capi` --- A.L.E C-API
 ============================================
 
 The :mod:`src` module
