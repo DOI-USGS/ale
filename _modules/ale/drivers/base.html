@@ -1,0 +1,499 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>ale.drivers.base &#8212; ale 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for ale.drivers.base</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">dateutil</span> <span class="k">import</span> <span class="n">parser</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pvl</span>
+<span class="kn">import</span> <span class="nn">spiceypy</span> <span class="k">as</span> <span class="nn">spice</span>
+
+<div class="viewcode-block" id="Driver"><a class="viewcode-back" href="../../../library/python/base.html#ale.drivers.base.Driver">[docs]</a><span class="k">class</span> <span class="nc">Driver</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for all Drivers.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">file</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">iid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument_id</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_keys</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">p</span><span class="p">:</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="LineScanner"><a class="viewcode-back" href="../../../library/python/base.html#ale.drivers.base.LineScanner">[docs]</a><span class="k">class</span> <span class="nc">LineScanner</span><span class="p">(</span><span class="n">Driver</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">t0_ephemeris</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">starting_ephemeris_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_ephemeris_time</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">t0_quaternion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">starting_ephemeris_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_ephemeris_time</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dt_ephemeris</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ending_ephemeris_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">starting_ephemeris_time</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_ephemerides</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dt_quaternion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ending_ephemeris_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">starting_ephemeris_time</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_ephemerides</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">line_scan_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        In the form: [start_line, line_time, exposure_duration]</span>
+<span class="sd">        The form below is for a fixed rate line scanner.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[[</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">starting_detector_line</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">t0_ephemeris</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_exposure_duration</span><span class="p">]]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">number_of_ephemerides</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#TODO: Not make this hardcoded</span>
+        <span class="k">return</span> <span class="mi">909</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">number_of_quaternions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#TODO: Not make this hardcoded</span>
+        <span class="k">return</span> <span class="mi">909</span></div>
+
+
+<div class="viewcode-block" id="Framer"><a class="viewcode-back" href="../../../library/python/base.html#ale.drivers.base.Framer">[docs]</a><span class="k">class</span> <span class="nc">Framer</span><span class="p">(</span><span class="n">Driver</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;USGS_ASTRO_FRAME_SENSOR_MODEL&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">filter_number</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;FILTER_NUMBER&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">number_of_ephemerides</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># always one for framers</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">number_of_quaternions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># always one for framers</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+
+<span class="k">class</span> <span class="nc">PDS3</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">_compute_ephemerides</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function to pull position and velocity in one pass</span>
+<span class="sd">        so that the results can then be cached in the associated</span>
+<span class="sd">        properties.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">eph</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_ephemerides</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">eph_rates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">eph</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">current_et</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">starting_ephemeris_time</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_ephemerides</span><span class="p">):</span>
+            <span class="n">state</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">spkezr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spacecraft_name</span><span class="p">,</span>
+                                    <span class="n">current_et</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">reference_frame</span><span class="p">,</span>
+                                    <span class="s1">&#39;NONE&#39;</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">target_name</span><span class="p">,)</span> <span class="c1"># If this is the sensor, insufficient, if this is the spacecraft, it works? Huh?</span>
+            <span class="n">eph</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">eph_rates</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+            <span class="n">current_et</span> <span class="o">+=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;dt_ephemeris&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># By default, spice works in km</span>
+        <span class="n">eph</span> <span class="o">*=</span> <span class="mi">1000</span>
+        <span class="n">eph_rates</span> <span class="o">*=</span> <span class="mi">1000</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sensor_velocity</span> <span class="o">=</span> <span class="n">eph_rates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sensor_position</span> <span class="o">=</span> <span class="n">eph</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">focal_plane_tempature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;FOCAL_PLANE_TEMPERATURE&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_label&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">,</span> <span class="n">pvl</span><span class="o">.</span><span class="n">PVLModule</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_label</span> <span class="o">=</span> <span class="n">label</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_label</span> <span class="o">=</span> <span class="n">pvl</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_label</span> <span class="o">=</span> <span class="n">pvl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> is not a valid label&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">line_exposure_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;LINE_EXPOSURE_DURATION&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="mf">0.001</span>  <span class="c1"># Scale to seconds</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">start_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;START_TIME&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">image_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IMAGE&#39;</span><span class="p">][</span><span class="s1">&#39;LINES&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">image_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IMAGE&#39;</span><span class="p">][</span><span class="s1">&#39;LINE_SAMPLES&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">interpolation_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;lagrange&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">target_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;TARGET_NAME&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_target_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">bodn2c</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;TARGET_NAME&#39;</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">focal_epsilon</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_FL_UNCERTAINTY&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">starting_ephemeris_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_starting_ephemeris_time&#39;</span><span class="p">):</span>
+            <span class="n">sclock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;SPACECRAFT_CLOCK_START_COUNT&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_starting_ephemeris_time</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">scs2e</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spacecraft_id</span><span class="p">,</span> <span class="n">sclock</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_starting_ephemeris_time</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">exposure_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;EXPOSURE_DURATION&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="mf">0.001</span>  <span class="c1"># Scale to seconds</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spacecraft_clock_stop_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SPACECRAFT_CLOCK_STOP_COUNT&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sc</span> <span class="o">==</span> <span class="s1">&#39;N/A&#39;</span><span class="p">:</span>
+            <span class="n">sc</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">sc</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ending_ephemeris_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_lines</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_exposure_duration</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">starting_ephemeris_time</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">center_ephemeris_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">starting_ephemeris_time</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ending_ephemeris_time</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_center</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_CCD_CENTER&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spacecraft_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;MISSION_NAME&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">starting_detector_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">starting_detector_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_sample_summing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_line_summing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SAMPLING_FACTOR&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Spice</span><span class="p">():</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">metakernel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Called when the context is created. This is used</span>
+<span class="sd">        to get the kernels furnished.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metakernel</span><span class="p">:</span>
+            <span class="n">spice</span><span class="o">.</span><span class="n">furnsh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metakernel</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Called when the context goes out of scope. Once</span>
+<span class="sd">        this is done, the object is out of scope and the</span>
+<span class="sd">        kernels can be unloaded.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">spice</span><span class="o">.</span><span class="n">unload</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metakernel</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">odtx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_OD_T_X&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="p">),</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">odty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_OD_T_Y&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">odtk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_OD_K&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="p">),</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ikid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">bods2c</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instrument_id</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spacecraft_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">bods2c</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spacecraft_name</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">focal2pixel_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_ITRANSL&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">focal2pixel_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_ITRANSS&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">focal_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_FOCAL_LENGTH&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">semimajor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rad</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">bodvrd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_name</span><span class="p">,</span> <span class="s1">&#39;RADII&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rad</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">semiminor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rad</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">bodvrd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_name</span><span class="p">,</span> <span class="s1">&#39;RADII&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rad</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">reference_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;IAU_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_name</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sun_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sun_state</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">spkezr</span><span class="p">(</span><span class="s2">&quot;SUN&quot;</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">center_ephemeris_time</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">reference_frame</span><span class="p">,</span>
+                                     <span class="s1">&#39;NONE&#39;</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">target_name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">sun_state</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sun_velocity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sun_state</span><span class="p">,</span> <span class="n">lt</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">spkezr</span><span class="p">(</span><span class="s2">&quot;SUN&quot;</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">center_ephemeris_time</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">reference_frame</span><span class="p">,</span>
+                                     <span class="s1">&#39;NONE&#39;</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">target_name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">sun_state</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sensor_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_sensor_position&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_compute_ephemerides</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sensor_position</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sensor_velocity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_sensor_velocity&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_compute_ephemerides</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sensor_velocity</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sensor_orientation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_sensor_orientation&#39;</span><span class="p">):</span>
+            <span class="n">current_et</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">starting_ephemeris_time</span>
+            <span class="n">qua</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_ephemerides</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_quaternions</span><span class="p">):</span>
+                <span class="c1"># Find the rotation matrix</span>
+                <span class="n">camera2bodyfixed</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">pxform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instrument_id</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">reference_frame</span><span class="p">,</span>
+                                                <span class="n">current_et</span><span class="p">)</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">m2q</span><span class="p">(</span><span class="n">camera2bodyfixed</span><span class="p">)</span>
+                <span class="n">qua</span><span class="p">[</span><span class="n">i</span><span class="p">,:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="n">qua</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">current_et</span> <span class="o">+=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;dt_quaternion&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sensor_orientation</span> <span class="o">=</span> <span class="n">qua</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sensor_orientation</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">reference_height</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># TODO: This should be a reasonable #</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_center</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_detector_center&#39;</span><span class="p">):</span>
+            <span class="n">center_line</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_BORESIGHT_LINE&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">center_sample</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_BORESIGHT_SAMPLE&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_detector_center</span> <span class="o">=</span> <span class="p">[</span><span class="n">center_line</span><span class="p">,</span> <span class="n">center_sample</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detector_center</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">center_ephemeris_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The center ephemeris time for a fixed rate line scanner.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_center_ephemeris_time&#39;</span><span class="p">):</span>
+            <span class="n">halflines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_lines</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">center_sclock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">starting_ephemeris_time</span> <span class="o">+</span> <span class="n">halflines</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_exposure_duration</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_center_ephemeris_time</span> <span class="o">=</span> <span class="n">center_sclock</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center_ephemeris_time</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fikid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Framer</span><span class="p">):</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_number</span>
+            <span class="k">if</span> <span class="n">fn</span> <span class="o">==</span> <span class="s1">&#39;N/A&#39;</span><span class="p">:</span>
+                <span class="n">fn</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ikid</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Isis3</span><span class="p">():</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_label&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">,</span> <span class="n">pvl</span><span class="o">.</span><span class="n">PVLModule</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_label</span> <span class="o">=</span> <span class="n">label</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_label</span> <span class="o">=</span> <span class="n">pvl</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_label</span> <span class="o">=</span> <span class="n">pvl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> is not a valid label&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">start_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;StartTime&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spacecraft_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;SpacecraftName&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">image_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Core&#39;</span><span class="p">][</span><span class="s1">&#39;Dimensions&#39;</span><span class="p">][</span><span class="s1">&#39;Lines&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">image_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Core&#39;</span><span class="p">][</span><span class="s1">&#39;Dimensions&#39;</span><span class="p">][</span><span class="s1">&#39;Samples&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_exposure_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;ExposureDuration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="mf">0.001</span> <span class="c1"># Scale to seconds</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">target_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;TargetName&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">starting_ephemeris_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_starting_ephemeris_time&#39;</span><span class="p">):</span>
+            <span class="n">sclock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Archive&#39;</span><span class="p">][</span><span class="s1">&#39;SpacecraftClockStartCount&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_starting_ephemeris_time</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">scs2e</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spacecraft_id</span><span class="p">,</span> <span class="n">sclock</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_starting_ephemeris_time</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Adam Paquette.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

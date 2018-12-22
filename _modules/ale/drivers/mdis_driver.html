@@ -1,0 +1,156 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>ale.drivers.mdis_driver &#8212; ale 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for ale.drivers.mdis_driver</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">glob</span> <span class="k">import</span> <span class="n">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">pvl</span>
+<span class="kn">import</span> <span class="nn">spiceypy</span> <span class="k">as</span> <span class="nn">spice</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">ale</span> <span class="k">import</span> <span class="n">config</span>
+<span class="kn">from</span> <span class="nn">ale.drivers.base</span> <span class="k">import</span> <span class="n">Framer</span><span class="p">,</span> <span class="n">Spice</span><span class="p">,</span> <span class="n">PDS3</span><span class="p">,</span> <span class="n">Isis3</span>
+<span class="kn">from</span> <span class="nn">ale.drivers</span> <span class="k">import</span> <span class="n">keys</span>
+
+
+<div class="viewcode-block" id="MdisSpice"><a class="viewcode-back" href="../../../library/python/mdis_driver.html#ale.drivers.mdis_driver.MdisSpice">[docs]</a><span class="k">class</span> <span class="nc">MdisSpice</span><span class="p">(</span><span class="n">Spice</span><span class="p">,</span> <span class="n">Framer</span><span class="p">):</span>
+    <span class="n">id_lookup</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;MDIS-WAC&#39;</span><span class="p">:</span> <span class="s1">&#39;MSGR_MDIS_WAC&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;MDIS-NAC&#39;</span><span class="p">:</span><span class="s1">&#39;MSGR_MDIS_NAC&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA&#39;</span><span class="p">:</span><span class="s1">&#39;MSGR_MDIS_NAC&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;MERCURY DUAL IMAGING SYSTEM WIDE ANGLE CAMERA&#39;</span><span class="p">:</span><span class="s1">&#39;MSGR_MDIS_WAC&#39;</span>
+    <span class="p">}</span>
+
+    <span class="n">required_keys</span> <span class="o">=</span> <span class="n">keys</span><span class="o">.</span><span class="n">base</span> <span class="o">|</span> <span class="n">keys</span><span class="o">.</span><span class="n">framer</span> <span class="o">|</span> <span class="n">keys</span><span class="o">.</span><span class="n">filter</span> <span class="o">|</span> <span class="n">keys</span><span class="o">.</span><span class="n">transverse_distortion</span> <span class="o">|</span> <span class="n">keys</span><span class="o">.</span><span class="n">temp_dep_focal_legth</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">metakernel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">metakernel_dir</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">mdis</span>
+        <span class="n">mks</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">metakernel_dir</span><span class="p">,</span><span class="s1">&#39;*.tm&#39;</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_metakernel&#39;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">mk</span> <span class="ow">in</span> <span class="n">mks</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">year</span><span class="p">)</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">mk</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_metakernel</span> <span class="o">=</span> <span class="n">mk</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metakernel</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">focal_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">coeffs</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_FL_TEMP_COEFFS &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+        <span class="c1"># reverse coeffs, mdis coeffs are listed a_0, a_1, a_2 ... a_n where</span>
+        <span class="c1"># numpy wants them a_n, a_n-1, a_n-2 ... a_0</span>
+        <span class="n">f_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">coeffs</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># eval at the focal_plane_tempature</span>
+        <span class="k">return</span> <span class="n">f_t</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">focal_plane_tempature</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">starting_detector_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_FPUBIN_START_SAMPLE&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">starting_detector_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_FPUBIN_START_LINE&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="MdisPDS3Driver"><a class="viewcode-back" href="../../../library/python/mdis_driver.html#ale.drivers.mdis_driver.MdisPDS3Driver">[docs]</a><span class="k">class</span> <span class="nc">MdisPDS3Driver</span><span class="p">(</span><span class="n">PDS3</span><span class="p">,</span> <span class="n">MdisSpice</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_lookup</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;INSTRUMENT_ID&#39;</span><span class="p">]]</span></div>
+
+
+<div class="viewcode-block" id="MdisIsis3Driver"><a class="viewcode-back" href="../../../library/python/mdis_driver.html#ale.drivers.mdis_driver.MdisIsis3Driver">[docs]</a><span class="k">class</span> <span class="nc">MdisIsis3Driver</span><span class="p">(</span><span class="n">Isis3</span><span class="p">,</span> <span class="n">MdisSpice</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">metakernel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">metakernel_dir</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">mdis</span>
+        <span class="n">mks</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">metakernel_dir</span><span class="p">,</span><span class="s1">&#39;*.tm&#39;</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_metakernel&#39;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">mk</span> <span class="ow">in</span> <span class="n">mks</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">year</span><span class="p">)</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">mk</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_metakernel</span> <span class="o">=</span> <span class="n">mk</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metakernel</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_lookup</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;InstrumentId&#39;</span><span class="p">]]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">focal_plane_tempature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;FocalPlaneTemperature&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Adam Paquette.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
