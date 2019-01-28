@@ -1,5 +1,7 @@
-ALE C API
-======
+ALE Package
+===========
 
-.. doxygenfile:: ale.cpp
-   :project: ale
+.. toctree::
+   :maxdepth: 2
+
+   library/index
