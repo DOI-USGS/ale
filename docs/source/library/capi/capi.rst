@@ -1,5 +1,5 @@
-:mod:`capi` --- Module C Functions
-============================================
+:mod:`capi` --- ALE C-API
+=======
 
 The :mod:`src` module
 

@@ -9,4 +9,5 @@ Library Reference
    :maxdepth: 2
 
    capi/index
-   io/index
+   python/index
+   ale/index
