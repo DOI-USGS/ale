@@ -1,5 +1,5 @@
 :mod:`cassini_driver` --- Cassini Driver Classes
-============================================
+================================================
 
 The :mod:`ale.drivers.cassini_driver` module
 

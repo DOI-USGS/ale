@@ -1,7 +1,13 @@
-ALE Package
-===========
+#############################
+Ephemeris Abstraction Library
+#############################
+
+:Release: |version|
+:Date: |today|
 
 .. toctree::
    :maxdepth: 2
 
-   library/index
+   library/capi/index
+   library/python/index
+   library/ale/index
