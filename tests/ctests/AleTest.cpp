@@ -302,7 +302,6 @@ TEST(PyInterfaceTest, LoadInvalidLabel) {
   EXPECT_THROW(ale::load(label), invalid_argument);
 }
 
-
 TEST(AngularVelocityInterpTest, ExampleGetRotation) {
   vector<double> times = {0,  1};
   vector<vector<double>> rots({{0,0}, {1,0}, {0,1}, {0,0}});

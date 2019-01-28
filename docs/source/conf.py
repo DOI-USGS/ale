@@ -21,12 +21,12 @@ import guzzle_sphinx_theme
 
 # -- Project information -----------------------------------------------------
 
-project = 'ale'
-copyright = '2018, Adam Paquette'
-author = 'Adam Paquette'
+project = 'ALE'
+copyright = 'Public Domain'
+author = 'USGS, Astrogeology Science Center'
 
 # The short X.Y version
-version = ''
+version = '0.1'
 # The full version, including alpha/beta/rc tags
 release = '0.1.0'
 
@@ -42,6 +42,8 @@ release = '0.1.0'
 # ones.
 
 breathe_projects = {"ale": "./../doxyxml/"}
+
+# breathe_projects_source = {"ale": ("../../include", ['ale.h'])}
 
 breathe_default_project = "ale"
 
@@ -144,7 +146,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'ALE.tex', 'ALE Documentation',
-     'Adam Paquette', 'manual'),
+     author, 'manual'),
 ]
 
 

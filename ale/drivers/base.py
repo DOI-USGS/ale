@@ -7,8 +7,18 @@ class Driver():
     """
     Base class for all Drivers.
 
+    Attributes
+    ----------
+    _file : str
+            Reference to file path to be used by mixins for opening.
     """
     def __init__(self, file):
+        """
+        Parameters
+        ----------
+        file : str
+               path to file to be parsed
+        """
         self._file = file
 
     def __str__(self):
@@ -29,6 +39,15 @@ class Driver():
 class LineScanner(Driver):
     @property
     def name_model(self):
+        """
+        Returns Key used to define the sensor type. Primarily
+        used for generating camera models.
+
+        Returns
+        -------
+        : str
+          USGS Frame model
+        """
         return "USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL"
 
     @property
@@ -50,8 +69,10 @@ class LineScanner(Driver):
     @property
     def line_scan_rate(self):
         """
-        In the form: [start_line, line_time, exposure_duration]
-        The form below is for a fixed rate line scanner.
+        Returns
+        -------
+        : list
+          2d list of scan rates in the form: [[start_line, line_time, exposure_duration], ...]
         """
         return [[float(self.starting_detector_line), self.t0_ephemeris, self.line_exposure_duration]]
 
@@ -69,6 +90,15 @@ class LineScanner(Driver):
 class Framer(Driver):
     @property
     def name_model(self):
+        """
+        Returns Key used to define the sensor type. Primarily
+        used for generating camera models.
+
+        Returns
+        -------
+        : str
+          USGS Frame model
+        """
         return "USGS_ASTRO_FRAME_SENSOR_MODEL"
 
     @property
@@ -87,6 +117,15 @@ class Framer(Driver):
 
 
 class PDS3():
+    """
+    Mixin for reading from PDS3 Labels.
+
+    Attributes
+    ----------
+    _label : PVLModule
+             Dict-like object with PVL keys
+
+    """
     def _compute_ephemerides(self):
         """
         Helper function to pull position and velocity in one pass
@@ -117,6 +156,14 @@ class PDS3():
 
     @property
     def label(self):
+        """
+        Loads a PVL from from the _file attribute.
+
+        Returns
+        -------
+        : PVLModule
+          Dict-like object with PVL keys
+        """
         if not hasattr(self, "_label"):
             if isinstance(self._file, pvl.PVLModule):
                 self._label = label
@@ -157,6 +204,17 @@ class PDS3():
 
     @property
     def target_name(self):
+        """
+        Returns an target name for unquely identifying the instrument, but often
+        piped into Spice Kernels to acquire Ephermis data from Spice. Therefore they
+        the same ID the Spice expects in bodvrd calls.
+
+        Returns
+        -------
+        : str
+          target name
+        """
+
         return self.label['TARGET_NAME']
 
     @property
@@ -203,6 +261,15 @@ class PDS3():
 
     @property
     def spacecraft_name(self):
+        """
+        Spacecraft name used in various Spice calls to acquire
+        ephemeris data.
+
+        Returns
+        -------
+        : str
+          Spacecraft name
+        """
         return self.label['MISSION_NAME']
 
     @property
@@ -223,6 +290,7 @@ class PDS3():
 
 
 class Spice():
+
     @property
     def metakernel(self):
         pass
@@ -246,18 +314,42 @@ class Spice():
 
     @property
     def odtx(self):
-        return spice.gdpool('INS{}_OD_T_X'.format(self.ikid),0, 10)
+        """
+        Returns
+        -------
+        : list
+          Optical distortion x coefficients
+        """
+        return spice.gdpool('INS{}_OD_T_X'.format(self.ikid),0, 10).tolist()
 
     @property
     def odty(self):
-        return spice.gdpool('INS{}_OD_T_Y'.format(self.ikid), 0, 10)
+        """
+        Returns
+        -------
+        : list
+          Optical distortion y coefficients
+        """
+        return spice.gdpool('INS{}_OD_T_Y'.format(self.ikid), 0, 10).tolist()
 
     @property
     def odtk(self):
-        return spice.gdpool('INS{}_OD_K'.format(self.ikid),0, 3)
+        """
+        Returns
+        -------
+        : list
+          Radial distortion coefficients
+        """
+        return spice.gdpool('INS{}_OD_K'.format(self.ikid),0, 3).tolist()
 
     @property
     def ikid(self):
+        """
+        Returns
+        -------
+        : int
+          Naif ID used to for indentifying the instrument in Spice kernels
+        """
         return spice.bods2c(self.instrument_id)
 
     @property
@@ -266,11 +358,11 @@ class Spice():
 
     @property
     def focal2pixel_lines(self):
-        return spice.gdpool('INS{}_ITRANSL'.format(self.fikid), 0, 3)
+        return list(spice.gdpool('INS{}_ITRANSL'.format(self.fikid), 0, 3))
 
     @property
     def focal2pixel_samples(self):
-        return spice.gdpool('INS{}_ITRANSS'.format(self.fikid), 0, 3)
+        return list(spice.gdpool('INS{}_ITRANSS'.format(self.fikid), 0, 3))
 
     @property
     def focal_length(self):
@@ -278,11 +370,23 @@ class Spice():
 
     @property
     def semimajor(self):
+        """
+        Returns
+        -------
+        : double
+          Semimajor axis of the target body
+        """
         rad = spice.bodvrd(self.target_name, 'RADII', 3)
         return rad[1][1]
 
     @property
     def semiminor(self):
+        """
+        Returns
+        -------
+        : double
+          Semiminor axis of the target body
+        """
         rad = spice.bodvrd(self.target_name, 'RADII', 3)
         return rad[1][0]
 
@@ -312,6 +416,7 @@ class Spice():
 
     @property
     def sensor_position(self):
+
         if not hasattr(self, '_sensor_position'):
             self._compute_ephemerides()
         return self._sensor_position.tolist()
@@ -395,14 +500,35 @@ class Isis3():
 
     @property
     def spacecraft_name(self):
+        """
+        Spacecraft name used in various Spice calls to acquire
+        ephemeris data.
+
+        Returns
+        -------
+        : str
+          Spacecraft name
+        """
         return self.label['IsisCube']['Instrument']['SpacecraftName']
 
     @property
     def image_lines(self):
+        """
+        Returns
+        -------
+        : int
+          Number of lines in image
+        """
         return self.label['IsisCube']['Core']['Dimensions']['Lines']
 
     @property
     def image_samples(self):
+        """
+        Returns
+        -------
+        : int
+          Number of samples in image
+        """
         return self.label['IsisCube']['Core']['Dimensions']['Samples']
 
     @property
@@ -411,6 +537,15 @@ class Isis3():
 
     @property
     def target_name(self):
+        """
+        Target name used in various Spice calls to acquire
+        target specific ephemeris data.
+
+        Returns
+        -------
+        : str
+          Target name
+        """
         return self.label['IsisCube']['Instrument']['TargetName']
 
     @property

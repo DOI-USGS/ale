@@ -11,24 +11,58 @@ from ale.drivers import keys
 
 
 class LrocSpice(Spice, LineScanner):
+    """
+    Lroc mixin class for defining snowflake Spice calls.
+    """
     required_keys = keys.base | keys.linescanner
 
     @property
     def metakernel(self):
+        """
+        Returns latest instrument metakernels
+
+        Returns
+        -------
+        : string
+          Path to latest metakernel file
+        """
         metakernels = get_metakernels(years=self.start_time.year, missions='lro', versions='latest')
         self._metakernel = metakernels['data'][0]['path']
         return self._metakernel
 
     @property
     def spacecraft_name(self):
+        """
+        Spacecraft name used in various Spice calls to acquire
+        ephemeris data.
+
+        Returns
+        -------
+        : str
+          Spacecraft name
+        """
         return "LRO"
 
 
-class LroPds3Driver(PDS3, LrocSpice):
+class LrocPds3Driver(PDS3, LrocSpice):
+    """
+    Driver for reading Lroc labels. Requires a Spice mixin to acquire addtional
+    ephemeris and instrument data located exclusively in spice kernels.
+    """
+
     @property
     def instrument_id(self):
         """
+        Returns an instrument id for uniquely identifying the instrument, but often
+        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+        the same ID the Spice expects in bods2c calls.
+
         Ignores Wide Angle for now
+
+        Returns
+        -------
+        : str
+          instrument id
         """
 
         instrument = self.label.get("INSTRUMENT_ID")
