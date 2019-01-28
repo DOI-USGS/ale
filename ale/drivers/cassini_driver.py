@@ -11,6 +11,9 @@ from ale.drivers import keys
 
 
 class CassiniISS(Framer):
+    """
+    Cassini mixin class for defining snowflake Spice calls. 
+    """
     id_lookup = {
         "ISSNA" : "CASSINI_ISS_NAC",
         "ISSWA" : "CASSINI_ISS_WAC"
@@ -20,6 +23,14 @@ class CassiniISS(Framer):
 
     @property
     def metakernel(self):
+        """
+        Returns latest instrument metakernels
+
+        Returns
+        -------
+        : string
+          Path to latest metakernel file
+        """
         metakernel_dir = config.cassini
         mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
         if not hasattr(self, '_metakernel'):
@@ -30,6 +41,16 @@ class CassiniISS(Framer):
 
     @property
     def instrument_id(self):
+        """
+        Returns an instrument id for unquely identifying the instrument, but often
+        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+        the same ID the Spice expects in bods2c calls.
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
         return self.id_lookup[self.label['INSTRUMENT_ID']]
 
     @property
@@ -38,6 +59,10 @@ class CassiniISS(Framer):
 
     @property
     def spacecraft_name(self):
+        """
+        Spacecraft name used in various Spice calls to acquire
+        ephemeris data.
+        """
         return 'CASSINI'
 
     @property
