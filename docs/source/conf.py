@@ -43,12 +43,13 @@ release = '0.1.0'
 
 breathe_projects = {"ale": "./../doxyxml/"}
 
-# breathe_projects_source = {"ale": ("../../include", ['ale.h'])}
+numpydoc_show_class_members = False
 
 breathe_default_project = "ale"
 
 extensions = [
     'sphinx.ext.autodoc',
+    'numpydoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
