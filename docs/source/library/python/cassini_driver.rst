@@ -8,3 +8,4 @@ The :mod:`ale.drivers.cassini_driver` module
 .. automodule:: ale.drivers.cassini_driver
    :synopsis:
    :members:
+   :show-inheritance:

@@ -8,3 +8,4 @@ The :mod:`ale.drivers.mdis_driver` module
 .. automodule:: ale.drivers.mdis_driver
    :synopsis:
    :members:
+   :show-inheritance:
