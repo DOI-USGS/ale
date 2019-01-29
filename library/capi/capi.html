@@ -6,18 +6,17 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>capi — A.L.E C-API &#8212; ale 0.1.0 documentation</title>
+    <title>capi — ALE C-API &#8212; ALE 0.1.0 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="python — Input/Output Algorithms" href="../python/index.html" />
-    <link rel="prev" title="capi — All A.L.E. functions" href="index.html" />
+    <link rel="prev" title="capi — All ALE functions" href="index.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
@@ -30,11 +29,230 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
+          
+
           <div class="body" role="main">
             
-  <div class="section" id="capi-a-l-e-c-api">
-<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">capi</span></code> — A.L.E C-API<a class="headerlink" href="#capi-a-l-e-c-api" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="capi-ale-c-api">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">capi</span></code> — ALE C-API<a class="headerlink" href="#capi-ale-c-api" title="Permalink to this headline">¶</a></h1>
 <p>The <code class="xref py py-mod docutils literal notranslate"><span class="pre">src</span></code> module</p>
+<dl class="type">
+<dt id="_CPPv33ale">
+<span id="_CPPv23ale"></span><span id="ale"></span><span class="target" id="namespaceale"></span><em class="property">namespace </em><code class="descname">ale</code><a class="headerlink" href="#_CPPv33ale" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Enums</p>
+<dl class="type">
+<dt id="_CPPv3N3ale13interpolationE">
+<span id="_CPPv2N3ale13interpolationE"></span><span id="ale::interpolation"></span><span class="target" id="namespaceale_1a346328704b11e596bcd1bdd1801b3666"></span><em class="property">enum </em><code class="descname">interpolation</code><a class="headerlink" href="#_CPPv3N3ale13interpolationE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Interpolation enum for defining different methods of interpolation. </p>
+<p><em>Values:</em></p>
+<dl class="enumerator">
+<dt id="_CPPv3N3ale6linearE">
+<span id="_CPPv2N3ale6linearE"></span><span class="target" id="namespaceale_1a346328704b11e596bcd1bdd1801b3666a9bc504f5fb73e7bde200c2788bbdac7b"></span><code class="descname">linear</code><a class="headerlink" href="#_CPPv3N3ale6linearE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Interpolate using linear interpolation. </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv3N3ale6splineE">
+<span id="_CPPv2N3ale6splineE"></span><span class="target" id="namespaceale_1a346328704b11e596bcd1bdd1801b3666a749bfa8f1993fc7bbed854922e14de0a"></span><code class="descname">spline</code><a class="headerlink" href="#_CPPv3N3ale6splineE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Interpolate using spline interpolation. </p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv3N3ale11getPositionENSt6vectorINSt6vectorIdEEEENSt6vectorIdEEd13interpolation">
+<span id="_CPPv2N3ale11getPositionENSt6vectorINSt6vectorIdEEEENSt6vectorIdEEd13interpolation"></span><span id="ale::getPosition__std::vector:std::vector:double::.std::vector:double:.double.interpolation"></span><span class="target" id="namespaceale_1a396c4fa8579176035556039764d9ee89"></span>std::vector&lt;double&gt; <code class="descname">getPosition</code><span class="sig-paren">(</span>std::vector&lt;std::vector&lt;double&gt;&gt; <em>coords</em>, std::vector&lt;double&gt; <em>times</em>, double <em>time</em>, <a class="reference internal" href="#_CPPv3N3ale13interpolationE" title="ale::interpolation">interpolation</a> <em>interp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N3ale11getPositionENSt6vectorINSt6vectorIdEEEENSt6vectorIdEEd13interpolation" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Get the position of the spacecraft at a given time based on a set of coordinates, and their associated times. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>A vector double of the spacecrafts position </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">coords</span></code>: A vector of double vectors of coordinates </li>
+<li><code class="docutils literal notranslate"><span class="pre">times</span></code>: A double vector of times </li>
+<li><code class="docutils literal notranslate"><span class="pre">time</span></code>: Time to observe the spacecraft’s position at </li>
+<li><code class="docutils literal notranslate"><span class="pre">interp</span></code>: Interpolation type </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N3ale11getVelocityENSt6vectorINSt6vectorIdEEEENSt6vectorIdEEdK13interpolation">
+<span id="_CPPv2N3ale11getVelocityENSt6vectorINSt6vectorIdEEEENSt6vectorIdEEdK13interpolation"></span><span id="ale::getVelocity__std::vector:std::vector:double::.std::vector:double:.double.interpolationC"></span><span class="target" id="namespaceale_1a8173b2cc738c00157f6ca1e1b835ce1d"></span>std::vector&lt;double&gt; <code class="descname">getVelocity</code><span class="sig-paren">(</span>std::vector&lt;std::vector&lt;double&gt;&gt; <em>coords</em>, std::vector&lt;double&gt; <em>times</em>, double <em>time</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv3N3ale13interpolationE" title="ale::interpolation">interpolation</a> <em>interp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N3ale11getVelocityENSt6vectorINSt6vectorIdEEEENSt6vectorIdEEdK13interpolation" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Get the velocity of the spacecraft at a given time based on a set of coordinates, and their associated times. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>A vector double of the spacecrafts velocity </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">coords</span></code>: A vector of double vectors of coordinates </li>
+<li><code class="docutils literal notranslate"><span class="pre">times</span></code>: A double vector of times </li>
+<li><code class="docutils literal notranslate"><span class="pre">time</span></code>: Time to observe the spacecraft’s velocity at </li>
+<li><code class="docutils literal notranslate"><span class="pre">interp</span></code>: Interpolation type </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N3ale11getPositionENSt6vectorINSt6vectorIdEEEEd">
+<span id="_CPPv2N3ale11getPositionENSt6vectorINSt6vectorIdEEEEd"></span><span id="ale::getPosition__std::vector:std::vector:double::.double"></span><span class="target" id="namespaceale_1a35704c7981ffc0e92e1e4a202352de33"></span>std::vector&lt;double&gt; <code class="descname">getPosition</code><span class="sig-paren">(</span>std::vector&lt;std::vector&lt;double&gt;&gt; <em>coeffs</em>, double <em>time</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N3ale11getPositionENSt6vectorINSt6vectorIdEEEEd" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Get the position of the spacecraft at a given time based on a derived function from a set of coeffcients. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>A vector double of the spacecrafts position </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">coeffs</span></code>: A vector of double vector of coeffcients </li>
+<li><code class="docutils literal notranslate"><span class="pre">time</span></code>: Time to observe the spacecraft’s position at </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N3ale11getVelocityENSt6vectorINSt6vectorIdEEEEd">
+<span id="_CPPv2N3ale11getVelocityENSt6vectorINSt6vectorIdEEEEd"></span><span id="ale::getVelocity__std::vector:std::vector:double::.double"></span><span class="target" id="namespaceale_1a0bd93ac555256c7062757768f22995a6"></span>std::vector&lt;double&gt; <code class="descname">getVelocity</code><span class="sig-paren">(</span>std::vector&lt;std::vector&lt;double&gt;&gt; <em>coeffs</em>, double <em>time</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N3ale11getVelocityENSt6vectorINSt6vectorIdEEEEd" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Get the velocity of the spacecraft at a given time based on a derived function from a set of coeffcients. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>A vector double of the spacecrafts velocity </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">coeffs</span></code>: A vector of double vector of coeffcients </li>
+<li><code class="docutils literal notranslate"><span class="pre">time</span></code>: Time to observe the spacecraft’s velocity at </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N3ale11getRotationENSt6vectorINSt6vectorIdEEEENSt6vectorIdEEd13interpolation">
+<span id="_CPPv2N3ale11getRotationENSt6vectorINSt6vectorIdEEEENSt6vectorIdEEd13interpolation"></span><span id="ale::getRotation__std::vector:std::vector:double::.std::vector:double:.double.interpolation"></span><span class="target" id="namespaceale_1a7171be1fd449745496b0c861a5b46e38"></span>std::vector&lt;double&gt; <code class="descname">getRotation</code><span class="sig-paren">(</span>std::vector&lt;std::vector&lt;double&gt;&gt; <em>rotations</em>, std::vector&lt;double&gt; <em>times</em>, double <em>time</em>, <a class="reference internal" href="#_CPPv3N3ale13interpolationE" title="ale::interpolation">interpolation</a> <em>interp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N3ale11getRotationENSt6vectorINSt6vectorIdEEEENSt6vectorIdEEd13interpolation" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Get the rotation of the spacecraft at a given time based on a set of rotations, and their associated times. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>A vector double of the spacecrafts rotation </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">rotations</span></code>: A vector of double vector of rotations </li>
+<li><code class="docutils literal notranslate"><span class="pre">times</span></code>: A double vector of times </li>
+<li><code class="docutils literal notranslate"><span class="pre">time</span></code>: Time to observe the spacecraft’s rotation at </li>
+<li><code class="docutils literal notranslate"><span class="pre">interp</span></code>: Interpolation type </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N3ale18getAngularVelocityENSt6vectorINSt6vectorIdEEEENSt6vectorIdEEd13interpolation">
+<span id="_CPPv2N3ale18getAngularVelocityENSt6vectorINSt6vectorIdEEEENSt6vectorIdEEd13interpolation"></span><span id="ale::getAngularVelocity__std::vector:std::vector:double::.std::vector:double:.double.interpolation"></span><span class="target" id="namespaceale_1a4113ffa35d469918bd49926150a7f10b"></span>std::vector&lt;double&gt; <code class="descname">getAngularVelocity</code><span class="sig-paren">(</span>std::vector&lt;std::vector&lt;double&gt;&gt; <em>rotations</em>, std::vector&lt;double&gt; <em>times</em>, double <em>time</em>, <a class="reference internal" href="#_CPPv3N3ale13interpolationE" title="ale::interpolation">interpolation</a> <em>interp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N3ale18getAngularVelocityENSt6vectorINSt6vectorIdEEEENSt6vectorIdEEd13interpolation" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Get the angular velocity of the spacecraft at a given time based on a set of rotations, and their associated times. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>A vector double of the spacecrafts angular velocity </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">rotations</span></code>: A vector of double vector of rotations </li>
+<li><code class="docutils literal notranslate"><span class="pre">times</span></code>: A double vector of times </li>
+<li><code class="docutils literal notranslate"><span class="pre">time</span></code>: Time to observe the spacecraft’s angular velocity at </li>
+<li><code class="docutils literal notranslate"><span class="pre">interp</span></code>: Interpolation type </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N3ale11getRotationENSt6vectorINSt6vectorIdEEEEd">
+<span id="_CPPv2N3ale11getRotationENSt6vectorINSt6vectorIdEEEEd"></span><span id="ale::getRotation__std::vector:std::vector:double::.double"></span><span class="target" id="namespaceale_1a528dbe501c578359315b580df8ed6c46"></span>std::vector&lt;double&gt; <code class="descname">getRotation</code><span class="sig-paren">(</span>std::vector&lt;std::vector&lt;double&gt;&gt; <em>coeffs</em>, double <em>time</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N3ale11getRotationENSt6vectorINSt6vectorIdEEEEd" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Get the rotation of the spacecraft at a given time based on a derived function from a set of coeffcients. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>A vector double of the spacecrafts rotation </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">coeffs</span></code>: A vector of double vector of coeffcients </li>
+<li><code class="docutils literal notranslate"><span class="pre">time</span></code>: Time to observe the spacecraft’s rotation at </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N3ale18getAngularVelocityENSt6vectorINSt6vectorIdEEEEd">
+<span id="_CPPv2N3ale18getAngularVelocityENSt6vectorINSt6vectorIdEEEEd"></span><span id="ale::getAngularVelocity__std::vector:std::vector:double::.double"></span><span class="target" id="namespaceale_1a6a6b1cb569519d8fb6a01087357a6f89"></span>std::vector&lt;double&gt; <code class="descname">getAngularVelocity</code><span class="sig-paren">(</span>std::vector&lt;std::vector&lt;double&gt;&gt; <em>coeffs</em>, double <em>time</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N3ale18getAngularVelocityENSt6vectorINSt6vectorIdEEEEd" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Get the angular velocity of the spacecraft at a given time based on a derived function from a set of coeffcients. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>A vector double of the spacecrafts angular velocity </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">coeffs</span></code>: A vector of double vector of coeffcients </li>
+<li><code class="docutils literal notranslate"><span class="pre">time</span></code>: Time to observe the spacecraft’s angular velocity at </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N3ale18evaluatePolynomialENSt6vectorIdEEdi">
+<span id="_CPPv2N3ale18evaluatePolynomialENSt6vectorIdEEdi"></span><span id="ale::evaluatePolynomial__std::vector:double:.double.i"></span><span class="target" id="namespaceale_1a52e112d7c3c33ed70c283b5dfc7ca816"></span>double <code class="descname">evaluatePolynomial</code><span class="sig-paren">(</span>std::vector&lt;double&gt; <em>coeffs</em>, double <em>time</em>, int <em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N3ale18evaluatePolynomialENSt6vectorIdEEdi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Generates a derivatives in respect to time from a polynomial constructed using the given coeffcients, time, and derivation number. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>Evalutation of the given polynomial as a double </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">coeffs</span></code>: A double vector of coefficients can be any number of coefficients </li>
+<li><code class="docutils literal notranslate"><span class="pre">time</span></code>: Time to use when deriving </li>
+<li><code class="docutils literal notranslate"><span class="pre">d</span></code>: The order of the derivative to generate (Currently supports 0, 1, and 2) </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N3ale11interpolateENSt6vectorIdEENSt6vectorIdEEd13interpolationi">
+<span id="_CPPv2N3ale11interpolateENSt6vectorIdEENSt6vectorIdEEd13interpolationi"></span><span id="ale::interpolate__std::vector:double:.std::vector:double:.double.interpolation.i"></span><span class="target" id="namespaceale_1a85c0f4ad758acca451019e77f4e5d6d8"></span>double <code class="descname">interpolate</code><span class="sig-paren">(</span>std::vector&lt;double&gt; <em>points</em>, std::vector&lt;double&gt; <em>times</em>, double <em>time</em>, <a class="reference internal" href="#_CPPv3N3ale13interpolationE" title="ale::interpolation">interpolation</a> <em>interp</em>, int <em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N3ale11interpolateENSt6vectorIdEENSt6vectorIdEEd13interpolationi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Interpolates the spacecrafts position along a path generated from a set of points, times, and a time of observation. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd></dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">points</span></code>: A double vector of points </li>
+<li><code class="docutils literal notranslate"><span class="pre">times</span></code>: A double vector of times </li>
+<li><code class="docutils literal notranslate"><span class="pre">time</span></code>: A double to use as the time of observation </li>
+<li><code class="docutils literal notranslate"><span class="pre">interp</span></code>: An interpolation enum dictating what type of interpolation to use </li>
+<li><code class="docutils literal notranslate"><span class="pre">d</span></code>: The order of the derivative to generate when interpolating (Currently supports 0, 1, and 2) </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N3ale4loadENSt6stringE">
+<span id="_CPPv2N3ale4loadENSt6stringE"></span><span id="ale::load__ss"></span><span class="target" id="namespaceale_1a037b05f845552a12dce4cadc6e988240"></span>std::string <code class="descname">load</code><span class="sig-paren">(</span>std::string <em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N3ale4loadENSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
 <div class="versionadded">
 <p><span class="versionmodified">New in version 0.1.0.</span></p>
 </div>
@@ -42,27 +260,45 @@
 
 
           </div>
+          
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Library Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html"><code class="docutils literal notranslate"><span class="pre">capi</span></code> — All ALE functions</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">capi</span></code> — ALE C-API</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../python/index.html"><code class="docutils literal notranslate"><span class="pre">python</span></code> — Input/Output Algorithms</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="index.html"><code class="docutils literal notranslate"><span class="pre">capi</span></code> — All A.L.E. functions</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter"><code class="docutils literal notranslate"><span class="pre">capi</span></code> — All A.L.E. functions</a></li>
+  <li><a href="../index.html">Library Reference</a><ul>
+  <li><a href="index.html"><code class="docutils literal notranslate"><span class="pre">capi</span></code> — All ALE functions</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter"><code class="docutils literal notranslate"><span class="pre">capi</span></code> — All ALE functions</a></li>
       <li>Next: <a href="../python/index.html" title="next chapter"><code class="docutils literal notranslate"><span class="pre">python</span></code> — Input/Output Algorithms</a></li>
+  </ul></li>
   </ul></li>
   </ul></li>
 </ul>
 </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/library/capi/capi.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <div class="searchformwrapper">
@@ -75,16 +311,24 @@
     </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
         </div>
       </div>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2018, Adam Paquette.
+      &copy;Public Domain.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
       <a href="../../_sources/library/capi/capi.rst.txt"

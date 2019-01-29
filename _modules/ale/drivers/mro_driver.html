@@ -6,14 +6,13 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>ale.drivers.mro_driver &#8212; ale 0.1.0 documentation</title>
+    <title>ale.drivers.mro_driver &#8212; ALE 0.1.0 documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -28,6 +27,8 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
+          
+
           <div class="body" role="main">
             
   <h1>Source code for ale.drivers.mro_driver</h1><div class="highlight"><pre>
@@ -44,6 +45,9 @@
 
 
 <div class="viewcode-block" id="CtxSpice"><a class="viewcode-back" href="../../../library/python/mro_driver.html#ale.drivers.mro_driver.CtxSpice">[docs]</a><span class="k">class</span> <span class="nc">CtxSpice</span><span class="p">(</span><span class="n">Spice</span><span class="p">,</span> <span class="n">LineScanner</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Spice mixins that defines MRO CTX specific snowflake Spice calls.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">id_lookup</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;CONTEXT CAMERA&#39;</span><span class="p">:</span><span class="s1">&#39;MRO_CTX&#39;</span>
     <span class="p">}</span>
@@ -52,6 +56,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">metakernel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns latest instrument metakernels</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : string</span>
+<span class="sd">          Path to latest metakernel file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">metakernel_dir</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">mro</span>
         <span class="n">mks</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">metakernel_dir</span><span class="p">,</span><span class="s1">&#39;*.tm&#39;</span><span class="p">)))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_metakernel&#39;</span><span class="p">):</span>
@@ -63,12 +75,31 @@
 
 
 <div class="viewcode-block" id="CtxPds3Driver"><a class="viewcode-back" href="../../../library/python/mro_driver.html#ale.drivers.mro_driver.CtxPds3Driver">[docs]</a><span class="k">class</span> <span class="nc">CtxPds3Driver</span><span class="p">(</span><span class="n">PDS3</span><span class="p">,</span> <span class="n">CtxSpice</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Driver for reading CTX PDS3 labels. Requires a Spice mixin to acquire addtional</span>
+<span class="sd">    ephemeris and instrument data located exclusively in spice kernels.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an instrument id for uniquely identifying the instrument, but often</span>
+<span class="sd">        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they</span>
+<span class="sd">        the same ID the Spice expects in bods2c calls.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          instrument id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_lookup</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;INSTRUMENT_NAME&#39;</span><span class="p">]]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">spacecraft_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Spacecraft name used in various Spice calls to acquire</span>
+<span class="sd">        ephemeris data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">name_lookup</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;MARS_RECONNAISSANCE_ORBITER&#39;</span><span class="p">:</span> <span class="s1">&#39;MRO&#39;</span>
         <span class="p">}</span>
@@ -76,14 +107,40 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an instrument id for unquely identifying the instrument, but often</span>
+<span class="sd">        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they</span>
+<span class="sd">        the same ID the Spice expects in bods2c calls.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          instrument id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_lookup</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;INSTRUMENT_NAME&#39;</span><span class="p">]]</span></div>
 </pre></div>
 
           </div>
+          
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../library/index.html">Library Reference</a></li>
+</ul>
+
+<div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../../../index.html">Documentation overview</a><ul>
@@ -104,16 +161,24 @@
     </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
         </div>
       </div>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2018, Adam Paquette.
+      &copy;Public Domain.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>
 

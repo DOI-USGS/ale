@@ -6,14 +6,13 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>ale.drivers.lro_driver &#8212; ale 0.1.0 documentation</title>
+    <title>ale.drivers.lro_driver &#8212; ALE 0.1.0 documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -28,6 +27,8 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
+          
+
           <div class="body" role="main">
             
   <h1>Source code for ale.drivers.lro_driver</h1><div class="highlight"><pre>
@@ -44,24 +45,58 @@
 
 
 <div class="viewcode-block" id="LrocSpice"><a class="viewcode-back" href="../../../library/python/lro_driver.html#ale.drivers.lro_driver.LrocSpice">[docs]</a><span class="k">class</span> <span class="nc">LrocSpice</span><span class="p">(</span><span class="n">Spice</span><span class="p">,</span> <span class="n">LineScanner</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Lroc mixin class for defining snowflake Spice calls.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">required_keys</span> <span class="o">=</span> <span class="n">keys</span><span class="o">.</span><span class="n">base</span> <span class="o">|</span> <span class="n">keys</span><span class="o">.</span><span class="n">linescanner</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">metakernel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns latest instrument metakernels</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : string</span>
+<span class="sd">          Path to latest metakernel file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">metakernels</span> <span class="o">=</span> <span class="n">get_metakernels</span><span class="p">(</span><span class="n">years</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">missions</span><span class="o">=</span><span class="s1">&#39;lro&#39;</span><span class="p">,</span> <span class="n">versions</span><span class="o">=</span><span class="s1">&#39;latest&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_metakernel</span> <span class="o">=</span> <span class="n">metakernels</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;path&#39;</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metakernel</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">spacecraft_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Spacecraft name used in various Spice calls to acquire</span>
+<span class="sd">        ephemeris data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          Spacecraft name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s2">&quot;LRO&quot;</span></div>
 
 
-<div class="viewcode-block" id="LroPds3Driver"><a class="viewcode-back" href="../../../library/python/lro_driver.html#ale.drivers.lro_driver.LroPds3Driver">[docs]</a><span class="k">class</span> <span class="nc">LroPds3Driver</span><span class="p">(</span><span class="n">PDS3</span><span class="p">,</span> <span class="n">LrocSpice</span><span class="p">):</span>
+<div class="viewcode-block" id="LrocPds3Driver"><a class="viewcode-back" href="../../../library/python/lro_driver.html#ale.drivers.lro_driver.LrocPds3Driver">[docs]</a><span class="k">class</span> <span class="nc">LrocPds3Driver</span><span class="p">(</span><span class="n">PDS3</span><span class="p">,</span> <span class="n">LrocSpice</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Driver for reading Lroc labels. Requires a Spice mixin to acquire addtional</span>
+<span class="sd">    ephemeris and instrument data located exclusively in spice kernels.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an instrument id for uniquely identifying the instrument, but often</span>
+<span class="sd">        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they</span>
+<span class="sd">        the same ID the Spice expects in bods2c calls.</span>
+
 <span class="sd">        Ignores Wide Angle for now</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          instrument id</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">instrument</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;INSTRUMENT_ID&quot;</span><span class="p">)</span>
@@ -76,10 +111,26 @@
 </pre></div>
 
           </div>
+          
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../library/index.html">Library Reference</a></li>
+</ul>
+
+<div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../../../index.html">Documentation overview</a><ul>
@@ -100,16 +151,24 @@
     </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
         </div>
       </div>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2018, Adam Paquette.
+      &copy;Public Domain.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>
 

@@ -6,14 +6,13 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>cassini_driver — Cassini Driver Classes &#8212; ale 0.1.0 documentation</title>
+    <title>cassini_driver — Cassini Driver Classes &#8212; ALE 0.1.0 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="lro_driver — LRO Driver Classes" href="lro_driver.html" />
@@ -30,6 +29,8 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
+          
+
           <div class="body" role="main">
             
   <div class="section" id="cassini-driver-cassini-driver-classes">
@@ -41,12 +42,61 @@
 <span class="target" id="module-ale.drivers.cassini_driver"></span><dl class="class">
 <dt id="ale.drivers.cassini_driver.CassiniISS">
 <em class="property">class </em><code class="descclassname">ale.drivers.cassini_driver.</code><code class="descname">CassiniISS</code><span class="sig-paren">(</span><em>file</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/drivers/cassini_driver.html#CassiniISS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.drivers.cassini_driver.CassiniISS" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
+<dd><p>Bases: <a class="reference internal" href="base.html#ale.drivers.base.Framer" title="ale.drivers.base.Framer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ale.drivers.base.Framer</span></code></a></p>
+<p>Cassini mixin class for defining snowflake Spice calls.</p>
+<dl class="attribute">
+<dt id="ale.drivers.cassini_driver.CassiniISS.instrument_id">
+<code class="descname">instrument_id</code><a class="headerlink" href="#ale.drivers.cassini_driver.CassiniISS.instrument_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an instrument id for unquely identifying the instrument, but often
+also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+the same ID the Spice expects in bods2c calls.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>: str</strong></dt>
+<dd><p class="first last">instrument id</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ale.drivers.cassini_driver.CassiniISS.metakernel">
+<code class="descname">metakernel</code><a class="headerlink" href="#ale.drivers.cassini_driver.CassiniISS.metakernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns latest instrument metakernels</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>: string</strong></dt>
+<dd><p class="first last">Path to latest metakernel file</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="ale.drivers.cassini_driver.CassiniISS.odtk">
 <code class="descname">odtk</code><a class="headerlink" href="#ale.drivers.cassini_driver.CassiniISS.odtk" title="Permalink to this definition">¶</a></dt>
 <dd><p>The radial distortion coeffs are not defined in the ik kernels, instead
 they are defined in the ISS Data User Guide (Knowles). Therefore, we
 manually specify the codes here.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ale.drivers.cassini_driver.CassiniISS.spacecraft_name">
+<code class="descname">spacecraft_name</code><a class="headerlink" href="#ale.drivers.cassini_driver.CassiniISS.spacecraft_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spacecraft name used in various Spice calls to acquire
+ephemeris data.</p>
 </dd></dl>
 
 </dd></dl>
@@ -55,27 +105,50 @@ manually specify the codes here.</p>
 
 
           </div>
+          
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Library Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../capi/index.html"><code class="docutils literal notranslate"><span class="pre">capi</span></code> — All ALE functions</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html"><code class="docutils literal notranslate"><span class="pre">python</span></code> — Input/Output Algorithms</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="base.html"><code class="docutils literal notranslate"><span class="pre">base</span></code> — Default Driver Classes</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">cassini_driver</span></code> — Cassini Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lro_driver.html"><code class="docutils literal notranslate"><span class="pre">lro_driver</span></code> — LRO Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mdis_driver.html"><code class="docutils literal notranslate"><span class="pre">mdis_driver</span></code> — MDIS Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mro_driver.html"><code class="docutils literal notranslate"><span class="pre">mro_driver</span></code> — MRO Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="util.html"><code class="docutils literal notranslate"><span class="pre">util</span></code> — General Utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Library Reference</a><ul>
   <li><a href="index.html"><code class="docutils literal notranslate"><span class="pre">python</span></code> — Input/Output Algorithms</a><ul>
       <li>Previous: <a href="base.html" title="previous chapter"><code class="docutils literal notranslate"><span class="pre">base</span></code> — Default Driver Classes</a></li>
       <li>Next: <a href="lro_driver.html" title="next chapter"><code class="docutils literal notranslate"><span class="pre">lro_driver</span></code> — LRO Driver Classes</a></li>
   </ul></li>
   </ul></li>
+  </ul></li>
 </ul>
 </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/library/python/cassini_driver.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <div class="searchformwrapper">
@@ -88,16 +161,24 @@ manually specify the codes here.</p>
     </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
         </div>
       </div>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2018, Adam Paquette.
+      &copy;Public Domain.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
       <a href="../../_sources/library/python/cassini_driver.rst.txt"
