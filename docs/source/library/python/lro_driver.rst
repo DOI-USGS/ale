@@ -8,3 +8,4 @@ The :mod:`ale.drivers.lro_driver` module
 .. automodule:: ale.drivers.lro_driver
    :synopsis:
    :members:
+   :show-inheritance:
