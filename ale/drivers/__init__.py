@@ -21,7 +21,12 @@ drivers = dict(chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.is
 
 def load(label):
     """
-    Load label from
+    Attempt to load a given label from all possible drivers
+
+    Parameters
+    ----------
+    label : str
+               String path to the given label file
     """
     for name, driver in drivers.items():
         try:
