@@ -22,9 +22,25 @@ class Driver():
         self._file = file
 
     def __str__(self):
+        """
+        Returns a string representation of the class
+
+        Returns
+        -------
+        str
+            String representation of all attributes and methods of the class
+        """
         return str(self.to_dict())
 
     def is_valid(self):
+        """
+        Checks if the driver has an intrument id associated with it
+
+        Returns
+        -------
+        bool
+            True if an instrument_id is defined, False otherwise
+        """
         try:
             iid = self.instrument_id
             return True
@@ -32,9 +48,17 @@ class Driver():
             return False
 
     def to_dict(self):
+        """
+        Generates a dictionary of keys based on the attributes and methods assocated with
+        the driver and the required keys for the driver
+
+        Returns
+        -------
+        dict
+            Dictionary of key, attribute pairs
+        """
         keys = set(dir(self)) & self.required_keys
         return {p:getattr(self, p) for p in keys}
-
 
 class LineScanner(Driver):
     @property
