@@ -355,11 +355,11 @@ namespace ale {
      PyObject *pDict = PyModule_GetDict(pModule);
 
      // Get the add method from the dictionary.
-     PyObject *pFunc = PyDict_GetItemString(pDict, "loads");
+     PyObject *pFunc = PyDict_GetItemString(pDict, "load");
      if(!pFunc) {
        // import errors do not set a PyError flag, need to use a custom
        // error message instead.
-       throw runtime_error("Failed to import ale.loads function from Python."
+       throw runtime_error("Failed to import ale.load function from Python."
                            "This Usually indicates an error in the Ale Python Library."
                            "Check if Installed correctly and the function ale.loads exists.");
      }
