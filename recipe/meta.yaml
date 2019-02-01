@@ -16,7 +16,7 @@ build:
 # Shotgun strat on requirements until we can narrow them down
 requirements:
   build:
-  - python=3.7.1
+  - python
   - cmake>=3.10
   - gsl
   - openblas>=0.3.0
@@ -26,7 +26,7 @@ requirements:
   - python-dateutil
   - pvl
   run:
-  - python=3.7.1
+  - python
   - cmake>=3.10
   - gsl
   - openblas>=0.3.0
