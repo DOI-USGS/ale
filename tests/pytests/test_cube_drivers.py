@@ -3,8 +3,8 @@ from collections import namedtuple
 import pytest
 
 import ale
-from ale.drivers import cube_driver, base
-from ale.drivers.cube_driver import Cube
+from ale.drivers import isis_spice_driver, base
+from ale.drivers.isis_spice_driver import IsisSpice
 from ale import util
 
 import pvl
@@ -428,13 +428,13 @@ End
         count = table_label['Records'] * len(table_label.getlist('Field'))
         doubles = [i for i in range(count)]
         return struct.pack('d' * count, *doubles)
-    monkeypatch.setattr(cube_driver, 'read_table_data', test_table_data)
+    monkeypatch.setattr(isis_spice_driver, 'read_table_data', test_table_data)
 
     def test_label(file):
         return pvl.loads(label)
     monkeypatch.setattr(pvl, 'load', test_label)
 
-def test_cube_creation(cubelabel):
-    with Cube('test_label') as m:
+def test_spice_cube_read(cubelabel):
+    with IsisSpice('test_label') as m:
         d = m.to_dict()
         assert isinstance(d, dict)
