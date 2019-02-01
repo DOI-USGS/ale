@@ -4,7 +4,6 @@ import struct
 import re
 
 import pvl
-import spiceypy as spice
 import numpy as np
 import quaternion
 
@@ -93,7 +92,7 @@ def parse_position_table(field_data):
         results['TimeScale'] = field_data['J2000SVY'][-1]
     return results
 
-class Cube(Base):
+class IsisSpice(Base):
 
     def __init__(self, file, *args, **kwargs):
         super(Cube, self).__init__('')
@@ -111,22 +110,6 @@ class Cube(Base):
                 self.sun_position_table = parse_position_table(field_data)
 
     @property
-    def instrument_id(self):
-        return self.label['IsisCube']['Instrument']['InstrumentId']
-
-    @property
-    def start_time(self):
-        return self.label['IsisCube']['Instrument']['StartTime']
-
-    @property
-    def image_lines(self):
-        return self.label['IsisCube']['Core']['Dimensions']['Lines']
-
-    @property
-    def image_samples(self):
-        return self.label['IsisCube']['Core']['Dimensions']['Samples']
-
-    @property
     def interpolation_method(self):
         return 'hermite'
 
@@ -137,10 +120,6 @@ class Cube(Base):
     @property
     def number_of_ephemerides(self):
         return len(self.sensor_position)
-
-    @property
-    def target_name(self):
-        return self.label['IsisCube']['Instrument']['TargetName']
 
     @property
     def starting_ephemeris_time(self):
@@ -158,16 +137,8 @@ class Cube(Base):
         ]
 
     @property
-    def spacecraft_name(self):
-        return self.label['IsisCube']['Instrument']['SpacecraftName']
-
-    @property
     def ikid(self):
         return self.label['IsisCube']['Kernels']['NaifIkCode']
-
-    @property
-    def fikid(self):
-        pass
 
     @property
     def focal2pixel_lines(self):
