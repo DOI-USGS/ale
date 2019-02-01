@@ -16,7 +16,7 @@ instructions may be found [here](https://conda.io/docs/user-guide/install/index.
 (TODO This command will need to be updated)
 Run the following commands to create a self-contained dev environment for ale (type `y` to confirm creation):
 ```bash
-conda create -n ale
+conda env create -n ale -f environment.yml
 ```
 > *For more information: [conda environments](https://conda.io/docs/user-guide/tasks/manage-environments.html)*
 

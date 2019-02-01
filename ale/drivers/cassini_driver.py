@@ -7,17 +7,30 @@ import numpy as np
 
 from ale import config
 from ale.drivers.base import Framer
-from ale.drivers.distortion import RadialDistortion
+from ale.drivers import keys
 
 
-class CassiniISS(Framer, RadialDistortion):
+class CassiniISS(Framer):
+    """
+    Cassini mixin class for defining snowflake Spice calls. 
+    """
     id_lookup = {
         "ISSNA" : "CASSINI_ISS_NAC",
         "ISSWA" : "CASSINI_ISS_WAC"
     }
 
+    required_keys = keys.base | keys.framer | keys.radial_distortion
+
     @property
     def metakernel(self):
+        """
+        Returns latest instrument metakernels
+
+        Returns
+        -------
+        : string
+          Path to latest metakernel file
+        """
         metakernel_dir = config.cassini
         mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
         if not hasattr(self, '_metakernel'):
@@ -28,7 +41,17 @@ class CassiniISS(Framer, RadialDistortion):
 
     @property
     def instrument_id(self):
-        return self.id_lookup[self._label['INSTRUMENT_ID']]
+        """
+        Returns an instrument id for unquely identifying the instrument, but often
+        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+        the same ID the Spice expects in bods2c calls.
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
+        return self.id_lookup[self.label['INSTRUMENT_ID']]
 
     @property
     def focal_epsilon(self):
@@ -36,6 +59,10 @@ class CassiniISS(Framer, RadialDistortion):
 
     @property
     def spacecraft_name(self):
+        """
+        Spacecraft name used in various Spice calls to acquire
+        ephemeris data.
+        """
         return 'CASSINI'
 
     @property
@@ -52,7 +79,7 @@ class CassiniISS(Framer, RadialDistortion):
     @property
     def _exposure_duration(self):
         # labels do not specify a unit explicitly
-        return self._label['EXPOSURE_DURATION'] * 0.001  # Scale to seconds
+        return self.label['EXPOSURE_DURATION'] * 0.001  # Scale to seconds
 
     @property
     def odtk(self):
