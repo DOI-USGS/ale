@@ -3,12 +3,16 @@ from collections import namedtuple
 import pytest
 
 import ale
-from ale.drivers import isis_spice_driver, base
+from ale.drivers import keys, isis_spice_driver
+from ale.drivers.base import Driver
 from ale.drivers.isis_spice_driver import IsisSpice
 from ale import util
 
 import pvl
 import struct
+
+class TestIsisSpice(IsisSpice, Driver):
+    required_keys = keys.base
 
 @pytest.fixture
 def cubelabel(monkeypatch):
@@ -435,6 +439,6 @@ End
     monkeypatch.setattr(pvl, 'load', test_label)
 
 def test_spice_cube_read(cubelabel):
-    with IsisSpice('test_label') as m:
+    with TestIsisSpice('testfile.cub') as m:
         d = m.to_dict()
         assert isinstance(d, dict)

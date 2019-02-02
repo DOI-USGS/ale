@@ -8,7 +8,7 @@ import numpy as np
 import quaternion
 
 from ale import config
-from ale.drivers.base import Base
+from ale.drivers.base import Driver, Isis3
 
 def read_table_data(table_label, file):
     file.seek(label['StartByte']-1)
@@ -92,22 +92,30 @@ def parse_position_table(field_data):
         results['TimeScale'] = field_data['J2000SVY'][-1]
     return results
 
-class IsisSpice(Base):
+class IsisSpice(Isis3):
 
-    def __init__(self, file, *args, **kwargs):
-        super(Cube, self).__init__('')
-        self.label = pvl.load(file)
-        for table in self.label.getlist('Table'):
-            binary_data = read_table_data(table, file)
-            field_data = parse_table_data(table, binary_data)
-            if table['Name'] == 'InstrumentPointing':
-                self.inst_pointing_table = parse_rotation_table(table, field_data)
-            elif table['Name'] == 'BodyRotation':
-                self.body_orientation_table = parse_rotation_table(table, field_data)
-            elif table['Name'] == 'InstrumentPosition':
-                self.inst_position_table = parse_position_table(field_data)
-            elif table['Name'] == 'SunPosition':
-                self.sun_position_table = parse_position_table(field_data)
+    @property
+    def label(self):
+        if not hasattr(self, "_label"):
+            super(Isis3).label()
+            for table in self._label.getlist('Table'):
+                binary_data = read_table_data(table, file)
+                field_data = parse_table_data(table, binary_data)
+                if table['Name'] == 'InstrumentPointing':
+                    self.inst_pointing_table = parse_rotation_table(table, field_data)
+                elif table['Name'] == 'BodyRotation':
+                    self.body_orientation_table = parse_rotation_table(table, field_data)
+                elif table['Name'] == 'InstrumentPosition':
+                    self.inst_position_table = parse_position_table(field_data)
+                elif table['Name'] == 'SunPosition':
+                    self.sun_position_table = parse_position_table(field_data)
+        return self._label
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
 
     @property
     def interpolation_method(self):
