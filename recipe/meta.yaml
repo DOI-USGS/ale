@@ -20,7 +20,7 @@ build:
 #
 # ISIS requires pinned versions for these dependencies to avoid conflicts with other dependencies.
 # Make sure to always confirm that version numbers in this file and version numbers in the
-# meta.yaml file within the ISIS3 repo match for each edpendency before building this library
+# meta.yaml file within the ISIS3 repo match for each dependency before building this library
 # for use within ISIS, and always upload this special ISIS build with the "isis" tag.
 requirements:
   build:
