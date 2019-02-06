@@ -3,19 +3,18 @@ from collections import namedtuple
 import pytest
 
 import ale
-from ale.drivers import keys, isis_spice_driver
-from ale.drivers.base import Driver
+from ale.drivers import isis_spice_driver
 from ale.drivers.isis_spice_driver import IsisSpice
 from ale import util
 
 import pvl
+import numpy as np
+import quaternion
 import struct
 
-class TestIsisSpice(IsisSpice, Driver):
-    required_keys = keys.base
 
 @pytest.fixture
-def cubelabel(monkeypatch):
+def test_cube(monkeypatch):
     label = """
 Object = IsisCube
 Object = Core
@@ -438,7 +437,72 @@ End
         return pvl.loads(label)
     monkeypatch.setattr(pvl, 'load', test_label)
 
-def test_spice_cube_read(cubelabel):
-    with TestIsisSpice('testfile.cub') as m:
-        d = m.to_dict()
-        assert isinstance(d, dict)
+    test_image = IsisSpice()
+    test_image._file = 'testfile.cub'
+    return test_image
+
+def test_read(test_cube):
+    assert isinstance(test_cube.label, pvl.PVLModule)
+
+def test_interpolation_method(test_cube):
+    assert test_cube.interpolation_method == 'hermite'
+
+def test_number_of_quaternions(test_cube):
+    assert test_cube.number_of_quaternions == 1
+
+def test_number_of_ephemerides(test_cube):
+    assert test_cube.number_of_ephemerides == 1
+
+def test_starting_ephemeris_time(test_cube):
+    assert test_cube.starting_ephemeris_time == 6.0
+
+def test_ending_ephemeris_time(test_cube):
+    assert test_cube.ending_ephemeris_time == 6.0
+
+def test_detector_center(test_cube):
+    assert test_cube.detector_center == [512.5, 512.5]
+
+def test_ikid(test_cube):
+    assert test_cube.ikid == -236820
+
+def test_focal2pixel_lines(test_cube):
+    assert test_cube.focal2pixel_lines == [0.0, 0.0, 71.42857143]
+
+def test_focal2pixel_samples(test_cube):
+    assert test_cube.focal2pixel_samples == [0.0, 71.42857143, 0.0]
+
+def test_focal_length(test_cube):
+    assert test_cube.focal_length == 549.11781953727
+
+def test_body_radii(test_cube):
+    assert test_cube.body_radii == [6051.8, 6051.8, 6051.8]
+
+def test_semimajor(test_cube):
+    assert test_cube.semimajor == 6051.8
+
+def test_semiminor(test_cube):
+    assert test_cube.semiminor == 6051.8
+
+def test_reference_frame(test_cube):
+    assert test_cube.reference_frame == 10012
+
+def test_sun_position(test_cube):
+    assert np.array_equal(test_cube.sun_position, np.array([[0, 1, 2]]))
+
+def test_sun_velocity(test_cube):
+    assert np.array_equal(test_cube.sun_velocity, np.array([[3, 4, 5]]))
+
+def test_sensor_position(test_cube):
+    assert np.array_equal(test_cube.sensor_position, np.array([[0, 1, 2]]))
+
+def test_sensor_velocity(test_cube):
+    assert np.array_equal(test_cube.sensor_velocity, np.array([[3, 4, 5]]))
+
+def test_sensor_orientation(test_cube):
+    assert np.array_equal(test_cube.sensor_orientation, quaternion.as_quat_array([[0, 1, 2, 3]]))
+
+def test_body_orientation(test_cube):
+    assert np.array_equal(test_cube.body_orientation, quaternion.as_quat_array([[0, 1, 2, 3]]))
+
+def test_naif_keywords(test_cube):
+    assert isinstance(test_cube.naif_keywords, pvl.PVLObject)

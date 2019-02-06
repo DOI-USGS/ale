@@ -97,18 +97,21 @@ class IsisSpice(Isis3):
     @property
     def label(self):
         if not hasattr(self, "_label"):
-            super(Isis3).label()
+            try:
+                self._label = pvl.load(self._file)
+            except:
+                raise Exception("{} is not a valid label".format(self._file))
             for table in self._label.getlist('Table'):
-                binary_data = read_table_data(table, file)
+                binary_data = read_table_data(table, self._file)
                 field_data = parse_table_data(table, binary_data)
                 if table['Name'] == 'InstrumentPointing':
-                    self.inst_pointing_table = parse_rotation_table(table, field_data)
+                    self._inst_pointing_table = parse_rotation_table(table, field_data)
                 elif table['Name'] == 'BodyRotation':
-                    self.body_orientation_table = parse_rotation_table(table, field_data)
+                    self._body_orientation_table = parse_rotation_table(table, field_data)
                 elif table['Name'] == 'InstrumentPosition':
-                    self.inst_position_table = parse_position_table(field_data)
+                    self._inst_position_table = parse_position_table(field_data)
                 elif table['Name'] == 'SunPosition':
-                    self.sun_position_table = parse_position_table(field_data)
+                    self._sun_position_table = parse_position_table(field_data)
         return self._label
 
     def __enter__(self):
@@ -131,17 +134,21 @@ class IsisSpice(Isis3):
 
     @property
     def starting_ephemeris_time(self):
-        return self.inst_position_table['Times'][0]
+        if not hasattr(self, "_inst_position_table"):
+            self.label
+        return self._inst_position_table['Times'][0]
 
     @property
     def ending_ephemeris_time(self):
-        return self.inst_position_table['Times'][-1]
+        if not hasattr(self, "_inst_position_table"):
+            self.label
+        return self._inst_position_table['Times'][-1]
 
     @property
     def detector_center(self):
         return [
-            self.label['NaifKeywords']['INS{}_BORESIGHT_LINE'.format(self.ikid)],
-            self.label['NaifKeywords']['INS{}_BORESIGHT_SAMPLE'.format(self.ikid)]
+            self.naif_keywords['INS{}_BORESIGHT_LINE'.format(self.ikid)],
+            self.naif_keywords['INS{}_BORESIGHT_SAMPLE'.format(self.ikid)]
         ]
 
     @property
@@ -150,21 +157,21 @@ class IsisSpice(Isis3):
 
     @property
     def focal2pixel_lines(self):
-        return self.label['NaifKeywords']['INS{}_ITRANSL'.format(self.ikid)]
+        return self.naif_keywords['INS{}_ITRANSL'.format(self.ikid)]
 
     @property
     def focal2pixel_samples(self):
-        return self.label['NaifKeywords']['INS{}_ITRANSS'.format(self.ikid)]
+        return self.naif_keywords['INS{}_ITRANSS'.format(self.ikid)]
 
     @property
     def focal_length(self):
-        return self.label['NaifKeywords']['INS{}_FOCAL_LENGTH'.format(self.ikid)]
+        return self.naif_keywords['INS{}_FOCAL_LENGTH'.format(self.ikid)]
 
     @property
     def body_radii(self):
-        for key in self.label['NaifKeywords']:
+        for key in self.naif_keywords:
             if re.match('BODY-?\d*_RADII', key[0]):
-                return self.label['NaifKeywords'][key[0]]
+                return self.naif_keywords[key[0]]
 
     @property
     def semimajor(self):
@@ -176,28 +183,46 @@ class IsisSpice(Isis3):
 
     @property
     def reference_frame(self):
-        return self.body_orientation_table['TimeDependentFrames'][0]
+        if not hasattr(self, "_body_orientation_table"):
+            self.label
+        return self._body_orientation_table['TimeDependentFrames'][0]
 
     @property
     def sun_position(self):
-        return self.sun_position_table['Positions']
+        if not hasattr(self, "_sun_position_table"):
+            self.label
+        return self._sun_position_table['Positions']
 
     @property
     def sun_velocity(self):
-        return self.sun_position_table['Velocities']
+        if not hasattr(self, "_sun_position_table"):
+            self.label
+        return self._sun_position_table['Velocities']
 
     @property
     def sensor_position(self):
-        return self.inst_position_table['Positions']
+        if not hasattr(self, "_inst_position_table"):
+            self.label
+        return self._inst_position_table['Positions']
 
     @property
     def sensor_velocity(self):
-        return self.inst_position_table['Velocities']
+        if not hasattr(self, "_inst_position_table"):
+            self.label
+        return self._inst_position_table['Velocities']
 
     @property
     def sensor_orientation(self):
-        return self.inst_pointing_table['Rotations']
+        if not hasattr(self, "_inst_pointing_table"):
+            self.label
+        return self._inst_pointing_table['Rotations']
 
     @property
     def body_orientation(self):
-        return self.body_orientation_table['Rotations']
+        if not hasattr(self, "_body_orientation_table"):
+            self.label
+        return self._body_orientation_table['Rotations']
+
+    @property
+    def naif_keywords(self):
+        return self.label['NaifKeywords']

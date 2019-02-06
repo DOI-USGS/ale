@@ -509,13 +509,13 @@ class Isis3():
     def label(self):
         if not hasattr(self, "_label"):
             if isinstance(self._file, pvl.PVLModule):
-                self._label = label
+                self._label = self._file
             try:
                 self._label = pvl.loads(self._file, strict=False)
             except AttributeError:
                 self._label = pvl.load(self._file, strict=False)
             except:
-                raise Exception("{} is not a valid label".format(label))
+                raise Exception("{} is not a valid label".format(self._file))
         return self._label
 
     @property
