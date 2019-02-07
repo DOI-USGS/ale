@@ -407,7 +407,7 @@ INS-236820_FL_TEMP_COEFFS                  = (549.51204973417,
                                             0.0, 0.0)
 TempDependentFocalLength                   = 549.27136298083462
 INS-236820_PIXEL_PITCH                     = 0.014
-CLOCK_ET_-236_1/0089576657:973000_COMPUTED = e08adf6724f0ab41
+CLOCK_ET_-236_1/0089576657:973000_COMPUTED = 0000000000002040
 INS-236820_TRANSX                          = (0.0, 0.014, 0.0)
 INS-236820_TRANSY                          = (0.0, 0.0, 0.014)
 INS-236820_ITRANSS                         = (0.0, 71.42857143, 0.0)
@@ -429,7 +429,7 @@ End
 
     def test_table_data(table_label, file):
         count = table_label['Records'] * len(table_label.getlist('Field'))
-        doubles = [i for i in range(count)]
+        doubles = list(range(count))
         return struct.pack('d' * count, *doubles)
     monkeypatch.setattr(isis_spice_driver, 'read_table_data', test_table_data)
 
@@ -454,10 +454,7 @@ def test_number_of_ephemerides(test_cube):
     assert test_cube.number_of_ephemerides == 1
 
 def test_starting_ephemeris_time(test_cube):
-    assert test_cube.starting_ephemeris_time == 6.0
-
-def test_ending_ephemeris_time(test_cube):
-    assert test_cube.ending_ephemeris_time == 6.0
+    assert test_cube.starting_ephemeris_time == 8.0
 
 def test_detector_center(test_cube):
     assert test_cube.detector_center == [512.5, 512.5]

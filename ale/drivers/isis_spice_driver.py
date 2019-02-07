@@ -31,9 +31,9 @@ def field_format(field_label):
     }
     return data_formats[field_label['Type']] * field_label['Size']
 
-def parse_field(field_label, data):
+def parse_field(field_label, data, encoding='latin_1'):
     if field_label['Type'] == 'Text':
-        results[field_label['Name']].append(data[:field_label['Size']].decode(encoding='latin_1'))
+        results[field_label['Name']].append(data[:field_label['Size']].decode(encoding=encoding))
     else:
         data_format = field_format(field_label)
         field_data = struct.unpack_from(data_format, data)
@@ -133,39 +133,55 @@ class IsisSpice(Isis3):
         return len(self.sensor_position)
 
     @property
-    def starting_ephemeris_time(self):
-        if not hasattr(self, "_inst_position_table"):
-            self.label
-        return self._inst_position_table['Times'][0]
+    def _sclock_hex_string(self):
+        for key in self.naif_keywords:
+            if re.match('CLOCK_ET_.*_COMPUTED', key[0]):
+                # If the hex string is only numbers and contains leading 0s,
+                # the PVL library strips them off (ie. 0000000000002040 becomes
+                # 2040). Pad to 16 in case this happens.
+                return str(key[1]).zfill(16)
+        raise Exception("No computed spacecraft clock time found in NaifKeywords.")
 
     @property
-    def ending_ephemeris_time(self):
-        if not hasattr(self, "_inst_position_table"):
-            self.label
-        return self._inst_position_table['Times'][-1]
+    def starting_ephemeris_time(self):
+        return struct.unpack('d', bytes.fromhex(self._sclock_hex_string))[0]
 
     @property
     def detector_center(self):
         return [
-            self.naif_keywords['INS{}_BORESIGHT_LINE'.format(self.ikid)],
-            self.naif_keywords['INS{}_BORESIGHT_SAMPLE'.format(self.ikid)]
+            self.naif_keywords.get('INS{}_BORESIGHT_LINE'.format(self.ikid), None),
+            self.naif_keywords.get('INS{}_BORESIGHT_SAMPLE'.format(self.ikid), None)
         ]
 
     @property
+    def _cube_label(self):
+        if 'IsisCube' not in self.label:
+            raise Exception("Could not find ISIS cube label.")
+        return self.label['IsisCube']
+
+    @property
+    def _kernels_group(self):
+        if 'Kernels' not in self._cube_label:
+            raise Exception("Could not find Kernels group in ISIS cube label.")
+        return self._cube_label['Kernels']
+
+    @property
     def ikid(self):
-        return self.label['IsisCube']['Kernels']['NaifIkCode']
+        if 'NaifIkCode' not in self._kernels_group:
+            raise Exception("Could not find Instrument NAIF ID in Kernels group.")
+        return self._kernels_group['NaifIkCode']
 
     @property
     def focal2pixel_lines(self):
-        return self.naif_keywords['INS{}_ITRANSL'.format(self.ikid)]
+        return self.naif_keywords.get('INS{}_ITRANSL'.format(self.ikid), None)
 
     @property
     def focal2pixel_samples(self):
-        return self.naif_keywords['INS{}_ITRANSS'.format(self.ikid)]
+        return self.naif_keywords.get('INS{}_ITRANSS'.format(self.ikid), None)
 
     @property
     def focal_length(self):
-        return self.naif_keywords['INS{}_FOCAL_LENGTH'.format(self.ikid)]
+        return self.naif_keywords.get('INS{}_FOCAL_LENGTH'.format(self.ikid), None)
 
     @property
     def body_radii(self):
@@ -182,47 +198,55 @@ class IsisSpice(Isis3):
         return self.body_radii[2]
 
     @property
-    def reference_frame(self):
+    def _body_time_dependent_frames(self):
         if not hasattr(self, "_body_orientation_table"):
             self.label
-        return self._body_orientation_table['TimeDependentFrames'][0]
+        if 'TimeDependentFrames' not in self._body_orientation_table:
+            raise Exception("Could not find body time dependent frames.")
+        return self._body_orientation_table['TimeDependentFrames']
+
+    @property
+    def reference_frame(self):
+        return self._body_time_dependent_frames[0]
 
     @property
     def sun_position(self):
         if not hasattr(self, "_sun_position_table"):
             self.label
-        return self._sun_position_table['Positions']
+        return self._sun_position_table.get('Positions', 'None')
 
     @property
     def sun_velocity(self):
         if not hasattr(self, "_sun_position_table"):
             self.label
-        return self._sun_position_table['Velocities']
+        return self._sun_position_table.get('Velocities', None)
 
     @property
     def sensor_position(self):
         if not hasattr(self, "_inst_position_table"):
             self.label
-        return self._inst_position_table['Positions']
+        return self._inst_position_table.get('Positions', None)
 
     @property
     def sensor_velocity(self):
         if not hasattr(self, "_inst_position_table"):
             self.label
-        return self._inst_position_table['Velocities']
+        return self._inst_position_table.get('Velocities', None)
 
     @property
     def sensor_orientation(self):
         if not hasattr(self, "_inst_pointing_table"):
             self.label
-        return self._inst_pointing_table['Rotations']
+        return self._inst_pointing_table.get('Rotations', None)
 
     @property
     def body_orientation(self):
         if not hasattr(self, "_body_orientation_table"):
             self.label
-        return self._body_orientation_table['Rotations']
+        return self._body_orientation_table.get('Rotations', None)
 
     @property
     def naif_keywords(self):
+        if 'NaifKeywords' not in self.label:
+            raise Exception("Could not find NaifKeywords in label.")
         return self.label['NaifKeywords']
