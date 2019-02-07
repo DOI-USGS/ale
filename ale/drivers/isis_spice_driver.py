@@ -205,6 +205,45 @@ def parse_position_table(field_data):
     return results
 
 class IsisSpice(Isis3):
+    """Mixin class for reading from an ISIS cube that has been spiceinit'd
+
+    Attributes
+    ----------
+    _label : PVLModule
+             Dict-like object with PVL keys
+
+    _inst_pointing_table : dict
+                           Dictionary that contains information about the
+                           rotation from J2000 to the sensor reference frame.
+                           All of the values for each property, such as angular
+                           velocity, are stored in a list or numpy array where
+                           each entry is the property at a different time.
+
+    _body_orientation_table : dict
+                              Dictionary that contains information about the
+                              rotation from J2000 to the body fixed reference
+                              frame. All of the  values for each property, such
+                              as angular velocity, are stored in a list or
+                              numpy array where each entry is the property at a
+                              different time.
+
+    _inst_position_table : dict
+                           Dictionary that contains information about the
+                           location of the sensor relative to the center of the
+                           target body. All of the  values for each property,
+                           such as velocity, are stored in a list or numpy
+                           array where each entry is the property at a
+                           different time.
+
+    _sun_position_table : dict
+                          Dictionary that contains information about the
+                          location of the sun relative to the center of the
+                          target body. All of the  values for each property,
+                          such as velocity, are stored in a list or numpy
+                          array where each entry is the property at a
+                          different time.
+
+    """
 
     @property
     def label(self):
