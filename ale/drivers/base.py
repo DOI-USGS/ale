@@ -515,7 +515,7 @@ class Isis3():
             except AttributeError:
                 self._label = pvl.load(self._file, strict=False)
             except:
-                raise Exception("{} is not a valid label".format(self._file))
+                raise ValueError("{} is not a valid label".format(self._file))
         return self._label
 
     @property

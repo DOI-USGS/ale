@@ -10,24 +10,24 @@ import quaternion
 from ale import config
 from ale.drivers.base import Driver, Isis3
 
-def read_table_data(table_label, file):
+def read_table_data(table_label, cube):
     """
     Helper function to read all of the binary table data
 
     Parameters
     ----------
     table_label : PVLModule
-        The ISIS table label
-    file : file
-        The ISIS cube file
+                  The ISIS table label
+    cube : file
+           The ISIS cube file
 
     Returns
     -------
-    bytes
-      The binary portion of the table data
+    bytes :
+        The binary portion of the table data
     """
-    file.seek(label['StartByte']-1) # This -1 is straight out of ISIS
-    return file.read(label['Bytes'])
+    cube.seek(label['StartByte']-1) # This -1 is straight out of ISIS
+    return cube.read(label['Bytes'])
 
 def field_size(field_label):
     """
@@ -37,12 +37,12 @@ def field_size(field_label):
     Parameters
     ----------
     field_label : PVLModule
-        The field label
+                  The field label
 
     Returns
     -------
-    int
-      The size of the one entry in bytes
+    int :
+        The size of the one entry in bytes
     """
     data_sizes = {
         'Integer' : 4,
@@ -60,12 +60,12 @@ def field_format(field_label):
     Parameters
     ----------
     field_label : PVLModule
-        The field label
+                  The field label
 
     Returns
     -------
-    str
-      The format string for the entry binary
+    str :
+        The format string for the entry binary
     """
     data_formats = {
         'Integer' : 'i',
@@ -76,25 +76,25 @@ def field_format(field_label):
 
 def parse_field(field_label, data, encoding='latin_1'):
     """
-    Parses all of the entries for a table field into a list.
-    If there is only one entry return that entry outside of
-    a list.
+    Parses a binary table field entry and converts it into
+    an in memory data type
 
     Parameters
     ----------
     field_label : PVLModule
-        The field label
+                  The field label
 
     data : bytes
-        The binary data for the entire table
+           The binary data for the field entry
 
     Returns
     -------
-    list
-      The table field entries
+    Union[int, float, str, list] :
+        The table field entry converted to a native python
+        type
     """
     if field_label['Type'] == 'Text':
-        results[field_label['Name']].append(data[:field_label['Size']].decode(encoding=encoding))
+        field_data = data[:field_label['Size']].decode(encoding=encoding)
     else:
         data_format = field_format(field_label)
         field_data = struct.unpack_from(data_format, data)
@@ -110,15 +110,15 @@ def parse_table_data(table_label, data):
     Parameters
     ----------
     table_label : PVLModule
-        The table label
+                  The table label
 
     data : bytes
-        The binary data for the entire table
+           The binary data for the entire table
 
     Returns
     -------
-    dict
-      The table as a dict
+    dict :
+        The table as a dict
     """
     fields = table_label.getlist('Field')
     results = {field['Name']:[] for field in fields}
@@ -137,19 +137,19 @@ def parse_rotation_table(label, field_data):
     Parameters
     ----------
     table_label : PVLModule
-        The table label
+                  The table label
 
     field_data : dict
-        The table data as a dict with field names as keys
-        and lists of entries as values
+                 The table data as a dict with field names
+                 as keys and lists of entries as values
 
     Returns
     -------
-    dict
-      The rotation data
+    dict :
+        The rotation data
     """
     results = {}
-    if all (key in field_data for key in ['J2000Q0','J2000Q1','J2000Q2','J2000Q3']):
+    if all (key in field_data for key in ('J2000Q0','J2000Q1','J2000Q2','J2000Q3')):
         results['Rotations'] = quaternion.as_quat_array( [ [q0, q1, q2, q3] for q0, q1, q2, q3 in zip(field_data['J2000Q0'],field_data['J2000Q1'],field_data['J2000Q2'],field_data['J2000Q3']) ] )
     if all (key in field_data for key in ('AV1','AV2','AV3')):
         results['AngularVelocities'] = np.array( [ [av1, av2, av3] for av1, av2, av3 in zip(field_data['AV1'],field_data['AV2'],field_data['AV3']) ] )
@@ -188,7 +188,7 @@ def parse_position_table(field_data):
 
     Returns
     -------
-    dict
+    dict :
       The position data
     """
     results = {}
@@ -214,14 +214,14 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        : PVLModule
-          Dict-like object with PVL keys
+        PVLModule :
+            Dict-like object with PVL keys
         """
         if not hasattr(self, "_label"):
             try:
                 self._label = pvl.load(self._file)
             except:
-                raise Exception("{} is not a valid label".format(self._file))
+                raise ValueError("{} is not a valid label".format(self._file))
             for table in self._label.getlist('Table'):
                 binary_data = read_table_data(table, self._file)
                 field_data = parse_table_data(table, binary_data)
@@ -256,8 +256,8 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        int
-          The number of quaternions
+        int :
+            The number of quaternions
         """
         return len(self.sensor_orientation)
 
@@ -269,8 +269,8 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        int
-          The number of states
+        int :
+            The number of states
         """
         return len(self.sensor_position)
 
@@ -282,9 +282,9 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        str
-          The hex string representation of the image start
-          time as a double
+        str :
+            The hex string representation of the image
+            start time as a double
         """
         for key in self.naif_keywords:
             if re.match('CLOCK_ET_.*_COMPUTED', key[0]):
@@ -292,7 +292,7 @@ class IsisSpice(Isis3):
                 # the PVL library strips them off (ie. 0000000000002040 becomes
                 # 2040). Pad to 16 in case this happens.
                 return str(key[1]).zfill(16)
-        raise Exception("No computed spacecraft clock time found in NaifKeywords.")
+        raise ValueError("No computed spacecraft clock time found in NaifKeywords.")
 
     @property
     def starting_ephemeris_time(self):
@@ -301,8 +301,8 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        float
-          The image start time
+        float :
+            The image start ephemeris time
         """
         return struct.unpack('d', bytes.fromhex(self._sclock_hex_string))[0]
 
@@ -313,8 +313,8 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        list
-          The center of the CCD formatted as line, sample
+        list :
+            The center of the CCD formatted as line, sample
         """
         return [
             self.naif_keywords.get('INS{}_BORESIGHT_LINE'.format(self.ikid), None),
@@ -328,11 +328,11 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        PVLModule
-          The ISIS cube label
+        PVLModule :
+            The ISIS cube label
         """
         if 'IsisCube' not in self.label:
-            raise Exception("Could not find ISIS cube label.")
+            raise ValueError("Could not find ISIS cube label.")
         return self.label['IsisCube']
 
     @property
@@ -343,11 +343,11 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        PVLModule
-          The kernels group
+        PVLModule :
+            The kernels group
         """
         if 'Kernels' not in self._cube_label:
-            raise Exception("Could not find Kernels group in ISIS cube label.")
+            raise ValueError("Could not find Kernels group in ISIS cube label.")
         return self._cube_label['Kernels']
 
     @property
@@ -357,11 +357,11 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        int
-          The instrument id
+        int :
+            The instrument id
         """
         if 'NaifIkCode' not in self._kernels_group:
-            raise Exception("Could not find Instrument NAIF ID in Kernels group.")
+            raise ValueError("Could not find Instrument NAIF ID in Kernels group.")
         return self._kernels_group['NaifIkCode']
 
     @property
@@ -372,9 +372,9 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        list
-          The coefficients of the affine transformation
-          formatted as constant, x, y
+        list :
+            The coefficients of the affine transformation
+            formatted as constant, x, y
         """
         return self.naif_keywords.get('INS{}_ITRANSL'.format(self.ikid), None)
 
@@ -386,9 +386,9 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        list
-          The coefficients of the affine transformation
-          formatted as constant, x, y
+        list :
+            The coefficients of the affine transformation
+            formatted as constant, x, y
         """
         return self.naif_keywords.get('INS{}_ITRANSS'.format(self.ikid), None)
 
@@ -399,8 +399,8 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        float
-          The focal length in millimeters
+        float :
+            The focal length in millimeters
         """
         return self.naif_keywords.get('INS{}_FOCAL_LENGTH'.format(self.ikid), None)
 
@@ -411,10 +411,10 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        list
-          The body radii in kilometers. For most bodies,
-          this is formatted as semimajor, semimajor,
-          semiminor
+        list :
+            The body radii in kilometers. For most bodies,
+            this is formatted as semimajor, semimajor,
+            semiminor
         """
         for key in self.naif_keywords:
             if re.match('BODY-?\d*_RADII', key[0]):
@@ -428,8 +428,8 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        float
-          The radius in kilometers
+        float :
+            The radius in kilometers
         """
         return self.body_radii[0]
 
@@ -441,8 +441,8 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        float
-          The radius in kilometers
+        float :
+            The radius in kilometers
         """
         return self.body_radii[2]
 
@@ -454,15 +454,15 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        list
-          The list of frames starting with the body
-          reference frame and ending with the final time
-          dependent frame.
+        list :
+            The list of frames starting with the body
+            reference frame and ending with the final time
+            dependent frame.
         """
         if not hasattr(self, "_body_orientation_table"):
             self.label
         if 'TimeDependentFrames' not in self._body_orientation_table:
-            raise Exception("Could not find body time dependent frames.")
+            raise ValueError("Could not find body time dependent frames.")
         return self._body_orientation_table['TimeDependentFrames']
 
     @property
@@ -472,8 +472,8 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        int
-          The frame ID
+        int :
+            The frame ID
         """
         return self._body_time_dependent_frames[0]
 
@@ -484,10 +484,10 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        array
-          The sun position vectors relative to the center
-          of the target body in the J2000 reference frame
-          as a 2d numpy array
+        array :
+            The sun position vectors relative to the center
+            of the target body in the J2000 reference frame
+            as a 2d numpy array
         """
         if not hasattr(self, "_sun_position_table"):
             self.label
@@ -500,9 +500,9 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        array
-          The sun velocity vectors in the J2000 reference
-          frame as a 2d numpy array
+        array :
+            The sun velocity vectors in the J2000 reference
+            frame as a 2d numpy array
         """
         if not hasattr(self, "_sun_position_table"):
             self.label
@@ -515,10 +515,10 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        array
-          The sensor position vectors relative to the center
-          of the target body in the J2000 reference frame
-          as a 2d numpy array
+        array :
+            The sensor position vectors relative to the
+            center of the target body in the J2000
+            reference frame as a 2d numpy array
         """
         if not hasattr(self, "_inst_position_table"):
             self.label
@@ -531,9 +531,9 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        array
-          The sensor velocity vectors in the J2000
-          reference frame as a 2d numpy array
+        array :
+            The sensor velocity vectors in the J2000
+              reference frame as a 2d numpy array
         """
         if not hasattr(self, "_inst_position_table"):
             self.label
@@ -547,9 +547,9 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        array
-          The sensor rotation quaternions as a numpy
-          quaternion array
+        array :
+            The sensor rotation quaternions as a numpy
+            quaternion array
         """
         if not hasattr(self, "_inst_pointing_table"):
             self.label
@@ -563,9 +563,9 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        array
-          The body rotation quaternions as a numpy
-          quaternion array
+        array :
+            The body rotation quaternions as a numpy
+            quaternion array
         """
         if not hasattr(self, "_body_orientation_table"):
             self.label
@@ -580,9 +580,9 @@ class IsisSpice(Isis3):
 
         Returns
         -------
-        PVLModule
-          The stored NAIF keyword values
+        PVLModule :
+            The stored NAIF keyword values
         """
         if 'NaifKeywords' not in self.label:
-            raise Exception("Could not find NaifKeywords in label.")
+            raise ValueError("Could not find NaifKeywords in label.")
         return self.label['NaifKeywords']
