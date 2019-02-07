@@ -444,9 +444,6 @@ End
 def test_read(test_cube):
     assert isinstance(test_cube.label, pvl.PVLModule)
 
-def test_interpolation_method(test_cube):
-    assert test_cube.interpolation_method == 'hermite'
-
 def test_number_of_quaternions(test_cube):
     assert test_cube.number_of_quaternions == 1
 
