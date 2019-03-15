@@ -56,5 +56,5 @@ def loads(label):
                 return obj.__str__()
             return json.JSONEncoder.default(self, obj)
 
-    res = load(label).to_dict()
+    res = load(label)
     return json.dumps(res, cls=JsonEncoder)
