@@ -37,7 +37,7 @@ def load(label):
             try:
                 if res.is_valid():
                     with res as r:
-                            return res
+                            return res.to_dict()
             except Exception as e:
                 import traceback
                 print("Driver Failed:", e)
