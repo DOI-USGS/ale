@@ -13,6 +13,8 @@ from datetime import datetime, date
 
 from abc import ABC
 
+import datetime
+
 # dynamically load drivers
 __all__ = [os.path.splitext(os.path.basename(d))[0] for d in glob(os.path.join(os.path.dirname(__file__), '*_driver.py'))]
 __driver_modules__ = [importlib.import_module('.'+m, package='ale.drivers') for m in __all__]
@@ -41,3 +43,18 @@ def load(label):
                         print("Driver Failed:", e)
                         traceback.print_exc()
     raise Exception('No Such Driver for Label')
+
+
+def loads(label):
+    class JsonEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, np.ndarray):
+                return obj.tolist()
+            if isinstance(obj, np.int64):
+                return int(obj)
+            if isinstance(obj, datetime.datetime):
+                return obj.__str__()
+            return json.JSONEncoder.default(self, obj)
+
+    res = load(label).to_dict()
+    return json.dumps(res, cls=JsonEncoder)
