@@ -6,15 +6,13 @@ import pvl
 import spiceypy as spice
 
 from ale.util import get_metakernels
-from ale.drivers.base import LineScanner, Spice, PDS3, Isis3
-from ale.drivers import keys
+from ale.drivers.base import LineScanner, Spice, PDS3, Isis3, Driver
 
 
-class LrocSpice(Spice, LineScanner):
+class LrocSpice(Driver, Spice, LineScanner):
     """
     Lroc mixin class for defining snowflake Spice calls.
     """
-    required_keys = keys.base | keys.linescanner
 
     @property
     def metakernel(self):

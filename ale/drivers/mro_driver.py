@@ -6,19 +6,44 @@ import pvl
 import spiceypy as spice
 from ale import config
 
-from ale.drivers.base import LineScanner, Spice, PDS3, Isis3
-from ale.drivers import keys
+from ale.drivers.base import LineScanner, Spice, PDS3, Isis3, IsisSpice, Driver, RadialDistortion
+
+class CtxIsisSpice(Driver, IsisSpice, LineScanner, RadialDistortion):
+
+    @property
+    def instrument_id(self):
+        """
+        Returns an instrument id for uniquely identifying the instrument, but often
+        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+        the same ID the Spice expects in bods2c calls.
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
+        return "N/A"
+
+    @property
+    def spacecraft_id(self):
+        return "N/A"
+
+    @property
+    def ikid(self):
+        return int(self.label["IsisCube"]["Kernels"]["NaifFrameCode"])
+
+    @property
+    def line_exposure_duration(self):
+        return self.label["IsisCube"]["Instrument"]["LineExposureDuration"].value * 0.001 # Scale to seconds
 
 
-class CtxSpice(Spice, LineScanner):
+class CtxSpice(Driver, Spice, LineScanner, RadialDistortion):
     """
     Spice mixins that defines MRO CTX specific snowflake Spice calls.
     """
     id_lookup = {
             'CONTEXT CAMERA':'MRO_CTX'
     }
-
-    required_keys = keys.base | keys.linescanner | keys.radial_distortion
 
     @property
     def metakernel(self):
