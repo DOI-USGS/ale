@@ -34,14 +34,14 @@ def load(label):
     for name, driver in drivers.items():
             print("Trying:", name)
             res = driver(label)
-            if res.is_valid():
-                with res as r:
-                    try:
-                        return res
-                    except Exception as e:
-                        import traceback
-                        print("Driver Failed:", e)
-                        traceback.print_exc()
+            try:
+                if res.is_valid():
+                    with res as r:
+                            return res
+            except Exception as e:
+                import traceback
+                print("Driver Failed:", e)
+                traceback.print_exc()
     raise Exception('No Such Driver for Label')
 
 
