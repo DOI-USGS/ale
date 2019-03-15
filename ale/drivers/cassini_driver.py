@@ -6,20 +6,17 @@ import spiceypy as spice
 import numpy as np
 
 from ale import config
-from ale.drivers.base import Framer
-from ale.drivers import keys
+from ale.drivers.base import Framer, RadialDistortion, Driver
 
 
-class CassiniISS(Framer):
+class CassiniISS(Driver, Framer, RadialDistortion):
     """
-    Cassini mixin class for defining snowflake Spice calls. 
+    Cassini mixin class for defining snowflake Spice calls.
     """
     id_lookup = {
         "ISSNA" : "CASSINI_ISS_NAC",
         "ISSWA" : "CASSINI_ISS_WAC"
     }
-
-    required_keys = keys.base | keys.framer | keys.radial_distortion
 
     @property
     def metakernel(self):

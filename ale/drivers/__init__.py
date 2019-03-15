@@ -19,6 +19,7 @@ __driver_modules__ = [importlib.import_module('.'+m, package='ale.drivers') for 
 
 drivers = dict(chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.isclass(x) and "_driver" in x.__module__) for dmod in __driver_modules__))
 
+
 def load(label):
     """
     Attempt to load a given label from all possible drivers
@@ -29,14 +30,15 @@ def load(label):
                String path to the given label file
     """
     for name, driver in drivers.items():
-        try:
-            print("TRYING:", driver)
+            print("Trying:", name)
             res = driver(label)
             if res.is_valid():
                 with res as r:
-                    return res
-
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
+                    print("sdl;fkasdkfl;as")
+                    try:
+                        return res
+                    except Exception as e:
+                        import traceback
+                        print("Driver Failed:", e)
+                        traceback.print_exc()
     raise Exception('No Such Driver for Label')
