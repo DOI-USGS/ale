@@ -34,7 +34,6 @@ def load(label):
             res = driver(label)
             if res.is_valid():
                 with res as r:
-                    print("sdl;fkasdkfl;as")
                     try:
                         return res
                     except Exception as e:
