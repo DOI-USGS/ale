@@ -28,7 +28,7 @@ def read_table_data(table_label, cube):
         The binary portion of the table data
     """
     cubehandle = open(cube, "rb")
-    cubehandle.seek(table_label['StartByte']) # This -1 is straight out of ISIS
+    cubehandle.seek(table_label['StartByte'])
     return cubehandle.read(table_label['Bytes'])
 
 def field_size(field_label):
@@ -216,13 +216,15 @@ class Driver():
     _file : str
             Reference to file path to be used by mixins for opening.
     """
-    def __init__(self, file):
+    def __init__(self, file, num_ephem=909, num_quats=909):
         """
         Parameters
         ----------
         file : str
                path to file to be parsed
         """
+        self._num_quaternions = num_quats
+        self._num_ephem = num_ephem
         self._file = file
 
     def __str__(self):
@@ -323,7 +325,7 @@ class Driver():
     def reference_height(self):
         # TODO: This should be a reasonable #
         return {
-            "maxheight" : 0,
+            "minheight" : 0,
             "maxheight": 1000,
             "unit": "m"
         }
@@ -408,14 +410,12 @@ class LineScanner():
 
     @property
     def number_of_ephemerides(self):
-        #TODO: Not make this hardcoded
-        return 909 #len(self._sensor_position)
+        return self._num_ephem
 
     @property
     def number_of_quaternions(self):
         #TODO: Not make this hardcoded
-        return 909 #
-        len(self._quaternions)
+        return self._num_quaternions
 
     @property
     def ending_ephemeris_time(self):
@@ -706,7 +706,7 @@ class Spice():
                                         current_et,
                                         self.reference_frame,
                                         'NONE',
-                                        self.target_name,) # If this is the sensor, insufficient, if this is the spacecraft, it works? Huh?
+                                        self.target_name,)
                 eph.append(state[:3])
                 current_et += getattr(self, "dt_ephemeris", 0)
             # By default, spice works in km
@@ -723,7 +723,7 @@ class Spice():
                                         current_et,
                                         self.reference_frame,
                                         'NONE',
-                                        self.target_name,) # If this is the sensor, insufficient, if this is the spacecraft, it works? Huh?
+                                        self.target_name,)
                 eph_rates.append(state[3:])
                 current_et += getattr(self, "dt_ephemeris", 0)
             # By default, spice works in km
