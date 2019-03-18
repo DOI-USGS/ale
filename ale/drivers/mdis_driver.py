@@ -6,11 +6,10 @@ import spiceypy as spice
 import numpy as np
 
 from ale import config
-from ale.drivers.base import Framer, Spice, PDS3, Isis3
-from ale.drivers import keys
+from ale.drivers.base import Framer, Spice, PDS3, Isis3, Driver
 
 
-class MdisSpice(Spice, Framer):
+class MdisSpice(Driver, Spice, Framer):
     """
     MDIS mixin class for defining snowflake Spice calls. Since MDIS has unique
     Spice keys, those are defined here as an intermediate mixin for MDIS drivers
@@ -24,7 +23,6 @@ class MdisSpice(Spice, Framer):
         'MERCURY DUAL IMAGING SYSTEM WIDE ANGLE CAMERA':'MSGR_MDIS_WAC'
     }
 
-    required_keys = keys.base | keys.framer | keys.filter | keys.transverse_distortion | keys.temp_dep_focal_legth
 
     @property
     def metakernel(self):
@@ -45,7 +43,7 @@ class MdisSpice(Spice, Framer):
         return self._metakernel
 
     @property
-    def focal_length(self):
+    def _focal_length(self):
         """
         Computes Focal Length from Kernels
 
@@ -65,7 +63,7 @@ class MdisSpice(Spice, Framer):
         f_t = np.poly1d(coeffs[::-1])
 
         # eval at the focal_plane_tempature
-        return f_t(self.focal_plane_tempature)
+        return f_t(self._focal_plane_tempature)
 
     @property
     def starting_detector_sample(self):
