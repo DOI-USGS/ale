@@ -247,4 +247,3 @@ def test_mdis_creation(mdislabel):
     with MdisPDS3Driver(mdislabel) as m:
         d = m.to_dict()
         assert isinstance(d, dict)
-        assert(set(d.keys()) == m.required_keys)
