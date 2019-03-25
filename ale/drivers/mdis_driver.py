@@ -66,6 +66,10 @@ class MdisSpice(Driver, Spice, Framer):
         return f_t(self._focal_plane_tempature)
 
     @property
+    def focal_epsilon(self):
+        return float(spice.gdpool('INS{}_FL_UNCERTAINTY'.format(self.ikid), 0, 1)[0])
+
+    @property
     def starting_detector_sample(self):
         """
         Returns starting detector sample quired from Spice Kernels.
