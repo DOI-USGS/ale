@@ -95,17 +95,3 @@ class CtxPds3Driver(PDS3, CtxSpice):
             'MARS_RECONNAISSANCE_ORBITER': 'MRO'
         }
         return name_lookup[self.label['SPACECRAFT_NAME']]
-
-    @property
-    def instrument_id(self):
-        """
-        Returns an instrument id for unquely identifying the instrument, but often
-        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
-        the same ID the Spice expects in bods2c calls.
-
-        Returns
-        -------
-        : str
-          instrument id
-        """
-        return self.id_lookup[self.label['INSTRUMENT_NAME']]
