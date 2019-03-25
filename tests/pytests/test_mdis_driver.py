@@ -7,15 +7,7 @@ import ale
 from ale.drivers import mdis_driver, base
 from ale.drivers.mdis_driver import MdisPDS3Driver
 
-
-# 'Mock' the spice module where it is imported
 from conftest import SimpleSpice, get_mockkernels
-
-simplespice = SimpleSpice()
-base.spice = simplespice
-mdis_driver.spice = simplespice
-
-MdisPDS3Driver.metakernel = get_mockkernels
 
 @pytest.fixture
 def mdislabel():
@@ -243,7 +235,19 @@ END_OBJECT = IMAGE
 END
     """
 
-def test_mdis_creation(mdislabel):
+@pytest.fixture
+def mdispds_driver():
+  pool_keys = ['INS-12345_FL_UNCERTAINTY', 'INS-12345_FL_TEMP_COEFFS ', 'EARTH',
+               'INS-12345_FPUBIN_START_LINE',
+               'INS-12345_FPUBIN_START_SAMPLE']
+
+  # Setup a kernel pool fixture for PDS3 driver testing
+  simplespice = SimpleSpice(pool_keys)
+  base.spice = simplespice
+  mdis_driver.spice = simplespice
+  MdisPDS3Driver.metakernel = get_mockkernels
+
+def test_mdis_creation(mdispds_driver, mdislabel):
     with MdisPDS3Driver(mdislabel) as m:
         d = m.to_dict()
         assert isinstance(d, dict)

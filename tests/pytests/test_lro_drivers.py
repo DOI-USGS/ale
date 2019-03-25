@@ -8,14 +8,8 @@ from ale.drivers import lro_driver, base
 from ale.drivers.lro_driver import LrocPds3Driver
 from ale import util
 
-# 'Mock' the spice module where it is imported
 from conftest import SimpleSpice, get_mockkernels
 
-simplespice = SimpleSpice()
-base.spice = simplespice
-lro_driver.spice = simplespice
-
-LrocPds3Driver.metakernel = get_mockkernels
 
 @pytest.fixture
 def lro_lroclabel():
@@ -110,6 +104,16 @@ def lro_lroclabel():
         END_OBJECT                         = IMAGE
         END
         """
+
+@pytest.fixture
+def lropds_driver():
+  pool_keys = ['MOON']
+
+  # Setup a kernel pool fixture for PDS3 driver testing
+  simplespice = SimpleSpice(pool_keys)
+  base.spice = simplespice
+  lro_driver.spice = simplespice
+  LrocPds3Driver.metakernel = get_mockkernels
 
 def test_lro_creation(lro_lroclabel):
     with LrocPds3Driver(lro_lroclabel) as m:

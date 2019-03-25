@@ -4,7 +4,6 @@ import ale
 from ale.drivers.mro_driver import CtxPds3Driver
 from ale.drivers import mro_driver, base
 
-# 'Mock' the spice module where it is imported
 from conftest import SimpleSpice, get_mockkernels
 
 @pytest.fixture
@@ -55,6 +54,7 @@ def mroctx_label():
     END_OBJECT = IMAGE
     END"""
 
+@pytest.fixture
 def mroctxpds_driver():
     pool_keys = ['INS-12345_OD_K', 'MARS']
 
@@ -65,7 +65,15 @@ def mroctxpds_driver():
     CtxPds3Driver.metakernel = get_mockkernels
     return
 
-def test_ctx_creation(mroctx_label):
+def test_ctx_creation(mroctxpds_driver, mroctx_label):
     with CtxPds3Driver(mroctx_label) as m:
         d = m.to_dict()
     assert isinstance(d, dict)
+
+def test_ctx_instrument_id(mroctxpds_driver, mroctx_label):
+    with CtxPds3Driver(mroctx_label) as m:
+        assert m.instrument_id == 'MRO_CTX'
+
+def test_ctx_spacecraft_name(mroctxpds_driver, mroctx_label):
+    with CtxPds3Driver(mroctx_label) as m:
+        assert m.spacecraft_name == 'MRO'
