@@ -7,12 +7,6 @@ from ale.drivers import mro_driver, base
 # 'Mock' the spice module where it is imported
 from conftest import SimpleSpice, get_mockkernels
 
-simplespice = SimpleSpice()
-base.spice = simplespice
-mro_driver.spice = simplespice
-
-CtxPds3Driver.metakernel = get_mockkernels
-
 @pytest.fixture
 def mroctx_label():
     return """
@@ -61,6 +55,15 @@ def mroctx_label():
     END_OBJECT = IMAGE
     END"""
 
+def mroctxpds_driver():
+    pool_keys = ['INS-12345_OD_K', 'MARS']
+
+    # Setup a kernel pool fixture for PDS3 driver testing
+    simplespice = SimpleSpice(pool_keys)
+    base.spice = simplespice
+    mro_driver.spice = simplespice
+    CtxPds3Driver.metakernel = get_mockkernels
+    return
 
 def test_ctx_creation(mroctx_label):
     with CtxPds3Driver(mroctx_label) as m:
