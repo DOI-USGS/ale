@@ -521,10 +521,6 @@ class PDS3():
         return spice.bodn2c(self.label['TARGET_NAME'])
 
     @property
-    def focal_epsilon(self):
-        return float(spice.gdpool('INS{}_FL_UNCERTAINTY'.format(self.ikid), 0, 1)[0])
-
-    @property
     def starting_ephemeris_time(self):
         if not hasattr(self, '_starting_ephemeris_time'):
             sclock = self.label['SPACECRAFT_CLOCK_START_COUNT']
@@ -582,6 +578,7 @@ class Spice():
         Called when the context is created. This is used
         to get the kernels furnished.
         """
+        print(self.metakernel)
         if self.metakernel:
             spice.furnsh(self.metakernel)
         return self
