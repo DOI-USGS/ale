@@ -34,8 +34,8 @@ def load(label):
     """
     for name, driver in drivers.items():
             print("Trying:", name)
-            res = driver(label, *args, **kwargs)
             try:
+                res = driver(label, *args, **kwargs)
                 if res.is_valid():
                     with res as r:
                             return res.to_dict()
