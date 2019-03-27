@@ -318,7 +318,7 @@ class Driver():
         return {
             "semimajor" : self._semimajor,
             "semiminor" : self._semiminor,
-            "unit" : "m" # default to meters
+            "unit" : "km" # default to meters
         }
 
     @property
@@ -659,7 +659,7 @@ class Spice():
           Semimajor axis of the target body
         """
         rad = spice.bodvrd(self.target_name, 'RADII', 3)
-        return rad[1][1]
+        return rad[1][0]
 
     @property
     def _semiminor(self):
@@ -670,7 +670,7 @@ class Spice():
           Semiminor axis of the target body
         """
         rad = spice.bodvrd(self.target_name, 'RADII', 3)
-        return rad[1][0]
+        return rad[1][2]
 
     @property
     def reference_frame(self):
@@ -727,14 +727,14 @@ class Spice():
                 eph_rates.append(state[3:])
                 current_et += getattr(self, "dt_ephemeris", 0)
             # By default, spice works in km
-            self._velocity = [e*1000 for e  in eph_rates]
+            self._velocity = [e*1000 for e in eph_rates]
         return self._velocity
 
     @property
     def _sensor_orientation(self):
         if not hasattr(self, '_orientation'):
             current_et = self.starting_ephemeris_time
-            qua = np.empty((self.number_of_ephemerides, 4))
+            qua = np.empty((self.number_of_quaternions, 4))
             for i in range(self.number_of_quaternions):
                 # Find the rotation matrix
                 camera2bodyfixed = spice.pxform(self.instrument_id,
@@ -745,7 +745,6 @@ class Spice():
                 qua[i,3] = q[0]
                 current_et += getattr(self, 'dt_quaternion', 0)
             self._orientation = qua
-        print(len(self._orientation))
         return self._orientation.tolist()
 
     @property
@@ -840,7 +839,7 @@ class Isis3():
     def starting_ephemeris_time(self):
         if not hasattr(self, '_starting_ephemeris_time'):
             sclock = self.label['IsisCube']['Archive']['SpacecraftClockStartCount']
-            self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock).value
+            self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
         return self._starting_ephemeris_time
 
 
