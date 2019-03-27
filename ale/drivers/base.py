@@ -318,7 +318,7 @@ class Driver():
         return {
             "semimajor" : self._semimajor,
             "semiminor" : self._semiminor,
-            "unit" : "km" # default to meters
+            "unit" : "km" # default to KM
         }
 
     @property
