@@ -22,6 +22,7 @@ __driver_modules__ = [importlib.import_module('.'+m, package='ale.drivers') for 
 drivers = dict(chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.isclass(x) and "_driver" in x.__module__) for dmod in __driver_modules__))
 
 
+
 def load(label):
     """
     Attempt to load a given label from all possible drivers
@@ -33,8 +34,8 @@ def load(label):
     """
     for name, driver in drivers.items():
             print("Trying:", name)
-            res = driver(label)
             try:
+                res = driver(label, *args, **kwargs)
                 if res.is_valid():
                     with res as r:
                             return res.to_dict()
