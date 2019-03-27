@@ -23,7 +23,7 @@ drivers = dict(chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.is
 
 
 
-def load(label, *args, **kwargs):
+def load(label):
     """
     Attempt to load a given label from all possible drivers
 
