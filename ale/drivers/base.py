@@ -318,7 +318,7 @@ class Driver():
         return {
             "semimajor" : self._semimajor,
             "semiminor" : self._semiminor,
-            "unit" : "m" # default to meters
+            "unit" : "km" # default to KM
         }
 
     @property
@@ -425,6 +425,10 @@ class LineScanner():
     def center_ephemeris_time(self):
         return (self.starting_ephemeris_time + self.ending_ephemeris_time)/2
 
+class Framer():
+    @property
+    def name_sensor(self):
+        return "Generic Framer"
 
 class Framer():
     @property
@@ -655,7 +659,7 @@ class Spice():
           Semimajor axis of the target body
         """
         rad = spice.bodvrd(self.target_name, 'RADII', 3)
-        return rad[1][1]
+        return rad[1][0]
 
     @property
     def _semiminor(self):
@@ -666,7 +670,7 @@ class Spice():
           Semiminor axis of the target body
         """
         rad = spice.bodvrd(self.target_name, 'RADII', 3)
-        return rad[1][0]
+        return rad[1][2]
 
     @property
     def reference_frame(self):
@@ -730,7 +734,7 @@ class Spice():
     def _sensor_orientation(self):
         if not hasattr(self, '_orientation'):
             current_et = self.starting_ephemeris_time
-            qua = np.empty((self.number_of_ephemerides, 4))
+            qua = np.empty((self.number_of_quaternions, 4))
             for i in range(self.number_of_quaternions):
                 # Find the rotation matrix
                 camera2bodyfixed = spice.pxform(self.instrument_id,
@@ -741,7 +745,6 @@ class Spice():
                 qua[i,3] = q[0]
                 current_et += getattr(self, 'dt_quaternion', 0)
             self._orientation = qua
-        print(len(self._orientation))
         return self._orientation.tolist()
 
     @property

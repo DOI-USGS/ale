@@ -62,8 +62,30 @@ class CtxSpice(Driver, Spice, LineScanner, RadialDistortion):
             for mk in mks:
                 if str(self.start_time.year) in os.path.basename(mk):
                     self._metakernel = mk
+            print(self._metakernel)
         return self._metakernel
 
+class CtxIsisCubeSpice(Isis3, CtxSpice):
+    @property
+    def instrument_id(self):
+        return "MRO_CTX"
+
+    @property
+    def starting_ephemeris_time(self):
+        if not hasattr(self, '_starting_ephemeris_time'):
+            sclock = self.label['IsisCube']['Instrument']['SpacecraftClockCount']
+            self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
+        return self._starting_ephemeris_time
+
+    @property
+    def line_exposure_duration(self):
+        if not hasattr(self, '_line_exposure_duration'):
+            self._line_exposure_duration = self.label['IsisCube']['Instrument']['LineExposureDuration'].value*0.001
+        return self._line_exposure_duration
+
+    @property
+    def spacecraft_name(self):
+        return "MRO"
 
 class CtxPds3Driver(PDS3, CtxSpice):
     """
@@ -95,17 +117,3 @@ class CtxPds3Driver(PDS3, CtxSpice):
             'MARS_RECONNAISSANCE_ORBITER': 'MRO'
         }
         return name_lookup[self.label['SPACECRAFT_NAME']]
-
-    @property
-    def instrument_id(self):
-        """
-        Returns an instrument id for unquely identifying the instrument, but often
-        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
-        the same ID the Spice expects in bods2c calls.
-
-        Returns
-        -------
-        : str
-          instrument id
-        """
-        return self.id_lookup[self.label['INSTRUMENT_NAME']]
