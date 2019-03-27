@@ -267,7 +267,6 @@ class Driver():
         keys = set()
         return {p:getattr(self, p) for p in dir(self) if p[0] != "_" and isinstance(getattr(type(self), p), property)}
 
-<<<<<<< HEAD
 
     @property
     def label(self):
@@ -369,109 +368,6 @@ class Driver():
         }
 
 
-=======
-
-    @property
-    def label(self):
-        if not hasattr(self, "_label"):
-            if isinstance(self._file, pvl.PVLModule):
-                self._label = self._file
-            try:
-                self._label = pvl.loads(self._file)
-            except Exception:
-                self._label = pvl.load(self._file)
-            except:
-                raise ValueError("{} is not a valid label".format(self._file))
-        return self._label
-
-    @property
-    def file(self):
-        return self._file
-
-    @property
-    def interpolation_method(self):
-        return "lagrange"
-
-    @property
-    def starting_detector_line(self):
-        return 1
-
-    @property
-    def starting_detector_sample(self):
-        return 1
-
-    @property
-    def detector_sample_summing(self):
-        return 1
-
-    @property
-    def detector_line_summing(self):
-        return 1
-
-    @property
-    def name_platform(self):
-        return "Generic Platform"
-
-    @property
-    def name_sensor(self):
-        return "Generic Sensor"
-
-    @property
-    def radii(self):
-        return {
-            "semimajor" : self._semimajor,
-            "semiminor" : self._semiminor,
-            "unit" : "m" # default to meters
-        }
-
-    @property
-    def reference_height(self):
-        # TODO: This should be a reasonable #
-        return {
-            "minheight" : 0,
-            "maxheight": 1000,
-            "unit": "m"
-        }
-
-    @property
-    def focal_length_model(self):
-        return {
-            "focal_length" : self._focal_length
-        }
-
-    @property
-    def detector_center(self):
-        if not hasattr(self, '_detector_center'):
-            self._detector_center = {
-                "line" : self._detector_center_line,
-                "sample" : self._detector_center_sample
-            }
-        return self._detector_center
-
-    @property
-    def sensor_position(self):
-        return {
-            "positions" : self._sensor_position,
-            "velocities" : self._sensor_velocity,
-            "unit" : "m"
-        }
-
-    @property
-    def sensor_orientation(self):
-        return {
-            "quaternions" : self._sensor_orientation
-        }
-
-    @property
-    def sun_position(self):
-        return {
-            "positions" : self._sun_position,
-            "velocities" : self._sun_velocity,
-            "unit" : "m"
-        }
-
-
->>>>>>> 895190557c1f11db2a32456a904f249c9aafb422
 class LineScanner():
     @property
     def name_model(self):
@@ -528,24 +424,17 @@ class LineScanner():
     @property
     def center_ephemeris_time(self):
         return (self.starting_ephemeris_time + self.ending_ephemeris_time)/2
-<<<<<<< HEAD
-
-=======
->>>>>>> 895190557c1f11db2a32456a904f249c9aafb422
 
 class Framer():
     @property
     def name_sensor(self):
         return "Generic Framer"
 
-<<<<<<< HEAD
-=======
 class Framer():
     @property
     def name_sensor(self):
         return "Generic Framer"
 
->>>>>>> 895190557c1f11db2a32456a904f249c9aafb422
     @property
     def name_model(self):
         """
@@ -838,11 +727,7 @@ class Spice():
                 eph_rates.append(state[3:])
                 current_et += getattr(self, "dt_ephemeris", 0)
             # By default, spice works in km
-<<<<<<< HEAD
-            self._velocity = [e*1000 for e in eph_rates]
-=======
             self._velocity = [e*1000 for e  in eph_rates]
->>>>>>> 895190557c1f11db2a32456a904f249c9aafb422
         return self._velocity
 
     @property
@@ -860,10 +745,6 @@ class Spice():
                 qua[i,3] = q[0]
                 current_et += getattr(self, 'dt_quaternion', 0)
             self._orientation = qua
-<<<<<<< HEAD
-=======
-        print(len(self._orientation))
->>>>>>> 895190557c1f11db2a32456a904f249c9aafb422
         return self._orientation.tolist()
 
     @property
