@@ -13,38 +13,54 @@ source:
 build:
   number: {{ build_number }}
 
-# Shotgun strat on requirements until we can narrow them down
+# A number of the requirements below will have two instances: one will include a specific version
+# pinning, while the other one will not. When building a version of ALE for use specifically within
+# ISIS, use the instances with the version pinned. For all other builds, use the unpinned instances.
+# (Confirm that every requirement has one and only one instance uncommented.)
+#
+# ISIS requires pinned versions for these dependencies to avoid conflicts with other dependencies.
+# Make sure to always confirm that version numbers in this file and version numbers in the
+# meta.yaml file within the ISIS3 repo match for each dependency before building this library
+# for use within ISIS, and always upload this special ISIS build with the "isis" tag.
 requirements:
   build:
-  - python=3.7.1
   - cmake>=3.10
-  - gsl
-  - openblas>=0.3.0
   - eigen
-  - spiceypy
+#  - eigen=3.3.3
+  - gsl
+#  - gsl==2.2.1
   - numpy
+  - openblas
+#  - openblas==0.2.19
+  - python
+#  - python==3.6
   - python-dateutil
   - pvl
+  - spiceypy
   run:
-  - python=3.7.1
   - cmake>=3.10
-  - gsl
-  - openblas>=0.3.0
   - eigen
-  - spiceypy
+#  - eigen=3.3.3
+  - gsl
+#  - gsl==2.2.1
   - numpy
+  - openblas
+#  - openblas==0.2.19
+  - python
+#  - python==3.6
   - python-dateutil
   - pvl
+  - spiceypy
 
 # Add the tests eventually
 # test:
 #
 
 # about:
-#   home: https://developers.google.com/protocol-buffers/
-#   license: BSD 3-Clause
-#   license_file: LICENSE
-#   summary: "Protocol Buffers - Google's data interchange format."
+#   home:
+#   license:
+#   license_file:
+#   summary: "Abstract Layer of Ephimerides"
 
 # extra:
 #   recipe-maintainers:
