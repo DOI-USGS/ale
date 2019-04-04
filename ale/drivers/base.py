@@ -480,10 +480,7 @@ class PDS3():
 
     @property
     def line_exposure_duration(self):
-        try:
-            return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
-        except:
-            return np.nan
+        return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
 
     @property
     def instrument_id(self):
@@ -530,13 +527,6 @@ class PDS3():
             sclock = self.label['SPACECRAFT_CLOCK_START_COUNT']
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
         return self._starting_ephemeris_time
-
-    @property
-    def exposure_duration(self):
-        try:
-            return self.label['EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
-        except:
-            return np.nan
 
     @property
     def spacecraft_clock_stop_count(self):
@@ -817,10 +807,6 @@ class Isis3():
           Number of samples in image
         """
         return self.label['IsisCube']['Core']['Dimensions']['Samples']
-
-    @property
-    def _exposure_duration(self):
-        return self.label['IsisCube']['Instrument']['ExposureDuration'].value * 0.001 # Scale to seconds
 
     @property
     def target_name(self):
@@ -1281,5 +1267,15 @@ class RadialDistortion():
         return {
             "Radial": {
                 "coefficients" : self._odtk
+            }
+        }
+
+class TransverseDistortion():
+    @property
+    def optical_distortion(self):
+        return {
+            "Transverse": {
+                "x" : self._odtx,
+                "y" : self._odty
             }
         }
