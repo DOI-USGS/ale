@@ -28,7 +28,7 @@ def read_table_data(table_label, cube):
         The binary portion of the table data
     """
     cubehandle = open(cube, "rb")
-    cubehandle.seek(table_label['StartByte'])
+    cubehandle.seek(table_label['StartByte'] - 1)
     return cubehandle.read(table_label['Bytes'])
 
 def field_size(field_label):
