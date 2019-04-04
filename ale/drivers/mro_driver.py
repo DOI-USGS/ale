@@ -36,7 +36,6 @@ class CtxIsisSpice(Driver, IsisSpice, LineScanner, RadialDistortion):
     def line_exposure_duration(self):
         return self.label["IsisCube"]["Instrument"]["LineExposureDuration"].value * 0.001 # Scale to seconds
 
-
 class CtxSpice(Driver, Spice, LineScanner, RadialDistortion):
     """
     Spice mixins that defines MRO CTX specific snowflake Spice calls.
@@ -62,7 +61,6 @@ class CtxSpice(Driver, Spice, LineScanner, RadialDistortion):
             for mk in mks:
                 if str(self.start_time.year) in os.path.basename(mk):
                     self._metakernel = mk
-            print(self._metakernel)
         return self._metakernel
 
 class CtxIsisCubeSpice(Isis3, CtxSpice):
@@ -80,7 +78,7 @@ class CtxIsisCubeSpice(Isis3, CtxSpice):
     @property
     def line_exposure_duration(self):
         if not hasattr(self, '_line_exposure_duration'):
-            self._line_exposure_duration = self.label['IsisCube']['Instrument']['LineExposureDuration'].value*0.001
+            self._line_exposure_duration = self.label['IsisCube']['Instrument']['LineExposureDuration'].value * 0.001
         return self._line_exposure_duration
 
     @property
