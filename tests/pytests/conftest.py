@@ -23,6 +23,8 @@ class SimpleSpice():
         return np.asarray([1,2,3,4])
     def bodn2c(self, *args):
         return "SPACE"
+    def sct2e(self, *args):
+        return 0.1
 
 def get_mockkernels(self, *args):
     return "some_metakernel"
