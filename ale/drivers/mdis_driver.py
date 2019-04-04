@@ -109,6 +109,13 @@ class MdisPDS3Driver(PDS3, MdisSpice):
         """
         return self.id_lookup[self.label['INSTRUMENT_ID']]
 
+    @property
+    def line_exposure_duration(self):
+        try:
+            return self.label['EXPOSURE_DURATION'].value * 0.001
+        except:
+            return np.nan
+
 
 class MdisIsis3Driver(Isis3, MdisSpice):
     """
