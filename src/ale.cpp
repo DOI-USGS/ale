@@ -355,7 +355,7 @@ namespace ale {
      PyObject *pDict = PyModule_GetDict(pModule);
 
      // Get the add method from the dictionary.
-     PyObject *pFunc = PyDict_GetItemString(pDict, "load");
+     PyObject *pFunc = PyDict_GetItemString(pDict, "loads");
      if(!pFunc) {
        // import errors do not set a PyError flag, need to use a custom
        // error message instead.
@@ -382,15 +382,13 @@ namespace ale {
         throw invalid_argument(getPyTraceback());
      }
 
-     std::string cResult;
-
-     // use PyObject_Str to ensure return is always a string
      PyObject *pResultStr = PyObject_Str(pResult);
      PyObject *temp_bytes = PyUnicode_AsUTF8String(pResultStr); // Owned reference
+
      if(!temp_bytes){
        throw invalid_argument(getPyTraceback());
      }
-
+     std::string cResult;
      char *temp_str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
      cResult = temp_str; // copy into std::string
 
