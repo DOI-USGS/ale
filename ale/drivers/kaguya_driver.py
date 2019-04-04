@@ -4,8 +4,9 @@ import pvl
 import ale
 
 import numpy as np
-from ale.drivers.base import Driver, LineScanner, PDS3, Spice, TransverseDistortion
 
+from ale import config
+from ale.drivers.base import Driver, LineScanner, PDS3, Spice, TransverseDistortion
 
 class TcPds3Driver(Driver, LineScanner, PDS3, Spice, TransverseDistortion):
     @property
