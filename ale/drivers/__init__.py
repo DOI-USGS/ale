@@ -22,6 +22,22 @@ __driver_modules__ = [importlib.import_module('.'+m, package='ale.drivers') for 
 drivers = dict(chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.isclass(x) and "_driver" in x.__module__) for dmod in __driver_modules__))
 
 
+class JsonEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, np.int64):
+            return int(obj)
+        if isinstance(obj, datetime.datetime):
+            return obj.__str__()
+        if isinstance(obj, bytes):
+            return obj.decode("utf-8")
+        if isinstance(obj, pvl.PVLModule):
+            return pvl.dumps(obj)
+        if isinstance(obj, set):
+            return list(obj)
+        return json.JSONEncoder.default(self, obj)
+
 
 def load(label):
     """
@@ -35,7 +51,7 @@ def load(label):
     for name, driver in drivers.items():
             print("Trying:", name)
             try:
-                res = driver(label, *args, **kwargs)
+                res = driver(label)
                 if res.is_valid():
                     with res as r:
                             return res.to_dict()
@@ -47,15 +63,5 @@ def load(label):
 
 
 def loads(label):
-    class JsonEncoder(json.JSONEncoder):
-        def default(self, obj):
-            if isinstance(obj, np.ndarray):
-                return obj.tolist()
-            if isinstance(obj, np.int64):
-                return int(obj)
-            if isinstance(obj, datetime.datetime):
-                return obj.__str__()
-            return json.JSONEncoder.default(self, obj)
-
     res = load(label)
     return json.dumps(res, cls=JsonEncoder)
