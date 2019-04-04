@@ -19,9 +19,13 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice, TransverseDistortion):
 
     @property
     def metakernel(self):
-        self._metakernels = 'mk_kaguyatc.tm'
-        return self._metakernels
-
+        metakernel_dir = config.kaguya
+        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
+        if not hasattr(self, '_metakernel'):
+            for mk in mks:
+                if str(self.start_time.year) in os.path.basename(mk):
+                    self._metakernel = mk
+        return self._metakernel
 
     @property
     def starting_ephemeris_time(self):
@@ -63,7 +67,8 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice, TransverseDistortion):
         """
         Calculated using pixel pitch and 1/pixel pitch
         """
-        return [0, 0, 142.857142857]
+        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0]
+        return [0, 0, 1/pixel_size]
 
 
     @property
@@ -71,7 +76,8 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice, TransverseDistortion):
         """
         Calculated using pixel pitch and 1/pixel pitch
         """
-        return [0, 142.857142857, 0]
+        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0]
+        return [0, 1/pixel_size, 0]
 
 
     @property

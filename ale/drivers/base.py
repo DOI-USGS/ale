@@ -425,10 +425,6 @@ class LineScanner():
     def center_ephemeris_time(self):
         return (self.starting_ephemeris_time + self.ending_ephemeris_time)/2
 
-class Framer():
-    @property
-    def name_sensor(self):
-        return "Generic Framer"
 
 class Framer():
     @property
