@@ -89,6 +89,14 @@ class MdisSpice(Driver, Spice, Framer):
         """
         return int(spice.gdpool('INS{}_FPUBIN_START_LINE'.format(self.ikid), 0, 1)[0])
 
+    @property
+    def _detector_center_sample(self):
+        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0])
+
+
+    @property
+    def _detector_center_line(self):
+        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
 
 class MdisPDS3Driver(PDS3, MdisSpice):
     """
@@ -120,6 +128,10 @@ class MdisIsis3Driver(Isis3, MdisSpice):
     """
 
     @property
+    def ikid(self):
+        return int(self.label["IsisCube"]["Kernels"]["NaifIkCode"])
+
+    @property
     def instrument_id(self):
         """
         Returns an instrument id for unquely identifying the instrument, but often
@@ -134,7 +146,7 @@ class MdisIsis3Driver(Isis3, MdisSpice):
         return self.id_lookup[self.label['IsisCube']['Instrument']['InstrumentId']]
 
     @property
-    def focal_plane_tempature(self):
+    def _focal_plane_tempature(self):
         """
         Acquires focal plane tempature from a PDS3 label. Used exclusively in
         computing focal length.
@@ -145,3 +157,14 @@ class MdisIsis3Driver(Isis3, MdisSpice):
           focal plane tempature
         """
         return self.label['IsisCube']['Instrument']['FocalPlaneTemperature'].value
+
+    @property
+    def starting_ephemeris_time(self):
+        if not hasattr(self, '_starting_ephemeris_time'):
+            sclock = self.label['IsisCube']['Archive']['SpacecraftClockStartCount']
+            self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
+        return self._starting_ephemeris_time
+
+    @property
+    def line_exposure_duration(self):
+        return self._exposure_duration
