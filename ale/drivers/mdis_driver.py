@@ -119,10 +119,7 @@ class MdisPDS3Driver(PDS3, MdisSpice):
 
     @property
     def line_exposure_duration(self):
-        try:
-            return self.label['EXPOSURE_DURATION'].value * 0.001
-        except:
-            return np.nan
+        return self.label["EXPOSURE_DURATION"].value * 0.001
 
 class MdisIsis3Driver(Isis3, MdisSpice):
     """
