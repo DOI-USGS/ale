@@ -442,11 +442,6 @@ class LineScanner():
         return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
 
 
-class Framer():
-    @property
-    def name_sensor(self):
-        return "Generic Framer"
-
     @property
     def name_model(self):
         """
