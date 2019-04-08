@@ -2,13 +2,10 @@ import ale
 from ale.drivers.base import *
 from ale import config
 
-config.dawn = '/data/fast/kernels/dawn-m_a-spice-6-v1.0/dawnsp_1000/extras/mk'
-
 class DawnCamera(Driver, Framer, PDS3, Spice, RadialDistortion):
     """
-    
     """
-    
+
     @property
     def metakernel(self):
         """
@@ -26,7 +23,7 @@ class DawnCamera(Driver, Framer, PDS3, Spice, RadialDistortion):
                 if str(self.start_time.year) in os.path.basename(mk):
                     self._metakernel = mk
         return self._metakernel
-        
+
     @property
     def instrument_id(self):
         """
@@ -39,11 +36,11 @@ class DawnCamera(Driver, Framer, PDS3, Spice, RadialDistortion):
         : str
           instrument id
         """
-        instrument_id = label["INSTRUMENT_ID"]
-        filter_number = label["FILTER_NUMBER"]
-        
+        instrument_id = self.label["INSTRUMENT_ID"]
+        filter_number = self.label["FILTER_NUMBER"]
+
         return "DAWN_{}_FILTER_{}".format(instrument_id, filter_number)
-    
+
     @property
     def _odtk(self):
         """
@@ -53,7 +50,7 @@ class DawnCamera(Driver, Framer, PDS3, Spice, RadialDistortion):
           Radial distortion coefficients
         """
         return spice.gdpool('INS{}_RAD_DIST_COEFF'.format(self.ikid),0, 1).tolist()
-    
+
     @property
     def label(self):
         """
@@ -72,12 +69,14 @@ class DawnCamera(Driver, Framer, PDS3, Spice, RadialDistortion):
                 self._file.replace("\\", "/")
                 self._label = pvl.loads(self._file)
             except Exception:
-                slabel = open(self._file).read().replace("\\", "/")
+                with open(self._file, 'rb') as fp:
+                    lines = [line.decode('utf-8', errors='ignore').replace('\\', '/') for line in fp]
+                    slabel = ''.join(lines)
                 self._label = pvl.loads(slabel)
             except:
                 raise ValueError("{} is not a valid label".format(self._file))
         return self._label
-    
+
     @property
     def spacecraft_name(self):
         """
@@ -89,8 +88,8 @@ class DawnCamera(Driver, Framer, PDS3, Spice, RadialDistortion):
         : str
           Spacecraft name
         """
-        return 'DAWN'
-    
+        return self.label['INSTRUMENT_HOST_NAME']
+
     @property
     def target_name(self):
         """
@@ -103,8 +102,10 @@ class DawnCamera(Driver, Framer, PDS3, Spice, RadialDistortion):
         : str
           target name
         """
-        return "VESTA"
-    
+        target = self.label['TARGET_NAME']
+        target = target.split(' ')[-1]
+        return target
+
     @property
     def center_ephemeris_time(self):
         """
@@ -112,7 +113,7 @@ class DawnCamera(Driver, Framer, PDS3, Spice, RadialDistortion):
         """
         center_time = self.starting_ephemeris_time + self.exposure_duration / 2
         return center_time
-    
+
     @property
     def focal2pixel_samples(self):
         # Microns to mm
@@ -122,5 +123,4 @@ class DawnCamera(Driver, Framer, PDS3, Spice, RadialDistortion):
     @property
     def focal2pixel_lines(self):
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
-        return [0.0, 0.0, 1/pixel_size] 
-        
+        return [0.0, 0.0, 1/pixel_size]

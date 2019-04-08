@@ -426,6 +426,22 @@ class LineScanner():
         return (self.starting_ephemeris_time + self.ending_ephemeris_time)/2
 
 
+    @property
+    def center_ephemeris_time(self):
+        """
+        The center ephemeris time for a fixed rate line scanner.
+        """
+        if not hasattr(self, '_center_ephemeris_time'):
+            halflines = self.image_lines / 2
+            center_sclock = self.starting_ephemeris_time + halflines * self.line_exposure_duration
+            self._center_ephemeris_time = center_sclock
+        return self._center_ephemeris_time
+
+    @property
+    def line_exposure_duration(self):
+        return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
+
+
 class Framer():
     @property
     def name_sensor(self):
@@ -458,6 +474,18 @@ class Framer():
         # always one for framers
         return 1
 
+    @property
+    def center_ephemeris_time(self):
+        """
+        The center ephemeris time for a framer.
+        """
+        center_time = self.starting_ephemeris_time + self.exposure_duration / 2
+        return center_time
+
+    @property
+    def exposure_duration(self):
+        return self.label['EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
+
 
 class PDS3():
     """
@@ -473,10 +501,6 @@ class PDS3():
     @property
     def _focal_plane_tempature(self):
         return self.label['FOCAL_PLANE_TEMPERATURE'].value
-
-    @property
-    def line_exposure_duration(self):
-        return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
 
     @property
     def instrument_id(self):
@@ -741,17 +765,6 @@ class Spice():
     @property
     def _detector_center_line(self):
         return float(spice.gdpool('INS{}_BORESIGHT_LINE'.format(self.ikid), 0, 1)[0])
-
-    @property
-    def center_ephemeris_time(self):
-        """
-        The center ephemeris time for a fixed rate line scanner.
-        """
-        if not hasattr(self, '_center_ephemeris_time'):
-            halflines = self.image_lines / 2
-            center_sclock = self.starting_ephemeris_time + halflines * self.line_exposure_duration
-            self._center_ephemeris_time = center_sclock
-        return self._center_ephemeris_time
 
     @property
     def fikid(self):
