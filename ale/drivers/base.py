@@ -418,15 +418,6 @@ class LineScanner():
         return self._num_quaternions
 
     @property
-    def ending_ephemeris_time(self):
-        return (self.image_lines * self.line_exposure_duration) + self.starting_ephemeris_time
-
-    @property
-    def center_ephemeris_time(self):
-        return (self.starting_ephemeris_time + self.ending_ephemeris_time)/2
-
-
-    @property
     def center_ephemeris_time(self):
         """
         The center ephemeris time for a fixed rate line scanner.
@@ -441,6 +432,10 @@ class LineScanner():
     def line_exposure_duration(self):
         return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
 
+class Framer():
+    @property
+    def name_sensor(self):
+        return "Generic Framer"
 
     @property
     def name_model(self):
