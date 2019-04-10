@@ -474,7 +474,7 @@ class Framer():
 
     @property
     def exposure_duration(self):
-        return self.label['EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
+        return self._exposure_duration.value * 0.001  # Scale to seconds
 
 
 class PDS3():
@@ -569,6 +569,10 @@ class PDS3():
     @property
     def detector_line_summing(self):
         return self.label.get('SAMPLING_FACTOR', 1)
+
+    @property
+    def _exposure_duration(self):
+        return self.label['EXPOSURE_DURATION']
 
 
 class Spice():
@@ -826,6 +830,10 @@ class Isis3():
             sclock = self.label['IsisCube']['Archive']['SpacecraftClockStartCount']
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock).value
         return self._starting_ephemeris_time
+
+    @property
+    def _exposure_duration(self):
+        return self.label['IsisCube']['Instrument']['ExposureDuration']
 
 
 class IsisSpice(Isis3):
@@ -1264,7 +1272,7 @@ class RadialDistortion():
     @property
     def optical_distortion(self):
         return {
-            "Radial": {
+            "radial": {
                 "coefficients" : self._odtk
             }
         }
@@ -1273,7 +1281,7 @@ class TransverseDistortion():
     @property
     def optical_distortion(self):
         return {
-            "Transverse": {
+            "transverse": {
                 "x" : self._odtx,
                 "y" : self._odty
             }
