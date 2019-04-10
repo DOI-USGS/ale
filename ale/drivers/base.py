@@ -1261,7 +1261,7 @@ class RadialDistortion():
     @property
     def optical_distortion(self):
         return {
-            "Radial": {
+            "radial": {
                 "coefficients" : self._odtk
             }
         }
@@ -1270,7 +1270,7 @@ class TransverseDistortion():
     @property
     def optical_distortion(self):
         return {
-            "Transverse": {
+            "transverse": {
                 "x" : self._odtx,
                 "y" : self._odty
             }
