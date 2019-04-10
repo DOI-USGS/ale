@@ -2,6 +2,8 @@ import ale
 from ale.drivers.base import *
 from ale import config
 
+import pvl
+
 class DawnCamera(Driver, Framer, PDS3, Spice, RadialDistortion):
     """
     """
@@ -69,10 +71,14 @@ class DawnCamera(Driver, Framer, PDS3, Spice, RadialDistortion):
                 self._file.replace("\\", "/")
                 self._label = pvl.loads(self._file)
             except Exception:
-                with open(self._file, 'rb') as fp:
-                    lines = [line.decode('utf-8', errors='ignore').replace('\\', '/') for line in fp]
-                    slabel = ''.join(lines)
-                self._label = pvl.loads(slabel)
+
+                class PvlDecoder(pvl.decoder.PVLDecoder):
+                    def unescape_next_char(self, stream):
+                        esc = stream.read(1)
+                        string = '\{}'.format(esc.decode('utf-8')).encode('utf-8')
+                        return string
+
+                self._label = pvl.load(self._file, PvlDecoder)
             except:
                 raise ValueError("{} is not a valid label".format(self._file))
         return self._label
@@ -124,3 +130,11 @@ class DawnCamera(Driver, Framer, PDS3, Spice, RadialDistortion):
     def focal2pixel_lines(self):
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
         return [0.0, 0.0, 1/pixel_size]
+
+    @property
+    def starting_ephemeris_time(self):
+        if not hasattr(self, '_starting_ephemeris_time'):
+            sclock = self.label['SPACECRAFT_CLOCK_START_COUNT']
+            self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
+            self._starting_ephemeris_time += 193.0 / 1000.0
+        return self._starting_ephemeris_time
