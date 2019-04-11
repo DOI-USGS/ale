@@ -216,6 +216,25 @@ class Driver():
     _file : str
             Reference to file path to be used by mixins for opening.
     """
+
+    def __enter__(self):
+        """
+        Called when the context is created. This is used
+        to get the kernels furnished.
+        """
+        if self.metakernel:
+            spice.furnsh(self.metakernel)
+            print("Furnished")
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Called when the context goes out of scope. Once
+        this is done, the object is out of scope and the
+        kernels can be unloaded.
+        """
+        spice.unload(self.metakernel)
+
     def __init__(self, file, num_ephem=909, num_quats=909):
         """
         Parameters
@@ -459,7 +478,7 @@ class Framer():
         return 1
 
 
-class PDS3():
+class Pds3Label():
     """
     Mixin for reading from PDS3 Labels.
 
@@ -557,28 +576,11 @@ class PDS3():
         return self.label.get('SAMPLING_FACTOR', 1)
 
 
-class Spice():
+class NaifSpice():
 
     @property
     def metakernel(self):
         pass
-
-    def __enter__(self):
-        """
-        Called when the context is created. This is used
-        to get the kernels furnished.
-        """
-        if self.metakernel:
-            spice.furnsh(self.metakernel)
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """
-        Called when the context goes out of scope. Once
-        this is done, the object is out of scope and the
-        kernels can be unloaded.
-        """
-        spice.unload(self.metakernel)
 
     @property
     def _odtx(self):
@@ -765,7 +767,7 @@ class Spice():
         return self.ikid - int(fn)
 
 
-class Isis3():
+class Isis3Label():
 
     @property
     def start_time(self):
@@ -825,7 +827,7 @@ class Isis3():
         return self._starting_ephemeris_time
 
 
-class IsisSpice(Isis3):
+class IsisSpice(Isis3Label):
     """Mixin class for reading from an ISIS cube that has been spiceinit'd
 
     Attributes
@@ -1261,7 +1263,7 @@ class RadialDistortion():
     @property
     def optical_distortion(self):
         return {
-            "Radial": {
+            "radial": {
                 "coefficients" : self._odtk
             }
         }
