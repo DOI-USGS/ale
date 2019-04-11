@@ -423,8 +423,18 @@ class LineScanner():
 
     @property
     def center_ephemeris_time(self):
-        return (self.starting_ephemeris_time + self.ending_ephemeris_time)/2
+        """
+        The center ephemeris time for a fixed rate line scanner.
+        """
+        if not hasattr(self, '_center_ephemeris_time'):
+            halflines = self.image_lines / 2
+            center_sclock = self.starting_ephemeris_time + halflines * self.line_exposure_duration
+            self._center_ephemeris_time = center_sclock
+        return self._center_ephemeris_time
 
+    @property
+    def line_exposure_duration(self):
+        return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
 
 class Framer():
     @property
@@ -458,6 +468,18 @@ class Framer():
         # always one for framers
         return 1
 
+    @property
+    def center_ephemeris_time(self):
+        """
+        The center ephemeris time for a framer.
+        """
+        center_time = self.starting_ephemeris_time + self.exposure_duration / 2
+        return center_time
+
+    @property
+    def exposure_duration(self):
+        return self._exposure_duration
+
 
 class PDS3():
     """
@@ -473,10 +495,6 @@ class PDS3():
     @property
     def _focal_plane_tempature(self):
         return self.label['FOCAL_PLANE_TEMPERATURE'].value
-
-    @property
-    def line_exposure_duration(self):
-        return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
 
     @property
     def instrument_id(self):
@@ -555,6 +573,10 @@ class PDS3():
     @property
     def detector_line_summing(self):
         return self.label.get('SAMPLING_FACTOR', 1)
+
+    @property
+    def _exposure_duration(self):
+        return self.label['EXPOSURE_DURATION'].value * 0.001
 
 
 class Spice():
@@ -743,17 +765,6 @@ class Spice():
         return float(spice.gdpool('INS{}_BORESIGHT_LINE'.format(self.ikid), 0, 1)[0])
 
     @property
-    def center_ephemeris_time(self):
-        """
-        The center ephemeris time for a fixed rate line scanner.
-        """
-        if not hasattr(self, '_center_ephemeris_time'):
-            halflines = self.image_lines / 2
-            center_sclock = self.starting_ephemeris_time + halflines * self.line_exposure_duration
-            self._center_ephemeris_time = center_sclock
-        return self._center_ephemeris_time
-
-    @property
     def fikid(self):
         if isinstance(self, Framer):
             fn = self.filter_number
@@ -823,6 +834,10 @@ class Isis3():
             sclock = self.label['IsisCube']['Archive']['SpacecraftClockStartCount']
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock).value
         return self._starting_ephemeris_time
+
+    @property
+    def _exposure_duration(self):
+        return self.label['IsisCube']['Instrument']['ExposureDuration'].value * 0.001
 
 
 class IsisSpice(Isis3):
