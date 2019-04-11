@@ -6,10 +6,10 @@ import spiceypy as spice
 import numpy as np
 
 from ale import config
-from ale.drivers.base import Framer, NaifSpice, Pds3Label, Isis3Label, Driver
+from ale.drivers.base import Framer, Spice, PDS3, Isis3, Driver
 
 
-class MdisSpice(Driver, NaifSpice, Framer):
+class MdisSpice(Driver, Spice, Framer):
     """
     MDIS mixin class for defining snowflake Spice calls. Since MDIS has unique
     Spice keys, those are defined here as an intermediate mixin for MDIS drivers
@@ -98,7 +98,7 @@ class MdisSpice(Driver, NaifSpice, Framer):
     def _detector_center_line(self):
         return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
 
-class MdisPDS3Driver(Pds3Label, MdisSpice):
+class MdisPDS3Driver(PDS3, MdisSpice):
     """
     Driver for reading MDIS PDS3 labels. Requires a Spice mixin to acquire addtional
     ephemeris and instrument data located exclusively in spice kernels.
@@ -117,8 +117,7 @@ class MdisPDS3Driver(Pds3Label, MdisSpice):
         """
         return self.id_lookup[self.label['INSTRUMENT_ID']]
 
-
-class MdisIsis3Driver(Isis3Label, MdisSpice):
+class MdisIsis3Driver(Isis3, MdisSpice):
     """
     Driver for reading MDIS ISIS3 Labels. These are Labels that have been ingested
     into ISIS from PDS EDR images but have not been spiceinit'd yet.

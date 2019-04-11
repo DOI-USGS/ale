@@ -8,9 +8,9 @@ import numpy as np
 from glob import glob
 
 from ale import config
-from ale.drivers.base import Driver, LineScanner, Pds3Label, NaifSpice, TransverseDistortion
+from ale.drivers.base import Driver, LineScanner, PDS3, Spice, TransverseDistortion
 
-class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice):
+class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
     @property
     def instrument_id(self):
         """

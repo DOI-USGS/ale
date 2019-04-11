@@ -4,7 +4,7 @@ from ale import config
 
 import pvl
 
-class DawnSpice(Driver, Framer, NaifSpice):
+class DawnSpice(Driver, Framer, Spice):
     """
     Dawn specific spice mixin to handle dawn specific spice calls and property
     overrides. This class is not used as a driver.
@@ -33,7 +33,7 @@ class DawnSpice(Driver, Framer, NaifSpice):
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
         return [0.0, 0.0, 1/pixel_size]
 
-class DawnPDS3Driver(Pds3Label, DawnSpice, RadialDistortion):
+class DawnPDS3Driver(PDS3, DawnSpice, RadialDistortion):
     """
     Dawn driver for generating an ISD from a Dawn PDS3 image.
     """
