@@ -4,9 +4,50 @@ from ale import config
 
 import pvl
 
-class DawnCamera(Driver, Framer, PDS3, Spice, RadialDistortion):
+class DawnSpice(Spice):
+    # TODO: Update focal2pixel samples and lines to reflect the rectangular
+    #       nature of dawn pixels
+    @property
+    def _odtk(self):
+        """
+        Returns
+        -------
+        : list
+          Radial distortion coefficients
+        """
+        return spice.gdpool('INS{}_RAD_DIST_COEFF'.format(self.ikid),0, 1).tolist()
+
+    @property
+    def focal2pixel_samples(self):
+        # Microns to mm
+        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
+        return [0.0, 1/pixel_size, 0.0]
+
+    @property
+    def focal2pixel_lines(self):
+        # Microns to mm
+        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
+        return [0.0, 0.0, 1/pixel_size]
+
+class DawnPDS3Driver(Driver, Framer, PDS3, DawnSpice, RadialDistortion):
     """
     """
+    @property
+    def instrument_id(self):
+        """
+        Returns an instrument id for uniquely identifying the instrument, but often
+        also used to be piped into Spice Kernels to acquire IKIDs. Therefore the
+        the same ID that Spice expects in bods2c calls.
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
+        instrument_id = self.label["INSTRUMENT_ID"]
+        filter_number = self.label["FILTER_NUMBER"]
+
+        return "DAWN_{}_FILTER_{}".format(instrument_id, filter_number)
 
     @property
     def metakernel(self):
@@ -27,33 +68,6 @@ class DawnCamera(Driver, Framer, PDS3, Spice, RadialDistortion):
         return self._metakernel
 
     @property
-    def instrument_id(self):
-        """
-        Returns an instrument id for uniquely identifying the instrument, but often
-        also used to be piped into Spice Kernels to acquire IKIDs. Therefore the
-        the same ID that Spice expects in bods2c calls.
-
-        Returns
-        -------
-        : str
-          instrument id
-        """
-        instrument_id = self.label["INSTRUMENT_ID"]
-        filter_number = self.label["FILTER_NUMBER"]
-
-        return "DAWN_{}_FILTER_{}".format(instrument_id, filter_number)
-
-    @property
-    def _odtk(self):
-        """
-        Returns
-        -------
-        : list
-          Radial distortion coefficients
-        """
-        return spice.gdpool('INS{}_RAD_DIST_COEFF'.format(self.ikid),0, 1).tolist()
-
-    @property
     def label(self):
         """
         Loads a PVL from from the _file attribute and
@@ -72,6 +86,8 @@ class DawnCamera(Driver, Framer, PDS3, Spice, RadialDistortion):
                 self._label = pvl.loads(self._file)
             except Exception:
 
+                # PvlDecoder class to ignore all escape sequences when getting
+                # the label
                 class PvlDecoder(pvl.decoder.PVLDecoder):
                     def unescape_next_char(self, stream):
                         esc = stream.read(1)
@@ -101,7 +117,9 @@ class DawnCamera(Driver, Framer, PDS3, Spice, RadialDistortion):
         """
         Returns an target name for unquely identifying the instrument, but often
         piped into Spice Kernels to acquire Ephermis data from Spice. Therefore they
-        the same ID the Spice expects in bodvrd calls.
+        the same ID the Spice expects in bodvrd calls. In this case, vesta images
+        have a number infront of them like "4 VESTA" which needs to be simplified
+        to "VESTA" for spice.
 
         Returns
         -------
@@ -113,26 +131,12 @@ class DawnCamera(Driver, Framer, PDS3, Spice, RadialDistortion):
         return target
 
     @property
-    def center_ephemeris_time(self):
-        """
-        The center ephemeris time for a framer.
-        """
-        center_time = self.starting_ephemeris_time + self.exposure_duration / 2
-        return center_time
-
-    @property
-    def focal2pixel_samples(self):
-        # Microns to mm
-        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
-        return [0.0, 1/pixel_size, 0.0]
-
-    @property
-    def focal2pixel_lines(self):
-        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
-        return [0.0, 0.0, 1/pixel_size]
-
-    @property
     def starting_ephemeris_time(self):
+        """
+        Compute the center ephemeris time for a Dawn Frame camera. This is done
+        via a spice call but 193 ms needs to be added to
+        account for the CCD being discharged or cleared.
+        """
         if not hasattr(self, '_starting_ephemeris_time'):
             sclock = self.label['SPACECRAFT_CLOCK_START_COUNT']
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
