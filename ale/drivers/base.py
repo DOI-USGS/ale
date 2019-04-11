@@ -217,24 +217,6 @@ class Driver():
             Reference to file path to be used by mixins for opening.
     """
 
-    def __enter__(self):
-        """
-        Called when the context is created. This is used
-        to get the kernels furnished.
-        """
-        if self.metakernel:
-            spice.furnsh(self.metakernel)
-            print("Furnished")
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """
-        Called when the context goes out of scope. Once
-        this is done, the object is out of scope and the
-        kernels can be unloaded.
-        """
-        spice.unload(self.metakernel)
-
     def __init__(self, file, num_ephem=909, num_quats=909):
         """
         Parameters
@@ -599,6 +581,24 @@ class Pds3Label():
 
 
 class NaifSpice():
+
+    def __enter__(self):
+        """
+        Called when the context is created. This is used
+        to get the kernels furnished.
+        """
+        if self.metakernel:
+            spice.furnsh(self.metakernel)
+            print("Furnished")
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Called when the context goes out of scope. Once
+        this is done, the object is out of scope and the
+        kernels can be unloaded.
+        """
+        spice.unload(self.metakernel)
 
     @property
     def metakernel(self):
