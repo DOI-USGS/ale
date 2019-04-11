@@ -423,7 +423,6 @@ END
 def test_mdis_creation(dawn_label):
     with DawnPDS3Driver(dawn_label) as m:
         d = m.to_dict()
-    print(d)
     assert d['instrument_id'] == 'DAWN_FC2_FILTER_1'
     assert d['spacecraft_name'] == 'DAWN'
     assert d['target_name'] == 'VESTA'
