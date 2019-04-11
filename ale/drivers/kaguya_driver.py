@@ -45,9 +45,7 @@ class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice, TransverseDistorti
     @property
     def ending_ephemeris_time(self):
         if not hasattr(self, '_ending_ephemeris_time'):
-            self._ending_ephemeris_time = float(self.label.get('SPACECRAFT_CLOCK_STOP_COUNT').split()[0])
-
-            # self._ending_ephemeris_time = self.label.get('CORRECTED_SC_CLOCK_STOP_COUNT').value
+            self._ending_ephemeris_time = self.label.get('CORRECTED_SC_CLOCK_STOP_COUNT').value
             self._ending_ephemeris_time = spice.sct2e(self.spacecraft_id, self._ending_ephemeris_time)
         return self._ending_ephemeris_time
 
@@ -55,8 +53,7 @@ class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice, TransverseDistorti
     @property
     def starting_ephemeris_time(self):
         if not hasattr(self, '_starting_ephemeris_time'):
-            self._starting_ephemeris_time = float(self.label.get('SPACECRAFT_CLOCK_START_COUNT').split()[0])
-            # self._starting_ephemeris_time = self.label.get('CORRECTED_SC_CLOCK_START_COUNT').value
+            self._starting_ephemeris_time = self.label.get('CORRECTED_SC_CLOCK_START_COUNT').value
             self._starting_ephemeris_time = spice.sct2e(self.spacecraft_id, self._starting_ephemeris_time)
         return self._starting_ephemeris_time
 
@@ -128,7 +125,13 @@ class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice, TransverseDistorti
 
     @property
     def line_exposure_duration(self):
-        return self.label['LINE_EXPOSURE_DURATION'][0].value * 0.001  # Scale to seconds
+        # this is dumb
+        if isinstance(self.label['LINE_EXPOSURE_DURATION'], list):
+            return self.label['LINE_EXPOSURE_DURATION'][0].value * 0.001  # Scale to seconds
+        else:
+            return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
+
+
 
     @property
     def _focal_length(self):
