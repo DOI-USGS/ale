@@ -418,6 +418,10 @@ class LineScanner():
         return self._num_quaternions
 
     @property
+    def ending_ephemeris_time(self):
+        return (self.image_lines * self.line_exposure_duration) + self.starting_ephemeris_time
+
+    @property
     def center_ephemeris_time(self):
         """
         The center ephemeris time for a fixed rate line scanner.
@@ -745,7 +749,8 @@ class Spice():
                                                 self.reference_frame,
                                                 current_et)
                 q = spice.m2q(camera2bodyfixed)
-                qua[i] = q
+                qua[i,:3] = q[1:]
+                qua[i,3] = q[0]
                 current_et += getattr(self, 'dt_quaternion', 0)
             self._orientation = qua
         return self._orientation.tolist()
