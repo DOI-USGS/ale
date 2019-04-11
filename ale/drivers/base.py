@@ -478,7 +478,7 @@ class Framer():
 
     @property
     def exposure_duration(self):
-        return self._exposure_duration.value * 0.001  # Scale to seconds
+        return self._exposure_duration
 
 
 class PDS3():
@@ -576,7 +576,7 @@ class PDS3():
 
     @property
     def _exposure_duration(self):
-        return self.label['EXPOSURE_DURATION']
+        return self.label['EXPOSURE_DURATION'].value * 0.001
 
 
 class Spice():
@@ -837,7 +837,7 @@ class Isis3():
 
     @property
     def _exposure_duration(self):
-        return self.label['IsisCube']['Instrument']['ExposureDuration']
+        return self.label['IsisCube']['Instrument']['ExposureDuration'].value * 0.001
 
 
 class IsisSpice(Isis3):
