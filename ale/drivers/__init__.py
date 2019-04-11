@@ -36,6 +36,8 @@ class JsonEncoder(json.JSONEncoder):
             return pvl.dumps(obj)
         if isinstance(obj, set):
             return list(obj)
+        if isinstance(obj, np.nan):
+            return None
         return json.JSONEncoder.default(self, obj)
 
 

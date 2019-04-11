@@ -6,10 +6,10 @@ import pvl
 import spiceypy as spice
 
 from ale.util import get_metakernels
-from ale.drivers.base import LineScanner, Spice, PDS3, Isis3, Driver
+from ale.drivers.base import LineScanner, NaifSpice, Pds3Label, Driver
 
 
-class LrocSpice(Driver, Spice, LineScanner):
+class LrocSpice(Driver, NaifSpice, LineScanner):
     """
     Lroc mixin class for defining snowflake Spice calls.
     """
@@ -42,7 +42,7 @@ class LrocSpice(Driver, Spice, LineScanner):
         return "LRO"
 
 
-class LrocPds3Driver(PDS3, LrocSpice):
+class LrocPds3Driver(Pds3Label, LrocSpice):
     """
     Driver for reading Lroc labels. Requires a Spice mixin to acquire addtional
     ephemeris and instrument data located exclusively in spice kernels.
