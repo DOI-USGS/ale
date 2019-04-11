@@ -745,8 +745,6 @@ class Spice():
                                                 self.reference_frame,
                                                 current_et)
                 q = spice.m2q(camera2bodyfixed)
-                qua[i,:3] = q[1:]
-                qua[i,3] = q[0]
                 current_et += getattr(self, 'dt_quaternion', 0)
             self._orientation = qua
         return self._orientation.tolist()
