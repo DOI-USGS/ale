@@ -117,9 +117,6 @@ class MdisPDS3Driver(Pds3Label, MdisSpice):
         """
         return self.id_lookup[self.label['INSTRUMENT_ID']]
 
-    @property
-    def line_exposure_duration(self):
-        return self.label["EXPOSURE_DURATION"].value * 0.001
 
 class MdisIsis3Driver(Isis3Label, MdisSpice):
     """
@@ -164,7 +161,3 @@ class MdisIsis3Driver(Isis3Label, MdisSpice):
             sclock = self.label['IsisCube']['Archive']['SpacecraftClockStartCount']
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
         return self._starting_ephemeris_time
-
-    @property
-    def line_exposure_duration(self):
-        return self._exposure_duration
