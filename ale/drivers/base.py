@@ -589,7 +589,6 @@ class NaifSpice():
         """
         if self.metakernel:
             spice.furnsh(self.metakernel)
-            print("Furnished")
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
