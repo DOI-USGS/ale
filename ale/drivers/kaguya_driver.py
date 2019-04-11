@@ -10,7 +10,7 @@ from glob import glob
 from ale import config
 from ale.drivers.base import Driver, LineScanner, Pds3Label, NaifSpice, TransverseDistortion
 
-class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice, TransverseDistortion):
+class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice):
     @property
     def instrument_id(self):
         """
@@ -30,6 +30,11 @@ class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice, TransverseDistorti
 
     @property
     def tc_id(self):
+        """
+        Some keys are stored in the IK kernel under a general ikid for TC1/TC2
+        presumably because they are not affected by the addtional parameters encoded in
+        the ikid returned by self.ikid. This method exists for those gdpool calls.
+        """
         return spice.bods2c("LISM_{}".format(self.label.get("INSTRUMENT_ID")))
 
     @property
@@ -59,7 +64,7 @@ class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice, TransverseDistorti
 
     @property
     def _detector_center_line(self):
-        return self.image_lines/2
+        return 1
 
     @property
     def _detector_center_sample(self):
@@ -87,7 +92,7 @@ class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice, TransverseDistorti
     @property
     def focal2pixel_samples(self):
         """
-        Calculated using pixel pitch and 1/pixel pitch
+        Calculated using 1/pixel pitch
         """
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.tc_id), 0, 1)[0]
         return [0, 0, 1/pixel_size]
@@ -96,14 +101,14 @@ class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice, TransverseDistorti
     @property
     def focal2pixel_lines(self):
         """
-        Calculated using pixel pitch and 1/pixel pitch
+        Calculated using 1/pixel pitch
         """
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.tc_id), 0, 1)[0]
         return [0, 1/pixel_size, 0]
 
 
     @property
-    def _odtkx(self):
+    def _odkx(self):
         """
         Returns
         -------
@@ -114,7 +119,7 @@ class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice, TransverseDistorti
 
 
     @property
-    def _odtky(self):
+    def _odky(self):
         """
         Returns
         -------
@@ -131,8 +136,6 @@ class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice, TransverseDistorti
         else:
             return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
 
-
-
     @property
     def _focal_length(self):
         return float(spice.gdpool('INS{}_FOCAL_LENGTH'.format(self.tc_id), 0, 1)[0])
@@ -141,7 +144,7 @@ class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice, TransverseDistorti
     def optical_distortion(self):
         return {
             "kaguyatc": {
-                "x" : self._odtkx,
-                "y" : self._odtky
+                "x" : self._odkx,
+                "y" : self._odky
             }
         }
