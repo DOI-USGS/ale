@@ -4,7 +4,11 @@ from ale import config
 
 import pvl
 
-class DawnSpice(Spice):
+class DawnSpice(Driver, Framer, Spice):
+    """
+    Dawn specific spice mixin to handle dawn specific spice calls and property
+    overrides. This class is not used as a driver.
+    """
     # TODO: Update focal2pixel samples and lines to reflect the rectangular
     #       nature of dawn pixels
     @property
@@ -29,8 +33,9 @@ class DawnSpice(Spice):
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
         return [0.0, 0.0, 1/pixel_size]
 
-class DawnPDS3Driver(Driver, Framer, PDS3, DawnSpice, RadialDistortion):
+class DawnPDS3Driver(PDS3, DawnSpice, RadialDistortion):
     """
+    Dawn driver for generating an ISD from a Dawn PDS3 image.
     """
     @property
     def instrument_id(self):
@@ -78,22 +83,21 @@ class DawnPDS3Driver(Driver, Framer, PDS3, DawnSpice, RadialDistortion):
         PVLModule :
             Dict-like object with PVL keys
         """
+        class PvlDecoder(pvl.decoder.PVLDecoder):
+            def unescape_next_char(self, stream):
+                esc = stream.read(1)
+                string = '\{}'.format(esc.decode('utf-8')).encode('utf-8')
+                return string
+
         if not hasattr(self, "_label"):
             if isinstance(self._file, pvl.PVLModule):
                 self._label = self._file
             try:
-                self._file.replace("\\", "/")
-                self._label = pvl.loads(self._file)
+                self._label = pvl.loads(self._file, PvlDecoder)
             except Exception:
 
                 # PvlDecoder class to ignore all escape sequences when getting
                 # the label
-                class PvlDecoder(pvl.decoder.PVLDecoder):
-                    def unescape_next_char(self, stream):
-                        esc = stream.read(1)
-                        string = '\{}'.format(esc.decode('utf-8')).encode('utf-8')
-                        return string
-
                 self._label = pvl.load(self._file, PvlDecoder)
             except:
                 raise ValueError("{} is not a valid label".format(self._file))
