@@ -8,7 +8,7 @@ from ale import config
 
 from ale.drivers.base import LineScanner, NaifSpice, Pds3Label, Isis3Label, IsisSpice, Driver, RadialDistortion
 
-class CtxIsisSpice(Driver, IsisSpice, LineScanner, RadialDistortion):
+class CtxNaifSpiceIsisLabelDriver(Driver, IsisSpice, LineScanner, RadialDistortion):
 
     @property
     def instrument_id(self):
@@ -63,7 +63,7 @@ class CtxSpice(Driver, NaifSpice, LineScanner, RadialDistortion):
                     self._metakernel = mk
         return self._metakernel
 
-class CtxIsisCubeSpice(Isis3Label, CtxSpice):
+class CtxSpiceInitedIsisCubeDriver(Isis3Label, CtxSpice):
     @property
     def instrument_id(self):
         return "MRO_CTX"
