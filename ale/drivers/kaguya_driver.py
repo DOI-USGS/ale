@@ -29,7 +29,7 @@ class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice):
         return id
 
     @property
-    def tc_id(self):
+    def _tc_id(self):
         """
         Some keys are stored in the IK kernel under a general ikid for TC1/TC2
         presumably because they are not affected by the addtional parameters encoded in
@@ -68,8 +68,7 @@ class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice):
 
     @property
     def _detector_center_sample(self):
-        return spice.gdpool('INS{}_CENTER'.format(spice.bods2c("LISM_TC2")), 0, 2)[0]
-
+        return spice.gdpool('INS{}_CENTER'.format(self._tc_id), 0, 2)[0]
 
     @property
     def _sensor_orientation(self):
@@ -94,7 +93,7 @@ class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice):
         """
         Calculated using 1/pixel pitch
         """
-        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.tc_id), 0, 1)[0]
+        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self._tc_id), 0, 1)[0]
         return [0, 0, 1/pixel_size]
 
 
@@ -103,7 +102,7 @@ class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice):
         """
         Calculated using 1/pixel pitch
         """
-        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.tc_id), 0, 1)[0]
+        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self._tc_id), 0, 1)[0]
         return [0, 1/pixel_size, 0]
 
 
@@ -115,7 +114,7 @@ class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice):
         : list
           Optical distortion x coefficients
         """
-        return spice.gdpool('INS{}_DISTORTION_COEF_X'.format(self.tc_id),0, 4).tolist()
+        return spice.gdpool('INS{}_DISTORTION_COEF_X'.format(self._tc_id),0, 4).tolist()
 
 
     @property
@@ -126,7 +125,7 @@ class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice):
         : list
           Optical distortion y coefficients
         """
-        return spice.gdpool('INS{}_DISTORTION_COEF_Y'.format(self.tc_id), 0, 4).tolist()
+        return spice.gdpool('INS{}_DISTORTION_COEF_Y'.format(self._tc_id), 0, 4).tolist()
 
     @property
     def line_exposure_duration(self):
@@ -138,7 +137,7 @@ class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice):
 
     @property
     def _focal_length(self):
-        return float(spice.gdpool('INS{}_FOCAL_LENGTH'.format(self.tc_id), 0, 1)[0])
+        return float(spice.gdpool('INS{}_FOCAL_LENGTH'.format(self._tc_id), 0, 1)[0])
 
     @property
     def optical_distortion(self):
