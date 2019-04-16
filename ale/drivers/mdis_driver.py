@@ -115,7 +115,7 @@ class MdisPDS3Driver(PDS3, MdisSpice):
         : str
           instrument id
         """
-        return self.id_lookup[self.label['INSTRUMENT_ID']]
+        return self.id_lookup[self._label['INSTRUMENT_ID']]
 
 class MdisIsis3Driver(Isis3, MdisSpice):
     """
@@ -125,7 +125,7 @@ class MdisIsis3Driver(Isis3, MdisSpice):
 
     @property
     def ikid(self):
-        return int(self.label["IsisCube"]["Kernels"]["NaifIkCode"])
+        return int(self._label["IsisCube"]["Kernels"]["NaifIkCode"])
 
     @property
     def instrument_id(self):
@@ -139,7 +139,7 @@ class MdisIsis3Driver(Isis3, MdisSpice):
         : str
           instrument id
         """
-        return self.id_lookup[self.label['IsisCube']['Instrument']['InstrumentId']]
+        return self.id_lookup[self._label['IsisCube']['Instrument']['InstrumentId']]
 
     @property
     def _focal_plane_tempature(self):
@@ -152,11 +152,11 @@ class MdisIsis3Driver(Isis3, MdisSpice):
         : double
           focal plane tempature
         """
-        return self.label['IsisCube']['Instrument']['FocalPlaneTemperature'].value
+        return self._label['IsisCube']['Instrument']['FocalPlaneTemperature'].value
 
     @property
     def starting_ephemeris_time(self):
         if not hasattr(self, '_starting_ephemeris_time'):
-            sclock = self.label['IsisCube']['Archive']['SpacecraftClockStartCount']
+            sclock = self._label['IsisCube']['Archive']['SpacecraftClockStartCount']
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
         return self._starting_ephemeris_time
