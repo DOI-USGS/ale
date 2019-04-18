@@ -95,7 +95,7 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
         Calculated using 1/pixel pitch
         """
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self._tc_id), 0, 1)[0]
-        return [0, 0, 1/pixel_size]
+        return [0, 0, -1/pixel_size]
 
 
     @property
@@ -104,7 +104,7 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
         Calculated using 1/pixel pitch
         """
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self._tc_id), 0, 1)[0]
-        return [0, 1/pixel_size, 0]
+        return [0, -1/pixel_size, 0]
 
 
     @property
@@ -131,10 +131,10 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
     @property
     def line_exposure_duration(self):
         # this is dumb
-        if isinstance(self.label['LINE_EXPOSURE_DURATION'], list):
-            return self.label['LINE_EXPOSURE_DURATION'][0].value * 0.001  # Scale to seconds
+        if isinstance(self.label['CORRECTED_SAMPLING_INTERVAL'], list):
+            return self.label['CORRECTED_SAMPLING_INTERVAL'][0].value * 0.001  # Scale to seconds
         else:
-            return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
+            return self.label['CORRECTED_SAMPLING_INTERVAL'].value * 0.001  # Scale to seconds
 
     @property
     def _focal_length(self):
