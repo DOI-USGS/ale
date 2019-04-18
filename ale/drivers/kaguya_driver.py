@@ -109,8 +109,14 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
     @property
     def reference_frame(self):
         """
+        Kaguya uses a slightly more accurate "mean Earth" reference frame for
+        moon obvervations. see https://darts.isas.jaxa.jp/pub/spice/SELENE/kernels/fk/moon_assoc_me.tf
         """
-        return "IAU_{}".format(self.target_name)
+        if self.taget_name.lower == "moon":
+            "MOON_ME"
+        else
+            # TODO: How do we handle no tartet?
+            return "NO TARGET"
 
     @property
     def focal2pixel_samples(self):
@@ -208,7 +214,9 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
         """
         Returns starting detector sample
 
-        Starting sample varies from swath mode. From Kaguya IK kernel:
+        Starting sample varies from swath mode (either FULL, NOMINAL or HALF).
+
+        From Kaguya IK kernel:
 
                                                      End
                                                Start Pixel
