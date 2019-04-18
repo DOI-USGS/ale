@@ -31,7 +31,7 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
         INSTRUMENT_ID = TC1/TC2
         SD = S/D short for single or double, which in turn means whether the
              the label belongs to a mono or stereo image.
-        COMPRESS = D/T short for DCT or through, we assume image has be decompressed already
+        COMPRESS = D/T short for DCT or through, we assume image has been decompressed already
         SWATCH = swatch mode, different swatch modes have different FOVs
         """
         instrument = self.label.get("INSTRUMENT_ID")
@@ -115,7 +115,7 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
         if self.taget_name.lower == "moon":
             "MOON_ME"
         else
-            # TODO: How do we handle no tartet?
+            # TODO: How do we handle no target?
             return "NO TARGET"
 
     @property
