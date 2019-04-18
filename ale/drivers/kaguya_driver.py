@@ -14,7 +14,13 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
     """
     Driver for a PDS3 Kaguya Terrain Camera image. Specifically level2b0 mono and stereo images.
 
-    
+    NOTES
+    -----
+
+    * Kaguaya has adjusted values for some of its keys, usually suffixed with `CORRECTED_`.
+      These corrected values should always be preffered over the original values.
+
+    *
     """
 
     @property
@@ -26,6 +32,7 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
         SD = S/D short for single or double, which in turn means whether the
              the label belongs to a mono or stereo image.
         COMPRESS = D/T short for DCT or through, we assume image has be decompressed already
+        SWATCH = swatch mode, different swatch modes have different FOVs
         """
         instrument = self.label.get("INSTRUMENT_ID")
         swath = self.label.get("SWATH_MODE_ID")[0]
@@ -37,6 +44,9 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
     @property
     def _tc_id(self):
         """
+        Returns ikid of LISM_TC1 or LISM_TC2, depending which camera was used
+        for capturing the image.
+
         Some keys are stored in the IK kernel under a general ikid for TC1/TC2
         presumably because they are not affected by the addtional parameters encoded in
         the ikid returned by self.ikid. This method exists for those gdpool calls.
@@ -56,6 +66,7 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
     @property
     def ending_ephemeris_time(self):
         if not hasattr(self, '_ending_ephemeris_time'):
+            # We need to get the corrected time
             self._ending_ephemeris_time = self.label.get('CORRECTED_SC_CLOCK_STOP_COUNT').value
             self._ending_ephemeris_time = spice.sct2e(self.spacecraft_id, self._ending_ephemeris_time)
         return self._ending_ephemeris_time
@@ -64,6 +75,7 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
     @property
     def starting_ephemeris_time(self):
         if not hasattr(self, '_starting_ephemeris_time'):
+            # We need to get the corrected time
             self._starting_ephemeris_time = self.label.get('CORRECTED_SC_CLOCK_START_COUNT').value
             self._starting_ephemeris_time = spice.sct2e(self.spacecraft_id, self._starting_ephemeris_time)
         return self._starting_ephemeris_time
@@ -96,7 +108,9 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
 
     @property
     def reference_frame(self):
-        return "MOON_ME"
+        """
+        """
+        return "IAU_{}".format(self.target_name)
 
     @property
     def focal2pixel_samples(self):
@@ -142,7 +156,9 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
         """
         Returns Line Exposure Duration
 
-        Kaguya TC
+        Kaguya TC has an unintuitive key for this called CORRECTED_SAMPLING_INTERVAL.
+        The original LINE_EXPOSURE_DURATION PDS3 keys is often incorrect and cannot
+        be trusted.
         """
         # It's a list, but only sometimes.
         try:
@@ -162,6 +178,23 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
         """
         Kaguya uses a unique radial distortion model so we need to overwrite the
         method packing the distortion model into the ISD.
+
+        from the IK:
+
+        Line-of-sight vector of pixel no. n can be expressed as below.
+
+        Distortion coefficients information:
+        INS<INSTID>_DISTORTION_COEF_X  = ( a0, a1, a2, a3)
+        INS<INSTID>_DISTORTION_COEF_Y  = ( b0, b1, b2, b3),
+
+        Distance r from the center:
+        r = - (n - INS<INSTID>_CENTER) * INS<INSTID>_PIXEL_SIZE.
+
+        Line-of-sight vector v is calculated as
+        v[X] = INS<INSTID>BORESIGHT[X] + a0 + a1*r + a2*r^2 + a3*r^3 ,
+        v[Y] = INS<INSTID>BORESIGHT[Y] + r+a0 + a1*r +a2*r^2 + a3*r^3 ,
+        v[Z] = INS<INSTID>BORESIGHT[Z]
+
         """
         return {
             "kaguyatc": {
