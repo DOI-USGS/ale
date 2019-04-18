@@ -24,9 +24,8 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
         instrument = self.label.get("INSTRUMENT_ID")
         swath = self.label.get("SWATH_MODE_ID")[0]
         sd = self.label.get("PRODUCT_SET_ID").split("_")[1].upper()
-        compression_type = self.label.get("IMAGE").get("COMPRESSION_TYPE")[0]
 
-        id = "LISM_{}_{}{}{}".format(instrument, sd, compression_type, swath)
+        id = "LISM_{}_{}T{}".format(instrument, sd, swath)
         return id
 
     @property
