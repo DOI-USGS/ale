@@ -11,6 +11,16 @@ from ale import config
 from ale.drivers.base import Driver, LineScanner, PDS3, Spice, TransverseDistortion
 
 class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
+    """
+    Driver for a PDS3 Kaguya Terrain Camera image.
+
+    NOTES
+    -----
+
+    * Kaguya
+
+    """
+
     @property
     def instrument_id(self):
         """
@@ -19,7 +29,7 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
         INSTRUMENT_ID = TC1/TC2
         SD = S/D short for single or double, which in turn means whether the
              the label belongs to a mono or stereo image.
-        COMPRESS = D/T short for DCT or through, we assume labels belong
+        COMPRESS = D/T short for DCT or through, we assume image has be decompressed already
         """
         instrument = self.label.get("INSTRUMENT_ID")
         swath = self.label.get("SWATH_MODE_ID")[0]
@@ -129,6 +139,8 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
 
     @property
     def line_exposure_duration(self):
+        """
+        """
         # this is dumb
         if isinstance(self.label['CORRECTED_SAMPLING_INTERVAL'], list):
             return self.label['CORRECTED_SAMPLING_INTERVAL'][0].value * 0.001  # Scale to seconds
@@ -137,10 +149,16 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
 
     @property
     def _focal_length(self):
+        """
+        """
         return float(spice.gdpool('INS{}_FOCAL_LENGTH'.format(self._tc_id), 0, 1)[0])
 
     @property
     def optical_distortion(self):
+        """
+        Kaguya uses a unique radial distortion model so we need to overwrite the
+        method packing the distortion model into the ISD.
+        """
         return {
             "kaguyatc": {
                 "x" : self._odkx,
