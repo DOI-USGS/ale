@@ -777,7 +777,7 @@ class NaifSpice():
         return self.ikid - int(fn)
 
 
-class Isis3Label():
+class IsisLabel():
 
     @property
     def start_time(self):
@@ -841,7 +841,7 @@ class Isis3Label():
         return self.label['IsisCube']['Instrument']['ExposureDuration'].value * 0.001
 
 
-class IsisSpice(Isis3Label):
+class IsisSpice(IsisLabel):
     """Mixin class for reading from an ISIS cube that has been spiceinit'd
 
     Attributes

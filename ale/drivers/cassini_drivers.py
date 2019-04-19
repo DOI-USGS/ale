@@ -6,12 +6,11 @@ import spiceypy as spice
 import numpy as np
 
 from ale import config
-from ale.drivers.base import Framer, RadialDistortion, Driver
+from ale.drivers.base import Framer, RadialDistortion, Driver, Pds3, NaifSpice
 
 
-class CassiniISS(Driver, Framer, RadialDistortion):
+class CassiniIssPds3NaifSpiceDriver(Driver, Pds3, NaifSpice, Framer, RadialDistortion):
     """
-    Cassini mixin class for defining snowflake Spice calls.
     """
     id_lookup = {
         "ISSNA" : "CASSINI_ISS_NAC",

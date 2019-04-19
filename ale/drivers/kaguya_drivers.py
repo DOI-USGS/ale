@@ -10,7 +10,7 @@ from glob import glob
 from ale import config
 from ale.drivers.base import Driver, LineScanner, Pds3Label, NaifSpice, TransverseDistortion
 
-class TcPds3Driver(Driver, LineScanner, Pds3Label, NaifSpice):
+class KaguyaTcPds3NaifSpiceDriver(Driver, LineScanner, Pds3Label, NaifSpice):
     """
     Driver for a PDS3 Kaguya Terrain Camera (TC) images. Specifically level2b0 mono and stereo images.
 
