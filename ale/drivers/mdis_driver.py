@@ -25,7 +25,7 @@ class MdisSpice(Driver, Spice, Framer):
 
 
     @property
-    def metakernel(self):
+    def _metakernel_dir(self):
         """
         Returns latest instrument metakernels
 
@@ -34,13 +34,7 @@ class MdisSpice(Driver, Spice, Framer):
         : string
           Path to latest metakernel file
         """
-        metakernel_dir = config.mdis
-        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
-        if not hasattr(self, '_metakernel'):
-            for mk in mks:
-                if str(self.start_time.year) in os.path.basename(mk):
-                    self._metakernel = mk
-        return self._metakernel
+        return config.mdis
 
     @property
     def _focal_length(self):
@@ -93,7 +87,6 @@ class MdisSpice(Driver, Spice, Framer):
     def _detector_center_sample(self):
         return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0])
 
-
     @property
     def _detector_center_line(self):
         return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
@@ -122,11 +115,6 @@ class MdisIsis3Driver(Isis3, MdisSpice):
     Driver for reading MDIS ISIS3 Labels. These are Labels that have been ingested
     into ISIS from PDS EDR images but have not been spiceinit'd yet.
     """
-
-    @property
-    def ikid(self):
-        return int(self._label["IsisCube"]["Kernels"]["NaifIkCode"])
-
     @property
     def instrument_id(self):
         """
@@ -140,19 +128,6 @@ class MdisIsis3Driver(Isis3, MdisSpice):
           instrument id
         """
         return self.id_lookup[self._label['IsisCube']['Instrument']['InstrumentId']]
-
-    @property
-    def _focal_plane_tempature(self):
-        """
-        Acquires focal plane tempature from a PDS3 label. Used exclusively in
-        computing focal length.
-
-        Returns
-        -------
-        : double
-          focal plane tempature
-        """
-        return self._label['IsisCube']['Instrument']['FocalPlaneTemperature'].value
 
     @property
     def starting_ephemeris_time(self):

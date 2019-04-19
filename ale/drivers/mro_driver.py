@@ -28,14 +28,6 @@ class CtxIsisSpice(Driver, IsisSpice, LineScanner, RadialDistortion):
     def spacecraft_id(self):
         return "N/A"
 
-    @property
-    def ikid(self):
-        return int(self.label["IsisCube"]["Kernels"]["NaifFrameCode"])
-
-    @property
-    def line_exposure_duration(self):
-        return self.label["IsisCube"]["Instrument"]["LineExposureDuration"].value * 0.001 # Scale to seconds
-
 class CtxSpice(Driver, Spice, LineScanner, RadialDistortion):
     """
     Spice mixins that defines MRO CTX specific snowflake Spice calls.
@@ -45,7 +37,7 @@ class CtxSpice(Driver, Spice, LineScanner, RadialDistortion):
     }
 
     @property
-    def metakernel(self):
+    def _metakernel_dir(self):
         """
         Returns latest instrument metakernels
 
@@ -54,14 +46,7 @@ class CtxSpice(Driver, Spice, LineScanner, RadialDistortion):
         : string
           Path to latest metakernel file
         """
-        metakernel_dir = config.mro
-        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
-        if not hasattr(self, '_metakernel'):
-            self._metakernel = None
-            for mk in mks:
-                if str(self.start_time.year) in os.path.basename(mk):
-                    self._metakernel = mk
-        return self._metakernel
+        return config.mro
 
 class CtxIsisCubeSpice(Isis3, CtxSpice):
     @property
@@ -71,14 +56,14 @@ class CtxIsisCubeSpice(Isis3, CtxSpice):
     @property
     def starting_ephemeris_time(self):
         if not hasattr(self, '_starting_ephemeris_time'):
-            sclock = self.label['IsisCube']['Instrument']['SpacecraftClockCount']
+            sclock = self._label['IsisCube']['Instrument']['SpacecraftClockCount']
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
         return self._starting_ephemeris_time
 
     @property
     def line_exposure_duration(self):
         if not hasattr(self, '_line_exposure_duration'):
-            self._line_exposure_duration = self.label['IsisCube']['Instrument']['LineExposureDuration'].value * 0.001
+            self._line_exposure_duration = self._label['IsisCube']['Instrument']['LineExposureDuration'].value * 0.001
         return self._line_exposure_duration
 
     @property
@@ -103,7 +88,7 @@ class CtxPds3Driver(PDS3, CtxSpice):
         : str
           instrument id
         """
-        return self.id_lookup[self.label['INSTRUMENT_NAME']]
+        return self.id_lookup[self._label['INSTRUMENT_NAME']]
 
     @property
     def spacecraft_name(self):
@@ -114,4 +99,4 @@ class CtxPds3Driver(PDS3, CtxSpice):
         name_lookup = {
             'MARS_RECONNAISSANCE_ORBITER': 'MRO'
         }
-        return name_lookup[self.label['SPACECRAFT_NAME']]
+        return name_lookup[self._label['SPACECRAFT_NAME']]

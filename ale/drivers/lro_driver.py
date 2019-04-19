@@ -24,8 +24,9 @@ class LrocSpice(Driver, Spice, LineScanner):
         : string
           Path to latest metakernel file
         """
-        metakernels = get_metakernels(years=self.start_time.year, missions='lro', versions='latest')
-        self._metakernel = metakernels['data'][0]['path']
+        if not hasattr(self, '_metakernel'):
+            metakernels = get_metakernels(years=self.start_time.year, missions='lro', versions='latest')
+            self._metakernel = metakernels['data'][0]['path']
         return self._metakernel
 
     @property
@@ -63,10 +64,10 @@ class LrocPds3Driver(PDS3, LrocSpice):
           instrument id
         """
 
-        instrument = self.label.get("INSTRUMENT_ID")
+        instrument = self._label.get("INSTRUMENT_ID")
 
         # should be left or right
-        frame_id = self.label.get("FRAME_ID")
+        frame_id = self._label.get("FRAME_ID")
 
         if instrument == "LROC" and frame_id == "LEFT":
             return "LRO_LROCNACL"

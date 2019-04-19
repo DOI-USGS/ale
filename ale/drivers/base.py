@@ -9,6 +9,7 @@ from dateutil import parser
 import pvl
 import spiceypy as spice
 from ale import config
+from ale.util import read_pvl
 
 
 def read_table_data(table_label, cube):
@@ -216,16 +217,17 @@ class Driver():
     _file : str
             Reference to file path to be used by mixins for opening.
     """
-    def __init__(self, file, num_ephem=909, num_quats=909):
+
+    def __init__(self, label_source, num_ephem=909, num_quats=909):
         """
         Parameters
         ----------
         file : str
                path to file to be parsed
         """
+        self._label_source = label_source
         self._num_quaternions = num_quats
         self._num_ephem = num_ephem
-        self._file = file
 
     def __str__(self):
         """
@@ -266,24 +268,6 @@ class Driver():
         """
         keys = set()
         return {p:getattr(self, p) for p in dir(self) if p[0] != "_" and isinstance(getattr(type(self), p), property)}
-
-
-    @property
-    def _label(self):
-        if not hasattr(self, "_pvl_label"):
-            if isinstance(self._file, pvl.PVLModule):
-                self._pvl_label = self._file
-            try:
-                self._pvl_label = pvl.loads(self._file)
-            except Exception:
-                self._pvl_label = pvl.load(self._file)
-            except:
-                raise ValueError("{} is not a valid label".format(self._file))
-        return self._pvl_label
-
-    @property
-    def file(self):
-        return self._file
 
     @property
     def interpolation_method(self):
@@ -367,7 +351,6 @@ class Driver():
             "unit" : "m"
         }
 
-
 class LineScanner():
     @property
     def name_model(self):
@@ -434,7 +417,7 @@ class LineScanner():
 
     @property
     def line_exposure_duration(self):
-        return self._label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
+        return self._line_exposure_duration
 
 class Framer():
     @property
@@ -456,7 +439,7 @@ class Framer():
 
     @property
     def filter_number(self):
-        return self._label.get('FILTER_NUMBER', 0)
+        return self._filter_number
 
     @property
     def number_of_ephemerides(self):
@@ -480,7 +463,6 @@ class Framer():
     def exposure_duration(self):
         return self._exposure_duration
 
-
 class PDS3():
     """
     Mixin for reading from PDS3 Labels.
@@ -491,6 +473,11 @@ class PDS3():
              Dict-like object with PVL keys
 
     """
+    @property
+    def _label(self):
+        if not hasattr(self, "_pds3_label"):
+            self._pds3_label = read_pvl(self._label_source)
+        return self._pds3_label
 
     @property
     def _focal_plane_tempature(self):
@@ -530,10 +517,6 @@ class PDS3():
         """
 
         return self._label['TARGET_NAME']
-
-    @property
-    def _target_id(self):
-        return spice.bodn2c(self._label['TARGET_NAME'])
 
     @property
     def starting_ephemeris_time(self):
@@ -578,12 +561,32 @@ class PDS3():
     def _exposure_duration(self):
         return self._label['EXPOSURE_DURATION'].value * 0.001
 
+    @property
+    def _line_exposure_duration(self):
+        return self._label['LINE_EXPOSURE_DURATION'].value * 0.001
+
+    @property
+    def _filter_number(self):
+        fn = self._label.get('FILTER_NUMBER', 0)
+        if fn == 'N/A':
+            return 0
+        return fn
 
 class Spice():
 
     @property
+    def _metakernel_dir(self):
+        return ""
+
+    @property
     def metakernel(self):
-        pass
+        mks = sorted(glob(os.path.join(self._metakernel_dir,'*.tm')))
+        if not hasattr(self, '_metakernel'):
+            self._metakernel = None
+            for mk in mks:
+                if str(self.start_time.year) in os.path.basename(mk):
+                    self._metakernel = mk
+        return self._metakernel
 
     def __enter__(self):
         """
@@ -775,8 +778,14 @@ class Spice():
 
         return self.ikid - int(fn)
 
-
 class Isis3():
+    """
+    """
+    @property
+    def _label(self):
+        if not hasattr(self, "_isis_label"):
+            self._isis_label = read_pvl(self._label_source)
+        return self._isis_label
 
     @property
     def start_time(self):
@@ -836,9 +845,36 @@ class Isis3():
         return self._starting_ephemeris_time
 
     @property
+    def spacecraft_clock_stop_count(self):
+        sc = self._label['IsisCube']['Archive']['SpacecraftClockStopCount']
+        if sc == 'N/A':
+            sc = None
+        return sc
+
+    @property
+    def _focal_plane_tempature(self):
+        """
+        Acquires focal plane tempature from a PDS3 label. Used exclusively in
+        computing focal length.
+
+        Returns
+        -------
+        : double
+          focal plane tempature
+        """
+        return self._label['IsisCube']['Instrument']['FocalPlaneTemperature'].value
+
+    @property
     def _exposure_duration(self):
         return self._label['IsisCube']['Instrument']['ExposureDuration'].value * 0.001
 
+    @property
+    def _line_exposure_duration(self):
+        return self._label['IsisCube']['Instrument']['LineExposureDuration'].value * 0.001
+
+    @property
+    def _filter_number(self):
+        return self._label['IsisCube']['Archive']['OriginalFilterNumber']
 
 class IsisSpice(Isis3):
     """Mixin class for reading from an ISIS cube that has been spiceinit'd
@@ -884,7 +920,7 @@ class IsisSpice(Isis3):
     def _init_tables(self):
         # init tables
         for table in self._label.getlist('Table'):
-            binary_data = read_table_data(table, self._file)
+            binary_data = read_table_data(table, self._label_source)
             field_data = parse_table_data(table, binary_data)
             if table['Name'] == 'InstrumentPointing':
                 self._inst_pointing_table = parse_rotation_table(table, field_data)
@@ -906,11 +942,11 @@ class IsisSpice(Isis3):
         PVLModule :
             Dict-like object with PVL keys
         """
-        if not hasattr(self, "_label"):
+        if not hasattr(self, "_pvl_label"):
             try:
-                self._pvl_label = pvl.load(self.file)
+                self._pvl_label = pvl.load(self._label_source)
             except:
-                raise ValueError("{} is not a valid label".format(self.file))
+                raise ValueError("{} is not a valid label".format(self._label_source))
         return self._pvl_label
 
     def __enter__(self):
@@ -1050,7 +1086,7 @@ class IsisSpice(Isis3):
         """
         if 'NaifIkCode' not in self._kernels_group:
             raise ValueError("Could not find Instrument NAIF ID in Kernels group.")
-        return self._kernels_group['NaifIkCode']
+        return int(self._kernels_group['NaifIkCode'])
 
     @property
     def focal2pixel_lines(self):
@@ -1270,7 +1306,6 @@ class IsisSpice(Isis3):
     @property
     def _odtk(self):
         return self._label["NaifKeywords"]["INS{}_OD_K".format(self.ikid)]
-
 
 class RadialDistortion():
     @property

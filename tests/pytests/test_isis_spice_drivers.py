@@ -441,7 +441,7 @@ End
     return test_image
 
 def test_read(test_cube):
-    assert isinstance(test_cube.label, pvl.PVLModule)
+    assert isinstance(test_cube._label, pvl.PVLModule)
 
 def test_number_of_quaternions(test_cube):
     assert test_cube.number_of_quaternions == 1

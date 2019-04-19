@@ -1,10 +1,10 @@
 import os
+import pvl
 from glob import glob
 from itertools import filterfalse, groupby
 from os import path
 
 from ale import config
-
 
 def get_metakernels(spice_dir=config.spice_root, missions=set(), years=set(), versions=set()):
     """
@@ -86,3 +86,13 @@ def get_metakernels(spice_dir=config.spice_root, missions=set(), years=set(), ve
         }
 
     return avail
+
+def read_pvl(label_source):
+    if isinstance(label_source, pvl.PVLModule):
+        return label_source
+    try:
+        return pvl.loads(label_source)
+    except Exception:
+        return pvl.load(label_source)
+    except:
+        raise ValueError("{} is not a valid label".format(label_source))

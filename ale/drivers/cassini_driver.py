@@ -19,7 +19,7 @@ class CassiniISS(Driver, Framer, RadialDistortion):
     }
 
     @property
-    def metakernel(self):
+    def _metakernel_dir(self):
         """
         Returns latest instrument metakernels
 
@@ -28,13 +28,7 @@ class CassiniISS(Driver, Framer, RadialDistortion):
         : string
           Path to latest metakernel file
         """
-        metakernel_dir = config.cassini
-        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
-        if not hasattr(self, '_metakernel'):
-            for mk in mks:
-                if str(self.start_time.year) in os.path.basename(mk):
-                    self._metakernel = mk
-        return self._metakernel
+        return config.cassini
 
     @property
     def instrument_id(self):
@@ -72,11 +66,6 @@ class CassiniISS(Driver, Framer, RadialDistortion):
     def focal2pixel_lines(self):
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
         return [0.0, 0.0, 1/pixel_size]
-
-    @property
-    def _exposure_duration(self):
-        # labels do not specify a unit explicitly
-        return self.label['EXPOSURE_DURATION'] * 0.001  # Scale to seconds
 
     @property
     def odtk(self):
