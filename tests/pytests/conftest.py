@@ -25,8 +25,6 @@ class SimpleSpice():
         return "SPACE"
     def sct2e(self, *args):
         return 0.1
-    def scs2e(self, *args):
-        return 0.1
 
 def get_mockkernels(self, *args):
     return "some_metakernel"
