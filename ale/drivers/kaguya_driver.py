@@ -12,7 +12,7 @@ from ale.drivers.base import Driver, LineScanner, PDS3, Spice, TransverseDistort
 
 class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
     """
-    Driver for a PDS3 Kaguya Terrain Camera image. Specifically level2b0 mono and stereo images.
+    Driver for a PDS3 Kaguya Terrain Camera (TC) images. Specifically level2b0 mono and stereo images.
 
     NOTES
     -----
@@ -20,8 +20,19 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
     * Kaguaya has adjusted values for some of its keys, usually suffixed with `CORRECTED_`.
       These corrected values should always be preffered over the original values.
 
-    *
+    * The Kaguya TC doesn't use a generic Distortion Model, uses on unique to the TC.
+      Therefore, methods normally in the Distortion classes are reimplemented here.
     """
+
+    @property
+    def metakernel(self):
+        metakernel_dir = config.kaguya
+        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
+        if not hasattr(self, '_metakernel'):
+            for mk in mks:
+                if str(self.start_time.year) in os.path.basename(mk):
+                    self._metakernel = mk
+        return self._metakernel
 
     @property
     def instrument_id(self):
@@ -54,16 +65,6 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
         return spice.bods2c("LISM_{}".format(self.label.get("INSTRUMENT_ID")))
 
     @property
-    def metakernel(self):
-        metakernel_dir = config.kaguya
-        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
-        if not hasattr(self, '_metakernel'):
-            for mk in mks:
-                if str(self.start_time.year) in os.path.basename(mk):
-                    self._metakernel = mk
-        return self._metakernel
-
-    @property
     def ending_ephemeris_time(self):
         if not hasattr(self, '_ending_ephemeris_time'):
             # We need to get the corrected time
@@ -86,6 +87,7 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
 
     @property
     def _detector_center_sample(self):
+        # Pixels are 0 based, not one based, so subtract 1
         return spice.gdpool('INS{}_CENTER'.format(self._tc_id), 0, 2)[0]-1
 
     @property
@@ -112,9 +114,9 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
         Kaguya uses a slightly more accurate "mean Earth" reference frame for
         moon obvervations. see https://darts.isas.jaxa.jp/pub/spice/SELENE/kernels/fk/moon_assoc_me.tf
         """
-        if self.taget_name.lower == "moon":
+        if self.target_name.lower == "moon":
             "MOON_ME"
-        else
+        else:
             # TODO: How do we handle no target?
             return "NO TARGET"
 
@@ -167,6 +169,9 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
         be trusted.
         """
         # It's a list, but only sometimes.
+        # seems to depend on whether you are using the original zipped archives or
+        # if its downloaded from Jaxa's image search:
+        # (https://darts.isas.jaxa.jp/planet/pdap/selene/product_search.html#)
         try:
             return self.label['CORRECTED_SAMPLING_INTERVAL'][0].value * 0.001  # Scale to seconds
         except:
@@ -176,6 +181,10 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
     @property
     def _focal_length(self):
         """
+        Returns
+        -------
+        : float
+          Camera focal length
         """
         return float(spice.gdpool('INS{}_FOCAL_LENGTH'.format(self._tc_id), 0, 1)[0])
 
