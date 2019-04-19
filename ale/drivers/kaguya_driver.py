@@ -259,4 +259,4 @@ class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
         LISM_TC2_SSH  (Single SP_support Half) 1172  2921      -131384
         """
 
-        return self.label["FIRST_PIXEL_NUMBER"]
+        return self._label["FIRST_PIXEL_NUMBER"]
