@@ -4,17 +4,17 @@ from unittest import mock
 import pytest
 
 import ale
-from ale.drivers import dawn_driver, base
-from ale.drivers.dawn_driver import DawnPDS3Driver
+from ale.drivers import dawn_drivers, base
+from ale.drivers.dawn_drivers import DawnFcPds3NaifSpiceDriver
 
 # 'Mock' the spice module where it is imported
 from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
 base.spice = simplespice
-dawn_driver.spice = simplespice
+dawn_drivers.spice = simplespice
 
-DawnPDS3Driver.metakernel = get_mockkernels
+DawnFcPds3NaifSpiceDriver.metakernel = get_mockkernels
 
 @pytest.fixture
 def dawn_label():
@@ -421,7 +421,7 @@ END
 """
 
 def test_mdis_creation(dawn_label):
-    with DawnPDS3Driver(dawn_label) as m:
+    with DawnFcPds3NaifSpiceDriver(dawn_label) as m:
         d = m.to_dict()
     assert d['instrument_id'] == 'DAWN_FC2_FILTER_1'
     assert d['spacecraft_name'] == 'DAWN'
