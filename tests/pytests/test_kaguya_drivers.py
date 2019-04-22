@@ -1,15 +1,15 @@
 import pytest
 
-from ale.drivers import kaguya_driver
-from ale.drivers.kaguya_driver import TcPds3Driver
+from ale.drivers import kaguya_drivers
+from ale.drivers.kaguya_drivers import KaguyaTcPds3NaifSpiceDriver
 
 # 'Mock' the spice module where it is imported
 from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
-kaguya_driver.spice = simplespice
+kaguya_drivers.spice = simplespice
 
-TcPds3Driver.metakernel = get_mockkernels
+KaguyaTcPds3NaifSpiceDriver.metakernel = get_mockkernels
 
 @pytest.fixture
 def kaguya_tclabel():
@@ -158,6 +158,6 @@ def kaguya_tclabel():
     """
 
 def test_kaguya_creation(kaguya_tclabel):
-    with TcPds3Driver(kaguya_tclabel) as m:
+    with KaguyaTcPds3NaifSpiceDriver(kaguya_tclabel) as m:
         d = m.to_dict()
         assert isinstance(d, dict)
