@@ -568,7 +568,7 @@ class PDS3():
         : str
           Spacecraft name
         """
-        return self.label['MISSION_NAME']
+        return self.label['MISSION_NAME']  # <--- this should potentially be the spacecraft name
 
     @property
     def detector_line_summing(self):
@@ -576,7 +576,10 @@ class PDS3():
 
     @property
     def _exposure_duration(self):
-        return self.label['EXPOSURE_DURATION'].value * 0.001
+        try:
+            return self.label['EXPOSURE_DURATION'].value * 0.001
+        except:
+            return self.label['EXPOSURE_DURATION'] * 0.001  
 
 
 class Spice():

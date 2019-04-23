@@ -6,12 +6,12 @@ import spiceypy as spice
 import numpy as np
 
 from ale import config
-from ale.drivers.base import Framer, RadialDistortion, Driver
+from ale.drivers.base import Framer, RadialDistortion, Driver, Spice, PDS3
 
-
-class CassiniISS(Driver, Framer, RadialDistortion):
+# driver, spice, pds3, linescanner
+class CassiniISS(Driver, Spice, PDS3, Framer): #, RadialDistortion):
     """
-    Cassini mixin class for defining snowflake Spice calls.
+    Cassini mixin class for defining Spice calls.
     """
     id_lookup = {
         "ISSNA" : "CASSINI_ISS_NAC",
@@ -29,19 +29,21 @@ class CassiniISS(Driver, Framer, RadialDistortion):
           Path to latest metakernel file
         """
         metakernel_dir = config.cassini
-        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
-        if not hasattr(self, '_metakernel'):
-            for mk in mks:
-                if str(self.start_time.year) in os.path.basename(mk):
-                    self._metakernel = mk
+        self._metakernel = metakernel_dir
+
+      # mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
+      # if not hasattr(self, '_metakernel'):
+      #     for mk in mks:
+      #         if str(self.start_time.year) in os.path.basename(mk):
+      #             self._metakernel = mk
         return self._metakernel
 
     @property
     def instrument_id(self):
         """
         Returns an instrument id for unquely identifying the instrument, but often
-        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
-        the same ID the Spice expects in bods2c calls.
+        also used to be piped into Spice Kernels to acquire instrument kernel (IK) NAIF IDs. 
+        Therefore they use the same NAIF ID asin bods2c calls.
 
         Returns
         -------
@@ -73,10 +75,10 @@ class CassiniISS(Driver, Framer, RadialDistortion):
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
         return [0.0, 0.0, 1/pixel_size]
 
-    @property
-    def _exposure_duration(self):
-        # labels do not specify a unit explicitly
-        return self.label['EXPOSURE_DURATION'] * 0.001  # Scale to seconds
+#
+#   def _exposure_duration(self):
+#       # labels do not specify a unit explicitly
+#       return self.label['EXPOSURE_DURATION'] * 0.001  # Scale to secondsb
 
     @property
     def odtk(self):
@@ -91,3 +93,13 @@ class CassiniISS(Driver, Framer, RadialDistortion):
         elif self.instrument_id == 'CASSINI_ISS_NAC':
             # NAC
             return [float('-8e-6'), 0, 0]
+
+    @property
+    # Don't know which (n, n) value from the FOV_CENTER_PIXEL is samples or lines
+    def _detector_center_line(self):
+      return float(spice.gdpool('INS{}_FOV_CENTER_PIXEL'.format(self.ikid), 0, 2)[1])
+
+    @property
+    # Don't know which (n, n) value from the FOV_CENTER_PIXEL is samples or lines
+    def _detector_center_sample(self):
+      return float(spice.gdpool('INS{}_FOV_CENTER_PIXEL'.format(self.ikid), 0, 2)[0])
