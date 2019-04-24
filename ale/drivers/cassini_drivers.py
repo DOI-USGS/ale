@@ -8,7 +8,7 @@ import numpy as np
 from ale import config
 from ale.drivers.base import Framer, RadialDistortion, Driver, Pds3Label, NaifSpice
 
-class CassiniIssPds3NaifSpiceDriver(Driver, Pds3Label, NaifSpice, Framer, RadialDistortion):
+class CassiniIssPds3LabelNaifSpiceDriver(Driver, Pds3Label, NaifSpice, Framer, RadialDistortion):
     """
     Cassini mixin class for defining Spice calls.
     """
