@@ -569,7 +569,7 @@ class Pds3Label():
         : str
           Spacecraft name
         """
-        return self.label['MISSION_NAME']  # <--- this should potentially be the spacecraft name
+        return self.label['MISSION_NAME']
 
     @property
     def detector_line_summing(self):
@@ -577,6 +577,7 @@ class Pds3Label():
 
     @property
     def _exposure_duration(self):
+        # The EXPOSURE_DURATION may either be stored as a (value, unit) or just a value 
         try:
             return self.label['EXPOSURE_DURATION'].value * 0.001
         except:
