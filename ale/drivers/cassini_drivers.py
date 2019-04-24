@@ -6,10 +6,9 @@ import spiceypy as spice
 import numpy as np
 
 from ale import config
-from ale.drivers.base import Framer, RadialDistortion, Driver, Spice, PDS3
+from ale.drivers.base import Framer, RadialDistortion, Driver, Pds3Label, NaifSpice
 
-# driver, spice, pds3, linescanner
-class CassiniISS(Driver, Spice, PDS3, Framer): #, RadialDistortion):
+class CassiniIssPds3NaifSpiceDriver(Driver, Pds3Label, NaifSpice, Framer, RadialDistortion):
     """
     Cassini mixin class for defining Spice calls.
     """
@@ -81,7 +80,7 @@ class CassiniISS(Driver, Spice, PDS3, Framer): #, RadialDistortion):
 #       return self.label['EXPOSURE_DURATION'] * 0.001  # Scale to secondsb
 
     @property
-    def odtk(self):
+    def _odtk(self):
         """
         The radial distortion coeffs are not defined in the ik kernels, instead
         they are defined in the ISS Data User Guide (Knowles). Therefore, we
