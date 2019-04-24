@@ -28,13 +28,12 @@ class CassiniIssPds3NaifSpiceDriver(Driver, Pds3Label, NaifSpice, Framer, Radial
           Path to latest metakernel file
         """
         metakernel_dir = config.cassini
-        self._metakernel = metakernel_dir
 
-      # mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
-      # if not hasattr(self, '_metakernel'):
-      #     for mk in mks:
-      #         if str(self.start_time.year) in os.path.basename(mk):
-      #             self._metakernel = mk
+        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
+        if not hasattr(self, '_metakernel'):
+            for mk in mks:
+               if str(self.start_time.year) in os.path.basename(mk):
+                   self._metakernel = mk
         return self._metakernel
 
     @property
@@ -73,11 +72,6 @@ class CassiniIssPds3NaifSpiceDriver(Driver, Pds3Label, NaifSpice, Framer, Radial
     def focal2pixel_lines(self):
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
         return [0.0, 0.0, 1/pixel_size]
-
-#
-#   def _exposure_duration(self):
-#       # labels do not specify a unit explicitly
-#       return self.label['EXPOSURE_DURATION'] * 0.001  # Scale to secondsb
 
     @property
     def _odtk(self):
