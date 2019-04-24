@@ -10,4 +10,3 @@ mro = '/data/spice/mro-m-spice-6-v1.0/mrosp_1000/extras/mk' # Mars Reconnaissanc
 kaguya = '/data/spice/SELENE/kernels/mk/'
 dawn = '/data/spice/dawn-m_a-spice-6-v1.0/dawnsp_1000/extras/mk'
 
-
