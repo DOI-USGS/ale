@@ -216,6 +216,7 @@ class Driver():
     _file : str
             Reference to file path to be used by mixins for opening.
     """
+
     def __init__(self, file, num_ephem=909, num_quats=909):
         """
         Parameters
@@ -481,7 +482,7 @@ class Framer():
         return self._exposure_duration
 
 
-class PDS3():
+class Pds3Label():
     """
     Mixin for reading from PDS3 Labels.
 
@@ -576,14 +577,14 @@ class PDS3():
 
     @property
     def _exposure_duration(self):
-        return self.label['EXPOSURE_DURATION'].value * 0.001
+        # The EXPOSURE_DURATION may either be stored as a (value, unit) or just a value 
+        try:
+            return self.label['EXPOSURE_DURATION'].value * 0.001
+        except:
+            return self.label['EXPOSURE_DURATION'] * 0.001  
 
 
-class Spice():
-
-    @property
-    def metakernel(self):
-        pass
+class NaifSpice():
 
     def __enter__(self):
         """
@@ -601,6 +602,10 @@ class Spice():
         kernels can be unloaded.
         """
         spice.unload(self.metakernel)
+
+    @property
+    def metakernel(self):
+        pass
 
     @property
     def _odtx(self):
@@ -776,7 +781,7 @@ class Spice():
         return self.ikid - int(fn)
 
 
-class Isis3():
+class IsisLabel():
 
     @property
     def start_time(self):
@@ -840,7 +845,7 @@ class Isis3():
         return self.label['IsisCube']['Instrument']['ExposureDuration'].value * 0.001
 
 
-class IsisSpice(Isis3):
+class IsisSpice(IsisLabel):
     """Mixin class for reading from an ISIS cube that has been spiceinit'd
 
     Attributes
