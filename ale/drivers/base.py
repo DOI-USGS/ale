@@ -713,7 +713,11 @@ class Pds3Label():
 
     @property
     def _exposure_duration(self):
-        return self.label['EXPOSURE_DURATION'].value * 0.001
+        # The EXPOSURE_DURATION may either be stored as a (value, unit) or just a value 
+        try:
+            return self.label['EXPOSURE_DURATION'].value * 0.001
+        except:
+            return self.label['EXPOSURE_DURATION'] * 0.001  
 
 
 class NaifSpice():
