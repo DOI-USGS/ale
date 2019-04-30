@@ -112,6 +112,6 @@ def lro_lroclabel():
         """
 
 def test_lro_creation(lro_lroclabel):
-    with LroLrocPds3NaifSpiceDriver(lro_lroclabel) as m:
+    with LroLrocPds3LabelNaifSpiceDriver(lro_lroclabel) as m:
         d = m.to_dict()
         assert isinstance(d, dict)
