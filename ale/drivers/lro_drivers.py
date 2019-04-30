@@ -5,44 +5,12 @@ import numpy as np
 import pvl
 import spiceypy as spice
 
+from ale import config
 from ale.util import get_metakernels
 from ale.drivers.base import LineScanner, NaifSpice, Pds3Label, Driver
 
 
-class LroLrocNaifSpice(Driver, NaifSpice, LineScanner):
-    """
-    Lroc mixin class for defining snowflake Spice calls.
-    """
-
-    @property
-    def metakernel(self):
-        """
-        Returns latest instrument metakernels
-
-        Returns
-        -------
-        : string
-          Path to latest metakernel file
-        """
-        metakernels = get_metakernels(years=self.start_time.year, missions='lro', versions='latest')
-        self._metakernel = metakernels['data'][0]['path']
-        return self._metakernel
-
-    @property
-    def spacecraft_name(self):
-        """
-        Spacecraft name used in various Spice calls to acquire
-        ephemeris data.
-
-        Returns
-        -------
-        : str
-          Spacecraft name
-        """
-        return "LRO"
-
-
-class LroLrocPds3NaifSpiceDriver(Pds3Label, LroLrocNaifSpice):
+class LroLrocPds3LabelNaifSpiceDriver(Driver, NaifSpice, Pds3Label, LineScanner):
     """
     Driver for reading Lroc labels. Requires a Spice mixin to acquire addtional
     ephemeris and instrument data located exclusively in spice kernels.
@@ -72,3 +40,38 @@ class LroLrocPds3NaifSpiceDriver(Pds3Label, LroLrocNaifSpice):
             return "LRO_LROCNACL"
         elif instrument == "LROC" and frame_id == "RIGHT":
             return "LRO_LROCNACR"
+        
+    @property
+    def metakernel(self):
+        """
+        Returns latest instrument metakernels
+
+        Returns
+        -------
+        : string
+          Path to latest metakernel file
+        """
+        metakernel_dir = config.lro
+
+        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
+        if not hasattr(self, '_metakernel'):
+            for mk in mks:
+               if str(self.start_time.year) in os.path.basename(mk):
+                   self._metakernel = mk
+        return self._metakernel
+
+    
+    @property
+    def spacecraft_name(self):
+        """
+        Spacecraft name used in various SPICE calls to acquire
+        ephemeris data.
+
+        Returns
+        -------
+        : str
+          Spacecraft name
+        """
+        return "LRO"
+
+
