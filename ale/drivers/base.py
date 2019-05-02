@@ -1068,7 +1068,9 @@ class IsisSpice(IsisLabel):
             The instrument id
         """
         if 'NaifIkCode' not in self._kernels_group:
-            raise ValueError("Could not find Instrument NAIF ID in Kernels group.")
+            if 'NaifFrameCode' not in self._kernels_group:
+                raise ValueError("Could not find Instrument NAIF ID in Kernels group.")
+            return self._kernels_group['NaifFrameCode']
         return self._kernels_group['NaifIkCode']
 
     @property
@@ -1310,7 +1312,6 @@ class IsisSpice(IsisLabel):
         else:
             orientations = Slerp(self._inst_pointing_table["Times"], Rotation.from_quat(rotations))(inst_pointing_times)
 
-        print('instrument pointing', orientations.as_dcm())
         bf2inst_rotation = (orientations*self._body_j2k2bf_rotation.inv()).as_quat()
         return bf2inst_rotation
 
