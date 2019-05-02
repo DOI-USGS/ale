@@ -954,7 +954,7 @@ class IsisSpice(IsisLabel):
         """
         if not hasattr(self, "_inst_pointing_table"):
             self._init_tables()
-        return self._inst_pointing_table['CkTableOriginalSize']
+        return int(self._inst_pointing_table['CkTableOriginalSize'])
 
     @property
     def number_of_ephemerides(self):
@@ -969,7 +969,7 @@ class IsisSpice(IsisLabel):
         """
         if not hasattr(self, "_inst_position_table"):
             self._init_tables()
-        return self._inst_position_table['SpkTableOriginalSize']
+        return int(self._inst_position_table['SpkTableOriginalSize'])
 
     @property
     def _sclock_hex_string(self):
@@ -1226,7 +1226,7 @@ class IsisSpice(IsisLabel):
 
         inst_positions_times = np.linspace(self._inst_position_table["Times"][0],
                                            self._inst_position_table["Times"][-1],
-                                           int(self.number_of_ephemerides))
+                                           self.number_of_ephemerides)
 
         # interpolate out positions
         if len(self._inst_position_table["Times"]) < 2:
@@ -1266,7 +1266,7 @@ class IsisSpice(IsisLabel):
 
         inst_velocities_times = np.linspace(self._inst_position_table["Times"][0],
                                            self._inst_position_table["Times"][-1],
-                                           int(self.number_of_ephemerides))
+                                           self.number_of_ephemerides)
 
         if len(self._inst_position_table["Times"]) < 2:
             velocity_0 = self._inst_position_table["Velocities"][0]
@@ -1303,7 +1303,7 @@ class IsisSpice(IsisLabel):
 
         inst_pointing_times = np.linspace(self._inst_pointing_table["Times"][0],
                                           self._inst_pointing_table["Times"][-1],
-                                          int(self.number_of_quaternions))
+                                          self.number_of_quaternions)
         rotations = self._inst_pointing_table["Rotations"]
         rotations = np.roll(np.asarray(rotations), -1, 1) # adjust rotations [0,1,2,3] -> [3,0,1,2]
 
@@ -1369,7 +1369,7 @@ class IsisSpice(IsisLabel):
 
         interp_rot_times = np.linspace(body_rot_times[0],
                                        body_rot_times[-1],
-                                       int(self.number_of_ephemerides))
+                                       self.number_of_ephemerides)
 
         if len(self._body_orientation_table["Times"]) < 2:
             rotation_mat = Rotation.from_quat(body_timed_rots[0])
