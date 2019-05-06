@@ -896,20 +896,6 @@ class IsisSpice(IsisLabel):
 
     """
 
-    def _init_tables(self):
-        # init tables
-        for table in self.label.getlist('Table'):
-            binary_data = read_table_data(table, self._file)
-            field_data = parse_table_data(table, binary_data)
-            if table['Name'] == 'InstrumentPointing':
-                self._inst_pointing_table = parse_rotation_table(table, field_data)
-            elif table['Name'] == 'BodyRotation':
-                self._body_orientation_table = parse_rotation_table(table, field_data)
-            elif table['Name'] == 'InstrumentPosition':
-                self._inst_position_table = parse_position_table(table, field_data)
-            elif table['Name'] == 'SunPosition':
-                self._sun_position_table = parse_position_table(table, field_data)
-
     @property
     def label(self):
         """
@@ -927,6 +913,62 @@ class IsisSpice(IsisLabel):
             except:
                 raise ValueError("{} is not a valid label".format(self.file))
         return self._label
+
+    @property
+    def inst_pointing_table(self):
+        """
+        ISIS Table containing the rotation between the J2000 reference frame
+        and the instrument reference frame.
+        """
+        if not hasattr(self, "_inst_pointing_table"):
+            for table in self.label.getlist('Table'):
+                if table['Name'] == 'InstrumentPointing':
+                    binary_data = read_table_data(table, self._file)
+                    field_data = parse_table_data(table, binary_data)
+                    self._inst_pointing_table = parse_rotation_table(table, field_data)
+        return self._inst_pointing_table
+
+    @property
+    def body_orientation_table(self):
+        """
+        ISIS Table containing the rotation between the J2000 reference frame
+        and the target body reference frame.
+        """
+        if not hasattr(self, "_body_orientation_table"):
+            for table in self.label.getlist('Table'):
+                if table['Name'] == 'BodyRotation':
+                    binary_data = read_table_data(table, self._file)
+                    field_data = parse_table_data(table, binary_data)
+                    self._body_orientation_table = parse_rotation_table(table, field_data)
+        return self._body_orientation_table
+
+    @property
+    def inst_position_table(self):
+        """
+        ISIS Table containing the location of the instrument relative to the
+        target body in the J2000 reference frame.
+        """
+        if not hasattr(self, "_inst_position_table"):
+            for table in self.label.getlist('Table'):
+                if table['Name'] == 'InstrumentPosition':
+                    binary_data = read_table_data(table, self._file)
+                    field_data = parse_table_data(table, binary_data)
+                    self._inst_position_table = parse_position_table(table, field_data)
+        return self._inst_position_table
+
+    @property
+    def sun_position_table(self):
+        """
+        ISIS Table containing the location of the sun relative to the
+        target body in the J2000 reference frame.
+        """
+        if not hasattr(self, "_sun_position_table"):
+            for table in self.label.getlist('Table'):
+                if table['Name'] == 'SunPosition':
+                    binary_data = read_table_data(table, self._file)
+                    field_data = parse_table_data(table, binary_data)
+                    self._sun_position_table = parse_position_table(table, field_data)
+        return self._sun_position_table
 
     def __enter__(self):
         """
@@ -952,9 +994,7 @@ class IsisSpice(IsisLabel):
         int :
             The number of quaternions
         """
-        if not hasattr(self, "_inst_pointing_table"):
-            self._init_tables()
-        return int(self._inst_pointing_table['CkTableOriginalSize'])
+        return int(self.inst_pointing_table['CkTableOriginalSize'])
 
     @property
     def number_of_ephemerides(self):
@@ -967,9 +1007,7 @@ class IsisSpice(IsisLabel):
         int :
             The number of states
         """
-        if not hasattr(self, "_inst_position_table"):
-            self._init_tables()
-        return int(self._inst_position_table['SpkTableOriginalSize'])
+        return int(self.inst_position_table['SpkTableOriginalSize'])
 
     @property
     def _sclock_hex_string(self):
@@ -1168,11 +1206,9 @@ class IsisSpice(IsisLabel):
             reference frame and ending with the final time
             dependent frame.
         """
-        if not hasattr(self, "_body_orientation_table"):
-            self._init_tables()
-        if 'TimeDependentFrames' not in self._body_orientation_table:
+        if 'TimeDependentFrames' not in self.body_orientation_table:
             raise ValueError("Could not find body time dependent frames.")
-        return self._body_orientation_table['TimeDependentFrames']
+        return self.body_orientation_table['TimeDependentFrames']
 
     @property
     def reference_frame(self):
@@ -1198,9 +1234,7 @@ class IsisSpice(IsisLabel):
             of the target body in the J2000 reference frame
             as a 2d numpy array
         """
-        if not hasattr(self, "_sun_position_table"):
-            self._init_tables()
-        return self._sun_position_table.get('Positions', 'None')
+        return self.sun_position_table.get('Positions', 'None')
 
     @property
     def _sun_velocity(self):
@@ -1213,34 +1247,29 @@ class IsisSpice(IsisLabel):
             The sun velocity vectors in the J2000 reference
             frame as a 2d numpy array
         """
-        if not hasattr(self, "_sun_position_table"):
-            self._init_tables()
-        return self._sun_position_table.get('Velocities', None)
+        return self.sun_position_table.get('Velocities', None)
 
     @property
     def _sensor_position(self):
         """
         """
-        if not hasattr(self, "_inst_position_table"):
-            self._init_tables()
-
-        inst_positions_times = np.linspace(self._inst_position_table["Times"][0],
-                                           self._inst_position_table["Times"][-1],
+        inst_positions_times = np.linspace(self.inst_position_table["Times"][0],
+                                           self.inst_position_table["Times"][-1],
                                            self.number_of_ephemerides)
 
         # interpolate out positions
-        if len(self._inst_position_table["Times"]) < 2:
-            time_0 = self._inst_position_table["Times"][0]
-            position_0 = self._inst_position_table["Positions"][0]
-            velocity_0 = self._inst_position_table["Velocities"][0]
+        if len(self.inst_position_table["Times"]) < 2:
+            time_0 = self.inst_position_table["Times"][0]
+            position_0 = self.inst_position_table["Positions"][0]
+            velocity_0 = self.inst_position_table["Velocities"][0]
             coefs = np.asarray([position_0 - time_0*velocity_0,
                                 velocity_0])
             positions = np.polynomial.polynomial.polyval(inst_positions_times, coefs)
 
         else:
-            f_positions_x = interp1d(self._inst_position_table["Times"], self._inst_position_table["Positions"].T[0])
-            f_positions_y = interp1d(self._inst_position_table["Times"], self._inst_position_table["Positions"].T[1])
-            f_positions_z = interp1d(self._inst_position_table["Times"], self._inst_position_table["Positions"].T[2])
+            f_positions_x = interp1d(self.inst_position_table["Times"], self.inst_position_table["Positions"].T[0])
+            f_positions_y = interp1d(self.inst_position_table["Times"], self.inst_position_table["Positions"].T[1])
+            f_positions_z = interp1d(self.inst_position_table["Times"], self.inst_position_table["Positions"].T[2])
 
             positions = np.asarray([f_positions_x(inst_positions_times),
                                    f_positions_y(inst_positions_times),
@@ -1261,23 +1290,20 @@ class IsisSpice(IsisLabel):
             The sensor velocity vectors in the J2000
               reference frame as a 2d numpy array
         """
-        if not hasattr(self, "_inst_position_table"):
-            self._init_tables()
+        inst_velocities_times = np.linspace(self.inst_position_table["Times"][0],
+                                            self.inst_position_table["Times"][-1],
+                                            self.number_of_ephemerides)
 
-        inst_velocities_times = np.linspace(self._inst_position_table["Times"][0],
-                                           self._inst_position_table["Times"][-1],
-                                           self.number_of_ephemerides)
-
-        if len(self._inst_position_table["Times"]) < 2:
-            velocity_0 = self._inst_position_table["Velocities"][0]
+        if len(self.inst_position_table["Times"]) < 2:
+            velocity_0 = self.inst_position_table["Velocities"][0]
             coefs = np.asarray([velocity_0,
                                 [0, 0, 0]])
             velocties = np.polynomial.polynomial.polyval(inst_velocities_times, coefs)
 
         else:
-            f_velocities_x = interp1d(self._inst_position_table["Times"], self._inst_position_table["Velocities"].T[0])
-            f_velocities_y = interp1d(self._inst_position_table["Times"], self._inst_position_table["Velocities"].T[1])
-            f_velocities_z = interp1d(self._inst_position_table["Times"], self._inst_position_table["Velocities"].T[2])
+            f_velocities_x = interp1d(self.inst_position_table["Times"], self.inst_position_table["Velocities"].T[0])
+            f_velocities_y = interp1d(self.inst_position_table["Times"], self.inst_position_table["Velocities"].T[1])
+            f_velocities_z = interp1d(self.inst_position_table["Times"], self.inst_position_table["Velocities"].T[2])
 
             velocties = np.asarray([f_velocities_x(inst_velocities_times),
                                    f_velocities_y(inst_velocities_times),
@@ -1298,19 +1324,16 @@ class IsisSpice(IsisLabel):
             The sensor rotation quaternions as a numpy
             quaternion array
         """
-        if not hasattr(self, "_inst_pointing_table"):
-            self._init_tables()
-
-        inst_pointing_times = np.linspace(self._inst_pointing_table["Times"][0],
-                                          self._inst_pointing_table["Times"][-1],
+        inst_pointing_times = np.linspace(self.inst_pointing_table["Times"][0],
+                                          self.inst_pointing_table["Times"][-1],
                                           self.number_of_quaternions)
-        rotations = self._inst_pointing_table["Rotations"]
+        rotations = self.inst_pointing_table["Rotations"]
         rotations = np.roll(np.asarray(rotations), -1, 1) # adjust rotations [0,1,2,3] -> [3,0,1,2]
 
-        if len(self._inst_pointing_table["Times"]) < 2:
+        if len(self.inst_pointing_table["Times"]) < 2:
             orientations = Rotation.from_quat(rotations[0])
         else:
-            orientations = Slerp(self._inst_pointing_table["Times"], Rotation.from_quat(rotations))(inst_pointing_times)
+            orientations = Slerp(self.inst_pointing_table["Times"], Rotation.from_quat(rotations))(inst_pointing_times)
 
         bf2inst_rotation = (orientations*self._body_j2k2bf_rotation.inv()).as_quat()
         return bf2inst_rotation
@@ -1327,9 +1350,7 @@ class IsisSpice(IsisLabel):
             The body rotation quaternions as a numpy
             quaternion array
         """
-        if not hasattr(self, "_body_orientation_table"):
-            self._init_tables()
-        return self._body_orientation_table.get('Rotations', None)
+        return self.body_orientation_table.get('Rotations', None)
 
     @property
     def naif_keywords(self):
@@ -1360,25 +1381,22 @@ class IsisSpice(IsisLabel):
 
         This represents the rotation to get positions from J2000 to body fixed,
         """
-        if not hasattr(self, "_body_orientation_table"):
-            self._init_tables()
-
-        body_rot_times = self._body_orientation_table["Times"]
-        body_timed_rots = self._body_orientation_table["Rotations"]
+        body_rot_times = self.body_orientation_table["Times"]
+        body_timed_rots = self.body_orientation_table["Rotations"]
         body_timed_rots = np.roll(np.asarray(body_timed_rots), -1, 1) # adjust quaternions [0,1,2,3] -> [3,0,1,2]
 
         interp_rot_times = np.linspace(body_rot_times[0],
                                        body_rot_times[-1],
                                        self.number_of_ephemerides)
 
-        if len(self._body_orientation_table["Times"]) < 2:
+        if len(self.body_orientation_table["Times"]) < 2:
             rotation_mat = Rotation.from_quat(body_timed_rots[0])
         else:
             rotation_mat = Slerp(body_rot_times, Rotation.from_quat(body_timed_rots))(interp_rot_times)
 
         # Not all body rotations have a constant component
-        if "ConstantRotation" in self._body_orientation_table:
-            body_const_rots = self._body_orientation_table["ConstantRotation"]
+        if "ConstantRotation" in self.body_orientation_table:
+            body_const_rots = self.body_orientation_table["ConstantRotation"]
             rotation_mat = Rotation.from_dcm(body_const_rots)*rotation_mat
 
         return rotation_mat
