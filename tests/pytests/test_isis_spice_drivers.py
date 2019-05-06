@@ -488,21 +488,22 @@ def test_sun_velocity(test_cube):
 
 def test_sensor_position(test_cube):
     #Make sure the tables are all parsed and loaded before we overwrite anything
-    test_cube.body_orientation
+    test_cube.body_orientation_table
     #Overwrite the body rotation, which is (0, 1, 2, 3) at this point
     test_cube._body_orientation_table['Rotations'] = [[1.0/np.sqrt(2), 1.0/np.sqrt(2), 0, 0]]
     np.testing.assert_almost_equal(test_cube._sensor_position, np.asarray([[0.0, -2000.0, 1000.0]]))
 
 def test_sensor_velocity(test_cube):
     #Make sure the tables are all parsed and loaded before we overwrite anything
-    test_cube.body_orientation
+    test_cube.body_orientation_table
     #Overwrite the body rotation, which is (0, 1, 2, 3) at this point
     test_cube._body_orientation_table['Rotations'] = [[1.0/np.sqrt(2), 1.0/np.sqrt(2), 0, 0]]
     np.testing.assert_almost_equal(test_cube._sensor_velocity, np.array([[3000, -5000, 4000]]))
 
 def test_sensor_orientation(test_cube):
     #Make sure the tables are all parsed and loaded before we overwrite anything
-    test_cube.body_orientation
+    test_cube.body_orientation_table
+    test_cube.inst_pointing_table
     #Overwrite the body rotation, which is (0, 1, 2, 3) at this point
     test_cube._body_orientation_table['Rotations'] = [[1.0/np.sqrt(2), 1.0/np.sqrt(2), 0, 0]]
     #Overwrite the instrument pointing, which is (0, 1, 2, 3) at this point
