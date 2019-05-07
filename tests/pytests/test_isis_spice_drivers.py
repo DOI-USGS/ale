@@ -8,8 +8,8 @@ from ale import util
 
 import pvl
 import numpy as np
-import quaternion
 import struct
+from scipy.spatial.transform import Rotation
 
 
 @pytest.fixture
@@ -453,7 +453,8 @@ def test_starting_ephemeris_time(test_cube):
     assert test_cube.starting_ephemeris_time == 8.0
 
 def test_detector_center(test_cube):
-    assert [test_cube._detector_center_line, test_cube._detector_center_sample]  == [512.5, 512.5]
+    assert test_cube._detector_center_line  == 512.5
+    assert test_cube._detector_center_sample  == 512.5
 
 def test_ikid(test_cube):
     assert test_cube.ikid == -236820
@@ -480,22 +481,38 @@ def test_reference_frame(test_cube):
     assert test_cube.reference_frame == 10012
 
 def test_sun_position(test_cube):
-    assert np.array_equal(test_cube._sun_position, np.array([[0, 1, 2]]))
+    np.testing.assert_equal(test_cube._sun_position, np.array([[0, 1, 2]]))
 
 def test_sun_velocity(test_cube):
-    assert np.array_equal(test_cube._sun_velocity, np.array([[3, 4, 5]]))
+    np.testing.assert_equal(test_cube._sun_velocity, np.array([[3, 4, 5]]))
 
 def test_sensor_position(test_cube):
-    assert np.array_equal(test_cube._sensor_position, np.array([[0, 1, 2]]))
+    #Make sure the tables are all parsed and loaded before we overwrite anything
+    test_cube.body_orientation_table
+    #Overwrite the body rotation, which is (0, 1, 2, 3) at this point
+    test_cube._body_orientation_table['Rotations'] = [[1.0/np.sqrt(2), 1.0/np.sqrt(2), 0, 0]]
+    np.testing.assert_almost_equal(test_cube._sensor_position, np.asarray([[0.0, -2000.0, 1000.0]]))
 
 def test_sensor_velocity(test_cube):
-    assert np.array_equal(test_cube._sensor_velocity, np.array([[3, 4, 5]]))
+    #Make sure the tables are all parsed and loaded before we overwrite anything
+    test_cube.body_orientation_table
+    #Overwrite the body rotation, which is (0, 1, 2, 3) at this point
+    test_cube._body_orientation_table['Rotations'] = [[1.0/np.sqrt(2), 1.0/np.sqrt(2), 0, 0]]
+    np.testing.assert_almost_equal(test_cube._sensor_velocity, np.array([[3000, -5000, 4000]]))
 
 def test_sensor_orientation(test_cube):
-    assert np.array_equal(test_cube._sensor_orientation, np.asarray([[0, 1, 2, 3]]))
+    #Make sure the tables are all parsed and loaded before we overwrite anything
+    test_cube.body_orientation_table
+    test_cube.inst_pointing_table
+    #Overwrite the body rotation, which is (0, 1, 2, 3) at this point
+    test_cube._body_orientation_table['Rotations'] = [[1.0/np.sqrt(2), 1.0/np.sqrt(2), 0, 0]]
+    #Overwrite the instrument pointing, which is (0, 1, 2, 3) at this point
+    test_cube._inst_pointing_table["Rotations"] = [[1.0/np.sqrt(2), 0, 1.0/np.sqrt(2), 0]]
+    print('inverse body rotation', test_cube._body_j2k2bf_rotation.inv().as_dcm())
+    np.testing.assert_almost_equal(test_cube._sensor_orientation, np.asarray([1/2, -1/2, -1/2, -1/2]))
 
 def test_body_orientation(test_cube):
-    assert np.array_equal(test_cube.body_orientation, np.asarray([[0, 1, 2, 3]]))
+    np.testing.assert_equal(test_cube.body_orientation, np.asarray([[0, 1, 2, 3]]))
 
 def test_naif_keywords(test_cube):
     assert isinstance(test_cube.naif_keywords, pvl.PVLObject)
