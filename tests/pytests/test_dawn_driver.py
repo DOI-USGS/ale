@@ -4,14 +4,16 @@ from unittest import mock
 import pytest
 
 import ale
-from ale.drivers import dawn_drivers, base
+from ale.drivers import dawn_drivers
+from ale.base import data_naif
+
 from ale.drivers.dawn_drivers import DawnFcPds3NaifSpiceDriver
 
 # 'Mock' the spice module where it is imported
 from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
-base.spice = simplespice
+data_naif.spice = simplespice
 dawn_drivers.spice = simplespice
 
 DawnFcPds3NaifSpiceDriver.metakernel = get_mockkernels

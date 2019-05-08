@@ -4,7 +4,9 @@ from unittest import mock
 import pytest
 
 import ale
-from ale.drivers import lro_drivers, base
+from ale.drivers import lro_drivers
+from ale.base import data_naif
+
 from ale.drivers.lro_drivers import LroLrocPds3LabelNaifSpiceDriver
 from ale import util
 
@@ -12,7 +14,7 @@ from ale import util
 from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
-base.spice = simplespice
+data_naif.spice = simplespice
 lro_drivers.spice = simplespice
 
 LroLrocPds3LabelNaifSpiceDriver.metakernel = get_mockkernels

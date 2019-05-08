@@ -1,12 +1,17 @@
-from glob import glob
 import os
+from glob import glob
+
+import numpy as np
 
 import pvl
 import spiceypy as spice
-import numpy as np
-
 from ale import config
-from ale.drivers.base import Framer, RadialDistortion, Driver, Pds3Label, NaifSpice
+from ale.base import Driver
+from ale.base.data_naif import NaifSpice
+from ale.base.label_pds3 import Pds3Label
+from ale.base.type_distortion import RadialDistortion
+from ale.base.type_sensor import Framer
+
 
 class CassiniIssPds3LabelNaifSpiceDriver(Driver, Pds3Label, NaifSpice, Framer, RadialDistortion):
     """
@@ -40,7 +45,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Driver, Pds3Label, NaifSpice, Framer, R
     def instrument_id(self):
         """
         Returns an instrument id for unquely identifying the instrument, but often
-        also used to be piped into Spice Kernels to acquire instrument kernel (IK) NAIF IDs. 
+        also used to be piped into Spice Kernels to acquire instrument kernel (IK) NAIF IDs.
         Therefore they use the same NAIF ID asin bods2c calls.
 
         Returns

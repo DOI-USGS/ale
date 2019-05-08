@@ -3,7 +3,8 @@ from collections import namedtuple
 import pytest
 
 import ale
-from ale.drivers import base
+from ale.base import data_isis
+from ale import base
 from ale import util
 
 import pvl
@@ -430,13 +431,13 @@ End
         count = table_label['Records'] * len(table_label.getlist('Field'))
         doubles = list(range(count))
         return struct.pack('d' * count, *doubles)
-    monkeypatch.setattr(base, 'read_table_data', test_table_data)
+    monkeypatch.setattr(data_isis, 'read_table_data', test_table_data)
 
     def test_label(file):
         return pvl.loads(label)
     monkeypatch.setattr(pvl, 'load', test_label)
 
-    test_image = type('TestCubeDriver', (base.Driver, base.IsisSpice), {})(label)
+    test_image = type('TestCubeDriver', (base.Driver, data_isis.IsisSpice), {})(label)
     # test_image._file = 'testfile.cub'
     return test_image
 
