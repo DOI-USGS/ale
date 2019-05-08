@@ -4,7 +4,9 @@ from unittest import mock
 import pytest
 
 import ale
-from ale.drivers import messenger_drivers, base
+from ale.drivers import messenger_drivers
+from ale.base import data_naif
+
 from ale.drivers.messenger_drivers import MessengerMdisPds3NaifSpiceDriver
 
 
@@ -12,7 +14,7 @@ from ale.drivers.messenger_drivers import MessengerMdisPds3NaifSpiceDriver
 from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
-base.spice = simplespice
+data_naif.spice = simplespice
 messenger_drivers.spice = simplespice
 
 MessengerMdisPds3NaifSpiceDriver.metakernel = get_mockkernels

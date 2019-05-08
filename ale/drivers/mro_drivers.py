@@ -4,9 +4,15 @@ import os
 import numpy as np
 import pvl
 import spiceypy as spice
-from ale import config
 
-from ale.drivers.base import LineScanner, NaifSpice, Pds3Label, IsisLabel, IsisSpice, Driver, RadialDistortion
+from ale import config
+from ale.base import Driver
+from ale.base.data_naif import NaifSpice
+from ale.base.data_isis import IsisSpice
+from ale.base.label_pds3 import Pds3Label
+from ale.base.label_isis import IsisLabel
+from ale.base.type_distortion import RadialDistortion
+from ale.base.type_sensor import LineScanner
 
 class MroCtxIsisLabelIsisSpiceDriver(Driver, IsisSpice, LineScanner, RadialDistortion):
 

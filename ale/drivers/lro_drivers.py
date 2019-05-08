@@ -6,7 +6,11 @@ from glob import glob
 
 from ale import config
 from ale.util import get_metakernels
-from ale.drivers.base import LineScanner, NaifSpice, Pds3Label, Driver
+from ale.base import Driver
+from ale.base.data_naif import NaifSpice
+from ale.base.label_pds3 import Pds3Label
+from ale.base.type_sensor import LineScanner
+
 
 class LroLrocPds3LabelNaifSpiceDriver(Driver, NaifSpice, Pds3Label, LineScanner):
   """
@@ -97,4 +101,3 @@ class LroLrocPds3LabelNaifSpiceDriver(Driver, NaifSpice, Pds3Label, LineScanner)
         "coefficients": self._odtk,
       }
     }
-

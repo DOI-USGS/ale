@@ -1,14 +1,18 @@
-import spiceypy as spice
 import os
-import pvl
-import ale
-
-
-import numpy as np
 from glob import glob
 
+import numpy as np
+
+import pvl
+import spiceypy as spice
+
 from ale import config
-from ale.drivers.base import Driver, LineScanner, Pds3Label, NaifSpice, TransverseDistortion
+from ale.base import Driver
+from ale.base.data_naif import NaifSpice
+from ale.base.label_pds3 import Pds3Label
+from ale.base.type_distortion import TransverseDistortion
+from ale.base.type_sensor import LineScanner
+
 
 class KaguyaTcPds3NaifSpiceDriver(Driver, LineScanner, Pds3Label, NaifSpice):
     """

@@ -6,8 +6,11 @@ import spiceypy as spice
 import numpy as np
 
 from ale import config
-from ale.drivers.base import Framer, NaifSpice, Pds3Label, IsisLabel, Driver
-
+from ale.base import Driver
+from ale.base.data_naif import NaifSpice
+from ale.base.label_pds3 import Pds3Label
+from ale.base.label_isis import IsisLabel
+from ale.base.type_sensor import Framer
 
 class MessengerMdisNaifSpice(Driver, NaifSpice, Framer):
     """

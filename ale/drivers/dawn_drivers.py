@@ -1,8 +1,14 @@
+import pvl
 import ale
-from ale.drivers.base import *
 from ale import config
 
-import pvl
+
+from ale.base import Driver
+from ale.base.data_naif import NaifSpice
+from ale.base.label_pds3 import Pds3Label
+from ale.base.type_distortion import RadialDistortion
+from ale.base.type_sensor import Framer
+
 
 class DawnFcNaifSpice(Driver, Framer, NaifSpice):
     """
