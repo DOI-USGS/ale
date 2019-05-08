@@ -43,7 +43,6 @@ InstrumentName        = "MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA"
 InstrumentId          = MDIS-NAC
 TargetName            = Venus
 OriginalTargetName    = VENUS
-SummingMode = 0
 StartTime             = 2007-06-06T00:22:10.751814
 StopTime              = 2007-06-06T00:22:10.768814
 SpacecraftClockCount  = 1/0089576657:973000
@@ -453,27 +452,6 @@ def test_number_of_ephemerides(test_cube):
 
 def test_starting_ephemeris_time(test_cube):
     assert test_cube.starting_ephemeris_time == 8.0
-
-def test_spacecraft_clock_start_count(test_cube):
-    assert test_cube.spacecraft_clock_start_count == "1/0089576657:973000"
-
-def test_target_name(test_cube):
-    assert test_cube.target_name.lower() == "venus"
-
-def test_exposure_duration(test_cube):
-    assert test_cube._exposure_duration == 0.017
-
-def test_image_samples(test_cube):
-    assert test_cube.image_samples == 1024
-
-def test_image_lines(test_cube):
-    assert test_cube.image_lines == 1024
-
-def test_sample_summing(test_cube):
-    assert test_cube.sample_summing == 0
-
-def test_line_summing(test_cube):
-    assert test_cube.line_summing == 0
 
 def test_detector_center(test_cube):
     assert test_cube._detector_center_line  == 512.5

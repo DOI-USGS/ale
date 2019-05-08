@@ -29,7 +29,11 @@ class IsisLabel():
         : int
           Number of samples in image
         """
-        return self.label['IsisCube']['Instrument']['SummingMode']
+        try:
+            summing = self.label['IsisCube']['Instrument']['SummingMode']
+        except:
+            summing = 1
+        return summing
 
     @property
     def line_summing(self):
@@ -39,7 +43,11 @@ class IsisLabel():
         : int
           Number of samples in image
         """
-        return self.label['IsisCube']['Instrument']['SummingMode']
+        try:
+            summing = self.label['IsisCube']['Instrument']['SummingMode']
+        except:
+            summing = 1
+        return summing
 
     @property
     def target_name(self):
@@ -73,7 +81,7 @@ class IsisLabel():
         return start_count
 
     @property
-    def _exposure_duration(self):
+    def  exposure_duration(self):
         """
         The exposure duration of the image, in seconds
 
