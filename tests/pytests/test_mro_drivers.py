@@ -1,17 +1,22 @@
 import pytest
 
 import ale
-from ale.drivers.mro_driver import CtxPds3Driver
-from ale.drivers import mro_driver, base
+from ale.drivers import mro_drivers
+from ale.base import data_naif
+from ale.base import label_pds3
 
 # 'Mock' the spice module where it is imported
 from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
-base.spice = simplespice
-mro_driver.spice = simplespice
 
-CtxPds3Driver.metakernel = get_mockkernels
+data_naif.spice = simplespice
+mro_drivers.spice = simplespice
+label_pds3.spice = simplespice
+
+from ale.drivers.mro_drivers import MroCtxPds3LabelNaifSpiceDriver
+
+MroCtxPds3LabelNaifSpiceDriver.metakernel = get_mockkernels
 
 @pytest.fixture
 def mroctx_label():
@@ -63,6 +68,6 @@ def mroctx_label():
 
 
 def test_ctx_creation(mroctx_label):
-    with CtxPds3Driver(mroctx_label) as m:
+    with MroCtxPds3LabelNaifSpiceDriver(mroctx_label) as m:
         d = m.to_dict()
     assert isinstance(d, dict)

@@ -1,16 +1,20 @@
-import spiceypy as spice
 import os
-import pvl
-import ale
-
-
-import numpy as np
 from glob import glob
 
-from ale import config
-from ale.drivers.base import Driver, LineScanner, PDS3, Spice, TransverseDistortion
+import numpy as np
 
-class TcPds3Driver(Driver, LineScanner, PDS3, Spice):
+import pvl
+import spiceypy as spice
+
+from ale import config
+from ale.base import Driver
+from ale.base.data_naif import NaifSpice
+from ale.base.label_pds3 import Pds3Label
+from ale.base.type_distortion import TransverseDistortion
+from ale.base.type_sensor import LineScanner
+
+
+class KaguyaTcPds3NaifSpiceDriver(Driver, LineScanner, Pds3Label, NaifSpice):
     """
     Driver for a PDS3 Kaguya Terrain Camera (TC) images. Specifically level2b0 mono and stereo images.
 

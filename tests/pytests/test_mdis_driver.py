@@ -4,18 +4,20 @@ from unittest import mock
 import pytest
 
 import ale
-from ale.drivers import mdis_driver, base
-from ale.drivers.mdis_driver import MdisPDS3Driver
+from ale.drivers import messenger_drivers
+from ale.base import data_naif
+
+from ale.drivers.messenger_drivers import MessengerMdisPds3NaifSpiceDriver
 
 
 # 'Mock' the spice module where it is imported
 from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
-base.spice = simplespice
-mdis_driver.spice = simplespice
+data_naif.spice = simplespice
+messenger_drivers.spice = simplespice
 
-MdisPDS3Driver.metakernel = get_mockkernels
+MessengerMdisPds3NaifSpiceDriver.metakernel = get_mockkernels
 
 @pytest.fixture
 def mdislabel():
@@ -244,6 +246,6 @@ END
     """
 
 def test_mdis_creation(mdislabel):
-    with MdisPDS3Driver(mdislabel) as m:
+    with MessengerMdisPds3NaifSpiceDriver(mdislabel) as m:
         d = m.to_dict()
         assert isinstance(d, dict)

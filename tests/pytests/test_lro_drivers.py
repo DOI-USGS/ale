@@ -4,18 +4,20 @@ from unittest import mock
 import pytest
 
 import ale
-from ale.drivers import lro_driver, base
-from ale.drivers.lro_driver import LrocPds3Driver
+from ale.drivers import lro_drivers
+from ale.base import data_naif
+
+from ale.drivers.lro_drivers import LroLrocPds3LabelNaifSpiceDriver
 from ale import util
 
 # 'Mock' the spice module where it is imported
 from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
-base.spice = simplespice
-lro_driver.spice = simplespice
+data_naif.spice = simplespice
+lro_drivers.spice = simplespice
 
-LrocPds3Driver.metakernel = get_mockkernels
+LroLrocPds3LabelNaifSpiceDriver.metakernel = get_mockkernels
 
 @pytest.fixture
 def lro_lroclabel():
@@ -112,6 +114,6 @@ def lro_lroclabel():
         """
 
 def test_lro_creation(lro_lroclabel):
-    with LrocPds3Driver(lro_lroclabel) as m:
+    with LroLrocPds3LabelNaifSpiceDriver(lro_lroclabel) as m:
         d = m.to_dict()
         assert isinstance(d, dict)

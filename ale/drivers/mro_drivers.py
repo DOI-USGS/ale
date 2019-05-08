@@ -4,11 +4,17 @@ import os
 import numpy as np
 import pvl
 import spiceypy as spice
+
 from ale import config
+from ale.base import Driver
+from ale.base.data_naif import NaifSpice
+from ale.base.data_isis import IsisSpice
+from ale.base.label_pds3 import Pds3Label
+from ale.base.label_isis import IsisLabel
+from ale.base.type_distortion import RadialDistortion
+from ale.base.type_sensor import LineScanner
 
-from ale.drivers.base import LineScanner, Spice, PDS3, Isis3, IsisSpice, Driver, RadialDistortion
-
-class CtxIsisSpice(Driver, IsisSpice, LineScanner, RadialDistortion):
+class MroCtxIsisLabelIsisSpiceDriver(Driver, IsisSpice, LineScanner, RadialDistortion):
 
     @property
     def instrument_id(self):
@@ -36,7 +42,7 @@ class CtxIsisSpice(Driver, IsisSpice, LineScanner, RadialDistortion):
     def line_exposure_duration(self):
         return self.label["IsisCube"]["Instrument"]["LineExposureDuration"].value * 0.001 # Scale to seconds
 
-class CtxSpice(Driver, Spice, LineScanner, RadialDistortion):
+class MroCtxNaifSpice(Driver, NaifSpice, LineScanner, RadialDistortion):
     """
     Spice mixins that defines MRO CTX specific snowflake Spice calls.
     """
@@ -63,7 +69,7 @@ class CtxSpice(Driver, Spice, LineScanner, RadialDistortion):
                     self._metakernel = mk
         return self._metakernel
 
-class CtxIsisCubeSpice(Isis3, CtxSpice):
+class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, MroCtxNaifSpice):
     @property
     def instrument_id(self):
         return "MRO_CTX"
@@ -85,7 +91,7 @@ class CtxIsisCubeSpice(Isis3, CtxSpice):
     def spacecraft_name(self):
         return "MRO"
 
-class CtxPds3Driver(PDS3, CtxSpice):
+class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, MroCtxNaifSpice):
     """
     Driver for reading CTX PDS3 labels. Requires a Spice mixin to acquire addtional
     ephemeris and instrument data located exclusively in spice kernels.

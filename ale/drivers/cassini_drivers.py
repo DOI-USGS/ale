@@ -1,17 +1,21 @@
-from glob import glob
 import os
+from glob import glob
+
+import numpy as np
 
 import pvl
 import spiceypy as spice
-import numpy as np
-
 from ale import config
-from ale.drivers.base import Framer, RadialDistortion, Driver
+from ale.base import Driver
+from ale.base.data_naif import NaifSpice
+from ale.base.label_pds3 import Pds3Label
+from ale.base.type_distortion import RadialDistortion
+from ale.base.type_sensor import Framer
 
 
-class CassiniISS(Driver, Framer, RadialDistortion):
+class CassiniIssPds3LabelNaifSpiceDriver(Driver, Pds3Label, NaifSpice, Framer, RadialDistortion):
     """
-    Cassini mixin class for defining snowflake Spice calls.
+    Cassini mixin class for defining Spice calls.
     """
     id_lookup = {
         "ISSNA" : "CASSINI_ISS_NAC",
@@ -29,19 +33,20 @@ class CassiniISS(Driver, Framer, RadialDistortion):
           Path to latest metakernel file
         """
         metakernel_dir = config.cassini
+
         mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
         if not hasattr(self, '_metakernel'):
             for mk in mks:
-                if str(self.start_time.year) in os.path.basename(mk):
-                    self._metakernel = mk
+               if str(self.start_time.year) in os.path.basename(mk):
+                   self._metakernel = mk
         return self._metakernel
 
     @property
     def instrument_id(self):
         """
         Returns an instrument id for unquely identifying the instrument, but often
-        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
-        the same ID the Spice expects in bods2c calls.
+        also used to be piped into Spice Kernels to acquire instrument kernel (IK) NAIF IDs.
+        Therefore they use the same NAIF ID asin bods2c calls.
 
         Returns
         -------
@@ -74,12 +79,7 @@ class CassiniISS(Driver, Framer, RadialDistortion):
         return [0.0, 0.0, 1/pixel_size]
 
     @property
-    def _exposure_duration(self):
-        # labels do not specify a unit explicitly
-        return self.label['EXPOSURE_DURATION'] * 0.001  # Scale to seconds
-
-    @property
-    def odtk(self):
+    def _odtk(self):
         """
         The radial distortion coeffs are not defined in the ik kernels, instead
         they are defined in the ISS Data User Guide (Knowles). Therefore, we
@@ -91,3 +91,15 @@ class CassiniISS(Driver, Framer, RadialDistortion):
         elif self.instrument_id == 'CASSINI_ISS_NAC':
             # NAC
             return [float('-8e-6'), 0, 0]
+
+    @property
+    # FOV_CENTER_PIXEL doesn't specify which coordinate is sample or line, but they are the same
+    # number, so the order doesn't matter
+    def _detector_center_line(self):
+      return float(spice.gdpool('INS{}_FOV_CENTER_PIXEL'.format(self.ikid), 0, 2)[1])
+
+    @property
+    # FOV_CENTER_PIXEL doesn't specify which coordinate is sample or line, but they are the same
+    # number, so the order doesn't matter
+    def _detector_center_sample(self):
+      return float(spice.gdpool('INS{}_FOV_CENTER_PIXEL'.format(self.ikid), 0, 2)[0])
