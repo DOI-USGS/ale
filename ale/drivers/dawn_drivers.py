@@ -27,18 +27,6 @@ class DawnFcNaifSpice(Driver, Framer, NaifSpice):
         return spice.gdpool('INS{}_RAD_DIST_COEFF'.format(self.ikid),0, 1).tolist()
 
     @property
-    def optical_distortion(self):
-        """
-        The Dawn framing camera uses a unique radial distortion model so we need 
-        to overwrite the method packing the distortion model into the ISD.
-        """
-        return {
-            "dawnfc": {
-                "coefficients" : self._odtk
-                }
-            }
-
-    @property
     def focal2pixel_samples(self):
         # Microns to mm
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
@@ -163,3 +151,16 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, DawnFcNaifSpice):
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
             self._starting_ephemeris_time += 193.0 / 1000.0
         return self._starting_ephemeris_time
+
+        @property
+        def optical_distortion(self):
+            """
+            The Dawn framing camera uses a unique radial distortion model so we need 
+            to overwrite the method packing the distortion model into the ISD.
+            """
+            return {
+                "dawnfc": {
+                    "coefficients" : self._odtk
+                    }
+                }
+
