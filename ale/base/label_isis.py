@@ -2,23 +2,6 @@
 class IsisLabel():
 
     @property
-    def start_time(self):
-        return self.label['IsisCube']['Instrument']['StartTime']
-
-    @property
-    def spacecraft_name(self):
-        """
-        Spacecraft name used in various Spice calls to acquire
-        ephemeris data.
-
-        Returns
-        -------
-        : str
-          Spacecraft name
-        """
-        return self.label['IsisCube']['Instrument']['SpacecraftName']
-
-    @property
     def image_lines(self):
         """
         Returns
@@ -39,9 +22,37 @@ class IsisLabel():
         return self.label['IsisCube']['Core']['Dimensions']['Samples']
 
     @property
+    def sample_summing(self):
+        """
+        Returns
+        -------
+        : int
+          Number of samples in image
+        """
+        try:
+            summing = self.label['IsisCube']['Instrument']['SummingMode']
+        except:
+            summing = 1
+        return summing
+
+    @property
+    def line_summing(self):
+        """
+        Returns
+        -------
+        : int
+          Number of samples in image
+        """
+        try:
+            summing = self.label['IsisCube']['Instrument']['SummingMode']
+        except:
+            summing = 1
+        return summing
+
+    @property
     def target_name(self):
         """
-        Target name used in various Spice calls to acquire
+        Target body name used in various Spice calls to acquire
         target specific ephemeris data.
 
         Returns
@@ -52,12 +63,41 @@ class IsisLabel():
         return self.label['IsisCube']['Instrument']['TargetName']
 
     @property
-    def starting_ephemeris_time(self):
-        if not hasattr(self, '_starting_ephemeris_time'):
-            sclock = self.label['IsisCube']['Archive']['SpacecraftClockStartCount']
-            self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock).value
-        return self._starting_ephemeris_time
+    def spacecraft_clock_start_count(self):
+        """
+        The spacecraft clock start count, frequently used to determine the start time
+        of the image.
+
+        Returns
+        -------
+        : str
+          Spacecraft clock start count
+        """
+        try:
+            start_count = self.label['IsisCube']['Instrument']['SpacecraftClockStartCount']
+        except: 
+            start_count = self.label['IsisCube']['Archive']['SpacecraftClockStartCount']
+
+        return start_count
 
     @property
-    def _exposure_duration(self):
-        return self.label['IsisCube']['Instrument']['ExposureDuration'].value * 0.001
+    def  exposure_duration(self):
+        """
+        The exposure duration of the image, in seconds
+
+        Returns
+        -------
+        : float
+          Exposure duration in seconds
+        """
+        try:
+            units = self.label['IsisCube']['Instrument']['ExposureDuration'].units
+            if "ms" in units.lower():
+                exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration'].value * 0.001
+            else:
+                # if not milliseconds, the units are probably seconds
+                exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration'].value
+        except:
+            # if no units are available, assume the exposure duration is given in milliseconds
+            exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration'].value * 0.001
+        return exposure_duration
