@@ -75,7 +75,7 @@ class IsisLabel():
         """
         try:
             start_count = self.label['IsisCube']['Instrument']['SpacecraftClockStartCount']
-        except: 
+        except:
             start_count = self.label['IsisCube']['Archive']['SpacecraftClockStartCount']
 
         return start_count
