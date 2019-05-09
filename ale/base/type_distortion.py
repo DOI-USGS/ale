@@ -6,6 +6,4 @@ class RadialDistortion():
                 "coefficients" : self._odtk
             }
         }
-
-
     
