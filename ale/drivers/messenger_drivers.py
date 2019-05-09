@@ -120,6 +120,14 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, MessengerMdisNaifSpice):
         """
         return self.id_lookup[self.label['INSTRUMENT_ID']]
 
+    @property
+    def optical_distortion(self):
+        return {
+            "messengermdis": {
+                "x" : self._odtx,
+                "y" : self._odty
+                }
+            }
 
 class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, MessengerMdisNaifSpice):
     """
@@ -164,3 +172,13 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, MessengerMdisNaifSpice):
             sclock = self.label['IsisCube']['Archive']['SpacecraftClockStartCount']
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
         return self._starting_ephemeris_time
+
+    @property
+    def optical_distortion(self):
+        return {
+            "messengermdis": {
+                "x" : self._odtx,
+                "y" : self._odty
+                }
+            }
+
