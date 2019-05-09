@@ -9,19 +9,19 @@ def to_usgscsm(driver):
     isd_data['radii'] = {
         'semimajor' : body_radii[0],
         'semiminor' : body_radii[1],
-        'units' : 'm'
+        'unit' : 'm'
     }
     positions, velocities, position_times = driver.positions
     isd_data['sensor_position'] = {
         'positions' : positions,
         'velocities' : velocities,
-        'units' : 'm'
+        'unit' : 'm'
     }
     sun_positions, sun_velocities, _ = driver.sun_positions
     isd_data['sun_position'] = {
         'positions' : sun_positions,
         'velocities' : sun_velocities,
-        'units' : 'm'
+        'unit' : 'm'
     }
     rotation_chain = driver.rotation_chain
     sensor_to_target = rotation_chain.rotation(rotation_chain[-1], rotation_chain[0])
@@ -67,9 +67,15 @@ def to_usgscsm(driver):
         isd_data['starting_ephemeris_time'] = start_times[0]
         isd_data['center_ephemeris_time'] = center_time
         isd_data['t0_ephemeris'] = position_times[0] - center_time
-        isd_data['dt_ephemeris'] = (position_times[-1] - position_times[0]) / len(position_times)
+        if len(position_times) > 1:
+            isd_data['dt_ephemeris'] = (position_times[-1] - position_times[0]) / (len(position_times) - 1)
+        else:
+            isd_data['dt_ephemeris'] = 0
         isd_data['t0_quaternion'] = rotation_times[0] - center_time
-        isd_data['dt_quaternion'] = (rotation_times[-1] - rotation_times[0]) / len(rotation_times)
+        if len(rotation_times) > 1:
+            isd_data['dt_quaternion'] = (rotation_times[-1] - rotation_times[0]) / (len(rotation_times) - 1)
+        else:
+            isd_data['dt_quaternion'] = 0
 
 
     # frame sensor model specifics
