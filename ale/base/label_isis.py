@@ -12,7 +12,7 @@ class IsisLabel():
                 self._label = pvl.load(self._file)
             except:
                 raise ValueError("{} is not a valid label".format(self._file))
-            return self._label
+        return self._label
 
     @property
     def image_lines(self):
