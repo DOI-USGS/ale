@@ -5,5 +5,4 @@ class RadialDistortion():
             "radial": {
                 "coefficients" : self._odtk
             }
-        }
-    
+        }    
