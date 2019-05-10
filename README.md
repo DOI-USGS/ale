@@ -31,6 +31,7 @@ After you've set up and activated your conda environment, you may then build ale
 of a cloned fork of the repository, follow these steps:
 
 ```bash
+python setup.py install
 mkdir build && cd build
 cmake ..
 make

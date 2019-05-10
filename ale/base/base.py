@@ -2,7 +2,6 @@ import pvl
 import abc
 from abc import ABC
 
-#
 #Get the rotation between two frames for the time range of the image
 #Get start and stop time for an image
 #Get line and sample counts
@@ -26,8 +25,6 @@ from abc import ABC
 #Get the target body radii
 #Get the detector center
 #Get the USGSCSM distortion model
-
-
 
 class Driver(ABC):
     """
@@ -63,7 +60,7 @@ class Driver(ABC):
 
 
     @property
-    @abc.abstractmethod
+ #   @abc.abstractmethod
     def image_lines(self):
         """
         Returns
@@ -74,7 +71,7 @@ class Driver(ABC):
         pass
 
     @property
-    @abc.abstractmethod
+#    @abc.abstractmethod
     def image_samples(self):
         """
         Returns

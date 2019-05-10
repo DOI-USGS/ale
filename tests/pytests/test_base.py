@@ -3,12 +3,14 @@ import pvl
 
 import ale
 from ale import base
+from ale.base import Driver
 from ale.base import label_isis
+from ale.base.label_isis import IsisLabel
 
 
 @pytest.fixture
-def test_cube(monkeypatch):
-    label = """
+def test_label():
+    return """
 Object = IsisCube
 Object = Core
 StartByte   = 65537
@@ -92,31 +94,11 @@ End_Group
 End_Object
 """
 
-    def test_label(file):
-        return pvl.loads(label)
-    monkeypatch.setattr(pvl, 'load', test_label)
+class testclass(Driver, IsisLabel):
+    pass
 
-    test_image = type('TestCubeDriver', (base.Driver, base.label_isis.IsisLabel), {})(label)
-    return test_image
+def test_me(test_label):
+    me = testclass(test_label)
+    assert me.image_lines == 1
 
-def test_spacecraft_clock_start_count(test_cube):
-    assert test_cube.spacecraft_clock_start_count == "1/0089576657:973000"
-
-def test_target_name(test_cube):
-    assert test_cube.target_name.lower() == "venus"
-
-def test_exposure_duration(test_cube):
-    assert test_cube.exposure_duration == 0.017
-
-def test_image_samples(test_cube):
-    assert test_cube.image_samples == 1024
-
-def test_image_lines(test_cube):
-    assert test_cube.image_lines == 1024
-
-def test_sample_summing(test_cube):
-    assert test_cube.sample_summing == 1
-
-def test_line_summing(test_cube):
-    assert test_cube.line_summing == 1
 
