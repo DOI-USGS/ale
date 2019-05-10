@@ -4,8 +4,6 @@ import pvl
 import ale
 from ale import base
 from ale.base import type_distortion
-from ale.base.data_naif import NaifSpice
-from unittest.mock import patch
 
 def test_radial_distortion():
     m = base.type_distortion.RadialDistortion()
