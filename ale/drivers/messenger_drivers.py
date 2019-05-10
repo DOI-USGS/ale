@@ -103,12 +103,12 @@ class MessengerMdisNaifSpice(Driver, NaifSpice, Framer):
         return int(spice.gdpool('INS{}_FPUBIN_START_LINE'.format(self.ikid), 0, 1)[0])
 
     @property
-    def _detector_center_sample(self):
+    def detector_center_sample(self):
         return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0])
 
 
     @property
-    def _detector_center_line(self):
+    def detector_center_line(self):
         return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
 
 class MessengerMdisPds3NaifSpiceDriver(Pds3Label, MessengerMdisNaifSpice):

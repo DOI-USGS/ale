@@ -76,11 +76,11 @@ class Pds3Label():
         return self.label['SPACECRAFT_CLOCK_STOP_COUNT']
 
     @property
-    def _detector_center_line(self):
+    def detector_center_line(self):
         return spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[0]
 
     @property
-    def _detector_center_sample(self):
+    def detector_center_sample(self):
         return spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[1]
 
     @property

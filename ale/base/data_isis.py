@@ -406,7 +406,7 @@ class IsisSpice(IsisLabel):
         return struct.unpack('d', bytes.fromhex(self._sclock_hex_string))[0]
 
     @property
-    def _detector_center_sample(self):
+    def detector_center_sample(self):
         """
         The center of the CCD in detector pixels
 
@@ -418,7 +418,7 @@ class IsisSpice(IsisLabel):
         return self.naif_keywords.get('INS{}_BORESIGHT_SAMPLE'.format(self.ikid), None)
 
     @property
-    def _detector_center_line(self):
+    def detector_center_line(self):
         """
         The center of the CCD in detector pixels
 

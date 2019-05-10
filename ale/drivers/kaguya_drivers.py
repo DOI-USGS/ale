@@ -85,11 +85,11 @@ class KaguyaTcPds3NaifSpiceDriver(Driver, LineScanner, Pds3Label, NaifSpice):
         return spice.sct2e(self.spacecraft_id, self.ephemeris_start_time)
 
     @property
-    def _detector_center_line(self):
+    def detector_center_line(self):
         return 0
 
     @property
-    def _detector_center_sample(self):
+    def detector_center_sample(self):
         # Pixels are 0 based, not one based, so subtract 1
         return spice.gdpool('INS{}_CENTER'.format(self._tc_id), 0, 2)[0]-1
 

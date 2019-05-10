@@ -454,8 +454,8 @@ def test_ephemeris_start_time(test_cube):
     assert test_cube.ephemeris_start_time == 8.0
 
 def test_detector_center(test_cube):
-    assert test_cube._detector_center_line  == 512.5
-    assert test_cube._detector_center_sample  == 512.5
+    assert test_cube.detector_center_line  == 512.5
+    assert test_cube.detector_center_sample  == 512.5
 
 def test_ikid(test_cube):
     assert test_cube.ikid == -236820
