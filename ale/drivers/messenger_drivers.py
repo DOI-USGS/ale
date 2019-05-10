@@ -59,7 +59,7 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, Driver, NaifSpice, Framer):
         return self.id_lookup[self.label['INSTRUMENT_ID']]
 
     @property
-    def _focal_length(self):
+    def focal_length(self):
         """
         Computes Focal Length from Kernels
 
@@ -106,11 +106,11 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, Driver, NaifSpice, Framer):
         return int(spice.gdpool('INS{}_FPUBIN_START_LINE'.format(self.ikid), 0, 1)[0])
 
     @property
-    def _detector_center_sample(self):
+    def detector_center_sample(self):
         return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0])
 
     @property
-    def _detector_center_line(self):
+    def detector_center_line(self):
         return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
 
 
@@ -184,7 +184,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, Driver, NaifSpice, Framer
         return self._starting_ephemeris_time
 
     @property
-    def _focal_length(self):
+    def focal_length(self):
         """
         Computes Focal Length from Kernels
 
@@ -231,10 +231,10 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, Driver, NaifSpice, Framer
         return int(spice.gdpool('INS{}_FPUBIN_START_LINE'.format(self.ikid), 0, 1)[0])
 
     @property
-    def _detector_center_sample(self):
+    def detector_center_sample(self):
         return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0])
 
 
     @property
-    def _detector_center_line(self):
+    def detector_center_line(self):
         return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
