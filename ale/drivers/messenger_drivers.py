@@ -46,6 +46,16 @@ class MessengerMdisNaifSpice(Driver, NaifSpice, Framer):
         return self._metakernel
 
     @property
+    def fikid(self):
+        if isinstance(self, Framer):
+            fn = self.label["FILTER_NUMBER"]
+            if fn == 'N/A':
+                fn = 0
+        else:
+            fn = 0
+        return self.ikid - int(fn)
+
+    @property
     def _focal_length(self):
         """
         Computes Focal Length from Kernels

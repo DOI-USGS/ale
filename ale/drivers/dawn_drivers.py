@@ -139,16 +139,3 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, DawnFcNaifSpice, RadialDistortion):
         target = self.label['TARGET_NAME']
         target = target.split(' ')[-1]
         return target
-
-    @property
-    def starting_ephemeris_time(self):
-        """
-        Compute the center ephemeris time for a Dawn Frame camera. This is done
-        via a spice call but 193 ms needs to be added to
-        account for the CCD being discharged or cleared.
-        """
-        if not hasattr(self, '_starting_ephemeris_time'):
-            sclock = self.label['SPACECRAFT_CLOCK_START_COUNT']
-            self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
-            self._starting_ephemeris_time += 193.0 / 1000.0
-        return self._starting_ephemeris_time
