@@ -8,37 +8,7 @@ from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.type_sensor import Framer
 
-
-class DawnFcNaifSpice(Driver, Framer, NaifSpice):
-    """
-    Dawn specific spice mixin to handle dawn specific spice calls and property
-    overrides. This class is not used as a driver.
-    """
-    # TODO: Update focal2pixel samples and lines to reflect the rectangular
-    #       nature of dawn pixels
-    @property
-    def _odtk(self):
-        """
-        Returns
-        -------
-        : list
-          Radial distortion coefficients
-        """
-        return spice.gdpool('INS{}_RAD_DIST_COEFF'.format(self.ikid),0, 1).tolist()
-
-    @property
-    def focal2pixel_samples(self):
-        # Microns to mm
-        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
-        return [0.0, 1/pixel_size, 0.0]
-
-    @property
-    def focal2pixel_lines(self):
-        # Microns to mm
-        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
-        return [0.0, 0.0, 1/pixel_size]
-
-class DawnFcPds3NaifSpiceDriver(Pds3Label, DawnFcNaifSpice):
+class DawnFcPds3NaifSpiceDriver(Pds3Label, Driver, Framer, NaifSpice):
     """
     Dawn driver for generating an ISD from a Dawn PDS3 image.
     """
@@ -152,15 +122,39 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, DawnFcNaifSpice):
             self._starting_ephemeris_time += 193.0 / 1000.0
         return self._starting_ephemeris_time
 
-        @property
-        def optical_distortion(self):
-            """
-            The Dawn framing camera uses a unique radial distortion model so we need 
-            to overwrite the method packing the distortion model into the ISD.
-            """
-            return {
-                "dawnfc": {
-                    "coefficients" : self._odtk
-                    }
+    @property
+    def optical_distortion(self):
+        """
+        The Dawn framing camera uses a unique radial distortion model so we need 
+        to overwrite the method packing the distortion model into the ISD.
+        """
+        return {
+            "dawnfc": {
+                "coefficients" : self._odtk
                 }
+            }
+
+    @property
+    def _odtk(self):
+        """
+        Returns
+        -------
+        : list
+          Radial distortion coefficients
+        """
+        return spice.gdpool('INS{}_RAD_DIST_COEFF'.format(self.ikid),0, 1).tolist()
+
+    # TODO: Update focal2pixel samples and lines to reflect the rectangular
+    #       nature of dawn pixels
+    @property
+    def focal2pixel_samples(self):
+        # Microns to mm
+        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
+        return [0.0, 1/pixel_size, 0.0]
+
+    @property
+    def focal2pixel_lines(self):
+        # Microns to mm
+        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
+        return [0.0, 0.0, 1/pixel_size]
 
