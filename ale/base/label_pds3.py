@@ -68,11 +68,11 @@ class Pds3Label():
         return spice.bodn2c(self.label['TARGET_NAME'])
 
     @property
-    def _starting_ephemeris_time(self):
+    def clock_start_count(self):
         return self.label['SPACECRAFT_CLOCK_START_COUNT']
 
     @property
-    def _ending_ephemeris_time(self):
+    def clock_stop_count(self):
         return self.label['SPACECRAFT_CLOCK_STOP_COUNT']
 
     @property

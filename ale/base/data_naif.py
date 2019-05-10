@@ -109,7 +109,7 @@ class NaifSpice():
     @property
     def _sun_position(self):
         sun_state, _ = spice.spkezr("SUN",
-                                     self.center_time,
+                                     self.center_ephemeris_time,
                                      self.reference_frame,
                                      'NONE',
                                      self.target_name)
@@ -118,9 +118,8 @@ class NaifSpice():
 
     @property
     def _sun_velocity(self):
-        center_time = self.ephemeris_time
         sun_state, lt = spice.spkezr("SUN",
-                                     self.center_time,
+                                     self.center_ephemeris_time,
                                      self.reference_frame,
                                      'NONE',
                                      self.target_name)
@@ -177,16 +176,16 @@ class NaifSpice():
         return self._orientation.tolist()
 
     @property
-    def start_time(self):
-        return spice.scs2e(self.spacecraft_id, self._starting_ephemeris_time)
+    def starting_ephemeris_time(self):
+        return spice.scs2e(self.spacecraft_id, self.clock_start_count)
 
     @property
-    def stop_time(self):
-        return spice.scs2e(self.spacecraft_id, self._ending_ephemeris_time)
+    def ending_ephemeris_time(self):
+        return spice.scs2e(self.spacecraft_id, self.clock_stop_count)
 
     @property
-    def center_time(self):
-        return (self.start_time + self.stop_time)/2
+    def center_ephemeris_time(self):
+        return (self.starting_ephemeris_time + self.ending_ephemeris_time)/2
 
     @property
     def _detector_center_sample(self):
