@@ -83,9 +83,9 @@ def to_usgscsm(driver):
         isd_data['name_model'] = 'USGS_ASTRO_FRAME_SENSOR_MODEL'
         isd_data['center_ephemeris_time'] = position_times[0]
 
-    # check that it's eithe a frame or line scan sensor
+    # check that there is a valid sensor model name
     if 'name_model' not in isd_data:
-        raise Exception('Unsupported sensor type. Supported sensor types are line scan and framing.')
+        raise Exception('No CSM sensor model name found!')
 
     # Convert to JSON object
     return json.dumps(isd_data)
