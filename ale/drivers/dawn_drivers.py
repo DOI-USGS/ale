@@ -6,11 +6,9 @@ from ale import config
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
-from ale.base.type_distortion import RadialDistortion
 from ale.base.type_sensor import Framer
 
-
-class DawnFcPds3NaifSpiceDriver(Pds3Label, Driver, Framer, NaifSpice, RadialDistortion):
+class DawnFcPds3NaifSpiceDriver(Pds3Label, Driver, Framer, NaifSpice):
     """
     Dawn driver for generating an ISD from a Dawn PDS3 image.
     """
@@ -125,6 +123,18 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, Driver, Framer, NaifSpice, RadialDist
         return self._starting_ephemeris_time
 
     @property
+    def optical_distortion(self):
+        """
+        The Dawn framing camera uses a unique radial distortion model so we need 
+        to overwrite the method packing the distortion model into the ISD.
+        """
+        return {
+            "dawnfc": {
+                "coefficients" : self._odtk
+                }
+            }
+
+    @property
     def _odtk(self):
         """
         Returns
@@ -147,3 +157,4 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, Driver, Framer, NaifSpice, RadialDist
         # Microns to mm
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
         return [0.0, 0.0, 1/pixel_size]
+

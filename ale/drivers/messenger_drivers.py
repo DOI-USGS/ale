@@ -184,6 +184,14 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, Driver, NaifSpice, Framer
         return self._starting_ephemeris_time
 
     @property
+    def optical_distortion(self):
+        return {
+            "transverse": {
+                "x" : self._odtx,
+                "y" : self._odty
+                }
+            }
+
     def focal_length(self):
         """
         Computes Focal Length from Kernels
@@ -238,3 +246,4 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, Driver, NaifSpice, Framer
     @property
     def detector_center_line(self):
         return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
+
