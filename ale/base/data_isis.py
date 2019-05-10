@@ -394,7 +394,7 @@ class IsisSpice(IsisLabel):
         raise ValueError("No computed spacecraft clock time found in NaifKeywords.")
 
     @property
-    def starting_ephemeris_time(self):
+    def ephemeris_start_time(self):
         """
         The image start time in ephemeris time
 

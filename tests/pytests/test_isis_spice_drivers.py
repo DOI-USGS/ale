@@ -450,8 +450,8 @@ def test_number_of_quaternions(test_cube):
 def test_number_of_ephemerides(test_cube):
     assert test_cube.number_of_ephemerides == 1
 
-def test_starting_ephemeris_time(test_cube):
-    assert test_cube.starting_ephemeris_time == 8.0
+def test_ephemeris_start_time(test_cube):
+    assert test_cube.ephemeris_start_time == 8.0
 
 def test_detector_center(test_cube):
     assert test_cube._detector_center_line  == 512.5

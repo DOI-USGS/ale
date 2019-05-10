@@ -69,20 +69,20 @@ class KaguyaTcPds3NaifSpiceDriver(Driver, LineScanner, Pds3Label, NaifSpice):
         return spice.bods2c("LISM_{}".format(self.label.get("INSTRUMENT_ID")))
 
     @property
-    def _ending_ephemeris_time(self):
+    def clock_stop_count(self):
         return self.label.get('CORRECTED_SC_CLOCK_STOP_COUNT').value
 
     @property
-    def stop_time(self):
-        return spice.sct2e(self.spacecraft_id, self._ending_ephemeris_time)
+    def ephemermis_stop_time(self):
+        return spice.sct2e(self.spacecraft_id, self.ephemeris_stop_time)
 
     @property
-    def _starting_ephemeris_time(self):
+    def clock_start_count(self):
         return self.label.get('CORRECTED_SC_CLOCK_START_COUNT').value
 
     @property
-    def start_time(self):
-        return spice.sct2e(self.spacecraft_id, self._starting_ephemeris_time)
+    def ephemermis_start_time(self):
+        return spice.sct2e(self.spacecraft_id, self.ephemeris_start_time)
 
     @property
     def _detector_center_line(self):
