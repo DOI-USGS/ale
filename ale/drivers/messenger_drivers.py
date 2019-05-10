@@ -123,7 +123,7 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, MessengerMdisNaifSpice):
     @property
     def optical_distortion(self):
         return {
-            "messengermdis": {
+            "transverse": {
                 "x" : self._odtx,
                 "y" : self._odty
                 }

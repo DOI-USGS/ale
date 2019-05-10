@@ -8,8 +8,8 @@ from ale.base.data_naif import NaifSpice
 from unittest.mock import patch
 
 @pytest.fixture
-def test_cube(monkeypatch):
-    label = """
+def test_label():
+    return """
 Object = IsisCube
 Object = Core
 StartByte   = 65537
@@ -93,14 +93,11 @@ End_Group
 End_Object
 """
 
-    def test_label(file):
-        return pvl.loads(label)
-    monkeypatch.setattr(pvl, 'load', test_label)
-
-    test_image = type('TestCubeDriver', (base.Driver, base.data_naif.NaifSpice, base.type_distortion.RadialDistortion), {})(label)
-    return test_image
+class testclass(base.Driver, base.data_naif.NaifSpice, base.type_distortion.RadialDistortion):
+    pass
 
 @patch.object(ale.base.data_naif.NaifSpice, '_odtk', [0.0, 0.1, 0.2])
-def test_radial_distortion(test_cube):
-    assert test_cube.optical_distortion["radial"]["coefficients"] == [0.0, 0.1, 0.2]
+def test_radial_distortion(test_label):
+    with testclass(test_label) as m:
+        assert m.optical_distortion["radial"]["coefficients"] == [0.0, 0.1, 0.2]
 
