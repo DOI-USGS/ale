@@ -143,7 +143,7 @@ class TimeDependentRotation:
         Get the inverse rotation, that is the rotation from the destination
         reference frame to the source reference frame.
         """
-        return TimeDependentRotation(self._rots.inv().as_quat(), self.dest, self.source)
+        return TimeDependentRotation(self._rots.inv().as_quat(), self.times, self.dest, self.source)
 
     def __mul__(self, other):
         """

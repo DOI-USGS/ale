@@ -64,3 +64,21 @@ def test_time_dependent_time_dependent_composition():
     expected_equats = np.array([[0, 0, 0, -1],[-1, 0, 0, 0]])
     np.testing.assert_equal(rot1_3.times, expected_times)
     np.testing.assert_almost_equal(rot1_3.quats, expected_equats)
+
+def test_constant_inverse():
+    rot1_2 = ConstantRotation(np.array([1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)]), 1, 2)
+    rot2_1 = rot1_2.inverse()
+    assert rot2_1.source == 2
+    assert rot2_1.dest == 1
+    np.testing.assert_almost_equal(rot2_1.quat, np.array([1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)]))
+
+def test_time_dependent_inverse():
+    quats1_2 = np.array([[1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)],[1, 0, 0, 0]])
+    times1_2 = np.array([0, 1])
+    rot1_2 = TimeDependentRotation(quats1_2, times1_2, 1, 2)
+    rot2_1 = rot1_2.inverse()
+    assert rot2_1.source == 2
+    assert rot2_1.dest == 1
+    expected_equats = np.array([[1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)],[1, 0, 0, 0]])
+    np.testing.assert_equal(rot2_1.times, times1_2)
+    np.testing.assert_almost_equal(rot2_1.quats, expected_equats)
