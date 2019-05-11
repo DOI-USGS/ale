@@ -428,6 +428,6 @@ def test_mdis_creation(dawn_label):
     assert d['instrument_id'] == 'DAWN_FC2_FILTER_1'
     assert d['spacecraft_name'] == 'DAWN'
     assert d['target_name'] == 'VESTA'
-    assert pytest.approx(d['ephemeris_start_time'], 1e-6) == 0.1
+    assert pytest.approx(d['ephemeris_start_time'], 1e-6) == 0.293
 
     assert isinstance(d, dict)
