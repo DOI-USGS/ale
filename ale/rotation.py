@@ -62,10 +62,11 @@ class ConstantRotation:
 
     def __mul__(self, other):
         """
-        Compose this rotation with another rotation. The destination frame of
-        the right rotation (other) and the source frame of the left
-        rotation (self) must be the same. I.E. if A and B are rotations, then
-        for A*B to be valid, A.source must equal B.dest.
+        Compose this rotation with another rotation.
+
+        The destination frame of the right rotation (other) and the source
+        frame of the left rotation (self) must be the same. I.E. if A and B are
+        rotations, then for A*B to be valid, A.source must equal B.dest.
 
         Parameters
         ----------
@@ -146,10 +147,15 @@ class TimeDependentRotation:
 
     def __mul__(self, other):
         """
-        Compose this rotation with another rotation. The destination frame of
-        the right rotation (other) and the source frame of the left
-        rotation (self) must be the same. I.E. if A and B are rotations, then
-        for A*B to be valid, A.source must equal B.dest.
+        Compose this rotation with another rotation.
+
+        The destination frame of the right rotation (other) and the source
+        frame of the left rotation (self) must be the same. I.E. if A and B are
+        rotations, then for A*B to be valid, A.source must equal B.dest.
+
+        If the other rotation is a time dependent rotation, then the time range
+        for the resultant rotation will be the time covered by both rotations.
+        I.E. if A covers 0 to 2 and B covers 1 to 4, then A*B will cover 1 to 2.
 
         Parameters
         ----------
@@ -161,7 +167,11 @@ class TimeDependentRotation:
         if isinstance(other, ConstantRotation):
             return TimeDependentRotation((self._rots * other._rot).as_quat(), self.times, other.source, self.dest)
         elif isinstance(other, TimeDependentRotation):
-            new_times = np.union1d(np.asarray(self.times), np.asarray(other.times))
+            merged_times = np.union1d(np.asarray(self.times), np.asarray(other.times))
+            # we cannot extrapolate so clip to the time range both cover
+            first_time = max(min(self.times), min(other.times))
+            last_time = min(max(self.times), max(other.times))
+            new_times = merged_times[np.logical_and(merged_times>=first_time, merged_times<=last_time)]
             first_rotation_interp = Slerp(other.times, other._rots)
             second_rotation_interp = Slerp(self.times, self._rots)
             new_quats = (second_rotation_interp(new_times) * first_rotation_interp(new_times)).as_quat()

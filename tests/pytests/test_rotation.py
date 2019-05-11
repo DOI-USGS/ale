@@ -48,8 +48,8 @@ def test_time_dependent_constant_composition():
 
 def test_time_dependent_time_dependent_composition():
     # 90 degree rotation about the X-axis to a 180 degree rotation about the X-axis
-    quats1_2 = np.array([[1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)],[1, 0, 0, 0],[1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)]])
-    times1_2 = np.array([0, 1, 2])
+    quats1_2 = np.array([[1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)],[1, 0, 0, 0]])
+    times1_2 = np.array([0, 1])
     rot1_2 = TimeDependentRotation(quats1_2, times1_2, 1, 2)
     # -90 degree rotation about the X-axis to a 90 degree rotation about the X-axis
     quats2_3 = np.array([[1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)],[1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)]])
@@ -60,7 +60,7 @@ def test_time_dependent_time_dependent_composition():
     assert isinstance(rot1_3, TimeDependentRotation)
     assert rot1_3.source == 1
     assert rot1_3.dest == 3
-    expected_times = np.array([0, 1, 2])
-    expected_equats = np.array([[0, 0, 0, -1],[-1, 0, 0, 0],[0, 0, 0, 1]])
+    expected_times = np.array([0, 1])
+    expected_equats = np.array([[0, 0, 0, -1],[-1, 0, 0, 0]])
     np.testing.assert_equal(rot1_3.times, expected_times)
     np.testing.assert_almost_equal(rot1_3.quats, expected_equats)
