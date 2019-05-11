@@ -2,6 +2,8 @@ from scipy.interpolate import interp1d
 from scipy.spatial.transform import Slerp
 from scipy.spatial.transform import Rotation
 
+import numpy as np
+
 class ConstantRotation:
     """
     A constant rotation between two 3D reference frames.
@@ -76,8 +78,7 @@ class ConstantRotation:
             new_rot = self._rot * other._rot
             return ConstantRotation(new_rot.as_quat(), other.source, self.dest)
         elif isinstance(other, TimeDependentRotation):
-            new_quats = np.array([(self._rot * rot).as_quat() for rot in other._rots])
-            return TimeDependentRotation(new_quats, other.times, other.source, self.dest)
+            return TimeDependentRotation((self._rot * other._rots).as_quat(), other.times, other.source, self.dest)
         else:
             raise TypeError("Rotations can only be composed with other rotations.")
 
@@ -122,9 +123,9 @@ class TimeDependentRotation:
         The quaternion that rotates from the source reference frame to
         the destination reference frame.
         """
-        return np.array([rot.as_quat() for rot in self._rots])
+        return self._rots.as_quat()
 
-    @quat.setter
+    @quats.setter
     def quats(self, new_quats):
         """
         Change the rotations to interpolate over
@@ -134,15 +135,14 @@ class TimeDependentRotation:
         new_quats : 2darray
                     The new quaternions as a 2d array.
         """
-        self._rot = [Rotation.from_quat(quat) for quat in new_quats]
+        self._rots = Rotation.from_quat(new_quats)
 
     def inverse(self):
         """
         Get the inverse rotation, that is the rotation from the destination
         reference frame to the source reference frame.
         """
-        new_quats = np.array([rot.inv().as_quat() for rot in self._rots])
-        return TimeDependentRotation(new_quats, self.dest, self.source)
+        return TimeDependentRotation(self._rots.inv().as_quat(), self.dest, self.source)
 
     def __mul__(self, other):
         """
@@ -159,15 +159,12 @@ class TimeDependentRotation:
         if self.source != other.dest:
             raise ValueError("Destination frame of first rotation is not the same as source frame of second rotation.")
         if isinstance(other, ConstantRotation):
-            new_quats = np.array([(rot * other._rot).as_quat() for rot in self._rots])
-            return TimeDependentRotation(new_quats, self.times, other.source, self.dest)
+            return TimeDependentRotation((self._rots * other._rot).as_quat(), self.times, other.source, self.dest)
         elif isinstance(other, TimeDependentRotation):
             new_times = np.union1d(np.asarray(self.times), np.asarray(other.times))
             first_rotation_interp = Slerp(other.times, other._rots)
             second_rotation_interp = Slerp(self.times, self._rots)
-            new_quats = []
-            for time in new_times:
-                new_quats.append( (second_rotation_interp(time) * first_rotation_interp(time)).as_quat() )
-            return TimeDependentRotation(np.array(new_quats), new_times, other.source, self.dest)
+            new_quats = (second_rotation_interp(new_times) * first_rotation_interp(new_times)).as_quat()
+            return TimeDependentRotation(new_quats, new_times, other.source, self.dest)
         else:
             raise TypeError("Rotations can only be composed with other rotations.")
