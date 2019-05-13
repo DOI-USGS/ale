@@ -68,48 +68,48 @@ class KaguyaTcPds3NaifSpiceDriver(Driver, LineScanner, Pds3Label, NaifSpice):
         return spice.bods2c("LISM_{}".format(self.label.get("INSTRUMENT_ID")))
 
     @property
-    def ending_ephemeris_time(self):
-        if not hasattr(self, '_ending_ephemeris_time'):
-            # We need to get the corrected time
-            self._ending_ephemeris_time = self.label.get('CORRECTED_SC_CLOCK_STOP_COUNT').value
-            self._ending_ephemeris_time = spice.sct2e(self.spacecraft_id, self._ending_ephemeris_time)
-        return self._ending_ephemeris_time
-
+    def clock_stop_count(self):
+        return self.label.get('CORRECTED_SC_CLOCK_STOP_COUNT').value
 
     @property
-    def starting_ephemeris_time(self):
-        if not hasattr(self, '_starting_ephemeris_time'):
-            # We need to get the corrected time
-            self._starting_ephemeris_time = self.label.get('CORRECTED_SC_CLOCK_START_COUNT').value
-            self._starting_ephemeris_time = spice.sct2e(self.spacecraft_id, self._starting_ephemeris_time)
-        return self._starting_ephemeris_time
+    def ephemermis_stop_time(self):
+        return spice.sct2e(self.spacecraft_id, self.ephemeris_stop_time)
 
     @property
-    def _detector_center_line(self):
+    def clock_start_count(self):
+        return self.label.get('CORRECTED_SC_CLOCK_START_COUNT').value
+
+    @property
+    def ephemermis_start_time(self):
+        return spice.sct2e(self.spacecraft_id, self.ephemeris_start_time)
+
+    @property
+    def detector_center_line(self):
         return 0
 
     @property
-    def _detector_center_sample(self):
+    def detector_center_sample(self):
         # Pixels are 0 based, not one based, so subtract 1
         return spice.gdpool('INS{}_CENTER'.format(self._tc_id), 0, 2)[0]-1
 
     @property
     def _sensor_orientation(self):
         if not hasattr(self, '_orientation'):
-            current_et = self.starting_ephemeris_time
-            qua = np.empty((self.number_of_quaternions, 4))
-            for i in range(self.number_of_quaternions):
+            ephem = self.ephemeris_time
+
+            qua = np.empty((len(ephem), 4))
+            for i, time in enumerate(ephem):
                 instrument = self.label.get("INSTRUMENT_ID")
                 # Find the rotation matrix
                 camera2bodyfixed = spice.pxform("LISM_{}_HEAD".format(instrument),
                                                 self.reference_frame,
-                                                current_et)
+                                                time)
                 q = spice.m2q(camera2bodyfixed)
                 qua[i,:3] = q[1:]
                 qua[i,3] = q[0]
-                current_et += getattr(self, 'dt_quaternion', 0)
             self._orientation = qua
         return self._orientation.tolist()
+
 
     @property
     def reference_frame(self):

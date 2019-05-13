@@ -134,8 +134,8 @@ class Driver():
     def detector_center(self):
         if not hasattr(self, '_detector_center'):
             self._detector_center = {
-                "line" : self._detector_center_line,
-                "sample" : self._detector_center_sample
+                "line" : self.detector_center_line,
+                "sample" : self.detector_center_sample
             }
         return self._detector_center
 
