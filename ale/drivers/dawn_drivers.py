@@ -110,7 +110,7 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, Driver, Framer, NaifSpice):
         return target
 
     @property
-    def starting_ephemeris_time(self):
+    def ephemeris_start_time(self):
         """
         Compute the center ephemeris time for a Dawn Frame camera. This is done
         via a spice call but 193 ms needs to be added to
@@ -125,7 +125,7 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, Driver, Framer, NaifSpice):
     @property
     def optical_distortion(self):
         """
-        The Dawn framing camera uses a unique radial distortion model so we need 
+        The Dawn framing camera uses a unique radial distortion model so we need
         to overwrite the method packing the distortion model into the ISD.
         """
         return {
@@ -157,4 +157,3 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, Driver, Framer, NaifSpice):
         # Microns to mm
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
         return [0.0, 0.0, 1/pixel_size]
-
