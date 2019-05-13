@@ -61,6 +61,17 @@ class Pds3Label():
 
 
     @property
+    def spacecraft_name(self):
+        """
+          Returns
+        -------
+        : str
+          Full name of the spacecraft
+        """
+        return self.label['SPACECRAFT_NAME']
+
+
+    @property
     def start_time(self):
         """
           Returns
