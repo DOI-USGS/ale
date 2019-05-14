@@ -95,11 +95,11 @@ class CassiniIssPds3LabelNaifSpiceDriver(Driver, Pds3Label, NaifSpice, Framer, R
     @property
     # FOV_CENTER_PIXEL doesn't specify which coordinate is sample or line, but they are the same
     # number, so the order doesn't matter
-    def _detector_center_line(self):
+    def detector_center_line(self):
       return float(spice.gdpool('INS{}_FOV_CENTER_PIXEL'.format(self.ikid), 0, 2)[1])
 
     @property
     # FOV_CENTER_PIXEL doesn't specify which coordinate is sample or line, but they are the same
     # number, so the order doesn't matter
-    def _detector_center_sample(self):
+    def detector_center_sample(self):
       return float(spice.gdpool('INS{}_FOV_CENTER_PIXEL'.format(self.ikid), 0, 2)[0])

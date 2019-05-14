@@ -45,6 +45,16 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, Driver, NaifSpice, Framer):
         return self._metakernel
 
     @property
+
+    def fikid(self):
+        if isinstance(self, Framer):
+            fn = self.label["FILTER_NUMBER"]
+            if fn == 'N/A':
+                fn = 0
+        else:
+            fn = 0
+        return self.ikid - int(fn)
+
     def instrument_id(self):
         """
         Returns an instrument id for unquely identifying the instrument, but often
@@ -60,6 +70,7 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, Driver, NaifSpice, Framer):
 
     @property
     def focal_length(self):
+
         """
         Computes Focal Length from Kernels
 
@@ -177,8 +188,8 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, Driver, NaifSpice, Framer
         return self.label['IsisCube']['Instrument']['FocalPlaneTemperature'].value
 
     @property
-    def starting_ephemeris_time(self):
-        if not hasattr(self, '_starting_ephemeris_time'):
+    def ephemeris_start_time(self):
+        if not hasattr(self, '_ephemeris_start_time'):
             sclock = self.label['IsisCube']['Archive']['SpacecraftClockStartCount']
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
         return self._starting_ephemeris_time
@@ -246,4 +257,3 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, Driver, NaifSpice, Framer
     @property
     def detector_center_line(self):
         return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
-

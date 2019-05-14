@@ -93,7 +93,6 @@ class Pds3Label():
         return self.label['STOP_TIME']
 
 
-
     @property
     def image_lines(self):
         """
@@ -129,7 +128,6 @@ class Pds3Label():
         : str
           Target name
         """
-
         return self.label['TARGET_NAME']
 
 
@@ -221,7 +219,26 @@ class Pds3Label():
 
         # With no units, assume milliseconds
         except:
+            # NOTE: If the key does not exist at all, this will cause an error about exception within an exception
             return self.label['EXPOSURE_DURATION'] * 0.001
 
 
+    # Consider expanding this to handle units
+    @property
+    def line_exposure_duration(self):
+        return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
+
+
+# Everything below here needs to be looked at closely and probably removed after
+# converting to the new names
+#-------------------------------------------------------------
+#        def clock_start_count(self):
+#            return self.label['SPACECRAFT_CLOCK_START_COUNT']
+#
+#        @property
+#        def clock_stop_count(self):
+#            return self.label['SPACECRAFT_CLOCK_STOP_COUNT']
+#
+## Add this one in with similar code to to EXPOSURE_DURATION
+#-------------------------------------------------------------
 

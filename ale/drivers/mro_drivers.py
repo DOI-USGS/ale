@@ -73,11 +73,11 @@ class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, Driver, NaifSpice, LineScanner, 
         return "MRO_CTX"
 
     @property
-    def starting_ephemeris_time(self):
-        if not hasattr(self, '_starting_ephemeris_time'):
+    def ephemeris_start_time(self):
+        if not hasattr(self, '_ephemeris_start_time'):
             sclock = self.label['IsisCube']['Instrument']['SpacecraftClockCount']
-            self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
-        return self._starting_ephemeris_time
+            self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
+        return self._ephemeris_start_time
 
     @property
     def line_exposure_duration(self):

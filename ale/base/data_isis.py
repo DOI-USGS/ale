@@ -394,7 +394,7 @@ class IsisSpice(IsisLabel):
         raise ValueError("No computed spacecraft clock time found in NaifKeywords.")
 
     @property
-    def starting_ephemeris_time(self):
+    def ephemeris_start_time(self):
         """
         The image start time in ephemeris time
 
@@ -406,7 +406,7 @@ class IsisSpice(IsisLabel):
         return struct.unpack('d', bytes.fromhex(self._sclock_hex_string))[0]
 
     @property
-    def _detector_center_sample(self):
+    def detector_center_sample(self):
         """
         The center of the CCD in detector pixels
 
@@ -418,7 +418,7 @@ class IsisSpice(IsisLabel):
         return self.naif_keywords.get('INS{}_BORESIGHT_SAMPLE'.format(self.ikid), None)
 
     @property
-    def _detector_center_line(self):
+    def detector_center_line(self):
         """
         The center of the CCD in detector pixels
 
