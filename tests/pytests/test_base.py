@@ -113,10 +113,6 @@ class testclass(IsisLabel, Driver):
         return 1
 
     @property
-    def image_samples(self):
-        return 1
-
-    @property
     def isis_naif_keywords(self):
         return {"key" : "value"}
 
@@ -147,10 +143,6 @@ class testclass(IsisLabel, Driver):
     @property
     def rotation_chain(self):
         return "rotation chain object"
-
-    @property
-    def sample_summing(self):
-        return 1
 
     @property
     def sensor_frame_id(self):
