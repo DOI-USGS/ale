@@ -95,7 +95,102 @@ End_Object
 """
 
 class testclass(Driver, IsisLabel):
-    pass
+
+    @property
+    def detector_center_line(self):
+        return 1
+    @property
+    def detector_center_sample(self): 
+        return 1
+    @property
+    def focal2pixel_lines(self):
+        return 1 
+    @property
+    def focal2pixel_samples(self):
+        return 1
+    @property
+    def focal_length(self):
+        return 1
+
+    @property
+    def image_lines(self):
+        return 1
+
+    @property
+    def image_samples(self):
+        return 1
+
+    @property
+    def isis_naif_keywords(self):
+        return {"key" : "value"}
+
+    @property
+    def line_scan_rate(self):
+        return ([0.0],[0],[0.0])
+
+    @property
+    def line_summing(self):
+        return 1 
+
+    @property
+    def name_platform(self):
+        return "test"
+
+    @property
+    def name_sensor(self):
+        return "testsensor"
+
+    @property
+    def usgscsm_distortion_model(self): 
+        return {'test': { 'coefficients' : [0.0, 0.0, 0.0] } }
+
+    @property
+    def rotation_chain(self):
+        return "rotation chain object"
+
+    @property
+    def sample_summing(self):
+        return 1
+
+    @property
+    def sensor_frame_id(self):
+        return "test id"
+
+    @property
+    def sensor_model_version(self):
+        return 1
+
+    @property
+    def sensor_position(self):
+        return ([1],[1],[1])
+
+    @property
+    def sensor_type(self):
+        return "test"
+
+    @property
+    def start_time(self):
+        return 0
+
+    @property
+    def starting_detector_line(self):
+        return 0
+
+    @property
+    def starting_detector_sample(self):
+        return 0
+
+    @property
+    def stop_time(self):
+        return 0
+
+    @property
+    def sun_position(self):
+        return ([1], [1])
+
+    @property
+    def target_body_id(self):
+        return 1
 
 def test_me(test_label):
     me = testclass(test_label)

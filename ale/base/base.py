@@ -72,7 +72,7 @@ class Driver(ABC):
 
     @property
     @abc.abstractmethod
-    def optical_distortion(self):
+    def usgscsm_distortion_model(self):
         """
         Returns
         -------
@@ -133,7 +133,6 @@ class Driver(ABC):
         """
         pass
 
-    @property
     @abc.abstractmethod
     def name_platform(self):
         pass
@@ -205,28 +204,19 @@ class Driver(ABC):
 
     @property
     @abc.abstractmethod
-    HERE
-    def sensor_orientation(self):
-        return {
-            "quaternions" : self._sensor_orientation
-            }
-
-    @property
-    @abc.abstractmethod
     #Get the frame chain between two frames and the frame types for all returned frames
     def rotation_chain(self):
         pass
 
-   @property
-   @abc.abstractmethod
-   def sun_position(self):
-       """
-       Returns
-       -------
-       : (sun_positions, sun_velocities)
-         a tuple containing a list of sun positions, a list of sun velocities
-       """
-       }
+    @property
+    @abc.abstractmethod
+    def sun_position(self):
+        """
+        Returns
+        -------
+        : (sun_positions, sun_velocities)
+          a tuple containing a list of sun positions, a list of sun velocities
+        """
 
     @property
     @abc.abstractmethod
