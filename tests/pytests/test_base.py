@@ -141,6 +141,10 @@ class testclass(Driver, IsisLabel):
         return "testsensor"
 
     @property
+    def target_body_radii(self):
+        return [1,1]
+
+    @property
     def usgscsm_distortion_model(self): 
         return {'test': { 'coefficients' : [0.0, 0.0, 0.0] } }
 

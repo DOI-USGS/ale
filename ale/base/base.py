@@ -48,8 +48,7 @@ class Driver(ABC):
         keys = set()
         return {p:getattr(self, p) for p in dir(self) if p[0] != "_" and isinstance(getattr(type(self), p), property)}
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def image_lines(self):
         """
         Returns
@@ -59,8 +58,7 @@ class Driver(ABC):
         """
         pass
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def image_samples(self):
         """
         Returns
@@ -70,8 +68,7 @@ class Driver(ABC):
         """
         pass
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def usgscsm_distortion_model(self):
         """
         Returns
@@ -97,22 +94,19 @@ class Driver(ABC):
 #           print(e)
 #           return False
 
-#   @property
+#   @abc.abstractproperty
 #   def file(self):
 #       return self._file
 #
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def starting_detector_line(self):
         pass
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def starting_detector_sample(self):
         pass
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def sample_summing(self):
         """
          Returns
@@ -122,8 +116,7 @@ class Driver(ABC):
         """
         pass
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def line_summing(self):
         """
         Returns
@@ -133,22 +126,20 @@ class Driver(ABC):
         """
         pass
 
-    @abc.abstractmethod
+    @abc.abstractproperty    
     def name_platform(self):
         pass
         
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def name_sensor(self):
         pass
 
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def sensor_type(self):
         pass
 
-    @property
+    @abc.abstractproperty
     def target_body_radii(self):
         """
         Returns
@@ -158,8 +149,7 @@ class Driver(ABC):
         """
         pass
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def focal_length(self):
         """
         Returns
@@ -169,18 +159,15 @@ class Driver(ABC):
         """
         pass
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def detector_center_line(self):
         pass
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def detector_center_sample(self):
         pass
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def sensor_position(self):
         """
         Returns
@@ -190,8 +177,7 @@ class Driver(ABC):
         """
         pass
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def line_scan_rate(self):
         """
         Returns
@@ -202,14 +188,12 @@ class Driver(ABC):
         """
         pass
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     #Get the frame chain between two frames and the frame types for all returned frames
     def rotation_chain(self):
         pass
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def sun_position(self):
         """
         Returns
@@ -218,8 +202,7 @@ class Driver(ABC):
           a tuple containing a list of sun positions, a list of sun velocities
         """
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def target_body_id(self):
         """
           Returns
@@ -230,8 +213,7 @@ class Driver(ABC):
         pass
 
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def sensor_frame_id(self):
         """
           Returns
@@ -241,8 +223,7 @@ class Driver(ABC):
         """
         pass
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def isis_naif_keywords(self):
         """
           Returns
@@ -252,8 +233,7 @@ class Driver(ABC):
         """
         pass
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def sensor_model_version(self):
         """
           Returns
@@ -263,18 +243,15 @@ class Driver(ABC):
         """
         pass
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def focal2pixel_lines(self):
         pass
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def focal2pixel_samples(self):
         pass
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def start_time(self):
         """
           Returns
@@ -284,8 +261,7 @@ class Driver(ABC):
         """
         pass
 
-    @property
-    @abc.abstractmethod
+    @abc.abstractproperty
     def stop_time(self):
         """
           Returns
