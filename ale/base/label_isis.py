@@ -2,6 +2,7 @@ import pvl
 
 class IsisLabel():
 
+    @property
     def label(self):
         if not hasattr(self, "_label"):
             if isinstance(self._file, pvl.PVLModule):

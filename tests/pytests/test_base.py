@@ -94,7 +94,7 @@ End_Group
 End_Object
 """
 
-class testclass(Driver, IsisLabel):
+class testclass(IsisLabel, Driver):
 
     @property
     def detector_center_line(self):
@@ -110,10 +110,6 @@ class testclass(Driver, IsisLabel):
         return 1
     @property
     def focal_length(self):
-        return 1
-
-    @property
-    def image_lines(self):
         return 1
 
     @property
@@ -198,6 +194,6 @@ class testclass(Driver, IsisLabel):
 
 def test_me(test_label):
     me = testclass(test_label)
-    assert me.image_lines == 1
+    assert me.image_lines == 1024
 
 
