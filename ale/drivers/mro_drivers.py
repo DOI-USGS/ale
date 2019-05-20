@@ -14,6 +14,7 @@ from ale.base.label_isis import IsisLabel
 from ale.base.type_distortion import RadialDistortion
 from ale.base.type_sensor import LineScanner
 
+
 class MroCtxIsisLabelIsisSpiceDriver(Driver, IsisSpice, LineScanner, RadialDistortion):
 
     @property
@@ -42,13 +43,11 @@ class MroCtxIsisLabelIsisSpiceDriver(Driver, IsisSpice, LineScanner, RadialDisto
     def line_exposure_duration(self):
         return self.label["IsisCube"]["Instrument"]["LineExposureDuration"].value * 0.001 # Scale to seconds
 
-class MroCtxNaifSpice(Driver, NaifSpice, LineScanner, RadialDistortion):
+
+class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, Driver, NaifSpice, LineScanner, RadialDistortion):
     """
-    Spice mixins that defines MRO CTX specific snowflake Spice calls.
+    Driver for reading CTX ISIS labels.
     """
-    id_lookup = {
-            'CONTEXT CAMERA':'MRO_CTX'
-    }
 
     @property
     def metakernel(self):
@@ -69,17 +68,16 @@ class MroCtxNaifSpice(Driver, NaifSpice, LineScanner, RadialDistortion):
                     self._metakernel = mk
         return self._metakernel
 
-class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, MroCtxNaifSpice):
     @property
     def instrument_id(self):
         return "MRO_CTX"
 
     @property
-    def starting_ephemeris_time(self):
-        if not hasattr(self, '_starting_ephemeris_time'):
+    def ephemeris_start_time(self):
+        if not hasattr(self, '_ephemeris_start_time'):
             sclock = self.label['IsisCube']['Instrument']['SpacecraftClockCount']
-            self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
-        return self._starting_ephemeris_time
+            self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
+        return self._ephemeris_start_time
 
     @property
     def line_exposure_duration(self):
@@ -91,11 +89,31 @@ class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, MroCtxNaifSpice):
     def spacecraft_name(self):
         return "MRO"
 
-class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, MroCtxNaifSpice):
+
+class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, Driver, NaifSpice, LineScanner, RadialDistortion):
     """
     Driver for reading CTX PDS3 labels. Requires a Spice mixin to acquire addtional
     ephemeris and instrument data located exclusively in spice kernels.
     """
+
+    @property
+    def metakernel(self):
+        """
+        Returns latest instrument metakernels
+
+        Returns
+        -------
+        : string
+          Path to latest metakernel file
+        """
+        metakernel_dir = config.mro
+        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
+        if not hasattr(self, '_metakernel'):
+            self._metakernel = None
+            for mk in mks:
+                if str(self.start_time.year) in os.path.basename(mk):
+                    self._metakernel = mk
+        return self._metakernel
 
     @property
     def instrument_id(self):
@@ -109,13 +127,22 @@ class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, MroCtxNaifSpice):
         : str
           instrument id
         """
-        return self.id_lookup[self.label['INSTRUMENT_NAME']]
+        id_lookup = {
+            'CONTEXT CAMERA':'MRO_CTX'
+        }
+
+        return id_lookup[self.label['INSTRUMENT_NAME']]
 
     @property
     def spacecraft_name(self):
         """
-        Spacecraft name used in various Spice calls to acquire
+        Returns the spacecraft name used in various Spice calls to acquire
         ephemeris data.
+        
+        Returns
+        -------
+        : str
+          spacecraft name
         """
         name_lookup = {
             'MARS_RECONNAISSANCE_ORBITER': 'MRO'

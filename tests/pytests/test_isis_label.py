@@ -3,11 +3,10 @@ import pvl
 
 import ale
 from ale import base
-from ale.base import label_isis
-
+from ale.base.label_isis import IsisLabel
 
 @pytest.fixture
-def test_cube(monkeypatch):
+def test_cube_label(monkeypatch):
     label = """
 Object = IsisCube
 Object = Core
@@ -96,27 +95,33 @@ End_Object
         return pvl.loads(label)
     monkeypatch.setattr(pvl, 'load', test_label)
 
-    test_image = type('TestCubeDriver', (base.Driver, base.label_isis.IsisLabel), {})(label)
-    return test_image
+    isis_label = IsisLabel()
+    isis_label._file = label
 
-def test_spacecraft_clock_start_count(test_cube):
-    assert test_cube.spacecraft_clock_start_count == "1/0089576657:973000"
+    return isis_label
 
-def test_target_name(test_cube):
-    assert test_cube.target_name.lower() == "venus"
+def test_isis_label(test_cube_label):
+    assert test_cube_label.label[0][0] == "IsisCube"
 
-def test_exposure_duration(test_cube):
-    assert test_cube.exposure_duration == 0.017
+def test_spacecraft_clock_start_count(test_cube_label):
+    assert test_cube_label.spacecraft_clock_start_count == "1/0089576657:973000"
 
-def test_image_samples(test_cube):
-    assert test_cube.image_samples == 1024
+def test_target_name(test_cube_label):
+    assert test_cube_label.target_name.lower() == "venus"
 
-def test_image_lines(test_cube):
-    assert test_cube.image_lines == 1024
+def test_exposure_duration(test_cube_label):
+    assert test_cube_label.exposure_duration == 0.017
 
-def test_sample_summing(test_cube):
-    assert test_cube.sample_summing == 1
+def test_image_samples(test_cube_label):
+    assert test_cube_label.image_samples == 1024
 
-def test_line_summing(test_cube):
-    assert test_cube.line_summing == 1
+def test_image_lines(test_cube_label):
+    assert test_cube_label.image_lines == 1024
+
+def test_sample_summing(test_cube_label):
+    assert test_cube_label.sample_summing == 1
+
+def test_line_summing(test_cube_label):
+    assert test_cube_label.line_summing == 1
+
 

@@ -34,10 +34,6 @@ class Pds3Label():
         pass
 
     @property
-    def start_time(self):
-        return self.label['START_TIME']
-
-    @property
     def image_lines(self):
         return self.label['IMAGE']['LINES']
 
@@ -48,6 +44,10 @@ class Pds3Label():
     @property
     def interpolation_method(self):
         return 'lagrange'
+
+    @property
+    def _line_exposure_duration(self):
+        return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
 
     @property
     def target_name(self):
@@ -61,7 +61,6 @@ class Pds3Label():
         : str
           target name
         """
-
         return self.label['TARGET_NAME']
 
     @property
@@ -69,25 +68,19 @@ class Pds3Label():
         return spice.bodn2c(self.label['TARGET_NAME'])
 
     @property
-    def starting_ephemeris_time(self):
-        if not hasattr(self, '_starting_ephemeris_time'):
-            sclock = self.label['SPACECRAFT_CLOCK_START_COUNT']
-            self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
-        return self._starting_ephemeris_time
+    def clock_start_count(self):
+        return self.label['SPACECRAFT_CLOCK_START_COUNT']
 
     @property
-    def spacecraft_clock_stop_count(self):
-        sc = self.label.get('SPACECRAFT_CLOCK_STOP_COUNT', None)
-        if sc == 'N/A':
-            sc = None
-        return sc
+    def clock_stop_count(self):
+        return self.label['SPACECRAFT_CLOCK_STOP_COUNT']
 
     @property
-    def _detector_center_line(self):
+    def detector_center_line(self):
         return spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[0]
 
     @property
-    def _detector_center_sample(self):
+    def detector_center_sample(self):
         return spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[1]
 
     @property

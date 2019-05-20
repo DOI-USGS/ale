@@ -1,3 +1,5 @@
+import pvl 
+
 class IsisLabel():
 
     def label(self):
@@ -38,7 +40,7 @@ class IsisLabel():
         Returns
         -------
         : int
-          Number of samples in image
+          Sample summing
         """
         try:
             summing = self.label['IsisCube']['Instrument']['SummingMode']
@@ -52,7 +54,7 @@ class IsisLabel():
         Returns
         -------
         : int
-          Number of samples in image
+          Line summing
         """
         try:
             summing = self.label['IsisCube']['Instrument']['SummingMode']

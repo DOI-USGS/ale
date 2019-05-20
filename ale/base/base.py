@@ -2,30 +2,6 @@ import pvl
 import abc
 from abc import ABC
 
-#Get the rotation between two frames for the time range of the image
-#Get start and stop time for an image
-#Get line and sample counts
-#Get the sensor frame ID
-#Get the target body frame ID
-#Get the frame chain between two frames and the frame types for all returned frames
-#Get sensor type
-#Get sensor name
-#Get sensor platform
-#Get line scan rates
-#Three lists: Line starts, start time, scan rate
-#Get sample summing
-#Get line summing
-#Get starting detector sample
-#Get starting detector line
-#Get ISIS NAIFKeywords
-#Return dictionary of keywords and values/lists of values
-#Get sensor model version
-#Get focal length
-#Get the detector to focal plane transformations
-#Get the target body radii
-#Get the detector center
-#Get the USGSCSM distortion model
-
 class Driver(ABC):
     """
     Base class for all Drivers.
@@ -59,8 +35,21 @@ class Driver(ABC):
         return str(self.to_dict())
 
 
+    def to_dict(self):
+        """
+        Generates a dictionary of keys based on the attributes and methods assocated with
+        the driver and the required keys for the driver
+
+        Returns
+        -------
+        dict
+            Dictionary of key, attribute pairs
+        """
+        keys = set()
+        return {p:getattr(self, p) for p in dir(self) if p[0] != "_" and isinstance(getattr(type(self), p), property)}
+
     @property
- #   @abc.abstractmethod
+    @abc.abstractmethod
     def image_lines(self):
         """
         Returns
@@ -71,7 +60,7 @@ class Driver(ABC):
         pass
 
     @property
-#    @abc.abstractmethod
+    @abc.abstractmethod
     def image_samples(self):
         """
         Returns
@@ -81,15 +70,17 @@ class Driver(ABC):
         """
         pass
 
-#    @abc.abstractmethod
-    def dont_exist(self):
+    @property
+    @abc.abstractmethod
+    def optical_distortion(self):
         """
         Returns
         -------
-        : int
-          Number of samples in image
+        : dict
+          A dict containing the information about the distortion model for the usgscsm
         """
         pass
+
 #   def is_valid(self):
 #       """
 #       Checks if the driver has an intrument id associated with it
@@ -105,103 +96,211 @@ class Driver(ABC):
 #       except Exception as e:
 #           print(e)
 #           return False
-#
-#   def to_dict(self):
-#       """
-#       Generates a dictionary of keys based on the attributes and methods assocated with
-#       the driver and the required keys for the driver
-#
-#       Returns
-#       -------
-#       dict
-#           Dictionary of key, attribute pairs
-#       """
-#       keys = set()
-#       return {p:getattr(self, p) for p in dir(self) if p[0] != "_" and isinstance(getattr(type(self), p), property)}
-#
-#
+
 #   @property
 #   def file(self):
 #       return self._file
 #
-#   @property
-#   def interpolation_method(self):
-#       return "lagrange"
-#
-#   @property
-#   def starting_detector_line(self):
-#       return 1
-#
-#   @property
-#   def starting_detector_sample(self):
-#       return 1
-#
-#   @property
-#   def detector_sample_summing(self):
-#       return 1
-#
-#   @property
-#   def detector_line_summing(self):
-#       return 1
-#
-#   @property
-#   def name_platform(self):
-#       return "Generic Platform"
-#
-#   @property
-#   def name_sensor(self):
-#       return "Generic Sensor"
-#
-#   @property
-#   def radii(self):
-#       return {
-#           "semimajor" : self._semimajor,
-#           "semiminor" : self._semiminor,
-#           "unit" : "km" # default to KM
-#       }
-#
-#   @property
-#   def reference_height(self):
-#       # TODO: This should be a reasonable #
-#       return {
-#           "minheight" : 0,
-#           "maxheight": 1000,
-#           "unit": "m"
-#       }
-#
-#   @property
-#   def focal_length_model(self):
-#       return {
-#           "focal_length" : self._focal_length
-#       }
-#
-#   @property
-#   def detector_center(self):
-#       if not hasattr(self, '_detector_center'):
-#           self._detector_center = {
-#               "line" : self._detector_center_line,
-#               "sample" : self._detector_center_sample
-#           }
-#       return self._detector_center
-#
-#   @property
-#   def sensor_position(self):
-#       return {
-#           "positions" : self._sensor_position,
-#           "velocities" : self._sensor_velocity,
-#           "unit" : "m"
-#       }
-#
-#   @property
-#   def sensor_orientation(self):
-#       return {
-#           "quaternions" : self._sensor_orientation
-#       }
-#
-#   @property
-#   def sun_position(self):
-#       return {
-#           "positions" : self._sun_position,
-#           "velocities" : self._sun_velocity,
-#           "unit" : "m"
-#       }
+    @property
+    @abc.abstractmethod
+    def starting_detector_line(self):
+        pass
+
+    @property
+    @abc.abstractmethod
+    def starting_detector_sample(self):
+        pass
+
+    @property
+    @abc.abstractmethod
+    def sample_summing(self):
+        """
+         Returns
+         -------
+         : int
+           Sample summing
+        """
+        pass
+
+    @property
+    @abc.abstractmethod
+    def line_summing(self):
+        """
+        Returns
+        -------
+        : int
+          Line summing
+        """
+        pass
+
+    @property
+    @abc.abstractmethod
+    def name_platform(self):
+        pass
+        
+    @property
+    @abc.abstractmethod
+    def name_sensor(self):
+        pass
+
+
+    @property
+    @abc.abstractmethod
+    def sensor_type(self):
+        pass
+
+    @property
+    def target_body_radii(self):
+        """
+        Returns
+        -------
+        : list
+          target body radii, first list element is semimajor axis, second is semiminor axis.
+        """
+        pass
+
+    @property
+    @abc.abstractmethod
+    def focal_length(self):
+        """
+        Returns
+        -------
+        : float
+          focal length
+        """
+        pass
+
+    @property
+    @abc.abstractmethod
+    def detector_center_line(self):
+        pass
+
+    @property
+    @abc.abstractmethod
+    def detector_center_sample(self):
+        pass
+
+    @property
+    @abc.abstractmethod
+    def sensor_position(self):
+        """
+        Returns
+        -------
+        : (positions, velocities, times)
+          a tuple containing a list of positions, a list of velocities, and a list of timess
+        """
+        pass
+
+    @property
+    @abc.abstractmethod
+    def line_scan_rate(self):
+        """
+        Returns
+        -------
+        : (start_lines, start_times, scan_rates)
+          a tuple containing a list of starting lines, a list start times for each line, 
+          and a list of scan rates for each line
+        """
+        pass
+
+    @property
+    @abc.abstractmethod
+    HERE
+    def sensor_orientation(self):
+        return {
+            "quaternions" : self._sensor_orientation
+            }
+
+    @property
+    @abc.abstractmethod
+    #Get the frame chain between two frames and the frame types for all returned frames
+    def rotation_chain(self):
+        pass
+
+   @property
+   @abc.abstractmethod
+   def sun_position(self):
+       """
+       Returns
+       -------
+       : (sun_positions, sun_velocities)
+         a tuple containing a list of sun positions, a list of sun velocities
+       """
+       }
+
+    @property
+    @abc.abstractmethod
+    def target_body_id(self):
+        """
+          Returns
+        -------
+        : int
+          NAIF ID associated with the target body
+        """
+        pass
+
+
+    @property
+    @abc.abstractmethod
+    def sensor_frame_id(self):
+        """
+          Returns
+        -------
+        : int
+          NAIF ID associated with the sensor frame
+        """
+        pass
+
+    @property
+    @abc.abstractmethod
+    def isis_naif_keywords(self):
+        """
+          Returns
+        -------
+        : dict
+          dictionary containing the keys : values needed by Isis for the NaifKeywords group
+        """
+        pass
+
+    @property
+    @abc.abstractmethod
+    def sensor_model_version(self):
+        """
+          Returns
+        -------
+        : int
+          version of the sensor model 
+        """
+        pass
+
+    @property
+    @abc.abstractmethod
+    def focal2pixel_lines(self):
+        pass
+
+    @property
+    @abc.abstractmethod
+    def focal2pixel_samples(self):
+        pass
+
+    @property
+    @abc.abstractmethod
+    def start_time(self):
+        """
+          Returns
+        -------
+        : str
+          Start time of the image in UTC YYYY-MM-DDThh:mm:ss[.fff]
+        """
+        pass
+
+    @property
+    @abc.abstractmethod
+    def stop_time(self):
+        """
+          Returns
+        -------
+        : str
+          Stop time of the image in UTC YYYY-MM-DDThh:mm:ss[.fff]
+        """
+        pass
