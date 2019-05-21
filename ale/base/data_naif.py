@@ -177,11 +177,11 @@ class NaifSpice():
 
     @property
     def ephemeris_start_time(self):
-        return spice.scs2e(self.spacecraft_id, self.clock_start_count)
+        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_start_count)
 
     @property
     def ephemeris_stop_time(self):
-        return spice.scs2e(self.spacecraft_id, self.clock_stop_count)
+        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_stop_count)
 
     @property
     def center_ephemeris_time(self):
