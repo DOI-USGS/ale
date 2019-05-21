@@ -72,7 +72,7 @@ class Pds3Label():
 
 
     @property
-    def start_time(self):
+    def utc_start_time(self):
         """
           Returns
         -------
@@ -83,7 +83,7 @@ class Pds3Label():
 
 
     @property
-    def stop_time(self):
+    def utc_stop_time(self):
         """
           Returns
         -------
@@ -227,18 +227,4 @@ class Pds3Label():
     @property
     def line_exposure_duration(self):
         return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
-
-
-# Everything below here needs to be looked at closely and probably removed after
-# converting to the new names
-#-------------------------------------------------------------
-#        def clock_start_count(self):
-#            return self.label['SPACECRAFT_CLOCK_START_COUNT']
-#
-#        @property
-#        def clock_stop_count(self):
-#            return self.label['SPACECRAFT_CLOCK_STOP_COUNT']
-#
-## Add this one in with similar code to to EXPOSURE_DURATION
-#-------------------------------------------------------------
 

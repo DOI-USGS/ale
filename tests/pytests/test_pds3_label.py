@@ -7,7 +7,7 @@ from ale import base
 from ale.base.label_pds3 import Pds3Label
 
 @pytest.fixture
-def test_image_label(monkeypatch):
+def test_image_label():
     label = """
   PDS_VERSION_ID = PDS3
   FILE_NAME = "T02_001251_1292_MU_00N237W.IMG"
@@ -65,8 +65,6 @@ END
     def test_label(file):
         return pvl.loads(label)
 
-    monkeypatch.setattr(pvl, 'load', test_label)
-
     isis_label = Pds3Label()
     isis_label._file = label
 
@@ -84,11 +82,11 @@ def test_instrument_host_id(test_image_label):
 def test_instrument_host_name(test_image_label):
     assert test_image_label.instrument_host_name.lower() == 'mars reconnaissance orbiter'
 
-def test_start_time(test_image_label):
-    assert test_image_label.start_time == datetime(2006, 11, 1, 22, 45, 53, 570000)
+def test_utc_start_time(test_image_label):
+    assert test_image_label.utc_start_time == datetime(2006, 11, 1, 22, 45, 53, 570000)
 
-def test_stop_time(test_image_label):
-    assert test_image_label.stop_time == datetime(2006, 11, 1, 23, 49, 50, 370000)
+def test_utc_stop_time(test_image_label):
+    assert test_image_label.utc_stop_time == datetime(2006, 11, 1, 23, 49, 50, 370000)
 
 def test_image_lines(test_image_label):
     assert test_image_label.image_lines == 2432
