@@ -23,7 +23,8 @@ class ConstantRotation:
         Parameters
         ----------
         quat : array
-               The quaternion representation of the rotation as a numpy array
+               The quaternion representation of the rotation as a numpy array.
+               The quaternion must be in scalar last format (x, y, z, w).
         source : int
                  The NAIF ID code for the source frame
         dest : int
@@ -37,7 +38,8 @@ class ConstantRotation:
     def quat(self):
         """
         The quaternion that rotates from the source reference frame to
-        the destination reference frame.
+        the destination reference frame. The quaternion is in scalar last
+        format (x, y, z, w).
         """
         return self._rot.as_quat()
 
@@ -49,7 +51,8 @@ class ConstantRotation:
         Parameters
         ----------
         new_quat : array
-                   The new quaternion as an array
+                   The new quaternion as an array.
+                   The quaternion must be in scalar last format (x, y, z, w).
         """
         self._rot = Rotation.from_quat(new_quat)
 
@@ -104,7 +107,8 @@ class TimeDependentRotation:
         quats : 2darray
                The quaternion representations of the rotation as a 2d numpy array.
                Each inner array represents the rotation at the time at the same index
-               in the times argument.
+               in the times argument. The quaternions must be in scalar last format
+               (x, y, z, w).
         times : array
                 The time for each rotation in quats. This array must be sorted
                 in ascending order.
@@ -121,8 +125,9 @@ class TimeDependentRotation:
     @property
     def quats(self):
         """
-        The quaternion that rotates from the source reference frame to
-        the destination reference frame.
+        The quaternions that rotates from the source reference frame to
+        the destination reference frame. The quaternions are in scalar
+        last format (x, y, z, w).
         """
         return self._rots.as_quat()
 
@@ -134,7 +139,8 @@ class TimeDependentRotation:
         Parameters
         ----------
         new_quats : 2darray
-                    The new quaternions as a 2d array.
+                    The new quaternions as a 2d array. The quaternions must be
+                    in scalar last format (x, y, z, w).
         """
         self._rots = Rotation.from_quat(new_quats)
 
