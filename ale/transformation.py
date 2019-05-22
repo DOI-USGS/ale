@@ -1,5 +1,7 @@
 import numpy as np
 
+from ale.rotation import ConstantRotation
+
 class FrameNode():
     """
     A single frame in a frame tree. This class is largely adapted from the Node
@@ -109,19 +111,22 @@ class FrameNode():
             raise RuntimeError('No common parent between nodes')
 
         first_path = parents_1[:parents_1.index(common_parent)+1]
-        second_path = reversed(parents_2[:parents_2.index(common_parent)])
+        second_path = parents_2[:parents_2.index(common_parent)][::-1]
 
         return first_path, second_path
 
     def rotation_to(self, other):
         """
-        Returns the rotation to another node.
+        Returns the rotation to another node. Returns the identity rotation
+        if the other node is this node.
 
         Parameters
         ----------
         other : FrameNode
                 The other node to find the rotation to.
         """
+        if other == self:
+            return ConstantRotation(np.array([0, 0, 0, 1]), self.id, other.id)
         forward_path, reverse_path = self.path_to(other)
         rotations = [node.rotation for node in forward_path[:-1]]
         rotations.extend([node.rotation.inverse() for node in reverse_path])
