@@ -1,8 +1,8 @@
 class RadialDistortion():
     @property
-    def optical_distortion(self):
+    def usgscsm_distortion_model(self):
         return {
             "radial": {
                 "coefficients" : self._odtk
             }
-        }    
+        }

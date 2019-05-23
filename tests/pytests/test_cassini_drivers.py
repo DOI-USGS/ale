@@ -70,5 +70,5 @@ def test_detector_center_sample(driver):
         mock_ikid.return_value = 123
         assert driver.detector_center_sample == 1
 
-def test_instrument_model_version(driver):
-    assert driver.instrument_model_version == 1
+def test_sensor_model_version(driver):
+    assert driver.sensor_model_version == 1

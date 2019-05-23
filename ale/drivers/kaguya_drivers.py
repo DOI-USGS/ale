@@ -182,7 +182,7 @@ class KaguyaTcPds3NaifSpiceDriver(Driver, LineScanner, Pds3Label, NaifSpice):
 
 
     @property
-    def _focal_length(self):
+    def focal_length(self):
         """
         Returns
         -------

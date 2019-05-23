@@ -13,7 +13,7 @@ from ale.base.type_distortion import RadialDistortion
 from ale.base.type_sensor import Framer
 
 
-class CassiniIssPds3LabelNaifSpiceDriver(Driver, Pds3Label, NaifSpice, Framer, RadialDistortion):
+class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDistortion, Driver):
     """
     Cassini mixin class for defining Spice calls.
     """
@@ -105,7 +105,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Driver, Pds3Label, NaifSpice, Framer, R
       return float(spice.gdpool('INS{}_FOV_CENTER_PIXEL'.format(self.ikid), 0, 2)[0])
 
     @property
-    def instrument_model_version(self):
+    def sensor_model_version(self):
         """
         Returns instrument model version
 
@@ -114,4 +114,12 @@ class CassiniIssPds3LabelNaifSpiceDriver(Driver, Pds3Label, NaifSpice, Framer, R
         : int
           model version
         """
+        return 1
+
+    @property
+    def detector_start_sample(Self):
+        return 1
+
+    @property
+    def detector_start_line(Self):
         return 1

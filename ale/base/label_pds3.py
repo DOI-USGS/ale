@@ -1,7 +1,7 @@
 import pvl
 
 class Pds3Label():
- 
+
     @property
     def label(self):
         if not hasattr(self, "_label"):
@@ -38,6 +38,12 @@ class Pds3Label():
         return self.label['INSTRUMENT_NAME']
 
 
+
+    @property
+    def sensor_name(self):
+        return self.instrument_name
+
+
     @property
     def instrument_host_id(self):
         """
@@ -58,6 +64,11 @@ class Pds3Label():
           Full name of the instrument host
         """
         return self.label['INSTRUMENT_HOST_NAME']
+
+
+    @property
+    def platform_name(self):
+        return self.instrument_host_name
 
 
     @property
@@ -118,7 +129,7 @@ class Pds3Label():
     @property
     def target_name(self):
         """
-        Returns a target name unquely identifying what an observation was capturing. 
+        Returns a target name unquely identifying what an observation was capturing.
         This is most often a body name (e.g., Mars, Moon, Europa). This value is often
         use to acquire Ephermis data from SPICE files; therefore it should be the same
         name spicelib expects in bodvrd calls.
@@ -134,7 +145,7 @@ class Pds3Label():
     @property
     def sampling_factor(self):
         """
-        Returns the summing factor from the PDS3 label. For example a return value of 2 
+        Returns the summing factor from the PDS3 label. For example a return value of 2
         indicates that 2 lines and 2 samples (4 pixels) were summed and divided by 4
         to produce the output pixel value.
 
@@ -144,6 +155,16 @@ class Pds3Label():
           Number of samples and lines combined from the original data to produce a single pixel in this image
         """
         return self.label.get('SAMPLING_FACTOR', 1)
+
+
+    @property
+    def line_summing(self):
+        return self.sampling_factor
+
+
+    @property
+    def sample_summing(self):
+        return self.sampling_factor
 
 
     @property
@@ -227,4 +248,3 @@ class Pds3Label():
     @property
     def line_exposure_duration(self):
         return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
-
