@@ -23,31 +23,6 @@ class Driver(ABC):
         self._num_ephem = num_ephem
         self._file = file
 
-    def __str__(self):
-        """
-        Returns a string representation of the class
-
-        Returns
-        -------
-        str
-            String representation of all attributes and methods of the class
-        """
-        return str(self.to_dict())
-
-
-    def to_dict(self):
-        """
-        Generates a dictionary of keys based on the attributes and methods assocated with
-        the driver and the required keys for the driver
-
-        Returns
-        -------
-        dict
-            Dictionary of key, attribute pairs
-        """
-        keys = set()
-        return {p:getattr(self, p) for p in dir(self) if p[0] != "_" and isinstance(getattr(type(self), p), property)}
-
     @abc.abstractproperty
     def image_lines(self):
         """
@@ -78,32 +53,12 @@ class Driver(ABC):
         """
         pass
 
-#   def is_valid(self):
-#       """
-#       Checks if the driver has an intrument id associated with it
-#
-#       Returns
-#       -------
-#       bool
-#           True if an instrument_id is defined, False otherwise
-#       """
-#       try:
-#           iid = self.instrument_id
-#           return True
-#       except Exception as e:
-#           print(e)
-#           return False
-
-#   @abc.abstractproperty
-#   def file(self):
-#       return self._file
-#
     @abc.abstractproperty
-    def starting_detector_line(self):
+    def detector_start_line(self):
         pass
 
     @abc.abstractproperty
-    def starting_detector_sample(self):
+    def detector_start_sample(self):
         pass
 
     @abc.abstractproperty
@@ -126,17 +81,12 @@ class Driver(ABC):
         """
         pass
 
-    @abc.abstractproperty    
-    def name_platform(self):
-        pass
-        
     @abc.abstractproperty
-    def name_sensor(self):
+    def platform_name(self):
         pass
 
-
     @abc.abstractproperty
-    def sensor_type(self):
+    def sensor_name(self):
         pass
 
     @abc.abstractproperty
@@ -178,19 +128,8 @@ class Driver(ABC):
         pass
 
     @abc.abstractproperty
-    def line_scan_rate(self):
-        """
-        Returns
-        -------
-        : (start_lines, start_times, scan_rates)
-          a tuple containing a list of starting lines, a list start times for each line, 
-          and a list of scan rates for each line
-        """
-        pass
-
-    @abc.abstractproperty
     #Get the frame chain between two frames and the frame types for all returned frames
-    def rotation_chain(self):
+    def frame_chain(self):
         pass
 
     @abc.abstractproperty
@@ -203,7 +142,7 @@ class Driver(ABC):
         """
 
     @abc.abstractproperty
-    def target_body_id(self):
+    def target_name(self):
         """
           Returns
         -------
@@ -212,6 +151,16 @@ class Driver(ABC):
         """
         pass
 
+
+    @abc.abstractproperty
+    def target_frame_id(self):
+        """
+          Returns
+        -------
+        : int
+          NAIF ID associated with the target body
+        """
+        pass
 
     @abc.abstractproperty
     def sensor_frame_id(self):
@@ -239,7 +188,7 @@ class Driver(ABC):
           Returns
         -------
         : int
-          version of the sensor model 
+          version of the sensor model
         """
         pass
 
@@ -252,7 +201,15 @@ class Driver(ABC):
         pass
 
     @abc.abstractproperty
-    def start_time(self):
+    def pixel2focal_x(self):
+        pass
+
+    @abc.abstractproperty
+    def pixel2focal_y(self):
+        pass
+
+    @abc.abstractproperty
+    def ephemeris_start_time(self):
         """
           Returns
         -------
@@ -262,7 +219,7 @@ class Driver(ABC):
         pass
 
     @abc.abstractproperty
-    def stop_time(self):
+    def ephemeris_stop_time(self):
         """
           Returns
         -------
