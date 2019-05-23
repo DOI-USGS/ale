@@ -6,10 +6,10 @@ from ale.base import data_naif
 from ale.base import label_pds3
 from ale.formatters import usgscsm_formatter
 
+from unittest.mock import PropertyMock, patch
+
 # 'Mock' the spice module where it is imported
 from conftest import SimpleSpice, get_mockkernels
-
-from unittest.mock import PropertyMock, patch
 
 simplespice = SimpleSpice()
 
