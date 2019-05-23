@@ -20,53 +20,55 @@ from ale.drivers.cassini_drivers import CassiniIssPds3LabelNaifSpiceDriver
 
 CassiniIssPds3LabelNaifSpiceDriver.metakernel = get_mockkernels
 
-c = CassiniIssPds3LabelNaifSpiceDriver("")
+@pytest.fixture
+def driver():
+    return CassiniIssPds3LabelNaifSpiceDriver("")
 
-def test_instrument_id():
+def test_instrument_id(driver):
     with patch('ale.base.label_pds3.Pds3Label.instrument_id', new_callable=PropertyMock) as mock_instrument_id:
 
         mock_instrument_id.return_value = 'ISSNA'
-        assert c.instrument_id == 'CASSINI_ISS_NAC'
+        assert driver.instrument_id == 'CASSINI_ISS_NAC'
 
         mock_instrument_id.return_value = 'ISSWA'
-        assert c.instrument_id == 'CASSINI_ISS_WAC'
+        assert driver.instrument_id == 'CASSINI_ISS_WAC'
 
-def test_focal_epsilon():
+def test_focal_epsilon(driver):
     with patch('ale.base.data_naif.NaifSpice.ikid', new_callable=PropertyMock) as mock_ikid:
         mock_ikid.return_value = 123
-        assert c.focal_epsilon == 1
+        assert driver.focal_epsilon == 1
 
-def test_spacecraft_name():
-    assert c.spacecraft_name == 'CASSINI'
+def test_spacecraft_name(driver):
+    assert driver.spacecraft_name == 'CASSINI'
 
-def test_focal2pixel_samples():
+def test_focal2pixel_samples(driver):
     with patch('ale.base.data_naif.NaifSpice.ikid', new_callable=PropertyMock) as mock_ikid:
         mock_ikid.return_value = 123
-        assert c.focal2pixel_samples == [0,1000,0]
+        assert driver.focal2pixel_samples == [0,1000,0]
 
-def test_focal2pixel_lines():
+def test_focal2pixel_lines(driver):
     with patch('ale.base.data_naif.NaifSpice.ikid', new_callable=PropertyMock) as mock_ikid:
         mock_ikid.return_value = 123
-        assert c.focal2pixel_lines == [0,0,1000]
+        assert driver.focal2pixel_lines == [0,0,1000]
 
-def test_odtk():
+def test_odtk(driver):
     with patch('ale.base.label_pds3.Pds3Label.instrument_id', new_callable=PropertyMock) as mock_instrument_id:
 
         mock_instrument_id.return_value = 'ISSNA'
-        assert c._odtk == [float('-8e-6'), 0, 0]
+        assert driver._odtk == [float('-8e-6'), 0, 0]
 
         mock_instrument_id.return_value = 'ISSWA'
-        assert c._odtk == [float('-6.2e-5'), 0, 0]
+        assert driver._odtk == [float('-6.2e-5'), 0, 0]
 
-def test_detector_center_line():
+def test_detector_center_line(driver):
     with patch('ale.base.data_naif.NaifSpice.ikid', new_callable=PropertyMock) as mock_ikid:
         mock_ikid.return_value = 123
-        assert c.detector_center_line == 1
+        assert driver.detector_center_line == 1
 
-def test_detector_center_sample():
+def test_detector_center_sample(driver):
     with patch('ale.base.data_naif.NaifSpice.ikid', new_callable=PropertyMock) as mock_ikid:
         mock_ikid.return_value = 123
-        assert c.detector_center_sample == 1
+        assert driver.detector_center_sample == 1
 
-def test_instrument_model_version():
-    assert c.instrument_model_version == 1
+def test_instrument_model_version(driver):
+    assert driver.instrument_model_version == 1
