@@ -4,7 +4,6 @@ import ale
 from ale.drivers import cassini_drivers
 from ale.base import data_naif
 from ale.base import label_pds3
-from ale.formatters import usgscsm_formatter
 
 from unittest.mock import PropertyMock, patch
 
