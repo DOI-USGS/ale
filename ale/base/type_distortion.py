@@ -3,6 +3,6 @@ class RadialDistortion():
     def usgscsm_distortion_model(self):
         return {
             "radial": {
-                "coefficients" : self._odtk
+                "coefficients" : self.odtk
             }
         }

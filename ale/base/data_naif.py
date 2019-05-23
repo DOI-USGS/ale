@@ -25,7 +25,7 @@ class NaifSpice():
         pass
 
     @property
-    def _odtx(self):
+    def odtx(self):
         """
         Returns
         -------
@@ -35,7 +35,7 @@ class NaifSpice():
         return spice.gdpool('INS{}_OD_T_X'.format(self.ikid),0, 10).tolist()
 
     @property
-    def _odty(self):
+    def odty(self):
         """
         Returns
         -------
@@ -45,7 +45,7 @@ class NaifSpice():
         return spice.gdpool('INS{}_OD_T_Y'.format(self.ikid), 0, 10).tolist()
 
     @property
-    def _odtk(self):
+    def odtk(self):
         """
         Returns
         -------

@@ -80,7 +80,7 @@ class LroLrocPds3LabelNaifSpiceDriver(Driver, NaifSpice, Pds3Label, LineScanner)
 
 
   @property
-  def _odtk(self):
+  def odtk(self):
     """
     Returns
     -------
@@ -98,6 +98,6 @@ class LroLrocPds3LabelNaifSpiceDriver(Driver, NaifSpice, Pds3Label, LineScanner)
     """
     return {
       "lrolrocnac": {
-        "coefficients": self._odtk,
+        "coefficients": self.odtk,
       }
     }

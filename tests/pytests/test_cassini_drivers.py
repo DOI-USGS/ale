@@ -51,14 +51,14 @@ def test_focal2pixel_lines(driver):
         mock_ikid.return_value = 123
         assert driver.focal2pixel_lines == [0,0,1000]
 
-def test_odtk(driver):
+def testodtk(driver):
     with patch('ale.base.label_pds3.Pds3Label.instrument_id', new_callable=PropertyMock) as mock_instrument_id:
 
         mock_instrument_id.return_value = 'ISSNA'
-        assert driver._odtk == [float('-8e-6'), 0, 0]
+        assert driver.odtk == [float('-8e-6'), 0, 0]
 
         mock_instrument_id.return_value = 'ISSWA'
-        assert driver._odtk == [float('-6.2e-5'), 0, 0]
+        assert driver.odtk == [float('-6.2e-5'), 0, 0]
 
 def test_detector_center_line(driver):
     with patch('ale.base.data_naif.NaifSpice.ikid', new_callable=PropertyMock) as mock_ikid:

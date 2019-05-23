@@ -733,7 +733,7 @@ class IsisSpice(IsisLabel):
         return self.label['NaifKeywords']
 
     @property
-    def _odtk(self):
+    def odtk(self):
         return self.label["NaifKeywords"]["INS{}_OD_K".format(self.ikid)]
 
     @property

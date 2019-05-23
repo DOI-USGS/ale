@@ -198,8 +198,8 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, Driver, NaifSpice, Framer
     def optical_distortion(self):
         return {
             "transverse": {
-                "x" : self._odtx,
-                "y" : self._odty
+                "x" : self.odtx,
+                "y" : self.odty
                 }
             }
 

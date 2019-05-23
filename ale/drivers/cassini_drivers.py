@@ -79,7 +79,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDis
         return [0.0, 0.0, 1/pixel_size]
 
     @property
-    def _odtk(self):
+    def odtk(self):
         """
         The radial distortion coeffs are not defined in the ik kernels, instead
         they are defined in the ISS Data User Guide (Knowles). Therefore, we
