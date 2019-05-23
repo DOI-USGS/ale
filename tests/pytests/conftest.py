@@ -7,6 +7,8 @@ class SimpleSpice():
         return -12345
     def gdpool(self, key, x, length):
         return np.ones(length)
+    def gipool(self, key, x, length):
+        return np.arange(length)
     def bodvrd(self, key, x, length):
         return (3, np.ones(length,))
     def spkpos(self, *args):

@@ -53,7 +53,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Driver, Pds3Label, NaifSpice, Framer, R
         : str
           instrument id
         """
-        return self.id_lookup[self.label['INSTRUMENT_ID']]
+        return self.id_lookup[super().instrument_id]
 
     @property
     def focal_epsilon(self):
@@ -103,3 +103,15 @@ class CassiniIssPds3LabelNaifSpiceDriver(Driver, Pds3Label, NaifSpice, Framer, R
     # number, so the order doesn't matter
     def detector_center_sample(self):
       return float(spice.gdpool('INS{}_FOV_CENTER_PIXEL'.format(self.ikid), 0, 2)[0])
+
+    @property
+    def instrument_model_version(self):
+        """
+        Returns instrument model version
+
+        Returns
+        -------
+        : int
+          model version
+        """
+        return 1

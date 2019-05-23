@@ -69,6 +69,14 @@ class NaifSpice():
         return spice.bods2c(self.spacecraft_name)
 
     @property
+    def target_id(self):
+        return spice.bods2c(self.target_name)
+
+    @property
+    def body_frame_code(self):
+        return spice.gipool('BODY_FRAME_CODE', 0, 1)
+
+    @property
     def focal2pixel_lines(self):
         return list(spice.gdpool('INS{}_ITRANSL'.format(self.ikid), 0, 3))
 
@@ -79,6 +87,21 @@ class NaifSpice():
     @property
     def _focal_length(self):
         return float(spice.gdpool('INS{}_FOCAL_LENGTH'.format(self.ikid), 0, 1)[0])
+
+    @property
+    def pixel_size(self):
+        return spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
+
+    @property
+    def _radii(self):
+        """
+        Returns
+        -------
+        : list<double>
+          Radius of all three axis of the target body
+        """
+        rad = spice.bodvrd(self.target_name, 'RADII', 3)
+        return rad[1]
 
     @property
     def _semimajor(self):
@@ -194,3 +217,18 @@ class NaifSpice():
     @property
     def detector_center_line(self):
         return float(spice.gdpool('INS{}_BORESIGHT_LINE'.format(self.ikid), 0, 1)[0])
+
+    @property
+    def _naif_keywords(self):
+        naif_keywords = dict()
+        
+        naif_keywords['BODY{}_RADII'.format(self.target_id)] = self._radii
+        naif_keywords['BODY_FRAME_CODE'] = self.body_frame_code
+        naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)] = self.pixel_size
+        naif_keywords['INS{}_ITRANSL'.format(self.ikid)] = self.focal2pixel_lines
+        naif_keywords['INS{}_ITRANSS'.format(self.ikid)] = self.focal2pixel_samples
+        naif_keywords['INS{}_FOCAL_LENGTH'.format(self.ikid)] = self._focal_length
+        naif_keywords['INS{}_BORESIGHT_SAMPLE'.format(self.ikid)] = self.detector_center_sample
+        naif_keywords['INS{}_BORESIGHT_LINE'.format(self.ikid)] = self.detector_center_line
+        
+        return naif_keywords
