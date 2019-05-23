@@ -117,9 +117,9 @@ class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDis
         return 1
 
     @property
-    def detector_start_sample(Self):
+    def detector_start_sample(self):
         return 1
 
     @property
-    def detector_start_line(Self):
+    def detector_start_line(self):
         return 1
