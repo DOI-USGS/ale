@@ -504,7 +504,7 @@ class IsisSpice(IsisLabel):
         return self.naif_keywords.get('INS{}_ITRANSS'.format(self.ikid), None)
 
     @property
-    def _focal_length(self):
+    def focal_length(self):
         """
         The focal length of the instrument
 
@@ -733,7 +733,7 @@ class IsisSpice(IsisLabel):
         return self.label['NaifKeywords']
 
     @property
-    def _odtk(self):
+    def odtk(self):
         return self.label["NaifKeywords"]["INS{}_OD_K".format(self.ikid)]
 
     @property

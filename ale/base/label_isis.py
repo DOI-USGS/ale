@@ -41,7 +41,7 @@ class IsisLabel():
         Returns
         -------
         : int
-          Number of samples in image
+          Sample summing
         """
         try:
             summing = self.label['IsisCube']['Instrument']['SummingMode']
@@ -55,7 +55,7 @@ class IsisLabel():
         Returns
         -------
         : int
-          Number of samples in image
+          Line summing
         """
         try:
             summing = self.label['IsisCube']['Instrument']['SummingMode']
@@ -89,6 +89,7 @@ class IsisLabel():
         """
         try:
             start_count = self.label['IsisCube']['Instrument']['SpacecraftClockStartCount']
+
         except:
             start_count = self.label['IsisCube']['Archive']['SpacecraftClockStartCount']
 
