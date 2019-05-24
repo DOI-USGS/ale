@@ -25,14 +25,14 @@ def test_pixel_size(test_naif_data):
     assert test_naif_data.pixel_size == (0.001)
 
 def test_radii(test_naif_data):
-    np.testing.assert_equal(test_naif_data._radii, np.ones(3))
+    np.testing.assert_equal(test_naif_data.target_body_radii, np.ones(3))
 
 def test_naif_keywords(test_naif_data):
-    np.testing.assert_equal(test_naif_data._naif_keywords['BODY-12345_RADII'], np.ones(3))
-    np.testing.assert_equal(test_naif_data._naif_keywords['BODY_FRAME_CODE'], np.arange(1))
-    np.testing.assert_equal(test_naif_data._naif_keywords['INS-12345_PIXEL_SIZE'], (0.001))
-    np.testing.assert_equal(test_naif_data._naif_keywords['INS-12345_ITRANSL'], np.ones(3))
-    np.testing.assert_equal(test_naif_data._naif_keywords['INS-12345_ITRANSS'], np.ones(3))
-    np.testing.assert_equal(test_naif_data._naif_keywords['INS-12345_FOCAL_LENGTH'], np.ones(1))
-    np.testing.assert_equal(test_naif_data._naif_keywords['INS-12345_BORESIGHT_LINE'], np.ones(1))
-    np.testing.assert_equal(test_naif_data._naif_keywords['INS-12345_BORESIGHT_SAMPLE'], np.ones(1))
+    np.testing.assert_equal(test_naif_data.isis_naif_keywords['BODY-12345_RADII'], np.ones(3))
+    np.testing.assert_equal(test_naif_data.isis_naif_keywords['BODY_FRAME_CODE'], np.arange(1))
+    np.testing.assert_equal(test_naif_data.isis_naif_keywords['INS-12345_PIXEL_SIZE'], (0.001))
+    np.testing.assert_equal(test_naif_data.isis_naif_keywords['INS-12345_ITRANSL'], np.ones(3))
+    np.testing.assert_equal(test_naif_data.isis_naif_keywords['INS-12345_ITRANSS'], np.ones(3))
+    np.testing.assert_equal(test_naif_data.isis_naif_keywords['INS-12345_FOCAL_LENGTH'], np.ones(1))
+    np.testing.assert_equal(test_naif_data.isis_naif_keywords['INS-12345_BORESIGHT_LINE'], np.ones(1))
+    np.testing.assert_equal(test_naif_data.isis_naif_keywords['INS-12345_BORESIGHT_SAMPLE'], np.ones(1))

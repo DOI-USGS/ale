@@ -130,12 +130,12 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, Driver, Framer, NaifSpice):
         """
         return {
             "dawnfc": {
-                "coefficients" : self._odtk
+                "coefficients" : self.odtk
                 }
             }
 
     @property
-    def _odtk(self):
+    def odtk(self):
         """
         Returns
         -------
