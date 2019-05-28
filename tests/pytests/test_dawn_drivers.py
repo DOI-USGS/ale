@@ -32,7 +32,9 @@ def test_instrument_id(driver):
             assert driver.instrument_id == 'DAWN_1_FILTER_2'
 
 def test_spacecraft_name(driver):
-    assert driver.spacecraft_name == 'DAWN'
+    with patch('ale.base.label_pds3.Pds3Label.instrument_host_id', new_callable=PropertyMock) as mock_host_id:
+        mock_host_id.return_value = 'DAWN'
+        assert driver.spacecraft_name == 'DAWN'
 
 def test_target_name(driver):
     with patch('ale.base.label_pds3.Pds3Label.target_name', new_callable=PropertyMock) as mock_target_name:
@@ -44,7 +46,9 @@ def test_target_name(driver):
 def test_ephemeris_start_time(driver):
     with patch('ale.base.label_pds3.Pds3Label.spacecraft_clock_start_count', new_callable=PropertyMock) as mock_start_count:
         mock_start_count.return_value == 123
-        assert driver.ephemeris_start_time == .1 + 193.0 / 1000.0
+        with patch('ale.base.label_pds3.Pds3Label.instrument_host_id', new_callable=PropertyMock) as mock_host_id:
+            mock_host_id.return_value = 'DAWN'
+            assert driver.ephemeris_start_time == .1 + 193.0 / 1000.0
 
 def test_odtk(driver):
     with patch('ale.base.data_naif.NaifSpice.ikid', new_callable=PropertyMock) as mock_ikid:

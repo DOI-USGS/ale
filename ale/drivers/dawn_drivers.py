@@ -82,14 +82,15 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
     def spacecraft_name(self):
         """
         Spacecraft name used in various Spice calls to acquire
-        ephemeris data.
+        ephemeris data. Dawn does not have a SPACECRAFT_NAME keyword, therefore
+        we are overwriting this method using the instrument_host_id keyword instead.
 
         Returns
         -------
         : str
           Spacecraft name
         """
-        return 'DAWN'
+        return self.instrument_host_id
 
     @property
     def target_name(self):
