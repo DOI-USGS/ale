@@ -58,6 +58,7 @@ EXPOSURE_DURATION = 1.23 <MS>
 INSTRUMENT_HOST_ID = "mro"
 DOWNTRACK_SUMMING = 2
 CROSSTRACK_SUMMING = 3
+FILTER_NUMBER = 5
 
 END
 """
@@ -115,3 +116,5 @@ def test_spacecraft_clock_stop_count(test_image_label):
 def test_exposure_duration(test_image_label):
     assert test_image_label.exposure_duration == 0.00123
 
+def test_filter_number(test_image_label):
+    assert test_image_label.filter_number == 5
