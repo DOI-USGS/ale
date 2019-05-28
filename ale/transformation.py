@@ -41,7 +41,7 @@ class FrameNode():
         self.children = []
         self.id = id
         if parent is not None:
-            self.parent = parent
+            self._parent = parent
         if rotation is not None:
             self.rotation = rotation
 
