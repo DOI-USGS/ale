@@ -25,7 +25,7 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
           instrument id
         """
         instrument_id = super().instrument_id
-        filter_number = super().filter_number
+        filter_number = self.filter_number
 
         return "DAWN_{}_FILTER_{}".format(instrument_id, filter_number)
 
@@ -117,7 +117,7 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         account for the CCD being discharged or cleared.
         """
         if not hasattr(self, '_starting_ephemeris_time'):
-            sclock = super().spacecraft_clock_start_count
+            sclock = self.spacecraft_clock_start_count
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
             self._starting_ephemeris_time += 193.0 / 1000.0
         return self._starting_ephemeris_time
