@@ -6,7 +6,6 @@ from ale import config
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
-from ale.base.type_distortion import RadialDistortion
 from ale.base.type_sensor import Framer
 
 class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
