@@ -18,6 +18,10 @@ def test_naif_data():
 
     return naif_data
 
+def test_frame_chain(test_naif_data):
+    assert test_naif_data.frame_chain['j2000'].parent == None
+    assert test_naif_data.frame_chain['target'].parent == test_naif_data.frame_chain['j2000']
+
 def test_target_id(test_naif_data):
     assert test_naif_data.target_id == -12345
 

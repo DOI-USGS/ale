@@ -1,6 +1,7 @@
 import spiceypy as spice
 import numpy as np
 from ale.base.type_sensor import Framer
+from ale.transformation import FrameNode
 
 class NaifSpice():
     def __enter__(self):
@@ -150,10 +151,22 @@ class NaifSpice():
 
     @property
     def frame_chain(self):
-        pass
+        # pass
+        if not hasattr(self, '_frame_chain'):
+            frame_chain = {}
+            frame_chain['j2000'] = FrameNode(1)
+            # self._frame_chain['spacecraft'] = FrameNode(self.)
+            frame_chain['sensor'] = FrameNode(self.sensor_frame_id, 
+                                                parent=frame_chain['j2000'],
+                                                rotation='ConstantRotation')
+            frame_chain['target'] = FrameNode(self.target_frame_id, 
+                                                 parent=frame_chain['j2000'],
+                                                 rotation='TimeDependentRotation')
+            self._frame_chain = frame_chain
+        return self._frame_chain
 
     @property
-    def _sensor_orientation(self):
+    def sensor_orientation(self):
         if not hasattr(self, '_orientation'):
             ephem = self.ephemeris_time
 
