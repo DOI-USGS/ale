@@ -80,20 +80,19 @@ class TestDriver(Driver):
         body_rotation = TimeDependentRotation(
             np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
             np.array([0, 1]),
-            1,
-            100
+            100,
+            1
         )
         body_fixed = FrameNode(100, parent=j2000, rotation=body_rotation)
         spacecraft_rotation = TimeDependentRotation(
             np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
             np.array([0, 1]),
-            1,
-            1000
+            1000,
+            1
         )
         spacecraft = FrameNode(1000, parent=j2000, rotation=spacecraft_rotation)
-        sensor_rotation = ConstantRotation(np.array([0, 0, 0, 1]), 1000, 1010)
+        sensor_rotation = ConstantRotation(np.array([0, 0, 0, 1]), 1010, 1000)
         sensor = FrameNode(1010, parent=spacecraft, rotation=sensor_rotation)
-        print([node.id for node in j2000.children])
         return j2000
 
     @property

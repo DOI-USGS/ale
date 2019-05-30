@@ -56,6 +56,12 @@ class ConstantRotation:
         """
         self._rot = Rotation.from_quat(new_quat)
 
+    def rotation_matrix(self):
+        """
+        The rotation matrix representation of the constant rotation
+        """
+        return self._rot.as_dcm()
+
     def inverse(self):
         """
         Get the inverse rotation, that is the rotation from the destination
@@ -77,7 +83,7 @@ class ConstantRotation:
                 Another rotation object, it can be constant or time dependent.
         """
         if self.source != other.dest:
-            raise ValueError("Destination frame of first rotation is not the same as source frame of second rotation.")
+            raise ValueError("Destination frame of first rotation {} is not the same as source frame of second rotation {}.".format(other.dest, self.source))
         if isinstance(other, ConstantRotation):
             new_rot = self._rot * other._rot
             return ConstantRotation(new_rot.as_quat(), other.source, self.dest)
@@ -169,7 +175,7 @@ class TimeDependentRotation:
                 Another rotation object, it can be constant or time dependent.
         """
         if self.source != other.dest:
-            raise ValueError("Destination frame of first rotation is not the same as source frame of second rotation.")
+            raise ValueError("Destination frame of first rotation {} is not the same as source frame of second rotation {}.".format(other.dest, self.source))
         if isinstance(other, ConstantRotation):
             return TimeDependentRotation((self._rots * other._rot).as_quat(), self.times, other.source, self.dest)
         elif isinstance(other, TimeDependentRotation):

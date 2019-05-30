@@ -39,7 +39,7 @@ def test_del_node(frame_tree):
     node3 = nodes[3]
     node2 = nodes[2]
     del node3
-    
+
     assert len(node2.children) == 0
 
 def test_parent_nodes(frame_tree):

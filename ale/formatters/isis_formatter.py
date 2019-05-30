@@ -23,19 +23,15 @@ def find_last_time_dependent_frame(source, dest):
     forward_path, reverse_path = source.path_to(dest)
     for frame in (forward_path + reverse_path):
         if isinstance(frame.rotation_to(dest), ConstantRotation):
-            # The last frame in reverse_path is dest, and the rotation from dest
-            # to dest is always constant, so this will always return something.
+            # The last frame is dest, and the rotation from dest to dest
+            # is always constant, so this will always return something.
             return frame
 
 def find_frame(root, id):
-    print('searching for frame with ID {} in children of {}'.format(id, root.id))
     if root.id == id:
-        print('found frame!')
         return root
     node = None
-    print('children {}'.format([node.id for node in root.children]))
     for child in root.children:
-        print('checking {}'.format(child.id))
         node = find_frame(child, id)
         if node is not None:
             return node
@@ -55,7 +51,7 @@ def to_isis(driver):
     time_dependent_sensor_frame = find_last_time_dependent_frame(j2000, sensor_frame)
     if time_dependent_sensor_frame != j2000:
         forward_path, reverse_path = j2000.path_to(time_dependent_sensor_frame)
-        instrument_pointing['TimeDependentFrames'] = (forward_path + reverse_path)[::-1]
+        instrument_pointing['TimeDependentFrames'] = [frame.id for frame in (forward_path + reverse_path)[::-1]]
         time_dependent_rotation = j2000.rotation_to(time_dependent_sensor_frame)
         instrument_pointing['CkTableStartTime'] = time_dependent_rotation.times[0]
         instrument_pointing['CkTableEndTime'] = time_dependent_rotation.times[-1]
@@ -64,9 +60,9 @@ def to_isis(driver):
         instrument_pointing['Quaternions'] = time_dependent_rotation.quats
     if time_dependent_sensor_frame != sensor_frame:
         forward_path, reverse_path = time_dependent_sensor_frame.path_to(sensor_frame)
-        instrument_pointing['ConstantFrames'] = (forward_path + reverse_path)[::-1]
+        instrument_pointing['ConstantFrames'] = [frame.id for frame in (forward_path + reverse_path)[::-1]]
         constant_rotation = time_dependent_sensor_frame.rotation_to(sensor_frame)
-        instrument_pointing['ConstantRotation'] = constant_rotation.rotation_matrix
+        instrument_pointing['ConstantRotation'] = constant_rotation.rotation_matrix()
     meta_data['InstrumentPointing'] = instrument_pointing
 
     body_rotation = {}
@@ -74,7 +70,7 @@ def to_isis(driver):
     time_dependent_target_frame = find_last_time_dependent_frame(j2000, target_frame)
     if time_dependent_target_frame != j2000:
         forward_path, reverse_path = j2000.path_to(time_dependent_target_frame)
-        body_rotation['TimeDependentFrames'] = (forward_path + reverse_path)[::-1]
+        body_rotation['TimeDependentFrames'] = [frame.id for frame in (forward_path + reverse_path)[::-1]]
         time_dependent_rotation = j2000.rotation_to(time_dependent_target_frame)
         body_rotation['CkTableStartTime'] = time_dependent_rotation.times[0]
         body_rotation['CkTableEndTime'] = time_dependent_rotation.times[-1]
@@ -83,9 +79,9 @@ def to_isis(driver):
         body_rotation['Quaternions'] = time_dependent_rotation.quats
     if time_dependent_target_frame != target_frame:
         forward_path, reverse_path = time_dependent_target_frame.path_to(target_frame)
-        body_rotation['ConstantFrames'] = (forward_path + reverse_path)[::-1]
+        body_rotation['ConstantFrames'] = [frame.id for frame in (forward_path + reverse_path)[::-1]]
         constant_rotation = time_dependent_target_frame.rotation_to(target_frame)
-        body_rotation['ConstantRotation'] = constant_rotation.rotation_matrix
+        body_rotation['ConstantRotation'] = constant_rotation.rotation_matrix()
     meta_data['BodyRotation'] = body_rotation
 
     instrument_position = {}
