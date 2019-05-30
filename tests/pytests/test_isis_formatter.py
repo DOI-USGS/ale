@@ -7,8 +7,6 @@ from ale.base.base import Driver
 from ale.transformation import FrameNode
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
-identity_matrix = np.array([[1, 0 ,0], [0, 1, 0], [0, 0, 1]])
-
 class TestDriver(Driver):
     """
     Test Driver implementation with dummy values.
@@ -163,7 +161,7 @@ def test_instrument_pointing(driver):
     pointing = meta_data['InstrumentPointing']
     assert pointing['TimeDependentFrames'] == [1000, 1]
     assert pointing['ConstantFrames'] == [1010, 1000]
-    np.testing.assert_equal(pointing['ConstantRotation'], identity_matrix)
+    np.testing.assert_equal(pointing['ConstantRotation'], np.array([[1, 0 ,0], [0, 1, 0], [0, 0, 1]]))
     assert pointing['CkTableStartTime'] == 0
     assert pointing['CkTableEndTime'] == 1
     assert pointing['CkTableOriginalSize'] == 2
