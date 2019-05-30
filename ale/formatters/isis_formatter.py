@@ -3,40 +3,6 @@ import json
 from ale.transformation import FrameNode
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
-def find_last_time_dependent_frame(source, dest):
-    """
-    Find the last time dependent frame between the source and destination frames.
-
-    Parameters
-    ----------
-    source : FrameNode
-        The starting frame
-    dest : FrameNode
-        The ending frame
-
-    Returns
-    -------
-    FrameNode
-        The first frame between the source frame and the destination frame such
-        that the rotation from this frame to the destination frame is constant.
-    """
-    forward_path, reverse_path = source.path_to(dest)
-    for frame in (forward_path + reverse_path):
-        if isinstance(frame.rotation_to(dest), ConstantRotation):
-            # The last frame is dest, and the rotation from dest to dest
-            # is always constant, so this will always return something.
-            return frame
-
-def find_frame(root, id):
-    if root.id == id:
-        return root
-    node = None
-    for child in root.children:
-        node = find_frame(child, id)
-        if node is not None:
-            return node
-    return node
-
 def to_isis(driver):
     meta_data = {}
 
@@ -48,7 +14,7 @@ def to_isis(driver):
 
     instrument_pointing = {}
     sensor_frame = j2000.find_child_frame(driver.sensor_frame_id)
-    time_dependent_sensor_frame = find_last_time_dependent_frame(j2000, sensor_frame)
+    time_dependent_sensor_frame = j2000.last_time_dependent_frame_between(sensor_frame)
     if time_dependent_sensor_frame != j2000:
         forward_path, reverse_path = j2000.path_to(time_dependent_sensor_frame)
         instrument_pointing['TimeDependentFrames'] = [frame.id for frame in (forward_path + reverse_path)[::-1]]
@@ -67,7 +33,7 @@ def to_isis(driver):
 
     body_rotation = {}
     target_frame = j2000.find_child_frame(driver.target_frame_id)
-    time_dependent_target_frame = find_last_time_dependent_frame(j2000, target_frame)
+    time_dependent_target_frame = j2000.last_time_dependent_frame_between(target_frame)
     if time_dependent_target_frame != j2000:
         forward_path, reverse_path = j2000.path_to(time_dependent_target_frame)
         body_rotation['TimeDependentFrames'] = [frame.id for frame in (forward_path + reverse_path)[::-1]]

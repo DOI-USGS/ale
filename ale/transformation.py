@@ -1,6 +1,6 @@
 import numpy as np
 
-from ale.rotation import ConstantRotation
+from ale.rotation import ConstantRotation, TimeDependentRotation
 
 class FrameNode():
     """
@@ -164,3 +164,31 @@ class FrameNode():
         for next_rotation in rotations[1:]:
             rotation = next_rotation * rotation
         return rotation
+
+    def last_time_dependent_frame_between(self, other):
+        """
+        Find the last time dependent frame between this frame and another frame.
+
+        Parameters
+        ----------
+        other : FrameNode
+            The frame to find the last time dependent frame between
+
+        Returns
+        -------
+        FrameNode
+            The first frame between the this frame and the other frame such
+            that the rotation from this frame to the in-between frame is time
+            dependent and the rotation from the in-between frame to the other
+            frame is constant. If there are no time dependent frames between
+            this frame and the other frame, None is returned.
+        """
+        forward_path, reverse_path = self.path_to(other)
+        # Reverse search the rotation chain for the last time dependent rotation
+        for node in reverse_path[::-1]:
+            if isinstance(node.rotation, TimeDependentRotation):
+                return node
+        for node in forward_path[:-1][::-1]:
+            if isinstance(node.rotation, TimeDependentRotation):
+                return node.parent
+        return None
