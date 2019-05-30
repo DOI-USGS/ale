@@ -134,3 +134,8 @@ def test_find_child_frame(frame_tree):
     assert child_1 == nodes[1]
     assert child_2 == nodes[2]
     assert child_3 == nodes[3]
+
+def test_find_non_child_frame(frame_tree):
+    nodes, rotations = frame_tree
+    bad_child = nodes[1].find_child_frame(4)
+    assert bad_child is None
