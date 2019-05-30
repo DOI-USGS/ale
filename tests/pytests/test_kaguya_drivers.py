@@ -1,166 +1,118 @@
 import pytest
+import numpy as np
+import pvl
 
+import ale
 from ale.drivers import kaguya_drivers
-from ale.drivers.kaguya_drivers import KaguyaTcPds3NaifSpiceDriver
+from ale.base import data_naif
+from ale.base import label_pds3
+
+from unittest.mock import PropertyMock, patch
 
 # 'Mock' the spice module where it is imported
 from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
+
+data_naif.spice = simplespice
 kaguya_drivers.spice = simplespice
+label_pds3.spice = simplespice
+
+from ale.drivers.kaguya_drivers import KaguyaTcPds3NaifSpiceDriver
 
 KaguyaTcPds3NaifSpiceDriver.metakernel = get_mockkernels
 
 @pytest.fixture
-def kaguya_tclabel():
-    return  """
-    PDS_VERSION_ID                       = "PDS3"
-    /*** FILE FORMAT ***/
-    RECORD_TYPE                          = "UNDEFINED"
-    FILE_NAME                            = "TC1W2B0_01_00296N081E2387.img"
-    PRODUCT_ID                           = "TC1W2B0_01_00296N081E2387"
-    DATA_FORMAT                          = "PDS"
+def driver():
+    return KaguyaTcPds3NaifSpiceDriver("")
 
-    /*** POINTERS TO START BYTE OFFSET OF OBJECTS IN FILE ***/
-    ^IMAGE                               = 7609 <BYTES>
+@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
+def test_instrument_id(driver):
+    with patch.dict(driver.label, {'SWATH_MODE_ID':'NOMINAL', 'PRODUCT_SET_ID':'TC_w_Level2B0' }) as f:
+        assert driver.instrument_id == 'LISM_123_WTN'
 
-    /*** GENERAL DATA DESCRIPTION PARAMETERS ***/
-    SOFTWARE_NAME                        = "RGC_TC_w_Level2B0 (based on RGC_TC_MI version 2.10.1)"
-    SOFTWARE_VERSION                     = "1.0.0"
-    PROCESS_VERSION_ID                   = "L2B"
-    PRODUCT_CREATION_TIME                = 2013-07-16T20:12:53Z
-    PROGRAM_START_TIME                   = 2013-07-16T20:08:01Z
-    PRODUCER_ID                          = "LISM"
-    PRODUCT_SET_ID                       = "TC_w_Level2B0"
-    PRODUCT_VERSION_ID                   = "01"
-    REGISTERED_PRODUCT                   = "Y"
-    ILLUMINATION_CONDITION               = "MORNING"
-    LEVEL2A_FILE_NAME                    = "TC1W2A0_02TSF00296_001_0022.img"
-    SPICE_METAKERNEL_FILE_NAME           = "RGC_INF_TCv401IK_MIv200IK_SPv105IK_RISE100h_02_LongCK_D_V02_de421_110706.mk"
+@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
+def test_tc_id(driver):
+    assert driver._tc_id == -12345
 
-    /*** SCENE RELATED PARAMETERS ***/
-    MISSION_NAME                         = "SELENE"
-    SPACECRAFT_NAME                      = "SELENE-M"
-    DATA_SET_ID                          = "TC1_Level2B"
-    INSTRUMENT_NAME                      = "Terrain Camera 1"
-    INSTRUMENT_ID                        = "TC1"
-    MISSION_PHASE_NAME                   = "InitialCheckout"
-    REVOLUTION_NUMBER                    = 296
-    STRIP_SEQUENCE_NUMBER                = 1
-    SCENE_SEQUENCE_NUMBER                = 22
-    UPPER_LEFT_DAYTIME_FLAG              = "Day"
-    UPPER_RIGHT_DAYTIME_FLAG             = "Day"
-    LOWER_LEFT_DAYTIME_FLAG              = "Day"
-    LOWER_RIGHT_DAYTIME_FLAG             = "Day"
-    TARGET_NAME                          = "MOON"
-    OBSERVATION_MODE_ID                  = "NORMAL"
-    SENSOR_DESCRIPTION                   = "Imagery type:Pushbroom. ImageryMode:Mono,Stereo. ExposureTimeMode:Long,Middle,Short. CompressionMode:NonComp,DCT. Q-table:32 patterns. H-table:4 patterns. SwathMode:F(Full),N(Nominal),H(Half). First pixel number:1(F),297(N),1172(H)."
-    SENSOR_DESCRIPTION2                  = "Pixel size:7x7[micron^2](TC1/TC2). Wavelength range:430-850[nm](TC1/TC2). A/D rate:10[bit](TC1/TC2). Slant angle:+/-15[degree] (from nadir to +x of S/C)(TC1/TC2). Focal length:72.45/72.63[mm](TC1/TC2). F number:3.97/3.98(TC1/TC2)."
-    DETECTOR_STATUS                      = {"TC1:ON","TC2:ON","MV:OFF","MN:OFF","SP:ON"}
-    EXPOSURE_MODE_ID                     = "SHORT"
-    LINE_EXPOSURE_DURATION               =   1.625000 <msec>
-    SPACECRAFT_CLOCK_START_COUNT         =  878074165.1875 <sec>
-    SPACECRAFT_CLOCK_STOP_COUNT          =  878074195.4450 <sec>
-    CORRECTED_SC_CLOCK_START_COUNT       =  878074165.186621 <sec>
-    CORRECTED_SC_CLOCK_STOP_COUNT        =  878074195.443901 <sec>
-    START_TIME                           = 2007-11-02T21:29:27.123714Z
-    STOP_TIME                            = 2007-11-02T21:29:57.381214Z
-    CORRECTED_START_TIME                 = 2007-11-02T21:29:27.122835Z
-    CORRECTED_STOP_TIME                  = 2007-11-02T21:29:57.380115Z
-    LINE_SAMPLING_INTERVAL               =   6.500000 <msec>
-    CORRECTED_SAMPLING_INTERVAL          =   6.499953 <msec>
-    UPPER_LEFT_LATITUDE                  =   7.290785 <deg>
-    UPPER_LEFT_LONGITUDE                 = 238.410490 <deg>
-    UPPER_RIGHT_LATITUDE                 =   7.288232 <deg>
-    UPPER_RIGHT_LONGITUDE                = 238.991705 <deg>
-    LOWER_LEFT_LATITUDE                  =   8.820028 <deg>
-    LOWER_LEFT_LONGITUDE                 = 238.417311 <deg>
-    LOWER_RIGHT_LATITUDE                 =   8.817605 <deg>
-    LOWER_RIGHT_LONGITUDE                = 238.999370 <deg>
-    LOCATION_FLAG                        = "A"
-    ROLL_CANT                            = "NO"
-    SCENE_CENTER_LATITUDE                =   8.053752 <deg>
-    SCENE_CENTER_LONGITUDE               = 238.704621 <deg>
-    INCIDENCE_ANGLE                      =  28.687 <deg>
-    EMISSION_ANGLE                       =  17.950 <deg>
-    PHASE_ANGLE                          =  31.600 <deg>
-    SOLAR_AZIMUTH_ANGLE                  = 108.126 <deg>
-    FOCAL_PLANE_TEMPERATURE              =  18.85 <degC>
-    TELESCOPE_TEMPERATURE                =  18.59 <degC>
-    SATELLITE_MOVING_DIRECTION           = "-1"
-    FIRST_SAMPLED_LINE_POSITION          = "UPPERMOST"
-    FIRST_DETECTOR_ELEMENT_POSITION      = "LEFT"
-    A_AXIS_RADIUS                        = 1737.400 <km>
-    B_AXIS_RADIUS                        = 1737.400 <km>
-    C_AXIS_RADIUS                        = 1737.400 <km>
-    DEFECT_PIXEL_POSITION                = "N/A"
+def test_clock_stop_count(driver):
+    with patch.dict(driver.label, {'CORRECTED_SC_CLOCK_STOP_COUNT':
+        pvl._collections.Units(value=105, units='<sec>')}) as f:
+        assert driver.clock_stop_count == 105
 
-    /*** CAMERA RELATED PARAMETERS ***/
-    SWATH_MODE_ID                        = "FULL"
-    FIRST_PIXEL_NUMBER                   = 1
-    LAST_PIXEL_NUMBER                    = 1600
-    SPACECRAFT_ALTITUDE                  =  108.719 <km>
-    SPACECRAFT_GROUND_SPEED              =  1.530 <km/sec>
-    TC1_TELESCOPE_TEMPERATURE            =  18.70 <degC>
-    TC2_TELESCOPE_TEMPERATURE            =  18.70 <degC>
-    DPU_TEMPERATURE                      =  14.60 <degC>
-    TM_TEMPERATURE                       =  18.01 <degC>
-    TM_RADIATOR_TEMPERATURE              =  17.67 <degC>
-    Q_TABLE_ID                           = "N/A"
-    HUFFMAN_TABLE_ID                     = "N/A"
-    DATA_COMPRESSION_PERCENT_MEAN        = 100.0
-    DATA_COMPRESSION_PERCENT_MAX         = 100.0
-    DATA_COMPRESSION_PERCENT_MIN         = 100.0
+def test_clock_start_count(driver):
+    with patch.dict(driver.label, {'CORRECTED_SC_CLOCK_START_COUNT':
+        pvl._collections.Units(value=501, units='<sec>')}) as f:
+        assert driver.clock_start_count == 501
 
-    /*** DESCRIPTION OF OBJECTS CONTAINED IN THE FILE ***/
+@patch('ale.base.data_naif.NaifSpice.ephemeris_stop_time', 800)
+@patch('ale.base.data_naif.NaifSpice.spacecraft_id', 123)
+def test_ephemeris_stop_time(driver):
+    assert driver.ephemeris_stop_time == 0.1
 
-    OBJECT                               = IMAGE
-        ENCODING_TYPE                    = "N/A"
-        ENCODING_COMPRESSION_PERCENT     = 100.0
-        NOMINAL_LINE_NUMBER              = 4088
-        NOMINAL_OVERLAP_LINE_NUMBER      = 568
-        OVERLAP_LINE_NUMBER              = 568
-        LINES                            = 4656
-        LINE_SAMPLES                     = 1600
-        SAMPLE_TYPE                      = "MSB_INTEGER"
-        SAMPLE_BITS                      = 16
-        IMAGE_VALUE_TYPE                 = "RADIANCE"
-        UNIT                             = "W/m**2/micron/sr"
-        SCALING_FACTOR                   = 1.30000e-02
-        OFFSET                           = 0.00000e+00
-        MIN_FOR_STATISTICAL_EVALUATION   = 0
-        MAX_FOR_STATISTICAL_EVALUATION   = 32767
-        SCENE_MAXIMUM_DN                 = 7602
-        SCENE_MINIMUM_DN                 = 1993
-        SCENE_AVERAGE_DN                 = 2888.6
-        SCENE_STDEV_DN                   = 370.2
-        SCENE_MODE_DN                    = 2682
-        SHADOWED_AREA_MINIMUM            = 0
-        SHADOWED_AREA_MAXIMUM            = 0
-        SHADOWED_AREA_PERCENTAGE         = 0
-        INVALID_TYPE                     = ("SATURATION" , "MINUS" , "DUMMY_DEFECT" , "OTHER")
-        INVALID_VALUE                    = (-20000 , -21000 , -22000 , -23000)
-        INVALID_PIXELS                   = (0 , 0 , 0 , 0)
-    END_OBJECT                           = IMAGE
+@patch('ale.base.data_naif.NaifSpice.ephemeris_start_time', 800)
+@patch('ale.base.data_naif.NaifSpice.spacecraft_id', 123)
+def test_ephemeris_start_time(driver):
+    assert driver.ephemeris_start_time == 0.1
 
-    OBJECT                               = PROCESSING_PARAMETERS
-        DARK_FILE_NAME                   = "TC1_DRK_00293_02951_S_N_b05.csv"
-        FLAT_FILE_NAME                   = "TC1_FLT_00293_04739_N_N_b05.csv"
-        EFFIC_FILE_NAME                  = "TC1_EFF_PRFLT_N_N_v01.csv"
-        NONLIN_FILE_NAME                 = "TC1_NLT_PRFLT_N_N_v01.csv"
-        RAD_CNV_COEF                     = 3.790009 <W/m**2/micron/sr>
-        L2A_DEAD_PIXEL_THRESHOLD         = 30
-        L2A_SATURATION_THRESHOLD         = 1023
-        DARK_VALID_MINIMUM               = -5
-        RADIANCE_SATURATION_THRESHOLD    = 425.971000 <W/m**2/micron/sr>
-    END_OBJECT                           = PROCESSING_PARAMETERS
-    END
-    """
+def test_detector_center_line(driver):
+    assert driver.detector_center_line == 0
 
-def test_kaguya_creation(kaguya_tclabel):
-    #with KaguyaTcPds3NaifSpiceDriver(kaguya_tclabel) as m:
-    #    d = m.to_dict()
-    #    assert isinstance(d, dict)
+@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
+def test_detector_center_sample(driver):
+    assert driver.detector_center_sample == 0
 
-    # Need to insert new tests here, one for each property unique to this driver
-    assert True
+@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
+@patch('ale.base.label_pds3.Pds3Label.target_name', 'MOON')
+def test_sensor_orientation(driver):
+    with patch('ale.base.type_sensor.LineScanner.ephemeris_time', new_callable=PropertyMock) as mock_time:
+        mock_time.return_value = np.linspace(100,200,2)
+        assert driver._sensor_orientation == [[2,3,4,1], [2,3,4,1]]
+
+def test_reference_frame(driver):
+    with patch('ale.base.label_pds3.Pds3Label.target_name', new_callable=PropertyMock) as mock_target_name:
+        mock_target_name.return_value = 'MOOn'
+        assert driver.reference_frame == 'MOON_ME'
+        mock_target_name.return_value = 'sun'
+        assert driver.reference_frame == 'NO TARGET'
+
+@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
+def test_focal2pixel_samples(driver):
+    assert driver.focal2pixel_samples == [0, 0, -1]
+
+@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
+def test_focal2pixel_lines(driver):
+    assert driver.focal2pixel_lines == [0, -1, 0]
+
+@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
+def test_odkx(driver):
+    assert driver._odkx == [1, 1, 1, 1]
+
+@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
+def test_odky(driver):
+    assert driver._odky == [1, 1, 1, 1]
+
+def test_line_exposure_duration(driver):
+    with patch.dict(driver.label, {'CORRECTED_SAMPLING_INTERVAL':
+        pvl._collections.Units(value=1000, units='<msec>')}) as f:
+        assert driver.line_exposure_duration == 1
+    with patch.dict(driver.label, {'CORRECTED_SAMPLING_INTERVAL':
+        [pvl._collections.Units(value=10000, units='<msec>'), 1]}) as f:
+         assert driver.line_exposure_duration == 10
+
+@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
+def test_focal_length(driver):
+    assert driver.focal_length == 1
+
+@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
+def test_usgscsm_distortion_model(driver):
+    distortion_model = driver.usgscsm_distortion_model
+    assert distortion_model['kaguyatc']['x'] == [1, 1, 1, 1]
+    assert distortion_model['kaguyatc']['y'] == [1, 1, 1, 1]
+
+def test_detector_start_sample(driver):
+    with patch.dict(driver.label, {'FIRST_PIXEL_NUMBER': 123}) as f:
+        assert driver.detector_start_sample == 123
+
+def test_sensor_model_version(driver):
+    assert driver.sensor_model_version == 1
