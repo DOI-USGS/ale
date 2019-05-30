@@ -69,7 +69,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
 
     @property
     def clock_stop_count(self):
-        return self.label['CORRECTED_SC_CLOCK_STOP_COUNT'].value
+        return self.label.get('CORRECTED_SC_CLOCK_STOP_COUNT').value
 
     @property
     def ephemeris_stop_time(self):
