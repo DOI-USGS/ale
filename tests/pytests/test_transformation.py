@@ -125,3 +125,12 @@ def test_self_rotation():
     assert rotation.source == 1
     assert rotation.dest == 1
     np.testing.assert_equal(rotation.quat, np.array([0, 0, 0, 1]))
+
+def test_find_child_frame(frame_tree):
+    nodes, rotations = frame_tree
+    child_1 = nodes[0].find_child_frame(2)
+    child_2 = nodes[0].find_child_frame(3)
+    child_3 = nodes[0].find_child_frame(4)
+    assert child_1 == nodes[1]
+    assert child_2 == nodes[2]
+    assert child_3 == nodes[3]

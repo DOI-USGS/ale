@@ -92,6 +92,33 @@ class FrameNode():
             current_parent = current_parent.parent
         return chain
 
+    def find_child_frame(self, id):
+        """
+        Find a child frame by its frame ID.
+
+        Recursively search this frame and it all of its children for a specific
+        reference frame.
+
+        Parameters
+        ----------
+        id : int
+            The NAIF frame ID of the frame to find
+
+        Returns
+        -------
+        FrameNode
+            The specified frame. If no child frame with the given ID exists,
+            None is returned.
+        """
+        if self.id == id:
+            return self
+        node = None
+        for child in self.children:
+            node = child.find_child_frame(id)
+            if node is not None:
+                return node
+        return node
+
     def path_to(self, other):
         """
         Returns the path to another node as two lists. The first list

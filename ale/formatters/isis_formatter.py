@@ -47,7 +47,7 @@ def to_isis(driver):
     j2000 = driver.frame_chain
 
     instrument_pointing = {}
-    sensor_frame = find_frame(j2000, driver.sensor_frame_id)
+    sensor_frame = j2000.find_child_frame(driver.sensor_frame_id)
     time_dependent_sensor_frame = find_last_time_dependent_frame(j2000, sensor_frame)
     if time_dependent_sensor_frame != j2000:
         forward_path, reverse_path = j2000.path_to(time_dependent_sensor_frame)
@@ -66,7 +66,7 @@ def to_isis(driver):
     meta_data['InstrumentPointing'] = instrument_pointing
 
     body_rotation = {}
-    target_frame = find_frame(j2000, driver.target_frame_id)
+    target_frame = j2000.find_child_frame(driver.target_frame_id)
     time_dependent_target_frame = find_last_time_dependent_frame(j2000, target_frame)
     if time_dependent_target_frame != j2000:
         forward_path, reverse_path = j2000.path_to(time_dependent_target_frame)
