@@ -4,8 +4,8 @@ import numpy as np
 from ale.rotation import ConstantRotation
 from ale.transformation import FrameNode
 
-@pytest.fixture
-def frame_tree():
+@pytest.fixture(scope='function')
+def frame_tree(request):
     """
     Test frame tree structure:
 
@@ -33,6 +33,14 @@ def frame_tree():
         child_node_3
     ]
     return (nodes, rotations)
+
+def test_del_node(frame_tree):
+    nodes, _ = frame_tree
+    node3 = nodes[3]
+    node2 = nodes[2]
+    del node3
+    
+    assert len(node2.children) == 0
 
 def test_parent_nodes(frame_tree):
     nodes, _ = frame_tree
