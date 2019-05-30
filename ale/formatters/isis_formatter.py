@@ -28,10 +28,14 @@ def find_last_time_dependent_frame(source, dest):
             return frame
 
 def find_frame(root, id):
+    print('searching for frame with ID {} in children of {}'.format(id, root.id))
     if root.id == id:
+        print('found frame!')
         return root
     node = None
+    print('children {}'.format([node.id for node in root.children]))
     for child in root.children:
+        print('checking {}'.format(child.id))
         node = find_frame(child, id)
         if node is not None:
             return node
