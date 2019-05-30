@@ -248,3 +248,13 @@ class Pds3Label():
     @property
     def line_exposure_duration(self):
         return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
+
+    @property
+    def filter_number(self):
+        """
+        Returns
+        -------
+        : int
+          Returns the filter number from the PDS3 label
+        """
+        return self.label['FILTER_NUMBER']
