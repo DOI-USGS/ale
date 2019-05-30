@@ -41,9 +41,12 @@ class FrameNode():
         self.children = []
         self.id = id
         if parent is not None:
-            self._parent = parent
+            self.parent = parent
         if rotation is not None:
             self.rotation = rotation
+
+    def __repr__(self):
+        return f'ID:{self.id}\nChildren:{self.children}'
 
     def __del__(self):
         """
@@ -72,7 +75,7 @@ class FrameNode():
         of the old parent and adds it to the children of the new parent.
         """
         if self.parent is not None:
-            self.parent.children.remove(self)
+            self._parent.children.remove(self)
 
         new_parent.children.append(self)
         self._parent = new_parent
