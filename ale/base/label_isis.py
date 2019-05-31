@@ -1,4 +1,4 @@
-import pvl 
+import pvl
 
 class IsisLabel():
 
@@ -14,6 +14,24 @@ class IsisLabel():
             except:
                 raise ValueError("{} is not a valid label".format(self._file))
         return self._label
+
+    @property
+    def instrument_id(self):
+        """
+        Returns
+        -------
+        : str
+          instrument id
+        """
+        return self.label['IsisCube']['Instrument']['InstrumentId']
+
+    @property
+    def platform_name(self):
+        return self.label['IsisCube']['Instrument']['SpacecraftName']
+
+    @property
+    def sensor_name(self):
+        return self.label['IsisCube']['Instrument']['InstrumentName']
 
     @property
     def image_lines(self):
