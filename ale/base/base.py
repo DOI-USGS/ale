@@ -1,0 +1,229 @@
+import pvl
+import abc
+from abc import ABC
+
+class Driver(ABC):
+    """
+    Base class for all Drivers.
+
+    Attributes
+    ----------
+    _file : str
+            Reference to file path to be used by mixins for opening.
+    """
+
+    def __init__(self, file, num_ephem=909, num_quats=909):
+        """
+        Parameters
+        ----------
+        file : str
+               path to file to be parsed
+        """
+        self._num_quaternions = num_quats
+        self._num_ephem = num_ephem
+        self._file = file
+
+    @abc.abstractproperty
+    def image_lines(self):
+        """
+        Returns
+        -------
+        : int
+          Number of lines in image
+        """
+        pass
+
+    @abc.abstractproperty
+    def image_samples(self):
+        """
+        Returns
+        -------
+        : int
+          Number of samples in image
+        """
+        pass
+
+    @abc.abstractproperty
+    def usgscsm_distortion_model(self):
+        """
+        Returns
+        -------
+        : dict
+          A dict containing the information about the distortion model for the usgscsm
+        """
+        pass
+
+    @abc.abstractproperty
+    def detector_start_line(self):
+        pass
+
+    @abc.abstractproperty
+    def detector_start_sample(self):
+        pass
+
+    @abc.abstractproperty
+    def sample_summing(self):
+        """
+         Returns
+         -------
+         : int
+           Sample summing
+        """
+        pass
+
+    @abc.abstractproperty
+    def line_summing(self):
+        """
+        Returns
+        -------
+        : int
+          Line summing
+        """
+        pass
+
+    @abc.abstractproperty
+    def platform_name(self):
+        pass
+
+    @abc.abstractproperty
+    def sensor_name(self):
+        pass
+
+    @abc.abstractproperty
+    def target_body_radii(self):
+        """
+        Returns
+        -------
+        : list
+          target body radii, first list element is semimajor axis, second is semiminor axis.
+        """
+        pass
+
+    @abc.abstractproperty
+    def focal_length(self):
+        """
+        Returns
+        -------
+        : float
+          focal length
+        """
+        pass
+
+    @abc.abstractproperty
+    def detector_center_line(self):
+        pass
+
+    @abc.abstractproperty
+    def detector_center_sample(self):
+        pass
+
+    @abc.abstractproperty
+    def sensor_position(self):
+        """
+        Returns
+        -------
+        : (positions, velocities, times)
+          a tuple containing a list of positions, a list of velocities, and a list of timess
+        """
+        pass
+
+    @abc.abstractproperty
+    #Get the frame chain between two frames and the frame types for all returned frames
+    def frame_chain(self):
+        pass
+
+    @abc.abstractproperty
+    def sun_position(self):
+        """
+        Returns
+        -------
+        : (sun_positions, sun_velocities)
+          a tuple containing a list of sun positions, a list of sun velocities
+        """
+
+    @abc.abstractproperty
+    def target_name(self):
+        """
+          Returns
+        -------
+        : int
+          NAIF ID associated with the target body
+        """
+        pass
+
+
+    @abc.abstractproperty
+    def target_frame_id(self):
+        """
+          Returns
+        -------
+        : int
+          NAIF ID associated with the target body
+        """
+        pass
+
+    @abc.abstractproperty
+    def sensor_frame_id(self):
+        """
+          Returns
+        -------
+        : int
+          NAIF ID associated with the sensor frame
+        """
+        pass
+
+    @abc.abstractproperty
+    def isis_naif_keywords(self):
+        """
+          Returns
+        -------
+        : dict
+          dictionary containing the keys : values needed by Isis for the NaifKeywords group
+        """
+        pass
+
+    @abc.abstractproperty
+    def sensor_model_version(self):
+        """
+          Returns
+        -------
+        : int
+          version of the sensor model
+        """
+        pass
+
+    @abc.abstractproperty
+    def focal2pixel_lines(self):
+        pass
+
+    @abc.abstractproperty
+    def focal2pixel_samples(self):
+        pass
+
+    @abc.abstractproperty
+    def pixel2focal_x(self):
+        pass
+
+    @abc.abstractproperty
+    def pixel2focal_y(self):
+        pass
+
+    @abc.abstractproperty
+    def ephemeris_start_time(self):
+        """
+          Returns
+        -------
+        : str
+          Start time of the image in UTC YYYY-MM-DDThh:mm:ss[.fff]
+        """
+        pass
+
+    @abc.abstractproperty
+    def ephemeris_stop_time(self):
+        """
+          Returns
+        -------
+        : str
+          Stop time of the image in UTC YYYY-MM-DDThh:mm:ss[.fff]
+        """
+        pass

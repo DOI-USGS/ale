@@ -1,39 +1,14 @@
+import pvl
 import ale
-from ale.drivers.base import *
 from ale import config
 
-import pvl
 
-class DawnFcNaifSpice(Driver, Framer, NaifSpice):
-    """
-    Dawn specific spice mixin to handle dawn specific spice calls and property
-    overrides. This class is not used as a driver.
-    """
-    # TODO: Update focal2pixel samples and lines to reflect the rectangular
-    #       nature of dawn pixels
-    @property
-    def _odtk(self):
-        """
-        Returns
-        -------
-        : list
-          Radial distortion coefficients
-        """
-        return spice.gdpool('INS{}_RAD_DIST_COEFF'.format(self.ikid),0, 1).tolist()
+from ale.base import Driver
+from ale.base.data_naif import NaifSpice
+from ale.base.label_pds3 import Pds3Label
+from ale.base.type_sensor import Framer
 
-    @property
-    def focal2pixel_samples(self):
-        # Microns to mm
-        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
-        return [0.0, 1/pixel_size, 0.0]
-
-    @property
-    def focal2pixel_lines(self):
-        # Microns to mm
-        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
-        return [0.0, 0.0, 1/pixel_size]
-
-class DawnFcPds3NaifSpiceDriver(Pds3Label, DawnFcNaifSpice, RadialDistortion):
+class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
     """
     Dawn driver for generating an ISD from a Dawn PDS3 image.
     """
@@ -49,8 +24,8 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, DawnFcNaifSpice, RadialDistortion):
         : str
           instrument id
         """
-        instrument_id = self.label["INSTRUMENT_ID"]
-        filter_number = self.label["FILTER_NUMBER"]
+        instrument_id = super().instrument_id
+        filter_number = self.filter_number
 
         return "DAWN_{}_FILTER_{}".format(instrument_id, filter_number)
 
@@ -107,14 +82,15 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, DawnFcNaifSpice, RadialDistortion):
     def spacecraft_name(self):
         """
         Spacecraft name used in various Spice calls to acquire
-        ephemeris data.
+        ephemeris data. Dawn does not have a SPACECRAFT_NAME keyword, therefore
+        we are overwriting this method using the instrument_host_id keyword instead.
 
         Returns
         -------
         : str
           Spacecraft name
         """
-        return self.label['INSTRUMENT_HOST_NAME']
+        return self.instrument_host_id
 
     @property
     def target_name(self):
@@ -130,19 +106,73 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, DawnFcNaifSpice, RadialDistortion):
         : str
           target name
         """
-        target = self.label['TARGET_NAME']
+        target = super().target_name
         target = target.split(' ')[-1]
         return target
 
     @property
-    def starting_ephemeris_time(self):
+    def ephemeris_start_time(self):
         """
         Compute the center ephemeris time for a Dawn Frame camera. This is done
         via a spice call but 193 ms needs to be added to
         account for the CCD being discharged or cleared.
         """
         if not hasattr(self, '_starting_ephemeris_time'):
-            sclock = self.label['SPACECRAFT_CLOCK_START_COUNT']
+            sclock = self.spacecraft_clock_start_count
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
             self._starting_ephemeris_time += 193.0 / 1000.0
         return self._starting_ephemeris_time
+
+    @property
+    def usgscsm_distortion_model(self):
+        """
+        The Dawn framing camera uses a unique radial distortion model so we need
+        to overwrite the method packing the distortion model into the ISD.
+        """
+        return {
+            "dawnfc": {
+                "coefficients" : self.odtk
+                }
+            }
+
+    @property
+    def odtk(self):
+        """
+        Returns
+        -------
+        : list
+          Radial distortion coefficients
+        """
+        return spice.gdpool('INS{}_RAD_DIST_COEFF'.format(self.ikid),0, 1).tolist()
+
+    # TODO: Update focal2pixel samples and lines to reflect the rectangular
+    #       nature of dawn pixels
+    @property
+    def focal2pixel_samples(self):
+        # Microns to mm
+        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
+        return [0.0, 1/pixel_size, 0.0]
+
+    @property
+    def focal2pixel_lines(self):
+        # Microns to mm
+        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
+        return [0.0, 0.0, 1/pixel_size]
+
+    def detector_start_line(self):
+        return 1
+
+    def detector_start_sample(self):
+        return 1
+
+    @property
+    def sensor_model_version(self):
+        """
+        Returns instrument model version
+
+        Returns
+        -------
+        : int
+          model version
+        """
+        return 2
