@@ -15,8 +15,6 @@ from ale.base.type_sensor import Framer
 ID_LOOKUP = {
     'MDIS-WAC': 'MSGR_MDIS_WAC',
     'MDIS-NAC':'MSGR_MDIS_NAC',
-    'MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA':'MSGR_MDIS_NAC',
-    'MERCURY DUAL IMAGING SYSTEM WIDE ANGLE CAMERA':'MSGR_MDIS_WAC'
 }
 
 class MessengerMdisPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):

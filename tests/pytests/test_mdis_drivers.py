@@ -41,12 +41,8 @@ def test_instrument_id_pds3(Pds3Driver):
     with patch('ale.base.label_pds3.Pds3Label.instrument_id', new_callable=PropertyMock) as mock_id:
         mock_id.return_value = 'MDIS-WAC'
         assert Pds3Driver.instrument_id == 'MSGR_MDIS_WAC'
-        mock_id.return_value = 'MERCURY DUAL IMAGING SYSTEM WIDE ANGLE CAMERA'
-        assert Pds3Driver.instrument_id == 'MSGR_MDIS_WAC'
         mock_id.return_value = 'MDIS-NAC'
-        assert Pds3Driver.instrument_id == 'MSGR_MDIS_NAC'
-        mock_id.return_value = 'MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA'
-        assert Pds3Driver.instrument_id == 'MSGR_MDIS_NAC'
+        assert Pds3Driver.instrument_id == 'MSGR_MDIS_NAC'    
 
 @patch('ale.base.label_pds3.Pds3Label.filter_number', 10)
 @patch('ale.base.data_naif.NaifSpice.ikid', 100)
@@ -84,11 +80,7 @@ def test_instrument_id_isis(IsisLabelDriver):
     with patch('ale.base.label_isis.IsisLabel.instrument_id', new_callable=PropertyMock) as mock_id:
         mock_id.return_value = 'MDIS-WAC'
         assert IsisLabelDriver.instrument_id == 'MSGR_MDIS_WAC'
-        mock_id.return_value = 'MERCURY DUAL IMAGING SYSTEM WIDE ANGLE CAMERA'
-        assert IsisLabelDriver.instrument_id == 'MSGR_MDIS_WAC'
         mock_id.return_value = 'MDIS-NAC'
-        assert IsisLabelDriver.instrument_id == 'MSGR_MDIS_NAC'
-        mock_id.return_value = 'MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA'
         assert IsisLabelDriver.instrument_id == 'MSGR_MDIS_NAC'
 
 @patch("ale.base.label_isis.IsisLabel.spacecraft_clock_start_count", 123)
