@@ -32,7 +32,7 @@ class ConstantRotation:
         """
         self.source = source
         self.dest = dest
-        self.quat = quat
+        self.quat = np.asarray(quat)
 
     @property
     def quat(self):
@@ -54,7 +54,7 @@ class ConstantRotation:
                    The new quaternion as an array.
                    The quaternion must be in scalar last format (x, y, z, w).
         """
-        self._rot = Rotation.from_quat(new_quat)
+        self._rot = Rotation.from_quat(np.asarray(new_quat))
 
     def rotation_matrix(self):
         """
@@ -125,8 +125,8 @@ class TimeDependentRotation:
         """
         self.source = source
         self.dest = dest
-        self.quats = quats
-        self.times = times
+        self.quats = np.asarray(quats)
+        self.times = np.asarray(times)
 
     @property
     def quats(self):
@@ -148,7 +148,7 @@ class TimeDependentRotation:
                     The new quaternions as a 2d array. The quaternions must be
                     in scalar last format (x, y, z, w).
         """
-        self._rots = Rotation.from_quat(new_quats)
+        self._rots = Rotation.from_quat(np.asarray(new_quats))
 
     def inverse(self):
         """
