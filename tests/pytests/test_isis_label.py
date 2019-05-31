@@ -124,4 +124,11 @@ def test_sample_summing(test_cube_label):
 def test_line_summing(test_cube_label):
     assert test_cube_label.line_summing == 1
 
+def test_instrument_id(test_cube_label):
+    assert test_cube_label.instrument_id == "MDIS-NAC"
 
+def test_platform_name(test_cube_label):
+    assert test_cube_label.platform_name.lower() == "messenger"
+
+def test_sensor_name(test_cube_label):
+    assert test_cube_label.sensor_name.lower() == "mercury dual imaging system narrow angle camera"

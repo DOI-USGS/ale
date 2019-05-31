@@ -13,7 +13,7 @@ from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
 
 
-class MessengerMdisPds3NaifSpiceDriver(Pds3Label, Driver, NaifSpice, Framer):
+class MessengerMdisPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
     """
     Driver for reading MDIS PDS3 labels. Requires a Spice mixin to acquire addtional
     ephemeris and instrument data located exclusively in spice kernels.
@@ -45,16 +45,16 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, Driver, NaifSpice, Framer):
         return self._metakernel
 
     @property
-
     def fikid(self):
         if isinstance(self, Framer):
-            fn = self.label["FILTER_NUMBER"]
+            fn = super().filter_number
             if fn == 'N/A':
                 fn = 0
         else:
             fn = 0
         return self.ikid - int(fn)
 
+    @property
     def instrument_id(self):
         """
         Returns an instrument id for unquely identifying the instrument, but often
@@ -66,11 +66,10 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, Driver, NaifSpice, Framer):
         : str
           instrument id
         """
-        return self.id_lookup[self.label['INSTRUMENT_ID']]
+        return self.id_lookup[super().instrument_id]
 
     @property
     def focal_length(self):
-
         """
         Computes Focal Length from Kernels
 
@@ -89,11 +88,11 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, Driver, NaifSpice, Framer):
         # numpy wants them a_n, a_n-1, a_n-2 ... a_0
         f_t = np.poly1d(coeffs[::-1])
 
-        # eval at the focal_plane_tempature
-        return f_t(self._focal_plane_tempature)
+        # eval at the focal_plane_temperature
+        return f_t(self.label['FOCAL_PLANE_TEMPERATURE'].value)
 
     @property
-    def starting_detector_sample(self):
+    def detector_start_sample(self):
         """
         Returns starting detector sample quired from Spice Kernels.
 
@@ -105,7 +104,7 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, Driver, NaifSpice, Framer):
         return int(spice.gdpool('INS{}_FPUBIN_START_SAMPLE'.format(self.ikid), 0, 1)[0])
 
     @property
-    def starting_detector_line(self):
+    def detector_start_line(self):
         """
         Returns starting detector sample acquired from Spice Kernels.
 
@@ -124,8 +123,27 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, Driver, NaifSpice, Framer):
     def detector_center_line(self):
         return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
 
+    @property
+    def sensor_model_version(self):
+        """
+        Returns
+        -------
+        : int
+          model version
+        """
+        return 2
 
-class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, Driver, NaifSpice, Framer):
+    @property
+    def usgscsm_distortion_model(self):
+        return {
+            "transverse": {
+                "x" : self.odtx,
+                "y" : self.odty
+                }
+            }
+
+
+class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver):
     """
     Driver for reading MDIS ISIS3 Labels. These are Labels that have been ingested
     into ISIS from PDS EDR images but have not been spiceinit'd yet.
@@ -157,10 +175,6 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, Driver, NaifSpice, Framer
         return self._metakernel
 
     @property
-    def ikid(self):
-        return int(self.label["IsisCube"]["Kernels"]["NaifIkCode"])
-
-    @property
     def instrument_id(self):
         """
         Returns an instrument id for unquely identifying the instrument, but often
@@ -172,10 +186,10 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, Driver, NaifSpice, Framer
         : str
           instrument id
         """
-        return self.id_lookup[self.label['IsisCube']['Instrument']['InstrumentId']]
+        return self.id_lookup[super().instrument_id]
 
     @property
-    def _focal_plane_tempature(self):
+    def _focal_plane_temperature(self):
         """
         Acquires focal plane tempature from a PDS3 label. Used exclusively in
         computing focal length.
@@ -190,12 +204,12 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, Driver, NaifSpice, Framer
     @property
     def ephemeris_start_time(self):
         if not hasattr(self, '_ephemeris_start_time'):
-            sclock = self.label['IsisCube']['Archive']['SpacecraftClockStartCount']
+            sclock = self.spacecraft_clock_start_count
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
         return self._starting_ephemeris_time
 
     @property
-    def optical_distortion(self):
+    def usgscsm_distortion_model(self):
         return {
             "transverse": {
                 "x" : self.odtx,
@@ -203,6 +217,17 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, Driver, NaifSpice, Framer
                 }
             }
 
+    @property
+    def fikid(self):
+        if isinstance(self, Framer):
+            fn = self.label['IsisCube']['BandBin']['Number']
+            if fn == 'N/A':
+                fn = 0
+        else:
+            fn = 0
+        return self.ikid - int(fn)
+
+    @property
     def focal_length(self):
         """
         Computes Focal Length from Kernels
@@ -222,11 +247,11 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, Driver, NaifSpice, Framer
         # numpy wants them a_n, a_n-1, a_n-2 ... a_0
         f_t = np.poly1d(coeffs[::-1])
 
-        # eval at the focal_plane_tempature
-        return f_t(self._focal_plane_tempature)
+        # eval at the focal_plane_temperature
+        return f_t(self._focal_plane_temperature)
 
     @property
-    def starting_detector_sample(self):
+    def detector_start_sample(self):
         """
         Returns starting detector sample quired from Spice Kernels.
 
@@ -238,7 +263,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, Driver, NaifSpice, Framer
         return int(spice.gdpool('INS{}_FPUBIN_START_SAMPLE'.format(self.ikid), 0, 1)[0])
 
     @property
-    def starting_detector_line(self):
+    def detector_start_line(self):
         """
         Returns starting detector sample acquired from Spice Kernels.
 
@@ -257,3 +282,13 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, Driver, NaifSpice, Framer
     @property
     def detector_center_line(self):
         return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
+
+    @property
+    def sensor_model_version(self):
+        """
+        Returns
+        -------
+        : int
+          model version
+        """
+        return 2
