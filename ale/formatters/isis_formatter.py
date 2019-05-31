@@ -18,6 +18,8 @@ def to_isis(driver):
     time_dependent_sensor_frame = j2000.last_time_dependent_frame_between(sensor_frame)
     if time_dependent_sensor_frame != j2000:
         forward_path, reverse_path = j2000.path_to(time_dependent_sensor_frame)
+        # Reverse the frame order because ISIS orders frames as
+        # (destination, intermediate, ..., intermediate, source)
         instrument_pointing['TimeDependentFrames'] = [frame.id for frame in (forward_path + reverse_path)[::-1]]
         time_dependent_rotation = j2000.rotation_to(time_dependent_sensor_frame)
         instrument_pointing['CkTableStartTime'] = time_dependent_rotation.times[0]
@@ -27,6 +29,8 @@ def to_isis(driver):
         instrument_pointing['Quaternions'] = time_dependent_rotation.quats
     if time_dependent_sensor_frame != sensor_frame:
         forward_path, reverse_path = time_dependent_sensor_frame.path_to(sensor_frame)
+        # Reverse the frame order because ISIS orders frames as
+        # (destination, intermediate, ..., intermediate, source)
         instrument_pointing['ConstantFrames'] = [frame.id for frame in (forward_path + reverse_path)[::-1]]
         constant_rotation = time_dependent_sensor_frame.rotation_to(sensor_frame)
         instrument_pointing['ConstantRotation'] = constant_rotation.rotation_matrix()
@@ -37,6 +41,8 @@ def to_isis(driver):
     time_dependent_target_frame = j2000.last_time_dependent_frame_between(target_frame)
     if time_dependent_target_frame != j2000:
         forward_path, reverse_path = j2000.path_to(time_dependent_target_frame)
+        # Reverse the frame order because ISIS orders frames as
+        # (destination, intermediate, ..., intermediate, source)
         body_rotation['TimeDependentFrames'] = [frame.id for frame in (forward_path + reverse_path)[::-1]]
         time_dependent_rotation = j2000.rotation_to(time_dependent_target_frame)
         body_rotation['CkTableStartTime'] = time_dependent_rotation.times[0]
@@ -46,6 +52,8 @@ def to_isis(driver):
         body_rotation['Quaternions'] = time_dependent_rotation.quats
     if time_dependent_target_frame != target_frame:
         forward_path, reverse_path = time_dependent_target_frame.path_to(target_frame)
+        # Reverse the frame order because ISIS orders frames as
+        # (destination, intermediate, ..., intermediate, source)
         body_rotation['ConstantFrames'] = [frame.id for frame in (forward_path + reverse_path)[::-1]]
         constant_rotation = time_dependent_target_frame.rotation_to(target_frame)
         body_rotation['ConstantRotation'] = constant_rotation.rotation_matrix()

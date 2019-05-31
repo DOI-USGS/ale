@@ -143,7 +143,7 @@ def test_find_non_child_frame(frame_tree):
 def test_no_dependent_frames_between(frame_tree):
     nodes, _ = frame_tree
     last_frame = nodes[0].last_time_dependent_frame_between(nodes[2])
-    assert last_frame is None
+    assert last_frame == nodes[0]
 
 def test_last_time_dependent_frame_between():
     """

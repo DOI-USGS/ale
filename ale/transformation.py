@@ -181,7 +181,7 @@ class FrameNode():
             that the rotation from this frame to the in-between frame is time
             dependent and the rotation from the in-between frame to the other
             frame is constant. If there are no time dependent frames between
-            this frame and the other frame, None is returned.
+            this frame and the other frame, this frame is returned.
         """
         forward_path, reverse_path = self.path_to(other)
         # Reverse search the rotation chain for the last time dependent rotation
@@ -191,4 +191,4 @@ class FrameNode():
         for node in forward_path[:-1][::-1]:
             if isinstance(node.rotation, TimeDependentRotation):
                 return node.parent
-        return None
+        return self
