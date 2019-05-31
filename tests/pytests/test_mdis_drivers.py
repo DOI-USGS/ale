@@ -91,11 +91,6 @@ def test_instrument_id_isis(IsisLabelDriver):
         mock_id.return_value = 'MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA'
         assert IsisLabelDriver.instrument_id == 'MSGR_MDIS_NAC'
 
-def test_focal_plane_temperature_isis(IsisLabelDriver):
-    with patch.dict(IsisLabelDriver.label, {'IsisCube': {'Instrument' : {'FocalPlaneTemperature' :
-    pvl._collections.Units(value=20, units='<DEGC>') }}}) as f:
-        assert IsisLabelDriver._focal_plane_temperature == 20
-
 @patch("ale.base.label_isis.IsisLabel.spacecraft_clock_start_count", 123)
 @patch("ale.base.data_naif.NaifSpice.spacecraft_id", 321)
 def test_ephemeris_start_time_isis(IsisLabelDriver):
@@ -113,9 +108,10 @@ def test_fikid_isis(IsisLabelDriver):
         assert IsisLabelDriver.fikid == 90
 
 @patch('ale.drivers.messenger_drivers.MessengerMdisIsisLabelNaifSpiceDriver.fikid', 1)
-@patch('ale.drivers.messenger_drivers.MessengerMdisIsisLabelNaifSpiceDriver._focal_plane_temperature', 1)
 def test_focal_length_isis(IsisLabelDriver):
-    assert IsisLabelDriver.focal_length == 5
+    with patch.dict(IsisLabelDriver.label, {'IsisCube': {'Instrument': {'FocalPlaneTemperature':
+    pvl._collections.Units(value=1, units='<DEGC>')}}}) as f:
+        assert IsisLabelDriver.focal_length == 5
 
 @patch('ale.base.data_naif.NaifSpice.ikid', 100)
 def test_detector_start_sample_isis(IsisLabelDriver):

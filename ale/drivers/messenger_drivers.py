@@ -12,19 +12,18 @@ from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
 
+ID_LOOKUP = {
+    'MDIS-WAC': 'MSGR_MDIS_WAC',
+    'MDIS-NAC':'MSGR_MDIS_NAC',
+    'MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA':'MSGR_MDIS_NAC',
+    'MERCURY DUAL IMAGING SYSTEM WIDE ANGLE CAMERA':'MSGR_MDIS_WAC'
+}
 
 class MessengerMdisPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
     """
     Driver for reading MDIS PDS3 labels. Requires a Spice mixin to acquire addtional
     ephemeris and instrument data located exclusively in spice kernels.
     """
-
-    id_lookup = {
-        'MDIS-WAC': 'MSGR_MDIS_WAC',
-        'MDIS-NAC':'MSGR_MDIS_NAC',
-        'MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA':'MSGR_MDIS_NAC',
-        'MERCURY DUAL IMAGING SYSTEM WIDE ANGLE CAMERA':'MSGR_MDIS_WAC'
-    }
 
     @property
     def metakernel(self):
@@ -66,7 +65,7 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         : str
           instrument id
         """
-        return self.id_lookup[super().instrument_id]
+        return ID_LOOKUP[super().instrument_id]
 
     @property
     def focal_length(self):
@@ -106,7 +105,7 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
     @property
     def detector_start_line(self):
         """
-        Returns starting detector sample acquired from Spice Kernels.
+        Returns starting detector line acquired from Spice Kernels.
 
         Returns
         -------
@@ -149,13 +148,6 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
     into ISIS from PDS EDR images but have not been spiceinit'd yet.
     """
 
-    id_lookup = {
-        'MDIS-WAC': 'MSGR_MDIS_WAC',
-        'MDIS-NAC':'MSGR_MDIS_NAC',
-        'MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA':'MSGR_MDIS_NAC',
-        'MERCURY DUAL IMAGING SYSTEM WIDE ANGLE CAMERA':'MSGR_MDIS_WAC'
-    }
-
     @property
     def metakernel(self):
         """
@@ -186,20 +178,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
         : str
           instrument id
         """
-        return self.id_lookup[super().instrument_id]
-
-    @property
-    def _focal_plane_temperature(self):
-        """
-        Acquires focal plane tempature from a PDS3 label. Used exclusively in
-        computing focal length.
-
-        Returns
-        -------
-        : double
-          focal plane tempature
-        """
-        return self.label['IsisCube']['Instrument']['FocalPlaneTemperature'].value
+        return ID_LOOKUP[super().instrument_id]
 
     @property
     def ephemeris_start_time(self):
@@ -242,13 +221,12 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
           focal length in meters
         """
         coeffs = spice.gdpool('INS{}_FL_TEMP_COEFFS '.format(self.fikid), 0, 5)
-
         # reverse coeffs, MDIS coeffs are listed a_0, a_1, a_2 ... a_n where
         # numpy wants them a_n, a_n-1, a_n-2 ... a_0
         f_t = np.poly1d(coeffs[::-1])
 
         # eval at the focal_plane_temperature
-        return f_t(self._focal_plane_temperature)
+        return f_t(self.label['IsisCube']['Instrument']['FocalPlaneTemperature'].value)
 
     @property
     def detector_start_sample(self):
@@ -265,7 +243,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
     @property
     def detector_start_line(self):
         """
-        Returns starting detector sample acquired from Spice Kernels.
+        Returns starting detector line acquired from Spice Kernels.
 
         Returns
         -------
