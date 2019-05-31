@@ -96,7 +96,7 @@ class FrameNode():
         """
         Find a child frame by its frame ID.
 
-        Recursively search this frame and it all of its children for a specific
+        Recursively search this frame and all of its children for a specific
         reference frame.
 
         Parameters
