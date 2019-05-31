@@ -5,6 +5,19 @@ from ale.rotation import ConstantRotation, TimeDependentRotation
 from ale.encoders import NumpyEncoder
 
 def to_isis(driver):
+    """
+    Formatter to create ISIS sensor model meta data from a driver.
+
+    Parameters
+    ----------
+    driver : Driver
+        Concrete driver for the image that meta data is being generated for.
+
+    Returns
+    -------
+    string
+        The ISIS compatible meta data as a JSON encoded string.
+    """
     meta_data = {}
 
     meta_data['CameraVersion'] = driver.sensor_model_version

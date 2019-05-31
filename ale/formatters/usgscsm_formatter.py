@@ -3,6 +3,19 @@ from ale.base.type_sensor import LineScanner, Framer
 from ale.encoders import NumpyEncoder
 
 def to_usgscsm(driver):
+    """
+    Formatter to create USGSCSM meta data from a driver.
+
+    Parameters
+    ----------
+    driver : Driver
+        Concrete driver for the image that meta data is being generated for.
+
+    Returns
+    -------
+    string
+        The USGSCSM compatible meta data as a JSON encoded string.
+    """
     isd_data = {}
 
     # exterior orientation
