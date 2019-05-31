@@ -1,5 +1,6 @@
 import json
 from ale.base.type_sensor import LineScanner, Framer
+from ale.encoders import NumpyEncoder
 
 def to_usgscsm(driver):
     isd_data = {}
@@ -88,4 +89,4 @@ def to_usgscsm(driver):
         raise Exception('No CSM sensor model name found!')
 
     # Convert to JSON object
-    return json.dumps(isd_data)
+    return json.dumps(isd_data, cls=NumpyEncoder)

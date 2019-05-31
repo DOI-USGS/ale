@@ -2,6 +2,7 @@ import json
 
 from ale.transformation import FrameNode
 from ale.rotation import ConstantRotation, TimeDependentRotation
+from ale.encoders import NumpyEncoder
 
 def to_isis(driver):
     meta_data = {}
@@ -70,4 +71,4 @@ def to_isis(driver):
     sun_position['Velocities'] = velocities
     meta_data['SunPosition'] = sun_position
 
-    return json.dumps(meta_data)
+    return json.dumps(meta_data, cls=NumpyEncoder)
