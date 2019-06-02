@@ -1,6 +1,6 @@
 import numpy as np
 
-from ale.rotation import ConstantRotation
+from ale.rotation import ConstantRotation, TimeDependentRotation
 
 class FrameNode():
     """
@@ -92,6 +92,33 @@ class FrameNode():
             current_parent = current_parent.parent
         return chain
 
+    def find_child_frame(self, id):
+        """
+        Find a child frame by its frame ID.
+
+        Recursively search this frame and all of its children for a specific
+        reference frame.
+
+        Parameters
+        ----------
+        id : int
+            The NAIF frame ID of the frame to find
+
+        Returns
+        -------
+        FrameNode
+            The specified frame. If no child frame with the given ID exists,
+            None is returned.
+        """
+        if self.id == id:
+            return self
+        node = None
+        for child in self.children:
+            node = child.find_child_frame(id)
+            if node is not None:
+                return node
+        return node
+
     def path_to(self, other):
         """
         Returns the path to another node as two lists. The first list
@@ -137,3 +164,31 @@ class FrameNode():
         for next_rotation in rotations[1:]:
             rotation = next_rotation * rotation
         return rotation
+
+    def last_time_dependent_frame_between(self, other):
+        """
+        Find the last time dependent frame between this frame and another frame.
+
+        Parameters
+        ----------
+        other : FrameNode
+            The frame to find the last time dependent frame between
+
+        Returns
+        -------
+        FrameNode
+            The first frame between the this frame and the other frame such
+            that the rotation from this frame to the in-between frame is time
+            dependent and the rotation from the in-between frame to the other
+            frame is constant. If there are no time dependent frames between
+            this frame and the other frame, this frame is returned.
+        """
+        forward_path, reverse_path = self.path_to(other)
+        # Reverse search the rotation chain for the last time dependent rotation
+        for node in reverse_path[::-1]:
+            if isinstance(node.rotation, TimeDependentRotation):
+                return node
+        for node in forward_path[:-1][::-1]:
+            if isinstance(node.rotation, TimeDependentRotation):
+                return node.parent
+        return self
