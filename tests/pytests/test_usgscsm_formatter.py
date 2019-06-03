@@ -1,31 +1,11 @@
 import pytest
 import json
+import numpy as np
 
 from ale.formatters import usgscsm_formatter
 from ale.base.type_sensor import LineScanner, Framer
-
-
-# These should be removed once the rotation chain class is finished
-class RotationTest:
-    def __init__(self, source, dest, quat):
-        self.source = source
-        self.dest = dest
-        self.quat = quat
-
-    def simplified_rotation(self):
-        return [self.quat], [[-1, -2, -3, -4]], [875]
-
-
-class RotationTestChain:
-    def __init__(self):
-        self.frames = [0, -100, -200, 20020, -20021]
-        self.quat = [0, 1, 2, 3]
-
-    def __getitem__(self, key):
-        return self.frames[key]
-
-    def rotation(self, source, dest):
-        return RotationTest(source, dest, self.quat)
+from ale.transformation import FrameNode
+from ale.rotation import ConstantRotation, TimeDependentRotation
 
 class TestLineScanner(LineScanner):
     """
@@ -38,6 +18,23 @@ class TestLineScanner(LineScanner):
 
 @pytest.fixture
 def test_line_scan_driver():
+    j2000 = FrameNode(1)
+    body_rotation = TimeDependentRotation(
+        np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
+        np.array([0, 1]),
+        100,
+        1
+    )
+    body_fixed = FrameNode(100, parent=j2000, rotation=body_rotation)
+    spacecraft_rotation = TimeDependentRotation(
+        np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
+        np.array([0, 1]),
+        1000,
+        1
+    )
+    spacecraft = FrameNode(1000, parent=j2000, rotation=spacecraft_rotation)
+    sensor_rotation = ConstantRotation(np.array([0, 0, 0, 1]), 1010, 1000)
+    sensor = FrameNode(1010, parent=spacecraft, rotation=sensor_rotation)
     driver = TestLineScanner()
     driver.target_body_radii = (1100, 1000)
     driver.positions = (
@@ -50,7 +47,9 @@ def test_line_scan_driver():
         [[0, -1, -2], [-3, -4, -5]],
         [800, 900]
     )
-    driver.rotation_chain = RotationTestChain()
+    driver.sensor_frame_id = 1010
+    driver.target_frame_id = 100
+    driver.frame_chain = j2000
     driver.sample_summing = 2
     driver.line_summing = 4
     driver.focal_length = 500
@@ -76,6 +75,23 @@ def test_line_scan_driver():
 
 @pytest.fixture
 def test_frame_driver():
+    j2000 = FrameNode(1)
+    body_rotation = TimeDependentRotation(
+        np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
+        np.array([0, 1]),
+        100,
+        1
+    )
+    body_fixed = FrameNode(100, parent=j2000, rotation=body_rotation)
+    spacecraft_rotation = TimeDependentRotation(
+        np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
+        np.array([0, 1]),
+        1000,
+        1
+    )
+    spacecraft = FrameNode(1000, parent=j2000, rotation=spacecraft_rotation)
+    sensor_rotation = ConstantRotation(np.array([0, 0, 0, 1]), 1010, 1000)
+    sensor = FrameNode(1010, parent=spacecraft, rotation=sensor_rotation)
     driver = Framer()
     driver.target_body_radii = (1100, 1000)
     driver.positions = (
@@ -88,7 +104,9 @@ def test_frame_driver():
         [[0, -1, -2]],
         [850]
     )
-    driver.rotation_chain = RotationTestChain()
+    driver.sensor_frame_id = 1010
+    driver.target_frame_id = 100
+    driver.frame_chain = j2000
     driver.sample_summing = 2
     driver.line_summing = 4
     driver.focal_length = 500
@@ -185,7 +203,7 @@ def test_framer_sensor_position(test_frame_driver):
 def test_sensor_orientation(test_frame_driver):
     isd = json.loads(usgscsm_formatter.to_usgscsm(test_frame_driver))
     sensor_orientation_obj = isd['sensor_orientation']
-    assert sensor_orientation_obj['quaternions'] == [[0, 1, 2, 3]]
+    assert sensor_orientation_obj['quaternions'] ==  [[0, 0, 0, -1], [0, 0, 0, -1]]
 
 def test_detector_start(test_frame_driver):
     isd = json.loads(usgscsm_formatter.to_usgscsm(test_frame_driver))
@@ -214,8 +232,8 @@ def test_position_times(test_line_scan_driver):
 
 def test_rotation_times(test_line_scan_driver):
     isd = json.loads(usgscsm_formatter.to_usgscsm(test_line_scan_driver))
-    assert isd['t0_quaternion'] == 25
-    assert isd['dt_quaternion'] == 0
+    assert isd['t0_quaternion'] == -850
+    assert isd['dt_quaternion'] == 1
 
 def test_interpolation_method(test_line_scan_driver):
     isd = json.loads(usgscsm_formatter.to_usgscsm(test_line_scan_driver))
