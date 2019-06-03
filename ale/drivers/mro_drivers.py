@@ -90,7 +90,7 @@ class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, Driver, NaifSpice, LineScanner, 
         return "MRO"
 
 
-class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, Driver, NaifSpice, LineScanner, RadialDistortion):
+class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, LineScanner, RadialDistortion, Driver):
     """
     Driver for reading CTX PDS3 labels. Requires a Spice mixin to acquire addtional
     ephemeris and instrument data located exclusively in spice kernels.
@@ -111,7 +111,7 @@ class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, Driver, NaifSpice, LineScanner, 
         if not hasattr(self, '_metakernel'):
             self._metakernel = None
             for mk in mks:
-                if str(self.start_time.year) in os.path.basename(mk):
+                if str(self.utc_start_time.year) in os.path.basename(mk):
                     self._metakernel = mk
         return self._metakernel
 
@@ -131,7 +131,7 @@ class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, Driver, NaifSpice, LineScanner, 
             'CONTEXT CAMERA':'MRO_CTX'
         }
 
-        return id_lookup[self.label['INSTRUMENT_NAME']]
+        return id_lookup[super().instrument_id]
 
     @property
     def spacecraft_name(self):
@@ -147,4 +147,16 @@ class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, Driver, NaifSpice, LineScanner, 
         name_lookup = {
             'MARS_RECONNAISSANCE_ORBITER': 'MRO'
         }
-        return name_lookup[self.label['SPACECRAFT_NAME']]
+        return name_lookup[super().spacecraft_name]
+
+    @property
+    def detector_start_line(self):
+        return 1
+
+    @property
+    def detector_start_sample(self):
+        return self.label.get('SAMPLE_FIRST_PIXEL', 0)
+    
+    @property
+    def sensor_model_version(self):
+        return 1
