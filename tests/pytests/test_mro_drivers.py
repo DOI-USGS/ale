@@ -33,7 +33,7 @@ def test_spacecraft_name(driver):
     assert driver.spacecraft_name == 'MRO'
 
 def test_detector_start_line(driver):
-    assert driver.detector_start_line == 0
+    assert driver.detector_start_line == 1
 
 def test_detector_start_sample(driver):
     # I am not sure how to accomplish this with a fixture and
