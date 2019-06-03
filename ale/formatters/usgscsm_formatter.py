@@ -1,6 +1,7 @@
 import json
 from ale.base.type_sensor import LineScanner, Framer
 from ale.encoders import NumpyEncoder
+from ale.rotation import ConstantRotation, TimeDependentRotation
 
 def to_usgscsm(driver):
     """
@@ -37,9 +38,13 @@ def to_usgscsm(driver):
         'velocities' : sun_velocities,
         'unit' : 'm'
     }
-    rotation_chain = driver.rotation_chain
-    sensor_to_target = rotation_chain.rotation(rotation_chain[-1], rotation_chain[0])
-    quaternions, _, rotation_times = sensor_to_target.simplified_rotation()
+
+    j2000 = driver.frame_chain
+    sensor_frame = j2000.find_child_frame(driver.sensor_frame_id)
+    target_frame = j2000.find_child_frame(driver.target_frame_id)
+    sensor_to_target = sensor_frame.rotation_to(target_frame)
+    quaternions = sensor_to_target.quats
+    rotation_times = sensor_to_target.times
     isd_data['sensor_orientation'] = {
         'quaternions' : quaternions
     }
