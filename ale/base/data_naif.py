@@ -2,6 +2,7 @@ import spiceypy as spice
 import numpy as np
 from ale.base.type_sensor import Framer
 from ale.transformation import FrameNode
+from ale.rotation import TimeDependentRotation
 
 class NaifSpice():
     def __enter__(self):
@@ -151,19 +152,67 @@ class NaifSpice():
 
     @property
     def frame_chain(self):
-        # pass
-        if not hasattr(self, '_frame_chain'):
-            frame_chain = {}
-            frame_chain['j2000'] = FrameNode(1)
-            # self._frame_chain['spacecraft'] = FrameNode(self.)
-            frame_chain['sensor'] = FrameNode(self.sensor_frame_id, 
-                                                parent=frame_chain['j2000'],
-                                                rotation='ConstantRotation')
-            frame_chain['target'] = FrameNode(self.target_frame_id, 
-                                                 parent=frame_chain['j2000'],
-                                                 rotation='TimeDependentRotation')
-            self._frame_chain = frame_chain
-        return self._frame_chain
+        """
+        Return the root node of the rotation frame tree/chain.
+
+        The root node is the J2000 reference frame. The other nodes in the
+        tree can be accessed via the methods in the FrameNode class.
+
+        This property expects the ephemeris_time property/attribute to be defined.
+        It should be a list of the ephemeris seconds past the J2000 epoch for each
+        exposure in the image.
+
+        Returns
+        -------
+        FrameNode
+            The root node of the frame tree. This will always be the J2000 reference frame.
+        """
+        if not hasattr(self, '_root_frame'):
+            self._root_frame = FrameNode(1) #J2000 is our root reference frame
+
+            sensor_quats = np.zeros((len(self.ephemeris_time), 4))
+            sensor_times = np.array(self.ephemeris_time)
+            body_quats = np.zeros((len(self.ephemeris_time), 4))
+            body_times = np.array(self.ephemeris_time)
+            for i, time in enumerate(self.ephemeris_time):
+                sensor2j2000 = spice.pxform(
+                    self.instrument_id,
+                    self._root_frame.id,
+                    time)
+                q_sensor = spice.m2q(sensor2j2000)
+                sensor_quats[i,:3] = q_sensor[1:]
+                sensor_quats[i,3] = q_sensor[0]
+
+                body2j2000 = spice.pxform(
+                    self.reference_frame,
+                    self._root_frame.id,
+                    time)
+                q_body = spice.m2q(body2j2000)
+                body_quats[i,:3] = q_body[1:]
+                body_quats[i,3] = q_body[0]
+
+            sensor2j2000_rot = TimeDependentRotation(
+                sensor_quats,
+                sensor_times,
+                self.instrument_id,
+                self._root_frame.id
+            )
+            sensor_node = FrameNode(
+                self.instrument_id,
+                parent=self._root_frame,
+                rotation=sensor2j2000_rot)
+
+            body2j2000_rot = TimeDependentRotation(
+                body_quats,
+                body_times,
+                self.reference_frame,
+                self._root_frame.id
+            )
+            body_node = FrameNode(
+                self.reference_frame,
+                parent=self._root_frame,
+                rotation=body2j2000_rot)
+        return self._root_frame
 
     @property
     def sensor_orientation(self):
