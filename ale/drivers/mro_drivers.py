@@ -151,7 +151,7 @@ class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, LineScanner, RadialDi
 
     @property
     def detector_start_line(self):
-        return 0
+        return 1
 
     @property
     def detector_start_sample(self):
