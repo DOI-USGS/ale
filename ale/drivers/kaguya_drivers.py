@@ -13,7 +13,7 @@ from ale.base.label_pds3 import Pds3Label
 from ale.base.type_sensor import LineScanner
 
 
-class KaguyaTcPds3NaifSpiceDriver(Driver, LineScanner, Pds3Label, NaifSpice):
+class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
     """
     Driver for a PDS3 Kaguya Terrain Camera (TC) images. Specifically level2b0 mono and stereo images.
 
@@ -48,7 +48,7 @@ class KaguyaTcPds3NaifSpiceDriver(Driver, LineScanner, Pds3Label, NaifSpice):
         COMPRESS = D/T short for DCT or through, we assume image has been decompressed already
         SWATCH = swatch mode, different swatch modes have different FOVs
         """
-        instrument = self.label.get("INSTRUMENT_ID")
+        instrument = super().instrument_id
         swath = self.label.get("SWATH_MODE_ID")[0]
         sd = self.label.get("PRODUCT_SET_ID").split("_")[1].upper()
 
@@ -65,23 +65,23 @@ class KaguyaTcPds3NaifSpiceDriver(Driver, LineScanner, Pds3Label, NaifSpice):
         presumably because they are not affected by the addtional parameters encoded in
         the ikid returned by self.ikid. This method exists for those gdpool calls.
         """
-        return spice.bods2c("LISM_{}".format(self.label.get("INSTRUMENT_ID")))
+        return spice.bods2c("LISM_{}".format(super().instrument_id))
 
     @property
     def clock_stop_count(self):
         return self.label.get('CORRECTED_SC_CLOCK_STOP_COUNT').value
 
     @property
-    def ephemermis_stop_time(self):
-        return spice.sct2e(self.spacecraft_id, self.ephemeris_stop_time)
+    def ephemeris_stop_time(self):
+        return spice.sct2e(self.spacecraft_id, super().ephemeris_stop_time)
 
     @property
     def clock_start_count(self):
         return self.label.get('CORRECTED_SC_CLOCK_START_COUNT').value
 
     @property
-    def ephemermis_start_time(self):
-        return spice.sct2e(self.spacecraft_id, self.ephemeris_start_time)
+    def ephemeris_start_time(self):
+        return spice.sct2e(self.spacecraft_id, super().ephemeris_start_time)
 
     @property
     def detector_center_line(self):
@@ -99,7 +99,7 @@ class KaguyaTcPds3NaifSpiceDriver(Driver, LineScanner, Pds3Label, NaifSpice):
 
             qua = np.empty((len(ephem), 4))
             for i, time in enumerate(ephem):
-                instrument = self.label.get("INSTRUMENT_ID")
+                instrument = super().instrument_id
                 # Find the rotation matrix
                 camera2bodyfixed = spice.pxform("LISM_{}_HEAD".format(instrument),
                                                 self.reference_frame,
@@ -117,8 +117,8 @@ class KaguyaTcPds3NaifSpiceDriver(Driver, LineScanner, Pds3Label, NaifSpice):
         Kaguya uses a slightly more accurate "mean Earth" reference frame for
         moon obvervations. see https://darts.isas.jaxa.jp/pub/spice/SELENE/kernels/fk/moon_assoc_me.tf
         """
-        if self.target_name.lower == "moon":
-            "MOON_ME"
+        if self.target_name.lower() == "moon":
+            return "MOON_ME"
         else:
             # TODO: How do we handle no target?
             return "NO TARGET"
@@ -176,7 +176,7 @@ class KaguyaTcPds3NaifSpiceDriver(Driver, LineScanner, Pds3Label, NaifSpice):
         # if its downloaded from Jaxa's image search:
         # (https://darts.isas.jaxa.jp/planet/pdap/selene/product_search.html#)
         try:
-            return self.label['CORRECTED_SAMPLING_INTERVAL'][0].value * 0.001  # Scale to seconds
+            return self.label['CORRECTED_SAMPLING_INTERVAL'][0].value * 0.001 # Scale to seconds
         except:
             return self.label['CORRECTED_SAMPLING_INTERVAL'].value * 0.001  # Scale to seconds
 
@@ -192,7 +192,7 @@ class KaguyaTcPds3NaifSpiceDriver(Driver, LineScanner, Pds3Label, NaifSpice):
         return float(spice.gdpool('INS{}_FOCAL_LENGTH'.format(self._tc_id), 0, 1)[0])
 
     @property
-    def optical_distortion(self):
+    def usgscsm_distortion_model(self):
         """
         Kaguya uses a unique radial distortion model so we need to overwrite the
         method packing the distortion model into the ISD.
@@ -222,7 +222,7 @@ class KaguyaTcPds3NaifSpiceDriver(Driver, LineScanner, Pds3Label, NaifSpice):
         }
 
     @property
-    def starting_detector_sample(self):
+    def detector_start_sample(self):
         """
         Returns starting detector sample
 
@@ -266,3 +266,18 @@ class KaguyaTcPds3NaifSpiceDriver(Driver, LineScanner, Pds3Label, NaifSpice):
         """
 
         return self.label["FIRST_PIXEL_NUMBER"]
+
+    @property
+    def detector_start_line(self):
+        return 1
+
+
+    @property
+    def sensor_model_version(self):
+        """
+        Returns
+        -------
+        : int
+          model version
+        """
+        return 1
