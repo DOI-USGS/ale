@@ -32,7 +32,7 @@ class ConstantRotation:
         """
         self.source = source
         self.dest = dest
-        self.quat = quat
+        self.quat = np.asarray(quat)
 
     @property
     def quat(self):
@@ -54,7 +54,13 @@ class ConstantRotation:
                    The new quaternion as an array.
                    The quaternion must be in scalar last format (x, y, z, w).
         """
-        self._rot = Rotation.from_quat(new_quat)
+        self._rot = Rotation.from_quat(np.asarray(new_quat))
+
+    def rotation_matrix(self):
+        """
+        The rotation matrix representation of the constant rotation
+        """
+        return self._rot.as_dcm()
 
     def inverse(self):
         """
@@ -77,7 +83,7 @@ class ConstantRotation:
                 Another rotation object, it can be constant or time dependent.
         """
         if self.source != other.dest:
-            raise ValueError("Destination frame of first rotation is not the same as source frame of second rotation.")
+            raise ValueError("Destination frame of first rotation {} is not the same as source frame of second rotation {}.".format(other.dest, self.source))
         if isinstance(other, ConstantRotation):
             new_rot = self._rot * other._rot
             return ConstantRotation(new_rot.as_quat(), other.source, self.dest)
@@ -119,8 +125,8 @@ class TimeDependentRotation:
         """
         self.source = source
         self.dest = dest
-        self.quats = quats
-        self.times = times
+        self.quats = np.asarray(quats)
+        self.times = np.asarray(times)
 
     @property
     def quats(self):
@@ -142,7 +148,7 @@ class TimeDependentRotation:
                     The new quaternions as a 2d array. The quaternions must be
                     in scalar last format (x, y, z, w).
         """
-        self._rots = Rotation.from_quat(new_quats)
+        self._rots = Rotation.from_quat(np.asarray(new_quats))
 
     def inverse(self):
         """
@@ -169,7 +175,7 @@ class TimeDependentRotation:
                 Another rotation object, it can be constant or time dependent.
         """
         if self.source != other.dest:
-            raise ValueError("Destination frame of first rotation is not the same as source frame of second rotation.")
+            raise ValueError("Destination frame of first rotation {} is not the same as source frame of second rotation {}.".format(other.dest, self.source))
         if isinstance(other, ConstantRotation):
             return TimeDependentRotation((self._rots * other._rot).as_quat(), self.times, other.source, self.dest)
         elif isinstance(other, TimeDependentRotation):
