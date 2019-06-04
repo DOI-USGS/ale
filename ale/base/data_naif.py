@@ -76,7 +76,10 @@ class NaifSpice():
 
     @property
     def target_frame_id(self):
-        return spice.gipool('BODY_FRAME_CODE', 0, 1)
+        frame_id, frame_name, found = spice.cidfrm(self.target_id)
+        if not found:
+            raise ValueError("No reference frame could be found for target ID {}.".format(self.target_id))
+        return frame_id
 
     @property
     def sensor_frame_id(self):
@@ -168,7 +171,8 @@ class NaifSpice():
             The root node of the frame tree. This will always be the J2000 reference frame.
         """
         if not hasattr(self, '_root_frame'):
-            self._root_frame = FrameNode(1) #J2000 is our root reference frame
+            j2000_id = 1 #J2000 is our root reference frame
+            self._root_frame = FrameNode(j2000_id)
 
             sensor_quats = np.zeros((len(self.ephemeris_time), 4))
             sensor_times = np.array(self.ephemeris_time)
@@ -176,16 +180,16 @@ class NaifSpice():
             body_times = np.array(self.ephemeris_time)
             for i, time in enumerate(self.ephemeris_time):
                 sensor2j2000 = spice.pxform(
-                    self.instrument_id,
-                    self._root_frame.id,
+                    self.sensor_frame_id,
+                    j2000_id,
                     time)
                 q_sensor = spice.m2q(sensor2j2000)
                 sensor_quats[i,:3] = q_sensor[1:]
                 sensor_quats[i,3] = q_sensor[0]
 
                 body2j2000 = spice.pxform(
-                    self.reference_frame,
-                    self._root_frame.id,
+                    self.target_frame_id,
+                    j2000_id,
                     time)
                 q_body = spice.m2q(body2j2000)
                 body_quats[i,:3] = q_body[1:]
@@ -194,22 +198,22 @@ class NaifSpice():
             sensor2j2000_rot = TimeDependentRotation(
                 sensor_quats,
                 sensor_times,
-                self.instrument_id,
-                self._root_frame.id
+                self.sensor_frame_id,
+                j2000_id
             )
             sensor_node = FrameNode(
-                self.instrument_id,
+                self.sensor_frame_id,
                 parent=self._root_frame,
                 rotation=sensor2j2000_rot)
 
             body2j2000_rot = TimeDependentRotation(
                 body_quats,
                 body_times,
-                self.reference_frame,
-                self._root_frame.id
+                self.target_frame_id,
+                j2000_id
             )
             body_node = FrameNode(
-                self.reference_frame,
+                self.target_frame_id,
                 parent=self._root_frame,
                 rotation=body2j2000_rot)
         return self._root_frame
