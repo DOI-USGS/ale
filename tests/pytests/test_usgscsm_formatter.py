@@ -37,12 +37,12 @@ def test_line_scan_driver():
     sensor = FrameNode(1010, parent=spacecraft, rotation=sensor_rotation)
     driver = TestLineScanner()
     driver.target_body_radii = (1100, 1000)
-    driver.positions = (
+    driver.sensor_position = (
         [[0, 1, 2], [3, 4, 5]],
         [[0, -1, -2], [-3, -4, -5]],
         [800, 900]
     )
-    driver.sun_positions = (
+    driver.sun_position = (
         [[0, 1, 2], [3, 4, 5]],
         [[0, -1, -2], [-3, -4, -5]],
         [800, 900]
@@ -55,8 +55,8 @@ def test_line_scan_driver():
     driver.focal_length = 500
     driver.detector_center_line = 0.5
     driver.detector_center_sample = 512
-    driver.starting_detector_line = 0
-    driver.starting_detector_sample = 8
+    driver.detector_start_line = 0
+    driver.detector_start_sample = 8
     driver.focal2pixel_lines = [0.1, 0.2, 0.3]
     driver.focal2pixel_samples = [0.3, 0.2, 0.1]
     driver.usgscsm_distortion_model = {
@@ -64,11 +64,11 @@ def test_line_scan_driver():
             'coefficients' : [0.0, 1.0, 0.1]
         }
     }
-    driver.line_count = 10000
-    driver.sample_count = 1024
+    driver.image_lines = 10000
+    driver.image_samples = 1024
     driver.platform_name = 'Test Platform'
     driver.sensor_name = 'Test Line Scan Sensor'
-    driver.stop_time = 900
+    driver.ephemeris_stop_time = 900
 
     return driver
 
@@ -94,12 +94,12 @@ def test_frame_driver():
     sensor = FrameNode(1010, parent=spacecraft, rotation=sensor_rotation)
     driver = Framer()
     driver.target_body_radii = (1100, 1000)
-    driver.positions = (
+    driver.sensor_position = (
         [[0, 1, 2]],
         [[0, -1, -2]],
         [850]
     )
-    driver.sun_positions = (
+    driver.sun_position = (
         [[0, 1, 2]],
         [[0, -1, -2]],
         [850]
@@ -112,8 +112,8 @@ def test_frame_driver():
     driver.focal_length = 500
     driver.detector_center_line = 256
     driver.detector_center_sample = 512
-    driver.starting_detector_line = 0
-    driver.starting_detector_sample = 8
+    driver.detector_start_line = 0
+    driver.detector_start_sample = 8
     driver.focal2pixel_lines = [0.1, 0.2, 0.3]
     driver.focal2pixel_samples = [0.3, 0.2, 0.1]
     driver.usgscsm_distortion_model = {
@@ -121,8 +121,8 @@ def test_frame_driver():
             'coefficients' : [0.0, 1.0, 0.1]
         }
     }
-    driver.line_count = 512
-    driver.sample_count = 1024
+    driver.image_lines = 512
+    driver.image_samples = 1024
     driver.platform_name = 'Test Platform'
     driver.sensor_name = 'Test Frame Sensor'
 

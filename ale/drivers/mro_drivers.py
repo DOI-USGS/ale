@@ -164,7 +164,8 @@ class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, LineScanner, RadialDi
           instrument id
         """
         id_lookup = {
-            'CONTEXT CAMERA':'MRO_CTX'
+            'CONTEXT CAMERA':'MRO_CTX',
+            'CTX':'MRO_CTX'
         }
 
         return id_lookup[super().instrument_id]
@@ -196,3 +197,7 @@ class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, LineScanner, RadialDi
     @property
     def sensor_model_version(self):
         return 1
+
+    @property
+    def exposure_duration(self):
+        return self.line_exposure_duration

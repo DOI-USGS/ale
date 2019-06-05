@@ -5,6 +5,8 @@ class SimpleSpice():
         return 0.1
     def bods2c(self, x):
         return -12345
+    def frmnam(self, id):
+        return 'Test_Frame'
     def gdpool(self, key, x, length):
         return np.ones(length)
     def gipool(self, key, x, length):

@@ -24,7 +24,7 @@ class LineScanner():
           2d list of scan rates in the form: [[start_line, line_time, exposure_duration], ...]
         """
         t0_ephemeris = self.ephemeris_start_time - self.center_ephemeris_time
-        return [[float(self.starting_detector_line)], [t0_ephemeris], [self._line_exposure_duration]]
+        return [[0.5], [t0_ephemeris], [self.exposure_duration]]
 
     @property
     def ephemeris_time(self):

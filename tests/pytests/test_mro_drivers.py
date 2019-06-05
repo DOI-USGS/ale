@@ -37,6 +37,10 @@ def test_instrument_id_pds3(Pds3NaifDriver):
 def test_spacecraft_name_pds3(Pds3NaifDriver):
     assert Pds3NaifDriver.spacecraft_name == 'MRO'
 
+@patch('ale.base.label_pds3.Pds3Label.line_exposure_duration', 12.1)
+def test_exposure_duration_pds3(Pds3NaifDriver):
+    assert Pds3NaifDriver.exposure_duration == 12.1
+
 def test_detector_start_line_pds3(Pds3NaifDriver):
     assert Pds3NaifDriver.detector_start_line == 1
 
