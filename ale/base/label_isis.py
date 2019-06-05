@@ -134,3 +134,15 @@ class IsisLabel():
             # if no units are available, assume the exposure duration is given in milliseconds
             exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration'].value * 0.001
         return exposure_duration
+
+    @property
+    def line_exposure_duration(self):
+        """
+        The line exposure duration of the image, in seconds
+
+        Returns
+        -------
+        : float
+          Line exposure duration in seconds
+        """
+        return self.label['IsisCube']['Instrument']['LineExposureDuration'] * 0.001 # scale to seconds

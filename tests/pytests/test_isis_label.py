@@ -56,6 +56,8 @@ DpuId                 = DPU-A
 PivotAngle            = -18.805847167969 <Degrees>
 Unlutted              = 1
 LutInversionTable     = $messenger/calibration/LUT_INVERT/MDISLUTINV_0.TAB
+# added to allow for testing
+LineExposureDuration  = 1000
 End_Group
 
 Group = Archive
@@ -132,3 +134,6 @@ def test_platform_name(test_cube_label):
 
 def test_sensor_name(test_cube_label):
     assert test_cube_label.sensor_name.lower() == "mercury dual imaging system narrow angle camera"
+
+def test_line_exposure_duration(test_cube_label):
+    assert test_cube_label.line_exposure_duration == 1
