@@ -16,7 +16,7 @@ from abc import ABC
 import datetime
 
 # dynamically load drivers
-__all__ = [os.path.splitext(os.path.basename(d))[0] for d in glob(os.path.join(os.path.dirname(__file__), '*_driver.py'))]
+__all__ = [os.path.splitext(os.path.basename(d))[0] for d in glob(os.path.join(os.path.dirname(__file__), '*_drivers.py'))]
 __driver_modules__ = [importlib.import_module('.'+m, package='ale.drivers') for m in __all__]
 
 drivers = dict(chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.isclass(x) and "_driver" in x.__module__) for dmod in __driver_modules__))

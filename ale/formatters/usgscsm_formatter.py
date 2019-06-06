@@ -24,15 +24,15 @@ def to_usgscsm(driver):
     isd_data['radii'] = {
         'semimajor' : body_radii[0],
         'semiminor' : body_radii[1],
-        'unit' : 'm'
+        'unit' : 'km'
     }
-    positions, velocities, position_times = driver.positions
+    positions, velocities, position_times = driver.sensor_position
     isd_data['sensor_position'] = {
         'positions' : positions,
         'velocities' : velocities,
         'unit' : 'm'
     }
-    sun_positions, sun_velocities, _ = driver.sun_positions
+    sun_positions, sun_velocities, _ = driver.sun_position
     isd_data['sun_position'] = {
         'positions' : sun_positions,
         'velocities' : sun_velocities,
@@ -59,15 +59,15 @@ def to_usgscsm(driver):
         'line' : driver.detector_center_line,
         'sample' : driver.detector_center_sample
     }
-    isd_data['starting_detector_line'] = driver.starting_detector_line
-    isd_data['starting_detector_sample'] = driver.starting_detector_sample
+    isd_data['starting_detector_line'] = driver.detector_start_line
+    isd_data['starting_detector_sample'] = driver.detector_start_sample
     isd_data['focal2pixel_lines'] = driver.focal2pixel_lines
     isd_data['focal2pixel_samples'] = driver.focal2pixel_samples
     isd_data['optical_distortion'] = driver.usgscsm_distortion_model
 
     # general information
-    isd_data['image_lines'] = driver.line_count
-    isd_data['image_samples'] = driver.sample_count
+    isd_data['image_lines'] = driver.image_lines
+    isd_data['image_samples'] = driver.image_samples
     isd_data['name_platform'] = driver.platform_name
     isd_data['name_sensor'] = driver.sensor_name
     isd_data['reference_height'] = {
@@ -81,9 +81,9 @@ def to_usgscsm(driver):
         isd_data['name_model'] = 'USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL'
         isd_data['interpolation_method'] = 'lagrange'
         start_lines, start_times, scan_rates = driver.line_scan_rate
-        center_time = (driver.stop_time + start_times[0]) / 2
-        isd_data['line_scan_rate'] = [[line, time - center_time, rate] for line, time, rate in zip(start_lines, start_times, scan_rates)]
-        isd_data['starting_ephemeris_time'] = start_times[0]
+        center_time = (driver.ephemeris_stop_time + driver.ephemeris_start_time) / 2
+        isd_data['line_scan_rate'] = [[line, time, rate] for line, time, rate in zip(start_lines, start_times, scan_rates)]
+        isd_data['starting_ephemeris_time'] = driver.ephemeris_start_time
         isd_data['center_ephemeris_time'] = center_time
         isd_data['t0_ephemeris'] = position_times[0] - center_time
         if len(position_times) > 1:
