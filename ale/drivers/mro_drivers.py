@@ -175,7 +175,7 @@ class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, LineScanner, RadialDi
         """
         Returns the spacecraft name used in various Spice calls to acquire
         ephemeris data.
-        
+
         Returns
         -------
         : str
@@ -197,7 +197,3 @@ class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, LineScanner, RadialDi
     @property
     def sensor_model_version(self):
         return 1
-
-    @property
-    def exposure_duration(self):
-        return self.line_exposure_duration
