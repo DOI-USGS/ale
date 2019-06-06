@@ -28,7 +28,7 @@ class LineScanner():
 
     @property
     def ephemeris_time(self):
-        return np.linspace(self.ephemeris_start_time,  self.ephemeris_stop_time, self.image_lines)
+        return np.linspace(self.ephemeris_start_time,  self.ephemeris_stop_time, self.image_lines / 64)
 
 class Framer():
     @property
