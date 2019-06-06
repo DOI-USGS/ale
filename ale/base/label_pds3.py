@@ -230,18 +230,20 @@ class Pds3Label():
            Returns the exposure duration in seconds from the PDS3 label.
          """
         # The EXPOSURE_DURATION may either be stored as a (value, unit) or just a value
-        try:
-            unit = self.label['EXPOSURE_DURATION'].units
-            unit = unit.lower()
-            if unit == "ms" or unit == "msec":
-              return self.label['EXPOSURE_DURATION'].value * 0.001
-            else:
-              return self.label['EXPOSURE_DURATION'].value
+        if 'EXPOSURE_DURATION' in self.label:
+            try:
+                unit = self.label['EXPOSURE_DURATION'].units
+                unit = unit.lower()
+                if unit == "ms" or unit == "msec":
+                  return self.label['EXPOSURE_DURATION'].value * 0.001
+                else:
+                  return self.label['EXPOSURE_DURATION'].value
 
-        # With no units, assume milliseconds
-        except:
-            # NOTE: If the key does not exist at all, this will cause an error about exception within an exception
-            return self.label['EXPOSURE_DURATION'] * 0.001
+            # With no units, assume milliseconds
+            except:
+                return self.label['EXPOSURE_DURATION'] * 0.001
+        else:
+            return self.line_exposure_duration
 
 
     # Consider expanding this to handle units

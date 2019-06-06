@@ -76,10 +76,8 @@ class NaifSpice():
 
     @property
     def target_frame_id(self):
-        frame_id, frame_name, found = spice.cidfrm(self.target_id)
-        if not found:
-            raise ValueError("No reference frame could be found for target ID {}.".format(self.target_id))
-        return frame_id
+        frame_info = spice.cidfrm(self.target_id)
+        return frame_info[0]
 
     @property
     def sensor_frame_id(self):
@@ -132,7 +130,7 @@ class NaifSpice():
                                      'NONE',
                                      self.target_name)
 
-        return [sun_state[:4].tolist()], [sun_state[3:6].tolist()], self.center_ephemeris_time
+        return [sun_state[:4].tolist()], [sun_state[3:6].tolist()], [self.center_ephemeris_time]
 
     @property
     def sensor_position(self):
@@ -180,16 +178,16 @@ class NaifSpice():
             body_times = np.array(self.ephemeris_time)
             for i, time in enumerate(self.ephemeris_time):
                 sensor2j2000 = spice.pxform(
-                    self.sensor_frame_id,
-                    j2000_id,
+                    spice.frmnam(self.sensor_frame_id),
+                    spice.frmnam(j2000_id),
                     time)
                 q_sensor = spice.m2q(sensor2j2000)
                 sensor_quats[i,:3] = q_sensor[1:]
                 sensor_quats[i,3] = q_sensor[0]
 
                 body2j2000 = spice.pxform(
-                    self.target_frame_id,
-                    j2000_id,
+                    spice.frmnam(self.target_frame_id),
+                    spice.frmnam(j2000_id),
                     time)
                 q_body = spice.m2q(body2j2000)
                 body_quats[i,:3] = q_body[1:]
@@ -241,7 +239,10 @@ class NaifSpice():
 
     @property
     def ephemeris_stop_time(self):
-        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_stop_count)
+        if self.spacecraft_clock_stop_count:
+            return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_stop_count)
+        else:
+            return spice.str2et(self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S"))
 
     @property
     def center_ephemeris_time(self):
