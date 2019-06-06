@@ -13,7 +13,7 @@ class TestLineScanner(LineScanner):
     """
     @property
     def line_scan_rate(self):
-        return [[0.5], [800], [0.01]]
+        return [[0.5], [-50], [0.01]]
 
 
 @pytest.fixture
@@ -69,6 +69,7 @@ def test_line_scan_driver():
     driver.platform_name = 'Test Platform'
     driver.sensor_name = 'Test Line Scan Sensor'
     driver.ephemeris_stop_time = 900
+    driver.ephemeris_start_time = 800
 
     return driver
 
@@ -184,7 +185,7 @@ def test_radii(test_frame_driver):
     radii_obj = isd['radii']
     assert radii_obj['semimajor'] == 1100
     assert radii_obj['semiminor'] == 1000
-    assert radii_obj['unit'] == 'm'
+    assert radii_obj['unit'] == 'km'
 
 def test_reference_height(test_frame_driver):
     isd = json.loads(usgscsm_formatter.to_usgscsm(test_frame_driver))
