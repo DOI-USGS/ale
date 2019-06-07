@@ -3,11 +3,129 @@ import json
 import numpy as np
 
 from ale.formatters import usgscsm_formatter
+from ale.base.base import Driver
 from ale.base.type_sensor import LineScanner, Framer
 from ale.transformation import FrameNode
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
-class TestLineScanner(LineScanner):
+class TestDriver(Driver):
+    """
+    Test Driver implementation with dummy values
+    """
+    @property
+    def target_body_radii(self):
+        return (1100, 1000)
+
+    @property
+    def frame_chain(self):
+        j2000 = FrameNode(1)
+        body_rotation = TimeDependentRotation(
+            np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
+            np.array([0, 1]),
+            100,
+            1
+        )
+        body_fixed = FrameNode(100, parent=j2000, rotation=body_rotation)
+        spacecraft_rotation = TimeDependentRotation(
+            np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
+            np.array([0, 1]),
+            1000,
+            1
+        )
+        spacecraft = FrameNode(1000, parent=j2000, rotation=spacecraft_rotation)
+        sensor_rotation = ConstantRotation(np.array([0, 0, 0, 1]), 1010, 1000)
+        sensor = FrameNode(1010, parent=spacecraft, rotation=sensor_rotation)
+        return j2000
+
+    @property
+    def sample_summing(self):
+        return 2
+
+    @property
+    def line_summing(self):
+        return 4
+
+    @property
+    def focal_length(self):
+        return 500
+
+    @property
+    def detector_center_sample(self):
+        return 512
+
+    @property
+    def detector_start_line(self):
+        return 0
+
+    @property
+    def detector_start_sample(self):
+        return 8
+
+    @property
+    def usgscsm_distortion_model(self):
+        return {
+            'radial' : {
+                'coefficients' : [0.0, 1.0, 0.1]
+            }
+        }
+
+    @property
+    def platform_name(self):
+        return 'Test Platform'
+
+    @property
+    def ephemeris_stop_time(self):
+        return 900
+
+    @property
+    def ephemeris_start_time(self):
+        return 800
+
+    @property
+    def focal2pixel_lines(self):
+        return [0.1, 0.2, 0.3]
+
+    @property
+    def focal2pixel_samples(self):
+        return  [0.3, 0.2, 0.1]
+
+    @property
+    def image_samples(self):
+        return 1024
+
+    @property
+    def sensor_frame_id(self):
+        return 1010
+
+    @property
+    def target_frame_id(self):
+        return 100
+
+    @property
+    def isis_naif_keywords(self):
+        return {
+            'keyword_1' : 0,
+            'keyword_2' : 'test'
+        }
+
+    @property
+    def pixel2focal_x(self):
+        return [456, 3, 1]
+
+    @property
+    def pixel2focal_y(self):
+        return [28, 93, 5]
+
+    @property
+    def sensor_model_version(self):
+        return 1
+
+    @property
+    def target_name(self):
+        return 'Test Target'
+
+
+class TestLineScanner(LineScanner, TestDriver):
     """
     Test class for overriding properties from the LineScanner class.
     """
@@ -15,119 +133,73 @@ class TestLineScanner(LineScanner):
     def line_scan_rate(self):
         return [[0.5], [-50], [0.01]]
 
+    @property
+    def sensor_name(self):
+        return 'Test Line Scan Sensor'
+
+    @property
+    def sensor_position(self):
+        return (
+            [[0, 1, 2], [3, 4, 5]],
+            [[0, -1, -2], [-3, -4, -5]],
+            [800, 900]
+        )
+
+    @property
+    def sun_position(self):
+        return (
+            [[0, 1, 2], [3, 4, 5]],
+            [[0, -1, -2], [-3, -4, -5]],
+            [800, 900]
+        )
+
+    @property
+    def detector_center_line(self):
+        return 0.5
+
+    @property
+    def image_lines(self):
+        return 10000
+
+
+class TestFramer(Framer, TestDriver):
+    """
+    Test class for overriding properties from the Framer class
+    """
+    @property
+    def sensor_name(self):
+        return 'Test Frame Sensor'
+
+    @property
+    def sensor_position(self):
+        return (
+            [[0, 1, 2]],
+            [[0, -1, -2]],
+            [850]
+        )
+    @property
+    def sun_position(self):
+        return (
+            [[0, 1, 2]],
+            [[0, -1, -2]],
+            [850]
+        )
+
+    @property
+    def detector_center_line(self):
+        return 256
+
+    @property
+    def image_lines(self):
+        return 512
 
 @pytest.fixture
 def test_line_scan_driver():
-    j2000 = FrameNode(1)
-    body_rotation = TimeDependentRotation(
-        np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
-        np.array([0, 1]),
-        100,
-        1
-    )
-    body_fixed = FrameNode(100, parent=j2000, rotation=body_rotation)
-    spacecraft_rotation = TimeDependentRotation(
-        np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
-        np.array([0, 1]),
-        1000,
-        1
-    )
-    spacecraft = FrameNode(1000, parent=j2000, rotation=spacecraft_rotation)
-    sensor_rotation = ConstantRotation(np.array([0, 0, 0, 1]), 1010, 1000)
-    sensor = FrameNode(1010, parent=spacecraft, rotation=sensor_rotation)
-    driver = TestLineScanner()
-    driver.target_body_radii = (1100, 1000)
-    driver.sensor_position = (
-        [[0, 1, 2], [3, 4, 5]],
-        [[0, -1, -2], [-3, -4, -5]],
-        [800, 900]
-    )
-    driver.sun_position = (
-        [[0, 1, 2], [3, 4, 5]],
-        [[0, -1, -2], [-3, -4, -5]],
-        [800, 900]
-    )
-    driver.sensor_frame_id = 1010
-    driver.target_frame_id = 100
-    driver.frame_chain = j2000
-    driver.sample_summing = 2
-    driver.line_summing = 4
-    driver.focal_length = 500
-    driver.detector_center_line = 0.5
-    driver.detector_center_sample = 512
-    driver.detector_start_line = 0
-    driver.detector_start_sample = 8
-    driver.focal2pixel_lines = [0.1, 0.2, 0.3]
-    driver.focal2pixel_samples = [0.3, 0.2, 0.1]
-    driver.usgscsm_distortion_model = {
-        'radial' : {
-            'coefficients' : [0.0, 1.0, 0.1]
-        }
-    }
-    driver.image_lines = 10000
-    driver.image_samples = 1024
-    driver.platform_name = 'Test Platform'
-    driver.sensor_name = 'Test Line Scan Sensor'
-    driver.ephemeris_stop_time = 900
-    driver.ephemeris_start_time = 800
-
-    return driver
-
+    return TestLineScanner("")
 
 @pytest.fixture
 def test_frame_driver():
-    j2000 = FrameNode(1)
-    body_rotation = TimeDependentRotation(
-        np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
-        np.array([0, 1]),
-        100,
-        1
-    )
-    body_fixed = FrameNode(100, parent=j2000, rotation=body_rotation)
-    spacecraft_rotation = TimeDependentRotation(
-        np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
-        np.array([0, 1]),
-        1000,
-        1
-    )
-    spacecraft = FrameNode(1000, parent=j2000, rotation=spacecraft_rotation)
-    sensor_rotation = ConstantRotation(np.array([0, 0, 0, 1]), 1010, 1000)
-    sensor = FrameNode(1010, parent=spacecraft, rotation=sensor_rotation)
-    driver = Framer()
-    driver.target_body_radii = (1100, 1000)
-    driver.sensor_position = (
-        [[0, 1, 2]],
-        [[0, -1, -2]],
-        [850]
-    )
-    driver.sun_position = (
-        [[0, 1, 2]],
-        [[0, -1, -2]],
-        [850]
-    )
-    driver.sensor_frame_id = 1010
-    driver.target_frame_id = 100
-    driver.frame_chain = j2000
-    driver.sample_summing = 2
-    driver.line_summing = 4
-    driver.focal_length = 500
-    driver.detector_center_line = 256
-    driver.detector_center_sample = 512
-    driver.detector_start_line = 0
-    driver.detector_start_sample = 8
-    driver.focal2pixel_lines = [0.1, 0.2, 0.3]
-    driver.focal2pixel_samples = [0.3, 0.2, 0.1]
-    driver.usgscsm_distortion_model = {
-        'radial' : {
-            'coefficients' : [0.0, 1.0, 0.1]
-        }
-    }
-    driver.image_lines = 512
-    driver.image_samples = 1024
-    driver.platform_name = 'Test Platform'
-    driver.sensor_name = 'Test Frame Sensor'
-
-    return driver
+    return TestFramer("")
 
 def test_frame_name_model(test_frame_driver):
     isd = json.loads(usgscsm_formatter.to_usgscsm(test_frame_driver))
