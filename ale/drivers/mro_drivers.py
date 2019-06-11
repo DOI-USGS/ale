@@ -33,14 +33,32 @@ class MroCtxIsisLabelIsisSpiceDriver(Driver, IsisSpice, LineScanner, RadialDisto
 
     @property
     def spacecraft_id(self):
+        """
+        Returns
+        -------
+        : int
+          Naif ID code for the spacecraft
+        """
         return "N/A"
 
     @property
     def ikid(self):
+        """
+        Returns
+        -------
+        : int
+          Naif ID code for the instrument
+        """
         return int(self.label["IsisCube"]["Kernels"]["NaifFrameCode"])
 
     @property
     def line_exposure_duration(self):
+        """
+        Returns
+        -------
+        : float
+          Line exposure duration in seconds
+        """
         return self.label["IsisCube"]["Instrument"]["LineExposureDuration"].value * 0.001 # Scale to seconds
 
 
@@ -74,6 +92,8 @@ class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDi
         Returns an instrument id for uniquely identifying the instrument, but often
         also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
         the same ID the Spice expects in bods2c calls.
+        Expects instrument_id to be defined in the IsisLabel mixin. This should be
+        a string of the form 'CTX'
 
         Returns
         -------
@@ -87,6 +107,16 @@ class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDi
 
     @property
     def ephemeris_start_time(self):
+        """
+        Returns the ephemeris start time of the image.
+        Expects spacecraft_id to be defined. This should be the integer
+        Naif ID code for the spacecraft.
+
+        Returns
+        -------
+        : float
+          ephemeris start time of the image
+        """
         if not hasattr(self, '_ephemeris_start_time'):
             sclock = self.label['IsisCube']['Instrument']['SpacecraftClockCount']
             self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
@@ -97,6 +127,8 @@ class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDi
         """
         Returns the spacecraft name used in various Spice calls to acquire
         ephemeris data.
+        Expects the platform_name to be defined. This should be a string of
+        the form 'Mars_Reconnaissance_Orbiter'
 
         Returns
         -------
@@ -110,10 +142,22 @@ class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDi
 
     @property
     def detector_start_line(self):
+        """
+        Returns
+        -------
+        : int
+          The starting detector line of the image
+        """
         return 1
 
     @property
     def detector_start_sample(self):
+        """
+        Returns
+        -------
+        : int
+          The starting detector sample of the image
+        """
         return self.label['IsisCube']['Instrument']['SampleFirstPixel']
 
     @property
@@ -157,6 +201,8 @@ class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, LineScanner, RadialDi
         Returns an instrument id for uniquely identifying the instrument, but often
         also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
         the same ID the Spice expects in bods2c calls.
+        Expects instrument_id to be defined in the Pds3Label mixin. This should
+        be a string of the form 'CONTEXT CAMERA' or 'CTX'
 
         Returns
         -------
@@ -175,6 +221,8 @@ class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, LineScanner, RadialDi
         """
         Returns the spacecraft name used in various Spice calls to acquire
         ephemeris data.
+        Expects spacecraft_name to be defined. This should be a string of the form
+        'MARS_RECONNAISSANCE_ORBITER'
 
         Returns
         -------
@@ -188,12 +236,30 @@ class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, LineScanner, RadialDi
 
     @property
     def detector_start_line(self):
+        """
+        Returns
+        -------
+        : int
+          Starting detector line for the image
+        """
         return 1
 
     @property
     def detector_start_sample(self):
+        """
+        Returns
+        -------
+        : int
+          Starting detector sample for the image
+        """
         return self.label.get('SAMPLE_FIRST_PIXEL', 0)
 
     @property
     def sensor_model_version(self):
+        """
+        Returns
+        -------
+        : int
+          sensor model version
+        """
         return 1

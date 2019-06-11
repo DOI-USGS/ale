@@ -18,6 +18,8 @@ class LineScanner():
     @property
     def line_scan_rate(self):
         """
+
+
         Returns
         -------
         : list
@@ -28,6 +30,15 @@ class LineScanner():
 
     @property
     def ephemeris_time(self):
+        """
+        Returns an array of times between the start/stop ephemeris times
+        based on the number of lines in the image
+
+        Returns
+        -------
+        : ndarray
+          ephemeris times split based on image lines
+        """
         return np.linspace(self.ephemeris_start_time,  self.ephemeris_stop_time, self.image_lines / 64)
 
 class Framer():
@@ -46,4 +57,15 @@ class Framer():
 
     @property
     def ephemeris_time(self):
+        """
+        Returns the center ephemeris time for the image which is the average
+        of the start and stop ephemeris time.
+        Expects center_ephemeris_time to be defined. This should be a double
+        containing the average of the start and stop ephemeris times.
+
+        Returns
+        -------
+        : double
+          Center ephemeris time for the image
+        """
         return [self.center_ephemeris_time]

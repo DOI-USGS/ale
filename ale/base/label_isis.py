@@ -18,6 +18,8 @@ class IsisLabel():
     @property
     def instrument_id(self):
         """
+        Returns the short name of the instrument
+
         Returns
         -------
         : str
@@ -27,15 +29,33 @@ class IsisLabel():
 
     @property
     def platform_name(self):
+        """
+        Returns the name of the platform containing the sensor
+
+        Returns
+        -------
+        : str
+          Name of the platform which the sensor is mounted on
+        """
         return self.label['IsisCube']['Instrument']['SpacecraftName']
 
     @property
     def sensor_name(self):
+        """
+        Returns the name of the instrument
+
+        Returns
+        -------
+        : str
+          Name of the sensor
+        """
         return self.label['IsisCube']['Instrument']['InstrumentName']
 
     @property
     def image_lines(self):
         """
+        Returns an integer containing the number of lines in the image
+
         Returns
         -------
         : int
@@ -46,6 +66,8 @@ class IsisLabel():
     @property
     def image_samples(self):
         """
+        Returns an integer containing the number of samples in the image
+
         Returns
         -------
         : int
@@ -56,6 +78,8 @@ class IsisLabel():
     @property
     def sample_summing(self):
         """
+        Returns the number of detector samples summed to produce each image sample
+
         Returns
         -------
         : int
@@ -70,6 +94,8 @@ class IsisLabel():
     @property
     def line_summing(self):
         """
+        the number of detector lines summed to produce each image sample
+
         Returns
         -------
         : int
