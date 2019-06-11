@@ -18,7 +18,10 @@ class LineScanner():
     @property
     def line_scan_rate(self):
         """
-
+        Expects ephemeris_start_time to be defined. This should be a float
+        containing the start time of the image.
+        Expects center_ephemeris_time to be defined. This should be a float
+        containing the average of the start and end ephemeris times.
 
         Returns
         -------
@@ -32,7 +35,12 @@ class LineScanner():
     def ephemeris_time(self):
         """
         Returns an array of times between the start/stop ephemeris times
-        based on the number of lines in the image
+        based on the number of lines in the image.
+        Expects ephemeris start/stop times to be defined. These should be
+        floating point numbers containing the start and stop times of the
+        images.
+        Expects image_lines to be defined. This should be an integer containing
+        the number of lines in the image.
 
         Returns
         -------
