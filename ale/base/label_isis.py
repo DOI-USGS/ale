@@ -105,13 +105,14 @@ class IsisLabel():
         : str
           Spacecraft clock start count
         """
-        try:
-            start_count = self.label['IsisCube']['Instrument']['SpacecraftClockStartCount']
-
-        except:
-            start_count = self.label['IsisCube']['Archive']['SpacecraftClockStartCount']
-
-        return start_count
+        if 'SpacecraftClockStartCount' in self.label['IsisCube']['Instrument']:
+            return self.label['IsisCube']['Instrument']['SpacecraftClockStartCount']
+        elif 'SpacecraftClockCount' in self.label['IsisCube']['Instrument']:
+            return self.label['IsisCube']['Instrument']['SpacecraftClockCount']
+        elif 'SpacecraftClockStartCount' in start_count = self.label['IsisCube']['Archive']:
+            return self.label['IsisCube']['Archive']['SpacecraftClockStartCount']
+        else:
+            return None
 
     @property
     def spacecraft_clock_stop_count(self):
@@ -124,13 +125,12 @@ class IsisLabel():
         : str
           Spacecraft clock stop count
         """
-        try:
-            start_count = self.label['IsisCube']['Instrument']['SpacecraftClockStopCount']
-
-        except:
-            start_count = self.label['IsisCube']['Archive']['SpacecraftClockStopCount']
-
-        return start_count
+        if 'SpacecraftClockStopCount' in self.label['IsisCube']['Instrument']:
+            return self.label['IsisCube']['Instrument']['SpacecraftClockStopCount']
+        elif 'SpacecraftClockStopCount' in self.label['IsisCube']['Archive']:
+            return self.label['IsisCube']['Archive']['SpacecraftClockStopCount']
+        else:
+            return None
 
     @property
     def utc_start_time(self):
@@ -170,17 +170,20 @@ class IsisLabel():
         : float
           Exposure duration in seconds
         """
-        try:
-            units = self.label['IsisCube']['Instrument']['ExposureDuration'].units
-            if "ms" in units.lower():
+        if 'EXPOSURE_DURATION' in self.label:
+            try:
+                units = self.label['IsisCube']['Instrument']['ExposureDuration'].units
+                if "ms" in units.lower():
+                    exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration'].value * 0.001
+                else:
+                    # if not milliseconds, the units are probably seconds
+                    exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration'].value
+            except:
+                # if no units are available, assume the exposure duration is given in milliseconds
                 exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration'].value * 0.001
-            else:
-                # if not milliseconds, the units are probably seconds
-                exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration'].value
-        except:
-            # if no units are available, assume the exposure duration is given in milliseconds
-            exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration'].value * 0.001
-        return exposure_duration
+            return exposure_duration
+        else:
+            return self.line_exposure_duration
 
     @property
     def line_exposure_duration(self):
@@ -192,4 +195,4 @@ class IsisLabel():
         : float
           Line exposure duration in seconds
         """
-        return self.label['IsisCube']['Instrument']['LineExposureDuration'] * 0.001 # scale to seconds
+        return self.label['IsisCube']['Instrument']['LineExposureDuration'].value * 0.001 # scale to seconds
