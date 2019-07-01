@@ -109,7 +109,7 @@ class IsisLabel():
             return self.label['IsisCube']['Instrument']['SpacecraftClockStartCount']
         elif 'SpacecraftClockCount' in self.label['IsisCube']['Instrument']:
             return self.label['IsisCube']['Instrument']['SpacecraftClockCount']
-        elif 'SpacecraftClockStartCount' in start_count = self.label['IsisCube']['Archive']:
+        elif 'SpacecraftClockStartCount' in self.label['IsisCube']['Archive']:
             return self.label['IsisCube']['Archive']['SpacecraftClockStartCount']
         else:
             return None
