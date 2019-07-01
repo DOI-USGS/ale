@@ -161,7 +161,7 @@ class IsisLabel():
         return self.label['IsisCube']['Instrument']['StopTime']
 
     @property
-    def  exposure_duration(self):
+    def exposure_duration(self):
         """
         The exposure duration of the image, in seconds
 
@@ -170,7 +170,7 @@ class IsisLabel():
         : float
           Exposure duration in seconds
         """
-        if 'EXPOSURE_DURATION' in self.label:
+        if 'ExposureDuration' in self.label['IsisCube']['Instrument']:
             try:
                 units = self.label['IsisCube']['Instrument']['ExposureDuration'].units
                 if "ms" in units.lower():
