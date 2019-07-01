@@ -114,6 +114,53 @@ class IsisLabel():
         return start_count
 
     @property
+    def spacecraft_clock_stop_count(self):
+        """
+        The spacecraft clock stop count, frequently used to determine the stop time
+        of the image.
+
+        Returns
+        -------
+        : str
+          Spacecraft clock stop count
+        """
+        try:
+            start_count = self.label['IsisCube']['Instrument']['SpacecraftClockStopCount']
+
+        except:
+            start_count = self.label['IsisCube']['Archive']['SpacecraftClockStopCount']
+
+        return start_count
+
+    @property
+    def utc_start_time(self):
+        """
+        The UTC start time of the image.
+        This is generally less accurate than converting the spacecraft start
+        clock count using the spacecraft clock kernel (SCLK).
+
+        Returns
+        -------
+        : datetime
+          Start time of the image in UTC
+        """
+        return self.label['IsisCube']['Instrument']['StartTime']
+
+    @property
+    def utc_stop_time(self):
+        """
+        The UTC stop time of the image.
+        This is generally less accurate than converting the spacecraft stop
+        clock count using the spacecraft clock kernel (SCLK).
+
+          Returns
+        -------
+        : datetime
+          Stop time of the image in UTC
+        """
+        return self.label['IsisCube']['Instrument']['StopTime']
+
+    @property
     def  exposure_duration(self):
         """
         The exposure duration of the image, in seconds
