@@ -220,6 +220,6 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         Returns
         -------
         : int
-          model version
+          ISIS sensor model version
         """
         return 2

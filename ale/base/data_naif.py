@@ -391,7 +391,7 @@ class NaifSpice():
         """
         Returns the starting ephemeris time of the image. Expects spacecraft_id to
         be defined. This must be the integer Naif Id code for the spacecraft. Expects
-        spacecraft_clock_start_count to be defined. This must be a floating point number
+        spacecraft_clock_start_count to be defined. This must be a string
         containing the start clock count of the spacecraft
 
         Returns
@@ -406,7 +406,7 @@ class NaifSpice():
         """
         Returns the ephemeris stop time of the image. Expects spacecraft_id to
         be defined. This must be the integer Naif Id code for the spacecraft.
-        Expects spacecraft_clock_stop_count to be defined. This must be a floating point number
+        Expects spacecraft_clock_stop_count to be defined. This must be a string
         containing the stop clock count of the spacecraft
 
         Returns

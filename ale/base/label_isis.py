@@ -30,7 +30,8 @@ class IsisLabel():
     @property
     def platform_name(self):
         """
-        Returns the name of the platform containing the sensor
+        Returns the name of the platform containing the sensor. This is usually
+        the spacecraft name.
 
         Returns
         -------

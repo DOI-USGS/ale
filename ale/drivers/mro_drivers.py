@@ -166,7 +166,7 @@ class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDi
         Returns
         -------
         : int
-          sensor model version
+          ISIS sensor model version
         """
         return 1
 
@@ -260,6 +260,6 @@ class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, LineScanner, RadialDi
         Returns
         -------
         : int
-          sensor model version
+          ISIS sensor model version
         """
         return 1

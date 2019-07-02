@@ -422,6 +422,6 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         Returns
         -------
         : int
-          model version
+          ISIS sensor model version
         """
         return 1

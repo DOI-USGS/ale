@@ -238,8 +238,9 @@ class Driver(ABC):
         """
         Returns
         -------
-        : int
-          Focal plane to detector lines
+        : list
+          3 element list containing affine transformation coefficient.
+          The elements are as follows: constant, x coefficent, y coeffecient
         """
         pass
 
@@ -248,8 +249,9 @@ class Driver(ABC):
         """
         Returns
         -------
-        : int
-          Focal plane to detector samples
+        : list
+          3 element list containing affine transformation coefficients.
+          The elements are as follows: constant, x coefficent, y coeffecient
         """
         pass
 
@@ -258,8 +260,9 @@ class Driver(ABC):
         """
         Returns
         -------
-        : int
-          detector to focal plane x
+        : list
+          3 element list containing coefficience for the pixels to focal plane
+          transformation. The elements are as follows: constant, sample, line
         """
         pass
 
@@ -268,8 +271,9 @@ class Driver(ABC):
         """
         Returns
         -------
-        : int
-          detector to focal plane y
+        : : list
+          3 element list containing coefficience for the pixels to focal plane
+          transformation. The elements are as follows: constant, sample, line
         """
         pass
 
@@ -279,7 +283,7 @@ class Driver(ABC):
           Returns
         -------
         : double
-          Ephemeris start time of the image
+          The start time of the image in ephemeris seconds past the J2000 epoch.
         """
         pass
 
@@ -289,6 +293,6 @@ class Driver(ABC):
           Returns
         -------
         : double
-          Ephemeris stop time of the image 
+          The stop time of the image in ephemeris seconds past the J2000 epoch.
         """
         pass

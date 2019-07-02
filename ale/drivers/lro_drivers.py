@@ -85,7 +85,7 @@ class LroLrocPds3LabelNaifSpiceDriver(NaifSpice, Pds3Label, LineScanner, Driver)
         Returns
         -------
         : int
-          sensor model version
+          ISIS sensor model version
         """
         return 2
 
@@ -97,7 +97,7 @@ class LroLrocPds3LabelNaifSpiceDriver(NaifSpice, Pds3Label, LineScanner, Driver)
         Returns
         -------
         : int
-          Returns the starting sample 
+          Returns the starting sample
         """
         return 1
 
@@ -109,7 +109,7 @@ class LroLrocPds3LabelNaifSpiceDriver(NaifSpice, Pds3Label, LineScanner, Driver)
         Returns
         -------
         : int
-          Returns the starting line 
+          Returns the starting line
         """
         return 1
 
@@ -124,7 +124,7 @@ class LroLrocPds3LabelNaifSpiceDriver(NaifSpice, Pds3Label, LineScanner, Driver)
         Returns
         -------
         : dict
-          Returns a dict with the model name : dict of the coefficients 
+          Returns a dict with the model name : dict of the coefficients
         """
 
         return {"lrolrocnac":
@@ -141,4 +141,3 @@ class LroLrocPds3LabelNaifSpiceDriver(NaifSpice, Pds3Label, LineScanner, Driver)
           Radial distortion coefficients. There is only one coefficient for LROC NAC l/r
         """
         return spice.gdpool('INS{}_OD_K'.format(self.ikid), 0, 1).tolist()
-

@@ -111,7 +111,7 @@ class Pds3Label():
     @property
     def utc_start_time(self):
         """
-        Returns the start time of the image
+        Returns the start time of the image as a UTC string
 
           Returns
         -------
@@ -124,7 +124,7 @@ class Pds3Label():
     @property
     def utc_stop_time(self):
         """
-        Returns the stop time of the image
+        Returns the stop time of the image as a UTC string
 
           Returns
         -------
@@ -303,6 +303,9 @@ class Pds3Label():
     @property
     def line_exposure_duration(self):
         """
+        Line exposure duration returns the time between the exposures for
+        subsequent lines.
+
         Returns
         -------
         : float

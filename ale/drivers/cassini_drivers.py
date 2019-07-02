@@ -172,7 +172,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDis
         Returns
         -------
         : int
-          model version
+          ISIS sensor model version
         """
         return 1
 
