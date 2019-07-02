@@ -19,7 +19,9 @@ class Pds3Label():
     @property
     def instrument_id(self):
         """
-          Returns
+        Returns the short name of the instrument
+
+         Returns
         -------
         : str
           Short name of the instrument
@@ -30,6 +32,8 @@ class Pds3Label():
     @property
     def instrument_name(self):
         """
+        Returns the full name of the instrument
+
           Returns
         -------
         : str
@@ -41,12 +45,22 @@ class Pds3Label():
 
     @property
     def sensor_name(self):
+        """
+        Returns the name of the instrument
+
+        Returns
+        -------
+        : str
+          Name of the sensor
+        """
         return self.instrument_name
 
 
     @property
     def instrument_host_id(self):
         """
+        Returns the short name of the instrument host
+
           Returns
         -------
         : str
@@ -58,6 +72,8 @@ class Pds3Label():
     @property
     def instrument_host_name(self):
         """
+        Returns the full name of the instrument host
+
           Returns
         -------
         : str
@@ -68,12 +84,22 @@ class Pds3Label():
 
     @property
     def platform_name(self):
+        """
+        Returns the name of the platform which the instrument is mounted on
+
+        Returns
+        -------
+        : str
+          platform name
+        """
         return self.instrument_host_name
 
 
     @property
     def spacecraft_name(self):
         """
+        Returns the name of the spacecraft
+
           Returns
         -------
         : str
@@ -85,6 +111,8 @@ class Pds3Label():
     @property
     def utc_start_time(self):
         """
+        Returns the start time of the image as a UTC string
+
           Returns
         -------
         : str
@@ -96,6 +124,8 @@ class Pds3Label():
     @property
     def utc_stop_time(self):
         """
+        Returns the stop time of the image as a UTC string
+
           Returns
         -------
         : str
@@ -159,11 +189,29 @@ class Pds3Label():
 
     @property
     def line_summing(self):
+        """
+        Expects sampling_factor to be defined. This must be an integer
+        containing the number of samples and lines combined from the original data
+
+        Returns
+        -------
+        : int
+           Number of detector lines summed to produce each image line
+        """
         return self.sampling_factor
 
 
     @property
     def sample_summing(self):
+        """
+        Expects sampling_factor to be defined. This must be an integer
+        containing the number of samples and lines combined from the original data
+
+        Returns
+        -------
+        : int
+           Number of detector lines summed to produce each image line
+        """
         return self.sampling_factor
 
 
@@ -224,6 +272,11 @@ class Pds3Label():
     @property
     def exposure_duration(self):
         """
+        Returns the exposure duration converted to seconds. If the exposure duration
+        is not present in the PDS3 label, then this property returns the
+        line exposure duration. Expects line_exposure_duration to be defined. This
+        should be a floating point number containing the line exposure duration.
+
          Returns
          -------
          : float
@@ -249,6 +302,15 @@ class Pds3Label():
     # Consider expanding this to handle units
     @property
     def line_exposure_duration(self):
+        """
+        Line exposure duration returns the time between the exposures for
+        subsequent lines.
+
+        Returns
+        -------
+        : float
+          Returns the line exposure duration in seconds from the PDS3 label.
+        """
         return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
 
     @property

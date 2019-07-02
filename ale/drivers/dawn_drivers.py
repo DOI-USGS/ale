@@ -17,7 +17,10 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         """
         Returns an instrument id for uniquely identifying the instrument, but often
         also used to be piped into Spice Kernels to acquire IKIDs. Therefore the
-        the same ID that Spice expects in bods2c calls.
+        the same ID that Spice expects in bods2c calls. Expects instrument_id to be
+        defined from the PDS3Label mixin. This should be a string containing the short
+        name of the instrument. Expects filter_number to be defined. This should be an
+        integer containing the filter number from the PDS3 Label.
 
         Returns
         -------
@@ -84,6 +87,8 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         Spacecraft name used in various Spice calls to acquire
         ephemeris data. Dawn does not have a SPACECRAFT_NAME keyword, therefore
         we are overwriting this method using the instrument_host_id keyword instead.
+        Expects instrument_host_id to be defined. This should be a string containing
+        the name of the spacecraft that the instrument is mounted on.
 
         Returns
         -------
@@ -99,7 +104,8 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         piped into Spice Kernels to acquire Ephermis data from Spice. Therefore they
         the same ID the Spice expects in bodvrd calls. In this case, vesta images
         have a number infront of them like "4 VESTA" which needs to be simplified
-        to "VESTA" for spice.
+        to "VESTA" for spice. Expects target_name to be defined in the Pds3Label mixin.
+        This should be a string containing the name of the target body.
 
         Returns
         -------
@@ -128,6 +134,13 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         """
         The Dawn framing camera uses a unique radial distortion model so we need
         to overwrite the method packing the distortion model into the ISD.
+        Expects odtk to be defined. This should be a list containing the radial
+        distortion coefficients
+
+        Returns
+        -------
+        : dict
+          Dictionary containing the distortion model
         """
         return {
             "dawnfc": {
@@ -138,6 +151,10 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
     @property
     def odtk(self):
         """
+        The coefficients for the distortion model
+        Expects ikid to be defined. This should be an integer containing the
+        Naif ID code for the instrument.
+
         Returns
         -------
         : list
@@ -149,20 +166,50 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
     #       nature of dawn pixels
     @property
     def focal2pixel_samples(self):
+        """
+        Expects ikid to be defined. This should be an integer containing the
+        Naif ID code for the instrument.
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector samples
+        """
         # Microns to mm
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
         return [0.0, 1/pixel_size, 0.0]
 
     @property
     def focal2pixel_lines(self):
+        """
+        Expects ikid to be defined. This should be an integer containing the
+        Naif ID code for the instrument.
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector lines
+        """
         # Microns to mm
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
         return [0.0, 0.0, 1/pixel_size]
 
     def detector_start_line(self):
+        """
+        Returns
+        -------
+        : int
+          Detector line corresponding to the first image line
+        """
         return 1
 
     def detector_start_sample(self):
+        """
+        Returns
+        -------
+        : int
+          Detector sample corresponding to the first image sample
+        """
         return 1
 
     @property
@@ -173,6 +220,6 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         Returns
         -------
         : int
-          model version
+          ISIS sensor model version
         """
         return 2
