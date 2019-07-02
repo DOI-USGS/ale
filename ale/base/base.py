@@ -55,10 +55,22 @@ class Driver(ABC):
 
     @abc.abstractproperty
     def detector_start_line(self):
+        """
+        Returns
+        -------
+        : int
+          Detector line corresponding to the first image line
+        """
         pass
 
     @abc.abstractproperty
     def detector_start_sample(self):
+        """
+        Returns
+        -------
+        : int
+          Detector sample corresponding to the first image sample
+        """
         pass
 
     @abc.abstractproperty
@@ -83,10 +95,22 @@ class Driver(ABC):
 
     @abc.abstractproperty
     def platform_name(self):
+        """
+        Returns
+        -------
+        : str
+          Name of the platform that the sensor is on
+        """
         pass
 
     @abc.abstractproperty
     def sensor_name(self):
+        """
+        Returns
+        -------
+        : str
+          Name of the sensor
+        """
         pass
 
     @abc.abstractproperty
@@ -111,10 +135,22 @@ class Driver(ABC):
 
     @abc.abstractproperty
     def detector_center_line(self):
+        """
+        Returns
+        -------
+        : int
+          The detector line of the principle point
+        """
         pass
 
     @abc.abstractproperty
     def detector_center_sample(self):
+        """
+        Returns
+        -------
+        : int
+          The detector sample of the principle point
+        """
         pass
 
     @abc.abstractproperty
@@ -123,13 +159,18 @@ class Driver(ABC):
         Returns
         -------
         : (positions, velocities, times)
-          a tuple containing a list of positions, a list of velocities, and a list of timess
+          a tuple containing a list of positions, a list of velocities, and a list of times
         """
         pass
 
     @abc.abstractproperty
-    #Get the frame chain between two frames and the frame types for all returned frames
     def frame_chain(self):
+        """
+        Returns
+        -------
+        FrameNode
+            The root node of the frame tree. This will always be the J2000 reference frame.
+        """
         pass
 
     @abc.abstractproperty
@@ -194,18 +235,46 @@ class Driver(ABC):
 
     @abc.abstractproperty
     def focal2pixel_lines(self):
+        """
+        Returns
+        -------
+        : list
+          3 element list containing affine transformation coefficient.
+          The elements are as follows: constant, x coefficent, y coeffecient
+        """
         pass
 
     @abc.abstractproperty
     def focal2pixel_samples(self):
+        """
+        Returns
+        -------
+        : list
+          3 element list containing affine transformation coefficients.
+          The elements are as follows: constant, x coefficent, y coeffecient
+        """
         pass
 
     @abc.abstractproperty
     def pixel2focal_x(self):
+        """
+        Returns
+        -------
+        : list
+          3 element list containing coefficience for the pixels to focal plane
+          transformation. The elements are as follows: constant, sample, line
+        """
         pass
 
     @abc.abstractproperty
     def pixel2focal_y(self):
+        """
+        Returns
+        -------
+        : : list
+          3 element list containing coefficience for the pixels to focal plane
+          transformation. The elements are as follows: constant, sample, line
+        """
         pass
 
     @abc.abstractproperty
@@ -213,8 +282,8 @@ class Driver(ABC):
         """
           Returns
         -------
-        : str
-          Start time of the image in UTC YYYY-MM-DDThh:mm:ss[.fff]
+        : double
+          The start time of the image in ephemeris seconds past the J2000 epoch.
         """
         pass
 
@@ -223,7 +292,7 @@ class Driver(ABC):
         """
           Returns
         -------
-        : str
-          Stop time of the image in UTC YYYY-MM-DDThh:mm:ss[.fff]
+        : double
+          The stop time of the image in ephemeris seconds past the J2000 epoch.
         """
         pass

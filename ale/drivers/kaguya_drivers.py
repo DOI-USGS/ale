@@ -29,6 +29,14 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
 
     @property
     def metakernel(self):
+        """
+        Returns latest instrument metakernels
+
+        Returns
+        -------
+        : string
+          Path to latest metakernel file
+        """
         metakernel_dir = config.kaguya
         mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
         if not hasattr(self, '_metakernel'):
@@ -47,6 +55,11 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
              the label belongs to a mono or stereo image.
         COMPRESS = D/T short for DCT or through, we assume image has been decompressed already
         SWATCH = swatch mode, different swatch modes have different FOVs
+
+        Returns
+        -------
+        : str
+          instrument id
         """
         instrument = super().instrument_id
         swath = self.label.get("SWATH_MODE_ID")[0]
@@ -64,36 +77,109 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         Some keys are stored in the IK kernel under a general ikid for TC1/TC2
         presumably because they are not affected by the addtional parameters encoded in
         the ikid returned by self.ikid. This method exists for those gdpool calls.
+
+        Expects instrument_id to be defined in the Pds3Label mixin. This should be
+        a string containing either TC1 or TC2
+
+        Returns
+        -------
+        : int
+          ikid of LISM_TC1 or LISM_TC2
         """
         return spice.bods2c("LISM_{}".format(super().instrument_id))
 
     @property
     def clock_stop_count(self):
+        """
+        The original SC_CLOCK_STOP_COUNT key is often incorrect and cannot be trusted.
+        Therefore we get this information from CORRECTED_SC_CLOCK_STOP_COUNT
+
+        Returns
+        -------
+        : float
+          spacecraft clock stop count in seconds
+        """
         return self.label.get('CORRECTED_SC_CLOCK_STOP_COUNT').value
 
     @property
     def ephemeris_stop_time(self):
+        """
+        Returns the ephemeris stop time of the image. Expects spacecraft_id to
+        be defined. This should be the integer naif ID code of the spacecraft.
+
+        Returns
+        -------
+        : float
+          ephemeris stop time of the image
+        """
         return spice.sct2e(self.spacecraft_id, super().ephemeris_stop_time)
 
     @property
     def clock_start_count(self):
+        """
+        The original SC_CLOCK_START_COUNT key is often incorrect and cannot be trusted.
+        Therefore we get this information from CORRECTED_SC_CLOCK_START_COUNT
+
+        Returns
+        -------
+        : float
+          spacecraft clock start count in seconds
+        """
         return self.label.get('CORRECTED_SC_CLOCK_START_COUNT').value
 
     @property
     def ephemeris_start_time(self):
+        """
+        Returns the ephemeris start time of the image. Expects spacecraft_id to
+        be defined. This should be the integer naif ID code of the spacecraft.
+
+        Returns
+        -------
+        : float
+          ephemeris start time of the image
+        """
         return spice.sct2e(self.spacecraft_id, super().ephemeris_start_time)
 
     @property
     def detector_center_line(self):
+        """
+        Returns
+        -------
+        : int
+          The detector line of the principle point
+        """
         return 0
 
     @property
     def detector_center_sample(self):
+        """
+        Returnce the center detector sample of the image. Expects tc_id to be
+        defined. This should be a string of the form LISM_TC1 or LISM_TC2.
+
+        Returns
+        -------
+        : int
+          The detector sample of the principle point
+        """
         # Pixels are 0 based, not one based, so subtract 1
         return spice.gdpool('INS{}_CENTER'.format(self._tc_id), 0, 2)[0]-1
 
     @property
     def _sensor_orientation(self):
+        """
+        Returns quaternions describing the orientation of the sensor.
+        Expects ephemeris_time to be defined. This should be a list containing
+        ephemeris times during which the image was taken.
+        Expects instrument_id to be defined in the Pds3Label mixin. This should be
+        a string of the form TC1 or TC2self.
+        Expects reference_frame to be defined. This should be a string containing
+        the name of the reference_frame.
+
+        Returns
+        -------
+        : list
+          Quaternions describing the orentiation of the sensor
+        """
         if not hasattr(self, '_orientation'):
             ephem = self.ephemeris_time
 
@@ -116,6 +202,14 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         """
         Kaguya uses a slightly more accurate "mean Earth" reference frame for
         moon obvervations. see https://darts.isas.jaxa.jp/pub/spice/SELENE/kernels/fk/moon_assoc_me.tf
+
+        Expects target_name to be defined. This should be a string containing the
+        name of the target body.
+
+        Returns
+        -------
+        : str
+          Reference frame
         """
         if self.target_name.lower() == "moon":
             return "MOON_ME"
@@ -127,6 +221,13 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
     def focal2pixel_samples(self):
         """
         Calculated using 1/pixel pitch
+        Expects tc_id to be defined. This should be a string of the form
+        LISM_TC1 or LISM_TC2.
+
+        Returns
+        -------
+        : list
+          focal plane to detector samples
         """
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self._tc_id), 0, 1)[0]
         return [0, 0, -1/pixel_size]
@@ -136,6 +237,13 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
     def focal2pixel_lines(self):
         """
         Calculated using 1/pixel pitch
+        Expects tc_id to be defined. This should be a string of the form
+        LISM_TC1 or LISM_TC2.
+
+        Returns
+        -------
+        : list
+          focal plane to detector lines
         """
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self._tc_id), 0, 1)[0]
         return [0, -1/pixel_size, 0]
@@ -144,6 +252,10 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
     @property
     def _odkx(self):
         """
+        Returns the x coefficients of the optical distortion model.
+        Expects tc_id to be defined. This should be a string of the form
+        LISM_TC1 or LISM_TC2.
+
         Returns
         -------
         : list
@@ -155,6 +267,10 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
     @property
     def _odky(self):
         """
+        Returns the y coefficients of the optical distortion model.
+        Expects tc_id to be defined. This should be a string of the form
+        LISM_TC1 or LISM_TC2.
+
         Returns
         -------
         : list
@@ -170,6 +286,11 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         Kaguya TC has an unintuitive key for this called CORRECTED_SAMPLING_INTERVAL.
         The original LINE_EXPOSURE_DURATION PDS3 keys is often incorrect and cannot
         be trusted.
+
+        Returns
+        -------
+        : float
+          Line exposure duration
         """
         # It's a list, but only sometimes.
         # seems to depend on whether you are using the original zipped archives or
@@ -184,6 +305,10 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
     @property
     def focal_length(self):
         """
+        Returns camera focal length
+        Expects tc_id to be defined. This should be a string of the form
+        LISM_TC1 or LISM_TC2.
+
         Returns
         -------
         : float
@@ -212,6 +337,14 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         v[X] = INS<INSTID>BORESIGHT[X] + a0 + a1*r + a2*r^2 + a3*r^3 ,
         v[Y] = INS<INSTID>BORESIGHT[Y] + r+a0 + a1*r +a2*r^2 + a3*r^3 ,
         v[Z] = INS<INSTID>BORESIGHT[Z]
+
+        Expects odkx and odky to be defined. These should be a list of optical
+        distortion x and y coefficients respectively.
+
+        Returns
+        -------
+        : dict
+          radial distortion model
 
         """
         return {
@@ -263,12 +396,23 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         LISM_TC2_SDH  (Single DCT Half)        1172  2921(+2)  -131382
         LISM_TC2_STH  (Single Through Half)    1172  2923      -131383
         LISM_TC2_SSH  (Single SP_support Half) 1172  2921      -131384
-        """
 
+
+        Returns
+        -------
+        : int
+          Detector sample corresponding to the first image sample
+        """
         return self.label["FIRST_PIXEL_NUMBER"]
 
     @property
     def detector_start_line(self):
+        """
+        Returns
+        -------
+        : int
+          Detector line corresponding to the first image sample
+        """
         return 1
 
 
@@ -278,6 +422,6 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         Returns
         -------
         : int
-          model version
+          ISIS sensor model version
         """
         return 1

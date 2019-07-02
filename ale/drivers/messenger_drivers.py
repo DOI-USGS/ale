@@ -43,6 +43,18 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
 
     @property
     def fikid(self):
+        """
+        Naif ID code used in calculating focal length
+        Expects filter_number to be defined. This should be an integer containing
+        the filter number from the pds3 label.
+        Expects ikid to be defined. This should be the integer Naid ID code for
+        the instrument.
+
+        Returns
+        -------
+        : int
+          Naif ID code used in calculating focal length
+        """
         if isinstance(self, Framer):
             fn = super().filter_number
             if fn == 'N/A':
@@ -57,6 +69,8 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         Returns an instrument id for unquely identifying the instrument, but often
         also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
         the same ID the Spice expects in bods2c calls.
+        Expects instrument_id to be defined in the Pds3Label mixin. This should
+        be a string of the form MDIS-WAC or MDIS-NAC.
 
         Returns
         -------
@@ -92,6 +106,8 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
     def detector_start_sample(self):
         """
         Returns starting detector sample quired from Spice Kernels.
+        Expects ikid to be defined. This should be the integer Naid ID code for
+        the instrument.
 
         Returns
         -------
@@ -104,20 +120,42 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
     def detector_start_line(self):
         """
         Returns starting detector line acquired from Spice Kernels.
+        Expects ikid to be defined. This should be the integer Naid ID code for
+        the instrument.
 
         Returns
         -------
-        : string
-          Path to latest metakernel file
+        : int
+          starting detector line
         """
         return int(spice.gdpool('INS{}_FPUBIN_START_LINE'.format(self.ikid), 0, 1)[0])
 
     @property
     def detector_center_sample(self):
+        """
+        Returns center detector sample acquired from Spice Kernels.
+        Expects ikid to be defined. This should be the integer Naid ID code for
+        the instrument.
+
+        Returns
+        -------
+        : float
+          center detector sample
+        """
         return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0])
 
     @property
     def detector_center_line(self):
+        """
+        Returns center detector line acquired from Spice Kernels.
+        Expects ikid to be defined. This should be the integer Naid ID code for
+        the instrument.
+
+        Returns
+        -------
+        : float
+          center detector line
+        """
         return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
 
     @property
@@ -126,12 +164,22 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         Returns
         -------
         : int
-          model version
+          ISIS sensor model version
         """
         return 2
 
     @property
     def usgscsm_distortion_model(self):
+        """
+        Returns a dictionary containing the distortion model.
+        Expects odtx and odty are defined. These should be the optical distortion
+        x and y coefficients respectively.
+
+        Returns
+        -------
+        : dict
+          radial distortion model
+        """
         return {
             "transverse": {
                 "x" : self.odtx,
@@ -170,6 +218,8 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
         Returns an instrument id for unquely identifying the instrument, but often
         also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
         the same ID the Spice expects in bods2c calls.
+        Expects instrument_id to be defined in the Pds3Label mixin. This should
+        be a string of the form MDIS-WAC or MDIS-NAC.
 
         Returns
         -------
@@ -180,6 +230,18 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
 
     @property
     def ephemeris_start_time(self):
+        """
+        Returns the ephemeris_start_time of the image.
+        Expects spacecraft_clock_start_count to be defined. This should be a float
+        containing the start clock count of the spacecraft.
+        Expects spacecraft_id to be defined. This should be the integer Naif ID code
+        for the spacecraft.
+
+        Returns
+        -------
+        : float
+          ephemeris start time of the image.
+        """
         if not hasattr(self, '_ephemeris_start_time'):
             sclock = self.spacecraft_clock_start_count
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
@@ -187,6 +249,16 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
 
     @property
     def usgscsm_distortion_model(self):
+        """
+        Returns a dictionary containing the distortion model.
+        Expects odtx and odty are defined. These should be the optical distortion
+        x and y coefficients respectively.
+
+        Returns
+        -------
+        : dict
+          radial distortion model
+        """
         return {
             "transverse": {
                 "x" : self.odtx,
@@ -196,6 +268,18 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
 
     @property
     def fikid(self):
+        """
+        Naif ID code used in calculating focal length
+        Expects filter_number to be defined. This should be an integer containing
+        the filter number from the pds3 label.
+        Expects ikid to be defined. This should be the integer Naid ID code for
+        the instrument.
+
+        Returns
+        -------
+        : int
+          Naif ID code used in calculating focal length
+        """
         if isinstance(self, Framer):
             fn = self.label['IsisCube']['BandBin']['Number']
             if fn == 'N/A':
@@ -230,6 +314,8 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
     def detector_start_sample(self):
         """
         Returns starting detector sample quired from Spice Kernels.
+        Expects ikid to be defined. This should be the integer Naid ID code for
+        the instrument.
 
         Returns
         -------
@@ -242,21 +328,43 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
     def detector_start_line(self):
         """
         Returns starting detector line acquired from Spice Kernels.
+        Expects ikid to be defined. This should be the integer Naid ID code for
+        the instrument.
 
         Returns
         -------
-        : string
-          Path to latest metakernel file
+        : int
+          detector start line
         """
         return int(spice.gdpool('INS{}_FPUBIN_START_LINE'.format(self.ikid), 0, 1)[0])
 
     @property
     def detector_center_sample(self):
+        """
+        Returns center detector sample acquired from Spice Kernels
+        Expects ikid to be defined. This should be the integer Naid ID code for
+        the instrument.
+
+        Returns
+        -------
+        : float
+          detector center sample
+        """
         return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0])
 
 
     @property
     def detector_center_line(self):
+        """
+        Returns center detector line acquired from Spice Kernels
+        Expects ikid to be defined. This should be the integer Naid ID code for
+        the instrument.
+
+        Returns
+        -------
+        : float
+          detector center line
+        """
         return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
 
     @property
@@ -265,6 +373,6 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
         Returns
         -------
         : int
-          model version
+          ISIS sensor model version
         """
         return 2
