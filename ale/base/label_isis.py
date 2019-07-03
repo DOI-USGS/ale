@@ -171,16 +171,18 @@ class IsisLabel():
           Exposure duration in seconds
         """
         if 'ExposureDuration' in self.label['IsisCube']['Instrument']:
-            try:
-                units = self.label['IsisCube']['Instrument']['ExposureDuration'].units
+            exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration']
+            # Check for units on the PVL keyword
+            if isinstance(exposure_duration, pvl._collections.Units):
+                units = exposure_duration.units
                 if "ms" in units.lower():
-                    exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration'].value * 0.001
+                    exposure_duration = exposure_duration.value * 0.001
                 else:
                     # if not milliseconds, the units are probably seconds
-                    exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration'].value
-            except:
+                    exposure_duration = exposure_duration.value
+            else:
                 # if no units are available, assume the exposure duration is given in milliseconds
-                exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration'].value * 0.001
+                exposure_duration = exposure_duration * 0.001
             return exposure_duration
         else:
             return self.line_exposure_duration
@@ -195,4 +197,15 @@ class IsisLabel():
         : float
           Line exposure duration in seconds
         """
-        return self.label['IsisCube']['Instrument']['LineExposureDuration'].value * 0.001 # scale to seconds
+        line_exposure_duration = self.label['IsisCube']['Instrument']['LineExposureDuration']
+        if isinstance(line_exposure_duration, pvl._collections.Units):
+            units = line_exposure_duration.units
+            if "ms" in units.lower():
+                line_exposure_duration = line_exposure_duration.value * 0.001
+            else:
+                # if not milliseconds, the units are probably seconds
+                line_exposure_duration = line_exposure_duration.value
+        else:
+            # if no units are available, assume the exposure duration is given in milliseconds
+            line_exposure_duration = line_exposure_duration * 0.001
+        return line_exposure_duration
