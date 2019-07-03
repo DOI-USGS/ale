@@ -82,7 +82,7 @@ class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDi
         if not hasattr(self, '_metakernel'):
             self._metakernel = None
             for mk in mks:
-                if str(self.start_time.year) in os.path.basename(mk):
+                if str(self.utc_start_time.year) in os.path.basename(mk):
                     self._metakernel = mk
         return self._metakernel
 
@@ -106,6 +106,13 @@ class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDi
         return id_lookup[super().instrument_id]
 
     @property
+    def sensor_name(self):
+        """
+        ISIS doesn't propergate this to the ingested cube label, so hard-code it.
+        """
+        return "CONTEXT CAMERA"
+
+    @property
     def ephemeris_start_time(self):
         """
         Returns the ephemeris start time of the image.
@@ -121,6 +128,15 @@ class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDi
             sclock = self.label['IsisCube']['Instrument']['SpacecraftClockCount']
             self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
         return self._ephemeris_start_time
+
+    @property
+    def ephemeris_stop_time(self):
+        """
+        ISIS doesn't preserve the spacecraft stop count that we can use to get
+        the ephemeris stop time of the image, so compute the epehemris stop time
+        from the start time and the exposure duration.
+        """
+        return self.ephemeris_start_time + self.exposure_duration * self.image_lines
 
     @property
     def spacecraft_name(self):

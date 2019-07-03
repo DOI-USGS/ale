@@ -1,5 +1,6 @@
 import pytest
 import pvl
+from datetime import datetime
 
 import ale
 from ale import base
@@ -107,6 +108,15 @@ def test_isis_label(test_cube_label):
 
 def test_spacecraft_clock_start_count(test_cube_label):
     assert test_cube_label.spacecraft_clock_start_count == "1/0089576657:973000"
+
+def test_spacecraft_clock_stop_count(test_cube_label):
+    assert test_cube_label.spacecraft_clock_stop_count == "1/0089576657:990000"
+
+def test_utc_start_time(test_cube_label):
+    assert test_cube_label.utc_start_time == datetime(2007, 6, 6, 00, 22, 10, 751814)
+
+def test_utc_stop_time(test_cube_label):
+    assert test_cube_label.utc_stop_time == datetime(2007, 6, 6, 00, 22, 10, 768814)
 
 def test_target_name(test_cube_label):
     assert test_cube_label.target_name.lower() == "venus"
