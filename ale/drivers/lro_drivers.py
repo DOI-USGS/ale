@@ -57,8 +57,9 @@ class LroLrocPds3LabelNaifSpiceDriver(NaifSpice, Pds3Label, LineScanner, Driver)
 
         mks = sorted(glob(os.path.join(metakernel_dir, '*.tm')))
         if not hasattr(self, '_metakernel'):
+            self._metakernel = None
             for mk in mks:
-                if str(self.start_time.year) in os.path.basename(mk):
+                if str(self.utc_start_time.year) in os.path.basename(mk):
                     self._metakernel = mk
         return self._metakernel
 
