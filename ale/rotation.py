@@ -104,9 +104,31 @@ class TimeDependentRotation:
            The NAIF ID code for the destination frame
     """
 
+    def from_euler(sequence, euler, times, source, dest):
+        """
+        Create a time dependent rotation from a set of Euler angles.
+
+        Parameters
+        ----------
+        sequence : string
+            The axis sequence that the Euler angles are applied in. I.E. 'XYZ'
+            or 'ZXZ'.
+        euler : 2darray
+            2D numpy array of the euler angle rotations in radians.
+        times : array
+                The time for each rotation in euler. This array must be sorted
+                in ascending order.
+        source : int
+                 The NAIF ID code for the source frame
+        dest : int
+               The NAIF ID code for the destination frame
+        """
+        rot = Rotation.from_euler(sequence, np.asarray(euler))
+        return TimeDependentRotation(rot.as_quat(), times, source, dest)
+
     def __init__(self, quats, times, source, dest):
         """
-        Construct a constant rotation
+        Construct a time dependent rotation
 
         Parameters
         ----------
