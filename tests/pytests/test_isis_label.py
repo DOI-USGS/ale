@@ -147,4 +147,3 @@ def test_sensor_name(test_cube_label):
 
 def test_line_exposure_duration(test_cube_label):
     assert test_cube_label.line_exposure_duration == 1
-
