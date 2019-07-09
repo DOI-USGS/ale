@@ -111,10 +111,10 @@ class TimeDependentRotation:
         Parameters
         ----------
         sequence : string
-            The axis sequence that the Euler angles are applied in. I.E. 'XYZ'
-            or 'ZXZ'.
+                   The axis sequence that the Euler angles are applied in. I.E. 'XYZ'
+                   or 'ZXZ'.
         euler : 2darray
-            2D numpy array of the euler angle rotations in radians.
+                2D numpy array of the euler angle rotations in radians.
         times : array
                 The time for each rotation in euler. This array must be sorted
                 in ascending order.
