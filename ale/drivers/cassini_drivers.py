@@ -33,7 +33,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDis
           Path to latest metakernel file
         """
         metakernel_dir = config.cassini
-        print(metakernel_dir)
+
         mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
         if not hasattr(self, '_metakernel'):
             for mk in mks:
