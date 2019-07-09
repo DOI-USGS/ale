@@ -1,18 +1,17 @@
 class RadialDistortion():
     @property
-    def optical_distortion(self):
+    def usgscsm_distortion_model(self):
+        """
+        Expects odtk to be defined. This should be a list containing
+        the radial distortion coefficients 
+
+        Returns
+        -------
+        : dict
+          Dictionary containing the usgscsm distortion model
+        """
         return {
             "radial": {
-                "coefficients" : self._odtk
-            }
-        }
-
-class TransverseDistortion():
-    @property
-    def optical_distortion(self):
-        return {
-            "transverse": {
-                "x" : self._odtx,
-                "y" : self._odty
+                "coefficients" : self.odtk
             }
         }

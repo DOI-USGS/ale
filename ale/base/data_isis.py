@@ -283,6 +283,11 @@ class IsisSpice(IsisLabel):
         """
         ISIS Table containing the rotation between the J2000 reference frame
         and the instrument reference frame.
+
+        Returns
+        -------
+        : dict
+          Instrument pointing table
         """
         if not hasattr(self, "_inst_pointing_table"):
             for table in self.label.getlist('Table'):
@@ -297,6 +302,11 @@ class IsisSpice(IsisLabel):
         """
         ISIS Table containing the rotation between the J2000 reference frame
         and the target body reference frame.
+
+        Returns
+        -------
+        : dict
+          Body orientation table
         """
         if not hasattr(self, "_body_orientation_table"):
             for table in self.label.getlist('Table'):
@@ -311,6 +321,11 @@ class IsisSpice(IsisLabel):
         """
         ISIS Table containing the location of the instrument relative to the
         target body in the J2000 reference frame.
+
+        Returns
+        -------
+        : dict
+          Instrument position table
         """
         if not hasattr(self, "_inst_position_table"):
             for table in self.label.getlist('Table'):
@@ -325,6 +340,11 @@ class IsisSpice(IsisLabel):
         """
         ISIS Table containing the location of the sun relative to the
         target body in the J2000 reference frame.
+
+        Returns
+        -------
+        : dict
+          Sun position table
         """
         if not hasattr(self, "_sun_position_table"):
             for table in self.label.getlist('Table'):
@@ -352,6 +372,9 @@ class IsisSpice(IsisLabel):
     def number_of_quaternions(self):
         """
         The number of instrument rotation quaternions
+        Expects inst_position_table to be defined. This should be a dict
+        containing the rotation between the J2000 reference frame
+        and the instrument reference frame.
 
         Returns
         -------
@@ -365,6 +388,9 @@ class IsisSpice(IsisLabel):
         """
         The number of instrument position states. These may
         be just positions or positions and vbelocities.
+        Expects inst_position_table to be defined. This should be a dict
+        containing the rotation between the J2000 reference frame
+        and the instrument reference frame.
 
         Returns
         -------
@@ -378,6 +404,8 @@ class IsisSpice(IsisLabel):
         """
         The hex encoded image start time computed from the
         spacecraft clock count
+        Expects naif_keywords to be defined. This should be a dict containing
+        Naif keyworkds from the label.
 
         Returns
         -------
@@ -394,9 +422,11 @@ class IsisSpice(IsisLabel):
         raise ValueError("No computed spacecraft clock time found in NaifKeywords.")
 
     @property
-    def starting_ephemeris_time(self):
+    def ephemeris_start_time(self):
         """
         The image start time in ephemeris time
+        Expects sclock_hex_string to be defined. This should be a string
+        containing the hex start time of the image
 
         Returns
         -------
@@ -406,9 +436,11 @@ class IsisSpice(IsisLabel):
         return struct.unpack('d', bytes.fromhex(self._sclock_hex_string))[0]
 
     @property
-    def _detector_center_sample(self):
+    def detector_center_sample(self):
         """
         The center of the CCD in detector pixels
+        Expects ikid to be defined. this should be the integer Naif ID code for
+        the instrument.
 
         Returns
         -------
@@ -418,9 +450,11 @@ class IsisSpice(IsisLabel):
         return self.naif_keywords.get('INS{}_BORESIGHT_SAMPLE'.format(self.ikid), None)
 
     @property
-    def _detector_center_line(self):
+    def detector_center_line(self):
         """
         The center of the CCD in detector pixels
+        Expects ikid to be defined. this should be the integer Naif ID code for
+        the instrument.
 
         Returns
         -------
@@ -449,6 +483,8 @@ class IsisSpice(IsisLabel):
         """
         The Kernels group from the ISIS cube label.
         This is where the original SPICE kernels are listed.
+        Expects cube_label to be defined. This should be a PVLModule containing
+        the ISIS cube label.
 
         Returns
         -------
@@ -463,6 +499,8 @@ class IsisSpice(IsisLabel):
     def ikid(self):
         """
         The NAIF id for the instrument
+        Expects kernels_group to be defined. This should be a PVLModule
+        containing the kernels group.
 
         Returns
         -------
@@ -480,6 +518,10 @@ class IsisSpice(IsisLabel):
         """
         The line component of the affine transformation
         from focal plane coordinates to centered ccd pixels
+        Expects naif_keywords to be defined. This should be a dict containing
+        Naif keyworkds from the label.
+        Expects ikid to be defined. This should be the integer Naif ID code
+        for the instrument.
 
         Returns
         -------
@@ -494,6 +536,10 @@ class IsisSpice(IsisLabel):
         """
         The sample component of the affine transformation
         from focal plane coordinates to centered ccd pixels
+        Expects naif_keywords to be defined. This should be a dict containing
+        Naif keyworkds from the label.
+        Expects ikid to be defined. This should be the integer Naif ID code
+        for the instrument.
 
         Returns
         -------
@@ -504,9 +550,13 @@ class IsisSpice(IsisLabel):
         return self.naif_keywords.get('INS{}_ITRANSS'.format(self.ikid), None)
 
     @property
-    def _focal_length(self):
+    def focal_length(self):
         """
         The focal length of the instrument
+        Expects naif_keywords to be defined. This should be a dict containing
+        Naif keyworkds from the label.
+        Expects ikid to be defined. This should be the integer Naif ID code
+        for the instrument.
 
         Returns
         -------
@@ -519,6 +569,8 @@ class IsisSpice(IsisLabel):
     def _body_radii(self):
         """
         The triaxial radii of the target body
+        Expects naif_keywords to be defined. This should be a dict containing
+        Naif keyworkds from the label.
 
         Returns
         -------
@@ -536,6 +588,8 @@ class IsisSpice(IsisLabel):
         """
         The radius of the target body at its widest
         diameter
+        Expects body_radii to be defined. This should be a list containing
+        the body radii in kilometers.
 
         Returns
         -------
@@ -549,6 +603,8 @@ class IsisSpice(IsisLabel):
         """
         The radius of the target body perpendicular to its
         widest diameter
+        Expects body_radii to be defined. This should be a list containing
+        the body radii in kilometers.
 
         Returns
         -------
@@ -562,6 +618,9 @@ class IsisSpice(IsisLabel):
         """
         List of time dependent reference frames between the
         target body reference frame and the J2000 frame.
+        Expects body_orientation_table to be defined. This is a dict
+        containing information about the rotation from J2000 to the body
+        fixed reference frame.
 
         Returns
         -------
@@ -578,6 +637,8 @@ class IsisSpice(IsisLabel):
     def reference_frame(self):
         """
         The NAIF ID for the target body reference frame
+        Expects body_time_dependent_frames to be defined. This should be a
+        list containing time dependent frames.
 
         Returns
         -------
@@ -590,6 +651,9 @@ class IsisSpice(IsisLabel):
     def _sun_position(self):
         """
         The sun position
+        Expects sun_position_table to be defined. This should be a
+        dictionary that contains information about the location of the sun
+        relative to the center of the target body.
 
         Returns
         -------
@@ -604,6 +668,9 @@ class IsisSpice(IsisLabel):
     def _sun_velocity(self):
         """
         The sun velocity
+        Expects sun_position_table to be defined. This should be a
+        dictionary that contains information about the location of the sun
+        relative to the center of the target body.
 
         Returns
         -------
@@ -616,6 +683,17 @@ class IsisSpice(IsisLabel):
     @property
     def _sensor_position(self):
         """
+        Sensor position
+        Expects inst_position_table to be defined. This should be a
+        dictionary that contains information about the location of the
+        sensor relative to the center of the target body.
+        Expects number_of_ephemerides to be defined. This should be an integer
+        containing the number of instrument position states.
+
+        Returns
+        -------
+        : (positions, velocities, times)
+          a tuple containing a list of positions, a list of velocities, and a list of times
         """
         inst_positions_times = np.linspace(self.inst_position_table["Times"][0],
                                            self.inst_position_table["Times"][-1],
@@ -647,6 +725,11 @@ class IsisSpice(IsisLabel):
     def _sensor_velocity(self):
         """
         The sensor velocity
+        Expects inst_position_table to be defined. This should be a
+        dictionary that contains information about the location of the
+        sensor relative to the center of the target body.
+        Expects number_of_ephemerides to be defined. This should be an integer
+        containing the number of instrument position states.
 
         Returns
         -------
@@ -679,8 +762,12 @@ class IsisSpice(IsisLabel):
     @property
     def _sensor_orientation(self):
         """
-        The rotation from J2000 to the sensor reference
-        frame
+        The rotation from J2000 to the sensor reference frame
+        Expects inst_position_table to be defined. This should be a
+        dictionary that contains information about the location of the
+        sensor relative to the center of the target body.
+        Expects number_of_quatiernions. This should be an integer
+        containing the number of instrument rotation quaternions
 
         Returns
         -------
@@ -707,6 +794,9 @@ class IsisSpice(IsisLabel):
         """
         The rotation from J2000 to the target body
         reference frame
+        Expects body_orientation_table to be defined. This should be a
+        dictionary that contains information about the rotation from J2000
+        to the body fixed reference frame.
 
         Returns
         -------
@@ -733,7 +823,17 @@ class IsisSpice(IsisLabel):
         return self.label['NaifKeywords']
 
     @property
-    def _odtk(self):
+    def odtk(self):
+        """
+        Returns optical distortion coefficients
+        Expects ikid to be defined. This should be the integer Naif ID code
+        for the instrument
+
+        Returns
+        -------
+        : list
+          optical distortion coefficients
+        """
         return self.label["NaifKeywords"]["INS{}_OD_K".format(self.ikid)]
 
     @property
@@ -743,7 +843,13 @@ class IsisSpice(IsisLabel):
         Mt is the time dependant portion of the rotation from j2000 to body fixed
         Mc is contant portion of the rotation from J2000 to body fixed.
 
-        This represents the rotation to get positions from J2000 to body fixed,
+        This represents the rotation to get positions from J2000 to body fixed.
+
+        Expects body_orientation_table to be defined. This should be a
+        dictionary that contains information about the rotation from J2000
+        to the body fixed reference frame.
+        Expects number_of_ephemerides to be defined. This should be an integer
+        containing the number of instrument position states.
         """
         body_rot_times = self.body_orientation_table["Times"]
         body_timed_rots = self.body_orientation_table["Rotations"]

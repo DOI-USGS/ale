@@ -1,4 +1,7 @@
+import numpy as np
+
 class LineScanner():
+
     @property
     def name_model(self):
         """
@@ -13,64 +16,40 @@ class LineScanner():
         return "USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL"
 
     @property
-    def t0_ephemeris(self):
-        return self.starting_ephemeris_time - self.center_ephemeris_time
-
-    @property
-    def t0_quaternion(self):
-        return self.starting_ephemeris_time - self.center_ephemeris_time
-
-    @property
-    def dt_ephemeris(self):
-        return (self.ending_ephemeris_time - self.starting_ephemeris_time) / self.number_of_ephemerides
-
-    @property
-    def dt_quaternion(self):
-        return (self.ending_ephemeris_time - self.starting_ephemeris_time) / self.number_of_quaternions
-
-    @property
     def line_scan_rate(self):
         """
+        Expects ephemeris_start_time to be defined. This should be a float
+        containing the start time of the image.
+        Expects center_ephemeris_time to be defined. This should be a float
+        containing the average of the start and end ephemeris times.
+
         Returns
         -------
         : list
           2d list of scan rates in the form: [[start_line, line_time, exposure_duration], ...]
         """
-        return [[float(self.starting_detector_line), self.t0_ephemeris, self.line_exposure_duration]]
+        t0_ephemeris = self.ephemeris_start_time - self.center_ephemeris_time
+        return [[0.5], [t0_ephemeris], [self.exposure_duration]]
 
     @property
-    def number_of_ephemerides(self):
-        return self._num_ephem
-
-    @property
-    def number_of_quaternions(self):
-        #TODO: Not make this hardcoded
-        return self._num_quaternions
-
-    @property
-    def ending_ephemeris_time(self):
-        return (self.image_lines * self.line_exposure_duration) + self.starting_ephemeris_time
-
-    @property
-    def center_ephemeris_time(self):
+    def ephemeris_time(self):
         """
-        The center ephemeris time for a fixed rate line scanner.
-        """
-        if not hasattr(self, '_center_ephemeris_time'):
-            halflines = self.image_lines / 2
-            center_sclock = self.starting_ephemeris_time + halflines * self.line_exposure_duration
-            self._center_ephemeris_time = center_sclock
-        return self._center_ephemeris_time
+        Returns an array of times between the start/stop ephemeris times
+        based on the number of lines in the image.
+        Expects ephemeris start/stop times to be defined. These should be
+        floating point numbers containing the start and stop times of the
+        images.
+        Expects image_lines to be defined. This should be an integer containing
+        the number of lines in the image.
 
-    @property
-    def line_exposure_duration(self):
-        return self.label['LINE_EXPOSURE_DURATION'].value * 0.001  # Scale to seconds
+        Returns
+        -------
+        : ndarray
+          ephemeris times split based on image lines
+        """
+        return np.linspace(self.ephemeris_start_time,  self.ephemeris_stop_time, self.image_lines / 64)
 
 class Framer():
-    @property
-    def name_sensor(self):
-        return "Generic Framer"
-
     @property
     def name_model(self):
         """
@@ -85,27 +64,16 @@ class Framer():
         return "USGS_ASTRO_FRAME_SENSOR_MODEL"
 
     @property
-    def filter_number(self):
-        return self.label.get('FILTER_NUMBER', 0)
-
-    @property
-    def number_of_ephemerides(self):
-        # always one for framers
-        return 1
-
-    @property
-    def number_of_quaternions(self):
-        # always one for framers
-        return 1
-
-    @property
-    def center_ephemeris_time(self):
+    def ephemeris_time(self):
         """
-        The center ephemeris time for a framer.
-        """
-        center_time = self.starting_ephemeris_time + self.exposure_duration / 2
-        return center_time
+        Returns the center ephemeris time for the image which is the average
+        of the start and stop ephemeris time.
+        Expects center_ephemeris_time to be defined. This should be a double
+        containing the average of the start and stop ephemeris times.
 
-    @property
-    def exposure_duration(self):
-        return self._exposure_duration
+        Returns
+        -------
+        : double
+          Center ephemeris time for the image
+        """
+        return [self.center_ephemeris_time]
