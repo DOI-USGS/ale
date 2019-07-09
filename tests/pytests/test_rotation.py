@@ -101,3 +101,13 @@ def test_from_euler():
     np.testing.assert_equal(rot.times, np.asarray(times))
     assert rot.source == 0
     assert rot.dest == 1
+
+def test_from_matrix():
+    mat = [[0, 0, 1],
+           [1, 0 ,0],
+           [0, 1, 0]]
+    rot = ConstantRotation.from_matrix(mat, 0, 1)
+    expected_quats = np.asarray([0.5, 0.5, 0.5, 0.5])
+    np.testing.assert_almost_equal(rot.quat, expected_quats)
+    assert rot.source == 0
+    assert rot.dest == 1

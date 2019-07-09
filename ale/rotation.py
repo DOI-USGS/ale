@@ -16,6 +16,22 @@ class ConstantRotation:
            The NAIF ID code for the destination frame
     """
 
+    def from_matrix(mat, source, dest):
+        """
+        Create a constant rotation from a rotation matricx
+
+        Parameters
+        ----------
+        mat : 2darray
+              The rotation matrix
+        source : int
+                 The NAIF ID code for the source frame
+        dest : int
+               The NAIF ID code for the destination frame
+        """
+        rot = Rotation.from_dcm(mat)
+        return ConstantRotation(rot.as_quat(), source, dest)
+
     def __init__(self, quat, source, dest):
         """
         Construct a constant rotation
