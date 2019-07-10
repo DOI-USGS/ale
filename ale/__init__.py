@@ -37,6 +37,7 @@ except DistributionNotFound:
 else:
     __version__ = _dist.version
 
+# bring ale stuff into main ale module
 from . import drivers
 from . import formatters
 from . drivers import load, loads
