@@ -218,7 +218,7 @@ def parse_position_table(label, field_data):
     return results
 
 
-class IsisSpice(IsisLabel):
+class IsisSpice():
     """Mixin class for reading from an ISIS cube that has been spiceinit'd
 
     Attributes
