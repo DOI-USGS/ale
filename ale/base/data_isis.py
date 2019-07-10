@@ -218,7 +218,6 @@ def parse_position_table(label, field_data):
     return results
 
 
-
 class IsisSpice(IsisLabel):
     """Mixin class for reading from an ISIS cube that has been spiceinit'd
 
@@ -369,42 +368,11 @@ class IsisSpice(IsisLabel):
         pass
 
     @property
-    def number_of_quaternions(self):
-        """
-        The number of instrument rotation quaternions
-        Expects inst_position_table to be defined. This should be a dict
-        containing the rotation between the J2000 reference frame
-        and the instrument reference frame.
-
-        Returns
-        -------
-        int :
-            The number of quaternions
-        """
-        return int(self.inst_pointing_table['CkTableOriginalSize'])
-
-    @property
-    def number_of_ephemerides(self):
-        """
-        The number of instrument position states. These may
-        be just positions or positions and vbelocities.
-        Expects inst_position_table to be defined. This should be a dict
-        containing the rotation between the J2000 reference frame
-        and the instrument reference frame.
-
-        Returns
-        -------
-        int :
-            The number of states
-        """
-        return int(self.inst_position_table['SpkTableOriginalSize'])
-
-    @property
     def _sclock_hex_string(self):
         """
         The hex encoded image start time computed from the
         spacecraft clock count
-        Expects naif_keywords to be defined. This should be a dict containing
+        Expects isis_naif_keywords to be defined. This should be a dict containing
         Naif keyworkds from the label.
 
         Returns
@@ -413,7 +381,7 @@ class IsisSpice(IsisLabel):
             The hex string representation of the image
             start time as a double
         """
-        for key in self.naif_keywords:
+        for key in self.isis_naif_keywords:
             if re.match('CLOCK_ET_.*_COMPUTED', key[0]):
                 # If the hex string is only numbers and contains leading 0s,
                 # the PVL library strips them off (ie. 0000000000002040 becomes
@@ -447,7 +415,7 @@ class IsisSpice(IsisLabel):
         list :
             The center of the CCD formatted as line, sample
         """
-        return self.naif_keywords.get('INS{}_BORESIGHT_SAMPLE'.format(self.ikid), None)
+        return self.isis_naif_keywords.get('INS{}_BORESIGHT_SAMPLE'.format(self.ikid), None)
 
     @property
     def detector_center_line(self):
@@ -461,18 +429,17 @@ class IsisSpice(IsisLabel):
         list :
             The center of the CCD formatted as line, sample
         """
-        return self.naif_keywords.get('INS{}_BORESIGHT_LINE'.format(self.ikid), None)
+        return self.isis_naif_keywords.get('INS{}_BORESIGHT_LINE'.format(self.ikid), None)
+
 
     @property
     def _cube_label(self):
         """
         The ISIS cube label portion of the file label
-
         Returns
         -------
         PVLModule :
             The ISIS cube label
-
         """
         if 'IsisCube' not in self.label:
             raise ValueError("Could not find ISIS cube label.")
@@ -485,7 +452,6 @@ class IsisSpice(IsisLabel):
         This is where the original SPICE kernels are listed.
         Expects cube_label to be defined. This should be a PVLModule containing
         the ISIS cube label.
-
         Returns
         -------
         PVLModule :
@@ -518,7 +484,7 @@ class IsisSpice(IsisLabel):
         """
         The line component of the affine transformation
         from focal plane coordinates to centered ccd pixels
-        Expects naif_keywords to be defined. This should be a dict containing
+        Expects isis_naif_keywords to be defined. This should be a dict containing
         Naif keyworkds from the label.
         Expects ikid to be defined. This should be the integer Naif ID code
         for the instrument.
@@ -529,14 +495,14 @@ class IsisSpice(IsisLabel):
             The coefficients of the affine transformation
             formatted as constant, x, y
         """
-        return self.naif_keywords.get('INS{}_ITRANSL'.format(self.ikid), None)
+        return self.isis_naif_keywords.get('INS{}_ITRANSL'.format(self.ikid), None)
 
     @property
     def focal2pixel_samples(self):
         """
         The sample component of the affine transformation
         from focal plane coordinates to centered ccd pixels
-        Expects naif_keywords to be defined. This should be a dict containing
+        Expects isis_naif_keywords to be defined. This should be a dict containing
         Naif keyworkds from the label.
         Expects ikid to be defined. This should be the integer Naif ID code
         for the instrument.
@@ -547,13 +513,21 @@ class IsisSpice(IsisLabel):
             The coefficients of the affine transformation
             formatted as constant, x, y
         """
-        return self.naif_keywords.get('INS{}_ITRANSS'.format(self.ikid), None)
+        return self.isis_naif_keywords.get('INS{}_ITRANSS'.format(self.ikid), None)
+
+    @property
+    def pixel2focal_x(self):
+        return self.isis_naif_keywords.get('INS{}_TRANSX'.format(self.ikid), None)
+
+    @property
+    def pixel2focal_y(self):
+        return self.isis_naif_keywords.get('INS{}_TRANSY'.format(self.ikid), None)
 
     @property
     def focal_length(self):
         """
         The focal length of the instrument
-        Expects naif_keywords to be defined. This should be a dict containing
+        Expects isis_naif_keywords to be defined. This should be a dict containing
         Naif keyworkds from the label.
         Expects ikid to be defined. This should be the integer Naif ID code
         for the instrument.
@@ -563,13 +537,13 @@ class IsisSpice(IsisLabel):
         float :
             The focal length in millimeters
         """
-        return self.naif_keywords.get('INS{}_FOCAL_LENGTH'.format(self.ikid), None)
+        return self.isis_naif_keywords.get('INS{}_FOCAL_LENGTH'.format(self.ikid), None)
 
     @property
-    def _body_radii(self):
+    def target_body_radii(self):
         """
         The triaxial radii of the target body
-        Expects naif_keywords to be defined. This should be a dict containing
+        Expects isis_naif_keywords to be defined. This should be a dict containing
         Naif keyworkds from the label.
 
         Returns
@@ -579,76 +553,13 @@ class IsisSpice(IsisLabel):
             this is formatted as semimajor, semimajor,
             semiminor
         """
-        for key in self.naif_keywords:
+        for key in self.isis_naif_keywords:
             if re.match(r'BODY-?\d*_RADII', key[0]):
-                return self.naif_keywords[key[0]]
+                return self.isis_naif_keywords[key[0]]
+
 
     @property
-    def _semimajor(self):
-        """
-        The radius of the target body at its widest
-        diameter
-        Expects body_radii to be defined. This should be a list containing
-        the body radii in kilometers.
-
-        Returns
-        -------
-        float :
-            The radius in kilometers
-        """
-        return self._body_radii[0]
-
-    @property
-    def _semiminor(self):
-        """
-        The radius of the target body perpendicular to its
-        widest diameter
-        Expects body_radii to be defined. This should be a list containing
-        the body radii in kilometers.
-
-        Returns
-        -------
-        float :
-            The radius in kilometers
-        """
-        return self._body_radii[2]
-
-    @property
-    def _body_time_dependent_frames(self):
-        """
-        List of time dependent reference frames between the
-        target body reference frame and the J2000 frame.
-        Expects body_orientation_table to be defined. This is a dict
-        containing information about the rotation from J2000 to the body
-        fixed reference frame.
-
-        Returns
-        -------
-        list :
-            The list of frames starting with the body
-            reference frame and ending with the final time
-            dependent frame.
-        """
-        if 'TimeDependentFrames' not in self.body_orientation_table:
-            raise ValueError("Could not find body time dependent frames.")
-        return self.body_orientation_table['TimeDependentFrames']
-
-    @property
-    def reference_frame(self):
-        """
-        The NAIF ID for the target body reference frame
-        Expects body_time_dependent_frames to be defined. This should be a
-        list containing time dependent frames.
-
-        Returns
-        -------
-        int :
-            The frame ID
-        """
-        return self._body_time_dependent_frames[0]
-
-    @property
-    def _sun_position(self):
+    def sun_position(self):
         """
         The sun position
         Expects sun_position_table to be defined. This should be a
@@ -662,26 +573,13 @@ class IsisSpice(IsisLabel):
             of the target body in the J2000 reference frame
             as a 2d numpy array
         """
-        return self.sun_position_table.get('Positions', 'None')
+        return (self.sun_position_table.get('Positions', 'None'),
+                self.sun_position_table.get('Velocities', 'None'),
+                self.sun_position_table.get('Times', 'None'))
+
 
     @property
-    def _sun_velocity(self):
-        """
-        The sun velocity
-        Expects sun_position_table to be defined. This should be a
-        dictionary that contains information about the location of the sun
-        relative to the center of the target body.
-
-        Returns
-        -------
-        array :
-            The sun velocity vectors in the J2000 reference
-            frame as a 2d numpy array
-        """
-        return self.sun_position_table.get('Velocities', None)
-
-    @property
-    def _sensor_position(self):
+    def sensor_position(self):
         """
         Sensor position
         Expects inst_position_table to be defined. This should be a
@@ -722,92 +620,7 @@ class IsisSpice(IsisLabel):
 
 
     @property
-    def _sensor_velocity(self):
-        """
-        The sensor velocity
-        Expects inst_position_table to be defined. This should be a
-        dictionary that contains information about the location of the
-        sensor relative to the center of the target body.
-        Expects number_of_ephemerides to be defined. This should be an integer
-        containing the number of instrument position states.
-
-        Returns
-        -------
-        array :
-            The sensor velocity vectors in the J2000
-              reference frame as a 2d numpy array
-        """
-        inst_velocities_times = np.linspace(self.inst_position_table["Times"][0],
-                                            self.inst_position_table["Times"][-1],
-                                            self.number_of_ephemerides)
-
-        if len(self.inst_position_table["Times"]) < 2:
-            velocity_0 = self.inst_position_table["Velocities"][0]
-            coefs = np.asarray([velocity_0,
-                                [0, 0, 0]])
-            velocties = np.polynomial.polynomial.polyval(inst_velocities_times, coefs)
-
-        else:
-            f_velocities_x = interp1d(self.inst_position_table["Times"], self.inst_position_table["Velocities"].T[0])
-            f_velocities_y = interp1d(self.inst_position_table["Times"], self.inst_position_table["Velocities"].T[1])
-            f_velocities_z = interp1d(self.inst_position_table["Times"], self.inst_position_table["Velocities"].T[2])
-
-            velocties = np.asarray([f_velocities_x(inst_velocities_times),
-                                   f_velocities_y(inst_velocities_times),
-                                   f_velocities_z(inst_velocities_times)])
-
-        # convert positions to Body-Fixed and scale to meters
-        return self._body_j2k2bf_rotation.apply(velocties.T)*1000
-
-    @property
-    def _sensor_orientation(self):
-        """
-        The rotation from J2000 to the sensor reference frame
-        Expects inst_position_table to be defined. This should be a
-        dictionary that contains information about the location of the
-        sensor relative to the center of the target body.
-        Expects number_of_quatiernions. This should be an integer
-        containing the number of instrument rotation quaternions
-
-        Returns
-        -------
-        array :
-            The sensor rotation quaternions as a numpy
-            quaternion array
-        """
-        inst_pointing_times = np.linspace(self.inst_pointing_table["Times"][0],
-                                          self.inst_pointing_table["Times"][-1],
-                                          self.number_of_quaternions)
-        rotations = self.inst_pointing_table["Rotations"]
-        rotations = np.roll(np.asarray(rotations), -1, 1) # adjust rotations [0,1,2,3] -> [3,0,1,2]
-
-        if len(self.inst_pointing_table["Times"]) < 2:
-            orientations = Rotation.from_quat(rotations[0])
-        else:
-            orientations = Slerp(self.inst_pointing_table["Times"], Rotation.from_quat(rotations))(inst_pointing_times)
-
-        bf2inst_rotation = (orientations*self._body_j2k2bf_rotation.inv()).as_quat()
-        return bf2inst_rotation
-
-    @property
-    def body_orientation(self):
-        """
-        The rotation from J2000 to the target body
-        reference frame
-        Expects body_orientation_table to be defined. This should be a
-        dictionary that contains information about the rotation from J2000
-        to the body fixed reference frame.
-
-        Returns
-        -------
-        array :
-            The body rotation quaternions as a numpy
-            quaternion array
-        """
-        return self.body_orientation_table.get('Rotations', None)
-
-    @property
-    def naif_keywords(self):
+    def isis_naif_keywords(self):
         """
         The NaifKeywords group from the file label that
         contains stored values from the original SPICE
@@ -836,37 +649,4 @@ class IsisSpice(IsisLabel):
         """
         return self.label["NaifKeywords"]["INS{}_OD_K".format(self.ikid)]
 
-    @property
-    def _body_j2k2bf_rotation(self):
-        """
-        Returns Mc*Mt where:
-        Mt is the time dependant portion of the rotation from j2000 to body fixed
-        Mc is contant portion of the rotation from J2000 to body fixed.
 
-        This represents the rotation to get positions from J2000 to body fixed.
-
-        Expects body_orientation_table to be defined. This should be a
-        dictionary that contains information about the rotation from J2000
-        to the body fixed reference frame.
-        Expects number_of_ephemerides to be defined. This should be an integer
-        containing the number of instrument position states.
-        """
-        body_rot_times = self.body_orientation_table["Times"]
-        body_timed_rots = self.body_orientation_table["Rotations"]
-        body_timed_rots = np.roll(np.asarray(body_timed_rots), -1, 1) # adjust quaternions [0,1,2,3] -> [3,0,1,2]
-
-        interp_rot_times = np.linspace(body_rot_times[0],
-                                       body_rot_times[-1],
-                                       self.number_of_ephemerides)
-
-        if len(self.body_orientation_table["Times"]) < 2:
-            rotation_mat = Rotation.from_quat(body_timed_rots[0])
-        else:
-            rotation_mat = Slerp(body_rot_times, Rotation.from_quat(body_timed_rots))(interp_rot_times)
-
-        # Not all body rotations have a constant component
-        if "ConstantRotation" in self.body_orientation_table:
-            body_const_rots = self.body_orientation_table["ConstantRotation"]
-            rotation_mat = Rotation.from_dcm(body_const_rots)*rotation_mat
-
-        return rotation_mat
