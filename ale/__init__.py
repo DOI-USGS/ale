@@ -3,9 +3,6 @@ import pathlib
 from shutil import copyfile
 import yaml
 from pkg_resources import get_distribution, DistributionNotFound
-from . import drivers
-from . import formatters
-from .drivers import load, loads
 
 class DotDict(dict):
     """dot.notation access to dictionary attributes"""""
@@ -25,7 +22,7 @@ config_dir.mkdir(parents=True, exist_ok=True)
 if not config_file_path.is_file():
   copyfile(os.path.join(os.path.dirname(__file__), 'config.yml'), config_file_path)
 
-config = DotDict(yaml.load(open(config_file_path)))
+config = DotDict(yaml.load(open(config_file_path), Loader=yaml.FullLoader))
 
 try:
     _dist = get_distribution('ale')
@@ -40,3 +37,6 @@ except DistributionNotFound:
 else:
     __version__ = _dist.version
 
+from . import drivers
+from . import formatters
+from . drivers import load, loads
