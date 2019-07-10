@@ -551,10 +551,6 @@ def test_ephemeris_start_time(testdata):
    assert testdata.ephemeris_start_time == 2
 
 
-def test_frame_chain(testdata):
-    pass
-
-
 def test_isis_naif_keywords(testdata):
 
     naif_keywords =   pvl.loads("""Object = NaifKeywords
