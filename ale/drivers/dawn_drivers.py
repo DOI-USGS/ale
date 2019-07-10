@@ -1,8 +1,10 @@
 import pvl
+import os
+
+from glob import glob
+
 import ale
 from ale import config
-
-
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
@@ -45,6 +47,7 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         metakernel_dir = config.dawn
         mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
         if not hasattr(self, '_metakernel'):
+            self._metakernel = None
             for mk in mks:
                 if str(self.start_time.year) in os.path.basename(mk):
                     self._metakernel = mk
