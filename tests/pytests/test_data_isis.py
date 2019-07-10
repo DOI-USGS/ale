@@ -543,6 +543,10 @@ def test_pixel2focal_y(testdata):
     assert testdata.pixel2focal_y == [11.9993, -0.012, 2.0e-06]
 
 
+def test_target_body_radii(testdata):
+    assert testdata.target_body_radii == [3396.19, 3396.19, 3376.2]
+
+
 def test_ephemeris_start_time(testdata):
    assert testdata.ephemeris_start_time == 2
 
@@ -568,3 +572,5 @@ def test_isis_naif_keywords(testdata):
     assert testdata.isis_naif_keywords == naif_keywords
 
 
+def test_odtk(testdata):
+    assert testdata.odtk == [-0.0048509, 2.41312e-07, -1.62369e-13]

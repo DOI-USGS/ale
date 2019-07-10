@@ -360,12 +360,6 @@ class IsisSpice():
         """
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """
-        Stub method to conform with how other driver mixins
-        are used.
-        """
-        pass
 
     @property
     def _sclock_hex_string(self):
@@ -381,8 +375,9 @@ class IsisSpice():
             The hex string representation of the image
             start time as a double
         """
+        regex = re.compile('CLOCK_ET_.*_COMPUTED')
         for key in self.isis_naif_keywords:
-            if re.match('CLOCK_ET_.*_COMPUTED', key[0]):
+            if re.match(regex, key[0]):
                 # If the hex string is only numbers and contains leading 0s,
                 # the PVL library strips them off (ie. 0000000000002040 becomes
                 # 2040). Pad to 16 in case this happens.
@@ -517,10 +512,28 @@ class IsisSpice():
 
     @property
     def pixel2focal_x(self):
+        """
+        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+
+        Returns
+        -------
+        : list<double>
+        detector to focal plane x
+        """
+
         return self.isis_naif_keywords.get('INS{}_TRANSX'.format(self.ikid), None)
 
     @property
     def pixel2focal_y(self):
+        """
+        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+
+        Returns
+        -------
+        : list<double>
+        detector to focal plane y
+        """
+
         return self.isis_naif_keywords.get('INS{}_TRANSY'.format(self.ikid), None)
 
     @property
@@ -553,8 +566,9 @@ class IsisSpice():
             this is formatted as semimajor, semimajor,
             semiminor
         """
+        regex = re.compile(r'BODY-?\d*_RADII')
         for key in self.isis_naif_keywords:
-            if re.match(r'BODY-?\d*_RADII', key[0]):
+            if re.match(regex, key[0]):
                 return self.isis_naif_keywords[key[0]]
 
 
@@ -571,7 +585,7 @@ class IsisSpice():
         array :
             The sun position vectors relative to the center
             of the target body in the J2000 reference frame
-            as a 2d numpy array
+            as a tuple of numpy arrays.
         """
         return (self.sun_position_table.get('Positions', 'None'),
                 self.sun_position_table.get('Velocities', 'None'),
@@ -647,6 +661,5 @@ class IsisSpice():
         : list
           optical distortion coefficients
         """
-        return self.label["NaifKeywords"]["INS{}_OD_K".format(self.ikid)]
-
+        return self.isis_naif_keywords["INS{}_OD_K".format(self.ikid)]
 
