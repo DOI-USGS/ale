@@ -4,15 +4,17 @@ channels:
   - default
 
 dependencies:
-  - python=3.7.1
   - cmake>=3.10
-  - gsl
-  - openblas>=0.3.0
   - eigen
-  - spiceypy
-  - numpy
+  - gsl
+  - jupyter
   - numba
-  - python-dateutil
+  - numpy
+  - openblas>=0.3.0
   - pvl
-  - quaternion
+  - python=3.7.1
+  - python-dateutil
   - scipy
+  - spiceypy
+  - quaternion
+  - pyyaml
