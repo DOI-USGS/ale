@@ -1,4 +1,4 @@
-# Abstraction Layer or Ephemerides (ALE)
+# Abstraction Layer for Ephemerides (ALE)
 [![Build Status](https://travis-ci.org/USGS-Astrogeology/ale.svg?branch=master)](https://travis-ci.org/USGS-Astrogeology/ale)
 [![Coverage Status](https://coveralls.io/repos/github/USGS-Astrogeology/ale/badge.svg?branch=master)](https://coveralls.io/github/USGS-Astrogeology/ale?branch=master)
 
@@ -31,6 +31,7 @@ After you've set up and activated your conda environment, you may then build ale
 of a cloned fork of the repository, follow these steps:
 
 ```bash
+python setup.py install
 mkdir build && cd build
 cmake ..
 make

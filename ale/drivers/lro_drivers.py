@@ -1,18 +1,47 @@
-from glob import glob
 import os
-
 import numpy as np
 import pvl
 import spiceypy as spice
+from glob import glob
 
+from ale import config
 from ale.util import get_metakernels
-from ale.drivers.base import LineScanner, NaifSpice, Pds3Label, Driver
+from ale.base import Driver
+from ale.base.data_naif import NaifSpice
+from ale.base.label_pds3 import Pds3Label
+from ale.base.type_sensor import LineScanner
 
 
-class LroLrocNaifSpice(Driver, NaifSpice, LineScanner):
+class LroLrocPds3LabelNaifSpiceDriver(NaifSpice, Pds3Label, LineScanner, Driver):
     """
-    Lroc mixin class for defining snowflake Spice calls.
+    Driver for reading LROC NACL, NACR (not WAC, it is a push frame) labels. Requires a Spice mixin to
+    acquire addtional ephemeris and instrument data located exclusively in SPICE kernels, A PDS3 label,
+    and the LineScanner and Driver bases.
     """
+
+    @property
+    def instrument_id(self):
+        """
+        The short text name for the instrument
+
+        Returns an instrument id uniquely identifying the instrument. Used to acquire
+        instrument codes from Spice Lib bods2c routine.
+
+        Returns
+        -------
+        str
+          The short text name for the instrument
+        """
+
+        instrument = super().instrument_id
+
+        frame_id = self.label.get("FRAME_ID")
+
+        if instrument == "LROC" and frame_id == "LEFT":
+            return "LRO_LROCNACL"
+        elif instrument == "LROC" and frame_id == "RIGHT":
+            return "LRO_LROCNACR"
+
 
     @property
     def metakernel(self):
@@ -21,54 +50,95 @@ class LroLrocNaifSpice(Driver, NaifSpice, LineScanner):
 
         Returns
         -------
-        : string
+        : str
           Path to latest metakernel file
         """
-        metakernels = get_metakernels(years=self.start_time.year, missions='lro', versions='latest')
-        self._metakernel = metakernels['data'][0]['path']
+        metakernel_dir = config.lro
+
+        mks = sorted(glob(os.path.join(metakernel_dir, '*.tm')))
+        if not hasattr(self, '_metakernel'):
+            self._metakernel = None
+            for mk in mks:
+                if str(self.utc_start_time.year) in os.path.basename(mk):
+                    self._metakernel = mk
         return self._metakernel
+
 
     @property
     def spacecraft_name(self):
         """
-        Spacecraft name used in various Spice calls to acquire
-        ephemeris data.
+        Spacecraft name used in various SPICE calls to acquire
+        ephemeris data. LROC NAC img PDS3 labels do not the have SPACECRAFT_NAME keyword, so we
+        override it here to use the label_pds3 property for instrument_host_id
 
         Returns
         -------
         : str
           Spacecraft name
         """
-        return "LRO"
-
-
-class LroLrocPds3NaifSpiceDriver(Pds3Label, LroLrocNaifSpice):
-    """
-    Driver for reading Lroc labels. Requires a Spice mixin to acquire addtional
-    ephemeris and instrument data located exclusively in spice kernels.
-    """
+        return self.instrument_host_id
 
     @property
-    def instrument_id(self):
+    def sensor_model_version(self):
         """
-        Returns an instrument id for uniquely identifying the instrument, but often
-        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
-        the same ID the Spice expects in bods2c calls.
-
-        Ignores Wide Angle for now
+        Returns ISIS instrument sensor model version number
 
         Returns
         -------
-        : str
-          instrument id
+        : int
+          ISIS sensor model version
+        """
+        return 2
+
+    @property
+    def detector_start_sample(self):
+        """
+        Returns the starting sample contained in the image
+
+        Returns
+        -------
+        : int
+          Returns the starting sample
+        """
+        return 1
+
+    @property
+    def detector_start_line(self):
+        """
+        Returns the starting line contained in the image
+
+        Returns
+        -------
+        : int
+          Returns the starting line
+        """
+        return 1
+
+    @property
+    def usgscsm_distortion_model(self):
+        """
+        The distortion model name with its coefficients
+
+        LRO LROC NAC does not use the default distortion model so we need to overwrite the
+        method packing the distortion model into the ISD.
+
+        Returns
+        -------
+        : dict
+          Returns a dict with the model name : dict of the coefficients
         """
 
-        instrument = self.label.get("INSTRUMENT_ID")
+        return {"lrolrocnac":
+                {"coefficients": self.odtk}}
 
-        # should be left or right
-        frame_id = self.label.get("FRAME_ID")
+    @property
+    def odtk(self):
+        """
+        The coefficients for the distortion model
 
-        if instrument == "LROC" and frame_id == "LEFT":
-            return "LRO_LROCNACL"
-        elif instrument == "LROC" and frame_id == "RIGHT":
-            return "LRO_LROCNACR"
+        Returns
+        -------
+        : list
+          Radial distortion coefficients. There is only one coefficient for LROC NAC l/r
+        """
+        return spice.gdpool('INS{}_OD_K'.format(self.ikid), 0, 1).tolist()
