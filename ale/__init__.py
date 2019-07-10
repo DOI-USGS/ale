@@ -1,8 +1,11 @@
 import os
 import pathlib
 from shutil import copyfile
-
 import yaml
+from pkg_resources import get_distribution, DistributionNotFound
+from . import drivers
+from . import formatters
+from .drivers import load, loads
 
 class DotDict(dict):
     """dot.notation access to dictionary attributes"""""
@@ -24,7 +27,16 @@ if not config_file_path.is_file():
 
 config = DotDict(yaml.load(open(config_file_path)))
 
-from . import drivers
-from . import formatters
-from .drivers import load, loads
+try:
+    _dist = get_distribution('ale')
+    # Normalize case for Windows systems
+    dist_loc = os.path.normcase(_dist.location)
+    here = os.path.normcase(__file__)
+    if not here.startswith(os.path.join(dist_loc, 'ale')):
+        # not installed, but there is another version that *is*
+        raise DistributionNotFound
+except DistributionNotFound:
+    __version__ = 'Please install this project with setup.py'
+else:
+    __version__ = _dist.version
 
