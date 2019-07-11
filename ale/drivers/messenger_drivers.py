@@ -37,7 +37,7 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
         if not hasattr(self, '_metakernel'):
             for mk in mks:
-                if str(self.start_time.year) in os.path.basename(mk):
+                if str(self.utc_start_time.year) in os.path.basename(mk):
                     self._metakernel = mk
         return self._metakernel
 
@@ -222,7 +222,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
         mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
         if not hasattr(self, '_metakernel'):
             for mk in mks:
-                if str(self.start_time.year) in os.path.basename(mk):
+                if str(self.utc_start_time.year) in os.path.basename(mk):
                     self._metakernel = mk
         return self._metakernel
 
