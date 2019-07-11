@@ -227,3 +227,38 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
           ISIS sensor model version
         """
         return 2
+
+    @property
+    def detector_center_sample(self):
+        """
+        Returns center detector sample acquired from Spice Kernels.
+        Expects ikid to be defined. This should be the integer Naid ID code for
+        the instrument.
+        Returns
+        -------
+        : float
+          center detector sample
+        """
+        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0])
+
+    @property
+    def detector_center_line(self):
+        """
+        Returns center detector line acquired from Spice Kernels.
+        Expects ikid to be defined. This should be the integer Naid ID code for
+        the instrument.
+        Returns
+        -------
+        : float
+          center detector line
+        """
+        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
+
+
+    @property
+    def detector_start_sample(self):
+        return int(spice.gdpool('INS{}_PIXEL_SAMPLES'.format(self.ikid), 0, 1)[0])
+
+    @property
+    def detector_start_line(self):
+        return int(spice.gdpool('INS{}_PIXEL_LINES'.format(self.ikid), 0, 1)[0])
