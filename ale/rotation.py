@@ -179,6 +179,10 @@ class TimeDependentRotation:
         if isinstance(other, ConstantRotation):
             return TimeDependentRotation((self._rots * other._rot).as_quat(), self.times, other.source, self.dest)
         elif isinstance(other, TimeDependentRotation):
+            # if self and other each have the same time and one rotation, don't interpolate.
+            if (self.times.size == 1) and (other.times.size == 1):
+                if (self.times == other.times):
+                    return TimeDependentRotation((self._rots * other._rots).as_quat(), self.times, other.source, other.dest)
             merged_times = np.union1d(np.asarray(self.times), np.asarray(other.times))
             # we cannot extrapolate so clip to the time range both cover
             first_time = max(min(self.times), min(other.times))
