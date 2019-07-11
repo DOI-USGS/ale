@@ -53,7 +53,7 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         : str
           Spacecraft name
         """
-        return self.label['INSTRUMENT_HOST_NAME']
+        return self.instrument_host_name
 
     @property
     def fikid(self):
