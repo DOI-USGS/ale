@@ -198,6 +198,7 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
         return [0.0, 0.0, 1/pixel_size]
 
+    @property
     def detector_start_line(self):
         """
         Returns
@@ -206,7 +207,8 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
           Detector line corresponding to the first image line
         """
         return 1
-
+        
+    @property
     def detector_start_sample(self):
         """
         Returns
@@ -253,12 +255,3 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
           center detector line
         """
         return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
-
-
-    @property
-    def detector_start_sample(self):
-        return int(spice.gdpool('INS{}_PIXEL_SAMPLES'.format(self.ikid), 0, 1)[0])
-
-    @property
-    def detector_start_line(self):
-        return int(spice.gdpool('INS{}_PIXEL_LINES'.format(self.ikid), 0, 1)[0])
