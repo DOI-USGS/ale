@@ -42,6 +42,20 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         return self._metakernel
 
     @property
+    def spacecraft_name(self):
+        """
+        Spacecraft name used in various SPICE calls to acquire
+        ephemeris data. Messenger MDIS img PDS3 labels do not the have a SPACECRAFT_NAME keyword,
+        so we override it here to find INSTRUMENT_HOST_NAME in the label.
+
+        Returns
+        -------
+        : str
+          Spacecraft name
+        """
+        return self.label['INSTRUMENT_HOST_NAME']
+
+    @property
     def fikid(self):
         """
         Naif ID code used in calculating focal length
