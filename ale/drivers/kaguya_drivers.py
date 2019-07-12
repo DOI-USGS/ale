@@ -130,32 +130,9 @@ class KaguyaTcPds3NaifSpiceDriver(Pds3Label,NaifSpice, LineScanner, Driver):
         """
         return self.label.get('MISSION_NAME')
 
-    @property
-    def spacecraft_clock_start_count(self):
-        """
-        Returns the start clock count string from the PDS3 label.
 
-        Returns
-        -------
-        : float
-          spacecraft clock stop count in seconds
-        """
-        return str(self.label['SPACECRAFT_CLOCK_START_COUNT'].value)
-    
     @property
     def spacecraft_clock_stop_count(self):
-        """
-        Returns the stop clock count string from the PDS3 label.
-
-        Returns
-        -------
-        : float
-          spacecraft clock stop count in seconds
-        """
-        return str(self.label['SPACECRAFT_CLOCK_STOP_COUNT'].value)
-
-    @property
-    def clock_stop_count(self):
         """
         The original SC_CLOCK_STOP_COUNT key is often incorrect and cannot be trusted.
         Therefore we get this information from CORRECTED_SC_CLOCK_STOP_COUNT
@@ -178,10 +155,10 @@ class KaguyaTcPds3NaifSpiceDriver(Pds3Label,NaifSpice, LineScanner, Driver):
         : float
           ephemeris stop time of the image
         """
-        return spice.sct2e(self.spacecraft_id, self.clock_stop_count)
+        return spice.sct2e(self.spacecraft_id, self.spacecraft_clock_stop_count)
 
     @property
-    def clock_start_count(self):
+    def spacecraft_clock_start_count(self):
         """
         The original SC_CLOCK_START_COUNT key is often incorrect and cannot be trusted.
         Therefore we get this information from CORRECTED_SC_CLOCK_START_COUNT
@@ -204,7 +181,7 @@ class KaguyaTcPds3NaifSpiceDriver(Pds3Label,NaifSpice, LineScanner, Driver):
         : float
           ephemeris start time of the image
         """
-        return spice.sct2e(self.spacecraft_id, self.clock_start_count)
+        return spice.sct2e(self.spacecraft_id, self.spacecraft_clock_start_count)
 
     @property
     def detector_center_line(self):
