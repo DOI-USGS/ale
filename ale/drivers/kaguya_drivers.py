@@ -42,6 +42,39 @@ class KaguyaTcPds3NaifSpiceDriver(Pds3Label,NaifSpice, LineScanner, Driver):
                     self._metakernel = mk
         return self._metakernel
 
+
+    @property
+    def utc_start_time(self):
+        """
+        Returns corrected utc start time.
+
+        If no corrected form is found, defaults to the form specified in parent class.
+        
+        Returns
+        -------
+        : str
+          Start time of the image in UTC YYYY-MM-DDThh:mm:ss[.fff]
+        """
+        return self.label.get('CORRECTED_START_TIME', super().utc_start_time)
+
+
+    @property
+    def utc_stop_time(self):
+        """
+        Returns corrected utc start time.
+
+        If no corrected form is found, defaults to the form specified in parent class.
+
+        Returns
+        -------
+        : str
+          Stop time of the image in UTC YYYY-MM-DDThh:mm:ss[.fff]
+
+        """
+
+        return self.label.get('CORRECTED_STOP_TIME', super().utc_stop_time)
+
+
     @property
     def instrument_id(self):
         """
