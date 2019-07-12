@@ -18,7 +18,7 @@ class ConstantRotation:
 
     def from_matrix(mat, source, dest):
         """
-        Create a constant rotation from a rotation matricx
+        Create a constant rotation from a directed cosine matrix
 
         Parameters
         ----------
@@ -28,6 +28,10 @@ class ConstantRotation:
                  The NAIF ID code for the source frame
         dest : int
                The NAIF ID code for the destination frame
+
+        See Also
+        --------
+        scipy.spatial.transform.Rotation.from_dcm
         """
         rot = Rotation.from_dcm(mat)
         return ConstantRotation(rot.as_quat(), source, dest)
@@ -138,6 +142,10 @@ class TimeDependentRotation:
                  The NAIF ID code for the source frame
         dest : int
                The NAIF ID code for the destination frame
+
+        See Also
+        --------
+        scipy.spatial.transform.Rotation.from_euler
         """
         rot = Rotation.from_euler(sequence, np.asarray(euler))
         return TimeDependentRotation(rot.as_quat(), times, source, dest)
