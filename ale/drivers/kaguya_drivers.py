@@ -1,11 +1,7 @@
 import os
 from glob import glob
-
 import numpy as np
-
-import pvl
 import spiceypy as spice
-
 from ale import config
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
@@ -13,7 +9,7 @@ from ale.base.label_pds3 import Pds3Label
 from ale.base.type_sensor import LineScanner
 
 
-class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
+class KaguyaTcPds3NaifSpiceDriver(Pds3Label,NaifSpice, LineScanner, Driver):
     """
     Driver for a PDS3 Kaguya Terrain Camera (TC) images. Specifically level2b0 mono and stereo images.
 
@@ -40,8 +36,9 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         metakernel_dir = config.kaguya
         mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
         if not hasattr(self, '_metakernel'):
+            self._metakernel = None
             for mk in mks:
-                if str(self.start_time.year) in os.path.basename(mk):
+                if str(self.utc_start_time.year) in os.path.basename(mk):
                     self._metakernel = mk
         return self._metakernel
 
@@ -68,8 +65,37 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         id = "LISM_{}_{}T{}".format(instrument, sd, swath)
         return id
 
+
     @property
-    def _tc_id(self):
+    def sensor_frame_id(self):
+        """
+        Returns the sensor frame id.  Depends on the instrument that was used to
+        capture the image.
+
+        Returns
+        -------
+        : int
+          Sensor frame id
+        """
+        return spice.bods2c("LISM_{}_HEAD".format(super().instrument_id))
+
+
+    @property
+    def instrument_host_name(self):
+        """
+        Returns the name of the instrument host.  Kaguya/SELENE labels do not have an
+        explicit instrument host name in the pvl, so we use the spacecraft name.
+
+        Returns
+        -------
+        : str
+          Spacecraft name as a proxy for instrument host name.
+        """
+        return self.label.get("SPACECRAFT_NAME", None)
+
+
+    @property
+    def ikid(self):
         """
         Returns ikid of LISM_TC1 or LISM_TC2, depending which camera was used
         for capturing the image.
@@ -87,6 +113,44 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
           ikid of LISM_TC1 or LISM_TC2
         """
         return spice.bods2c("LISM_{}".format(super().instrument_id))
+
+    @property
+    def spacecraft_name(self):
+        """
+        No NAIF code exists for the spacecraft name 'SELENE-M.'  The NAIF code
+        exists only for 'SELENE' or 'KAGUYA' -- 'SELENE' is captured as
+        'MISSION_NAME'
+        
+        Returns
+        -------
+        : str
+          mission name
+        """
+        return self.label.get('MISSION_NAME')
+
+    @property
+    def spacecraft_clock_start_count(self):
+        """
+        Returns the start clock count string from the PDS3 label.
+
+        Returns
+        -------
+        : float
+          spacecraft clock stop count in seconds
+        """
+        return str(self.label['SPACECRAFT_CLOCK_START_COUNT'].value)
+    
+    @property
+    def spacecraft_clock_stop_count(self):
+        """
+        Returns the stop clock count string from the PDS3 label.
+
+        Returns
+        -------
+        : float
+          spacecraft clock stop count in seconds
+        """
+        return str(self.label['SPACECRAFT_CLOCK_STOP_COUNT'].value)
 
     @property
     def clock_stop_count(self):
@@ -112,7 +176,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         : float
           ephemeris stop time of the image
         """
-        return spice.sct2e(self.spacecraft_id, super().ephemeris_stop_time)
+        return spice.sct2e(self.spacecraft_id, self.clock_stop_count)
 
     @property
     def clock_start_count(self):
@@ -138,7 +202,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         : float
           ephemeris start time of the image
         """
-        return spice.sct2e(self.spacecraft_id, super().ephemeris_start_time)
+        return spice.sct2e(self.spacecraft_id, self.clock_start_count)
 
     @property
     def detector_center_line(self):
@@ -162,7 +226,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
           The detector sample of the principle point
         """
         # Pixels are 0 based, not one based, so subtract 1
-        return spice.gdpool('INS{}_CENTER'.format(self._tc_id), 0, 2)[0]-1
+        return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[0]-1
 
     @property
     def _sensor_orientation(self):
@@ -229,7 +293,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         : list
           focal plane to detector samples
         """
-        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self._tc_id), 0, 1)[0]
+        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0]
         return [0, 0, -1/pixel_size]
 
 
@@ -245,7 +309,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         : list
           focal plane to detector lines
         """
-        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self._tc_id), 0, 1)[0]
+        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0]
         return [0, -1/pixel_size, 0]
 
 
@@ -261,7 +325,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         : list
           Optical distortion x coefficients
         """
-        return spice.gdpool('INS{}_DISTORTION_COEF_X'.format(self._tc_id),0, 4).tolist()
+        return spice.gdpool('INS{}_DISTORTION_COEF_X'.format(self.ikid),0, 4).tolist()
 
 
     @property
@@ -276,7 +340,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         : list
           Optical distortion y coefficients
         """
-        return spice.gdpool('INS{}_DISTORTION_COEF_Y'.format(self._tc_id), 0, 4).tolist()
+        return spice.gdpool('INS{}_DISTORTION_COEF_Y'.format(self.ikid), 0, 4).tolist()
 
     @property
     def line_exposure_duration(self):
@@ -314,7 +378,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         : float
           Camera focal length
         """
-        return float(spice.gdpool('INS{}_FOCAL_LENGTH'.format(self._tc_id), 0, 1)[0])
+        return float(spice.gdpool('INS{}_FOCAL_LENGTH'.format(self.ikid), 0, 1)[0])
 
     @property
     def usgscsm_distortion_model(self):
