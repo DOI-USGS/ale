@@ -1,8 +1,11 @@
 import pvl
+import spiceypy as spice
+import os
+
+from glob import glob
+
 import ale
 from ale import config
-
-
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
@@ -45,8 +48,9 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         metakernel_dir = config.dawn
         mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
         if not hasattr(self, '_metakernel'):
+            self._metakernel = None
             for mk in mks:
-                if str(self.start_time.year) in os.path.basename(mk):
+                if str(self.utc_start_time.year) in os.path.basename(mk):
                     self._metakernel = mk
         return self._metakernel
 
@@ -194,6 +198,7 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
         return [0.0, 0.0, 1/pixel_size]
 
+    @property
     def detector_start_line(self):
         """
         Returns
@@ -202,7 +207,8 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
           Detector line corresponding to the first image line
         """
         return 1
-
+        
+    @property
     def detector_start_sample(self):
         """
         Returns
@@ -223,3 +229,29 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
           ISIS sensor model version
         """
         return 2
+
+    @property
+    def detector_center_sample(self):
+        """
+        Returns center detector sample acquired from Spice Kernels.
+        Expects ikid to be defined. This should be the integer Naid ID code for
+        the instrument.
+        Returns
+        -------
+        : float
+          center detector sample
+        """
+        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0])
+
+    @property
+    def detector_center_line(self):
+        """
+        Returns center detector line acquired from Spice Kernels.
+        Expects ikid to be defined. This should be the integer Naid ID code for
+        the instrument.
+        Returns
+        -------
+        : float
+          center detector line
+        """
+        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
