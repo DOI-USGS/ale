@@ -117,6 +117,8 @@ class KaguyaTcPds3NaifSpiceDriver(Pds3Label,NaifSpice, LineScanner, Driver):
     @property
     def spacecraft_name(self):
         """
+        Returns "MISSION_NAME" as a proxy for spacecraft_name.
+
         No NAIF code exists for the spacecraft name 'SELENE-M.'  The NAIF code
         exists only for 'SELENE' or 'KAGUYA' -- 'SELENE' is captured as
         'MISSION_NAME'
