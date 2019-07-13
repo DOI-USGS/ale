@@ -91,7 +91,7 @@ class Framer():
         : double
           Center ephemeris time for the image
         """
-        return [self.center_ephemeris_time
+        return [self.center_ephemeris_time]
 
     @property
     def center_ephemeris_time(self):
