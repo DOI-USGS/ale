@@ -49,6 +49,21 @@ class LineScanner():
         """
         return np.linspace(self.ephemeris_start_time,  self.ephemeris_stop_time, self.image_lines / 64)
 
+    @property
+    def center_ephemeris_time(self):
+        """
+        Returns the sum of the starting ephemeris time and half of the line exposure
+        duration. Expects ephemeris start time and line exposure duration to be
+        defined. These should be double precision numbers containing the ephemeris start and
+        line exposure duration of the image.
+
+        Returns
+        -------
+        : double
+          Center ephemeris time for an image
+        """
+        return self.ephemeris_start_time + self.line_exposure_duration / 2
+
 class Framer():
     @property
     def name_model(self):
@@ -66,8 +81,8 @@ class Framer():
     @property
     def ephemeris_time(self):
         """
-        Returns the center ephemeris time for the image which is the average
-        of the start and stop ephemeris time.
+        Returns the center ephemeris time for the image which is start time plus
+        half of the exposure duration.
         Expects center_ephemeris_time to be defined. This should be a double
         containing the average of the start and stop ephemeris times.
 
@@ -76,4 +91,19 @@ class Framer():
         : double
           Center ephemeris time for the image
         """
-        return [self.center_ephemeris_time]
+        return [self.center_ephemeris_time
+
+    @property
+    def center_ephemeris_time(self):
+        """
+        Returns the sum of the starting ephemeris time and half of the exposure duration.
+        Expects ephemeris start time and exposure duration to be defined. These
+        should be double precision numbers containing the ephemeris start and
+        exposure duration of the image.
+
+        Returns
+        -------
+        : double
+          Center ephemeris time for an image
+        """
+        return self.ephemeris_start_time + self.exposure_duration / 2

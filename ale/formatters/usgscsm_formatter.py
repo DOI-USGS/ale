@@ -23,7 +23,7 @@ def to_usgscsm(driver):
     body_radii = driver.target_body_radii
     isd_data['radii'] = {
         'semimajor' : body_radii[0],
-        'semiminor' : body_radii[1],
+        'semiminor' : body_radii[2],
         'unit' : 'km'
     }
     positions, velocities, position_times = driver.sensor_position
@@ -100,7 +100,7 @@ def to_usgscsm(driver):
     # frame sensor model specifics
     if isinstance(driver, Framer):
         isd_data['name_model'] = 'USGS_ASTRO_FRAME_SENSOR_MODEL'
-        isd_data['center_ephemeris_time'] = position_times[0]
+        isd_data['center_ephemeris_time'] = driver.center_ephemeris_time
 
     # check that there is a valid sensor model name
     if 'name_model' not in isd_data:

@@ -287,7 +287,7 @@ class Pds3Label():
             try:
                 unit = self.label['EXPOSURE_DURATION'].units
                 unit = unit.lower()
-                if unit == "ms" or unit == "msec":
+                if unit == "ms" or unit == "msec" or unit == "millisecond":
                   return self.label['EXPOSURE_DURATION'].value * 0.001
                 else:
                   return self.label['EXPOSURE_DURATION'].value
