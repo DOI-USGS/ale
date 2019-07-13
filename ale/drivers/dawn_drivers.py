@@ -123,11 +123,11 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         via a spice call but 193 ms needs to be added to
         account for the CCD being discharged or cleared.
         """
-        if not hasattr(self, '_starting_ephemeris_time'):
+        if not hasattr(self, '_ephemeris_start_time'):
             sclock = self.spacecraft_clock_start_count
-            self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
-            self._starting_ephemeris_time += 193.0 / 1000.0
-        return self._starting_ephemeris_time
+            self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
+            self._ephemeris_start_time += 193.0 / 1000.0
+        return self._ephemeris_start_time
 
     @property
     def usgscsm_distortion_model(self):
@@ -203,6 +203,7 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         """
         return 1
 
+    @property
     def detector_start_sample(self):
         """
         Returns
@@ -223,3 +224,29 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
           ISIS sensor model version
         """
         return 2
+
+    @property
+    def detector_center_sample(self):
+        """
+        Returns center detector sample acquired from Spice Kernels.
+        Expects ikid to be defined. This should be the integer Naid ID code for
+        the instrument.
+        Returns
+        -------
+        : float
+          center detector sample
+        """
+        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[0])
+
+    @property
+    def detector_center_line(self):
+        """
+        Returns center detector line acquired from Spice Kernels.
+        Expects ikid to be defined. This should be the integer Naid ID code for
+        the instrument.
+        Returns
+        -------
+        : float
+          center detector line
+        """
+        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[1])
