@@ -55,7 +55,6 @@ def load(label, formater):
         try:
             res = driver(label)
             with res as driver:
-                print(driver.metakernel)
                 return formater(driver)
         except Exception as e:
             import traceback
