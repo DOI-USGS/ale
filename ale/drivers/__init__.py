@@ -41,7 +41,7 @@ class JsonEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def load(label):
+def load(label, formater):
     """
     Attempt to load a given label from all possible drivers
 
@@ -51,19 +51,19 @@ def load(label):
                String path to the given label file
     """
     for name, driver in drivers.items():
-            print("Trying:", name)
-            try:
-                res = driver(label)
-                if res.is_valid():
-                    with res as r:
-                            return res.to_dict()
-            except Exception as e:
-                import traceback
-                print("Driver Failed:", e)
-                traceback.print_exc()
+        print(f'Trying {name}')
+        try:
+            res = driver(label)
+            with res as driver:
+                print(driver.metakernel)
+                return formater(driver)
+        except Exception as e:
+            import traceback
+            print(f'Failed: {e}\n')
+            traceback.print_exc()
     raise Exception('No Such Driver for Label')
 
 
-def loads(label):
-    res = load(label)
+def loads(label, formater):
+    res = load(label, formater)
     return json.dumps(res, cls=JsonEncoder)
