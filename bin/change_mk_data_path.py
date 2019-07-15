@@ -13,16 +13,23 @@ args = parser.parse_args()
 
 mks = glob(path.join(args.mk_path,'*.tm'))
 
+
+
 for mk in mks:
     with open(mk, 'r') as f:
         lines = f.readlines()
 
-    lines_to_change = [i for i,l in enumerate(lines) if 'PATH_VALUES     =' in l]
+    lines_to_change = []
+    for i,l in enumerate(lines):
+        match = re.search('PATH_VALUES\s*=', l)
+        if match:
+            lines_to_change.append(i)
+
     if not lines_to_change:
         print(f'No path values in {mk}')
 
     for i in lines_to_change:
-        lines[i] = f'      PATH_VALUES     = ( \'{args.new_data_path}\' )\n'
-
+        lines[i] = f'      PATH_VALUES     = ( \'{new_data_dir}\' )\n'
     with open(mk, 'w') as f:
         f.write(''.join(lines))
+
