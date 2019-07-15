@@ -16,6 +16,26 @@ class ConstantRotation:
            The NAIF ID code for the destination frame
     """
 
+    def from_matrix(mat, source, dest):
+        """
+        Create a constant rotation from a directed cosine matrix
+
+        Parameters
+        ----------
+        mat : 2darray
+              The rotation matrix
+        source : int
+                 The NAIF ID code for the source frame
+        dest : int
+               The NAIF ID code for the destination frame
+
+        See Also
+        --------
+        scipy.spatial.transform.Rotation.from_dcm
+        """
+        rot = Rotation.from_dcm(mat)
+        return ConstantRotation(rot.as_quat(), source, dest)
+
     def __init__(self, quat, source, dest):
         """
         Construct a constant rotation
@@ -104,9 +124,35 @@ class TimeDependentRotation:
            The NAIF ID code for the destination frame
     """
 
+    def from_euler(sequence, euler, times, source, dest):
+        """
+        Create a time dependent rotation from a set of Euler angles.
+
+        Parameters
+        ----------
+        sequence : string
+                   The axis sequence that the Euler angles are applied in. I.E. 'XYZ'
+                   or 'ZXZ'.
+        euler : 2darray
+                2D numpy array of the euler angle rotations in radians.
+        times : array
+                The time for each rotation in euler. This array must be sorted
+                in ascending order.
+        source : int
+                 The NAIF ID code for the source frame
+        dest : int
+               The NAIF ID code for the destination frame
+
+        See Also
+        --------
+        scipy.spatial.transform.Rotation.from_euler
+        """
+        rot = Rotation.from_euler(sequence, np.asarray(euler))
+        return TimeDependentRotation(rot.as_quat(), times, source, dest)
+
     def __init__(self, quats, times, source, dest):
         """
-        Construct a constant rotation
+        Construct a time dependent rotation
 
         Parameters
         ----------
@@ -163,7 +209,7 @@ class TimeDependentRotation:
 
         The destination frame of the right rotation (other) and the source
         frame of the left rotation (self) must be the same. I.E. if A and B are
-        rotations, then for A*B to be valid, A.source must equal B.dest.
+        rotations, then for A*B to be valid, A.source must equal B.dest. 
 
         If the other rotation is a time dependent rotation, then the time range
         for the resultant rotation will be the time covered by both rotations.
@@ -179,6 +225,9 @@ class TimeDependentRotation:
         if isinstance(other, ConstantRotation):
             return TimeDependentRotation((self._rots * other._rot).as_quat(), self.times, other.source, self.dest)
         elif isinstance(other, TimeDependentRotation):
+            # if self and other each have the same time and one rotation, don't interpolate.
+            if (self.times.size == 1) and (other.times.size == 1) and (self.times == other.times):
+                return TimeDependentRotation((self._rots * other._rots).as_quat(), self.times, other.source, self.dest)
             merged_times = np.union1d(np.asarray(self.times), np.asarray(other.times))
             # we cannot extrapolate so clip to the time range both cover
             first_time = max(min(self.times), min(other.times))

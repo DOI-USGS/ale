@@ -14,7 +14,7 @@ class TestDriver(Driver):
     """
     @property
     def target_body_radii(self):
-        return (1100, 1000)
+        return (1100, 1100, 1000)
 
     @property
     def frame_chain(self):
@@ -80,6 +80,10 @@ class TestDriver(Driver):
     @property
     def ephemeris_start_time(self):
         return 800
+
+    @property
+    def exposure_duration(self):
+        return 100
 
     @property
     def focal2pixel_lines(self):
