@@ -6,9 +6,10 @@ from ale.formatters import usgscsm_formatter
 from ale.base.base import Driver
 from ale.base.type_sensor import LineScanner, Framer
 from ale.transformation import FrameNode
+from ale.base.data_naif import NaifSpice
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
-class TestDriver(Driver):
+class TestDriver(Driver, NaifSpice):
     """
     Test Driver implementation with dummy values
     """
@@ -164,6 +165,10 @@ class TestLineScanner(LineScanner, TestDriver):
     @property
     def image_lines(self):
         return 10000
+
+    @property
+    def line_exposure_duration(self):
+        return .01
 
 
 class TestFramer(Framer, TestDriver):

@@ -62,7 +62,7 @@ class LineScanner():
         : double
           Center ephemeris time for an image
         """
-        return self.ephemeris_start_time + (self.lines * self.line_exposure_duration)
+        return self.ephemeris_start_time + (self.image_lines * self.line_exposure_duration)
 
 class Framer():
     @property
