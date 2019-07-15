@@ -9,11 +9,11 @@ import os
 from glob import glob
 import json
 import numpy as np
+import datetime
 from datetime import datetime, date
+import traceback
 
 from abc import ABC
-
-import datetime
 
 # dynamically load drivers
 __all__ = [os.path.splitext(os.path.basename(d))[0] for d in glob(os.path.join(os.path.dirname(__file__), '*_drivers.py'))]
@@ -63,7 +63,6 @@ def load(label, formatter='usgscsm'):
             with res as driver:
                 return formatter(driver)
         except Exception as e:
-            import traceback
             print(f'Failed: {e}\n')
             traceback.print_exc()
     raise Exception('No Such Driver for Label')
