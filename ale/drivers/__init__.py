@@ -19,8 +19,11 @@ import datetime
 __all__ = [os.path.splitext(os.path.basename(d))[0] for d in glob(os.path.join(os.path.dirname(__file__), '*_drivers.py'))]
 __driver_modules__ = [importlib.import_module('.'+m, package='ale.drivers') for m in __all__]
 
-drivers = dict(chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.isclass(x) and "_driver" in x.__module__) for dmod in __driver_modules__))
+__formatters__ = importlib.import_module('.formatters', package='ale')
+__formatters__ = {'usgscsm': __formatters__.usgscsm_formatter.to_usgscsm,
+                  'isis': __formatters__.isis_formatter.to_isis}
 
+drivers = dict(chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.isclass(x) and "_driver" in x.__module__) for dmod in __driver_modules__))
 
 class JsonEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -41,7 +44,7 @@ class JsonEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def load(label, formater):
+def load(label, formatter='usgscsm'):
     """
     Attempt to load a given label from all possible drivers
 
@@ -50,12 +53,15 @@ def load(label, formater):
     label : str
                String path to the given label file
     """
+    if isinstance(formatter, str):
+        formatter = __formatters__[formatter]
+
     for name, driver in drivers.items():
         print(f'Trying {name}')
         try:
             res = driver(label)
             with res as driver:
-                return formater(driver)
+                return formatter(driver)
         except Exception as e:
             import traceback
             print(f'Failed: {e}\n')
@@ -63,6 +69,6 @@ def load(label, formater):
     raise Exception('No Such Driver for Label')
 
 
-def loads(label, formater):
-    res = load(label, formater)
+def loads(label, formatter='usgscsm'):
+    res = load(label, formatter)
     return json.dumps(res, cls=JsonEncoder)
