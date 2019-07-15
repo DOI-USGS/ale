@@ -420,6 +420,19 @@ class NaifSpice():
             return spice.str2et(self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S"))
 
     @property
+    def center_ephemeris_time(self):
+        """
+        Returns the average of the start and stop ephemeris times. Expects
+        ephemeris start and stop times to be defined. These should be double precision
+        numbers containing the ephemeris start and stop times of the image.
+         Returns
+        -------
+        : double
+          Center ephemeris time for an image
+        """
+        return (self.ephemeris_start_time + self.ephemeris_stop_time)/2
+
+    @property
     def detector_center_sample(self):
         """
         Returns the center detector sample. Expects ikid to be defined. This should
