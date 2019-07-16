@@ -425,7 +425,8 @@ class NaifSpice():
         Returns the average of the start and stop ephemeris times. Expects
         ephemeris start and stop times to be defined. These should be double precision
         numbers containing the ephemeris start and stop times of the image.
-         Returns
+
+        Returns
         -------
         : double
           Center ephemeris time for an image
