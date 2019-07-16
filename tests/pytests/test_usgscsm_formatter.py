@@ -167,7 +167,7 @@ class TestLineScanner(LineScanner, TestDriver):
         return 10000
 
     @property
-    def line_exposure_duration(self):
+    def exposure_duration(self):
         return .01
 
 

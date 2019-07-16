@@ -81,7 +81,7 @@ def to_usgscsm(driver):
         isd_data['name_model'] = 'USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL'
         isd_data['interpolation_method'] = 'lagrange'
         start_lines, start_times, scan_rates = driver.line_scan_rate
-        center_time = (driver.ephemeris_stop_time + driver.ephemeris_start_time) / 2
+        center_time = driver.center_ephemeris_time
         isd_data['line_scan_rate'] = [[line, time, rate] for line, time, rate in zip(start_lines, start_times, scan_rates)]
         isd_data['starting_ephemeris_time'] = driver.ephemeris_start_time
         isd_data['center_ephemeris_time'] = center_time
