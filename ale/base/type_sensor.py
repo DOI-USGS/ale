@@ -52,10 +52,11 @@ class LineScanner():
     @property
     def ephemeris_stop_time(self):
         """
-        Returns the sum of the starting ephemeris time and half of the line exposure
-        duration. Expects ephemeris start time and line exposure duration to be
-        defined. These should be double precision numbers containing the ephemeris start and
-        line exposure duration of the image.
+        Returns the sum of the starting ephemeris time and the number of lines
+        times the exposure duration. Expects ephemeris start time, exposure duration
+        and image lines to be defined. These should be double precision numbers
+        containing the ephemeris start, exposure duration and number of lines of
+        the image.
 
         Returns
         -------
