@@ -13,15 +13,17 @@ import datetime
 from datetime import datetime, date
 import traceback
 
+from ale.formatters.usgscsm_formatter import to_usgscsm
+from ale.formatters.isis_formatter import to_isis
+
 from abc import ABC
 
 # dynamically load drivers
 __all__ = [os.path.splitext(os.path.basename(d))[0] for d in glob(os.path.join(os.path.dirname(__file__), '*_drivers.py'))]
 __driver_modules__ = [importlib.import_module('.'+m, package='ale.drivers') for m in __all__]
 
-__formatters__ = importlib.import_module('.formatters', package='ale')
-__formatters__ = {'usgscsm': __formatters__.usgscsm_formatter.to_usgscsm,
-                  'isis': __formatters__.isis_formatter.to_isis}
+__formatters__ = {'usgscsm': to_usgscsm,
+                  'isis': to_isis}
 
 drivers = dict(chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.isclass(x) and "_driver" in x.__module__) for dmod in __driver_modules__))
 
