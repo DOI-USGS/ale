@@ -73,6 +73,18 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
 
     NOTES
     -----
+    
+    * HRSC has 9 different filters. Each has it's own instrument id, as well as
+      the main/"HEAD" camera composing those filters. There is also another
+      "SRC" instrument, making-up a total of 11 distinct sensors. It is very
+      important to understand which code is needed when/where.
+    
+    * HRSC is a variable line scanner, and so does not maintain one exposure
+      duration, but rather differing exposure durations per line. This
+      information is stored within the individual records in the image data
+      itself, with the the first 8 bytes making up the double presicion
+      ephemeris time that the line exposure was started, and the next 4 bytes
+      making up the float containing that line's exposure duration.
 
     """
     
@@ -92,10 +104,6 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         if not hasattr(self, '_metakernel'):
             self._metakernel = find_latest_metakernel(self._metakernel_dir, self.utc_start_time.year)
         return self._metakernel
-
-
-    # @property
-    # def instrument_id(self):
     
     
     @property
@@ -144,6 +152,9 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         return spice.bods2c(self.label['DETECTOR_ID'])
     
     
+    # TODO Since HRSC has different frames based on filters, need to check that
+    # this is returning the value needed for all calculations from the base
+    # class and therefor does not need to be reimplemented.
     # @property
     # def sensor_frame_id(self):
     #     """
@@ -199,7 +210,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         Expects fikid to be defined. This must be the integer Naif id code of
         the filter-specific instrument. 
         
-        These values are pulled from ISIS iak kernels.
+        NOTE: These values are pulled from ISIS iak kernels.
 
         Returns
         -------
@@ -213,7 +224,9 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
     def focal2pixel_lines(self):
         """
         Expects fikid to be defined. This must be the integer Naif id code of
-        the filet-sepcific instrument.
+        the filter-sepcific instrument.
+        
+        NOTE: These values are pulled from ISIS iak kernels.
 
         Returns
         -------
@@ -227,7 +240,9 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
     def focal2pixel_samples(self):
         """
         Expects fikid to be defined. This must be the integer Naif id code of
-        the filet-sepcific instrument.
+        the filter-sepcific instrument.
+        
+        NOTE: These values are pulled from ISIS iak kernels.
 
         Returns
         -------
@@ -241,7 +256,9 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
     def pixel2focal_x(self):
         """
         Expects fikid to be defined. This must be the integer Naif id code of
-        the instrument
+        the filter-specific instrument.
+        
+        NOTE: These values are pulled from ISIS iak kernels.
 
         Returns
         -------
@@ -255,7 +272,9 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
     def pixel2focal_y(self):
         """
         Expects fikid to be defined. This must be the integer Naif id code of
-        the instrument
+        the filter-specific instrument.
+        
+        NOTE: These values are pulled from ISIS iak kernels.
 
         Returns
         -------
@@ -299,7 +318,6 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         : int
           Detector line corresponding to the first image sample
         """
-        # return 1
         return self.label["SAMPLE_FIRST_PIXEL"]
         
         
@@ -376,12 +394,17 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         return lines, times, durations
     
     
-    # Consider expanding this to handle units
+    # TODO We need to confirm that returning nothing here does not affect
+    # calculations elsewhere in code. Or is there possibly just a better way of
+    # doing this?
     @property
     def line_exposure_duration(self):
         """
         Line exposure duration returns the time between the exposures for
         subsequent lines.
+        
+        Since HRSC is a variable line scan camera, it does not make sense to
+        have one exposure duration value.
 
         Returns
         -------
