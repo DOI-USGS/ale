@@ -10,6 +10,7 @@ from dateutil import parser
 import pvl
 import spiceypy as spice
 from ale.rotation import ConstantRotation, TimeDependentRotation
+from ale.transformation import FrameNode
 from ale import config
 
 from scipy.interpolate import interp1d
@@ -629,6 +630,38 @@ class IsisSpice():
         for key in self.isis_naif_keywords:
             if re.match(regex, key[0]):
                 return self.isis_naif_keywords[key[0]]
+
+    @property
+    def frame_chain(self):
+        """
+        Return the root node of the rotation frame tree/chain.
+
+        The root node is the J2000 reference frame. The other nodes in the
+        tree can be accessed via the methods in the FrameNode class.
+
+        Returns
+        -------
+        FrameNode
+            The root node of the frame tree. This will always be the J2000 reference frame.
+        """
+        if not hasattr(self, '_root_frame'):
+            j2000_id = 1 # J2000 is our root reference frame
+            self._root_frame = FrameNode(j2000_id)
+
+            current_parent = self._root_frame
+            for rotation in create_rotations(self.inst_pointing_table):
+                new_node = FrameNode(rotation.dest,
+                                     parent=current_parent,
+                                     rotation=rotation)
+                current_parent = new_node
+
+            current_parent = self._root_frame
+            for rotation in create_rotations(self.body_orientation_table):
+                new_node = FrameNode(rotation.dest,
+                                     parent=current_parent,
+                                     rotation=rotation)
+                current_parent = new_node
+        return self._root_frame
 
 
     @property

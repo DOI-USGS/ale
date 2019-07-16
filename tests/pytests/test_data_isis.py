@@ -612,3 +612,33 @@ def test_create_euler_rotations():
     assert rotations[0].dest == -1000
     np.testing.assert_equal(rotations[0].times, np.array([10, 12]))
     np.testing.assert_almost_equal(rotations[0].quats, np.array([[0.5, 0.5, 0.5, 0.5], [0, 0, 0, 1]]))
+
+def test_frame_chain(testdata):
+    testdata._inst_pointing_table = {
+        'Rotations' : np.array([[1, 0, 0, 0], [0.5, 0.5, 0.5, 0.5]]),
+        'Times' : np.array([0, 1]),
+        'TimeDependentFrames' : np.array([-1000, -100, 1]),
+        'ConstantRotation' : np.array([[0, 0, 1], [1, 0 , 0], [0, 1, 0]]),
+        'ConstantFrames' : np.array([-1020, -1000])}
+    testdata._body_orientation_table = {
+        'Rotations' : np.array([[1, 0, 0, 0], [0.5, 0.5, 0.5, 0.5]]),
+        'Times' : np.array([0, 1]),
+        'TimeDependentFrames' : np.array([80, 1]),
+        'ConstantRotation' : np.array([[0, 0, 1], [1, 0 , 0], [0, 1, 0]]),
+        'ConstantFrames' : np.array([81, 80])}
+    j2000 = testdata.frame_chain
+    assert j2000.id == 1
+    assert j2000.parent is None
+    assert len(j2000.children) == 2
+    spacecraft = j2000.find_child_frame(-1000)
+    assert spacecraft.parent == j2000
+    assert len(spacecraft.children) == 1
+    sensor = spacecraft.find_child_frame(-1020)
+    assert sensor.parent == spacecraft
+    assert len(sensor.children) == 0
+    barycenter = j2000.find_child_frame(80)
+    assert barycenter.parent == j2000
+    assert len(barycenter.children) == 1
+    target = barycenter.find_child_frame(81)
+    assert target.parent == barycenter
+    assert len(target.children) == 0

@@ -310,7 +310,7 @@ class NaifSpice():
             The root node of the frame tree. This will always be the J2000 reference frame.
         """
         if not hasattr(self, '_root_frame'):
-            j2000_id = 1 #J2000 is our root reference frame
+            j2000_id = 1 # J2000 is our root reference frame
             self._root_frame = FrameNode(j2000_id)
 
             sensor_quats = np.zeros((len(self.ephemeris_time), 4))
