@@ -431,7 +431,7 @@ class NaifSpice():
         : double
           Center ephemeris time for an image
         """
-        return (self.ephemeris_start_time + self.ephemeris_stop_time)/2
+        return (self.ephemeris_start_time + self.ephemeris_stop_time) / 2
 
     @property
     def detector_center_sample(self):

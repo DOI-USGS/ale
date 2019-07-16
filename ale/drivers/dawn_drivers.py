@@ -127,11 +127,11 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         via a spice call but 193 ms needs to be added to
         account for the CCD being discharged or cleared.
         """
-        if not hasattr(self, '_starting_ephemeris_time'):
+        if not hasattr(self, '_ephemeris_start_time'):
             sclock = self.spacecraft_clock_start_count
-            self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
-            self._starting_ephemeris_time += 193.0 / 1000.0
-        return self._starting_ephemeris_time
+            self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
+            self._ephemeris_start_time += 193.0 / 1000.0
+        return self._ephemeris_start_time
 
     @property
     def usgscsm_distortion_model(self):
@@ -207,7 +207,7 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
           Detector line corresponding to the first image line
         """
         return 1
-        
+
     @property
     def detector_start_sample(self):
         """
@@ -241,7 +241,7 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         : float
           center detector sample
         """
-        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0])
+        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[0])
 
     @property
     def detector_center_line(self):
@@ -254,4 +254,4 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         : float
           center detector line
         """
-        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
+        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[1])
