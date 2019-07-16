@@ -75,10 +75,6 @@ class TestDriver(Driver, NaifSpice):
         return 'Test Platform'
 
     @property
-    def ephemeris_stop_time(self):
-        return 900
-
-    @property
     def ephemeris_start_time(self):
         return 800
 
