@@ -1,6 +1,7 @@
 import pytest
 import pvl
-from ale.base.data_isis import IsisSpice
+import numpy as np
+from ale.base.data_isis import IsisSpice, create_rotations
 
 
 testlabel = """
@@ -570,3 +571,44 @@ def test_isis_naif_keywords(testdata):
 
 def test_odtk(testdata):
     assert testdata.odtk == [-0.0048509, 2.41312e-07, -1.62369e-13]
+
+def test_create_quaternion_rotations():
+    test_table = {
+        'Rotations' : np.array([[1, 0, 0, 0], [0.5, 0.5, 0.5, 0.5]]),
+        'Times' : np.array([0, 1]),
+        'TimeDependentFrames' : np.array([-1000, -100, 1])}
+    rotations = create_rotations(test_table)
+    assert len(rotations) == 1
+    assert rotations[0].source == 1
+    assert rotations[0].dest == -1000
+    np.testing.assert_equal(rotations[0].times, np.array([0, 1]))
+    np.testing.assert_almost_equal(rotations[0].quats, np.array([[0, 0, 0, 1], [0.5, 0.5, 0.5, 0.5]]))
+
+def test_create_two_rotations():
+    test_table = {
+        'Rotations' : np.array([[1, 0, 0, 0], [0.5, 0.5, 0.5, 0.5]]),
+        'Times' : np.array([0, 1]),
+        'TimeDependentFrames' : np.array([-1000, -100, 1]),
+        'ConstantRotation' : np.array([[0, 0, 1], [1, 0 , 0], [0, 1, 0]]),
+        'ConstantFrames' : np.array([-1020, -1000])}
+    rotations = create_rotations(test_table)
+    assert len(rotations) == 2
+    assert rotations[1].source == -1000
+    assert rotations[1].dest == -1020
+    np.testing.assert_almost_equal(rotations[1].quat, np.array([0.5, 0.5, 0.5, 0.5]))
+
+def test_create_euler_rotations():
+    test_table = {
+        'EulerCoefficients' : np.array([[0, 0], [90, -90], [90, -90]]),
+        'BaseTime' : 10,
+        'TimeScale' : 2,
+        'CkTableStartTime' : 10,
+        'CkTableEndTime' : 12,
+        'CkTableOriginalSize' : 2,
+        'TimeDependentFrames' : np.array([-1000, -100, 1])}
+    rotations = create_rotations(test_table)
+    assert len(rotations) == 1
+    assert rotations[0].source == 1
+    assert rotations[0].dest == -1000
+    np.testing.assert_equal(rotations[0].times, np.array([10, 12]))
+    np.testing.assert_almost_equal(rotations[0].quats, np.array([[0.5, 0.5, 0.5, 0.5], [0, 0, 0, 1]]))

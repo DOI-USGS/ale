@@ -4,15 +4,15 @@ import struct
 from glob import glob
 
 import numpy as np
+from numpy.polynomial.polynomial import polyval
 from dateutil import parser
 
 import pvl
 import spiceypy as spice
+from ale.rotation import ConstantRotation, TimeDependentRotation
 from ale import config
 
 from scipy.interpolate import interp1d
-from scipy.spatial.transform import Slerp
-from scipy.spatial.transform import Rotation
 
 from ale.base.label_isis import IsisLabel
 
@@ -171,6 +171,9 @@ def parse_rotation_table(label, field_data):
         results['TimeDependentFrames'] = np.array(label['TimeDependentFrames'])
     if 'CkTableOriginalSize' in label:
         results['CkTableOriginalSize'] = label['CkTableOriginalSize']
+    if all (key in label for key in ('CkTableStartTime','CkTableEndTime')):
+        results['CkTableStartTime'] = label['CkTableStartTime']
+        results['CkTableEndTime'] = label['CkTableEndTime']
     if all (key in label for key in ('ConstantRotation','ConstantFrames')):
         const_rotation_mat = np.array(label['ConstantRotation'])
         results['ConstantRotation'] = np.reshape(const_rotation_mat, (3, 3))
@@ -217,6 +220,62 @@ def parse_position_table(label, field_data):
         results['SpkTableOriginalSize'] = label['SpkTableOriginalSize']
     return results
 
+def create_rotations(rotation_table):
+    """
+    Convert a rotation table into rotation objects.
+
+    Parameters
+    ----------
+    rotation_table : dict
+    The rotation table as a dict from parse_rotation_table
+
+    Returns
+    -------
+    : list
+    A list of time dependent or constant rotation objects from the table. This
+    list will always have either 1 or 2 elements. The first rotation will be
+    time dependent and the second rotation will be constant. The rotations will
+    be ordered such that the reference frame the first rotation rotates to is
+    the reference frame the second rotation rotates from.
+    """
+    rotations = []
+    root_frame = rotation_table['TimeDependentFrames'][-1]
+    last_time_dep_frame = rotation_table['TimeDependentFrames'][0]
+    # Case 1: It's a table of quaternions and times
+    if 'Rotations' in rotation_table:
+        # SPICE quaternions are (W, X, Y, Z) and ALE uses (X, Y, Z, W).
+        # So, roll everything 1 index backwards.
+        time_dep_rot = TimeDependentRotation(np.roll(rotation_table['Rotations'], -1, axis=1),
+                                             rotation_table['Times'],
+                                             root_frame,
+                                             last_time_dep_frame)
+        rotations.append(time_dep_rot)
+    # Case 2: It's a table of Euler angle coefficients
+    elif 'EulerCoefficients' in rotation_table:
+        ephemeris_times = np.linspace(rotation_table['CkTableStartTime'],
+                                      rotation_table['CkTableEndTime'],
+                                      rotation_table['CkTableOriginalSize'])
+        scaled_times = (ephemeris_times - rotation_table['BaseTime']) / rotation_table['TimeScale']
+        # The two transposes, result in an output array where each row is a set
+        # of Euler angles.
+        # This way, angles[i] are the Euler rotations for ephemeris_times[i].
+        angles = polyval(scaled_times, rotation_table['EulerCoefficients'].T).T
+        # ISIS is hard coded to ZXZ (313) Euler angle axis order.
+        time_dep_rot = TimeDependentRotation.from_euler('zxz',
+                                                        angles,
+                                                        ephemeris_times,
+                                                        root_frame,
+                                                        last_time_dep_frame,
+                                                        degrees=True)
+        rotations.append(time_dep_rot)
+
+    if 'ConstantRotation' in rotation_table:
+        last_constant_frame = rotation_table['ConstantFrames'][0]
+        constant_rot = ConstantRotation.from_matrix(rotation_table['ConstantRotation'],
+                                                    last_time_dep_frame,
+                                                    last_constant_frame)
+        rotations.append(constant_rot)
+    return rotations
 
 class IsisSpice():
     """Mixin class for reading from an ISIS cube that has been spiceinit'd
@@ -662,4 +721,3 @@ class IsisSpice():
           optical distortion coefficients
         """
         return self.isis_naif_keywords["INS{}_OD_K".format(self.ikid)]
-
