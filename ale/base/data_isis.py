@@ -4,7 +4,7 @@ import struct
 from glob import glob
 
 import numpy as np
-from numpy.polynomial.polynomial import polyval
+from numpy.polynomial.polynomial import polyval, polyder
 from dateutil import parser
 
 import pvl
@@ -13,7 +13,7 @@ from ale.rotation import ConstantRotation, TimeDependentRotation
 from ale.transformation import FrameNode
 from ale import config
 
-from scipy.interpolate import interp1d
+from scipy.interpolate import interp1d, BPoly
 
 from ale.base.label_isis import IsisLabel
 
@@ -219,6 +219,9 @@ def parse_position_table(label, field_data):
 
     if 'SpkTableOriginalSize' in label:
         results['SpkTableOriginalSize'] = label['SpkTableOriginalSize']
+    if all (key in label for key in ('SpkTableStartTime','SpkTableEndTime')):
+        results['SpkTableStartTime'] = label['SpkTableStartTime']
+        results['SpkTableEndTime'] = label['SpkTableEndTime']
     return results
 
 def create_rotations(rotation_table):
@@ -679,9 +682,39 @@ class IsisSpice():
             of the target body in the J2000 reference frame
             as a tuple of numpy arrays.
         """
-        return (self.sun_position_table.get('Positions', 'None'),
-                self.sun_position_table.get('Velocities', 'None'),
-                self.sun_position_table.get('Times', 'None'))
+        j2000 = self.frame_chain
+        target_frame = j2000.find_child_frame(self.target_frame_id)
+        j2000_to_target = j2000.rotation_to(target_frame)
+        # Case 1, the table has positions (and possibly velocities) at discrete times
+        if 'Positions' in self.sun_position_table:
+            ephemeris_times = self.sun_position_table['Times']
+            rotated_pos = j2000_to_target.apply_at(self.sun_position_table['Positions'],
+                                                   ephemeris_times)
+            if 'Velocities' in self.sun_position_table:
+                rotated_vel = j2000_to_target.apply_at(self.sun_position_table['Velocities'],
+                                                       ephemeris_times)
+            else:
+                rotated_vel = None
+        # Case 2, the table has coefficients of polynomials for the position
+        elif 'PositionCoefficients' in self.sun_position_table:
+            ephemeris_times = np.linspace(self.sun_position_table['SpkTableStartTime'],
+                                          self.sun_position_table['SpkTableEndTime'],
+                                          self.sun_position_table['SpkTableOriginalSize'])
+            scaled_times = (ephemeris_times - self.sun_position_table['BaseTime']) / self.sun_position_table['TimeScale']
+            # The transposes convert the coefficient arrays into the shape that
+            # numpy wants, and array of 3 arrays of elements, and then back into
+            # what we want, an array of 3 element arrays.
+            positions = polyval(scaled_times, self.sun_position_table['PositionCoefficients'].T).T
+            scaled_vel = polyval(scaled_times, polyder(self.sun_position_table['PositionCoefficients'], axis=1).T).T
+            # We took a derivative in scaled time, so we have to multiply by our
+            # scale in order to get the derivative in real time
+            velocity = scaled_vel / self.sun_position_table['TimeScale']
+            rotated_pos = j2000_to_target.apply_at(positions,
+                                                   ephemeris_times)
+            rotated_vel = j2000_to_target.apply_at(velocity,
+                                                   ephemeris_times)
+
+        return (rotated_pos, rotated_vel, ephemeris_times)
 
 
     @property

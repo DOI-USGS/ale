@@ -242,3 +242,10 @@ class TimeDependentRotation:
             return TimeDependentRotation(new_quats, new_times, other.source, self.dest)
         else:
             raise TypeError("Rotations can only be composed with other rotations.")
+
+    def apply_at(self, vec, et):
+        """
+        Apply the rotation at a specific time
+        """
+        rot = Slerp(self.times, self._rots)(et)
+        return rot.apply(vec)

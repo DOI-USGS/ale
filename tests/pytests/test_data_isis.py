@@ -650,3 +650,44 @@ def test_frame_chain(testdata):
     assert len(target.children) == 0
     assert target.rotation.source == 81
     assert target.rotation.dest == 80
+
+def test_sun_position_cache(testdata):
+    testdata._inst_pointing_table = {
+        'Rotations' : np.array([[1, 0, 0, 0], [1, 0, 0, 0]]),
+        'Times' : np.array([0, 1]),
+        'TimeDependentFrames' : np.array([-1000, -100, 1])}
+    testdata._body_orientation_table = {
+        'Rotations' : np.array([[1, 0, 0, 0], [0.5, 0.5, 0.5, 0.5]]),
+        'Times' : np.array([0, 1]),
+        'TimeDependentFrames' : np.array([80, 1])}
+    testdata._sun_position_table = {
+        'Positions' : np.array([[1, 0, 0], [0, 1, 0]]),
+        'Velocities' : np.array([[-1, 0, 0], [0, -1, 0]]),
+        'Times' : np.array([0, 1])}
+    testdata.target_frame_id = 80
+    sun_pos, sun_vel, sun_times = testdata.sun_position
+    np.testing.assert_almost_equal(sun_pos, np.array([[1, 0, 0], [0, 0, 1]]))
+    np.testing.assert_almost_equal(sun_vel, np.array([[-1, 0, 0], [0, 0, -1]]))
+    np.testing.assert_equal(sun_times, np.array([0, 1]))
+
+def test_sun_position_polynomial(testdata):
+    testdata._inst_pointing_table = {
+        'Rotations' : np.array([[1, 0, 0, 0], [1, 0, 0, 0]]),
+        'Times' : np.array([2, 4]),
+        'TimeDependentFrames' : np.array([-1000, -100, 1])}
+    testdata._body_orientation_table = {
+        'Rotations' : np.array([[1, 0, 0, 0], [0.5, 0.5, 0.5, 0.5]]),
+        'Times' : np.array([2, 4]),
+        'TimeDependentFrames' : np.array([80, 1])}
+    testdata._sun_position_table = {
+        'SpkTableOriginalSize' : 2,
+        'SpkTableStartTime' : 2,
+        'SpkTableEndTime' : 4,
+        'BaseTime' : 2,
+        'TimeScale' : 2,
+        'PositionCoefficients' : np.array([[1, -1], [0, 1], [0, -1]])}
+    testdata.target_frame_id = 80
+    sun_pos, sun_vel, sun_times = testdata.sun_position
+    np.testing.assert_almost_equal(sun_pos, np.array([[1, 0, 0], [-1, 0, 1]]))
+    np.testing.assert_almost_equal(sun_vel, np.array([[-0.5, 0.5, -0.5], [-0.5, -0.5, 0.5]]))
+    np.testing.assert_equal(sun_times, np.array([2, 4]))
