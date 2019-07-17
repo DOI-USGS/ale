@@ -652,14 +652,14 @@ class IsisSpice():
             for rotation in create_rotations(self.inst_pointing_table):
                 new_node = FrameNode(rotation.dest,
                                      parent=current_parent,
-                                     rotation=rotation)
+                                     rotation=rotation.inverse())
                 current_parent = new_node
 
             current_parent = self._root_frame
             for rotation in create_rotations(self.body_orientation_table):
                 new_node = FrameNode(rotation.dest,
                                      parent=current_parent,
-                                     rotation=rotation)
+                                     rotation=rotation.inverse())
                 current_parent = new_node
         return self._root_frame
 

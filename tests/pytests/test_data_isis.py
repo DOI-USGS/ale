@@ -633,12 +633,20 @@ def test_frame_chain(testdata):
     spacecraft = j2000.find_child_frame(-1000)
     assert spacecraft.parent == j2000
     assert len(spacecraft.children) == 1
+    assert spacecraft.rotation.source == -1000
+    assert spacecraft.rotation.dest == 1
     sensor = spacecraft.find_child_frame(-1020)
     assert sensor.parent == spacecraft
     assert len(sensor.children) == 0
+    assert sensor.rotation.source == -1020
+    assert sensor.rotation.dest == -1000
     barycenter = j2000.find_child_frame(80)
     assert barycenter.parent == j2000
     assert len(barycenter.children) == 1
+    assert barycenter.rotation.source == 80
+    assert barycenter.rotation.dest == 1
     target = barycenter.find_child_frame(81)
     assert target.parent == barycenter
     assert len(target.children) == 0
+    assert target.rotation.source == 81
+    assert target.rotation.dest == 80
