@@ -12,6 +12,7 @@ from ale.base.label_pds3 import Pds3Label
 from ale.base.type_distortion import RadialDistortion
 from ale.base.type_sensor import Framer
 
+from ale.util import find_latest_metakernel
 
 class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDistortion, Driver):
     """
@@ -33,12 +34,10 @@ class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDis
           Path to latest metakernel file
         """
         metakernel_dir = config.cassini
+        year = self.utc_start_time.year
 
-        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
         if not hasattr(self, '_metakernel'):
-            for mk in mks:
-               if str(self.utc_start_time.year) in os.path.basename(mk):
-                   self._metakernel = mk
+            self._metakernel = find_latest_metakernel(metakernel_dir, year)
         return self._metakernel
 
     @property
@@ -96,7 +95,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDis
         """
         # Microns to mm
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
-        return [0.0, 1/pixel_size, 0.0]
+        return [0.0, -1/pixel_size, 0.0]
 
     @property
     def focal2pixel_lines(self):
@@ -110,7 +109,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDis
           focal plane to detector lines
         """
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
-        return [0.0, 0.0, 1/pixel_size]
+        return [0.0, 0.0, -1/pixel_size]
 
     @property
     def odtk(self):
