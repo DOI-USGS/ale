@@ -691,3 +691,22 @@ def test_sun_position_polynomial(testdata):
     np.testing.assert_almost_equal(sun_pos, np.array([[1, 0, 0], [-1, 0, 1]]))
     np.testing.assert_almost_equal(sun_vel, np.array([[-0.5, 0.5, -0.5], [-0.5, -0.5, 0.5]]))
     np.testing.assert_equal(sun_times, np.array([2, 4]))
+
+def test_inst_position_cache(testdata):
+    testdata._inst_pointing_table = {
+        'Rotations' : np.array([[1, 0, 0, 0], [1, 0, 0, 0]]),
+        'Times' : np.array([0, 1]),
+        'TimeDependentFrames' : np.array([-1000, -100, 1])}
+    testdata._body_orientation_table = {
+        'Rotations' : np.array([[1, 0, 0, 0], [0.5, 0.5, 0.5, 0.5]]),
+        'Times' : np.array([0, 1]),
+        'TimeDependentFrames' : np.array([80, 1])}
+    testdata._inst_position_table = {
+        'Positions' : np.array([[1, 0, 0], [0, 1, 0]]),
+        'Velocities' : np.array([[-1, 0, 0], [0, -1, 0]]),
+        'Times' : np.array([0, 1])}
+    testdata.target_frame_id = 80
+    sensor_pos, sensor_vel, sensor_times = testdata.sensor_position
+    np.testing.assert_almost_equal(sensor_pos, np.array([[1, 0, 0], [0, 0, 1]]))
+    np.testing.assert_almost_equal(sensor_vel, np.array([[-1, 0, 0], [0, 0, -1]]))
+    np.testing.assert_equal(sensor_times, np.array([0, 1]))

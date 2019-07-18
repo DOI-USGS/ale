@@ -231,16 +231,16 @@ def create_rotations(rotation_table):
     Parameters
     ----------
     rotation_table : dict
-    The rotation table as a dict from parse_rotation_table
+                     The rotation table as a dict from parse_rotation_table
 
     Returns
     -------
     : list
-    A list of time dependent or constant rotation objects from the table. This
-    list will always have either 1 or 2 elements. The first rotation will be
-    time dependent and the second rotation will be constant. The rotations will
-    be ordered such that the reference frame the first rotation rotates to is
-    the reference frame the second rotation rotates from.
+      A list of time dependent or constant rotation objects from the table. This
+      list will always have either 1 or 2 elements. The first rotation will be
+      time dependent and the second rotation will be constant. The rotations will
+      be ordered such that the reference frame the first rotation rotates to is
+      the reference frame the second rotation rotates from.
     """
     rotations = []
     root_frame = rotation_table['TimeDependentFrames'][-1]
@@ -280,6 +280,90 @@ def create_rotations(rotation_table):
                                                     last_constant_frame)
         rotations.append(constant_rot)
     return rotations
+
+def rotate_positions(table, rotation):
+    """
+    Rotate the positions in a position Table.
+
+    If the table stores positions as a function, then it will re compute them
+    based on the original size of the table.
+
+    Parameters
+    ----------
+    table : dict
+            The position table as a dict from parse_position_table
+    rotation : TimeDependentRotation
+               The rotation to rotate the positions by
+
+    Returns
+    -------
+    : 2darray
+      Array of rotated positions
+    : array
+      Array of times for the positions
+
+    """
+    # Case 1, the table has positions at discrete times
+    if 'Positions' in table:
+        ephemeris_times = table['Times']
+        rotated_pos = rotation.apply_at(table['Positions'], ephemeris_times)
+    # Case 2, the table has coefficients of polynomials for the position
+    elif 'PositionCoefficients' in table:
+        ephemeris_times = np.linspace(table['SpkTableStartTime'],
+                                      table['SpkTableEndTime'],
+                                      table['SpkTableOriginalSize'])
+        scaled_times = (ephemeris_times - table['BaseTime']) / table['TimeScale']
+        # The transposes convert the coefficient arrays into the shape that
+        # numpy wants, and array of 3 arrays of elements, and then back into
+        # what we want, an array of 3 element arrays.
+        position = polyval(scaled_times, table['PositionCoefficients'].T).T
+        rotated_pos = rotation.apply_at(position, ephemeris_times)
+    else:
+        raise ValueError('No positions are available in the input table.')
+    return rotated_pos, ephemeris_times
+
+def rotate_velocities(table, rotation):
+    """
+    Rotate the velocities in a position Table.
+
+    If the table stores positions as a function, then it will re compute them
+    based on the original size of the table.
+
+    Parameters
+    ----------
+    table : dict
+            The position table as a dict from parse_position_table
+    rotation : TimeDependentRotation
+               The rotation to rotate the velocities by
+
+    Returns
+    -------
+    : 2darray
+      Array of rotated velocities. Returns None if no velocities are in the table.
+
+    """
+    # Case 1, the table has velocities at discrete times
+    if 'Velocities' in table:
+        ephemeris_times = table['Times']
+        rotated_vel = rotation.apply_at(table['Velocities'], ephemeris_times)
+    # Case 2, the table has coefficients of polynomials for the position
+    elif 'PositionCoefficients' in table:
+        ephemeris_times = np.linspace(table['SpkTableStartTime'],
+                                      table['SpkTableEndTime'],
+                                      table['SpkTableOriginalSize'])
+        scaled_times = (ephemeris_times - table['BaseTime']) / table['TimeScale']
+        # The transposes convert the coefficient arrays into the shape that
+        # numpy wants, and array of 3 arrays of elements, and then back into
+        # what we want, an array of 3 element arrays.
+        scaled_vel = polyval(scaled_times,
+                             polyder(table['PositionCoefficients'],axis=1).T).T
+        # We took a derivative in scaled time, so we have to multiply by our
+        # scale in order to get the derivative in real time
+        velocity = scaled_vel / table['TimeScale']
+        rotated_vel = rotation.apply_at(velocity, ephemeris_times)
+    else:
+        rotated_vel = None
+    return rotated_vel
 
 class IsisSpice():
     """Mixin class for reading from an ISIS cube that has been spiceinit'd
@@ -685,36 +769,9 @@ class IsisSpice():
         j2000 = self.frame_chain
         target_frame = j2000.find_child_frame(self.target_frame_id)
         j2000_to_target = j2000.rotation_to(target_frame)
-        # Case 1, the table has positions (and possibly velocities) at discrete times
-        if 'Positions' in self.sun_position_table:
-            ephemeris_times = self.sun_position_table['Times']
-            rotated_pos = j2000_to_target.apply_at(self.sun_position_table['Positions'],
-                                                   ephemeris_times)
-            if 'Velocities' in self.sun_position_table:
-                rotated_vel = j2000_to_target.apply_at(self.sun_position_table['Velocities'],
-                                                       ephemeris_times)
-            else:
-                rotated_vel = None
-        # Case 2, the table has coefficients of polynomials for the position
-        elif 'PositionCoefficients' in self.sun_position_table:
-            ephemeris_times = np.linspace(self.sun_position_table['SpkTableStartTime'],
-                                          self.sun_position_table['SpkTableEndTime'],
-                                          self.sun_position_table['SpkTableOriginalSize'])
-            scaled_times = (ephemeris_times - self.sun_position_table['BaseTime']) / self.sun_position_table['TimeScale']
-            # The transposes convert the coefficient arrays into the shape that
-            # numpy wants, and array of 3 arrays of elements, and then back into
-            # what we want, an array of 3 element arrays.
-            positions = polyval(scaled_times, self.sun_position_table['PositionCoefficients'].T).T
-            scaled_vel = polyval(scaled_times, polyder(self.sun_position_table['PositionCoefficients'], axis=1).T).T
-            # We took a derivative in scaled time, so we have to multiply by our
-            # scale in order to get the derivative in real time
-            velocity = scaled_vel / self.sun_position_table['TimeScale']
-            rotated_pos = j2000_to_target.apply_at(positions,
-                                                   ephemeris_times)
-            rotated_vel = j2000_to_target.apply_at(velocity,
-                                                   ephemeris_times)
-
-        return (rotated_pos, rotated_vel, ephemeris_times)
+        positions, times = rotate_positions(self.sun_position_table, j2000_to_target)
+        velocities = rotate_velocities(self.sun_position_table, j2000_to_target)
+        return positions, velocities, times
 
 
     @property
@@ -732,30 +789,12 @@ class IsisSpice():
         : (positions, velocities, times)
           a tuple containing a list of positions, a list of velocities, and a list of times
         """
-        inst_positions_times = np.linspace(self.inst_position_table["Times"][0],
-                                           self.inst_position_table["Times"][-1],
-                                           self.number_of_ephemerides)
-
-        # interpolate out positions
-        if len(self.inst_position_table["Times"]) < 2:
-            time_0 = self.inst_position_table["Times"][0]
-            position_0 = self.inst_position_table["Positions"][0]
-            velocity_0 = self.inst_position_table["Velocities"][0]
-            coefs = np.asarray([position_0 - time_0*velocity_0,
-                                velocity_0])
-            positions = np.polynomial.polynomial.polyval(inst_positions_times, coefs)
-
-        else:
-            f_positions_x = interp1d(self.inst_position_table["Times"], self.inst_position_table["Positions"].T[0])
-            f_positions_y = interp1d(self.inst_position_table["Times"], self.inst_position_table["Positions"].T[1])
-            f_positions_z = interp1d(self.inst_position_table["Times"], self.inst_position_table["Positions"].T[2])
-
-            positions = np.asarray([f_positions_x(inst_positions_times),
-                                   f_positions_y(inst_positions_times),
-                                   f_positions_z(inst_positions_times)])
-
-        # convert positions to Body-Fixed and scale to meters
-        return self._body_j2k2bf_rotation.apply(positions.T)*1000
+        j2000 = self.frame_chain
+        target_frame = j2000.find_child_frame(self.target_frame_id)
+        j2000_to_target = j2000.rotation_to(target_frame)
+        positions, times = rotate_positions(self.inst_position_table, j2000_to_target)
+        velocities = rotate_velocities(self.inst_position_table, j2000_to_target)
+        return positions, velocities, times
 
 
     @property
