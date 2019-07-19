@@ -8,19 +8,20 @@ from ale.rotation import ConstantRotation, TimeDependentRotation
 
 class FrameChain(nx.DiGraph):
     """
-    A single frame in a frame tree. This class is largely adapted from the Node
-    class in the vispy scene graph implementation.
+    This class is responsible for handling rotations between reference frames.
+    Every node is the reference frame and every edge represents the rotation to
+    between those two nodes. Each edge is directional, where the source --> destination
+    is one rotation and destination --> source is the inverse of that rotation.
 
     Attributes
     __________
-    id : int
-         The NAIF ID code for the frame
-    parent : FrameNode
-             The parent node in the frame tree
-    children : List of FrameNode
-               The children nodes in the frame tree
-    rotation : ConstantRotation or TimeDependentRotation
-               The rotation from this frame to the frame of the parent node
+    frame_changes : list
+                    A list of tuples that represent the rotation from one frame
+                    to another. These tuples should all be NAIF codes for
+                    reference frames
+    ephemeris_time : list
+                     A of ephemeris times that need to be rotated for each set
+                     of frame rotations in the frame chain
     """
     def __init__(self, *args, frame_changes = [], ephemeris_time=[], **kwargs):
         super(FrameChain, self).__init__(*args, **kwargs)
@@ -45,8 +46,17 @@ class FrameChain(nx.DiGraph):
 
         Parameters
         ----------
-        other : FrameNode
-                The other node to find the rotation to.
+        source : int
+                 Integer id for the source node to rotate from
+        destination : int
+                      Integer id for the node to rotate into from the source node
+
+        Returns
+        -------
+        rotation : Object
+                   Returns either a TimeDependentRotation object or ConstantRotation
+                   object depending on the number of rotations being multiplied
+                   together
         """
         if source == destination:
             return ConstantRotation(np.array([0, 0, 0, 1]), source, destination)
@@ -60,23 +70,26 @@ class FrameChain(nx.DiGraph):
 
     def last_time_dependent_frame_between(self, source, destination):
         """
-        Find the last time dependent frame between this frame and another frame.
+        Find the last time dependent frame between the source frame and the
+        destination frame.
 
         Parameters
         ----------
-        other : FrameNode
-            The frame to find the last time dependent frame between
+        source : int
+                 Integer id of the source node
+
+        destination : int
+                      Integer of the destination node
 
         Returns
         -------
-        FrameNode
-            The first frame between the this frame and the other frame such
-            that the rotation from this frame to the in-between frame is time
-            dependent and the rotation from the in-between frame to the other
-            frame is constant. If there are no time dependent frames between
-            this frame and the other frame, this frame is returned.
+        : tuple, None
+          Returns the source node id, destination node id, and edge dictionary
+          which contains the rotation from source to destination.
         """
         path = shortest_path(self, source, destination)
+        # Reverse the path to search bottom up to find the last time dependent
+        # frame between the source and destination
         path.reverse()
         for i in range(len(path) - 1):
             edge = self.edges[path[i+1], path[i]]
