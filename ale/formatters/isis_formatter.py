@@ -3,6 +3,8 @@ import json
 from ale.rotation import ConstantRotation, TimeDependentRotation
 from ale.encoders import NumpyEncoder
 
+from networkx.algorithms.shortest_paths.generic import shortest_path
+
 def to_isis(driver):
     """
     Formatter to create ISIS sensor model meta data from a driver.
@@ -26,13 +28,14 @@ def to_isis(driver):
     frame_chain = driver.frame_chain
 
     instrument_pointing = {}
-    time_dependent_sensor_frame = frame_chain.last_time_dependent_frame_between(driver.sensor_frame_id, 1)
+    s, d, time_dependent_sensor_frame = frame_chain.last_time_dependent_frame_between(driver.sensor_frame_id, 1)
 
-    if time_dependent_sensor_frame != j2000:
-        forward_path, reverse_path = j2000.path_to(time_dependent_sensor_frame)
+    if time_dependent_sensor_frame['rotation'].source != 1:
+        path = shortest_path(frame_chain, 1, driver.sensor_frame_id)
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
-        instrument_pointing['TimeDependentFrames'] = [frame.id for frame in (forward_path + reverse_path)[::-1]]
+        instrument_pointing['TimeDependentFrames'] = [frame for frame in path[::-1]]
+        print(instrument_pointing['TimeDependentFrames'])
         time_dependent_rotation = j2000.rotation_to(time_dependent_sensor_frame)
         instrument_pointing['CkTableStartTime'] = time_dependent_rotation.times[0]
         instrument_pointing['CkTableEndTime'] = time_dependent_rotation.times[-1]
