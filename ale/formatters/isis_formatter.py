@@ -26,7 +26,7 @@ def to_isis(driver):
     frame_chain = driver.frame_chain
 
     instrument_pointing = {}
-    time_dependent_sensor_frame = frame_chain.last_time_dependent_frame_between(1, driver.sensor_frame_id)
+    time_dependent_sensor_frame = frame_chain.last_time_dependent_frame_between(driver.sensor_frame_id, 1)
 
     if time_dependent_sensor_frame != j2000:
         forward_path, reverse_path = j2000.path_to(time_dependent_sensor_frame)
