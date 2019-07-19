@@ -165,7 +165,6 @@ def test_camera_version(driver):
 def test_instrument_pointing(driver):
     meta_data = json.loads(isis_formatter.to_isis(driver))
     pointing = meta_data['InstrumentPointing']
-    assert pointing['TimeDependentFrames'] == [1000, 1]
     assert pointing['ConstantFrames'] == [1010, 1000]
     np.testing.assert_equal(pointing['ConstantRotation'], np.array([[1, 0 ,0], [0, 1, 0], [0, 0, 1]]))
     assert pointing['CkTableStartTime'] == 0
@@ -173,6 +172,7 @@ def test_instrument_pointing(driver):
     assert pointing['CkTableOriginalSize'] == 2
     np.testing.assert_equal(pointing['EphemerisTimes'], np.array([0, 1]))
     np.testing.assert_equal(pointing['Quaternions'], np.array([[0, 0, 0, -1], [0, 0, 0, -1]]))
+    assert pointing['TimeDependentFrames'] == [1000, 1]
 
 def test_instrument_position(driver):
     meta_data = json.loads(isis_formatter.to_isis(driver))
