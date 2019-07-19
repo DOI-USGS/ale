@@ -32,28 +32,28 @@ def test_instrument_id(driver):
         assert driver.instrument_id == 'LISM_123_WTN'
 
 @patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
-def test_tc_id(driver):
-    assert driver._tc_id == -12345
+def test_ikid(driver):
+    assert driver.ikid == -12345
 
-def test_clock_stop_count(driver):
+def test_spacecraft_clock_stop_count(driver):
     with patch.dict(driver.label, {'CORRECTED_SC_CLOCK_STOP_COUNT':
         pvl._collections.Units(value=105, units='<sec>')}) as f:
-        assert driver.clock_stop_count == 105
+        assert driver.spacecraft_clock_stop_count == 105
 
-def test_clock_start_count(driver):
+def test_spacecraft_clock_start_count(driver):
     with patch.dict(driver.label, {'CORRECTED_SC_CLOCK_START_COUNT':
         pvl._collections.Units(value=501, units='<sec>')}) as f:
-        assert driver.clock_start_count == 501
+        assert driver.spacecraft_clock_start_count == 501
 
-@patch('ale.base.data_naif.NaifSpice.ephemeris_stop_time', 800)
-@patch('ale.base.data_naif.NaifSpice.spacecraft_id', 123)
 def test_ephemeris_stop_time(driver):
-    assert driver.ephemeris_stop_time == 0.1
+    with patch.dict(driver.label, {'CORRECTED_SC_CLOCK_STOP_COUNT':
+                                   pvl._collections.Units(value=501, units='<sec>')}) as f:
+        assert driver.ephemeris_stop_time == 0.1
 
-@patch('ale.base.data_naif.NaifSpice.ephemeris_start_time', 800)
-@patch('ale.base.data_naif.NaifSpice.spacecraft_id', 123)
 def test_ephemeris_start_time(driver):
-    assert driver.ephemeris_start_time == 0.1
+    with patch.dict(driver.label, {'CORRECTED_SC_CLOCK_START_COUNT':
+                                   pvl._collections.Units(value=501, units='<sec>')}) as f:
+        assert driver.ephemeris_start_time == 0.1
 
 def test_detector_center_line(driver):
     assert driver.detector_center_line == 0

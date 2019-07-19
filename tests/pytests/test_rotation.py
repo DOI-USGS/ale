@@ -89,3 +89,25 @@ def test_rotation_matrix():
     mat = rot.rotation_matrix()
     assert isinstance(mat, np.ndarray)
     assert mat.shape == (3, 3)
+
+def test_from_euler():
+    angles = [[np.pi/2, np.pi/2, 0],
+              [-np.pi/2, -np.pi/2, 0]]
+    times = [0, 1]
+    seq = 'XYZ'
+    rot = TimeDependentRotation.from_euler(seq, angles, times, 0, 1)
+    expected_quats = np.asarray([[0.5, 0.5, 0.5, 0.5], [-0.5, -0.5, 0.5, 0.5]])
+    np.testing.assert_almost_equal(rot.quats, expected_quats)
+    np.testing.assert_equal(rot.times, np.asarray(times))
+    assert rot.source == 0
+    assert rot.dest == 1
+
+def test_from_matrix():
+    mat = [[0, 0, 1],
+           [1, 0 ,0],
+           [0, 1, 0]]
+    rot = ConstantRotation.from_matrix(mat, 0, 1)
+    expected_quats = np.asarray([0.5, 0.5, 0.5, 0.5])
+    np.testing.assert_almost_equal(rot.quat, expected_quats)
+    assert rot.source == 0
+    assert rot.dest == 1

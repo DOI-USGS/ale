@@ -86,3 +86,16 @@ def get_metakernels(spice_dir=config.spice_root, missions=set(), years=set(), ve
         }
 
     return avail
+    
+    
+def find_latest_metakernel(path, year):
+    metakernel = None
+    mks = sorted(glob(os.path.join(path,'*.[Tt][Mm]')))
+    if not mks:
+        raise Exception(f'No metakernels found in {path}.')
+    for mk in mks:
+        if str(year) in os.path.basename(mk):
+            metakernel = mk
+    if not metakernel:
+        raise Exception(f'No metakernels found in {path} for {year}.')
+    return metakernel

@@ -8,13 +8,13 @@ from ale.base.type_sensor import LineScanner, Framer
 from ale.transformation import FrameChain
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
-class TestDriver(Driver):
+class TestDriver(Driver, NaifSpice):
     """
     Test Driver implementation with dummy values
     """
     @property
     def target_body_radii(self):
-        return (1100, 1000)
+        return (1100, 1100, 1000)
 
     @property
     def frame_chain(self):
@@ -80,12 +80,12 @@ class TestDriver(Driver):
         return 'Test Platform'
 
     @property
-    def ephemeris_stop_time(self):
-        return 900
-
-    @property
     def ephemeris_start_time(self):
         return 800
+
+    @property
+    def exposure_duration(self):
+        return 100
 
     @property
     def focal2pixel_lines(self):
@@ -166,6 +166,10 @@ class TestLineScanner(LineScanner, TestDriver):
     @property
     def image_lines(self):
         return 10000
+
+    @property
+    def exposure_duration(self):
+        return .01
 
 
 class TestFramer(Framer, TestDriver):
