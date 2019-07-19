@@ -6,6 +6,7 @@ from ale.formatters import usgscsm_formatter
 from ale.base.base import Driver
 from ale.base.type_sensor import LineScanner, Framer
 from ale.transformation import FrameChain
+from ale.base.data_naif import NaifSpice
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
 class TestDriver(Driver, NaifSpice):
