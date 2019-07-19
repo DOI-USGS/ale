@@ -45,7 +45,7 @@ def to_isis(driver):
     if time_dependent_sensor_frame['rotation'].source != sensor_frame:
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
-        instrument_pointing['ConstantFrames'] = shortest_path(frame_chain, source_frame, sensor_frame)
+        instrument_pointing['ConstantFrames'] = shortest_path(frame_chain, sensor_frame, source_frame)
         constant_rotation = frame_chain.compute_rotation(source_frame, sensor_frame)
         instrument_pointing['ConstantRotation'] = constant_rotation.rotation_matrix()
     meta_data['InstrumentPointing'] = instrument_pointing
@@ -67,7 +67,7 @@ def to_isis(driver):
     if time_dependent_target_frame['rotation'].source != target_frame:
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
-        body_rotation['ConstantFrames'] = shortest_path(frame_chain, source_frame, target_frame)
+        body_rotation['ConstantFrames'] = shortest_path(frame_chain, target_frame, source_frame)
         constant_rotation = frame_chain.compute_rotation(source_frame, target_frame)
         body_rotation['ConstantRotation'] = constant_rotation.rotation_matrix()
     meta_data['BodyRotation'] = body_rotation
