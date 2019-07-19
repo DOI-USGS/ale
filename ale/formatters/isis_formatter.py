@@ -1,6 +1,5 @@
 import json
 
-from ale.transformation import FrameNode
 from ale.rotation import ConstantRotation, TimeDependentRotation
 from ale.encoders import NumpyEncoder
 
