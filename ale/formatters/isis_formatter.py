@@ -23,11 +23,11 @@ def to_isis(driver):
 
     meta_data['NaifKeywords'] = driver.isis_naif_keywords
 
-    j2000 = driver.frame_chain
+    frame_chain = driver.frame_chain
 
     instrument_pointing = {}
-    sensor_frame = j2000.find_child_frame(driver.sensor_frame_id)
-    time_dependent_sensor_frame = j2000.last_time_dependent_frame_between(sensor_frame)
+    time_dependent_sensor_frame = frame_chain.last_time_dependent_frame_between(1, driver.sensor_frame_id)
+
     if time_dependent_sensor_frame != j2000:
         forward_path, reverse_path = j2000.path_to(time_dependent_sensor_frame)
         # Reverse the frame order because ISIS orders frames as
@@ -39,6 +39,7 @@ def to_isis(driver):
         instrument_pointing['CkTableOriginalSize'] = len(time_dependent_rotation.times)
         instrument_pointing['EphemerisTimes'] = time_dependent_rotation.times
         instrument_pointing['Quaternions'] = time_dependent_rotation.quats
+
     if time_dependent_sensor_frame != sensor_frame:
         forward_path, reverse_path = time_dependent_sensor_frame.path_to(sensor_frame)
         # Reverse the frame order because ISIS orders frames as
