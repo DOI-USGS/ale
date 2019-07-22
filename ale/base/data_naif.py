@@ -27,6 +27,25 @@ class NaifSpice():
         pass
 
     @property
+    def light_time_correction(self):
+        """
+        Returns the type of light time correciton and abberation correction to
+        use in NAIF calls.
+
+        This defaults to light time correction and abberation correction (LT+S),
+        concrete drivers should override this if they need to either not use
+        light time correction or use a different type of light time correction.
+
+        Returns
+        -------
+        : str
+          The light time and abberation correction string for use in NAIF calls.
+          See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/abcorr.html
+          for the different options available.
+        """
+        return 'LT+S'
+
+    @property
     def odtx(self):
         """
         Returns the x coefficient for the optical distortion model
@@ -254,7 +273,7 @@ class NaifSpice():
         sun_state, _ = spice.spkezr("SUN",
                                      self.center_ephemeris_time,
                                      self.reference_frame,
-                                     'NONE',
+                                     self.light_time_correction,
                                      self.target_name)
 
         return [sun_state[:4].tolist()], [sun_state[3:6].tolist()], [self.center_ephemeris_time]
@@ -283,7 +302,7 @@ class NaifSpice():
                 state, _ = spice.spkezr(self.spacecraft_name,
                                         time,
                                         self.reference_frame,
-                                        'NONE',
+                                        self.light_time_correction,
                                         self.target_name,)
                 pos.append(state[:3])
                 vel.append(state[3:])
