@@ -504,7 +504,7 @@ End
 @pytest.fixture
 def testdata():
     isis_spice = IsisSpice()
-    isis_spice._label = pvl.loads(testlabel)
+    isis_spice.label = pvl.loads(testlabel)
     return isis_spice
 
 
