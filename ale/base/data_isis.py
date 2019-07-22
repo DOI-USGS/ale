@@ -716,8 +716,8 @@ class IsisSpice():
         if not hasattr(self, '_frame_chain'):
             self._frame_chain = FrameChain.from_isis_tables(
                     inst_pointing = self.inst_pointing_table,
-                    body_orientation = self.body_rotation_table)
-        return self._root_frame
+                    body_orientation = self.body_orientation_table)
+        return self._frame_chain
 
 
     @property
@@ -802,7 +802,7 @@ class IsisSpice():
 
     @property
     def target_frame_id(self):
-        if 'ConstantFrames' in self.inst_pointing_table:
-            return self.body_rotation_table['ConstantFrames'][0]
+        if 'ConstantFrames' in self.body_orientation_table:
+            return self.body_orientation_table['ConstantFrames'][0]
         else:
-            return self.body_rotation_table['TimeDependentFrames'][0]
+            return self.body_orientation_table['TimeDependentFrames'][0]

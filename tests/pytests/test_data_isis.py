@@ -626,30 +626,22 @@ def test_frame_chain(testdata):
         'TimeDependentFrames' : np.array([80, 1]),
         'ConstantRotation' : np.array([[0, 0, 1], [1, 0 , 0], [0, 1, 0]]),
         'ConstantFrames' : np.array([81, 80])}
-    j2000 = testdata.frame_chain
-    assert j2000.id == 1
-    assert j2000.parent is None
-    assert len(j2000.children) == 2
-    spacecraft = j2000.find_child_frame(-1000)
-    assert spacecraft.parent == j2000
-    assert len(spacecraft.children) == 1
-    assert spacecraft.rotation.source == -1000
-    assert spacecraft.rotation.dest == 1
-    sensor = spacecraft.find_child_frame(-1020)
-    assert sensor.parent == spacecraft
-    assert len(sensor.children) == 0
-    assert sensor.rotation.source == -1020
-    assert sensor.rotation.dest == -1000
-    barycenter = j2000.find_child_frame(80)
-    assert barycenter.parent == j2000
-    assert len(barycenter.children) == 1
-    assert barycenter.rotation.source == 80
-    assert barycenter.rotation.dest == 1
-    target = barycenter.find_child_frame(81)
-    assert target.parent == barycenter
-    assert len(target.children) == 0
-    assert target.rotation.source == 81
-    assert target.rotation.dest == 80
+    frame_chain = testdata.frame_chain
+    assert len(frame_chain.nodes) == 5
+    assert frame_chain.has_node(1)
+    assert frame_chain.has_node(80)
+    assert frame_chain.has_node(81)
+    assert frame_chain.has_node(-1000)
+    assert frame_chain.has_node(-1020)
+    assert len(frame_chain.edges) == 8
+    assert frame_chain.has_edge(1, 80)
+    assert frame_chain.has_edge(80, 1)
+    assert frame_chain.has_edge(81, 80)
+    assert frame_chain.has_edge(80, 81)
+    assert frame_chain.has_edge(1, -1000)
+    assert frame_chain.has_edge(-1000, 1)
+    assert frame_chain.has_edge(-1020, -1000)
+    assert frame_chain.has_edge(-1000, -1020)
 
 def test_sun_position_cache(testdata):
     testdata._inst_pointing_table = {
@@ -664,7 +656,6 @@ def test_sun_position_cache(testdata):
         'Positions' : np.array([[1, 0, 0], [0, 1, 0]]),
         'Velocities' : np.array([[-1, 0, 0], [0, -1, 0]]),
         'Times' : np.array([0, 1])}
-    testdata.target_frame_id = 80
     sun_pos, sun_vel, sun_times = testdata.sun_position
     np.testing.assert_almost_equal(sun_pos, np.array([[1, 0, 0], [0, 0, 1]]))
     np.testing.assert_almost_equal(sun_vel, np.array([[-1, 0, 0], [0, 0, -1]]))
@@ -686,7 +677,6 @@ def test_sun_position_polynomial(testdata):
         'BaseTime' : 2,
         'TimeScale' : 2,
         'PositionCoefficients' : np.array([[1, -1], [0, 1], [0, -1]])}
-    testdata.target_frame_id = 80
     sun_pos, sun_vel, sun_times = testdata.sun_position
     np.testing.assert_almost_equal(sun_pos, np.array([[1, 0, 0], [-1, 0, 1]]))
     np.testing.assert_almost_equal(sun_vel, np.array([[-0.5, 0.5, -0.5], [-0.5, -0.5, 0.5]]))
@@ -705,7 +695,6 @@ def test_inst_position_cache(testdata):
         'Positions' : np.array([[1, 0, 0], [0, 1, 0]]),
         'Velocities' : np.array([[-1, 0, 0], [0, -1, 0]]),
         'Times' : np.array([0, 1])}
-    testdata.target_frame_id = 80
     sensor_pos, sensor_vel, sensor_times = testdata.sensor_position
     np.testing.assert_almost_equal(sensor_pos, np.array([[1, 0, 0], [0, 0, 1]]))
     np.testing.assert_almost_equal(sensor_vel, np.array([[-1, 0, 0], [0, 0, -1]]))
