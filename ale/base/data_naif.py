@@ -1,7 +1,8 @@
 import spiceypy as spice
 import numpy as np
+
 from ale.base.type_sensor import Framer
-from ale.transformation import FrameNode
+from ale.transformation import FrameChain
 from ale.rotation import TimeDependentRotation
 
 class NaifSpice():
@@ -313,68 +314,9 @@ class NaifSpice():
 
     @property
     def frame_chain(self):
-        """
-        Return the root node of the rotation frame tree/chain.
-
-        The root node is the J2000 reference frame. The other nodes in the
-        tree can be accessed via the methods in the FrameNode class.
-
-        This property expects the ephemeris_time property/attribute to be defined.
-        It should be a list of the ephemeris seconds past the J2000 epoch for each
-        exposure in the image.
-
-        Returns
-        -------
-        FrameNode
-            The root node of the frame tree. This will always be the J2000 reference frame.
-        """
-        if not hasattr(self, '_root_frame'):
-            j2000_id = 1 #J2000 is our root reference frame
-            self._root_frame = FrameNode(j2000_id)
-
-            sensor_quats = np.zeros((len(self.ephemeris_time), 4))
-            sensor_times = np.array(self.ephemeris_time)
-            body_quats = np.zeros((len(self.ephemeris_time), 4))
-            body_times = np.array(self.ephemeris_time)
-            for i, time in enumerate(self.ephemeris_time):
-                sensor2j2000 = spice.pxform(
-                    spice.frmnam(self.sensor_frame_id),
-                    spice.frmnam(j2000_id),
-                    time)
-                q_sensor = spice.m2q(sensor2j2000)
-                sensor_quats[i,:3] = q_sensor[1:]
-                sensor_quats[i,3] = q_sensor[0]
-
-                body2j2000 = spice.pxform(
-                    spice.frmnam(self.target_frame_id),
-                    spice.frmnam(j2000_id),
-                    time)
-                q_body = spice.m2q(body2j2000)
-                body_quats[i,:3] = q_body[1:]
-                body_quats[i,3] = q_body[0]
-
-            sensor2j2000_rot = TimeDependentRotation(
-                sensor_quats,
-                sensor_times,
-                self.sensor_frame_id,
-                j2000_id
-            )
-            sensor_node = FrameNode(
-                self.sensor_frame_id,
-                parent=self._root_frame,
-                rotation=sensor2j2000_rot)
-
-            body2j2000_rot = TimeDependentRotation(
-                body_quats,
-                body_times,
-                self.target_frame_id,
-                j2000_id
-            )
-            body_node = FrameNode(
-                self.target_frame_id,
-                parent=self._root_frame,
-                rotation=body2j2000_rot)
-        return self._root_frame
+        if not hasattr(self, '_frame_chain'):
+            self._frame_chain = FrameChain.from_spice(frame_changes = [(1, self.sensor_frame_id), (1, self.target_frame_id)], ephemeris_time=self.ephemeris_time)
+        return self._frame_chain
 
     @property
     def sensor_orientation(self):

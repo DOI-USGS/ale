@@ -54,6 +54,9 @@ class ConstantRotation:
         self.dest = dest
         self.quat = np.asarray(quat)
 
+    def __repr__(self):
+        return f'ConstantRotation Source: {self.source}, Destination: {self.dest}, Quat: {self.quat}'
+
     @property
     def quat(self):
         """
@@ -174,6 +177,9 @@ class TimeDependentRotation:
         self.quats = np.asarray(quats)
         self.times = np.asarray(times)
 
+    def __repr__(self):
+        return f'Time Dependent Rotation Source: {self.source}, Destination: {self.dest}, Quat: {self.quats}'
+
     @property
     def quats(self):
         """
@@ -209,7 +215,7 @@ class TimeDependentRotation:
 
         The destination frame of the right rotation (other) and the source
         frame of the left rotation (self) must be the same. I.E. if A and B are
-        rotations, then for A*B to be valid, A.source must equal B.dest. 
+        rotations, then for A*B to be valid, A.source must equal B.dest.
 
         If the other rotation is a time dependent rotation, then the time range
         for the resultant rotation will be the time covered by both rotations.
