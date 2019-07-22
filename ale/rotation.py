@@ -247,5 +247,7 @@ class TimeDependentRotation:
         """
         Apply the rotation at a specific time
         """
+        if len(self.times) == 1 and self.times[0] == et:
+            return self._rots.apply(vec)
         rot = Slerp(self.times, self._rots)(et)
         return rot.apply(vec)

@@ -407,24 +407,6 @@ class IsisSpice():
     """
 
     @property
-    def label(self):
-        """
-        Loads a PVL from from the _file attribute and
-        parses the binary table data.
-
-        Returns
-        -------
-        PVLModule :
-            Dict-like object with PVL keys
-        """
-        if not hasattr(self, "_label"):
-            try:
-                self._label = pvl.load(self.file)
-            except:
-                raise ValueError("{} is not a valid label".format(self.file))
-        return self._label
-
-    @property
     def inst_pointing_table(self):
         """
         ISIS Table containing the rotation between the J2000 reference frame
