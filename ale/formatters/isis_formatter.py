@@ -31,7 +31,7 @@ def to_isis(driver):
     instrument_pointing = {}
     source_frame, destination_frame, time_dependent_sensor_frame = frame_chain.last_time_dependent_frame_between(sensor_frame, 1)
 
-    if time_dependent_sensor_frame['rotation'].source != 1:
+    if source_frame != 1:
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
         instrument_pointing['TimeDependentFrames'] = shortest_path(frame_chain, source_frame, 1)
@@ -42,7 +42,7 @@ def to_isis(driver):
         instrument_pointing['EphemerisTimes'] = time_dependent_rotation.times
         instrument_pointing['Quaternions'] = time_dependent_rotation.quats
 
-    if time_dependent_sensor_frame['rotation'].source != sensor_frame:
+    if source_frame != sensor_frame:
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
         instrument_pointing['ConstantFrames'] = shortest_path(frame_chain, sensor_frame, source_frame)
@@ -54,7 +54,7 @@ def to_isis(driver):
     target_frame = driver.target_frame_id
     source_frame, destination_frame, time_dependent_target_frame = frame_chain.last_time_dependent_frame_between(target_frame, 1)
 
-    if time_dependent_target_frame['rotation'].source != 1:
+    if source_frame != 1:
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
         body_rotation['TimeDependentFrames'] = shortest_path(frame_chain, source_frame, 1)
@@ -64,7 +64,8 @@ def to_isis(driver):
         body_rotation['CkTableOriginalSize'] = len(time_dependent_rotation.times)
         body_rotation['EphemerisTimes'] = time_dependent_rotation.times
         body_rotation['Quaternions'] = time_dependent_rotation.quats
-    if time_dependent_target_frame['rotation'].source != target_frame:
+        
+    if source_frame != target_frame:
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
         body_rotation['ConstantFrames'] = shortest_path(frame_chain, target_frame, source_frame)
