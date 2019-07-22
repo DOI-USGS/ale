@@ -808,3 +808,18 @@ class IsisSpice():
           optical distortion coefficients
         """
         return self.isis_naif_keywords["INS{}_OD_K".format(self.ikid)]
+
+    @property
+    def sensor_frame_id(self):
+        if 'ConstantFrames' in self.inst_pointing_table:
+            return self.inst_pointing_table['ConstantFrames'][0]
+        else:
+            return self.inst_pointing_table['TimeDependentFrames'][0]
+
+
+    @property
+    def target_frame_id(self):
+        if 'ConstantFrames' in self.inst_pointing_table:
+            return self.body_rotation_table['ConstantFrames'][0]
+        else:
+            return self.body_rotation_table['TimeDependentFrames'][0]

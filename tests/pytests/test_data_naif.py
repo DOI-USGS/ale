@@ -19,16 +19,6 @@ def test_naif_data():
 
     return naif_data
 
-def test_frame_chain(test_naif_data):
-    j2000 = test_naif_data.frame_chain
-    assert j2000.parent == None
-    assert j2000.id == 1
-    assert len(j2000.children) == 2
-    for child in j2000.children:
-        assert child.parent == j2000
-        np.testing.assert_equal(child.rotation.times, np.array([0, 1]))
-        assert child.rotation.quats.shape == (2, 4)
-
 def test_target_id(test_naif_data):
     assert test_naif_data.target_id == -12345
 

@@ -1,4 +1,7 @@
 import json
+
+from ale.transformation import FrameChain
+
 from ale.base.type_sensor import LineScanner, Framer
 from ale.encoders import NumpyEncoder
 from ale.rotation import ConstantRotation, TimeDependentRotation
@@ -23,7 +26,7 @@ def to_usgscsm(driver):
     body_radii = driver.target_body_radii
     isd_data['radii'] = {
         'semimajor' : body_radii[0],
-        'semiminor' : body_radii[1],
+        'semiminor' : body_radii[2],
         'unit' : 'km'
     }
     positions, velocities, position_times = driver.sensor_position
@@ -39,10 +42,8 @@ def to_usgscsm(driver):
         'unit' : 'm'
     }
 
-    j2000 = driver.frame_chain
-    sensor_frame = j2000.find_child_frame(driver.sensor_frame_id)
-    target_frame = j2000.find_child_frame(driver.target_frame_id)
-    sensor_to_target = sensor_frame.rotation_to(target_frame)
+    frame_chain = driver.frame_chain
+    sensor_to_target = frame_chain.compute_rotation(driver.sensor_frame_id, driver.target_frame_id)
     quaternions = sensor_to_target.quats
     rotation_times = sensor_to_target.times
     isd_data['sensor_orientation'] = {
@@ -81,7 +82,7 @@ def to_usgscsm(driver):
         isd_data['name_model'] = 'USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL'
         isd_data['interpolation_method'] = 'lagrange'
         start_lines, start_times, scan_rates = driver.line_scan_rate
-        center_time = (driver.ephemeris_stop_time + driver.ephemeris_start_time) / 2
+        center_time = driver.center_ephemeris_time
         isd_data['line_scan_rate'] = [[line, time, rate] for line, time, rate in zip(start_lines, start_times, scan_rates)]
         isd_data['starting_ephemeris_time'] = driver.ephemeris_start_time
         isd_data['center_ephemeris_time'] = center_time
@@ -100,7 +101,7 @@ def to_usgscsm(driver):
     # frame sensor model specifics
     if isinstance(driver, Framer):
         isd_data['name_model'] = 'USGS_ASTRO_FRAME_SENSOR_MODEL'
-        isd_data['center_ephemeris_time'] = position_times[0]
+        isd_data['center_ephemeris_time'] = driver.center_ephemeris_time
 
     # check that there is a valid sensor model name
     if 'name_model' not in isd_data:

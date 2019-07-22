@@ -1,8 +1,9 @@
 import json
 
-from ale.transformation import FrameNode
 from ale.rotation import ConstantRotation, TimeDependentRotation
 from ale.encoders import NumpyEncoder
+
+from networkx.algorithms.shortest_paths.generic import shortest_path
 
 def to_isis(driver):
     """
@@ -24,51 +25,51 @@ def to_isis(driver):
 
     meta_data['NaifKeywords'] = driver.isis_naif_keywords
 
-    j2000 = driver.frame_chain
+    frame_chain = driver.frame_chain
+    sensor_frame = driver.sensor_frame_id
 
     instrument_pointing = {}
-    sensor_frame = j2000.find_child_frame(driver.sensor_frame_id)
-    time_dependent_sensor_frame = j2000.last_time_dependent_frame_between(sensor_frame)
-    if time_dependent_sensor_frame != j2000:
-        forward_path, reverse_path = j2000.path_to(time_dependent_sensor_frame)
+    source_frame, destination_frame, time_dependent_sensor_frame = frame_chain.last_time_dependent_frame_between(sensor_frame, 1)
+
+    if source_frame != 1:
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
-        instrument_pointing['TimeDependentFrames'] = [frame.id for frame in (forward_path + reverse_path)[::-1]]
-        time_dependent_rotation = j2000.rotation_to(time_dependent_sensor_frame)
+        instrument_pointing['TimeDependentFrames'] = shortest_path(frame_chain, source_frame, 1)
+        time_dependent_rotation = frame_chain.compute_rotation(1, source_frame)
         instrument_pointing['CkTableStartTime'] = time_dependent_rotation.times[0]
         instrument_pointing['CkTableEndTime'] = time_dependent_rotation.times[-1]
         instrument_pointing['CkTableOriginalSize'] = len(time_dependent_rotation.times)
         instrument_pointing['EphemerisTimes'] = time_dependent_rotation.times
         instrument_pointing['Quaternions'] = time_dependent_rotation.quats
-    if time_dependent_sensor_frame != sensor_frame:
-        forward_path, reverse_path = time_dependent_sensor_frame.path_to(sensor_frame)
+
+    if source_frame != sensor_frame:
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
-        instrument_pointing['ConstantFrames'] = [frame.id for frame in (forward_path + reverse_path)[::-1]]
-        constant_rotation = time_dependent_sensor_frame.rotation_to(sensor_frame)
+        instrument_pointing['ConstantFrames'] = shortest_path(frame_chain, sensor_frame, source_frame)
+        constant_rotation = frame_chain.compute_rotation(source_frame, sensor_frame)
         instrument_pointing['ConstantRotation'] = constant_rotation.rotation_matrix()
     meta_data['InstrumentPointing'] = instrument_pointing
 
     body_rotation = {}
-    target_frame = j2000.find_child_frame(driver.target_frame_id)
-    time_dependent_target_frame = j2000.last_time_dependent_frame_between(target_frame)
-    if time_dependent_target_frame != j2000:
-        forward_path, reverse_path = j2000.path_to(time_dependent_target_frame)
+    target_frame = driver.target_frame_id
+    source_frame, destination_frame, time_dependent_target_frame = frame_chain.last_time_dependent_frame_between(target_frame, 1)
+
+    if source_frame != 1:
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
-        body_rotation['TimeDependentFrames'] = [frame.id for frame in (forward_path + reverse_path)[::-1]]
-        time_dependent_rotation = j2000.rotation_to(time_dependent_target_frame)
+        body_rotation['TimeDependentFrames'] = shortest_path(frame_chain, source_frame, 1)
+        time_dependent_rotation = frame_chain.compute_rotation(1, source_frame)
         body_rotation['CkTableStartTime'] = time_dependent_rotation.times[0]
         body_rotation['CkTableEndTime'] = time_dependent_rotation.times[-1]
         body_rotation['CkTableOriginalSize'] = len(time_dependent_rotation.times)
         body_rotation['EphemerisTimes'] = time_dependent_rotation.times
         body_rotation['Quaternions'] = time_dependent_rotation.quats
-    if time_dependent_target_frame != target_frame:
-        forward_path, reverse_path = time_dependent_target_frame.path_to(target_frame)
+        
+    if source_frame != target_frame:
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
-        body_rotation['ConstantFrames'] = [frame.id for frame in (forward_path + reverse_path)[::-1]]
-        constant_rotation = time_dependent_target_frame.rotation_to(target_frame)
+        body_rotation['ConstantFrames'] = shortest_path(frame_chain, target_frame, source_frame)
+        constant_rotation = frame_chain.compute_rotation(source_frame, target_frame)
         body_rotation['ConstantRotation'] = constant_rotation.rotation_matrix()
     meta_data['BodyRotation'] = body_rotation
 

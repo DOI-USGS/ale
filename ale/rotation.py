@@ -54,6 +54,9 @@ class ConstantRotation:
         self.dest = dest
         self.quat = np.asarray(quat)
 
+    def __repr__(self):
+        return f'ConstantRotation Source: {self.source}, Destination: {self.dest}, Quat: {self.quat}'
+
     @property
     def quat(self):
         """
@@ -176,6 +179,9 @@ class TimeDependentRotation:
         self.dest = dest
         self.quats = np.asarray(quats)
         self.times = np.asarray(times)
+
+    def __repr__(self):
+        return f'Time Dependent Rotation Source: {self.source}, Destination: {self.dest}, Quat: {self.quats}'
 
     @property
     def quats(self):

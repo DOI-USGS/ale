@@ -26,10 +26,14 @@ class LineScanner():
         Returns
         -------
         : list
-          2d list of scan rates in the form: [[start_line, line_time, exposure_duration], ...]
+          Start lines
+        : list
+          Line times
+        : list
+          Exposure durations
         """
         t0_ephemeris = self.ephemeris_start_time - self.center_ephemeris_time
-        return [[0.5], [t0_ephemeris], [self.exposure_duration]]
+        return [0.5], [t0_ephemeris], [self.exposure_duration]
 
     @property
     def ephemeris_time(self):
@@ -49,6 +53,22 @@ class LineScanner():
         """
         return np.linspace(self.ephemeris_start_time,  self.ephemeris_stop_time, self.image_lines / 64)
 
+    @property
+    def ephemeris_stop_time(self):
+        """
+        Returns the sum of the starting ephemeris time and the number of lines
+        times the exposure duration. Expects ephemeris start time, exposure duration
+        and image lines to be defined. These should be double precision numbers
+        containing the ephemeris start, exposure duration and number of lines of
+        the image.
+
+        Returns
+        -------
+        : double
+          Center ephemeris time for an image
+        """
+        return self.ephemeris_start_time + (self.image_lines * self.exposure_duration)
+
 class Framer():
     @property
     def name_model(self):
@@ -66,8 +86,8 @@ class Framer():
     @property
     def ephemeris_time(self):
         """
-        Returns the center ephemeris time for the image which is the average
-        of the start and stop ephemeris time.
+        Returns the center ephemeris time for the image which is start time plus
+        half of the exposure duration.
         Expects center_ephemeris_time to be defined. This should be a double
         containing the average of the start and stop ephemeris times.
 
@@ -77,3 +97,18 @@ class Framer():
           Center ephemeris time for the image
         """
         return [self.center_ephemeris_time]
+
+    @property
+    def ephemeris_stop_time(self):
+        """
+        Returns the sum of the starting ephemeris time and the exposure duration.
+        Expects ephemeris start time and exposure duration to be defined. These
+        should be double precision numbers containing the ephemeris start and
+        exposure duration of the image.
+
+        Returns
+        -------
+        : double
+          Ephemeris stop time for an image
+        """
+        return self.ephemeris_start_time + self.exposure_duration

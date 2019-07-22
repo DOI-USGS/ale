@@ -2,7 +2,7 @@ import pytest
 
 import numpy as np
 from ale.rotation import ConstantRotation, TimeDependentRotation
-from ale.transformation import FrameNode
+from ale.transformation import FrameChain
 
 @pytest.fixture(scope='function')
 def frame_tree(request):
@@ -17,72 +17,26 @@ def frame_tree(request):
      /
     3
     """
+    frame_chain = FrameChain()
+
     rotations = [
         ConstantRotation(np.array([1, 0, 0, 0]), 2, 1),
         ConstantRotation(np.array([1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)]), 3, 2),
         ConstantRotation(np.array([1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)]), 4, 1)
     ]
-    root_node = FrameNode(1)
-    child_node_1 = FrameNode(2, parent = root_node, rotation = rotations[0])
-    child_node_2 = FrameNode(3, parent = child_node_1, rotation = rotations[1])
-    child_node_3 = FrameNode(4, parent = root_node, rotation = rotations[2])
-    nodes = [
-        root_node,
-        child_node_1,
-        child_node_2,
-        child_node_3
-    ]
-    return (nodes, rotations)
+    frame_chain.add_edge(1, 2, rotation = rotations[0].inverse())
+    frame_chain.add_edge(2, 1, rotation = rotations[0])
+    frame_chain.add_edge(2, 3, rotation = rotations[1].inverse())
+    frame_chain.add_edge(3, 2, rotation = rotations[1])
+    frame_chain.add_edge(1, 4, rotation = rotations[2].inverse())
+    frame_chain.add_edge(4, 1, rotation = rotations[2])
 
-def test_del_node(frame_tree):
-    nodes, _ = frame_tree
-    node3 = nodes[3]
-    node2 = nodes[2]
-    del node3
-
-    assert len(node2.children) == 0
-
-def test_parent_nodes(frame_tree):
-    nodes, _ = frame_tree
-    root_parents = nodes[0].parent_nodes()
-    child_1_parents = nodes[1].parent_nodes()
-    child_2_parents = nodes[2].parent_nodes()
-    child_3_parents = nodes[3].parent_nodes()
-
-    assert root_parents == [nodes[0]]
-    assert child_1_parents == [nodes[1], nodes[0]]
-    assert child_2_parents == [nodes[2], nodes[1], nodes[0]]
-    assert child_3_parents == [nodes[3], nodes[0]]
-
-def test_path_to_parent(frame_tree):
-    nodes, _ = frame_tree
-    forward_path, reverse_path = nodes[2].path_to(nodes[0])
-    assert forward_path == [nodes[2], nodes[1], nodes[0]]
-    assert reverse_path == []
-
-def test_path_to_common_parent(frame_tree):
-    nodes, _ = frame_tree
-    forward_path, reverse_path = nodes[2].path_to(nodes[3])
-    assert forward_path == [nodes[2], nodes[1], nodes[0]]
-    assert reverse_path == [nodes[3]]
-
-def test_path_to_child(frame_tree):
-    nodes, _ = frame_tree
-    forward_path, reverse_path = nodes[0].path_to(nodes[3])
-    assert forward_path == [nodes[0]]
-    assert reverse_path == [nodes[3]]
-
-def test_path_to_self():
-    node = FrameNode(1)
-    forward_path, reverse_path = node.path_to(node)
-    assert forward_path == [node]
-    assert reverse_path == []
-
+    return frame_chain, rotations
 
 def test_parent_rotation(frame_tree):
-    nodes, rotations = frame_tree
-    child_to_root = nodes[1].rotation_to(nodes[0])
-    root_to_child = nodes[0].rotation_to(nodes[1])
+    frame_chain, rotations = frame_tree
+    child_to_root = frame_chain.compute_rotation(2, 1)
+    root_to_child = frame_chain.compute_rotation(1, 2)
 
     assert child_to_root.source == 2
     assert child_to_root.dest == 1
@@ -92,9 +46,9 @@ def test_parent_rotation(frame_tree):
     np.testing.assert_equal(root_to_child.quat, rotations[0].inverse().quat)
 
 def test_grand_parent_rotation(frame_tree):
-    nodes, rotations = frame_tree
-    child_2_to_root = nodes[2].rotation_to(nodes[0])
-    root_to_child_2 = nodes[0].rotation_to(nodes[2])
+    frame_chain, rotations = frame_tree
+    child_2_to_root = frame_chain.compute_rotation(3, 1)
+    root_to_child_2 = frame_chain.compute_rotation(1, 3)
 
     assert child_2_to_root.source == 3
     assert child_2_to_root.dest == 1
@@ -106,9 +60,9 @@ def test_grand_parent_rotation(frame_tree):
     np.testing.assert_equal(root_to_child_2.quat, expected_rotation_2.quat)
 
 def test_common_parent_rotation(frame_tree):
-    nodes, rotations = frame_tree
-    child_2_to_child_3 = nodes[2].rotation_to(nodes[3])
-    child_3_to_child_2 = nodes[3].rotation_to(nodes[2])
+    frame_chain, rotations = frame_tree
+    child_2_to_child_3 = frame_chain.compute_rotation(3, 4)
+    child_3_to_child_2 = frame_chain.compute_rotation(4, 3)
 
     assert child_2_to_child_3.source == 3
     assert child_2_to_child_3.dest == 4
@@ -119,31 +73,17 @@ def test_common_parent_rotation(frame_tree):
     expected_rotation_2 = rotations[1].inverse() * rotations[0].inverse() * rotations[2]
     np.testing.assert_equal(child_3_to_child_2.quat, expected_rotation_2.quat)
 
-def test_self_rotation():
-    node = FrameNode(1)
-    rotation = node.rotation_to(node)
+def test_self_rotation(frame_tree):
+    frame_chain, _ = frame_tree
+    rotation = frame_chain.compute_rotation(1, 1)
     assert rotation.source == 1
     assert rotation.dest == 1
     np.testing.assert_equal(rotation.quat, np.array([0, 0, 0, 1]))
 
-def test_find_child_frame(frame_tree):
-    nodes, _ = frame_tree
-    child_1 = nodes[0].find_child_frame(2)
-    child_2 = nodes[0].find_child_frame(3)
-    child_3 = nodes[0].find_child_frame(4)
-    assert child_1 == nodes[1]
-    assert child_2 == nodes[2]
-    assert child_3 == nodes[3]
-
-def test_find_non_child_frame(frame_tree):
-    nodes, _ = frame_tree
-    bad_child = nodes[1].find_child_frame(4)
-    assert bad_child is None
-
 def test_no_dependent_frames_between(frame_tree):
-    nodes, _ = frame_tree
-    last_frame = nodes[0].last_time_dependent_frame_between(nodes[2])
-    assert last_frame == nodes[0]
+    frame_chain, _ = frame_tree
+    last_frame = frame_chain.last_time_dependent_frame_between(1, 3)
+    assert last_frame == None
 
 def test_last_time_dependent_frame_between():
     """
@@ -160,27 +100,40 @@ def test_last_time_dependent_frame_between():
     The rotations from 3 to 2 and 1 to 4 are time dependent.
     All other rotations are constant.
     """
+    frame_chain = FrameChain()
+
     rotations = [
         ConstantRotation(np.array([1, 0, 0, 0]), 2, 1),
         TimeDependentRotation(
             np.array([1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)]),
-            np.array([1]), 4, 1),
+            np.array([1]), 3, 2),
         TimeDependentRotation(
             np.array([1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)]),
-            np.array([1]), 5, 4),
-        ConstantRotation(np.array([1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)]), 3, 2)
+            np.array([1]), 4, 1),
+        ConstantRotation(np.array([1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)]), 5, 4)
     ]
-    root_node = FrameNode(1)
-    child_node_1 = FrameNode(2, parent = root_node, rotation = rotations[0])
-    child_node_2 = FrameNode(3, parent = child_node_1, rotation = rotations[1])
-    child_node_3 = FrameNode(4, parent = root_node, rotation = rotations[2])
-    child_node_4 = FrameNode(5, parent = child_node_3, rotation = rotations[3])
-    last_frame_from_root_to_child_2 = root_node.last_time_dependent_frame_between(child_node_2)
-    last_frame_from_child_2_to_root = child_node_2.last_time_dependent_frame_between(root_node)
-    last_frame_from_child_2_to_child_4 = child_node_2.last_time_dependent_frame_between(child_node_4)
-    last_frame_from_child_4_to_child_2 = child_node_4.last_time_dependent_frame_between(child_node_2)
+    frame_chain.add_edge(1, 2, rotation = rotations[0].inverse())
+    frame_chain.add_edge(2, 1, rotation = rotations[0])
+    frame_chain.add_edge(2, 3, rotation = rotations[1].inverse())
+    frame_chain.add_edge(3, 2, rotation = rotations[1])
+    frame_chain.add_edge(1, 4, rotation = rotations[2].inverse())
+    frame_chain.add_edge(4, 1, rotation = rotations[2])
+    frame_chain.add_edge(4, 5, rotation = rotations[3].inverse())
+    frame_chain.add_edge(5, 4, rotation = rotations[3])
 
-    assert last_frame_from_root_to_child_2 == child_node_2
-    assert last_frame_from_child_2_to_root == child_node_1
-    assert last_frame_from_child_2_to_child_4 == child_node_3
-    assert last_frame_from_child_4_to_child_2 == child_node_2
+    # last frame from node 1 to node 3
+    s31, d31, _ = frame_chain.last_time_dependent_frame_between(1, 3)
+    assert s31 == 2
+    assert d31 == 3
+    # last frame from node 3 to node 1
+    s13, d13, _ = frame_chain.last_time_dependent_frame_between(3, 1)
+    assert s13 == 3
+    assert d13 == 2
+    # last frame from node 3 to node 5
+    s35, d35, _ = frame_chain.last_time_dependent_frame_between(3, 5)
+    assert s35 == 1
+    assert d35 == 4
+    # last frame from node 5 to node 3
+    s53, d53, _ = frame_chain.last_time_dependent_frame_between(5, 3)
+    assert s53 == 2
+    assert d53 == 3
