@@ -32,8 +32,9 @@ class NaifSpice():
         Returns the type of light time correciton and abberation correction to
         use in NAIF calls.
 
-        This defaults to no correction, concrete drivers should override this of
-        they need to use light time correction.
+        This defaults to light time correction and abberation correction (LT+S),
+        concrete drivers should override this if they need to either not use
+        light time correction or use a different type of light time correction.
 
         Returns
         -------
@@ -42,7 +43,7 @@ class NaifSpice():
           See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/abcorr.html
           for the different options available.
         """
-        return 'NONE'
+        return 'LT+S'
 
     @property
     def odtx(self):

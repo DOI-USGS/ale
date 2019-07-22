@@ -142,3 +142,22 @@ class LroLrocPds3LabelNaifSpiceDriver(NaifSpice, Pds3Label, LineScanner, Driver)
           Radial distortion coefficients. There is only one coefficient for LROC NAC l/r
         """
         return spice.gdpool('INS{}_OD_K'.format(self.ikid), 0, 1).tolist()
+
+    @property
+    def light_time_correction(self):
+        """
+        Returns the type of light time correciton and abberation correction to
+        use in NAIF calls.
+
+        LROC is specifically set to not use light time correction because it is
+        so close to the surface of the moon that light time correction to the
+        center of the body is incorrect.
+
+        Returns
+        -------
+        : str
+          The light time and abberation correction string for use in NAIF calls.
+          See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/abcorr.html
+          for the different options available.
+        """
+        return 'NONE'
