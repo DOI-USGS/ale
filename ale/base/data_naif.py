@@ -1,6 +1,5 @@
 import spiceypy as spice
 import numpy as np
-from networkx import DiGraph
 
 from ale.base.type_sensor import Framer
 from ale.transformation import FrameChain
