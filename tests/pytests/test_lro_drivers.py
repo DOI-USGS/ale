@@ -46,12 +46,6 @@ def test_spacecraft_name(driver):
 def test_sensor_model_version(driver):
     assert driver.sensor_model_version == 2
 
-def test_detector_start_sample(driver):
-    assert driver.detector_start_sample == 1
-
-def test_detector_start_line(driver):
-    assert driver.detector_start_sample == 1
-
 @patch('ale.base.data_naif.NaifSpice.ikid', 123)
 def test_odtk(driver):
     assert driver.odtk == [1.0]
@@ -60,5 +54,3 @@ def test_odtk(driver):
 def test_usgscsm_distortion_model(driver):
     distortion_model = driver.usgscsm_distortion_model
     assert distortion_model['lrolrocnac']['coefficients'] == [1.0]
-
-
