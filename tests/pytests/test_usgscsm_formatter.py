@@ -28,7 +28,6 @@ class TestDriver(Driver, NaifSpice):
             1
         )
         frame_chain.add_edge(100, 1, rotation=body_rotation)
-        frame_chain.add_edge(1, 100, rotation=body_rotation.inverse())
 
         spacecraft_rotation = TimeDependentRotation(
             np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
@@ -37,11 +36,9 @@ class TestDriver(Driver, NaifSpice):
             1
         )
         frame_chain.add_edge(1000, 1, rotation=spacecraft_rotation)
-        frame_chain.add_edge(1, 1000, rotation=spacecraft_rotation.inverse())
 
         sensor_rotation = ConstantRotation(np.array([0, 0, 0, 1]), 1010, 1000)
         frame_chain.add_edge(1010, 1000, rotation=sensor_rotation)
-        frame_chain.add_edge(1000, 1010, rotation=sensor_rotation.inverse())
         return frame_chain
 
     @property
