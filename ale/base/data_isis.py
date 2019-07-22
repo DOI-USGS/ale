@@ -10,7 +10,7 @@ from dateutil import parser
 import pvl
 import spiceypy as spice
 from ale.rotation import ConstantRotation, TimeDependentRotation
-from ale.transformation import FrameNode
+from ale.transformation import FrameChain
 from ale import config
 
 from scipy.interpolate import interp1d, BPoly
@@ -713,23 +713,10 @@ class IsisSpice():
         FrameNode
             The root node of the frame tree. This will always be the J2000 reference frame.
         """
-        if not hasattr(self, '_root_frame'):
-            j2000_id = 1 # J2000 is our root reference frame
-            self._root_frame = FrameNode(j2000_id)
-
-            current_parent = self._root_frame
-            for rotation in create_rotations(self.inst_pointing_table):
-                new_node = FrameNode(rotation.dest,
-                                     parent=current_parent,
-                                     rotation=rotation.inverse())
-                current_parent = new_node
-
-            current_parent = self._root_frame
-            for rotation in create_rotations(self.body_orientation_table):
-                new_node = FrameNode(rotation.dest,
-                                     parent=current_parent,
-                                     rotation=rotation.inverse())
-                current_parent = new_node
+        if not hasattr(self, '_frame_chain'):
+            self._frame_chain = FrameChain.from_isis_tables(
+                    inst_pointing = self.inst_pointing_table,
+                    body_orientation = self.body_rotation_table)
         return self._root_frame
 
 
@@ -748,9 +735,7 @@ class IsisSpice():
             of the target body in the J2000 reference frame
             as a tuple of numpy arrays.
         """
-        j2000 = self.frame_chain
-        target_frame = j2000.find_child_frame(self.target_frame_id)
-        j2000_to_target = j2000.rotation_to(target_frame)
+        j2000_to_target = self.frame_chain.compute_rotation(1, self.target_frame_id)
         positions, times = rotate_positions(self.sun_position_table, j2000_to_target)
         velocities = rotate_velocities(self.sun_position_table, j2000_to_target)
         return positions, velocities, times
@@ -771,9 +756,7 @@ class IsisSpice():
         : (positions, velocities, times)
           a tuple containing a list of positions, a list of velocities, and a list of times
         """
-        j2000 = self.frame_chain
-        target_frame = j2000.find_child_frame(self.target_frame_id)
-        j2000_to_target = j2000.rotation_to(target_frame)
+        j2000_to_target = self.frame_chain.compute_rotation(1, self.target_frame_id)
         positions, times = rotate_positions(self.inst_position_table, j2000_to_target)
         velocities = rotate_velocities(self.inst_position_table, j2000_to_target)
         return positions, velocities, times

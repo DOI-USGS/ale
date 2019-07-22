@@ -6,6 +6,63 @@ import spiceypy as spice
 
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
+def create_rotations(rotation_table):
+    """
+    Convert a rotation table into rotation objects.
+
+    Parameters
+    ----------
+    rotation_table : dict
+                     The rotation table as a dict from parse_rotation_table
+
+    Returns
+    -------
+    : list
+      A list of time dependent or constant rotation objects from the table. This
+      list will always have either 1 or 2 elements. The first rotation will be
+      time dependent and the second rotation will be constant. The rotations will
+      be ordered such that the reference frame the first rotation rotates to is
+      the reference frame the second rotation rotates from.
+    """
+    rotations = []
+    root_frame = rotation_table['TimeDependentFrames'][-1]
+    last_time_dep_frame = rotation_table['TimeDependentFrames'][0]
+    # Case 1: It's a table of quaternions and times
+    if 'Rotations' in rotation_table:
+        # SPICE quaternions are (W, X, Y, Z) and ALE uses (X, Y, Z, W).
+        # So, roll everything 1 index backwards.
+        time_dep_rot = TimeDependentRotation(np.roll(rotation_table['Rotations'], -1, axis=1),
+                                             rotation_table['Times'],
+                                             root_frame,
+                                             last_time_dep_frame)
+        rotations.append(time_dep_rot)
+    # Case 2: It's a table of Euler angle coefficients
+    elif 'EulerCoefficients' in rotation_table:
+        ephemeris_times = np.linspace(rotation_table['CkTableStartTime'],
+                                      rotation_table['CkTableEndTime'],
+                                      rotation_table['CkTableOriginalSize'])
+        scaled_times = (ephemeris_times - rotation_table['BaseTime']) / rotation_table['TimeScale']
+        # The two transposes, result in an output array where each row is a set
+        # of Euler angles.
+        # This way, angles[i] are the Euler rotations for ephemeris_times[i].
+        angles = polyval(scaled_times, rotation_table['EulerCoefficients'].T).T
+        # ISIS is hard coded to ZXZ (313) Euler angle axis order.
+        time_dep_rot = TimeDependentRotation.from_euler('zxz',
+                                                        angles,
+                                                        ephemeris_times,
+                                                        root_frame,
+                                                        last_time_dep_frame,
+                                                        degrees=True)
+        rotations.append(time_dep_rot)
+
+    if 'ConstantRotation' in rotation_table:
+        last_constant_frame = rotation_table['ConstantFrames'][0]
+        constant_rot = ConstantRotation.from_matrix(rotation_table['ConstantRotation'],
+                                                    last_time_dep_frame,
+                                                    last_constant_frame)
+        rotations.append(constant_rot)
+    return rotations
+
 class FrameChain(nx.DiGraph):
     """
     This class is responsible for handling rotations between reference frames.
@@ -38,6 +95,21 @@ class FrameChain(nx.DiGraph):
                 quats[i,3] = quat_from_rotation[0]
             rotation = TimeDependentRotation(quats, times, s, d)
             frame_chain.add_edge(s, d, rotation=rotation)
+        return frame_chain
+
+    @classmethod
+    def from_isis_tables(cls, *args, inst_pointing = {}, body_orientation={}, **kwargs):
+        frame_chain = cls()
+
+        for rotation in create_rotations(inst_pointing):
+            frame_chain.add_edge(rotation.source,
+                                 rotation.dest,
+                                 rotation=rotation)
+
+        for rotation in create_rotations(body_orientation):
+            frame_chain.add_edge(rotation.source,
+                                 rotation.dest,
+                                 rotation=rotation)
         return frame_chain
 
     def add_edge(self, s, d, rotation, **kwargs):
