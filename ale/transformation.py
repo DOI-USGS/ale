@@ -23,8 +23,9 @@ class FrameChain(nx.DiGraph):
                      A of ephemeris times that need to be rotated for each set
                      of frame rotations in the frame chain
     """
-    def __init__(self, *args, frame_changes = [], ephemeris_time=[], **kwargs):
-        super(FrameChain, self).__init__(*args, **kwargs)
+    @classmethod
+    def from_spice(cls, *args, frame_changes = [], ephemeris_time=[], **kwargs):
+        frame_chain = cls()
 
         times = np.array(ephemeris_time)
         quats = np.zeros((len(times), 4))
@@ -36,8 +37,12 @@ class FrameChain(nx.DiGraph):
                 quats[i,:3] = quat_from_rotation[1:]
                 quats[i,3] = quat_from_rotation[0]
             rotation = TimeDependentRotation(quats, times, s, d)
-            self.add_edge(s, d, rotation = rotation)
-            self.add_edge(d, s, rotation = rotation.inverse())
+            frame_chain.add_edge(s, d, rotation=rotation)
+        return frame_chain
+
+    def add_edge(self, s, d, rotation, **kwargs):
+        super(FrameChain, self).add_edge(s, d, rotation=rotation, **kwargs)
+        super(FrameChain, self).add_edge(d, s, rotation=rotation.inverse(), **kwargs)
 
     def compute_rotation(self, source, destination):
         """

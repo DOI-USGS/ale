@@ -297,7 +297,7 @@ class NaifSpice():
     @property
     def frame_chain(self):
         if not hasattr(self, '_frame_chain'):
-            self._frame_chain = FrameChain(frame_changes = [(1, self.sensor_frame_id), (1, self.target_frame_id)], ephemeris_time=self.ephemeris_time)
+            self._frame_chain = FrameChain.from_spice(frame_changes = [(1, self.sensor_frame_id), (1, self.target_frame_id)], ephemeris_time=self.ephemeris_time)
         return self._frame_chain
 
     @property
