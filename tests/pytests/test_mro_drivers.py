@@ -41,9 +41,6 @@ def test_spacecraft_name_pds3(Pds3NaifDriver):
 def test_exposure_duration_pds3(Pds3NaifDriver):
     assert Pds3NaifDriver.exposure_duration == 12.1
 
-def test_detector_start_line_pds3(Pds3NaifDriver):
-    assert Pds3NaifDriver.detector_start_line == 1
-
 def test_detector_start_sample_pds3(Pds3NaifDriver):
     # I am not sure how to accomplish this with a fixture and
     # a decorator. Therefore, using a context
@@ -66,9 +63,6 @@ def test_ephemeris_start_time_isis(IsisLabelNaifDriver):
     with patch.dict(IsisLabelNaifDriver.label, {'IsisCube' : {'Instrument' :
         {'SpacecraftClockCount' : 800}}}) as f:
         assert IsisLabelNaifDriver.ephemeris_start_time == 0.1
-
-def test_detector_start_line_isis(IsisLabelNaifDriver):
-    assert IsisLabelNaifDriver.detector_start_line == 1
 
 def test_detector_start_sample_isis(IsisLabelNaifDriver):
     with patch.dict(IsisLabelNaifDriver.label, {'IsisCube' : {'Instrument' :

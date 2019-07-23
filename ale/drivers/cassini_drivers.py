@@ -175,23 +175,3 @@ class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDis
           ISIS sensor model version
         """
         return 1
-
-    @property
-    def detector_start_sample(self):
-        """
-        Returns
-        -------
-        : int
-          Detector sample corresponding to the first image sample
-        """
-        return 1
-
-    @property
-    def detector_start_line(self):
-        """
-        Returns
-        -------
-        : int
-          Detector line corresponding to the first image line
-        """
-        return 1

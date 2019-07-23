@@ -91,30 +91,6 @@ class LroLrocPds3LabelNaifSpiceDriver(NaifSpice, Pds3Label, LineScanner, Driver)
         return 2
 
     @property
-    def detector_start_sample(self):
-        """
-        Returns the starting sample contained in the image
-
-        Returns
-        -------
-        : int
-          Returns the starting sample
-        """
-        return 1
-
-    @property
-    def detector_start_line(self):
-        """
-        Returns the starting line contained in the image
-
-        Returns
-        -------
-        : int
-          Returns the starting line
-        """
-        return 1
-
-    @property
     def usgscsm_distortion_model(self):
         """
         The distortion model name with its coefficients
