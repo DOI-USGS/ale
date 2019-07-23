@@ -40,11 +40,11 @@ def test_spacecraft_name(driver):
 
 @patch('ale.base.data_naif.NaifSpice.ikid', 123)
 def test_focal2pixel_samples(driver):
-    assert driver.focal2pixel_samples == [0,-1000,0]
+    assert driver.focal2pixel_samples == [0,1000,0]
 
 @patch('ale.base.data_naif.NaifSpice.ikid', 123)
 def test_focal2pixel_lines(driver):
-    assert driver.focal2pixel_lines == [0,0,-1000]
+    assert driver.focal2pixel_lines == [0,0,1000]
 
 def testodtk(driver):
     with patch('ale.base.label_pds3.Pds3Label.instrument_id', new_callable=PropertyMock) as mock_instrument_id:
