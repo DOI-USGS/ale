@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.polynomial.polynomial import polyval, polyder
 import networkx as nx
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
@@ -8,12 +9,12 @@ from ale.rotation import ConstantRotation, TimeDependentRotation
 
 def create_rotations(rotation_table):
     """
-    Convert a rotation table into rotation objects.
+    Convert an ISIS rotation table into rotation objects.
 
     Parameters
     ----------
     rotation_table : dict
-                     The rotation table as a dict from parse_rotation_table
+                     The rotation ISIS table as a dictionary
 
     Returns
     -------
@@ -28,24 +29,29 @@ def create_rotations(rotation_table):
     root_frame = rotation_table['TimeDependentFrames'][-1]
     last_time_dep_frame = rotation_table['TimeDependentFrames'][0]
     # Case 1: It's a table of quaternions and times
-    if 'Rotations' in rotation_table:
+    if 'J2000Q0' in rotation_table:
         # SPICE quaternions are (W, X, Y, Z) and ALE uses (X, Y, Z, W).
-        # So, roll everything 1 index backwards.
-        time_dep_rot = TimeDependentRotation(np.roll(rotation_table['Rotations'], -1, axis=1),
-                                             rotation_table['Times'],
+        quats = np.array([rotation_table['J2000Q1'],
+                          rotation_table['J2000Q2'],
+                          rotation_table['J2000Q3'],
+                          rotation_table['J2000Q0']]).T
+        time_dep_rot = TimeDependentRotation(quats,
+                                             rotation_table['ET'],
                                              root_frame,
                                              last_time_dep_frame)
         rotations.append(time_dep_rot)
     # Case 2: It's a table of Euler angle coefficients
-    elif 'EulerCoefficients' in rotation_table:
+    elif 'J2000Ang1' in rotation_table:
         ephemeris_times = np.linspace(rotation_table['CkTableStartTime'],
                                       rotation_table['CkTableEndTime'],
                                       rotation_table['CkTableOriginalSize'])
-        scaled_times = (ephemeris_times - rotation_table['BaseTime']) / rotation_table['TimeScale']
-        # The two transposes, result in an output array where each row is a set
-        # of Euler angles.
-        # This way, angles[i] are the Euler rotations for ephemeris_times[i].
-        angles = polyval(scaled_times, rotation_table['EulerCoefficients'].T).T
+        base_time = rotation_table['J2000Ang1'][-1]
+        time_scale = rotation_table['J2000Ang2'][-1]
+        scaled_times = (ephemeris_times - base_time) / time_scale
+        coeffs = np.array([rotation_table['J2000Ang1'][:-1],
+                           rotation_table['J2000Ang2'][:-1],
+                           rotation_table['J2000Ang3'][:-1]]).T
+        angles = polyval(scaled_times, coeffs).T
         # ISIS is hard coded to ZXZ (313) Euler angle axis order.
         time_dep_rot = TimeDependentRotation.from_euler('zxz',
                                                         angles,
@@ -57,7 +63,8 @@ def create_rotations(rotation_table):
 
     if 'ConstantRotation' in rotation_table:
         last_constant_frame = rotation_table['ConstantFrames'][0]
-        constant_rot = ConstantRotation.from_matrix(rotation_table['ConstantRotation'],
+        rot_mat =  np.reshape(np.array(rotation_table['ConstantRotation']), (3, 3))
+        constant_rot = ConstantRotation.from_matrix(rot_mat,
                                                     last_time_dep_frame,
                                                     last_constant_frame)
         rotations.append(constant_rot)

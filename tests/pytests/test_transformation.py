@@ -2,7 +2,54 @@ import pytest
 
 import numpy as np
 from ale.rotation import ConstantRotation, TimeDependentRotation
-from ale.transformation import FrameChain
+from ale.transformation import FrameChain, create_rotations
+
+def test_create_quaternion_rotations():
+    test_table = {
+        'J2000Q0' : [1, 0.5],
+        'J2000Q1' : [0, 0.5],
+        'J2000Q2' : [0, 0.5],
+        'J2000Q3' : [0, 0.5],
+        'ET' : [0, 1],
+        'TimeDependentFrames' : [-1000, -100, 1]}
+    rotations = create_rotations(test_table)
+    assert len(rotations) == 1
+    assert rotations[0].source == 1
+    assert rotations[0].dest == -1000
+    np.testing.assert_equal(rotations[0].times, np.array([0, 1]))
+    np.testing.assert_almost_equal(rotations[0].quats, np.array([[0, 0, 0, 1], [0.5, 0.5, 0.5, 0.5]]))
+
+def test_create_two_rotations():
+    test_table = {
+        'J2000Q0' : [1, 0.5],
+        'J2000Q1' : [0, 0.5],
+        'J2000Q2' : [0, 0.5],
+        'J2000Q3' : [0, 0.5],
+        'ET' : [0, 1],
+        'TimeDependentFrames' : [-1000, -100, 1],
+        'ConstantRotation' : [0, 0, 1, 1, 0 , 0, 0, 1, 0],
+        'ConstantFrames' : [-1020, -1000]}
+    rotations = create_rotations(test_table)
+    assert len(rotations) == 2
+    assert rotations[1].source == -1000
+    assert rotations[1].dest == -1020
+    np.testing.assert_almost_equal(rotations[1].quat, np.array([0.5, 0.5, 0.5, 0.5]))
+
+def test_create_euler_rotations():
+    test_table = {
+        'J2000Ang1' : [0, 0, 10],
+        'J2000Ang2' : [90, -90, 2],
+        'J2000Ang3' : [90, -90, 1],
+        'CkTableStartTime' : 10,
+        'CkTableEndTime' : 12,
+        'CkTableOriginalSize' : 2,
+        'TimeDependentFrames' : [-1000, -100, 1]}
+    rotations = create_rotations(test_table)
+    assert len(rotations) == 1
+    assert rotations[0].source == 1
+    assert rotations[0].dest == -1000
+    np.testing.assert_equal(rotations[0].times, np.array([10, 12]))
+    np.testing.assert_almost_equal(rotations[0].quats, np.array([[0.5, 0.5, 0.5, 0.5], [0, 0, 0, 1]]))
 
 @pytest.fixture(scope='function')
 def frame_tree(request):
