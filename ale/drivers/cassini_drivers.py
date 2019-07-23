@@ -234,27 +234,6 @@ class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDis
         return 1
 
     @property
-    def detector_start_sample(self):
-        """
-        Returns
-        -------
-        : int
-          Detector sample corresponding to the first image sample
-        """
-        return 0
-
-    @property
-    def detector_start_line(self):
-        """
-        Returns
-        -------
-        : int
-          Detector line corresponding to the first image line
-        """
-        return 0
-
-
-    @property
     def frame_chain(self):
         if not hasattr(self, '_frame_chain'):
             if self.instrument_id == 'CASSINI_ISS_NAC':

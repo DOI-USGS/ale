@@ -199,26 +199,6 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         return [0.0, 0.0, 1/pixel_size]
 
     @property
-    def detector_start_line(self):
-        """
-        Returns
-        -------
-        : int
-          Detector line corresponding to the first image line
-        """
-        return 1
-
-    @property
-    def detector_start_sample(self):
-        """
-        Returns
-        -------
-        : int
-          Detector sample corresponding to the first image sample
-        """
-        return 1
-
-    @property
     def sensor_model_version(self):
         """
         Returns instrument model version
