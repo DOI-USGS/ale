@@ -53,25 +53,25 @@ class Driver(ABC):
         """
         pass
 
-    @abc.abstractproperty
+    @property
     def detector_start_line(self):
         """
         Returns
         -------
         : int
-          Detector line corresponding to the first image line
+          Zero based Detector line corresponding to the first image line
         """
-        pass
+        return 0
 
-    @abc.abstractproperty
+    @property
     def detector_start_sample(self):
         """
         Returns
         -------
         : int
-          Detector sample corresponding to the first image sample
+          Zero based Detector sample corresponding to the first image sample
         """
-        pass
+        return 0
 
     @abc.abstractproperty
     def sample_summing(self):
