@@ -14,6 +14,11 @@ from ale.base.type_sensor import Framer
 
 from ale.util import find_latest_metakernel
 
+from ale.rotation import ConstantRotation
+from ale.transformation import FrameChain
+from scipy.spatial.transform import Rotation
+
+
 class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDistortion, Driver):
     """
     Cassini mixin class for defining Spice calls.
@@ -22,6 +27,59 @@ class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDis
         "ISSNA" : "CASSINI_ISS_NAC",
         "ISSWA" : "CASSINI_ISS_WAC"
     }
+
+    nac_filter_to_focal_length = {
+        ("P0","BL2"):2002.19,
+        ("P0","CB1"):2002.30,
+        ("P0","GRN"):2002.38,
+        ("P0","IR1"):2002.35,
+        ("P0","MT1"):2002.40,
+        ("P0","UV3"):2002.71,
+        ("P60","BL2"):2002.13,
+        ("P60","CB1"):2002.18,
+        ("P60","GRN"):2002.28,
+        ("P60","IR1"):2002.36,
+        ("P60","MT1"):2002.34,
+        ("P60","UV3"):2002.51,
+        ("RED","GRN"):2002.61,
+        ("RED","IR1"):2002.48,
+        ("UV1","CL2"):2003.03,
+        ("UV2","CL2"):2002.91,
+        ("UV2","UV3"):2002.90,
+        ("RED","CL2"):2002.69,
+        ("CL1","IR3"):2002.65,
+        ("CL1","BL2"):2002.37,
+        ("CL1","CB1"):2002.66,
+        ("CL1","CB2"):2002.66,
+        ("CL1","CB3"):2002.68,
+        ("CL1","MT1"):2002.88,
+        ("CL1","MT2"):2002.91,
+        ("CL1","MT3"):2002.87,
+        ("CL1","UV3"):2003.09,
+        ("HAL","CL2"):2002.94,
+        ("IR2","CL2"):2002.71,
+        ("IR2","IR1"):2002.56,
+        ("IR2","IR3"):2002.55,
+        ("IR4","CL2"):2002.89,
+        ("IR4","IR3"):2002.81,
+        ("BL1","CL2"):2002.79,
+        ("CL1","CL2"):2002.88,
+        ("CL1","GRN"):2002.75,
+        ("CL1","IR1"):2002.74,
+        ("IRP0","CB2"):2002.48,
+        ("IRP0","CB3"):2002.74,
+        ("IRP0","IR1"):2002.60,
+        ("IRP0","IR3"):2002.48,
+        ("IRP0","MT2"):2002.72,
+        ("IRP0","MT3"):2002.72,
+        ("P120","BL2"):2002.11,
+        ("P120","CB1"):002.28,
+        ("P120","GRN"):2002.38,
+        ("P120","IR1"):2002.39,
+        ("P120","MT1"):2002.54,
+        ("P120","UV3"):2002.71
+    }
+
 
     @property
     def metakernel(self):
@@ -95,7 +153,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDis
         """
         # Microns to mm
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
-        return [0.0, -1/pixel_size, 0.0]
+        return [0.0, 1/pixel_size, 0.0]
 
     @property
     def focal2pixel_lines(self):
@@ -109,7 +167,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDis
           focal plane to detector lines
         """
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
-        return [0.0, 0.0, -1/pixel_size]
+        return [0.0, 0.0, 1/pixel_size]
 
     @property
     def odtk(self):
@@ -183,7 +241,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDis
         : int
           Detector sample corresponding to the first image sample
         """
-        return 1
+        return 0
 
     @property
     def detector_start_line(self):
@@ -193,4 +251,49 @@ class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDis
         : int
           Detector line corresponding to the first image line
         """
-        return 1
+        return 0
+
+
+    @property
+    def frame_chain(self):
+        if not hasattr(self, '_frame_chain'):
+            if self.instrument_id == 'CASSINI_ISS_NAC':
+                self._frame_chain = FrameChain.from_spice(frame_changes = [(1, self._original_naif_sensor_frame_id), (1, self.target_frame_id)], ephemeris_time=self.ephemeris_time)
+                rot_180 = Rotation.from_euler('z', 180, degrees=True)
+                self._frame_chain.add_edge(self._original_naif_sensor_frame_id, self.sensor_frame_id, ConstantRotation(rot_180.as_quat(), self._original_naif_sensor_frame_id, self.sensor_frame_id))
+            elif self.instrument_id == "CASSINI_ISS_WAC":
+                self._frame_chain =  super(CassiniIssPds3LabelNaifSpiceDriver, self).frame_chain
+        return self._frame_chain
+
+    @property
+    def focal_length(self):
+        """
+
+        """
+        # default focal defined by IK kernel
+        default_focal_len = super(CassiniIssPds3LabelNaifSpiceDriver, self).focal_length
+
+        if self.instrument_id == "CASSINI_ISS_NAC":
+          filters = tuple(self.label['FILTER_NAME'])
+          return self.nac_filter_to_focal_length.get(filters, default_focal_len)
+
+        elif self.instrument_id == "CASSINI_ISS_WAC":
+           return default_focal_len
+
+    @property
+    def _original_naif_sensor_frame_id(self):
+        """
+        Returns the Naif ID code for the target reference frame
+        Expects the target_id to be defined. This must be the integer Naif ID code
+        for the target body.
+
+        Returns
+        -------
+        : int
+          Naif ID code for the target frame
+        """
+        return self.ikid
+
+    @property
+    def sensor_frame_id(self):
+        return 140
