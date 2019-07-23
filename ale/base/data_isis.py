@@ -82,6 +82,8 @@ def parse_table(table_label, data):
     # Parse the keywords from the label
     results.update({key : value for key, value in table_label.items() if not isinstance(value, pvl._collections.PVLGroup)})
 
+    return results
+
 def rotate_positions(table, rotation):
     """
     Rotate the positions in a position Table.
