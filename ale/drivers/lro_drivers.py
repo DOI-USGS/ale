@@ -137,3 +137,77 @@ class LroLrocPds3LabelNaifSpiceDriver(NaifSpice, Pds3Label, LineScanner, Driver)
           for the different options available.
         """
         return 'NONE'
+
+    @property
+    def ephemeris_start_time(self):
+        """
+        The starting ephemeris time for LRO is computed by taking the 
+        LRO:SPACECRAFT_CLOCK_PREROLL_COUNT, as defined in the label, and 
+        adding offsets that were taken from an IAK.
+        -------
+        : double
+          Starting ephemeris time of the image
+        """
+        start_time = spice.scs2e(self.spacecraft_id, self.label['LRO:SPACECRAFT_CLOCK_PREROLL_COUNT'])
+        return start_time + self.constant_time_offset + self.additional_preroll * self.exposure_duration
+
+    @property
+    def exposure_duration(self):
+        """
+        Takes the exposure_duration defined in a parent class and adds 
+        offsets taken from an IAK.
+
+         Returns
+         -------
+         : float
+           Returns the exposure duration in seconds.
+         """
+        return super().exposure_duration * (1 + self.multipli_line_error) + self.additive_line_error
+
+    @property
+    def multipli_line_error(self):
+        """
+        Returns the multiplicative line error defined in an IAK.
+
+         Returns
+         -------
+         : float
+           Returns the multiplicative line error.
+         """
+        return 0.0045
+
+    @property
+    def additive_line_error(self):
+        """
+        Returns the additive line error defined in an IAK.
+
+         Returns
+         -------
+         : float
+           Returns the additive line error.
+         """
+        return 0.0
+
+    @property
+    def constant_time_offset(self):
+        """
+        Returns the constant time offset defined in an IAK.
+
+         Returns
+         -------
+         : float
+           Returns the constant time offset.
+         """
+        return 0.0
+
+    @property
+    def additional_preroll(self):
+        """
+        Returns the addition preroll defined in an IAK.
+
+         Returns
+         -------
+         : float
+           Returns the additionl preroll.
+         """
+        return 1024.0
