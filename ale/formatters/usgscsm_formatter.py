@@ -96,14 +96,16 @@ def to_usgscsm(driver):
         if velocities:
             positions = np.asarray(positions)
             velocities = np.asarray(velocities)
+            pos_x, pos_y, pos_z = np.asarray(positions).T
+            vel_x, vel_y, vel_z = np.asarray(velocities).T
             x_interp = BPoly.from_derivatives(position_times,
-                                              np.vstack((positions.T[0], velocities.T[0])).T,
+                                              np.vstack((pos_x, vel_x)).T,
                                               extrapolate=True)
             y_interp = BPoly.from_derivatives(position_times,
-                                              np.vstack((positions.T[1], velocities.T[1])).T,
+                                              np.vstack((pos_y, vel_y)).T,
                                               extrapolate=True)
             z_interp = BPoly.from_derivatives(position_times,
-                                              np.vstack((positions.T[2], velocities.T[2])).T,
+                                              np.vstack((pos_z, vel_z)).T,
                                               extrapolate=True)
             interp_pos = np.vstack((x_interp(interp_times),
                                     y_interp(interp_times),
