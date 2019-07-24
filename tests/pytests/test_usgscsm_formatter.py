@@ -5,37 +5,41 @@ import numpy as np
 from ale.formatters import usgscsm_formatter
 from ale.base.base import Driver
 from ale.base.type_sensor import LineScanner, Framer
-from ale.transformation import FrameNode
+from ale.transformation import FrameChain
+from ale.base.data_naif import NaifSpice
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
-class TestDriver(Driver):
+class TestDriver(Driver, NaifSpice):
     """
     Test Driver implementation with dummy values
     """
     @property
     def target_body_radii(self):
-        return (1100, 1000)
+        return (1100, 1100, 1000)
 
     @property
     def frame_chain(self):
-        j2000 = FrameNode(1)
+        frame_chain = FrameChain()
+
         body_rotation = TimeDependentRotation(
             np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
             np.array([0, 1]),
             100,
             1
         )
-        body_fixed = FrameNode(100, parent=j2000, rotation=body_rotation)
+        frame_chain.add_edge(100, 1, rotation=body_rotation)
+
         spacecraft_rotation = TimeDependentRotation(
             np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
             np.array([0, 1]),
             1000,
             1
         )
-        spacecraft = FrameNode(1000, parent=j2000, rotation=spacecraft_rotation)
+        frame_chain.add_edge(1000, 1, rotation=spacecraft_rotation)
+
         sensor_rotation = ConstantRotation(np.array([0, 0, 0, 1]), 1010, 1000)
-        sensor = FrameNode(1010, parent=spacecraft, rotation=sensor_rotation)
-        return j2000
+        frame_chain.add_edge(1010, 1000, rotation=sensor_rotation)
+        return frame_chain
 
     @property
     def sample_summing(self):
@@ -74,12 +78,12 @@ class TestDriver(Driver):
         return 'Test Platform'
 
     @property
-    def ephemeris_stop_time(self):
-        return 900
-
-    @property
     def ephemeris_start_time(self):
         return 800
+
+    @property
+    def exposure_duration(self):
+        return 100
 
     @property
     def focal2pixel_lines(self):
@@ -160,6 +164,10 @@ class TestLineScanner(LineScanner, TestDriver):
     @property
     def image_lines(self):
         return 10000
+
+    @property
+    def exposure_duration(self):
+        return .01
 
 
 class TestFramer(Framer, TestDriver):

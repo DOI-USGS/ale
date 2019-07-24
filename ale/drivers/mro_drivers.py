@@ -61,7 +61,6 @@ class MroCtxIsisLabelIsisSpiceDriver(Driver, IsisSpice, LineScanner, RadialDisto
         """
         return self.label["IsisCube"]["Instrument"]["LineExposureDuration"].value * 0.001 # Scale to seconds
 
-
 class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDistortion, Driver):
     """
     Driver for reading CTX ISIS labels.
@@ -157,16 +156,6 @@ class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDi
         return name_lookup[super().platform_name]
 
     @property
-    def detector_start_line(self):
-        """
-        Returns
-        -------
-        : int
-          The starting detector line of the image
-        """
-        return 1
-
-    @property
     def detector_start_sample(self):
         """
         Returns
@@ -249,16 +238,6 @@ class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, LineScanner, RadialDi
             'MARS_RECONNAISSANCE_ORBITER': 'MRO'
         }
         return name_lookup[super().spacecraft_name]
-
-    @property
-    def detector_start_line(self):
-        """
-        Returns
-        -------
-        : int
-          Starting detector line for the image
-        """
-        return 1
 
     @property
     def detector_start_sample(self):
