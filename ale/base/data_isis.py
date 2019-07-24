@@ -109,9 +109,9 @@ def rotate_positions(table, rotation):
     # Case 1, the table has positions at discrete times
     if 'J2000X' in table:
         ephemeris_times = table['ET']
-        positions = np.array([table['J2000X'],
-                              table['J2000Y'],
-                              table['J2000Z']]).T
+        positions = 1000 * np.array([table['J2000X'],
+                                     table['J2000Y'],
+                                     table['J2000Z']]).T
         rotated_pos = rotation.apply_at(positions, ephemeris_times)
     # Case 2, the table has coefficients of polynomials for the position
     elif 'J2000SVX' in table:
@@ -124,7 +124,7 @@ def rotate_positions(table, rotation):
         coeffs = np.array([table['J2000SVX'][:-1],
                            table['J2000SVY'][:-1],
                            table['J2000SVZ'][:-1]]).T
-        positions = polyval(scaled_times, coeffs).T
+        positions = 1000 * polyval(scaled_times, coeffs).T
         rotated_pos = rotation.apply_at(positions, ephemeris_times)
     else:
         raise ValueError('No positions are available in the input table.')
@@ -153,9 +153,9 @@ def rotate_velocities(table, rotation):
     # Case 1, the table has velocities at discrete times
     if 'J2000XV' in table:
         ephemeris_times = table['ET']
-        velocity = np.array([table['J2000XV'],
-                             table['J2000YV'],
-                             table['J2000ZV']]).T
+        velocity = 1000 * np.array([table['J2000XV'],
+                                    table['J2000YV'],
+                                    table['J2000ZV']]).T
         rotated_vel = rotation.apply_at(velocity, ephemeris_times)
     # Case 2, the table has coefficients of polynomials for the position
     elif 'J2000SVX' in table:
@@ -168,8 +168,7 @@ def rotate_velocities(table, rotation):
         coeffs = np.array([table['J2000SVX'][:-1],
                            table['J2000SVY'][:-1],
                            table['J2000SVZ'][:-1]])
-        scaled_vel = polyval(scaled_times,
-                             polyder(coeffs,axis=1).T).T
+        scaled_vel = 1000 * polyval(scaled_times,  polyder(coeffs,axis=1).T).T
         # We took a derivative in scaled time, so we have to multiply by our
         # scale in order to get the derivative in real time
         velocity = scaled_vel / time_scale

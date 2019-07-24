@@ -633,8 +633,8 @@ def test_sun_position_cache(testdata):
         'J2000ZV' : [0, 0],
         'ET' : [0, 1]}
     sun_pos, sun_vel, sun_times = testdata.sun_position
-    np.testing.assert_almost_equal(sun_pos, np.array([[1, 0, 0], [0, 0, 1]]))
-    np.testing.assert_almost_equal(sun_vel, np.array([[-1, 0, 0], [0, 0, -1]]))
+    np.testing.assert_almost_equal(sun_pos, np.array([[1000, 0, 0], [0, 0, 1000]]))
+    np.testing.assert_almost_equal(sun_vel, np.array([[-1000, 0, 0], [0, 0, -1000]]))
     np.testing.assert_equal(sun_times, np.array([0, 1]))
 
 def test_sun_position_polynomial(testdata):
@@ -660,8 +660,8 @@ def test_sun_position_polynomial(testdata):
         'J2000SVY' : [0, 1, 2],
         'J2000SVZ' : [0, -1, 1]}
     sun_pos, sun_vel, sun_times = testdata.sun_position
-    np.testing.assert_almost_equal(sun_pos, np.array([[1, 0, 0], [-1, 0, 1]]))
-    np.testing.assert_almost_equal(sun_vel, np.array([[-0.5, 0.5, -0.5], [-0.5, -0.5, 0.5]]))
+    np.testing.assert_almost_equal(sun_pos, np.array([[1000, 0, 0], [-1000, 0, 1000]]))
+    np.testing.assert_almost_equal(sun_vel, np.array([[-500, 500, -500], [-500, -500, 500]]))
     np.testing.assert_equal(sun_times, np.array([2, 4]))
 
 def test_inst_position_cache(testdata):
@@ -688,6 +688,6 @@ def test_inst_position_cache(testdata):
         'J2000ZV' : [0, 0],
         'ET' : [0, 1]}
     sensor_pos, sensor_vel, sensor_times = testdata.sensor_position
-    np.testing.assert_almost_equal(sensor_pos, np.array([[1, 0, 0], [0, 0, 1]]))
-    np.testing.assert_almost_equal(sensor_vel, np.array([[-1, 0, 0], [0, 0, -1]]))
+    np.testing.assert_almost_equal(sensor_pos, np.array([[1000, 0, 0], [0, 0, 1000]]))
+    np.testing.assert_almost_equal(sensor_vel, np.array([[-1000, 0, 0], [0, 0, -1000]]))
     np.testing.assert_equal(sensor_times, np.array([0, 1]))
