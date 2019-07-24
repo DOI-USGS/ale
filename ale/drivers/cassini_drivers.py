@@ -247,6 +247,9 @@ class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDis
     @property
     def focal_length(self):
         """
+        NAC uses multiple filter pairs, each filter combination has a different focal length.
+        NAIF's Cassini kernels do not contain focal lengths for NAC filters and
+        so we aquired updated NAC filter data from ISIS's IAK kernel.
 
         """
         # default focal defined by IK kernel
@@ -257,22 +260,40 @@ class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDis
           return self.nac_filter_to_focal_length.get(filters, default_focal_len)
 
         elif self.instrument_id == "CASSINI_ISS_WAC":
-           return default_focal_len
+          return default_focal_len
 
     @property
     def _original_naif_sensor_frame_id(self):
         """
-        Returns the Naif ID code for the target reference frame
-        Expects the target_id to be defined. This must be the integer Naif ID code
-        for the target body.
+        Original sensor frame ID as defined in Cassini's IK kernel. This
+        is the frame ID you want to default to for WAC. For NAC, this Frame ID
+        sits between J2000 and an extra 180 rotation since NAC was mounted
+        upside down.
 
         Returns
         -------
         : int
-          Naif ID code for the target frame
+          sensor frame code from NAIF's IK kernel
         """
         return self.ikid
 
     @property
     def sensor_frame_id(self):
-        return 140
+        """
+        Overwrite sensor frame id to return fake frame ID for NAC representing a
+        mounting point with a 180 degree rotation. ID was taken from ISIS's IAK
+        kernel for Cassini. This is because NAC requires an extra rotation not
+        in NAIF's Cassini kernels. Wac does not require an extra rotation so
+        se simply return original sensor frame id for Wac.
+
+        Returns
+        -------
+        : int
+          NAIF's Wac sensor frame ID, or ALE's Nac sensor frame ID
+
+        """
+        if self.instrument_id == "CASSINI_ISS_NAC":
+          return 14082360
+        elif self.instrument_id == "CASSINI_ISS_WAC":
+          return self._original_naif_sensor_frame_id
+
