@@ -49,7 +49,7 @@ class KaguyaTcPds3NaifSpiceDriver(Pds3Label,NaifSpice, LineScanner, Driver):
         Returns corrected utc start time.
 
         If no corrected form is found, defaults to the form specified in parent class.
-        
+
         Returns
         -------
         : str
@@ -155,7 +155,7 @@ class KaguyaTcPds3NaifSpiceDriver(Pds3Label,NaifSpice, LineScanner, Driver):
         No NAIF code exists for the spacecraft name 'SELENE-M.'  The NAIF code
         exists only for 'SELENE' or 'KAGUYA' -- 'SELENE' is captured as
         'MISSION_NAME'
-        
+
         Returns
         -------
         : str
@@ -480,16 +480,6 @@ class KaguyaTcPds3NaifSpiceDriver(Pds3Label,NaifSpice, LineScanner, Driver):
           Detector sample corresponding to the first image sample
         """
         return self.label["FIRST_PIXEL_NUMBER"]
-
-    @property
-    def detector_start_line(self):
-        """
-        Returns
-        -------
-        : int
-          Detector line corresponding to the first image sample
-        """
-        return 1
 
 
     @property
