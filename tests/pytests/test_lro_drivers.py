@@ -54,3 +54,13 @@ def test_odtk(driver):
 def test_usgscsm_distortion_model(driver):
     distortion_model = driver.usgscsm_distortion_model
     assert distortion_model['lrolrocnac']['coefficients'] == [1.0]
+
+@patch('ale.base.label_pds3.Pds3Label.instrument_host_id', 'LRO')
+@patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.exposure_duration', 1)
+def test_ephemeris_start_time(driver):
+    with patch.dict(driver.label, {'LRO:SPACECRAFT_CLOCK_PREROLL_COUNT':'1'}) as f:
+        assert driver.ephemeris_start_time == 1024.1
+
+@patch('ale.base.label_pds3.Pds3Label.exposure_duration', 1)
+def test_exposure_duration(driver):
+    assert driver.exposure_duration == 1.0045
