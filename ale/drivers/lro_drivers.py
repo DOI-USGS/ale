@@ -162,10 +162,10 @@ class LroLrocPds3LabelNaifSpiceDriver(NaifSpice, Pds3Label, LineScanner, Driver)
          : float
            Returns the exposure duration in seconds.
          """
-        return super().exposure_duration * (1 + self.multipli_line_error) + self.additive_line_error
+        return super().exposure_duration * (1 + self.multiplicative_line_error) + self.additive_line_error
 
     @property
-    def multipli_line_error(self):
+    def multiplicative_line_error(self):
         """
         Returns the multiplicative line error defined in an IAK.
 
