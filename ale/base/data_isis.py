@@ -297,6 +297,14 @@ class IsisSpice():
         """
         return self
 
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Called when the context goes out of scope. This is
+        implemented to conform to the context manager paradigm
+        used by other data mix ins.
+        """
+        pass
+
 
     @property
     def _sclock_hex_string(self):
