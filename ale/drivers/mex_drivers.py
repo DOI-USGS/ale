@@ -285,6 +285,17 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
 
 
     @property
+    def detector_start_line(self):
+        """
+        Returns
+        -------
+        : int
+          Detector sample corresponding to the first image sample
+        """
+        return 1
+
+
+    @property
     def detector_center_line(self):
         """
         Returns the center detector line.
@@ -352,36 +363,53 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         : list
           Exposure durations
         """
-        lines = []
-        times = []
-        durations = []
+        if not hasattr(self, '_line_scan_rate'):
+            self._line_scan_rate = None
+            lines = []
+            times = []
+            durations = []
 
-        with open(self._file, 'rb') as image_file:
-            bytes_per_record = self.label['RECORD_BYTES']
-            num_records = self.label['FILE_RECORDS']
-            img_start_record = self.label['^IMAGE']
-            img_start_byte = bytes_per_record * (img_start_record - 1) # Offset by one for zero-based records
-            num_img_records = num_records - img_start_record
-            image_file.seek(img_start_byte)
+            with open(self._file, 'rb') as image_file:
+                bytes_per_record = self.label['RECORD_BYTES']
+                num_records = self.label['FILE_RECORDS']
+                img_start_record = self.label['^IMAGE']
+                img_start_byte = bytes_per_record * (img_start_record - 1) # Offset by one for zero-based records
+                num_img_records = num_records - img_start_record
+                image_file.seek(img_start_byte)
 
-            for record in range(num_img_records):
-                record_bytes = image_file.read(bytes_per_record)
-                eph_time = struct.unpack('<d', record_bytes[:8])[0]
-                exp_dur = struct.unpack('<f', record_bytes[8:12])[0] / 1000
-                if record == 0:
+                for record in range(num_img_records):
+                    record_bytes = image_file.read(bytes_per_record)
+                    eph_time = struct.unpack('<d', record_bytes[:8])[0]
+                    exp_dur = struct.unpack('<f', record_bytes[8:12])[0] / 1000
+                    #if record == 0:
                     # Offset for zero-based corrections, and then offest for ISIS pixel definition
                     lines.append(record+1-0.5)
                     times.append(eph_time)
                     durations.append(exp_dur)
                 # Only add records if exposure duration has changed since the line before
-                elif exp_dur != durations[-1]:
-                    # Offset for zero-based corrections, and then offest for ISIS pixel definition
-                    lines.append(record+1-0.5)
-                    times.append(eph_time)
-                    durations.append(exp_dur)
+                    #elif exp_dur != durations[-1]:
+                    #    # Offset for zero-based corrections, and then offest for ISIS pixel definition
+                    #    lines.append(record+1-0.5)
+                    #    times.append(eph_time)
+                    #    durations.append(exp_dur)
+            self._ephemeris_stop_time = times[-1] + durations[-1]
+            self._center_ephemeris_time = (self.ephemeris_stop_time + self.ephemeris_start_time) / 2
+            times = [time - self.center_ephemeris_time for time in times]
+            # print(self.ephemeris_stop_time, self.center_ephemeris_time)
 
-        return lines, times, durations
+            self._line_scan_rate = (lines, times, durations)
+        return self._line_scan_rate
+    @property
+    def center_ephemeris_time(self):
+        if not hasattr(self, '_center_ephemeris_time'):
+            self._center_ephemeris_time = (self.ephemeris_stop_time - self._ephemeris_start_time) / 2
+        return self._center_ephemeris_time
 
+    @property
+    def ephemeris_stop_time(self):
+        if not hasattr(self, '_ephemeris_stop_time'):
+            _, _, _ = self.line_scan_rate
+        return self._ephemeris_stop_time
 
     # TODO We need to confirm that returning nothing here does not affect
     # calculations elsewhere in code. Or is there possibly just a better way of
