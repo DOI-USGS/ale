@@ -212,6 +212,23 @@ class TimeDependentRotation:
         """
         return TimeDependentRotation(self._rots.inv().as_quat(), self.times, self.dest, self.source)
 
+    def reinterpolate(self, times):
+        """
+        Reinterpolate the rotation at a given set of times.
+
+        Parameters
+        ----------
+        times : 1darray
+                The new times to interpolate at.
+
+        Returns
+        -------
+         : TimeDependentRotation
+           The new rotation that the input times
+        """
+        new_quats = Slerp(self.times, self._rots)(times).as_quat()
+        return TimeDependentRotation(new_quats, times, self.source, self.dest)
+
     def __mul__(self, other):
         """
         Compose this rotation with another rotation.

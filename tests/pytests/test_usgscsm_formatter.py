@@ -23,7 +23,7 @@ class TestDriver(Driver, NaifSpice):
 
         body_rotation = TimeDependentRotation(
             np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
-            np.array([0, 1]),
+            np.array([800, 900]),
             100,
             1
         )
@@ -31,7 +31,7 @@ class TestDriver(Driver, NaifSpice):
 
         spacecraft_rotation = TimeDependentRotation(
             np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
-            np.array([0, 1]),
+            np.array([800, 900]),
             1000,
             1
         )
@@ -145,7 +145,7 @@ class TestLineScanner(LineScanner, TestDriver):
     def sensor_position(self):
         return (
             [[0, 1, 2], [3, 4, 5]],
-            [[0, -1, -2], [-3, -4, -5]],
+            [[0.03, 0.03, 0.03], [0.03, 0.03, 0.03]],
             [800, 900]
         )
 
@@ -309,12 +309,12 @@ def test_line_scan_rate(test_line_scan_driver):
 def test_position_times(test_line_scan_driver):
     isd = json.loads(usgscsm_formatter.to_usgscsm(test_line_scan_driver))
     assert isd['t0_ephemeris'] == -50
-    assert isd['dt_ephemeris'] == 100
+    assert isd['dt_ephemeris'] == 100.0 / 155.0
 
 def test_rotation_times(test_line_scan_driver):
     isd = json.loads(usgscsm_formatter.to_usgscsm(test_line_scan_driver))
-    assert isd['t0_quaternion'] == -850
-    assert isd['dt_quaternion'] == 1
+    assert isd['t0_quaternion'] == -50
+    assert isd['dt_quaternion'] == 100.0 / 155.0
 
 def test_interpolation_method(test_line_scan_driver):
     isd = json.loads(usgscsm_formatter.to_usgscsm(test_line_scan_driver))
@@ -323,8 +323,16 @@ def test_interpolation_method(test_line_scan_driver):
 def test_line_scan_sensor_position(test_line_scan_driver):
     isd = json.loads(usgscsm_formatter.to_usgscsm(test_line_scan_driver))
     sensor_position_obj = isd['sensor_position']
-    assert sensor_position_obj['positions'] == [[0, 1, 2], [3, 4, 5]]
-    assert sensor_position_obj['velocities'] == [[0, -1, -2], [-3, -4, -5]]
+    expected_positions = np.vstack((np.linspace(0, 3, 156),
+                                    np.linspace(1, 4, 156),
+                                    np.linspace(2, 5, 156))).T
+    expected_velocities = np.vstack((np.linspace(0.03, 0.03, 156),
+                                     np.linspace(0.03, 0.03, 156),
+                                     np.linspace(0.03, 0.03, 156))).T
+    np.testing.assert_almost_equal(sensor_position_obj['positions'],
+                                   expected_positions)
+    np.testing.assert_almost_equal(sensor_position_obj['velocities'],
+                                   expected_velocities)
     assert sensor_position_obj['unit'] == 'm'
 
 def test_line_scan_sun_position(test_line_scan_driver):

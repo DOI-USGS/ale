@@ -1,4 +1,6 @@
 import json
+import numpy as np
+from scipy.interpolate import interp1d, BPoly
 
 from ale.transformation import FrameChain
 
@@ -45,7 +47,6 @@ def to_usgscsm(driver):
     frame_chain = driver.frame_chain
     sensor_to_target = frame_chain.compute_rotation(driver.sensor_frame_id, driver.target_frame_id)
     quaternions = sensor_to_target.quats
-    rotation_times = sensor_to_target.times
     isd_data['sensor_orientation'] = {
         'quaternions' : quaternions
     }
@@ -81,21 +82,59 @@ def to_usgscsm(driver):
     if isinstance(driver, LineScanner):
         isd_data['name_model'] = 'USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL'
         isd_data['interpolation_method'] = 'lagrange'
+
         start_lines, start_times, scan_rates = driver.line_scan_rate
         center_time = driver.center_ephemeris_time
         isd_data['line_scan_rate'] = [[line, time, rate] for line, time, rate in zip(start_lines, start_times, scan_rates)]
         isd_data['starting_ephemeris_time'] = driver.ephemeris_start_time
         isd_data['center_ephemeris_time'] = center_time
-        isd_data['t0_ephemeris'] = position_times[0] - center_time
-        if len(position_times) > 1:
-            isd_data['dt_ephemeris'] = (position_times[-1] - position_times[0]) / (len(position_times) - 1)
+
+        interp_times = np.linspace(position_times[0],
+                                   position_times[-1],
+                                   int(driver.image_lines / 64))
+
+        if velocities is not None:
+            positions = np.asarray(positions)
+            velocities = np.asarray(velocities)
+            pos_x, pos_y, pos_z = np.asarray(positions).T
+            vel_x, vel_y, vel_z = np.asarray(velocities).T
+            x_interp = BPoly.from_derivatives(position_times,
+                                              np.vstack((pos_x, vel_x)).T,
+                                              extrapolate=True)
+            y_interp = BPoly.from_derivatives(position_times,
+                                              np.vstack((pos_y, vel_y)).T,
+                                              extrapolate=True)
+            z_interp = BPoly.from_derivatives(position_times,
+                                              np.vstack((pos_z, vel_z)).T,
+                                              extrapolate=True)
+            interp_pos = np.vstack((x_interp(interp_times),
+                                    y_interp(interp_times),
+                                    z_interp(interp_times))).T
+            interp_vel = np.vstack((x_interp(interp_times, nu=1),
+                                    y_interp(interp_times, nu=1),
+                                    z_interp(interp_times, nu=1))).T
+        else:
+            position_interp = interp1d(position_times, positions)
+            interp_pos = position_interp(interp_times)
+            interp_vel = None
+        isd_data['sensor_position'] = {
+            'positions' : interp_pos,
+            'velocities' : interp_vel,
+            'unit' : 'm'
+        }
+
+        rotation_interp = sensor_to_target.reinterpolate(interp_times)
+        isd_data['sensor_orientation'] = {
+            'quaternions' : rotation_interp.quats
+        }
+
+        isd_data['t0_ephemeris'] = interp_times[0] - center_time
+        if len(interp_times) > 1:
+            isd_data['dt_ephemeris'] = (interp_times[-1] - interp_times[0]) / (len(interp_times) - 1)
         else:
             isd_data['dt_ephemeris'] = 0
-        isd_data['t0_quaternion'] = rotation_times[0] - center_time
-        if len(rotation_times) > 1:
-            isd_data['dt_quaternion'] = (rotation_times[-1] - rotation_times[0]) / (len(rotation_times) - 1)
-        else:
-            isd_data['dt_quaternion'] = 0
+        isd_data['t0_quaternion'] = isd_data['t0_ephemeris']
+        isd_data['dt_quaternion'] = isd_data['dt_ephemeris']
 
 
     # frame sensor model specifics
