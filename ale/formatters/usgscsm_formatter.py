@@ -93,7 +93,7 @@ def to_usgscsm(driver):
                                    position_times[-1],
                                    int(driver.image_lines / 64))
 
-        if velocities:
+        if velocities is not None:
             positions = np.asarray(positions)
             velocities = np.asarray(velocities)
             pos_x, pos_y, pos_z = np.asarray(positions).T
