@@ -194,4 +194,4 @@ class IdealLsIsisLabelIsisSpiceDriver(IsisSpice, LineScanner, IsisLabel, NoDisto
         float :
             The center of line the CCD
         """
-        return self.label['IsisCube']['Instrument']['LineDetectors'] / 2.0
+        return 0.0
