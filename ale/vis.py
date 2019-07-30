@@ -131,7 +131,7 @@ def point_info(cube_path, x, y, point_type, allow_outside=False):
     return pvlres
 
 
-def compare_to_isis(isd, cube, nx=4, ny=8):
+def reprojection_diff(isd, cube, nx=4, ny=8):
     """
     """
     hv.extension('bokeh')
