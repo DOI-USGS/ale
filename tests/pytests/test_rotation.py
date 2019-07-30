@@ -56,13 +56,15 @@ def test_time_dependent_time_dependent_composition():
     quats2_3 = [[1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)],[1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)]]
     times2_3 = [0, 2]
     rot2_3 = TimeDependentRotation(quats2_3, times2_3, 2, 3)
+
+
     # compose to get no rotation to a 180 degree rotation about the X-axis to no rotation
     rot1_3 = rot2_3*rot1_2
     assert isinstance(rot1_3, TimeDependentRotation)
     assert rot1_3.source == 1
     assert rot1_3.dest == 3
-    expected_times = np.array([0, 1])
-    expected_quats = np.array([[0, 0, 0, -1],[-1, 0, 0, 0]])
+    expected_times = np.array([0, 1, 2])
+    expected_quats = np.array([[0, 0, 0, -1], [-1, 0, 0, 0], [0, 0, 0, 1]])
     np.testing.assert_equal(rot1_3.times, expected_times)
     np.testing.assert_almost_equal(rot1_3.quats, expected_quats)
 
@@ -147,3 +149,26 @@ def test_reinterpolate_single_time():
     np.testing.assert_equal(new_rot.times, np.asarray([-1 ,3]))
     np.testing.assert_almost_equal(new_rot.quats,
                                    np.asarray([[0, 0, 0, 1], [0, 0, 0, 1]]))
+
+def test_reinterpolate_same_time():
+    rot = TimeDependentRotation([[0, 0, 0, 1]], [0], 1, 2)
+    new_rot = rot.reinterpolate([0])
+    assert new_rot.source == rot.source
+    assert new_rot.dest == rot.dest
+    np.testing.assert_equal(new_rot.times, np.asarray([0]))
+    np.testing.assert_almost_equal(new_rot.quats,
+                                   np.asarray([[0, 0, 0, 1]]))
+
+def test_apply_at_single_time():
+    test_quats = Rotation.from_euler('x', np.array([-90, 0, 45]), degrees=True).as_quat()
+    rot = TimeDependentRotation(test_quats, [0, 1, 1.5], 1, 2)
+    input_vec = np.asarray([1, 2, 3])
+    rot_vec = rot.apply_at(input_vec, 0)
+    np.testing.assert_almost_equal(rot_vec, np.asarray([[1, 3, -2]]))
+
+def test_apply_at_vector_time():
+    test_quats = Rotation.from_euler('x', np.array([-90, 0, 45]), degrees=True).as_quat()
+    rot = TimeDependentRotation(test_quats, [0, 1, 1.5], 1, 2)
+    input_vec = np.asarray([[1, 2, 3], [1, 2, 3]])
+    rot_vec = rot.apply_at(input_vec, [0, 2])
+    np.testing.assert_almost_equal(rot_vec, np.asarray([[1, 3, -2], [1, -3, 2]]))

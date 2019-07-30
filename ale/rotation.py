@@ -218,7 +218,7 @@ class TimeDependentRotation:
 
         Parameters
         ----------
-        times : 1darray
+        times : 1darray or float
                 The new times to interpolate at.
 
         Returns
@@ -226,19 +226,24 @@ class TimeDependentRotation:
          : TimeDependentRotation
            The new rotation that the input times
         """
+        vec_times = np.asarray(times)
+        if vec_times.ndim < 1:
+            vec_times = np.asarray([times])
+        elif vec_times.ndim > 1:
+            raise ValueError('Input times must be either a float or a 1d iterable of floats')
         if len(self.times) < 2:
-            new_quats = np.repeat(self.quats, len(times), 0)
+            new_quats = np.repeat(self.quats, len(vec_times), 0)
         else:
             # This uses the same code as scipy SLERP, except it extrapolates
             # assuming constant angular velocity before and after the first
             # and last intervals.
-            idx = np.searchsorted(self.times, times)
+            idx = np.searchsorted(self.times, vec_times)
             idx[idx >= len(self.times) - 1] = len(self.times) - 2
             steps = self.times[idx+1] - self.times[idx]
             rotvecs = (self._rots[idx].inv() * self._rots[idx + 1]).as_rotvec()
-            alpha = (times - self.times[idx]) / steps
+            alpha = (vec_times - self.times[idx]) / steps
             new_quats = (self._rots[idx] * Rotation.from_rotvec(rotvecs * alpha[:, None])).as_quat()
-        return TimeDependentRotation(new_quats, times, self.source, self.dest)
+        return TimeDependentRotation(new_quats, vec_times, self.source, self.dest)
 
     def __mul__(self, other):
         """
@@ -262,18 +267,9 @@ class TimeDependentRotation:
         if isinstance(other, ConstantRotation):
             return TimeDependentRotation((self._rots * other._rot).as_quat(), self.times, other.source, self.dest)
         elif isinstance(other, TimeDependentRotation):
-            # if self and other each have the same time and one rotation, don't interpolate.
-            if (self.times.size == 1) and (other.times.size == 1) and (self.times == other.times):
-                return TimeDependentRotation((self._rots * other._rots).as_quat(), self.times, other.source, self.dest)
             merged_times = np.union1d(np.asarray(self.times), np.asarray(other.times))
-            # we cannot extrapolate so clip to the time range both cover
-            first_time = max(min(self.times), min(other.times))
-            last_time = min(max(self.times), max(other.times))
-            new_times = merged_times[np.logical_and(merged_times>=first_time, merged_times<=last_time)]
-            first_rotation_interp = Slerp(other.times, other._rots)
-            second_rotation_interp = Slerp(self.times, self._rots)
-            new_quats = (second_rotation_interp(new_times) * first_rotation_interp(new_times)).as_quat()
-            return TimeDependentRotation(new_quats, new_times, other.source, self.dest)
+            new_quats = (self.reinterpolate(merged_times)._rots * other.reinterpolate(merged_times)._rots).as_quat()
+            return TimeDependentRotation(new_quats, merged_times, other.source, self.dest)
         else:
             raise TypeError("Rotations can only be composed with other rotations.")
 
@@ -281,7 +277,4 @@ class TimeDependentRotation:
         """
         Apply the rotation at a specific time
         """
-        if len(self.times) == 1 and self.times[0] == et:
-            return self._rots.apply(vec)
-        rot = Slerp(self.times, self._rots)(et)
-        return rot.apply(vec)
+        return self.reinterpolate(et)._rots.apply(vec)
