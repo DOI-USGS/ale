@@ -226,7 +226,18 @@ class TimeDependentRotation:
          : TimeDependentRotation
            The new rotation that the input times
         """
-        new_quats = Slerp(self.times, self._rots)(times).as_quat()
+        if len(self.times) < 2:
+            new_quats = np.repeat(self.quats, len(times), 0)
+        else:
+            # This uses the same code as scipy SLERP, except it extrapolates
+            # assuming constant angular velocity before and after the first
+            # and last intervals.
+            idx = np.searchsorted(self.times, times)
+            idx[idx >= len(self.times) - 1] = len(self.times) - 2
+            steps = self.times[idx+1] - self.times[idx]
+            rotvecs = (self._rots[idx].inv() * self._rots[idx + 1]).as_rotvec()
+            alpha = (times - self.times[idx]) / steps
+            new_quats = (self._rots[idx] * Rotation.from_rotvec(rotvecs * alpha[:, None])).as_quat()
         return TimeDependentRotation(new_quats, times, self.source, self.dest)
 
     def __mul__(self, other):
