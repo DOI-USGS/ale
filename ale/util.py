@@ -10,6 +10,8 @@ import pvl
 from collections import OrderedDict
 from itertools import chain
 
+import pysis
+
 def get_metakernels(spice_dir=config.spice_root, missions=set(), years=set(), versions=set()):
     """
     Given a root directory, get any subdirectory containing metakernels,
@@ -165,9 +167,11 @@ def generate_kernels_from_cube(cube):
 
     return kernels
 
-def write_metakernel(kernels, mk_path=None):
+def write_metakernel_from_cube(cube, mkpath=None):
     # add ISISPREF paths as path_symbols and path_values to avoid custom expand logic
     pvlprefs = get_isis_preferences()
+
+    kernels = generate_kernels_from_cube(cube)
 
     # make sure kernels are mk strings
     kernels = ["'"+k+"'" for k in kernels]
