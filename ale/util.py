@@ -104,9 +104,12 @@ def find_latest_metakernel(path, year):
         raise Exception(f'No metakernels found in {path} for {year}.')
     return metakernel
 
-
-def generate_metakernel_from_isis(cube, mkpath=None):
-    isis_preferences = os.path.join(os.path.expanduser("~"), '.Isis', 'IsisPreferences')
+def get_isis_preferences(isis_preferences=None):
+    """
+    Returns ISIS Preference file as a pvl object
+    """
+    if not isis_preferences:
+        isis_preferences = os.path.join(os.path.expanduser("~"), '.Isis', 'IsisPreferences')
 
     if not os.path.isfile(isis_preferences):
         isis_preferences = os.path.join(pysis.env.ISIS_ROOT, 'IsisPreferences')
@@ -117,6 +120,9 @@ def generate_metakernel_from_isis(cube, mkpath=None):
     except Exception as e:
         raise Exception(f'Failed to load IsisPreferences file [{isis_preferences}]: {e}')
 
+    return pvlprefs
+
+def generate_kernels_from_cube(cube):
     # enforce key order
     mk_paths = OrderedDict.fromkeys(
         ['TargetPosition', 'InstrumentPosition',
@@ -127,13 +133,23 @@ def generate_metakernel_from_isis(cube, mkpath=None):
     # just work with full path
     cube = os.path.abspath(cube)
     cubelabel = pvl.load(cube)
-    kernel_group = cubelabel['IsisCube']['Kernels']
+
+    try:
+        kernel_group = cubelabel['IsisCube']['Kernels']
+    except KeyError:
+        raise KeyError(f'{cubelabel}, Could not find kernels group, input cube [{cube}] may not be spiceinited')
 
     # Start loading. Stuff that might have multiple entries first
-    mk_paths['TargetPosition'] = kernel_group.get('TargetPosition', None)[1:]
-    mk_paths['InstrumentPosition'] = kernel_group.get('InstrumentPosition', None)[1:]
-    mk_paths['InstrumentPointing'] = kernel_group.get('InstrumentPointing', None)[1:]
-    mk_paths['TargetAttitudeShape'] = [kernel_group.get('TargetAttitudeShape', None)]
+    def load_table_data(key):
+        mk_paths[key] = kernel_group.get(key, None)
+        if isinstance(mk_paths[key], str):
+            mk_paths[key] = [mk_paths[key]]
+        while 'Table' in mk_paths[key]: mk_paths[key].remove('Table')
+
+    load_table_data('TargetPosition')
+    load_table_data('InstrumentPosition')
+    load_table_data('InstrumentPointing')
+    load_table_data('TargetAttitudeShape')
 
     # the rest
     mk_paths['Frame'] = [kernel_group.get('Frame', None)]
@@ -141,12 +157,21 @@ def generate_metakernel_from_isis(cube, mkpath=None):
     mk_paths['InstrumentAddendum'] = [kernel_group.get('InstrumentAddendum', None)]
     mk_paths['SpacecraftClock'] = [kernel_group.get('SpacecraftClock', None)]
     mk_paths['LeapSecond'] = [kernel_group.get('LeapSecond', None)]
+    mk_paths['Clock'] = [kernel_group.get('Clock', None)]
     mk_paths['Extra'] = [kernel_group.get('Extra', None)]
 
     # get kernels as 1-d string list
-    kernels = ["'"+kernel+"'" for kernel in chain.from_iterable(mk_paths.values()) if isinstance(kernel, str)]
+    kernels = [kernel for kernel in chain.from_iterable(mk_paths.values()) if isinstance(kernel, str)]
 
+    return kernels
+
+def write_metakernel(kernels, mk_path=None):
     # add ISISPREF paths as path_symbols and path_values to avoid custom expand logic
+    pvlprefs = get_isis_preferences()
+
+    # make sure kernels are mk strings
+    kernels = ["'"+k+"'" for k in kernels]
+
     paths = OrderedDict(pvlprefs['DataDirectory'])
     path_values = ["'"+os.path.expandvars(path)+"'" for path in paths.values()]
     path_symbols = ["'"+symbol.lower()+"'" for symbol in paths.keys()]
