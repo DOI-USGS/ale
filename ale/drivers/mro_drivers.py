@@ -15,7 +15,7 @@ from ale.base.type_distortion import RadialDistortion
 from ale.base.type_sensor import LineScanner
 
 
-class MroCtxIsisLabelIsisSpiceDriver(Driver, IsisSpice, LineScanner, RadialDistortion):
+class MroCtxIsisLabelIsisSpiceDriver(IsisLabel, IsisSpice, LineScanner, RadialDistortion, Driver):
 
     @property
     def instrument_id(self):
@@ -29,7 +29,10 @@ class MroCtxIsisLabelIsisSpiceDriver(Driver, IsisSpice, LineScanner, RadialDisto
         : str
           instrument id
         """
-        return "N/A"
+        id_lookup = {
+        "CTX" : "MRO_CTX"
+        }
+        return id_lookup[super().instrument_id]
 
     @property
     def spacecraft_id(self):
@@ -39,27 +42,25 @@ class MroCtxIsisLabelIsisSpiceDriver(Driver, IsisSpice, LineScanner, RadialDisto
         : int
           Naif ID code for the spacecraft
         """
-        return "N/A"
+        return "-74"
 
     @property
-    def ikid(self):
+    def sensor_model_version(self):
         """
         Returns
         -------
         : int
-          Naif ID code for the instrument
+          ISIS sensor model version
         """
-        return int(self.label["IsisCube"]["Kernels"]["NaifFrameCode"])
+        return 1
 
     @property
-    def line_exposure_duration(self):
+    def sensor_name(self):
         """
-        Returns
-        -------
-        : float
-          Line exposure duration in seconds
+        ISIS doesn't propergate this to the ingested cube label, so hard-code it.
         """
-        return self.label["IsisCube"]["Instrument"]["LineExposureDuration"].value * 0.001 # Scale to seconds
+        return "CONTEXT CAMERA"
+
 
 class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDistortion, Driver):
     """
