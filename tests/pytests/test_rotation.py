@@ -102,6 +102,15 @@ def test_from_euler():
     assert rot.source == 0
     assert rot.dest == 1
 
+def test_from_euler_degrees():
+    rad_angles = [[np.pi/2, np.pi/2, 0],
+                  [-np.pi/2, -np.pi/2, 0]]
+    degree_angles = [[90, 90, 0],
+                     [-90, -90, 0]]
+    rad_rot = TimeDependentRotation.from_euler('XYZ', rad_angles, [0, 1], 0, 1)
+    degree_rot = TimeDependentRotation.from_euler('XYZ', degree_angles, [0, 1], 0, 1, degrees=True)
+    np.testing.assert_almost_equal(rad_rot.quats, degree_rot.quats)
+
 def test_from_matrix():
     mat = [[0, 0, 1],
            [1, 0 ,0],
