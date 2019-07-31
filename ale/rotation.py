@@ -1,5 +1,4 @@
 from scipy.interpolate import interp1d
-from scipy.spatial.transform import Slerp
 from scipy.spatial.transform import Rotation
 
 import numpy as np
@@ -212,6 +211,47 @@ class TimeDependentRotation:
         """
         return TimeDependentRotation(self._rots.inv().as_quat(), self.times, self.dest, self.source)
 
+    def _slerp(self, times):
+        """
+        Using SLERP interpolate the rotation and angular velocity at specific times
+
+        This uses the same code as scipy SLERP, except it extrapolates
+        assuming constant angular velocity before and after the first
+        and last intervals.
+
+        If the this rotation is only defined at one time, then the rotation is
+        assumed to be constant.
+
+        Parameters
+        ----------
+        times : 1darray or float
+                The new times to interpolate at.
+
+        Returns
+        -------
+         : Rotation
+           The new rotations at the input times
+         : 2darray
+           The angular velocity vectors
+        """
+        vec_times = np.asarray(times)
+        if vec_times.ndim < 1:
+            vec_times = np.asarray([times])
+        elif vec_times.ndim > 1:
+            raise ValueError('Input times must be either a float or a 1d iterable of floats')
+        if len(self.times) < 2:
+            return Rotation.from_quat(np.repeat(self.quats, len(vec_times), 0)), np.zeros((len(vec_times), 3))
+        else:
+            idx = np.searchsorted(self.times, vec_times) - 1
+            idx[idx >= len(self.times) - 1] = len(self.times) - 2
+            idx[idx < 0] = 0
+            steps = self.times[idx+1] - self.times[idx]
+            rotvecs = (self._rots[idx + 1] * self._rots[idx].inv()).as_rotvec()
+            alpha = (vec_times - self.times[idx]) / steps
+            interp_rots = Rotation.from_rotvec(rotvecs * alpha[:, None]) * self._rots[idx]
+            interp_av = rotvecs / steps[:, None]
+            return interp_rots, interp_av
+
     def reinterpolate(self, times):
         """
         Reinterpolate the rotation at a given set of times.
@@ -226,24 +266,8 @@ class TimeDependentRotation:
          : TimeDependentRotation
            The new rotation that the input times
         """
-        vec_times = np.asarray(times)
-        if vec_times.ndim < 1:
-            vec_times = np.asarray([times])
-        elif vec_times.ndim > 1:
-            raise ValueError('Input times must be either a float or a 1d iterable of floats')
-        if len(self.times) < 2:
-            new_quats = np.repeat(self.quats, len(vec_times), 0)
-        else:
-            # This uses the same code as scipy SLERP, except it extrapolates
-            # assuming constant angular velocity before and after the first
-            # and last intervals.
-            idx = np.searchsorted(self.times, vec_times)
-            idx[idx >= len(self.times) - 1] = len(self.times) - 2
-            steps = self.times[idx+1] - self.times[idx]
-            rotvecs = (self._rots[idx].inv() * self._rots[idx + 1]).as_rotvec()
-            alpha = (vec_times - self.times[idx]) / steps
-            new_quats = (self._rots[idx] * Rotation.from_rotvec(rotvecs * alpha[:, None])).as_quat()
-        return TimeDependentRotation(new_quats, vec_times, self.source, self.dest)
+        new_rots, _ = self._slerp(times)
+        return TimeDependentRotation(new_rots.as_quat(), times, self.source, self.dest)
 
     def __mul__(self, other):
         """
@@ -275,6 +299,35 @@ class TimeDependentRotation:
 
     def apply_at(self, vec, et):
         """
-        Apply the rotation at a specific time
+        Apply the rotation to a position at a specific time
         """
         return self.reinterpolate(et)._rots.apply(vec)
+
+    def rotate_velocity_at(self, pos, vel, et):
+        """
+        Apply the rotation to a velocity at a specific time
+
+        See:
+        https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/rotation.html#State%20transformations
+        For an explanation of why a separate method is required to rotate velocities.
+        """
+        vec_pos = np.asarray(pos)
+        vec_vel = np.asarray(vel)
+        if vec_pos.ndim < 1:
+            vec_pos = np.asarray([pos])
+        if vec_vel.ndim < 1:
+            vec_vel = np.asarray([vel])
+        if vec_pos.shape != vec_vel.shape:
+            raise ValueError('Input velocities and positions must have the same shape')
+
+        rots, avs = self._slerp(et)
+        rotated_vel = np.zeros(vec_vel.shape)
+        for indx in range(vec_pos.shape[0]):
+            skew = np.array([[0, -avs[indx, 2], avs[indx, 1]],
+                             [avs[indx, 2], 0, -avs[indx, 0]],
+                             [-avs[indx, 1], avs[indx, 0], 0]])
+            rot_deriv = np.dot(skew, rots[indx].as_dcm())
+            rotated_vel[indx] = rots[indx].apply(vec_vel[indx])
+            rotated_vel[indx] += np.dot(rot_deriv, vec_pos[indx])
+
+        return rotated_vel
