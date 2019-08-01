@@ -336,6 +336,20 @@ class IsisSpice():
         return struct.unpack('d', bytes.fromhex(self._sclock_hex_string))[0]
 
     @property
+    def center_ephemeris_time(self):
+        """
+        Returns the average of the start and stop ephemeris times. Expects
+        ephemeris start and stop times to be defined. These should be double precision
+        numbers containing the ephemeris start and stop times of the image.
+
+        Returns
+        -------
+        : double
+          Center ephemeris time for an image
+        """
+        return (self.ephemeris_start_time + self.ephemeris_stop_time) / 2
+
+    @property
     def detector_center_sample(self):
         """
         The center of the CCD in detector pixels
