@@ -61,6 +61,19 @@ class MroCtxIsisLabelIsisSpiceDriver(Driver, IsisSpice, LineScanner, RadialDisto
         """
         return self.label["IsisCube"]["Instrument"]["LineExposureDuration"].value * 0.001 # Scale to seconds
 
+    @property
+    def detector_center_sample(self):
+        """
+        The center of the CCD in detector pixels
+        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.
+
+        Returns
+        -------
+        float :
+            The center sample of the CCD
+        """
+        return super().detector_center_sample - 0.5
+
 class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDistortion, Driver):
     """
     Driver for reading CTX ISIS labels.
