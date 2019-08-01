@@ -53,6 +53,18 @@ class IsisLabel():
         return self.label['IsisCube']['Instrument']['InstrumentName']
 
     @property
+    def sensor_model_version(self):
+        """
+        Returns the ISIS camera version
+
+        Returns
+        -------
+        : int
+          Camera version number
+        """
+        return self.label["IsisCube"]["Kernels"]["CameraVersion"]
+
+    @property
     def image_lines(self):
         """
         Returns an integer containing the number of lines in the image

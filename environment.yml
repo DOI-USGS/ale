@@ -19,3 +19,6 @@ dependencies:
   - quaternion
   - pyyaml
   - networkx
+  - pysis
+  - holoviews
+  - bokeh
