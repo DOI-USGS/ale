@@ -45,16 +45,6 @@ class MroCtxIsisLabelIsisSpiceDriver(IsisLabel, IsisSpice, LineScanner, RadialDi
         return "-74"
 
     @property
-    def sensor_model_version(self):
-        """
-        Returns
-        -------
-        : int
-          ISIS sensor model version
-        """
-        return 1
-
-    @property
     def sensor_name(self):
         """
         ISIS doesn't propergate this to the ingested cube label, so hard-code it.
