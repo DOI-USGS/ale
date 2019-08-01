@@ -363,24 +363,6 @@ class NaifSpice():
         return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_start_count)
 
     @property
-    def ephemeris_stop_time(self):
-        """
-        Returns the ephemeris stop time of the image. Expects spacecraft_id to
-        be defined. This must be the integer Naif Id code for the spacecraft.
-        Expects spacecraft_clock_stop_count to be defined. This must be a string
-        containing the stop clock count of the spacecraft
-
-        Returns
-        -------
-        : double
-          Ephemeris stop time of the image
-        """
-        if self.spacecraft_clock_stop_count:
-            return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_stop_count)
-        else:
-            return spice.str2et(self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S"))
-
-    @property
     def center_ephemeris_time(self):
         """
         Returns the average of the start and stop ephemeris times. Expects
