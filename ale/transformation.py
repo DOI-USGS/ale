@@ -53,12 +53,13 @@ def create_rotations(rotation_table):
                            rotation_table['J2000Ang3'][:-1]]).T
         angles = polyval(scaled_times, coeffs).T
         # ISIS is hard coded to ZXZ (313) Euler angle axis order.
+        # SPICE also interprets Euler angle rotations as negative rotations,
+        # so negate them before passing to scipy.
         time_dep_rot = TimeDependentRotation.from_euler('zxz',
-                                                        angles,
+                                                        -angles,
                                                         ephemeris_times,
                                                         root_frame,
-                                                        last_time_dep_frame,
-                                                        degrees=True)
+                                                        last_time_dep_frame)
         rotations.append(time_dep_rot)
 
     if 'ConstantRotation' in rotation_table:
@@ -88,7 +89,7 @@ class FrameChain(nx.DiGraph):
                      of frame rotations in the frame chain
     """
     @classmethod
-    def from_spice(cls, *args, frame_changes = [], ephemeris_time=[], **kwargs):
+    def from_spice(cls, *args, frame_changes=[], ephemeris_time=[], **kwargs):
         frame_chain = cls()
 
         times = np.array(ephemeris_time)
@@ -105,7 +106,7 @@ class FrameChain(nx.DiGraph):
         return frame_chain
 
     @classmethod
-    def from_isis_tables(cls, *args, inst_pointing = {}, body_orientation={}, **kwargs):
+    def from_isis_tables(cls, *args, inst_pointing={}, body_orientation={}, **kwargs):
         frame_chain = cls()
 
         for rotation in create_rotations(inst_pointing):
