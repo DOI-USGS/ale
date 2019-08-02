@@ -375,10 +375,7 @@ class NaifSpice():
         : double
           Ephemeris stop time of the image
         """
-        if self.spacecraft_clock_stop_count:
-            return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_stop_count)
-        else:
-            return spice.str2et(self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S"))
+        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_stop_count)
 
     @property
     def detector_center_sample(self):
