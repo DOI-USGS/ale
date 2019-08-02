@@ -151,12 +151,15 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         Expects ikid to be defined. This should be the integer Naid ID code for
         the instrument.
 
+        We subtract 0.5 from the ISIS center sample because ISIS detector
+        coordinates are 0.5 based.
+
         Returns
         -------
         : float
           center detector sample
         """
-        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0])
+        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0]) - 0.5
 
     @property
     def detector_center_line(self):
@@ -165,12 +168,15 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         Expects ikid to be defined. This should be the integer Naid ID code for
         the instrument.
 
+        We subtract 0.5 from the ISIS center line because ISIS detector
+        coordinates are 0.5 based.
+
         Returns
         -------
         : float
           center detector line
         """
-        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
+        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1]) - 0.5
 
     @property
     def sensor_model_version(self):
@@ -359,12 +365,15 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
         Expects ikid to be defined. This should be the integer Naid ID code for
         the instrument.
 
+        We subtract 0.5 from the ISIS center sample because ISIS detector
+        coordinates are 0.5 based.
+
         Returns
         -------
         : float
           detector center sample
         """
-        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0])
+        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0]) - 0.5
 
 
     @property
@@ -374,12 +383,15 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
         Expects ikid to be defined. This should be the integer Naid ID code for
         the instrument.
 
+        We subtract 0.5 from the ISIS center line because ISIS detector
+        coordinates are 0.5 based.
+
         Returns
         -------
         : float
           detector center line
         """
-        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
+        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1]) - 0.5
 
     @property
     def sensor_model_version(self):
