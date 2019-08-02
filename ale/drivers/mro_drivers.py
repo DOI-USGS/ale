@@ -15,7 +15,7 @@ from ale.base.type_distortion import RadialDistortion
 from ale.base.type_sensor import LineScanner
 
 
-class MroCtxIsisLabelIsisSpiceDriver(Driver, IsisSpice, LineScanner, RadialDistortion):
+class MroCtxIsisLabelIsisSpiceDriver(IsisLabel, IsisSpice, LineScanner, RadialDistortion, Driver):
 
     @property
     def instrument_id(self):
@@ -29,7 +29,10 @@ class MroCtxIsisLabelIsisSpiceDriver(Driver, IsisSpice, LineScanner, RadialDisto
         : str
           instrument id
         """
-        return "N/A"
+        id_lookup = {
+        "CTX" : "MRO_CTX"
+        }
+        return id_lookup[super().instrument_id]
 
     @property
     def spacecraft_id(self):
@@ -39,27 +42,28 @@ class MroCtxIsisLabelIsisSpiceDriver(Driver, IsisSpice, LineScanner, RadialDisto
         : int
           Naif ID code for the spacecraft
         """
-        return "N/A"
+        return "-74"
 
     @property
-    def ikid(self):
+    def sensor_name(self):
         """
-        Returns
-        -------
-        : int
-          Naif ID code for the instrument
+        ISIS doesn't propergate this to the ingested cube label, so hard-code it.
         """
-        return int(self.label["IsisCube"]["Kernels"]["NaifFrameCode"])
+        return "CONTEXT CAMERA"
+
 
     @property
-    def line_exposure_duration(self):
+    def detector_center_sample(self):
         """
+        The center of the CCD in detector pixels
+        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.
+
         Returns
         -------
-        : float
-          Line exposure duration in seconds
+        float :
+            The center sample of the CCD
         """
-        return self.label["IsisCube"]["Instrument"]["LineExposureDuration"].value * 0.001 # Scale to seconds
+        return super().detector_center_sample - 0.5
 
 class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDistortion, Driver):
     """
@@ -166,6 +170,19 @@ class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDi
         return self.label['IsisCube']['Instrument']['SampleFirstPixel']
 
     @property
+    def detector_center_sample(self):
+        """
+        The center of the CCD in detector pixels
+        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.
+
+        Returns
+        -------
+        float :
+            The center sample of the CCD
+        """
+        return super().detector_center_sample - 0.5
+
+    @property
     def sensor_model_version(self):
         """
         Returns
@@ -248,6 +265,19 @@ class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, LineScanner, RadialDi
           Starting detector sample for the image
         """
         return self.label.get('SAMPLE_FIRST_PIXEL', 0)
+
+    @property
+    def detector_center_sample(self):
+        """
+        The center of the CCD in detector pixels
+        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.
+
+        Returns
+        -------
+        float :
+            The center sample of the CCD
+        """
+        return super().detector_center_sample - 0.5
 
     @property
     def sensor_model_version(self):

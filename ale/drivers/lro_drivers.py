@@ -137,3 +137,104 @@ class LroLrocPds3LabelNaifSpiceDriver(NaifSpice, Pds3Label, LineScanner, Driver)
           for the different options available.
         """
         return 'NONE'
+
+    @property
+    def detector_center_sample(self):
+        """
+        The center of the CCD in detector pixels
+        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.
+
+        Returns
+        -------
+        float :
+            The center sample of the CCD
+        """
+        return super().detector_center_sample - 0.5
+
+    @property
+    def ephemeris_start_time(self):
+        """
+        The starting ephemeris time for LRO is computed by taking the
+        LRO:SPACECRAFT_CLOCK_PREROLL_COUNT, as defined in the label, and
+        adding offsets that were taken from an IAK.
+        -------
+        : double
+          Starting ephemeris time of the image
+        """
+        start_time = spice.scs2e(self.spacecraft_id, self.label['LRO:SPACECRAFT_CLOCK_PREROLL_COUNT'])
+        return start_time + self.constant_time_offset + self.additional_preroll * self.exposure_duration
+
+    @property
+    def exposure_duration(self):
+        """
+        Takes the exposure_duration defined in a parent class and adds
+        offsets taken from an IAK.
+
+         Returns
+         -------
+         : float
+           Returns the exposure duration in seconds.
+         """
+        return super().exposure_duration * (1 + self.multiplicative_line_error) + self.additive_line_error
+
+    @property
+    def multiplicative_line_error(self):
+        """
+        Returns the multiplicative line error defined in an IAK.
+
+         Returns
+         -------
+         : float
+           Returns the multiplicative line error.
+         """
+        return 0.0045
+
+    @property
+    def additive_line_error(self):
+        """
+        Returns the additive line error defined in an IAK.
+
+         Returns
+         -------
+         : float
+           Returns the additive line error.
+         """
+        return 0.0
+
+    @property
+    def constant_time_offset(self):
+        """
+        Returns the constant time offset defined in an IAK.
+
+         Returns
+         -------
+         : float
+           Returns the constant time offset.
+         """
+        return 0.0
+
+    @property
+    def additional_preroll(self):
+        """
+        Returns the addition preroll defined in an IAK.
+
+         Returns
+         -------
+         : float
+           Returns the additionl preroll.
+         """
+        return 1024.0
+
+    @property
+    def sampling_factor(self):
+        """
+        Returns the summing factor from the PDS3 label that is defined by the CROSSTRACK_SUMMING.
+        For example a return value of 2 indicates that 2 lines and 2 samples (4 pixels)
+        were summed and divided by 4 to produce the output pixel value.
+
+        Returns
+        -------
+        : int
+          Number of samples and lines combined from the original data to produce a single pixel in this image
+        """
+        return self.crosstrack_summing

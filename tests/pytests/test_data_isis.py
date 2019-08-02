@@ -1,5 +1,6 @@
 import pytest
 import pvl
+import numpy as np
 from ale.base.data_isis import IsisSpice
 
 
@@ -503,7 +504,7 @@ End
 @pytest.fixture
 def testdata():
     isis_spice = IsisSpice()
-    isis_spice._label = pvl.loads(testlabel)
+    isis_spice.label = pvl.loads(testlabel)
     return isis_spice
 
 
@@ -570,3 +571,123 @@ def test_isis_naif_keywords(testdata):
 
 def test_odtk(testdata):
     assert testdata.odtk == [-0.0048509, 2.41312e-07, -1.62369e-13]
+
+
+def test_frame_chain(testdata):
+    testdata._inst_pointing_table = {
+        'J2000Q0' : [1, 0.5],
+        'J2000Q1' : [0, 0.5],
+        'J2000Q2' : [0, 0.5],
+        'J2000Q3' : [0, 0.5],
+        'ET' : [0, 1],
+        'TimeDependentFrames' : [-1000, -100, 1],
+        'ConstantRotation' : [0, 0, 1, 1, 0 , 0, 0, 1, 0],
+        'ConstantFrames' : [-1020, -1000]}
+    testdata._body_orientation_table = {
+        'J2000Q0' : [1, 0.5],
+        'J2000Q1' : [0, 0.5],
+        'J2000Q2' : [0, 0.5],
+        'J2000Q3' : [0, 0.5],
+        'ET' : [0, 1],
+        'TimeDependentFrames' : [80, 1],
+        'ConstantRotation' : [0, 0, 1, 1, 0 , 0, 0, 1, 0],
+        'ConstantFrames' : [81, 80]}
+    frame_chain = testdata.frame_chain
+    assert len(frame_chain.nodes) == 5
+    assert frame_chain.has_node(1)
+    assert frame_chain.has_node(80)
+    assert frame_chain.has_node(81)
+    assert frame_chain.has_node(-1000)
+    assert frame_chain.has_node(-1020)
+    assert len(frame_chain.edges) == 8
+    assert frame_chain.has_edge(1, 80)
+    assert frame_chain.has_edge(80, 1)
+    assert frame_chain.has_edge(81, 80)
+    assert frame_chain.has_edge(80, 81)
+    assert frame_chain.has_edge(1, -1000)
+    assert frame_chain.has_edge(-1000, 1)
+    assert frame_chain.has_edge(-1020, -1000)
+    assert frame_chain.has_edge(-1000, -1020)
+
+def test_sun_position_cache(testdata):
+    testdata._inst_pointing_table = {
+        'J2000Q0' : [1, 1],
+        'J2000Q1' : [0, 0],
+        'J2000Q2' : [0, 0],
+        'J2000Q3' : [0, 0],
+        'ET' : [0, 1],
+        'TimeDependentFrames' : [-1000, -100, 1]}
+    testdata._body_orientation_table = {
+        'J2000Q0' : [1, 0.5],
+        'J2000Q1' : [0, 0.5],
+        'J2000Q2' : [0, 0.5],
+        'J2000Q3' : [0, 0.5],
+        'ET' : [0, 1],
+        'TimeDependentFrames' : [80, 1]}
+    testdata._sun_position_table = {
+        'J2000X' : [1, 0],
+        'J2000Y' : [0, 1],
+        'J2000Z' : [0, 0],
+        'J2000XV' : [-1, 0],
+        'J2000YV' : [0, -1],
+        'J2000ZV' : [0, 0],
+        'ET' : [0, 1]}
+    sun_pos, sun_vel, sun_times = testdata.sun_position
+    np.testing.assert_almost_equal(sun_pos, np.array([[1000, 0, 0], [0, 0, 1000]]))
+    np.testing.assert_almost_equal(sun_vel, np.array([[-1000, 0, 0], [0, 0, -1000]]))
+    np.testing.assert_equal(sun_times, np.array([0, 1]))
+
+def test_sun_position_polynomial(testdata):
+    testdata._inst_pointing_table = {
+        'J2000Q0' : [1, 1],
+        'J2000Q1' : [0, 0],
+        'J2000Q2' : [0, 0],
+        'J2000Q3' : [0, 0],
+        'ET' : [2, 4],
+        'TimeDependentFrames' : [-1000, -100, 1]}
+    testdata._body_orientation_table = {
+        'J2000Q0' : [1, 0.5],
+        'J2000Q1' : [0, 0.5],
+        'J2000Q2' : [0, 0.5],
+        'J2000Q3' : [0, 0.5],
+        'ET' : [2, 4],
+        'TimeDependentFrames' : [80, 1]}
+    testdata._sun_position_table = {
+        'SpkTableOriginalSize' : 2,
+        'SpkTableStartTime' : 2,
+        'SpkTableEndTime' : 4,
+        'J2000SVX' : [1, -1, 2],
+        'J2000SVY' : [0, 1, 2],
+        'J2000SVZ' : [0, -1, 1]}
+    sun_pos, sun_vel, sun_times = testdata.sun_position
+    np.testing.assert_almost_equal(sun_pos, np.array([[1000, 0, 0], [-1000, 0, 1000]]))
+    np.testing.assert_almost_equal(sun_vel, np.array([[-500, 500, -500], [-500, -500, 500]]))
+    np.testing.assert_equal(sun_times, np.array([2, 4]))
+
+def test_inst_position_cache(testdata):
+    testdata._inst_pointing_table = {
+        'J2000Q0' : [1, 1],
+        'J2000Q1' : [0, 0],
+        'J2000Q2' : [0, 0],
+        'J2000Q3' : [0, 0],
+        'ET' : [0, 1],
+        'TimeDependentFrames' : [-1000, -100, 1]}
+    testdata._body_orientation_table = {
+        'J2000Q0' : [1, 0.5],
+        'J2000Q1' : [0, 0.5],
+        'J2000Q2' : [0, 0.5],
+        'J2000Q3' : [0, 0.5],
+        'ET' : [0, 1],
+        'TimeDependentFrames' : [80, 1]}
+    testdata._inst_position_table = {
+        'J2000X' : [1, 0],
+        'J2000Y' : [0, 1],
+        'J2000Z' : [0, 0],
+        'J2000XV' : [-1, 0],
+        'J2000YV' : [0, -1],
+        'J2000ZV' : [0, 0],
+        'ET' : [0, 1]}
+    sensor_pos, sensor_vel, sensor_times = testdata.sensor_position
+    np.testing.assert_almost_equal(sensor_pos, np.array([[1000, 0, 0], [0, 0, 1000]]))
+    np.testing.assert_almost_equal(sensor_vel, np.array([[-1000, 0, 0], [0, 0, -1000]]))
+    np.testing.assert_equal(sensor_times, np.array([0, 1]))

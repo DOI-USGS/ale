@@ -127,7 +127,7 @@ class TimeDependentRotation:
            The NAIF ID code for the destination frame
     """
 
-    def from_euler(sequence, euler, times, source, dest):
+    def from_euler(sequence, euler, times, source, dest, degrees=False):
         """
         Create a time dependent rotation from a set of Euler angles.
 
@@ -145,12 +145,15 @@ class TimeDependentRotation:
                  The NAIF ID code for the source frame
         dest : int
                The NAIF ID code for the destination frame
+        degrees : bool
+                  If the angles are in degrees. If false, then degrees are
+                  assumed to be in radians. Defaults to False.
 
         See Also
         --------
         scipy.spatial.transform.Rotation.from_euler
         """
-        rot = Rotation.from_euler(sequence, np.asarray(euler))
+        rot = Rotation.from_euler(sequence, np.asarray(euler), degrees=degrees)
         return TimeDependentRotation(rot.as_quat(), times, source, dest)
 
     def __init__(self, quats, times, source, dest):
@@ -209,6 +212,23 @@ class TimeDependentRotation:
         """
         return TimeDependentRotation(self._rots.inv().as_quat(), self.times, self.dest, self.source)
 
+    def reinterpolate(self, times):
+        """
+        Reinterpolate the rotation at a given set of times.
+
+        Parameters
+        ----------
+        times : 1darray
+                The new times to interpolate at.
+
+        Returns
+        -------
+         : TimeDependentRotation
+           The new rotation that the input times
+        """
+        new_quats = Slerp(self.times, self._rots)(times).as_quat()
+        return TimeDependentRotation(new_quats, times, self.source, self.dest)
+
     def __mul__(self, other):
         """
         Compose this rotation with another rotation.
@@ -245,3 +265,12 @@ class TimeDependentRotation:
             return TimeDependentRotation(new_quats, new_times, other.source, self.dest)
         else:
             raise TypeError("Rotations can only be composed with other rotations.")
+
+    def apply_at(self, vec, et):
+        """
+        Apply the rotation at a specific time
+        """
+        if len(self.times) == 1 and self.times[0] == et:
+            return self._rots.apply(vec)
+        rot = Slerp(self.times, self._rots)(et)
+        return rot.apply(vec)

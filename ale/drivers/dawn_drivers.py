@@ -216,12 +216,17 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         Returns center detector sample acquired from Spice Kernels.
         Expects ikid to be defined. This should be the integer Naid ID code for
         the instrument.
+
+        We have to add 0.5 to the CCD Center because the Dawn IK defines the
+        detector pixels as 0.0 being the center of the first pixel so they are
+        -0.5 based.
+
         Returns
         -------
         : float
           center detector sample
         """
-        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[0])
+        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[0]) + 0.5
 
     @property
     def detector_center_line(self):
@@ -229,9 +234,14 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         Returns center detector line acquired from Spice Kernels.
         Expects ikid to be defined. This should be the integer Naid ID code for
         the instrument.
+
+        We have to add 0.5 to the CCD Center because the Dawn IK defines the
+        detector pixels as 0.0 being the center of the first pixel so they are
+        -0.5 based.
+
         Returns
         -------
         : float
           center detector line
         """
-        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[1])
+        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[1]) + 0.5
