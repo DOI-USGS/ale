@@ -55,8 +55,9 @@ def test_ephemeris_start_time(driver):
                                    pvl._collections.Units(value=501, units='<sec>')}) as f:
         assert driver.ephemeris_start_time == 0.1
 
+@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
 def test_detector_center_line(driver):
-    assert driver.detector_center_line == 0
+    assert driver.detector_center_line == 0.5
 
 @patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
 def test_detector_center_sample(driver):
