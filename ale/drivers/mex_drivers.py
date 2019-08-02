@@ -289,7 +289,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         """
         Returns the center detector line.
 
-        For HRSC, we are dealing with a single line, so center line will be 1.
+        For HRSC, we are dealing with a single line, so center line will be 0.
 
         Returns
         -------
@@ -297,7 +297,6 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
           Detector line of the principal point
         """
         return 0.0
-
 
     @property
     def detector_start_sample(self):
@@ -315,14 +314,16 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         """
         Returns the center detector sample.
 
-        For HRSC, center sample is consistent regardless of filter.
+        For HRSC, center sample is consistent regardless of filter. This is
+        different from ISIS's center sample because ISIS line scan sensors use
+        0.5 based detector samples.
 
         Returns
         -------
         : float
           Detector sample of the principal point
         """
-        return 2592.5
+        return 2592.0
 
 
     @property

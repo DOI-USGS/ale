@@ -219,26 +219,34 @@ class KaguyaTcPds3NaifSpiceDriver(Pds3Label,NaifSpice, LineScanner, Driver):
     @property
     def detector_center_line(self):
         """
+        Returns the center detector line of the detector. Expects tc_id to be
+        defined. This should be a string of the form LISM_TC1 or LISM_TC2.
+
+        We subtract 0.5 from the center line because as per the IK:
+        Center of the first pixel is defined as "1.0".
+
         Returns
         -------
         : int
           The detector line of the principle point
         """
-        return 0
+        return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[0] - 0.5
 
     @property
     def detector_center_sample(self):
         """
-        Returnce the center detector sample of the image. Expects tc_id to be
+        Returns the center detector sample of the detector. Expects tc_id to be
         defined. This should be a string of the form LISM_TC1 or LISM_TC2.
+
+        We subtract 0.5 from the center sample because as per the IK:
+        Center of the first pixel is defined as "1.0".
 
         Returns
         -------
         : int
           The detector sample of the principle point
         """
-        # Pixels are 0 based, not one based, so subtract 1
-        return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[0]-1
+        return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[0] - 0.5
 
     @property
     def _sensor_orientation(self):

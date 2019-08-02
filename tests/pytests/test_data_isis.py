@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import patch
 import pvl
 import numpy as np
 from ale.base.data_isis import IsisSpice
@@ -633,9 +634,11 @@ def test_sun_position_cache(testdata):
         'J2000ZV' : [0, 0],
         'ET' : [0, 1]}
     sun_pos, sun_vel, sun_times = testdata.sun_position
-    np.testing.assert_almost_equal(sun_pos, np.array([[1000, 0, 0], [0, 0, 1000]]))
-    np.testing.assert_almost_equal(sun_vel, np.array([[-1000, 0, 0], [0, 0, -1000]]))
-    np.testing.assert_equal(sun_times, np.array([0, 1]))
+    np.testing.assert_almost_equal(sun_pos, [[1000, 0, 0], [0, 0, 1000]])
+    np.testing.assert_almost_equal(sun_vel,
+                                   [[-1000, 2000*np.pi*np.sqrt(3)/9, -2000*np.pi*np.sqrt(3)/9],
+                                    [2000*np.pi*np.sqrt(3)/9, -2000*np.pi*np.sqrt(3)/9, -1000]])
+    np.testing.assert_equal(sun_times, [0, 1])
 
 def test_sun_position_polynomial(testdata):
     testdata._inst_pointing_table = {
@@ -659,10 +662,13 @@ def test_sun_position_polynomial(testdata):
         'J2000SVX' : [1, -1, 2],
         'J2000SVY' : [0, 1, 2],
         'J2000SVZ' : [0, -1, 1]}
+
     sun_pos, sun_vel, sun_times = testdata.sun_position
-    np.testing.assert_almost_equal(sun_pos, np.array([[1000, 0, 0], [-1000, 0, 1000]]))
-    np.testing.assert_almost_equal(sun_vel, np.array([[-500, 500, -500], [-500, -500, 500]]))
-    np.testing.assert_equal(sun_times, np.array([2, 4]))
+    np.testing.assert_almost_equal(sun_pos, [[1000, 0, 0], [-1000, 0, 1000]])
+    np.testing.assert_almost_equal(sun_vel,
+                                   [[-500, 500 + 1000*np.pi*np.sqrt(3)/9, -500 - 1000*np.pi*np.sqrt(3)/9],
+                                    [-500 + 1000*np.pi*np.sqrt(3)/9, -500 - 2000*np.pi*np.sqrt(3)/9, 500 + 1000*np.pi*np.sqrt(3)/9]])
+    np.testing.assert_equal(sun_times, [2, 4])
 
 def test_inst_position_cache(testdata):
     testdata._inst_pointing_table = {
@@ -688,6 +694,8 @@ def test_inst_position_cache(testdata):
         'J2000ZV' : [0, 0],
         'ET' : [0, 1]}
     sensor_pos, sensor_vel, sensor_times = testdata.sensor_position
-    np.testing.assert_almost_equal(sensor_pos, np.array([[1000, 0, 0], [0, 0, 1000]]))
-    np.testing.assert_almost_equal(sensor_vel, np.array([[-1000, 0, 0], [0, 0, -1000]]))
-    np.testing.assert_equal(sensor_times, np.array([0, 1]))
+    np.testing.assert_almost_equal(sensor_pos, [[1000, 0, 0], [0, 0, 1000]])
+    np.testing.assert_almost_equal(sensor_vel,
+                                   [[-1000, 2000*np.pi*np.sqrt(3)/9, -2000*np.pi*np.sqrt(3)/9],
+                                    [2000*np.pi*np.sqrt(3)/9, -2000*np.pi*np.sqrt(3)/9, -1000]])
+    np.testing.assert_equal(sensor_times, [0, 1])

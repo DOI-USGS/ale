@@ -299,17 +299,22 @@ class NaifSpice():
             ephem = self.ephemeris_time
             pos = []
             vel = []
+         
             for time in ephem:
-                state, _ = spice.spkezr(self.spacecraft_name,
-                                        time,
-                                        self.reference_frame,
-                                        self.light_time_correction,
-                                        self.target_name,)
+                # spkezr returns a vector from the observer's location to the aberration-corrected
+                # location of the target. For more information, see: 
+                # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
+                state, _ = spice.spkezr(self.target_name,
+                                       time,
+                                       self.reference_frame,
+                                       self.light_time_correction,
+                                       self.spacecraft_name,)
                 pos.append(state[:3])
                 vel.append(state[3:])
-            # By default, spice works in km
-            self._position = [p * 1000 for p in pos]
-            self._velocity = [v * 1000 for v in vel]
+            # By default, spice works in km, and the vector returned by spkezr points the opposite
+            # direction to what ALE needs, so it must be multiplied by (-1) 
+            self._position = [p * -1000 for p in pos]
+            self._velocity = [v * -1000 for v in vel] 
         return self._position, self._velocity, self.ephemeris_time
 
     @property
@@ -375,24 +380,7 @@ class NaifSpice():
         : double
           Ephemeris stop time of the image
         """
-        if self.spacecraft_clock_stop_count:
-            return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_stop_count)
-        else:
-            return spice.str2et(self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S"))
-
-    @property
-    def center_ephemeris_time(self):
-        """
-        Returns the average of the start and stop ephemeris times. Expects
-        ephemeris start and stop times to be defined. These should be double precision
-        numbers containing the ephemeris start and stop times of the image.
-
-        Returns
-        -------
-        : double
-          Center ephemeris time for an image
-        """
-        return (self.ephemeris_start_time + self.ephemeris_stop_time) / 2
+        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_stop_count)
 
     @property
     def detector_center_sample(self):

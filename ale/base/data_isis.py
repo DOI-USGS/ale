@@ -84,11 +84,11 @@ def parse_table(table_label, data):
 
     return results
 
-def rotate_positions(table, rotation):
+def rotate_state(table, rotation):
     """
-    Rotate the positions in a position Table.
+    Rotate the positions and velocities in an ISIS position Table.
 
-    If the table stores positions as a function, then it will re compute them
+    If the table stores states as a function, then it will re compute them
     based on the original size of the table.
 
     Parameters
@@ -102,62 +102,27 @@ def rotate_positions(table, rotation):
     -------
     : 2darray
       Array of rotated positions
+    : 2darray
+      Array of rotated velocities. Returns None if no velocities are in the table.
     : array
-      Array of times for the positions
-
+      Array of times for the states
     """
-    # Case 1, the table has positions at discrete times
+    positions = None
+    velocities = None
+    ephemeris_times = None
+    # Case 1, the table has states at discrete times
     if 'J2000X' in table:
         ephemeris_times = table['ET']
         positions = 1000 * np.array([table['J2000X'],
                                      table['J2000Y'],
                                      table['J2000Z']]).T
-        rotated_pos = rotation.apply_at(positions, ephemeris_times)
-    # Case 2, the table has coefficients of polynomials for the position
-    elif 'J2000SVX' in table:
-        ephemeris_times = np.linspace(table['SpkTableStartTime'],
-                                      table['SpkTableEndTime'],
-                                      table['SpkTableOriginalSize'])
-        base_time = table['J2000SVX'][-1]
-        time_scale = table['J2000SVY'][-1]
-        scaled_times = (ephemeris_times - base_time) / time_scale
-        coeffs = np.array([table['J2000SVX'][:-1],
-                           table['J2000SVY'][:-1],
-                           table['J2000SVZ'][:-1]]).T
-        positions = 1000 * polyval(scaled_times, coeffs).T
-        rotated_pos = rotation.apply_at(positions, ephemeris_times)
-    else:
-        raise ValueError('No positions are available in the input table.')
-    return rotated_pos, ephemeris_times
+        if 'J2000XV' in table:
+            ephemeris_times = table['ET']
+            velocities = 1000 * np.array([table['J2000XV'],
+                                          table['J2000YV'],
+                                          table['J2000ZV']]).T
 
-def rotate_velocities(table, rotation):
-    """
-    Rotate the velocities in a position Table.
-
-    If the table stores positions as a function, then it will re compute them
-    based on the original size of the table.
-
-    Parameters
-    ----------
-    table : dict
-            The position table as a dict from parse_position_table
-    rotation : TimeDependentRotation
-               The rotation to rotate the velocities by
-
-    Returns
-    -------
-    : 2darray
-      Array of rotated velocities. Returns None if no velocities are in the table.
-
-    """
-    # Case 1, the table has velocities at discrete times
-    if 'J2000XV' in table:
-        ephemeris_times = table['ET']
-        velocity = 1000 * np.array([table['J2000XV'],
-                                    table['J2000YV'],
-                                    table['J2000ZV']]).T
-        rotated_vel = rotation.apply_at(velocity, ephemeris_times)
-    # Case 2, the table has coefficients of polynomials for the position
+    # Case 2, the table has coefficients of polynomials for the states
     elif 'J2000SVX' in table:
         ephemeris_times = np.linspace(table['SpkTableStartTime'],
                                       table['SpkTableEndTime'],
@@ -168,14 +133,20 @@ def rotate_velocities(table, rotation):
         coeffs = np.array([table['J2000SVX'][:-1],
                            table['J2000SVY'][:-1],
                            table['J2000SVZ'][:-1]])
+        positions = 1000 * polyval(scaled_times, coeffs.T).T
         scaled_vel = 1000 * polyval(scaled_times,  polyder(coeffs,axis=1).T).T
         # We took a derivative in scaled time, so we have to multiply by our
         # scale in order to get the derivative in real time
-        velocity = scaled_vel / time_scale
-        rotated_vel = rotation.apply_at(velocity, ephemeris_times)
+        velocities = scaled_vel / time_scale
+    else:
+        raise ValueError('No positions are available in the input table.')
+
+    rotated_pos = rotation.apply_at(positions, ephemeris_times)
+    if velocities is not None:
+        rotated_vel = rotation.rotate_velocity_at(positions, velocities, ephemeris_times)
     else:
         rotated_vel = None
-    return rotated_vel
+    return rotated_pos, rotated_vel, ephemeris_times
 
 class IsisSpice():
     """Mixin class for reading from an ISIS cube that has been spiceinit'd
@@ -296,6 +267,14 @@ class IsisSpice():
         are used.
         """
         return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Called when the context goes out of scope. This is
+        implemented to conform to the context manager paradigm
+        used by other data mix ins.
+        """
+        pass
 
 
     @property
@@ -544,8 +523,7 @@ class IsisSpice():
             as a tuple of numpy arrays.
         """
         j2000_to_target = self.frame_chain.compute_rotation(1, self.target_frame_id)
-        positions, times = rotate_positions(self.sun_position_table, j2000_to_target)
-        velocities = rotate_velocities(self.sun_position_table, j2000_to_target)
+        positions, velocities, times = rotate_state(self.sun_position_table, j2000_to_target)
         return positions, velocities, times
 
 
@@ -565,8 +543,7 @@ class IsisSpice():
           a tuple containing a list of positions, a list of velocities, and a list of times
         """
         j2000_to_target = self.frame_chain.compute_rotation(1, self.target_frame_id)
-        positions, times = rotate_positions(self.inst_position_table, j2000_to_target)
-        velocities = rotate_velocities(self.inst_position_table, j2000_to_target)
+        positions, velocities, times = rotate_state(self.inst_position_table, j2000_to_target)
         return positions, velocities, times
 
 

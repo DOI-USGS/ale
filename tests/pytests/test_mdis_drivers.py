@@ -42,7 +42,7 @@ def test_instrument_id_pds3(Pds3Driver):
         mock_id.return_value = 'MDIS-WAC'
         assert Pds3Driver.instrument_id == 'MSGR_MDIS_WAC'
         mock_id.return_value = 'MDIS-NAC'
-        assert Pds3Driver.instrument_id == 'MSGR_MDIS_NAC'    
+        assert Pds3Driver.instrument_id == 'MSGR_MDIS_NAC'
 
 @patch('ale.base.label_pds3.Pds3Label.filter_number', 10)
 @patch('ale.base.data_naif.NaifSpice.ikid', 100)
@@ -61,11 +61,11 @@ def test_detector_start_line_pds3(Pds3Driver):
 
 @patch('ale.base.data_naif.NaifSpice.ikid', 123)
 def test_detector_center_sample_pds3(Pds3Driver):
-    assert Pds3Driver.detector_center_sample == 1
+    assert Pds3Driver.detector_center_sample == 512
 
 @patch('ale.base.data_naif.NaifSpice.ikid', 123)
 def test_detector_center_line_pds3(Pds3Driver):
-    assert Pds3Driver.detector_center_line == 1
+    assert Pds3Driver.detector_center_line == 512
 
 def test_sensor_model_version_pds3(Pds3Driver):
     assert Pds3Driver.sensor_model_version == 2
@@ -115,11 +115,11 @@ def test_detector_start_line_isis(IsisLabelDriver):
 
 @patch('ale.base.data_naif.NaifSpice.ikid', 100)
 def test_detector_center_line_isis(IsisLabelDriver):
-    assert IsisLabelDriver.detector_center_line == 1
+    assert IsisLabelDriver.detector_center_line == 0.5
 
 @patch('ale.base.data_naif.NaifSpice.ikid', 100)
 def detector_center_sample_isis(IsisLabelDriver):
-    assert IsisLabelDriver.detector_center_sample == 1
+    assert IsisLabelDriver.detector_center_sample == 0.5
 
 def test_sensor_model_version_isis(IsisLabelDriver):
     assert IsisLabelDriver.sensor_model_version == 2
