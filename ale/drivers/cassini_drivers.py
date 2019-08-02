@@ -19,7 +19,7 @@ from ale.transformation import FrameChain
 from scipy.spatial.transform import Rotation
 
 
-class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDistortion, Driver):
+class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDistortion, Driver):
     """
     Cassini mixin class for defining Spice calls.
     """
@@ -296,4 +296,3 @@ class CassiniIssPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, Framer, RadialDis
           return 14082360
         elif self.instrument_id == "CASSINI_ISS_WAC":
           return self._original_naif_sensor_frame_id
-

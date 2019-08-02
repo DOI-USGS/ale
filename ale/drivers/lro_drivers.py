@@ -12,7 +12,7 @@ from ale.base.label_pds3 import Pds3Label
 from ale.base.type_sensor import LineScanner
 
 
-class LroLrocPds3LabelNaifSpiceDriver(NaifSpice, Pds3Label, LineScanner, Driver):
+class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver):
     """
     Driver for reading LROC NACL, NACR (not WAC, it is a push frame) labels. Requires a Spice mixin to
     acquire addtional ephemeris and instrument data located exclusively in SPICE kernels, A PDS3 label,

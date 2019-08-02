@@ -15,7 +15,7 @@ from ale.base.type_distortion import RadialDistortion
 from ale.base.type_sensor import LineScanner
 
 
-class MroCtxIsisLabelIsisSpiceDriver(IsisLabel, IsisSpice, LineScanner, RadialDistortion, Driver):
+class MroCtxIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, RadialDistortion, Driver):
 
     @property
     def instrument_id(self):
