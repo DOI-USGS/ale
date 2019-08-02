@@ -139,10 +139,23 @@ class LroLrocPds3LabelNaifSpiceDriver(NaifSpice, Pds3Label, LineScanner, Driver)
         return 'NONE'
 
     @property
+    def detector_center_sample(self):
+        """
+        The center of the CCD in detector pixels
+        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.
+
+        Returns
+        -------
+        float :
+            The center sample of the CCD
+        """
+        return super().detector_center_sample - 0.5
+
+    @property
     def ephemeris_start_time(self):
         """
-        The starting ephemeris time for LRO is computed by taking the 
-        LRO:SPACECRAFT_CLOCK_PREROLL_COUNT, as defined in the label, and 
+        The starting ephemeris time for LRO is computed by taking the
+        LRO:SPACECRAFT_CLOCK_PREROLL_COUNT, as defined in the label, and
         adding offsets that were taken from an IAK.
         -------
         : double
@@ -154,7 +167,7 @@ class LroLrocPds3LabelNaifSpiceDriver(NaifSpice, Pds3Label, LineScanner, Driver)
     @property
     def exposure_duration(self):
         """
-        Takes the exposure_duration defined in a parent class and adds 
+        Takes the exposure_duration defined in a parent class and adds
         offsets taken from an IAK.
 
          Returns
@@ -215,8 +228,8 @@ class LroLrocPds3LabelNaifSpiceDriver(NaifSpice, Pds3Label, LineScanner, Driver)
     @property
     def sampling_factor(self):
         """
-        Returns the summing factor from the PDS3 label that is defined by the CROSSTRACK_SUMMING. 
-        For example a return value of 2 indicates that 2 lines and 2 samples (4 pixels) 
+        Returns the summing factor from the PDS3 label that is defined by the CROSSTRACK_SUMMING.
+        For example a return value of 2 indicates that 2 lines and 2 samples (4 pixels)
         were summed and divided by 4 to produce the output pixel value.
 
         Returns

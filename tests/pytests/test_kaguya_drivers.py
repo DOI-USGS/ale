@@ -60,7 +60,7 @@ def test_detector_center_line(driver):
 
 @patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
 def test_detector_center_sample(driver):
-    assert driver.detector_center_sample == 0
+    assert driver.detector_center_sample == 0.5
 
 @patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
 @patch('ale.base.label_pds3.Pds3Label.target_name', 'MOON')

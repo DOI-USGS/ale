@@ -52,6 +52,19 @@ class MroCtxIsisLabelIsisSpiceDriver(IsisLabel, IsisSpice, LineScanner, RadialDi
         return "CONTEXT CAMERA"
 
 
+    @property
+    def detector_center_sample(self):
+        """
+        The center of the CCD in detector pixels
+        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.
+
+        Returns
+        -------
+        float :
+            The center sample of the CCD
+        """
+        return super().detector_center_sample - 0.5
+
 class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDistortion, Driver):
     """
     Driver for reading CTX ISIS labels.
@@ -157,6 +170,19 @@ class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDi
         return self.label['IsisCube']['Instrument']['SampleFirstPixel']
 
     @property
+    def detector_center_sample(self):
+        """
+        The center of the CCD in detector pixels
+        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.
+
+        Returns
+        -------
+        float :
+            The center sample of the CCD
+        """
+        return super().detector_center_sample - 0.5
+
+    @property
     def sensor_model_version(self):
         """
         Returns
@@ -239,6 +265,19 @@ class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, LineScanner, RadialDi
           Starting detector sample for the image
         """
         return self.label.get('SAMPLE_FIRST_PIXEL', 0)
+
+    @property
+    def detector_center_sample(self):
+        """
+        The center of the CCD in detector pixels
+        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.
+
+        Returns
+        -------
+        float :
+            The center sample of the CCD
+        """
+        return super().detector_center_sample - 0.5
 
     @property
     def sensor_model_version(self):
