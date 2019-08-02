@@ -61,11 +61,11 @@ def test_detector_start_line_pds3(Pds3Driver):
 
 @patch('ale.base.data_naif.NaifSpice.ikid', 123)
 def test_detector_center_sample_pds3(Pds3Driver):
-    assert Pds3Driver.detector_center_sample == 0.5
+    assert Pds3Driver.detector_center_sample == 512
 
 @patch('ale.base.data_naif.NaifSpice.ikid', 123)
 def test_detector_center_line_pds3(Pds3Driver):
-    assert Pds3Driver.detector_center_line == 0.5
+    assert Pds3Driver.detector_center_line == 512
 
 def test_sensor_model_version_pds3(Pds3Driver):
     assert Pds3Driver.sensor_model_version == 2
