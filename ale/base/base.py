@@ -296,3 +296,15 @@ class Driver(ABC):
           The stop time of the image in ephemeris seconds past the J2000 epoch.
         """
         pass
+
+    @property
+    def center_ephemeris_time(self):
+        """
+        Returns the average of the start and stop ephemeris times.
+
+        Returns
+        -------
+        : double
+          Center ephemeris time for an image
+        """
+        return (self.ephemeris_start_time + self.ephemeris_stop_time) / 2

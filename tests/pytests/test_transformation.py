@@ -38,8 +38,8 @@ def test_create_two_rotations():
 def test_create_euler_rotations():
     test_table = {
         'J2000Ang1' : [0, 0, 10],
-        'J2000Ang2' : [90, -90, 2],
-        'J2000Ang3' : [90, -90, 1],
+        'J2000Ang2' : [-np.pi/2, np.pi/2, 2],
+        'J2000Ang3' : [-np.pi/2, np.pi/2, 1],
         'CkTableStartTime' : 10,
         'CkTableEndTime' : 12,
         'CkTableOriginalSize' : 2,

@@ -23,7 +23,7 @@ class IdealLsIsisLabelIsisSpiceDriver(IsisSpice, LineScanner, IsisLabel, NoDisto
     def ephemeris_start_time(self):
         """
         The image start time in ephemeris time.
-        
+
         Returns
         -------
         float :
@@ -33,7 +33,7 @@ class IdealLsIsisLabelIsisSpiceDriver(IsisSpice, LineScanner, IsisLabel, NoDisto
         return self.label.get('IsisCube').get('Instrument').get("EphemerisTime").value
 
 
-    @property 
+    @property
     def ephemeris_stop_time(self):
         """
         Returns the sum of the starting ephemeris time and the number of lines
@@ -48,7 +48,7 @@ class IdealLsIsisLabelIsisSpiceDriver(IsisSpice, LineScanner, IsisLabel, NoDisto
           Center ephemeris time for an image
         """
         return super().ephemeris_stop_time
-        
+
 
     @property
     def spacecraft_name(self):
@@ -144,7 +144,7 @@ class IdealLsIsisLabelIsisSpiceDriver(IsisSpice, LineScanner, IsisLabel, NoDisto
        """
 
         return self.isis_naif_keywords.get('IDEAL_TRANSL')
-        
+
 
     @property
     def focal2pixel_samples(self):
@@ -158,7 +158,40 @@ class IdealLsIsisLabelIsisSpiceDriver(IsisSpice, LineScanner, IsisLabel, NoDisto
        """
         return self.isis_naif_keywords.get('IDEAL_TRANSS')
 
+    @property
+    def focal_length(self):
+        """
+        The focal length of the instrument
+        Expects isis_naif_keywords to be defined. This should be a dict containing
+        Naif keyworkds from the label.
+
+        Returns
+        -------
+        float :
+            The focal length in millimeters
+        """
+        return self.isis_naif_keywords.get('IDEAL_FOCAL_LENGTH', None)
 
     @property
-    def frame_chain(self):
-        pass
+    def detector_center_sample(self):
+        """
+        The center sample of the CCD in detector pixels
+
+        Returns
+        -------
+        float :
+            The center sample of the CCD
+        """
+        return self.label['IsisCube']['Instrument']['SampleDetectors'] / 2.0
+
+    @property
+    def detector_center_line(self):
+        """
+        The center line of the CCD in detector pixels
+
+        Returns
+        -------
+        float :
+            The center of line the CCD
+        """
+        return 0.0
