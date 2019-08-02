@@ -5,7 +5,7 @@ from ale.base.type_sensor import LineScanner
 from ale.base.type_distortion import NoDistortion
 
 
-class IdealLsIsisLabelIsisSpiceDriver(IsisSpice, LineScanner, IsisLabel, NoDistortion, Driver):
+class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDistortion, Driver):
     @property
     def sensor_name(self):
         """

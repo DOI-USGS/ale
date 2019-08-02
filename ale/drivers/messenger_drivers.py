@@ -17,7 +17,7 @@ ID_LOOKUP = {
     'MDIS-NAC':'MSGR_MDIS_NAC',
 }
 
-class MessengerMdisPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
+class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
     """
     Driver for reading MDIS PDS3 labels. Requires a Spice mixin to acquire addtional
     ephemeris and instrument data located exclusively in spice kernels.
@@ -92,15 +92,15 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
           instrument id
         """
         return ID_LOOKUP[super().instrument_id]
-        
+
     @property
     def sampling_factor(self):
         """
         Returns the summing factor from the PDS3 label. For example a return value of 2
         indicates that 2 lines and 2 samples (4 pixels) were summed and divided by 4
         to produce the output pixel value.
-        
-        NOTE: This is overwritten for the messenger driver as the value is stored in "MESS:PIXELBIN" 
+
+        NOTE: This is overwritten for the messenger driver as the value is stored in "MESS:PIXELBIN"
 
         Returns
         -------
@@ -169,8 +169,8 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         Returns center detector sample acquired from Spice Kernels.
         Expects ikid to be defined. This should be the integer Naid ID code for
         the instrument.
-        
-        NOTE: This value is defined in an ISIS iak as 512.5, but we subtract 0.5 from the 
+
+        NOTE: This value is defined in an ISIS iak as 512.5, but we subtract 0.5 from the
         ISIS center sample because ISIS detector coordinates are 0.5 based.
 
         Returns
@@ -186,8 +186,8 @@ class MessengerMdisPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         Returns center detector line acquired from Spice Kernels.
         Expects ikid to be defined. This should be the integer Naid ID code for
         the instrument.
-        
-        NOTE: This value is defined in an ISIS iak as 512.5, but we subtract 0.5 from the 
+
+        NOTE: This value is defined in an ISIS iak as 512.5, but we subtract 0.5 from the
         ISIS center sample because ISIS detector coordinates are 0.5 based.
 
         Returns

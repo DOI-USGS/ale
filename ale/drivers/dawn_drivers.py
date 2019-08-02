@@ -11,7 +11,7 @@ from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.type_sensor import Framer
 
-class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
+class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
     """
     Dawn driver for generating an ISD from a Dawn PDS3 image.
     """
