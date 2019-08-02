@@ -9,7 +9,7 @@ from ale.base.label_pds3 import Pds3Label
 from ale.base.type_sensor import LineScanner
 
 
-class KaguyaTcPds3NaifSpiceDriver(Pds3Label,NaifSpice, LineScanner, Driver):
+class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
     """
     Driver for a PDS3 Kaguya Terrain Camera (TC) images. Specifically level2b0 mono and stereo images.
 
