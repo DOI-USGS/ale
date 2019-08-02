@@ -214,7 +214,7 @@ class IsisLabel():
             # Check for units on the PVL keyword
             if isinstance(exposure_duration, pvl._collections.Units):
                 units = exposure_duration.units
-                if "ms" in units.lower():
+                if "ms" in units.lower() or 'milliseconds' in units.lower():
                     exposure_duration = exposure_duration.value * 0.001
                 else:
                     # if not milliseconds, the units are probably seconds

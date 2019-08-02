@@ -20,5 +20,3 @@ dependencies:
   - pyyaml
   - networkx
   - pysis
-  - holoviews
-  - bokeh
