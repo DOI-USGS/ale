@@ -299,17 +299,22 @@ class NaifSpice():
             ephem = self.ephemeris_time
             pos = []
             vel = []
+         
             for time in ephem:
-                state, _ = spice.spkezr(self.spacecraft_name,
-                                        time,
-                                        self.reference_frame,
-                                        self.light_time_correction,
-                                        self.target_name,)
+                # spkezr returns a vector from the observer's location to the aberration-corrected
+                # location of the target. For more information, see: 
+                # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
+                state, _ = spice.spkezr(self.target_name,
+                                       time,
+                                       self.reference_frame,
+                                       self.light_time_correction,
+                                       self.spacecraft_name,)
                 pos.append(state[:3])
                 vel.append(state[3:])
-            # By default, spice works in km
-            self._position = [p * 1000 for p in pos]
-            self._velocity = [v * 1000 for v in vel]
+            # By default, spice works in km, and the vector returned by spkezr points the opposite
+            # direction to what ALE needs, so it must be multiplied by (-1) 
+            self._position = [p * -1000 for p in pos]
+            self._velocity = [v * -1000 for v in vel] 
         return self._position, self._velocity, self.ephemeris_time
 
     @property
