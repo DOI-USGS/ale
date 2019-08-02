@@ -232,13 +232,15 @@ class KaguyaTcPds3NaifSpiceDriver(Pds3Label,NaifSpice, LineScanner, Driver):
         Returnce the center detector sample of the image. Expects tc_id to be
         defined. This should be a string of the form LISM_TC1 or LISM_TC2.
 
+        We subtract 0.5 from the ISIS center line because ISIS detector
+        coordinates are 0.5 based.
+
         Returns
         -------
         : int
           The detector sample of the principle point
         """
-        # Pixels are 0 based, not one based, so subtract 1
-        return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[0]-1
+        return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[0] - 0.5
 
     @property
     def _sensor_orientation(self):
