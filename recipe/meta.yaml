@@ -26,30 +26,17 @@ requirements:
   build:
   - cmake>=3.10
   - eigen
-#  - eigen=3.3.3
   - gsl
-#  - gsl==2.2.1
-  - numpy
-  - openblas
-#  - openblas==0.2.19
-  - python
-#  - python==3.6
-  - python-dateutil
-  - pvl
-  - spiceypy
   run:
-  - cmake>=3.10
   - eigen
-#  - eigen=3.3.3
   - gsl
-#  - gsl==2.2.1
+  - netowrkx
   - numpy
   - openblas
-#  - openblas==0.2.19
   - python
-#  - python==3.6
   - python-dateutil
   - pvl
+  - pysis
   - spiceypy
 
 # Add the tests eventually
