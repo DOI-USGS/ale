@@ -27,16 +27,7 @@ requirements:
   - cmake>=3.10
   - eigen
   - gsl
-  - netowrkx
-  - numpy
-  - openblas
-  - python
-  - python-dateutil
-  - pvl
-  - pysis
-  - spiceypy
   run:
-  - cmake>=3.10
   - eigen
   - gsl
   - netowrkx
