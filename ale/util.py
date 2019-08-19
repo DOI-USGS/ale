@@ -4,11 +4,15 @@ from os import path
 from glob import glob
 from itertools import filterfalse, groupby
 
-from ale import config
-
 import pvl
+
+import collections
 from collections import OrderedDict
 from itertools import chain
+
+from ale import config
+
+
 
 def get_metakernels(spice_dir=config.spice_root, missions=set(), years=set(), versions=set()):
     """
@@ -105,17 +109,8 @@ def find_latest_metakernel(path, year):
     return metakernel
 
 
-import collections
 
 def dict_merge(dct, merge_dct):
-    """ Recursive dict merge. Inspired by :meth:``dict.update()``, instead of
-    updating only top-level keys, dict_merge recurses down into dicts nested
-    to an arbitrary depth, updating keys. The ``merge_dct`` is merged into
-    ``dct``.
-    :param dct: dict onto which the merge is executed
-    :param merge_dct: dct merged into dct
-    :return: None
-    """
     for k, v in merge_dct.items():
         if (k in dct and isinstance(dct[k], dict)
                 and isinstance(merge_dct[k], collections.Mapping)):
