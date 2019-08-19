@@ -4,13 +4,15 @@ from os import path
 from glob import glob
 from itertools import filterfalse, groupby
 
-from ale import config
-
 import pvl
+
+import collections
 from collections import OrderedDict
 from itertools import chain
 
-import pysis
+from ale import config
+
+
 
 def get_metakernels(spice_dir=config.spice_root, missions=set(), years=set(), versions=set()):
     """
@@ -106,23 +108,53 @@ def find_latest_metakernel(path, year):
         raise Exception(f'No metakernels found in {path} for {year}.')
     return metakernel
 
+
+
+def dict_merge(dct, merge_dct):
+    for k, v in merge_dct.items():
+        if (k in dct and isinstance(dct[k], dict)
+                and isinstance(merge_dct[k], collections.Mapping)):
+            dict_merge(dct[k], merge_dct[k])
+        else:
+            dct[k] = merge_dct[k]
+
+    return dct
+
+
 def get_isis_preferences(isis_preferences=None):
     """
     Returns ISIS Preference file as a pvl object
     """
-    if not isis_preferences:
-        isis_preferences = os.path.join(os.path.expanduser("~"), '.Isis', 'IsisPreferences')
+    def read_pref(path):
+        try:
+            with open(path) as f:
+                preftext = f.read().replace('EndGroup', 'End_Group')
+                pvlprefs = pvl.loads(preftext)
+        except Exception as e:
+            raise Exception(f'Failed to load IsisPreferences file [{path}]: {e}')
+            
+        return pvlprefs
 
-    if not os.path.isfile(isis_preferences):
-        isis_preferences = os.path.join(pysis.env.ISIS_ROOT, 'IsisPreferences')
+    argprefs = {}
+    if isis_preferences:
+        if isinstance(isis_preferences, dict):
+            argprefs = isis_preferences
+        elif os.path.isfile(isis_preferences):
+            argprefs = reaf_pref(isis_preferences)
+        else:
+            warnings.warn(f'{isis_preferences} does not exist, ignoring')
+
     try:
-        with open(isis_preferences) as f:
-            preftext = f.read().replace('EndGroup', 'End_Group')
-            pvlprefs = pvl.loads(preftext)
-    except Exception as e:
-        raise Exception(f'Failed to load IsisPreferences file [{isis_preferences}]: {e}')
+        homeprefs = read_pref(os.path.join(os.path.expanduser("~"), '.Isis', 'IsisPreferences'))
+    except: 
+        homeprefs = {}
 
-    return pvlprefs
+
+    isisrootprefs = read_pref(os.path.join(os.environ["ISISROOT"], 'IsisPreferences'))
+
+    finalprefs = dict_merge(dict_merge(isisrootprefs, homeprefs), argprefs)
+
+    return finalprefs
 
 def generate_kernels_from_cube(cube):
     # enforce key order

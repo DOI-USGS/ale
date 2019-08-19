@@ -19,4 +19,3 @@ dependencies:
   - quaternion
   - pyyaml
   - networkx
-  - pysis
