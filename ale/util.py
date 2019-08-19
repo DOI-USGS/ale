@@ -131,7 +131,6 @@ def get_isis_preferences(isis_preferences=None):
     Returns ISIS Preference file as a pvl object
     """
     def read_pref(path):
-        print("reading: ", path)
         try:
             with open(path) as f:
                 preftext = f.read().replace('EndGroup', 'End_Group')
@@ -157,8 +156,6 @@ def get_isis_preferences(isis_preferences=None):
 
 
     isisrootprefs = read_pref(os.path.join(os.environ["ISISROOT"], 'IsisPreferences'))
-
-    print([k for k in isisrootprefs.keys()])
 
     finalprefs = dict_merge(dict_merge(isisrootprefs, homeprefs), argprefs)
 
