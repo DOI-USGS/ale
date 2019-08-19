@@ -24,5 +24,6 @@ setup(
     packages=find_packages(),
     long_description="""\
     An Abstraction library for reading, writing and computing ephemeris data
-    """
+    """,
+    package_data={'': ['config.yml']}
 )
