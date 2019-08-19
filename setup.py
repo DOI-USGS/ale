@@ -25,5 +25,5 @@ setup(
     long_description="""\
     An Abstraction library for reading, writing and computing ephemeris data
     """,
-    data_files=[('ale', ['ale/config.yml'])]
+    package_data={'': ['config.yml']}
 )
