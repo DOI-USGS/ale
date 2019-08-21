@@ -1,8 +1,7 @@
 import pvl
 import abc
-from abc import ABC
 
-class Driver(ABC):
+class Driver():
     """
     Base class for all Drivers.
 
@@ -12,13 +11,15 @@ class Driver(ABC):
             Reference to file path to be used by mixins for opening.
     """
 
-    def __init__(self, file, num_ephem=909, num_quats=909):
+    def __init__(self, file, num_ephem=909, num_quats=909, props={}):
         """
         Parameters
         ----------
         file : str
                path to file to be parsed
         """
+
+        self._props = props
         self._num_quaternions = num_quats
         self._num_ephem = num_ephem
         self._file = file
