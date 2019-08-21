@@ -8,9 +8,12 @@ from ale.base import base
 # 'Mock' the spice module where it is imported
 from conftest import SimpleSpice
 
-simplespice = SimpleSpice()
-data_naif.spice = simplespice
-base.spice = simplespice
+@pytest.fixture
+def simple_spice():
+    simplespice = SimpleSpice()
+    data_naif.spice = simplespice
+    base.spice = simplespice
+    return simplespice
 
 @pytest.fixture
 def test_naif_data():
@@ -51,7 +54,6 @@ def test_target_frame_id(test_naif_data):
     assert test_naif_data.target_frame_id == 2000
 
 
-def test_spice_kernel_list(test_naif_data_with_kernels):
+def test_spice_kernel_list(test_naif_data_with_kernels, simple_spice):
     with test_naif_data_with_kernels as t:
-        assert simplespice._loaded_kernels == [('one',), ('two',), ('three',), ('four',)]
-
+        assert simple_spice._loaded_kernels == [('one',), ('two',), ('three',), ('four',)]
