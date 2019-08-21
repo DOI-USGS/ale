@@ -1,0 +1,125 @@
+Messenger/MDIS Instrument Kernel
+=============================================================
+
+This instrument kernel (I-kernel) contains parameters that
+describe the Messenger MDIS narrow angle (NAC) and wide angle (WAC)
+camera
+
+Version and Date
+-------------------------------------------------------------
+
+Version 2.0 -- July 31, 2005 -- Kris Becker, U.S. Geological Survey,
+    Flagstaff, AZ
+    Initial version.
+
+Version 3.0 -- April 24, 2007 -- Kris Becker, U.S. Geological Survey,
+    Updated for modifications/refinements to the framing kernel.  These
+    changes were introduced in msgr_v070.tf.
+
+Version 4.0 -- December 06, 2007 -- Kris Becker, U.S. Geological Survey,
+    Added initial camera distortion parameter for both NAC and WAC as
+    well as update the focal lengths.  This model is provided courtesy
+    of Scott Turner, JHU, on 2007/12/03.
+
+Version 5.0 -- January 17, 2008 - Kris Becker, U.S. Geological Survey
+    Turns out the MDIS WAC has different focal lengths for each
+    of the 12 filters.  The distortion model development was done
+    using filter 2, the clear filter.  The other filter focal lengths
+    are derived from the ratio of the published (SIS) length and
+    the new focal lenght of filter 2.
+
+Version 6.0 -- September 30, 2009 -- Kris Becker, U.S. Geological Survey
+    Greatly slimmed down version since much of the keywords in previous
+    versions has now been incorporated in the newest instrument kernel (IK),
+    msgr_mdis_v110.ti.
+
+Version 7.0 -- January 12, 2010 -- Debbie A. Cook, U.S. Geological Survey
+    Update to include CK_FRAME_ID and CK_REFERENCE_ID
+
+$Id: mdisAddendumXXX.ti,v 1.3 2008/01/18 13:30:30 kbecker Exp $
+-------------------------------------------------------------
+
+The following is the definitions for the MDIS Narrow Angle Camera (MDIS-NAC).
+Some missions use have time offsets that are needed in order to correct for
+timing into the SPICE kernels.  Set the CK time tolerances used when searching
+for camera pointing attitude in the CK kernels.
+
+SPK and CK time biases are used in cases where an offset exists in these
+kernels in relation to spacecraft clock time.  These times are expressed in
+seconds.  The CK_TIME_TOLERANCE is used as a direct argument in the NAIF
+routine (ckpg_c) that finds camera pointing.  This is expressed in spacecraft
+clock ticks.
+
+\begindata
+INS-236820_SPK_TIME_BIAS      = 0.0
+INS-236820_CK_TIME_BIAS       = 0.0
+INS-236820_CK_TIME_TOLERANCE  = 1
+
+\begintext
+
+The REFERENCE_FRAME and FRAME are used to specify the frames that translate
+from spacecraft instrument platform to the instrument orientation.  These
+are specific to each mission and are defined in the frame kernel (FK).
+For MESSENGER, these are defined in msgr_v???.tf.
+
+\begindata
+INS-236820_REFERENCE_FRAME    = 'MSGR_SPACECRAFT'
+
+INS-236820_BORESIGHT_SAMPLE   = 512.5
+INS-236820_BORESIGHT_LINE     = 512.5
+
+\begintext
+These are the parameters required for writing c-kernels.  Isis will
+create ck with the same frame endpoints as the mission ck.  For 
+Messenger the ck instrument frame is MSGR_SPACECRAFT (-236000), and the
+ck reference frame is J2000 (1).
+
+\begindata
+INS-236820_CK_FRAME_ID=-236000
+INS-236820_CK_REFERENCE_ID=1
+
+\begintext
+This is the description of the Messenger MDIS wide angle camera (MDIS-WAC).
+It has twelve filters on a wheel, however, the transforms for pixel/detector
+coordinates are independantly defined to simplify maintainance of these
+values should the need arise during flight.
+
+\begindata
+INS-236800_SPK_TIME_BIAS     = 0.0
+INS-236800_CK_TIME_BIAS      = 0
+INS-236800_CK_TIME_TOLERANCE = 1
+
+INS-236800_REFERENCE_FRAME    = 'MSGR_SPACECRAFT'
+
+INS-236800_BORESIGHT_SAMPLE   = 512.5
+INS-236800_BORESIGHT_LINE     = 512.5
+
+\begintext
+These are the parameters required for writing c-kernels.  Isis will
+create ck with the same frame endpoints as the mission ck.  For 
+Messenger the ck instrument frame is MSGR_SPACECRAFT (-236000), and the
+ck reference frame is J2000 (1).
+
+\begindata
+INS-236800_CK_FRAME_ID=-236000
+INS-236800_CK_REFERENCE_ID=1
+
+\begintext
+OBSERVER/TARGET SWAPPING and STELLAR ABERRATION and LIGHT TIME CORRECTION
+
+These parameters set MESSENGER MDIS WAC/NAC to swap observer/target,
+sets light time correction to "LT+S" and disables correction for light time to
+surface.
+
+\begindata
+
+INS-236800_SWAP_OBSERVER_TARGET = 'TRUE'
+INS-236800_LIGHTTIME_CORRECTION = 'LT+S'
+INS-236800_LT_SURFACE_CORRECT = 'FALSE'
+
+INS-236820_SWAP_OBSERVER_TARGET = 'TRUE'
+INS-236820_LIGHTTIME_CORRECTION = 'LT+S'
+INS-236820_LT_SURFACE_CORRECT = 'FALSE'
+
+\begintext
+

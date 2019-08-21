@@ -1,0 +1,40 @@
+DAFETF NAIF DAF ENCODED TRANSFER FILE
+'DAF/CK  '
+'2'
+'6'
+' < DAFCAT: CK CONCATENATION >                               '
+BEGIN_ARRAY 1 19
+'MDIS Pivot Nonlinear Model              '
+'133B773F21B88^D'
+'133B773F21F7^D'
+'-39D5A'
+'-39D5C'
+'3'
+'1'
+19
+'FFFFF807449E38^0'
+'0^0'
+'0^0'
+'-3FE2E66A725118^-2'
+'0^0'
+'0^0'
+'0^0'
+'FFFFF807449E38^0'
+'0^0'
+'0^0'
+'-3FE2E66A725118^-2'
+'0^0'
+'0^0'
+'0^0'
+'133B773F21B88^D'
+'133B773F21F7^D'
+'133B773F21B88^D'
+'1^1'
+'2^1'
+END_ARRAY 1 19
+TOTAL_ARRAYS 1
+ ~NAIF/SPC BEGIN COMMENTS~
+This C Kernel was created by extracting the pointing for -236890 from
+msgr_mdis_gm040812_150430v1.bc between "2/0072174528:989000" and
+"2/072174528:990000" using the ckslicer program.
+ ~NAIF/SPC END COMMENTS~
