@@ -24,6 +24,7 @@ class Driver():
         self._num_ephem = num_ephem
         self._file = file
 
+    @property
     def image_lines(self):
         """
         Returns
@@ -33,6 +34,7 @@ class Driver():
         """
         raise NotImplementedError
 
+    @property
     def image_samples(self):
         """
         Returns
@@ -42,7 +44,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def usgscsm_distortion_model(self):
         """
         Returns
@@ -72,7 +74,7 @@ class Driver():
         """
         return 0
 
-
+    @property
     def sample_summing(self):
         """
          Returns
@@ -82,7 +84,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def line_summing(self):
         """
         Returns
@@ -92,7 +94,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def platform_name(self):
         """
         Returns
@@ -102,7 +104,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def sensor_name(self):
         """
         Returns
@@ -112,7 +114,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def target_body_radii(self):
         """
         Returns
@@ -122,7 +124,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def focal_length(self):
         """
         Returns
@@ -132,7 +134,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def detector_center_line(self):
         """
         Returns
@@ -142,7 +144,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def detector_center_sample(self):
         """
         Returns
@@ -152,7 +154,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def sensor_position(self):
         """
         Returns
@@ -162,7 +164,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def frame_chain(self):
         """
         Returns
@@ -172,7 +174,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def sun_position(self):
         """
         Returns
@@ -181,7 +183,7 @@ class Driver():
           a tuple containing a list of sun positions, a list of sun velocities
         """
 
-
+    @property
     def target_name(self):
         """
           Returns
@@ -192,7 +194,7 @@ class Driver():
         raise NotImplementedError
 
 
-
+    @property
     def target_frame_id(self):
         """
           Returns
@@ -202,7 +204,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def sensor_frame_id(self):
         """
           Returns
@@ -212,7 +214,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def isis_naif_keywords(self):
         """
           Returns
@@ -222,7 +224,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def sensor_model_version(self):
         """
           Returns
@@ -232,7 +234,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def focal2pixel_lines(self):
         """
         Returns
@@ -243,7 +245,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def focal2pixel_samples(self):
         """
         Returns
@@ -254,7 +256,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def pixel2focal_x(self):
         """
         Returns
@@ -265,7 +267,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def pixel2focal_y(self):
         """
         Returns
@@ -276,7 +278,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def ephemeris_start_time(self):
         """
           Returns
@@ -286,7 +288,7 @@ class Driver():
         """
         raise NotImplementedError
 
-
+    @property
     def ephemeris_stop_time(self):
         """
           Returns
