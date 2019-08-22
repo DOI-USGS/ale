@@ -1,8 +1,6 @@
 import pvl
-import abc
-from abc import ABC
 
-class Driver(ABC):
+class Driver():
     """
     Base class for all Drivers.
 
@@ -12,18 +10,20 @@ class Driver(ABC):
             Reference to file path to be used by mixins for opening.
     """
 
-    def __init__(self, file, num_ephem=909, num_quats=909):
+    def __init__(self, file, num_ephem=909, num_quats=909, props={}):
         """
         Parameters
         ----------
         file : str
                path to file to be parsed
         """
+
+        self._props = props
         self._num_quaternions = num_quats
         self._num_ephem = num_ephem
         self._file = file
 
-    @abc.abstractproperty
+    @property
     def image_lines(self):
         """
         Returns
@@ -31,9 +31,9 @@ class Driver(ABC):
         : int
           Number of lines in image
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def image_samples(self):
         """
         Returns
@@ -41,9 +41,9 @@ class Driver(ABC):
         : int
           Number of samples in image
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def usgscsm_distortion_model(self):
         """
         Returns
@@ -51,7 +51,7 @@ class Driver(ABC):
         : dict
           A dict containing the information about the distortion model for the usgscsm
         """
-        pass
+        raise NotImplementedError
 
     @property
     def detector_start_line(self):
@@ -73,7 +73,7 @@ class Driver(ABC):
         """
         return 0
 
-    @abc.abstractproperty
+    @property
     def sample_summing(self):
         """
          Returns
@@ -81,9 +81,9 @@ class Driver(ABC):
          : int
            Sample summing
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def line_summing(self):
         """
         Returns
@@ -91,9 +91,9 @@ class Driver(ABC):
         : int
           Line summing
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def platform_name(self):
         """
         Returns
@@ -101,9 +101,9 @@ class Driver(ABC):
         : str
           Name of the platform that the sensor is on
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def sensor_name(self):
         """
         Returns
@@ -111,9 +111,9 @@ class Driver(ABC):
         : str
           Name of the sensor
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def target_body_radii(self):
         """
         Returns
@@ -121,9 +121,9 @@ class Driver(ABC):
         : list
           target body radii, first list element is semimajor axis, second is semiminor axis.
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def focal_length(self):
         """
         Returns
@@ -131,9 +131,9 @@ class Driver(ABC):
         : float
           focal length
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def detector_center_line(self):
         """
         Returns
@@ -141,9 +141,9 @@ class Driver(ABC):
         : int
           The detector line of the principle point
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def detector_center_sample(self):
         """
         Returns
@@ -151,9 +151,9 @@ class Driver(ABC):
         : int
           The detector sample of the principle point
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def sensor_position(self):
         """
         Returns
@@ -161,9 +161,9 @@ class Driver(ABC):
         : (positions, velocities, times)
           a tuple containing a list of positions, a list of velocities, and a list of times
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def frame_chain(self):
         """
         Returns
@@ -171,9 +171,9 @@ class Driver(ABC):
         FrameNode
             The root node of the frame tree. This will always be the J2000 reference frame.
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def sun_position(self):
         """
         Returns
@@ -182,7 +182,7 @@ class Driver(ABC):
           a tuple containing a list of sun positions, a list of sun velocities
         """
 
-    @abc.abstractproperty
+    @property
     def target_name(self):
         """
           Returns
@@ -190,10 +190,10 @@ class Driver(ABC):
         : int
           NAIF ID associated with the target body
         """
-        pass
+        raise NotImplementedError
 
 
-    @abc.abstractproperty
+    @property
     def target_frame_id(self):
         """
           Returns
@@ -201,9 +201,9 @@ class Driver(ABC):
         : int
           NAIF ID associated with the target body
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def sensor_frame_id(self):
         """
           Returns
@@ -211,9 +211,9 @@ class Driver(ABC):
         : int
           NAIF ID associated with the sensor frame
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def isis_naif_keywords(self):
         """
           Returns
@@ -221,9 +221,9 @@ class Driver(ABC):
         : dict
           dictionary containing the keys : values needed by Isis for the NaifKeywords group
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def sensor_model_version(self):
         """
           Returns
@@ -231,9 +231,9 @@ class Driver(ABC):
         : int
           version of the sensor model
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def focal2pixel_lines(self):
         """
         Returns
@@ -242,9 +242,9 @@ class Driver(ABC):
           3 element list containing affine transformation coefficient.
           The elements are as follows: constant, x coefficent, y coeffecient
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def focal2pixel_samples(self):
         """
         Returns
@@ -253,9 +253,9 @@ class Driver(ABC):
           3 element list containing affine transformation coefficients.
           The elements are as follows: constant, x coefficent, y coeffecient
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def pixel2focal_x(self):
         """
         Returns
@@ -264,9 +264,9 @@ class Driver(ABC):
           3 element list containing coefficience for the pixels to focal plane
           transformation. The elements are as follows: constant, sample, line
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def pixel2focal_y(self):
         """
         Returns
@@ -275,9 +275,9 @@ class Driver(ABC):
           3 element list containing coefficience for the pixels to focal plane
           transformation. The elements are as follows: constant, sample, line
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def ephemeris_start_time(self):
         """
           Returns
@@ -285,9 +285,9 @@ class Driver(ABC):
         : double
           The start time of the image in ephemeris seconds past the J2000 epoch.
         """
-        pass
+        raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
     def ephemeris_stop_time(self):
         """
           Returns
@@ -295,7 +295,7 @@ class Driver(ABC):
         : double
           The stop time of the image in ephemeris seconds past the J2000 epoch.
         """
-        pass
+        raise NotImplementedError
 
     @property
     def center_ephemeris_time(self):

@@ -11,7 +11,9 @@ class NaifSpice():
         Called when the context is created. This is used
         to get the kernels furnished.
         """
-        if self.metakernel:
+        if self.kernels:
+            [spice.furnsh(k) for k in self.kernels]
+        elif self.metakernel:
             spice.furnsh(self.metakernel)
         return self
 
@@ -21,9 +23,17 @@ class NaifSpice():
         this is done, the object is out of scope and the
         kernels can be unloaded.
         """
-        spice.unload(self.metakernel)
+        if self.kernels:
+            [spice.unload(k) for k in self.kernels]
+        else:
+            spice.unload(self.metakernel)
 
     @property
+    def kernels(self):
+        if not hasattr(self, '_kernels'):
+            self._kernels =  self._props.get('kernels', None)
+        return self._kernels
+
     def metakernel(self):
         pass
 
@@ -299,10 +309,10 @@ class NaifSpice():
             ephem = self.ephemeris_time
             pos = []
             vel = []
-         
+
             for time in ephem:
                 # spkezr returns a vector from the observer's location to the aberration-corrected
-                # location of the target. For more information, see: 
+                # location of the target. For more information, see:
                 # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
                 state, _ = spice.spkezr(self.target_name,
                                        time,
@@ -312,9 +322,9 @@ class NaifSpice():
                 pos.append(state[:3])
                 vel.append(state[3:])
             # By default, spice works in km, and the vector returned by spkezr points the opposite
-            # direction to what ALE needs, so it must be multiplied by (-1) 
+            # direction to what ALE needs, so it must be multiplied by (-1)
             self._position = [p * -1000 for p in pos]
-            self._velocity = [v * -1000 for v in vel] 
+            self._velocity = [v * -1000 for v in vel]
         return self._position, self._velocity, self.ephemeris_time
 
     @property

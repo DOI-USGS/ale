@@ -12,7 +12,7 @@ from itertools import chain
 
 from ale import config
 
-
+import re
 
 def get_metakernels(spice_dir=config.spice_root, missions=set(), years=set(), versions=set()):
     """
@@ -126,37 +126,52 @@ def get_isis_preferences(isis_preferences=None):
     Returns ISIS Preference file as a pvl object
     """
     def read_pref(path):
-        try:
-            with open(path) as f:
-                preftext = f.read().replace('EndGroup', 'End_Group')
-                pvlprefs = pvl.loads(preftext)
-        except Exception as e:
-            raise Exception(f'Failed to load IsisPreferences file [{path}]: {e}')
-            
+        with open(path) as f:
+            preftext = f.read().replace('EndGroup', 'End_Group')
+            pvlprefs = pvl.loads(preftext)
         return pvlprefs
 
     argprefs = {}
     if isis_preferences:
         if isinstance(isis_preferences, dict):
             argprefs = isis_preferences
-        elif os.path.isfile(isis_preferences):
-            argprefs = reaf_pref(isis_preferences)
         else:
-            warnings.warn(f'{isis_preferences} does not exist, ignoring')
+            argprefs = read_pref(isis_preferences)
 
     try:
         homeprefs = read_pref(os.path.join(os.path.expanduser("~"), '.Isis', 'IsisPreferences'))
-    except: 
+    except FileNotFoundError as e:
         homeprefs = {}
 
-
-    isisrootprefs = read_pref(os.path.join(os.environ["ISISROOT"], 'IsisPreferences'))
+    try:
+        isisrootprefs_path = os.path.join(os.environ["ISISROOT"], 'IsisPreferences')
+        isisroot = os.environ['ISISROOT']
+        isisrootprefs = read_pref(isisrootprefs_path)
+    except (FileNotFoundError, KeyError) as e:
+        isisrootprefs = {}
 
     finalprefs = dict_merge(dict_merge(isisrootprefs, homeprefs), argprefs)
 
     return finalprefs
 
-def generate_kernels_from_cube(cube):
+
+def dict_to_lower(d):
+    return {k.lower():v if not isinstance(v, dict) else dict_to_lower(v) for k,v in d.items()}
+
+
+def expandvars(path, env_dict=os.environ, default=None, case_sensative=True):
+    user_dict = env_dict if case_sensative else dict_to_lower(env_dict)
+
+    def replace_var(m):
+        group0 = m.group(0) if case_sensative else m.group(0).lower()
+        group1 = m.group(1) if case_sensative else m.group(1).lower()
+
+        return user_dict.get(m.group(2) or group1, group0 if default is None else default)
+    reVar = r'\$(\w+|\{([^}]*)\})'
+    return re.sub(reVar, replace_var, path)
+
+
+def generate_kernels_from_cube(cube,  expand=False):
     # enforce key order
     mk_paths = OrderedDict.fromkeys(
         ['TargetPosition', 'InstrumentPosition',
@@ -197,7 +212,12 @@ def generate_kernels_from_cube(cube):
     # get kernels as 1-d string list
     kernels = [kernel for kernel in chain.from_iterable(mk_paths.values()) if isinstance(kernel, str)]
 
+    if expand:
+        isisprefs = get_isis_preferences()
+        kernels = [expandvars(expandvars(k, dict_to_lower(isisprefs['DataDirectory']))) for k in kernels]
+
     return kernels
+
 
 def write_metakernel_from_cube(cube, mkpath=None):
     # add ISISPREF paths as path_symbols and path_values to avoid custom expand logic

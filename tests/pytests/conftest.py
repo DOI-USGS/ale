@@ -31,6 +31,10 @@ class SimpleSpice():
         return 0.1
     def cidfrm(self, *args):
         return (2000, "Test_Body_Frame", True)
+    def furnsh(self, *args):
+        if not hasattr(self, '_loaded_kernels'):
+            self._loaded_kernels = []
+        self._loaded_kernels.append(args)
 
 def get_mockkernels(self, *args):
     return "some_metakernel"
