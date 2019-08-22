@@ -138,6 +138,23 @@ def test_get_prefernces_arg_isisroot_home(monkeypatch, tmpdir, pvl_one_group, pv
                 assert pvl_obj['Test']['t'] == 't1'
                 assert pvl_obj['Data']['b'] == 'b3'
 
+
+@pytest.mark.parametrize('filename', [os.path.join('.Isis', 'IsisPreferences'), 'IsisPreferences'])
+def test_get_prefrences_malformed_files(monkeypatch, tmpdir, filename):
+    monkeypatch.setenv('ISISROOT', str(tmpdir))
+    monkeypatch.setenv('HOME', str(tmpdir))
+    tmpdir.mkdir('.Isis')
+
+    with pytest.raises(pvl.decoder.ParseError):
+        with open(tmpdir.join(filename), 'w+') as brokenpref:
+            brokenpref.write('Totally not PVL')
+            brokenpref.flush()
+            util.get_isis_preferences()
+
+    with pytest.raises(pvl.decoder.ParseError):
+        util.get_isis_preferences(tmpdir.join(filename))
+
+
 @pytest.mark.parametrize('string,expected,case_sensative', [('$bar/baz', '/bar/baz', False), ('$bar/$foo/baz', '/bar//foo/baz', True), ('$BAR/$FOO/baz', '/bar//foo/baz', False)])
 def test_expand_vars(string, expected, case_sensative):
     user_vars = {'foo': '/foo', 'bar': '/bar'}

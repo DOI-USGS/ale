@@ -126,36 +126,28 @@ def get_isis_preferences(isis_preferences=None):
     Returns ISIS Preference file as a pvl object
     """
     def read_pref(path):
-        try:
-            with open(path) as f:
-                preftext = f.read().replace('EndGroup', 'End_Group')
-                pvlprefs = pvl.loads(preftext)
-        except Exception as e:
-            raise Exception(f'Failed to load IsisPreferences file [{path}]: {e}')
-
+        with open(path) as f:
+            preftext = f.read().replace('EndGroup', 'End_Group')
+            pvlprefs = pvl.loads(preftext)
         return pvlprefs
 
     argprefs = {}
     if isis_preferences:
         if isinstance(isis_preferences, dict):
             argprefs = isis_preferences
-        elif os.path.isfile(isis_preferences):
-            argprefs = read_pref(isis_preferences)
         else:
-            warnings.warn(f'{isis_preferences} does not exist, ignoring')
+            argprefs = read_pref(isis_preferences)
 
     try:
         homeprefs = read_pref(os.path.join(os.path.expanduser("~"), '.Isis', 'IsisPreferences'))
-    except Exception as e:
-        print(f'error: {e}')
+    except FileNotFoundError as e:
         homeprefs = {}
 
     try:
+        isisrootprefs_path = os.path.join(os.environ["ISISROOT"], 'IsisPreferences')
         isisroot = os.environ['ISISROOT']
-        print(isisroot)
-        isisrootprefs = read_pref(os.path.join(os.environ["ISISROOT"], 'IsisPreferences'))
-    except Exception as e:
-        print('failed {e}')
+        isisrootprefs = read_pref(isisrootprefs_path)
+    except (FileNotFoundError, KeyError) as e:
         isisrootprefs = {}
 
     finalprefs = dict_merge(dict_merge(isisrootprefs, homeprefs), argprefs)
