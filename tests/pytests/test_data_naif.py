@@ -3,12 +3,17 @@ import pytest
 import numpy as np
 
 from ale.base import data_naif
+from ale.base import base
 
 # 'Mock' the spice module where it is imported
 from conftest import SimpleSpice
 
-simplespice = SimpleSpice()
-data_naif.spice = simplespice
+@pytest.fixture
+def simple_spice():
+    simplespice = SimpleSpice()
+    data_naif.spice = simplespice
+    base.spice = simplespice
+    return simplespice
 
 @pytest.fixture
 def test_naif_data():
@@ -18,6 +23,13 @@ def test_naif_data():
     naif_data.ephemeris_time = [0, 1]
 
     return naif_data
+
+@pytest.fixture
+def test_naif_data_with_kernels():
+    kernels = ['one', 'two', 'three','four']
+    FakeNaifDriver = type("FakeNaifDriver", (base.Driver, data_naif.NaifSpice), {})
+    return FakeNaifDriver("", props={'kernels': kernels})
+
 
 def test_target_id(test_naif_data):
     assert test_naif_data.target_id == -12345
@@ -40,3 +52,8 @@ def test_naif_keywords(test_naif_data):
 
 def test_target_frame_id(test_naif_data):
     assert test_naif_data.target_frame_id == 2000
+
+
+def test_spice_kernel_list(test_naif_data_with_kernels, simple_spice):
+    with test_naif_data_with_kernels as t:
+        assert simple_spice._loaded_kernels == [('one',), ('two',), ('three',), ('four',)]
