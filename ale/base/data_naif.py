@@ -299,10 +299,10 @@ class NaifSpice():
             ephem = self.ephemeris_time
             pos = []
             vel = []
-         
+
             for time in ephem:
                 # spkezr returns a vector from the observer's location to the aberration-corrected
-                # location of the target. For more information, see: 
+                # location of the target. For more information, see:
                 # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
                 state, _ = spice.spkezr(self.target_name,
                                        time,
@@ -312,9 +312,9 @@ class NaifSpice():
                 pos.append(state[:3])
                 vel.append(state[3:])
             # By default, spice works in km, and the vector returned by spkezr points the opposite
-            # direction to what ALE needs, so it must be multiplied by (-1) 
+            # direction to what ALE needs, so it must be multiplied by (-1)
             self._position = [p * -1000 for p in pos]
-            self._velocity = [v * -1000 for v in vel] 
+            self._velocity = [v * -1000 for v in vel]
         return self._position, self._velocity, self.ephemeris_time
 
     @property
@@ -424,7 +424,7 @@ class NaifSpice():
         naif_keywords['INS{}_ITRANSL'.format(self.ikid)] = self.focal2pixel_lines
         naif_keywords['INS{}_ITRANSS'.format(self.ikid)] = self.focal2pixel_samples
         naif_keywords['INS{}_FOCAL_LENGTH'.format(self.ikid)] = self.focal_length
-        naif_keywords['INS{}_BORESIGHT_SAMPLE'.format(self.ikid)] = self.detector_center_sample
-        naif_keywords['INS{}_BORESIGHT_LINE'.format(self.ikid)] = self.detector_center_line
+        naif_keywords['INS{}_BORESIGHT_SAMPLE'.format(self.ikid)] = self.detector_center_sample + 0.5
+        naif_keywords['INS{}_BORESIGHT_LINE'.format(self.ikid)] = self.detector_center_line + 0.5
 
         return naif_keywords
