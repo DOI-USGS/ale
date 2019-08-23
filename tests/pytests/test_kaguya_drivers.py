@@ -3,7 +3,7 @@ import numpy as np
 import pvl
 
 import ale
-from ale.drivers import kaguya_drivers
+from ale.drivers import selene_drivers
 from ale.base import data_naif
 from ale.base import label_pds3
 
@@ -15,10 +15,10 @@ from conftest import SimpleSpice, get_mockkernels
 simplespice = SimpleSpice()
 
 data_naif.spice = simplespice
-kaguya_drivers.spice = simplespice
+selene_drivers.spice = simplespice
 label_pds3.spice = simplespice
 
-from ale.drivers.kaguya_drivers import KaguyaTcPds3NaifSpiceDriver
+from ale.drivers.selene_drivers import KaguyaTcPds3NaifSpiceDriver
 
 KaguyaTcPds3NaifSpiceDriver.metakernel = get_mockkernels
 

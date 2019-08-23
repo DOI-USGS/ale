@@ -11,7 +11,6 @@ import pvl
 import spiceypy as spice
 from ale.rotation import ConstantRotation, TimeDependentRotation
 from ale.transformation import FrameChain
-from ale import config
 
 from scipy.interpolate import interp1d, BPoly
 

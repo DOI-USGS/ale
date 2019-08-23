@@ -309,3 +309,7 @@ class Driver():
           Center ephemeris time for an image
         """
         return (self.ephemeris_start_time + self.ephemeris_stop_time) / 2
+
+    @property
+    def short_mission_name(self):
+        return self.__module__.split('.')[-1].split('_')[0]

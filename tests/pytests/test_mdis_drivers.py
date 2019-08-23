@@ -2,7 +2,7 @@ import pytest
 import pvl
 
 import ale
-from ale.drivers import messenger_drivers
+from ale.drivers import mes_drivers
 from ale.base import data_naif
 from ale.base import label_pds3
 from ale.base import label_isis
@@ -15,11 +15,11 @@ from conftest import SimpleSpice, get_mockkernels
 simplespice = SimpleSpice()
 
 data_naif.spice = simplespice
-messenger_drivers.spice = simplespice
+mes_drivers.spice = simplespice
 label_pds3.spice = simplespice
 
-from ale.drivers.messenger_drivers import MessengerMdisPds3NaifSpiceDriver
-from ale.drivers.messenger_drivers import MessengerMdisIsisLabelNaifSpiceDriver
+from ale.drivers.mes_drivers import MessengerMdisPds3NaifSpiceDriver
+from ale.drivers.mes_drivers import MessengerMdisIsisLabelNaifSpiceDriver
 
 MessengerMdisPds3NaifSpiceDriver.metakernel = get_mockkernels
 MessengerMdisIsisLabelNaifSpiceDriver.metakernel = get_mockkernels
@@ -99,7 +99,7 @@ def test_fikid_isis(IsisLabelDriver):
     with patch.dict(IsisLabelDriver.label, {'IsisCube': {'BandBin' : {'Number' : 10 }}}) as f:
         assert IsisLabelDriver.fikid == 90
 
-@patch('ale.drivers.messenger_drivers.MessengerMdisIsisLabelNaifSpiceDriver.fikid', 1)
+@patch('ale.drivers.mes_drivers.MessengerMdisIsisLabelNaifSpiceDriver.fikid', 1)
 def test_focal_length_isis(IsisLabelDriver):
     with patch.dict(IsisLabelDriver.label, {'IsisCube': {'Instrument': {'FocalPlaneTemperature':
     pvl._collections.Units(value=1, units='<DEGC>')}}}) as f:

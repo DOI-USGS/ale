@@ -5,7 +5,6 @@ import os
 from glob import glob
 
 import ale
-from ale import config
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
@@ -34,25 +33,6 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         filter_number = self.filter_number
 
         return "DAWN_{}_FILTER_{}".format(instrument_id, filter_number)
-
-    @property
-    def metakernel(self):
-        """
-        Returns latest instrument metakernels
-
-        Returns
-        -------
-        : string
-          Path to latest metakernel file
-        """
-        metakernel_dir = config.dawn
-        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
-        if not hasattr(self, '_metakernel'):
-            self._metakernel = None
-            for mk in mks:
-                if str(self.utc_start_time.year) in os.path.basename(mk):
-                    self._metakernel = mk
-        return self._metakernel
 
     @property
     def label(self):
