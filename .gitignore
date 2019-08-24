@@ -208,3 +208,7 @@ dmypy.json
 
 # Mac ignores
 .DS_Store
+
+# Binary Kernels
+*.bsp
+*.bc
