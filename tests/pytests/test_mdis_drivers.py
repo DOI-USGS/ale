@@ -280,18 +280,6 @@ Group = SUBFRAME5_PARAMETERS
 End_Group
 End
 """
-    data_root = '/Users/jmapel/ale/tests/pytests/data/EN1072174528M'
-    kernels = [
-        'mdisAddendum009.ti',
-        'msgr_art_cal_EN1072174528M.xc',
-        'msgr_mdis_v160.ti',
-        'msgr_v231.tf',
-        'pck00010_msgr_v23.tpc',
-        'messenger_2548.tsc',
-        'msgr_gm_EN1072174528M.xc',
-        'msgr_sc_EN1072174528M.xc',
-        'naif0012.tls'
-    ]
     return MessengerMdisPds3NaifSpiceDriver(pds_label)
 
 @pytest.fixture
@@ -469,5 +457,4 @@ def test_ephemeris_stop_time(Pds3Driver):
     assert Pds3Driver.ephemeris_stop_time == 483122606.85302466
 
 def test_center_ephemeris_time(Pds3Driver):
-    print('in test', type(spice))
     assert Pds3Driver.center_ephemeris_time == 483122606.85252464
