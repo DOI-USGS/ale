@@ -2,9 +2,11 @@ import pytest
 
 import numpy as np
 
-from unittest.mock import patch
+from unittest.mock import patch, call
 
 from ale.base.data_naif import NaifSpice
+from ale.base import data_naif
+from ale.base import base
 
 @pytest.fixture
 def test_naif_data():
@@ -14,6 +16,13 @@ def test_naif_data():
     naif_data.ephemeris_time = [0, 1]
 
     return naif_data
+
+@pytest.fixture
+def test_naif_data_with_kernels():
+    kernels = ['one', 'two', 'three','four']
+    FakeNaifDriver = type("FakeNaifDriver", (base.Driver, data_naif.NaifSpice), {})
+    return FakeNaifDriver("", props={'kernels': kernels})
+
 
 def test_target_id(test_naif_data):
     with patch('spiceypy.bods2c', return_value=-12345) as bods2c:
@@ -38,3 +47,9 @@ def test_target_frame_id(test_naif_data):
         assert test_naif_data.target_frame_id == -12345
         bods2c.assert_called_once_with("TARGET")
         cidfrm.assert_called_once_with(12345)
+
+
+def test_spice_kernel_list(test_naif_data_with_kernels):
+    with patch('spiceypy.furnsh') as furnsh:
+        with test_naif_data_with_kernels as t:
+            assert furnsh.call_args_list == [call('one'), call('two'), call('three'), call('four')]

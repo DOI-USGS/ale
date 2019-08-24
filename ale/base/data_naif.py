@@ -11,7 +11,9 @@ class NaifSpice():
         Called when the context is created. This is used
         to get the kernels furnished.
         """
-        if self.metakernel:
+        if self.kernels:
+            [spice.furnsh(k) for k in self.kernels]
+        elif self.metakernel:
             spice.furnsh(self.metakernel)
         return self
 
@@ -21,9 +23,17 @@ class NaifSpice():
         this is done, the object is out of scope and the
         kernels can be unloaded.
         """
-        spice.unload(self.metakernel)
+        if self.kernels:
+            [spice.unload(k) for k in self.kernels]
+        else:
+            spice.unload(self.metakernel)
 
     @property
+    def kernels(self):
+        if not hasattr(self, '_kernels'):
+            self._kernels =  self._props.get('kernels', None)
+        return self._kernels
+
     def metakernel(self):
         pass
 
