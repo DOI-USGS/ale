@@ -205,3 +205,6 @@ dmypy.json
 
 # Jupyter ignores
 .ipynb_checkpoints
+
+# Mac ignores
+.DS_Store
