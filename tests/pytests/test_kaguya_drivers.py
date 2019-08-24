@@ -4,8 +4,6 @@ import pvl
 
 import ale
 from ale.drivers import kaguya_drivers
-from ale.base import data_naif
-from ale.base import label_pds3
 
 from unittest.mock import PropertyMock, patch
 
@@ -14,9 +12,7 @@ from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
 
-data_naif.spice = simplespice
 kaguya_drivers.spice = simplespice
-label_pds3.spice = simplespice
 
 from ale.drivers.kaguya_drivers import KaguyaTcPds3NaifSpiceDriver
 
@@ -45,11 +41,13 @@ def test_spacecraft_clock_start_count(driver):
         pvl._collections.Units(value=501, units='<sec>')}) as f:
         assert driver.spacecraft_clock_start_count == 501
 
+@patch('ale.base.data_naif.NaifSpice.spacecraft_id', -131)
 def test_ephemeris_stop_time(driver):
     with patch.dict(driver.label, {'CORRECTED_SC_CLOCK_STOP_COUNT':
                                    pvl._collections.Units(value=501, units='<sec>')}) as f:
         assert driver.ephemeris_stop_time == 0.1
 
+@patch('ale.base.data_naif.NaifSpice.spacecraft_id', -131)
 def test_ephemeris_start_time(driver):
     with patch.dict(driver.label, {'CORRECTED_SC_CLOCK_START_COUNT':
                                    pvl._collections.Units(value=501, units='<sec>')}) as f:

@@ -126,7 +126,6 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         : double
           focal length in meters
         """
-        print(self.fikid)
         coeffs = spice.gdpool('INS{}_FL_TEMP_COEFFS '.format(self.fikid), 0, 6)
 
         # reverse coeffs, MDIS coeffs are listed a_0, a_1, a_2 ... a_n where

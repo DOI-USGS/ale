@@ -5,53 +5,55 @@ import subprocess
 import numpy as np
 import spiceypy as spice
 
+import ale
+from ale.base import data_naif
+
+# We have to re-assign spiceypy because other tests overwrite it
+ale.base.data_naif.spice = spice
+
 from ale.drivers.messenger_drivers import MessengerMdisPds3NaifSpiceDriver
-# from ale.drivers.messenger_drivers import MessengerMdisIsisLabelNaifSpiceDriver
 
 @pytest.fixture(scope="module", autouse=True)
-def convert_kernels(request):
-    data_root = '/Users/jmapel/ale/tests/pytests/data/EN1072174528M'
+def convert_kernels():
+    ale_root = os.path.split(ale.__file__)[0]
+    data_root = os.path.join(ale_root, '../tests/pytests/data/EN1072174528M')
     kernels = [
         'mdisAddendum009.ti',
-        'msgr_art_cal_EN1072174528M.bc',
+        'msgr_art_cal_EN1072174528M.xc',
         'msgr_mdis_v160.ti',
         'msgr_v231.tf',
         'pck00010_msgr_v23.tpc',
         'messenger_2548.tsc',
-        'msgr_gm_EN1072174528M.bc',
-        'msgr_sc_EN1072174528M.bc',
-        'msgr_merc_EN1072174528M.bsp',
-        'msgr_merc_bc_EN1072174528M.bsp',
-        'msgr_sun_EN1072174528M.bsp',
-        'msgr_sc_EN1072174528M.bsp',
-        'naif0012.tls'
-    ]
-    xfer_kernels = [
-        'msgr_art_cal_EN1072174528M.xc',
         'msgr_gm_EN1072174528M.xc',
         'msgr_sc_EN1072174528M.xc',
         'msgr_merc_EN1072174528M.xsp',
         'msgr_merc_bc_EN1072174528M.xsp',
         'msgr_sun_EN1072174528M.xsp',
-        'msgr_sc_EN1072174528M.xsp'
+        'msgr_sc_EN1072174528M.xsp',
+        'naif0012.tls'
     ]
-    bin_kernels = [
-        'msgr_art_cal_EN1072174528M.bc',
-        'msgr_gm_EN1072174528M.bc',
-        'msgr_sc_EN1072174528M.bc',
-        'msgr_merc_EN1072174528M.bsp',
-        'msgr_merc_bc_EN1072174528M.bsp',
-        'msgr_sun_EN1072174528M.bsp',
-        'msgr_sc_EN1072174528M.bsp'
-    ]
-    abs_kernels = [os.path.join(data_root, kern) for kern in kernels]
-    for kern in xfer_kernels:
-        subprocess.call(['tobin', os.path.join(data_root, kern)])
-    spice.furnsh(abs_kernels)
+    kernels = [os.path.join(data_root, kern) for kern in kernels]
+    bin_kernels = []
+    final_kernels = []
+    for kernel in kernels:
+        split_kernel = os.path.splitext(kernel)
+        if split_kernel[1] == '.xc':
+            subprocess.call(['tobin', os.path.join(data_root, kernel)])
+            bin_kernel = split_kernel[0] + '.bc'
+            bin_kernels.append(bin_kernel)
+            final_kernels.append(bin_kernel)
+        elif split_kernel[1] == '.xsp':
+            subprocess.call(['tobin', os.path.join(data_root, kernel)])
+            bin_kernel = split_kernel[0] + '.bsp'
+            bin_kernels.append(bin_kernel)
+            final_kernels.append(bin_kernel)
+        else:
+            final_kernels.append(kernel)
+    spice.furnsh(final_kernels)
     yield
-    spice.unload(abs_kernels)
+    spice.unload(final_kernels)
     for kern in bin_kernels:
-        os.remove(os.path.join(data_root, kern))
+        os.remove(kern)
 
 @pytest.fixture
 def Pds3Driver():
@@ -369,28 +371,50 @@ def test_sensor_position(Pds3Driver):
     """
     position, velocity, time = Pds3Driver.sensor_position
     image_et = spice.scs2e(-236, '2/0072174528:989000') + 0.0005
-    expected_state, _ = spice.spkez(-236, image_et, 'IAU_MERCURY', 'LT+S', 199)
-    expected_position = 1000 * np.asarray(expected_state[:3])
-    expected_velocity = 1000 * np.asarray(expected_state[3:])
-
-    # Commented out because the driver is not sufficiently accurate.
-    # Position is off by ~450m and velocity is off by ~1 m/s
-    # Jesse Mapel 2019-08-22
-
-    # np.testing.assert_almost_equal(position,
-    #                                [expected_position])
-    # np.testing.assert_almost_equal(velocity,
-    #                                [expected_velocity])
+    expected_state, _ = spice.spkez(199, image_et, 'IAU_MERCURY', 'LT+S', -236)
+    expected_position = -1000 * np.asarray(expected_state[:3])
+    expected_velocity = -1000 * np.asarray(expected_state[3:])
+    np.testing.assert_allclose(position,
+                               [expected_position],
+                               rtol=1e-8)
+    np.testing.assert_allclose(velocity,
+                               [expected_velocity],
+                               rtol=1e-8)
     np.testing.assert_almost_equal(time,
                                    [image_et])
 
 def test_frame_chain(Pds3Driver):
-    # TODO test output
-    Pds3Driver.frame_chain
+    assert Pds3Driver.frame_chain.has_node(1)
+    assert Pds3Driver.frame_chain.has_node(10011)
+    assert Pds3Driver.frame_chain.has_node(-236820)
+    image_et = spice.scs2e(-236, '2/0072174528:989000') + 0.0005
+    target_to_j2000 = Pds3Driver.frame_chain.compute_rotation(10011, 1)
+    target_to_j2000_mat = spice.pxform('IAU_MERCURY', 'J2000', image_et)
+    target_to_j2000_quats = spice.m2q(target_to_j2000_mat)
+    np.testing.assert_almost_equal(target_to_j2000.quats,
+                                   [-np.roll(target_to_j2000_quats, -1)])
+    sensor_to_j2000 = Pds3Driver.frame_chain.compute_rotation(-236820, 1)
+    sensor_to_j2000_mat = spice.pxform('MSGR_MDIS_NAC', 'J2000', image_et)
+    sensor_to_j2000_quats = spice.m2q(sensor_to_j2000_mat)
+    np.testing.assert_almost_equal(sensor_to_j2000.quats,
+                                   [-np.roll(sensor_to_j2000_quats, -1)])
+
+
 
 def test_sun_position(Pds3Driver):
-    # TODO test output
     position, velocity, time = Pds3Driver.sun_position
+    image_et = spice.scs2e(-236, '2/0072174528:989000') + 0.0005
+    expected_state, _ = spice.spkez(10, image_et, 'IAU_MERCURY', 'LT+S', 199)
+    expected_position = 1000 * np.asarray(expected_state[:3])
+    expected_velocity = 1000 * np.asarray(expected_state[3:])
+    np.testing.assert_allclose(position,
+                               [expected_position],
+                               rtol=1e-8)
+    np.testing.assert_allclose(velocity,
+                               [expected_velocity],
+                               rtol=1e-8)
+    np.testing.assert_almost_equal(time,
+                                   [image_et])
 
 def test_target_name(Pds3Driver):
     assert Pds3Driver.target_name == 'MERCURY'
@@ -445,4 +469,5 @@ def test_ephemeris_stop_time(Pds3Driver):
     assert Pds3Driver.ephemeris_stop_time == 483122606.85302466
 
 def test_center_ephemeris_time(Pds3Driver):
+    print('in test', type(spice))
     assert Pds3Driver.center_ephemeris_time == 483122606.85252464

@@ -7,8 +7,6 @@ from collections import namedtuple
 
 import ale
 from ale.drivers import lro_drivers
-from ale.base import data_naif
-from ale.base import label_pds3
 
 from unittest.mock import PropertyMock, patch
 
@@ -16,11 +14,9 @@ from ale import util
 
 from ale.drivers.lro_drivers import LroLrocPds3LabelNaifSpiceDriver
 
-
 simplespice = SimpleSpice()
-data_naif.spice = simplespice
+
 lro_drivers.spice = simplespice
-label_pds3.spice = simplespice
 
 LroLrocPds3LabelNaifSpiceDriver.metakernel = get_mockkernels
 

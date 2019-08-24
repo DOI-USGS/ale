@@ -276,8 +276,11 @@ class NaifSpice():
                                      self.reference_frame,
                                      self.light_time_correction,
                                      self.target_name)
+        positions = 1000 * np.asarray([sun_state[:3]])
+        velocities = 1000 * np.asarray([sun_state[3:6]])
+        times = np.asarray([self.center_ephemeris_time])
 
-        return [sun_state[:4].tolist()], [sun_state[3:6].tolist()], [self.center_ephemeris_time]
+        return positions, velocities, times
 
     @property
     def sensor_position(self):

@@ -2,8 +2,6 @@ import pytest
 
 import ale
 from ale.drivers import cassini_drivers
-from ale.base import data_naif
-from ale.base import label_pds3
 
 from unittest.mock import PropertyMock, patch
 
@@ -12,9 +10,7 @@ from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
 
-data_naif.spice = simplespice
 cassini_drivers.spice = simplespice
-label_pds3.spice = simplespice
 
 from ale.drivers.cassini_drivers import CassiniIssPds3LabelNaifSpiceDriver
 
