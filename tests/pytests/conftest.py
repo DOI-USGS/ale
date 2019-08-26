@@ -94,20 +94,17 @@ def convert_kernels(kernels):
     binary_kernels : list
                      The list of binary kernels created.
     """
+    ext_map = {
+        '.xc' : '.bc',
+        '.xsp' : '.bsp'
+    }
     binary_kernels = []
     updated_kernels = []
     for kernel in kernels:
         split_kernel = os.path.splitext(kernel)
-        if split_kernel[1] == '.xc':
+        if split_kernel[1] in ext_map:
             subprocess.call(['tobin', os.path.join(data_root, kernel)])
-            binary_kernel = split_kernel[0] + '.bc'
-            binary_kernels.append(binary_kernel)
-            updated_kernels.append(binary_kernel)
-        elif split_kernel[1] == '.xsp':
-            subprocess.call(['tobin', os.path.join(data_root, kernel)])
-            binary_kernel = split_kernel[0] + '.bsp'
-            binary_kernels.append(binary_kernel)
-            updated_kernels.append(binary_kernel)
-        else:
-            updated_kernels.append(kernel)
+            kernel = split_kernel[0] + ext_map[split_kernel[1]]
+            binary_kernels.append(kernel)
+        updated_kernels.append(kernel)
     return updated_kernels, binary_kernels
