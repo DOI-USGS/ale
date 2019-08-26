@@ -8,7 +8,6 @@ import struct
 import spiceypy as spice
 import warnings
 
-from ale import config
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
@@ -87,24 +86,6 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
       making up the float containing that line's exposure duration.
 
     """
-
-
-    @property
-    def metakernel(self):
-        """
-        Returns latest instrument metakernels
-
-        Returns
-        -------
-        : string
-          Path to latest metakernel file
-        """
-        warnings.warn('This driver has currently not been tested! Use at your own risk.')
-        self._metakernel_dir = config.mex
-        if not hasattr(self, '_metakernel'):
-            self._metakernel = find_latest_metakernel(self._metakernel_dir, self.utc_start_time.year)
-        return self._metakernel
-
 
     @property
     def odtk(self):

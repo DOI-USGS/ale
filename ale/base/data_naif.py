@@ -4,6 +4,7 @@ import numpy as np
 from ale.base.type_sensor import Framer
 from ale.transformation import FrameChain
 from ale.rotation import TimeDependentRotation
+from ale import util
 
 class NaifSpice():
     def __enter__(self):
@@ -13,8 +14,6 @@ class NaifSpice():
         """
         if self.kernels:
             [spice.furnsh(k) for k in self.kernels]
-        elif self.metakernel:
-            spice.furnsh(self.metakernel)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -25,17 +24,16 @@ class NaifSpice():
         """
         if self.kernels:
             [spice.unload(k) for k in self.kernels]
-        else:
-            spice.unload(self.metakernel)
 
     @property
     def kernels(self):
         if not hasattr(self, '_kernels'):
-            self._kernels =  self._props.get('kernels', None)
+            if 'kernels' in self._props.keys():
+                self._kernels =  self._props['kernels']
+            else:
+                search_results = util.get_metakernels(missions=self.short_mission_name, years=self.utc_start_time.year, versions='latest')
+                self._kernels = [search_results['data'][0]['path']]
         return self._kernels
-
-    def metakernel(self):
-        pass
 
     @property
     def light_time_correction(self):

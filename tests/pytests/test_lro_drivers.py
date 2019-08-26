@@ -28,6 +28,8 @@ LroLrocPds3LabelNaifSpiceDriver.metakernel = get_mockkernels
 def driver():
     return LroLrocPds3LabelNaifSpiceDriver("")
 
+def test_short_mission_name(driver):
+    assert driver.short_mission_name=='lro'
 
 @patch('ale.base.label_pds3.Pds3Label.instrument_id', 'LROC')
 def test_instrument_id_left(driver):

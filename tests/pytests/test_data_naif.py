@@ -30,7 +30,6 @@ def test_naif_data_with_kernels():
     FakeNaifDriver = type("FakeNaifDriver", (base.Driver, data_naif.NaifSpice), {})
     return FakeNaifDriver("", props={'kernels': kernels})
 
-
 def test_target_id(test_naif_data):
     assert test_naif_data.target_id == -12345
 
