@@ -23,7 +23,6 @@ def test_naif_data_with_kernels():
     FakeNaifDriver = type("FakeNaifDriver", (base.Driver, data_naif.NaifSpice), {})
     return FakeNaifDriver("", props={'kernels': kernels})
 
-
 def test_target_id(test_naif_data):
     with patch('spiceypy.bods2c', return_value=-12345) as bods2c:
         assert test_naif_data.target_id == -12345

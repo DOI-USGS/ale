@@ -10,11 +10,11 @@ import collections
 from collections import OrderedDict
 from itertools import chain
 
-from ale import config
+from ale import spice_root
 
 import re
 
-def get_metakernels(spice_dir=config.spice_root, missions=set(), years=set(), versions=set()):
+def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=set()):
     """
     Given a root directory, get any subdirectory containing metakernels,
     assume spice directory structure.
@@ -55,12 +55,13 @@ def get_metakernels(spice_dir=config.spice_root, missions=set(), years=set(), ve
         'data': []
     }
 
+    missions = [m.lower() for m in missions]
     mission_dirs = list(filter(path.isdir, glob(path.join(spice_dir, '*'))))
 
     for md in mission_dirs:
         # Assuming spice root has the same name as the original on NAIF website"
         mission = os.path.basename(md).split('-')[0]
-        if missions and mission not in missions:
+        if missions and (mission.lower() not in missions):
             continue
 
         metakernel_keys = ['mission', 'year', 'version', 'path']
@@ -87,11 +88,6 @@ def get_metakernels(spice_dir=config.spice_root, missions=set(), years=set(), ve
         avail['data'].extend(metakernels)
 
     avail['count'] = len(avail['data'])
-    if not avail:
-        avail = {
-            'count' : 0,
-            'data' : 'ERROR: NONE OF {} ARE VALID MISSIONS'.format(missions)
-        }
 
     return avail
 

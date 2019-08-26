@@ -20,6 +20,9 @@ DawnFcPds3NaifSpiceDriver.metakernel = get_mockkernels
 def driver():
     return DawnFcPds3NaifSpiceDriver("")
 
+def test_short_mission_name(driver):
+    assert driver.short_mission_name=='dawn'
+
 @patch('ale.base.label_pds3.Pds3Label.instrument_id', 1)
 @patch('ale.base.label_pds3.Pds3Label.filter_number', 2)
 def test_instrument_id(driver):

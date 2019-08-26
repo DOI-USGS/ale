@@ -253,6 +253,9 @@ End
 """
     return MessengerMdisPds3NaifSpiceDriver(pds_label)
 
+def test_short_mission_name(Pds3Driver):
+    assert Pds3Driver.short_mission_name=='mes'
+
 @pytest.fixture
 def IsisLabelDriver():
     return MessengerMdisIsisLabelNaifSpiceDriver("")
