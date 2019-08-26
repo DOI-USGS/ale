@@ -226,8 +226,3 @@ def test_get_metakernels_search_counts(tmpdir, search_kwargs, expected_count):
 
     search_result =  util.get_metakernels(str(tmpdir), **search_kwargs)
     assert search_result['count'] == expected_count
-
-
-
-
-
