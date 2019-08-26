@@ -41,7 +41,7 @@ def get_mockkernels(self, *args):
 ale_root = os.path.split(ale.__file__)[0]
 data_root = os.path.join(ale_root, '../tests/pytests/data')
 dirs = next(os.walk(data_root, topdown=True))[1]
-dirs[:] = [d for d in dirs if not d.startswith('.')]
+dirs = [d for d in dirs if not d.startswith('.')]
 image_2_data = {}
 
 for d in dirs:
