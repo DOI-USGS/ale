@@ -5,6 +5,9 @@ import subprocess
 import numpy as np
 import spiceypy as spice
 
+
+from conftest import get_image_kernels, convert_kernels
+
 import ale
 from ale.base import data_naif
 
@@ -14,45 +17,13 @@ ale.base.data_naif.spice = spice
 from ale.drivers.messenger_drivers import MessengerMdisPds3NaifSpiceDriver
 
 @pytest.fixture(scope="module", autouse=True)
-def convert_kernels():
-    ale_root = os.path.split(ale.__file__)[0]
-    data_root = os.path.join(ale_root, '../tests/pytests/data/EN1072174528M')
-    kernels = [
-        'mdisAddendum009.ti',
-        'msgr_art_cal_EN1072174528M.xc',
-        'msgr_mdis_v160.ti',
-        'msgr_v231.tf',
-        'pck00010_msgr_v23.tpc',
-        'messenger_2548.tsc',
-        'msgr_gm_EN1072174528M.xc',
-        'msgr_sc_EN1072174528M.xc',
-        'msgr_merc_EN1072174528M.xsp',
-        'msgr_merc_bc_EN1072174528M.xsp',
-        'msgr_sun_EN1072174528M.xsp',
-        'msgr_sc_EN1072174528M.xsp',
-        'naif0012.tls'
-    ]
-    kernels = [os.path.join(data_root, kern) for kern in kernels]
-    bin_kernels = []
-    final_kernels = []
-    for kernel in kernels:
-        split_kernel = os.path.splitext(kernel)
-        if split_kernel[1] == '.xc':
-            subprocess.call(['tobin', os.path.join(data_root, kernel)])
-            bin_kernel = split_kernel[0] + '.bc'
-            bin_kernels.append(bin_kernel)
-            final_kernels.append(bin_kernel)
-        elif split_kernel[1] == '.xsp':
-            subprocess.call(['tobin', os.path.join(data_root, kernel)])
-            bin_kernel = split_kernel[0] + '.bsp'
-            bin_kernels.append(bin_kernel)
-            final_kernels.append(bin_kernel)
-        else:
-            final_kernels.append(kernel)
-    spice.furnsh(final_kernels)
+def test_kernels():
+    kernels = get_image_kernels('EN1072174528M')
+    updated_kernels, binary_kernels = convert_kernels(kernels)
+    spice.furnsh(updated_kernels)
     yield
-    spice.unload(final_kernels)
-    for kern in bin_kernels:
+    spice.unload(updated_kernels)
+    for kern in binary_kernels:
         os.remove(kern)
 
 @pytest.fixture
