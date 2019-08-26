@@ -12,9 +12,11 @@ import numpy as np
 import datetime
 from datetime import datetime, date
 import traceback
+from collections import OrderedDict
 
 from ale.formatters.usgscsm_formatter import to_usgscsm
 from ale.formatters.isis_formatter import to_isis
+from ale.base.data_isis import IsisSpice
 
 from abc import ABC
 
@@ -25,7 +27,8 @@ __driver_modules__ = [importlib.import_module('.'+m, package='ale.drivers') for 
 __formatters__ = {'usgscsm': to_usgscsm,
                   'isis': to_isis}
 
-drivers = dict(chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.isclass(x) and "_driver" in x.__module__) for dmod in __driver_modules__))
+def sort_drivers(drivers=[]):
+    return list(sorted(drivers, key=lambda x:IsisSpice in x.__bases__, reverse=True))
 
 class JsonEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -46,7 +49,7 @@ class JsonEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def load(file_path, formatter='usgscsm'):
+def load(label, props={}, formatter='usgscsm'):
     """
     Attempt to load a given label from all possible drivers
 
@@ -58,18 +61,24 @@ def load(file_path, formatter='usgscsm'):
     if isinstance(formatter, str):
         formatter = __formatters__[formatter]
 
-    for name, driver in drivers.items():
-        print(f'Trying {name}')
+    if isinstance(props, str):
+        props = json.loads(props)
+
+    drivers = chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.isclass(x) and "_driver" in x.__module__)[1] for dmod in __driver_modules__)
+    drivers = sort_drivers([d[1] for d in drivers])
+
+    for driver in drivers:
+        print(f'Trying {driver}')
         try:
             res = driver(label)
             with res as driver:
-                return formatter(driver)
+                return formatter(driver, props=props)
         except Exception as e:
             print(f'Failed: {e}\n')
             traceback.print_exc()
     raise Exception('No Such Driver for Label')
 
 
-def loads(label, formatter='usgscsm'):
-    res = load(label, formatter)
+def loads(label, props='', formatter='usgscsm'):
+    res = load(label, props, formatter)
     return json.dumps(res, cls=JsonEncoder)
