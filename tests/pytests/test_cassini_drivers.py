@@ -24,6 +24,9 @@ CassiniIssPds3LabelNaifSpiceDriver.metakernel = get_mockkernels
 def driver():
     return CassiniIssPds3LabelNaifSpiceDriver("")
 
+def test_short_mission_name(driver):
+    assert driver.short_mission_name=='co'
+
 def test_instrument_id(driver):
     with patch('ale.base.label_pds3.Pds3Label.instrument_id', new_callable=PropertyMock) as mock_instrument_id:
         mock_instrument_id.return_value = 'ISSNA'

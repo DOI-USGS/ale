@@ -28,6 +28,9 @@ MessengerMdisIsisLabelNaifSpiceDriver.metakernel = get_mockkernels
 def Pds3Driver():
     return MessengerMdisPds3NaifSpiceDriver("")
 
+def test_short_mission_name(Pds3Driver):
+    assert Pds3Driver.short_mission_name=='mes'
+
 @pytest.fixture
 def IsisLabelDriver():
     return MessengerMdisIsisLabelNaifSpiceDriver("")

@@ -26,6 +26,9 @@ KaguyaTcPds3NaifSpiceDriver.metakernel = get_mockkernels
 def driver():
     return KaguyaTcPds3NaifSpiceDriver("")
 
+def test_short_mission_name(driver):
+    assert driver.short_mission_name=='selene'
+
 @patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
 def test_instrument_id(driver):
     with patch.dict(driver.label, {'SWATH_MODE_ID':'NOMINAL', 'PRODUCT_SET_ID':'TC_w_Level2B0' }) as f:
