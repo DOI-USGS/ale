@@ -8,13 +8,7 @@ import spiceypy as spice
 
 from conftest import get_image_kernels, convert_kernels
 
-import ale
-from ale.base import data_naif
-
-# We have to re-assign spiceypy because other tests overwrite it
-ale.base.data_naif.spice = spice
-
-from ale.drivers.messenger_drivers import MessengerMdisPds3NaifSpiceDriver
+from ale.drivers.mes_drivers import MessengerMdisPds3NaifSpiceDriver
 
 @pytest.fixture(scope="module", autouse=True)
 def test_kernels():

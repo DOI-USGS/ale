@@ -3,7 +3,7 @@ import numpy as np
 import pvl
 
 import ale
-from ale.drivers import kaguya_drivers
+from ale.drivers import selene_drivers
 
 from unittest.mock import PropertyMock, patch
 
@@ -12,7 +12,7 @@ from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
 
-kaguya_drivers.spice = simplespice
+selene_drivers.spice = simplespice
 
 from ale.drivers.selene_drivers import KaguyaTcPds3NaifSpiceDriver
 
