@@ -5,7 +5,6 @@ import numpy as np
 
 import pvl
 import spiceypy as spice
-from ale import config
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
@@ -79,24 +78,6 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         ("P120","MT1"):2002.54,
         ("P120","UV3"):2002.71
     }
-
-
-    @property
-    def metakernel(self):
-        """
-        Returns latest instrument metakernels
-
-        Returns
-        -------
-        : string
-          Path to latest metakernel file
-        """
-        metakernel_dir = config.cassini
-        year = self.utc_start_time.year
-
-        if not hasattr(self, '_metakernel'):
-            self._metakernel = find_latest_metakernel(metakernel_dir, year)
-        return self._metakernel
 
     @property
     def instrument_id(self):

@@ -25,6 +25,9 @@ MroCtxPds3LabelNaifSpiceDriver.metakernel = get_mockkernels
 def Pds3NaifDriver():
     return MroCtxPds3LabelNaifSpiceDriver("")
 
+def test_short_mission_name(Pds3NaifDriver):
+    assert Pds3NaifDriver.short_mission_name=='mro'
+
 @pytest.fixture
 def IsisLabelNaifDriver():
     return MroCtxIsisLabelNaifSpiceDriver("")

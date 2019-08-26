@@ -46,7 +46,7 @@ class JsonEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def load(label, formatter='usgscsm'):
+def load(file_path, formatter='usgscsm'):
     """
     Attempt to load a given label from all possible drivers
 

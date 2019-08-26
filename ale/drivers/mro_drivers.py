@@ -5,7 +5,6 @@ import numpy as np
 import pvl
 import spiceypy as spice
 
-from ale import config
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
@@ -69,25 +68,6 @@ class MroCtxIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDi
     """
     Driver for reading CTX ISIS labels.
     """
-
-    @property
-    def metakernel(self):
-        """
-        Returns latest instrument metakernels
-
-        Returns
-        -------
-        : string
-          Path to latest metakernel file
-        """
-        metakernel_dir = config.mro
-        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
-        if not hasattr(self, '_metakernel'):
-            self._metakernel = None
-            for mk in mks:
-                if str(self.utc_start_time.year) in os.path.basename(mk):
-                    self._metakernel = mk
-        return self._metakernel
 
     @property
     def instrument_id(self):
@@ -197,25 +177,6 @@ class MroCtxPds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDi
     Driver for reading CTX PDS3 labels. Requires a Spice mixin to acquire addtional
     ephemeris and instrument data located exclusively in spice kernels.
     """
-
-    @property
-    def metakernel(self):
-        """
-        Returns latest instrument metakernels
-
-        Returns
-        -------
-        : string
-          Path to latest metakernel file
-        """
-        metakernel_dir = config.mro
-        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
-        if not hasattr(self, '_metakernel'):
-            self._metakernel = None
-            for mk in mks:
-                if str(self.utc_start_time.year) in os.path.basename(mk):
-                    self._metakernel = mk
-        return self._metakernel
 
     @property
     def instrument_id(self):
