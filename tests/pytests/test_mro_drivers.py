@@ -4,17 +4,13 @@ import pytest
 
 import ale
 from ale.drivers import mro_drivers
-from ale.base import data_naif
-from ale.base import label_pds3
 
 # 'Mock' the spice module where it is imported
 from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
 
-data_naif.spice = simplespice
 mro_drivers.spice = simplespice
-label_pds3.spice = simplespice
 
 from ale.drivers.mro_drivers import MroCtxPds3LabelNaifSpiceDriver
 from ale.drivers.mro_drivers import MroCtxIsisLabelNaifSpiceDriver
