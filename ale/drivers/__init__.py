@@ -49,7 +49,7 @@ class JsonEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def load(label, props={}, formatter='usgscsm'):
+def load(label, props={}, formatter='usgscsm', verbose=False):
     """
     Attempt to load a given label from all possible drivers
 
@@ -61,21 +61,23 @@ def load(label, props={}, formatter='usgscsm'):
     if isinstance(formatter, str):
         formatter = __formatters__[formatter]
 
-    if isinstance(props, str):
+    if props and isinstance(props, str):
         props = json.loads(props)
 
-    drivers = chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.isclass(x) and "_driver" in x.__module__)[1] for dmod in __driver_modules__)
+    drivers = chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.isclass(x) and "_driver" in x.__module__) for dmod in __driver_modules__)
     drivers = sort_drivers([d[1] for d in drivers])
 
     for driver in drivers:
-        print(f'Trying {driver}')
+        if verbose:
+            print(f'Trying {driver}')
         try:
-            res = driver(label)
+            res = driver(label, props=props)
             with res as driver:
-                return formatter(driver, props=props)
+                return formatter(driver)
         except Exception as e:
-            print(f'Failed: {e}\n')
-            traceback.print_exc()
+            if verbose:
+                print(f'Failed: {e}\n')
+                traceback.print_exc()
     raise Exception('No Such Driver for Label')
 
 

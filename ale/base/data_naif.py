@@ -28,10 +28,14 @@ class NaifSpice():
     @property
     def kernels(self):
         if not hasattr(self, '_kernels'):
+
             if 'kernels' in self._props.keys():
                 self._kernels =  self._props['kernels']
             else:
                 search_results = util.get_metakernels(missions=self.short_mission_name, years=self.utc_start_time.year, versions='latest')
+
+                if search_results['count'] == 0:
+                    raise Exception(f'Failed to find metakernels. mission: {self.short_mission_name}, year:{self.utc_start_time.year}, versions="latest"')
                 self._kernels = [search_results['data'][0]['path']]
         return self._kernels
 
