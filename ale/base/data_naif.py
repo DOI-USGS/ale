@@ -1,11 +1,11 @@
 import spiceypy as spice
 import numpy as np
 
+import ale
 from ale.base.type_sensor import Framer
 from ale.transformation import FrameChain
 from ale.rotation import TimeDependentRotation
 from ale import util
-from ale import spice_root
 
 class NaifSpice():
     def __enter__(self):
@@ -32,13 +32,13 @@ class NaifSpice():
             if 'kernels' in self._props.keys():
                 self._kernels =  self._props['kernels']
             else:
-                if not spice_root:
-                    raise NameError(f'ale.spice_root is not set, cannot search for metakernels. ale.spice_root = "{spice_root}"')
+                if not ale.spice_root:
+                    raise EnvironmentError(f'ale.spice_root is not set, cannot search for metakernels. ale.spice_root = "{spice_root}"')
 
-                search_results = util.get_metakernels(spice_root, missions=self.short_mission_name, years=self.utc_start_time.year, versions='latest')
+                search_results = util.get_metakernels(ale.spice_root, missions=self.short_mission_name, years=self.utc_start_time.year, versions='latest')
 
                 if search_results['count'] == 0:
-                    raise Exception(f'Failed to find metakernels. mission: {self.short_mission_name}, year:{self.utc_start_time.year}, versions="latest" spice root = "{spice_root}"')
+                    raise ValueError(f'Failed to find metakernels. mission: {self.short_mission_name}, year:{self.utc_start_time.year}, versions="latest" spice root = "{spice_root}"')
                 self._kernels = [search_results['data'][0]['path']]
         return self._kernels
 

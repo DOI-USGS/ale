@@ -48,7 +48,6 @@ def test_load_mes_from_metakernels(tmpdir, monkeypatch):
 
     # reload module to repopulate ale.spice_root
     reload(ale)
-    reload(ale.base.data_naif)
 
     updated_kernels, _ = convert_kernels(get_image_kernels('EN1072174528M'))
     label_file = get_image_label('EN1072174528M')
@@ -70,7 +69,6 @@ def test_load_mes_with_no_metakernels(tmpdir, monkeypatch):
 
     # reload module to repopulate ale.spice_root
     reload(ale)
-    reload(ale.base.data_naif)
 
     updated_kernels, _ = convert_kernels(get_image_kernels('EN1072174528M'))
     label_file = get_image_label('EN1072174528M')

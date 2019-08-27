@@ -1,23 +1,18 @@
 import pytest
 
-# 'Mock' the spice module where it is imported
-from conftest import SimpleSpice, get_mockkernels
-
-from collections import namedtuple
-
-import ale
-from ale.drivers import lro_drivers
-
 from unittest.mock import PropertyMock, patch
 
+import ale
 from ale import util
-
+from ale.drivers import lro_drivers
 from ale.drivers.lro_drivers import LroLrocPds3LabelNaifSpiceDriver
 
+# 'Mock' the spice module where it is imported
+from conftest import SimpleSpice, get_mockkernels
+from collections import namedtuple
+
 simplespice = SimpleSpice()
-
 lro_drivers.spice = simplespice
-
 LroLrocPds3LabelNaifSpiceDriver.metakernel = get_mockkernels
 
 @pytest.fixture
