@@ -284,8 +284,11 @@ class NaifSpice():
                                      self.reference_frame,
                                      self.light_time_correction,
                                      self.target_name)
+        positions = 1000 * np.asarray([sun_state[:3]])
+        velocities = 1000 * np.asarray([sun_state[3:6]])
+        times = np.asarray([self.center_ephemeris_time])
 
-        return [sun_state[:4].tolist()], [sun_state[3:6].tolist()], [self.center_ephemeris_time]
+        return positions, velocities, times
 
     @property
     def sensor_position(self):
@@ -432,7 +435,7 @@ class NaifSpice():
         naif_keywords['INS{}_ITRANSL'.format(self.ikid)] = self.focal2pixel_lines
         naif_keywords['INS{}_ITRANSS'.format(self.ikid)] = self.focal2pixel_samples
         naif_keywords['INS{}_FOCAL_LENGTH'.format(self.ikid)] = self.focal_length
-        naif_keywords['INS{}_BORESIGHT_SAMPLE'.format(self.ikid)] = self.detector_center_sample
-        naif_keywords['INS{}_BORESIGHT_LINE'.format(self.ikid)] = self.detector_center_line
+        naif_keywords['INS{}_BORESIGHT_SAMPLE'.format(self.ikid)] = self.detector_center_sample + 0.5
+        naif_keywords['INS{}_BORESIGHT_LINE'.format(self.ikid)] = self.detector_center_line + 0.5
 
         return naif_keywords
