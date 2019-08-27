@@ -107,7 +107,7 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         : double
           focal length in meters
         """
-        coeffs = spice.gdpool('INS{}_FL_TEMP_COEFFS '.format(self.fikid), 0, 5)
+        coeffs = spice.gdpool('INS{}_FL_TEMP_COEFFS '.format(self.fikid), 0, 6)
 
         # reverse coeffs, MDIS coeffs are listed a_0, a_1, a_2 ... a_n where
         # numpy wants them a_n, a_n-1, a_n-2 ... a_0
@@ -206,6 +206,18 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
                 "y" : self.odty
                 }
             }
+
+    @property
+    def pixel_size(self):
+        """
+        Overriden because the MESSENGER IK uses PIXEL_PITCH and the units
+        are already millimeters
+
+        Returns
+        -------
+        : float pixel size
+        """
+        return spice.gdpool('INS{}_PIXEL_PITCH'.format(self.ikid), 0, 1)
 
 
 class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver):

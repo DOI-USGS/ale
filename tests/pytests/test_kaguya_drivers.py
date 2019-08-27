@@ -4,8 +4,6 @@ import pvl
 
 import ale
 from ale.drivers import selene_drivers
-from ale.base import data_naif
-from ale.base import label_pds3
 
 from unittest.mock import PropertyMock, patch
 
@@ -13,10 +11,7 @@ from unittest.mock import PropertyMock, patch
 from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
-
-data_naif.spice = simplespice
 selene_drivers.spice = simplespice
-label_pds3.spice = simplespice
 
 from ale.drivers.selene_drivers import KaguyaTcPds3NaifSpiceDriver
 
@@ -25,6 +20,9 @@ KaguyaTcPds3NaifSpiceDriver.metakernel = get_mockkernels
 @pytest.fixture
 def driver():
     return KaguyaTcPds3NaifSpiceDriver("")
+
+def test_short_mission_name(driver):
+    assert driver.short_mission_name=='selene'
 
 @patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
 def test_instrument_id(driver):
@@ -45,11 +43,13 @@ def test_spacecraft_clock_start_count(driver):
         pvl._collections.Units(value=501, units='<sec>')}) as f:
         assert driver.spacecraft_clock_start_count == 501
 
+@patch('ale.base.data_naif.NaifSpice.spacecraft_id', -131)
 def test_ephemeris_stop_time(driver):
     with patch.dict(driver.label, {'CORRECTED_SC_CLOCK_STOP_COUNT':
                                    pvl._collections.Units(value=501, units='<sec>')}) as f:
         assert driver.ephemeris_stop_time == 0.1
 
+@patch('ale.base.data_naif.NaifSpice.spacecraft_id', -131)
 def test_ephemeris_start_time(driver):
     with patch.dict(driver.label, {'CORRECTED_SC_CLOCK_START_COUNT':
                                    pvl._collections.Units(value=501, units='<sec>')}) as f:

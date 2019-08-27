@@ -251,3 +251,35 @@ def write_metakernel_from_cube(cube, mkpath=None):
     return body
 
 
+def write_metakernel_from_kernel_list(kernels):
+    """
+    Parameters
+    ----------
+    kernels : str
+              list of kernel paths
+
+    Returns
+    -------
+    : str
+      Returns string representation of a Naif Metakernel file
+    """
+    common_prefix = os.path.commonprefix(kernels)
+
+    kernels = ["'"+"$PREFIX"+k[len(common_prefix):]+"'" for k in kernels]
+    body = '\n\n'.join([
+            'KPL/MK',
+            f'Metakernel Generated from a kernel list by Ale',
+            '\\begindata',
+            'PATH_VALUES = (',
+            "'"+common_prefix+"'",
+            ')',
+            'PATH_SYMBOLS = (',
+            "'PREFIX'",
+            ')',
+            'KERNELS_TO_LOAD = (',
+            '\n'.join(kernels),
+            ')',
+            '\\begintext'
+        ])
+
+    return body

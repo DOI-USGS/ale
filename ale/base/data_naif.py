@@ -5,6 +5,7 @@ from ale.base.type_sensor import Framer
 from ale.transformation import FrameChain
 from ale.rotation import TimeDependentRotation
 from ale import util
+from ale import spice_root
 
 class NaifSpice():
     def __enter__(self):
@@ -28,14 +29,16 @@ class NaifSpice():
     @property
     def kernels(self):
         if not hasattr(self, '_kernels'):
-
             if 'kernels' in self._props.keys():
                 self._kernels =  self._props['kernels']
             else:
-                search_results = util.get_metakernels(missions=self.short_mission_name, years=self.utc_start_time.year, versions='latest')
+                if not spice_root:
+                    raise NameError(f'ale.spice_root is not set, cannot search for metakernels. ale.spice_root = "{spice_root}"')
+
+                search_results = util.get_metakernels(spice_root, missions=self.short_mission_name, years=self.utc_start_time.year, versions='latest')
 
                 if search_results['count'] == 0:
-                    raise Exception(f'Failed to find metakernels. mission: {self.short_mission_name}, year:{self.utc_start_time.year}, versions="latest"')
+                    raise Exception(f'Failed to find metakernels. mission: {self.short_mission_name}, year:{self.utc_start_time.year}, versions="latest" spice root = "{spice_root}"')
                 self._kernels = [search_results['data'][0]['path']]
         return self._kernels
 
@@ -288,8 +291,11 @@ class NaifSpice():
                                      self.reference_frame,
                                      self.light_time_correction,
                                      self.target_name)
+        positions = 1000 * np.asarray([sun_state[:3]])
+        velocities = 1000 * np.asarray([sun_state[3:6]])
+        times = np.asarray([self.center_ephemeris_time])
 
-        return [sun_state[:4].tolist()], [sun_state[3:6].tolist()], [self.center_ephemeris_time]
+        return positions, velocities, times
 
     @property
     def sensor_position(self):
@@ -436,7 +442,7 @@ class NaifSpice():
         naif_keywords['INS{}_ITRANSL'.format(self.ikid)] = self.focal2pixel_lines
         naif_keywords['INS{}_ITRANSS'.format(self.ikid)] = self.focal2pixel_samples
         naif_keywords['INS{}_FOCAL_LENGTH'.format(self.ikid)] = self.focal_length
-        naif_keywords['INS{}_BORESIGHT_SAMPLE'.format(self.ikid)] = self.detector_center_sample
-        naif_keywords['INS{}_BORESIGHT_LINE'.format(self.ikid)] = self.detector_center_line
+        naif_keywords['INS{}_BORESIGHT_SAMPLE'.format(self.ikid)] = self.detector_center_sample + 0.5
+        naif_keywords['INS{}_BORESIGHT_LINE'.format(self.ikid)] = self.detector_center_line + 0.5
 
         return naif_keywords

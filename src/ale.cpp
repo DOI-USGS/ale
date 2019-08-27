@@ -337,7 +337,7 @@ namespace ale {
     return "";
  }
 
- std::string load(std::string filename) {
+ std::string load(std::string filename, std::string props, std::string formatter) {
      static bool first_run = true;
      if(first_run) {
          // Initialize the Python interpreter but only once.
@@ -359,25 +359,35 @@ namespace ale {
      if(!pFunc) {
        // import errors do not set a PyError flag, need to use a custom
        // error message instead.
-       throw runtime_error("Failed to import ale.load function from Python."
+       throw runtime_error("Failed to import ale.loads function from Python."
                            "This Usually indicates an error in the Ale Python Library."
                            "Check if Installed correctly and the function ale.loads exists.");
      }
 
      // Create a Python tuple to hold the arguments to the method.
-     PyObject *pArgs = PyTuple_New(1);
+     PyObject *pArgs = PyTuple_New(3);
      if(!pArgs) {
        throw runtime_error(getPyTraceback());
      }
 
      // Set the Python int as the first and second arguments to the method.
-     PyObject *pString = PyUnicode_FromString(filename.c_str());
-     PyTuple_SetItem(pArgs, 0, pString);
+     PyObject *pStringFileName = PyUnicode_FromString(filename.c_str());
+     PyTuple_SetItem(pArgs, 0, pStringFileName);
+
+     PyObject *pStringProps = PyUnicode_FromString(props.c_str());
+     PyTuple_SetItem(pArgs, 1, pStringProps);
+
+     PyObject *pStringFormatter = PyUnicode_FromString(formatter.c_str());
+     PyTuple_SetItem(pArgs, 2, pStringFormatter);
+
 
      // Call the function with the arguments.
      PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
      Py_DECREF(pArgs);
-     Py_DECREF(pString);
+     Py_DECREF(pStringFileName);
+     Py_DECREF(pStringProps);
+     Py_DECREF(pStringFormatter);
+
      if(!pResult) {
         throw invalid_argument(getPyTraceback());
      }

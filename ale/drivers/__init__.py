@@ -30,24 +30,19 @@ __formatters__ = {'usgscsm': to_usgscsm,
 def sort_drivers(drivers=[]):
     return list(sorted(drivers, key=lambda x:IsisSpice in x.__bases__, reverse=True))
 
-class JsonEncoder(json.JSONEncoder):
+class AleJsonEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        if isinstance(obj, np.int64):
-            return int(obj)
-        if isinstance(obj, datetime.datetime):
-            return obj.__str__()
-        if isinstance(obj, bytes):
-            return obj.decode("utf-8")
-        if isinstance(obj, pvl.PVLModule):
-            return pvl.dumps(obj)
         if isinstance(obj, set):
             return list(obj)
-        if isinstance(obj, np.nan):
-            return None
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, datetime.date):
+            return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
-
 
 def load(label, props={}, formatter='usgscsm', verbose=False):
     """
@@ -72,6 +67,9 @@ def load(label, props={}, formatter='usgscsm', verbose=False):
             print(f'Trying {driver}')
         try:
             res = driver(label, props=props)
+            # get instrument_id to force early failure
+            res.instrument_id
+
             with res as driver:
                 return formatter(driver)
         except Exception as e:
@@ -80,7 +78,6 @@ def load(label, props={}, formatter='usgscsm', verbose=False):
                 traceback.print_exc()
     raise Exception('No Such Driver for Label')
 
-
 def loads(label, props='', formatter='usgscsm'):
     res = load(label, props, formatter)
-    return json.dumps(res, cls=JsonEncoder)
+    return json.dumps(res, cls=AleJsonEncoder)
