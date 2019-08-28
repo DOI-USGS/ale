@@ -156,11 +156,11 @@ def driver():
     return TestDriver('')
 
 def test_camera_version(driver):
-    meta_data = json.loads(isis_formatter.to_isis(driver))
+    meta_data = isis_formatter.to_isis(driver)
     assert meta_data['CameraVersion'] == 1
 
 def test_instrument_pointing(driver):
-    meta_data = json.loads(isis_formatter.to_isis(driver))
+    meta_data = isis_formatter.to_isis(driver)
     pointing = meta_data['InstrumentPointing']
     assert pointing['TimeDependentFrames'] == [1000, 1]
     assert pointing['ConstantFrames'] == [1010, 1000]
@@ -172,7 +172,7 @@ def test_instrument_pointing(driver):
     np.testing.assert_equal(pointing['Quaternions'], np.array([[0, 0, 0, -1], [0, 0, 0, -1]]))
 
 def test_instrument_position(driver):
-    meta_data = json.loads(isis_formatter.to_isis(driver))
+    meta_data = isis_formatter.to_isis(driver)
     position = meta_data['InstrumentPosition']
     assert position['SpkTableStartTime'] == 800
     assert position['SpkTableEndTime'] == 900
@@ -182,7 +182,7 @@ def test_instrument_position(driver):
     np.testing.assert_equal(position['Velocities'], np.array([[0, -1, -2], [-3, -4, -5]]))
 
 def test_body_rotation(driver):
-    meta_data = json.loads(isis_formatter.to_isis(driver))
+    meta_data = isis_formatter.to_isis(driver)
     rotation = meta_data['BodyRotation']
     assert rotation['TimeDependentFrames'] == [100, 1]
     assert rotation['CkTableStartTime'] == 0
@@ -192,7 +192,7 @@ def test_body_rotation(driver):
     np.testing.assert_equal(rotation['Quaternions'], np.array([[0, 0, 0, -1], [0, 0, 0, -1]]))
 
 def test_sun_position(driver):
-    meta_data = json.loads(isis_formatter.to_isis(driver))
+    meta_data = isis_formatter.to_isis(driver)
     position = meta_data['SunPosition']
     assert position['SpkTableStartTime'] == 600
     assert position['SpkTableEndTime'] == 700
@@ -202,7 +202,7 @@ def test_sun_position(driver):
     np.testing.assert_equal(position['Velocities'], np.array([[0, -1, -2], [-3, -4, -5]]))
 
 def test_naif_keywords(driver):
-    meta_data = json.loads(isis_formatter.to_isis(driver))
+    meta_data = isis_formatter.to_isis(driver)
     assert meta_data['NaifKeywords'] == {
         'keyword_1' : 0,
         'keyword_2' : 'test'

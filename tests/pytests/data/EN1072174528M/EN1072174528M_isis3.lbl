@@ -1,0 +1,95 @@
+Object = IsisCube
+Object = Core
+StartByte   = 65537
+Format      = Tile
+TileSamples = 512
+TileLines   = 512
+
+Group = Dimensions
+  Samples = 512
+  Lines   = 512
+  Bands   = 1
+End_Group
+
+Group = Pixels
+  Type       = Real
+  ByteOrder  = Lsb
+  Base       = 0.0
+  Multiplier = 1.0
+End_Group
+End_Object
+
+Group = Instrument
+SpacecraftName        = Messenger
+InstrumentName        = "MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA"
+InstrumentId          = MDIS-NAC
+TargetName            = Mercury
+OriginalTargetName    = MERCURY
+StartTime             = 2015-04-24T04:42:19.666463
+StopTime              = 2015-04-24T04:42:19.667463
+SpacecraftClockCount  = 2/0072174528:989000
+MissionPhaseName      = "MERCURY ORBIT YEAR 5"
+ExposureDuration      = 1 <MS>
+ExposureType          = AUTO
+DetectorTemperature   = -11.62 <DEGC>
+FocalPlaneTemperature = 4.07 <DEGC>
+FilterTemperature     = N/A
+OpticsTemperature     = 17.08 <DEGC>
+AttitudeQuality       = Ok
+FilterWheelPosition   = 17348
+PivotPosition         = 15
+FpuBinningMode        = 1
+PixelBinningMode      = 0
+SubFrameMode          = 0
+JailBars              = 0
+DpuId                 = DPU-A
+PivotAngle            = 0.04119873046875 <Degrees>
+Unlutted              = 1
+LutInversionTable     = $messenger/calibration/LUT_INVERT/MDISLUTINV_0.TAB
+End_Group
+
+Group = Archive
+DataSetId                 = MESS-E/V/H-MDIS-2-EDR-RAWDATA-V1.0
+DataQualityId             = 0000001000000000
+ProducerId                = "APPLIED COHERENT TECHNOLOGY CORPORATION"
+EdrSourceProductId        = 1072174528_IM6
+ProductId                 = EN1072174528M
+SequenceName              = N/A
+ObservationId             = 8386282
+ObservationType           = (Monochrome, "Ridealong NAC")
+SiteId                    = N/A
+MissionElapsedTime        = 72174528
+EdrProductCreationTime    = 2015-04-30T18:25:23
+ObservationStartTime      = 2015-04-24T04:42:19.666463
+SpacecraftClockStartCount = 2/0072174528:989000
+SpacecraftClockStopCount  = 2/0072174528:990000
+Exposure                  = 1
+CCDTemperature            = 1139
+OriginalFilterNumber      = 0
+OrbitNumber               = 4086
+YearDoy                   = 2015114
+SourceProductId           = ("EN1072174528M", "MDISLUTINV_0")
+End_Group
+
+Group = BandBin
+Name   = "748 BP 53"
+Number = 2
+Center = 747.7 <NM>
+Width  = 52.6 <NM>
+End_Group
+
+Group = Kernels
+NaifIkCode = -236820
+End_Group
+End_Object
+
+Object = Label
+Bytes = 65536
+End_Object
+
+Object = OriginalLabel
+Name      = IsisCube
+StartByte = 1114113
+Bytes     = 7944
+End_Object
+End
