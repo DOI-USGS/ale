@@ -1,5 +1,6 @@
 import subprocess
 import os
+import re
 import numpy as np
 import ale
 
@@ -94,20 +95,21 @@ def convert_kernels(kernels):
     binary_kernels : list
                      The list of binary kernels created.
     """
-    ext_map = {
-        '.xc' : '.bc',
-        '.xsp' : '.bsp'
-    }
     binary_kernels = []
     updated_kernels = []
     for kernel in kernels:
         print('Checking kernel', kernel)
         split_kernel = os.path.splitext(kernel)
-        if split_kernel[1].lower() in ext_map:
+        if 'x' in split_kernel[1].lower():
             print('Converting transfer kernel', kernel)
-            subprocess.call(['tobin', os.path.join(data_root, kernel)])
-            kernel = split_kernel[0] + ext_map[split_kernel[1].lower()]
-            binary_kernels.append(kernel)
-            print('New binary kernel', kernel)
+            bin_output = subprocess.run(['tobin', os.path.join(data_root, kernel)],
+                                        capture_output=True, check=True)
+            matches = re.search(r'To: (.*\.\w*)', str(bin_output.stdout))
+            if not matches:
+                print('Failed to convert transfer kenernel', kernel, 'skipping...')
+            else:
+                kernel = matches.group(1)
+                binary_kernels.append(kernel)
+                print('New binary kernel', kernel)
         updated_kernels.append(kernel)
     return updated_kernels, binary_kernels
