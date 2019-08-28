@@ -4,12 +4,9 @@ import numpy as np
 
 from unittest.mock import patch, call
 
-import ale
 from ale.base.data_naif import NaifSpice
 from ale.base import data_naif
 from ale.base import base
-
-from conftest import get_image_label
 
 @pytest.fixture
 def test_naif_data():

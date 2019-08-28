@@ -50,14 +50,14 @@ for d in dirs:
     tmp = os.path.join(data_root, d)
     image_2_data[d] = [os.path.join(tmp, f) for f in os.listdir(tmp) if not f.startswith('.') and os.path.splitext(f)[1] != '.lbl']
 
-def get_image_label(image):
+def get_image_label(image, label_type='pds3'):
     if not isinstance(image, str):
         try:
             image = str(image)
         except:
             raise KeyError('Cannot coerce requested image name to string')
 
-    label_file = glob(os.path.join(data_root, '*',f'{image}.lbl'))
+    label_file = glob(os.path.join(data_root, '*',f'{image}_{label_type}.lbl'))
     if not label_file:
         raise Exception(f'Could not find label file for {image}')
 
