@@ -10,9 +10,12 @@ import collections
 from collections import OrderedDict
 from itertools import chain
 
-from ale import spice_root
-
+import subprocess
 import re
+import networkx as nx
+from networkx.algorithms.shortest_paths.generic import shortest_path
+
+from ale import spice_root
 
 def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=set()):
     """
@@ -211,7 +214,7 @@ def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
         if expand:
             isisprefs = get_isis_preferences()
             kernels = [expandvars(expandvars(k, dict_to_lower(isisprefs['DataDirectory']))) for k in kernels]
-        return kernels   
+        return kernels
     elif (format_as == 'dict'):
         # return created dict
         return mk_paths
@@ -253,3 +256,82 @@ def write_metakernel_from_cube(cube, mkpath=None):
             f.write(body)
 
     return body
+
+def create_spk_dependency_tree(kernels, type):
+    """
+    construct the dependency tree for the body states in a set of kernels.
+
+    Parameters
+    ----------
+    kernels : list
+              The list of kernels to evaluate the dependencies in. If two
+              kernels in this list contain the same information for the same
+              pair of bodies, then the later kernel in the list will be
+              identified in the kernel property for that edge in dep_tree.
+
+    Returns
+    -------
+    dep_tree : nx.DiGraph
+               The dependency tree for the kernels. Nodes are bodies. There is
+               an edge from one node to another if the state of the body of the
+               source node is defined relative to the state of the body of the
+               destination node. The kernel edge property identifies what kernel
+               the information for the edge is defined in.
+    """
+    dep_tree = nx.DiGraph()
+
+    for kernel in kernels:
+        brief = subprocess.run(["brief", "-c {}".format(kernel)],
+                               capture_output=True,
+                               check=True,
+                               text=True)
+        for body, rel_body in re.findall(r'\((.*)\).*w\.r\.t\..*\((.*)\)', brief.stdout):
+            dep_tree.add_edge(body, rel_body, kernel=kernel)
+
+    return dep_tree
+
+def spkmerge_config_string(dep_tree, output_spk, bodies, lsk, start, stop):
+    """
+    Create the contents of an spkmerge config file that will produce a spk that
+    completely defines the state of a list of bodies for a time range.
+
+    Parameters
+    ----------
+    dep_tree : nx.DiGraph
+               Dependency tree from create_kernel_dependency_tree that contains
+               information about what the state of different bodies are relative
+               to and where that information is stored.
+    output_spk : str
+                 The path to the SPK that will be output by spkmerge
+    bodies : list
+             The list of body ID codes that need to be defined in the kernel
+             created by spkmerge
+    lsk : str
+          The absolute path to the leap second kernel to use
+    start : str
+            The UTC start time for the kernel created by spkmerge
+    stop : str
+           The UTC stop time for the kernel created by spkmerge
+
+    Returns
+    -------
+     : str
+       The contents of an spkmerge config file that will produce a kernel that
+       defines the state of the input bodies for the input time range.
+    """
+    input_kernels = set()
+    for body in bodies:
+        # Everything is ultimately defined relative to
+        # SOLAR SYSTEM BARYCENTER (0) so find the path to it
+        dep_path = shortest_path(dep_tree, body, 0)
+        for i in range(len(dep_path) - 1):
+            input_kernels.add(dep_path[dep_path[i]][dep_path[i+1]]['kernel'])
+    config =  f"LEAPSECONDS_KERNEL     = {lsk}\n"
+    config += f"SPK_KERNEL             = {output_spk}\n"
+    config += f"   BODIES              = {', '.join(bodies)}\n"
+    config += f"   BEGIN_TIME          = {start}\n"
+    config += f"   END_TIME            = {stop}\n"
+    for kernel in input_kernels:
+        config += f"   SOURCE_SPK_KERNEL   = {kernel}\n"
+        config += f"      INCLUDE_COMMENTS = no\n"
+    return config
