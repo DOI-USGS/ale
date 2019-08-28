@@ -183,6 +183,8 @@ End
 def test_short_mission_name(Pds3Driver):
     assert Pds3Driver.short_mission_name == 'selene'
 
+# This property is not part of the base driver interface, but we mock it
+# out later, so we need to test it to ensure it returns the proper real value
 def test_reference_frame(Pds3Driver):
     assert Pds3Driver.reference_frame == 'MOON_ME'
 
