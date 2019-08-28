@@ -4,9 +4,11 @@ import os
 import subprocess
 import numpy as np
 import spiceypy as spice
+from importlib import reload
 
 from conftest import get_image_label, get_image_kernels, convert_kernels
 
+import ale
 from ale.drivers.mes_drivers import MessengerMdisPds3NaifSpiceDriver
 
 @pytest.fixture(scope="module", autouse=True)
@@ -26,6 +28,23 @@ def Pds3Driver():
 
 def test_short_mission_name(Pds3Driver):
     assert Pds3Driver.short_mission_name=='mes'
+
+
+def test_no_metakernels(Pds3Driver, tmpdir, monkeypatch):
+    monkeypatch.setenv('ALESPICEROOT', str(tmpdir))
+    reload(ale)
+
+    with pytest.raises(ValueError):
+        with Pds3Driver as failure:
+            pass
+
+def test_no_spice_root(Pds3Driver, monkeypatch):
+    monkeypatch.delenv('ALESPICEROOT', raising=False)
+    reload(ale)
+
+    with pytest.raises(EnvironmentError):
+        with Pds3Driver as failure:
+            pass
 
 @pytest.fixture
 def IsisLabelDriver():

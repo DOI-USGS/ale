@@ -4,9 +4,12 @@ import numpy as np
 
 from unittest.mock import patch, call
 
+import ale
 from ale.base.data_naif import NaifSpice
 from ale.base import data_naif
 from ale.base import base
+
+from conftest import get_image_label
 
 @pytest.fixture
 def test_naif_data():
@@ -47,8 +50,8 @@ def test_target_frame_id(test_naif_data):
         bods2c.assert_called_once_with("TARGET")
         cidfrm.assert_called_once_with(12345)
 
-
 def test_spice_kernel_list(test_naif_data_with_kernels):
     with patch('spiceypy.furnsh') as furnsh:
         with test_naif_data_with_kernels as t:
             assert furnsh.call_args_list == [call('one'), call('two'), call('three'), call('four')]
+
