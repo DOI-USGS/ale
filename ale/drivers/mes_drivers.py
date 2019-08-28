@@ -407,3 +407,22 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
         : float pixel size
         """
         return spice.gdpool('INS{}_PIXEL_PITCH'.format(self.ikid), 0, 1)
+
+    @property
+    def sampling_factor(self):
+        """
+        Returns the summing factor from the PDS3 label. For example a return value of 2
+        indicates that 2 lines and 2 samples (4 pixels) were summed and divided by 4
+        to produce the output pixel value.
+
+        NOTE: This is overwritten for the messenger driver as the value is stored in "MESS:PIXELBIN"
+
+        Returns
+        -------
+        : int
+          Number of samples and lines combined from the original data to produce a single pixel in this image
+        """
+        pixel_bin = self.label['IsisCube']['Instrument']['PixelBinningMode']
+        if pixel_bin == 0:
+            pixel_bin = 1
+        return pixel_bin * 2
