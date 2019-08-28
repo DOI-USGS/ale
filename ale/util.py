@@ -167,7 +167,7 @@ def expandvars(path, env_dict=os.environ, default=None, case_sensative=True):
     return re.sub(reVar, replace_var, path)
 
 
-def generate_kernels_from_cube(cube,  expand=False):
+def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
     # enforce key order
     mk_paths = OrderedDict.fromkeys(
         ['TargetPosition', 'InstrumentPosition',
@@ -205,14 +205,18 @@ def generate_kernels_from_cube(cube,  expand=False):
     mk_paths['Clock'] = [kernel_group.get('Clock', None)]
     mk_paths['Extra'] = [kernel_group.get('Extra', None)]
 
-    # get kernels as 1-d string list
-    kernels = [kernel for kernel in chain.from_iterable(mk_paths.values()) if isinstance(kernel, str)]
-
-    if expand:
-        isisprefs = get_isis_preferences()
-        kernels = [expandvars(expandvars(k, dict_to_lower(isisprefs['DataDirectory']))) for k in kernels]
-
-    return kernels
+    if (format_as == 'list'):
+        # get kernels as 1-d string list
+        kernels = [kernel for kernel in chain.from_iterable(mk_paths.values()) if isinstance(kernel, str)]
+        if expand:
+            isisprefs = get_isis_preferences()
+            kernels = [expandvars(expandvars(k, dict_to_lower(isisprefs['DataDirectory']))) for k in kernels]
+        return kernels   
+    elif (format_as == 'dict'):
+        # return created dict
+        return mk_paths
+    else:
+        raise Exception(f'{format_as} is not a valid return format')
 
 
 def write_metakernel_from_cube(cube, mkpath=None):
