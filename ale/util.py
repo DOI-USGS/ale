@@ -156,7 +156,7 @@ def get_isis_preferences(isis_preferences=None):
 
     return finalprefs
 
-def generate_kernels_from_cube(cube):
+def generate_kernels_from_cube(cube, format_as='list'):
     # enforce key order
     mk_paths = OrderedDict.fromkeys(
         ['TargetPosition', 'InstrumentPosition',
@@ -194,10 +194,15 @@ def generate_kernels_from_cube(cube):
     mk_paths['Clock'] = [kernel_group.get('Clock', None)]
     mk_paths['Extra'] = [kernel_group.get('Extra', None)]
 
-    # get kernels as 1-d string list
-    kernels = [kernel for kernel in chain.from_iterable(mk_paths.values()) if isinstance(kernel, str)]
-
-    return kernels
+    if (format_as == 'list'):
+        # get kernels as 1-d string list
+        kernels = [kernel for kernel in chain.from_iterable(mk_paths.values()) if isinstance(kernel, str)]
+        return kernels   
+    elif (format_as == 'dict'):
+        # return created dict
+        return mk_paths
+    else:
+        raise Exception(f'{format_as} is not a valid return format')
 
 def write_metakernel_from_cube(cube, mkpath=None):
     # add ISISPREF paths as path_symbols and path_values to avoid custom expand logic
