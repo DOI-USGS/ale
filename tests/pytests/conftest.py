@@ -104,9 +104,9 @@ def convert_kernels(kernels):
             print('Converting transfer kernel', kernel)
             bin_output = subprocess.run(['tobin', os.path.join(data_root, kernel)],
                                         capture_output=True, check=True)
-            matches = re.search(r'To: (.*\.\w*)', str(bin_output.stdout))
+            matches = re.search(r'To: (.*\.b\w*)', str(bin_output.stdout))
             if not matches:
-                print('Failed to convert transfer kenernel', kernel, 'skipping...')
+                print('Failed to convert transfer kernel', kernel, 'skipping...')
             else:
                 kernel = matches.group(1)
                 binary_kernels.append(kernel)

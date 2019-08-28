@@ -181,7 +181,10 @@ End
     return KaguyaTcPds3NaifSpiceDriver(pds_label)
 
 def test_short_mission_name(Pds3Driver):
-    assert Pds3Driver.short_mission_name=='selene'
+    assert Pds3Driver.short_mission_name == 'selene'
+
+def test_reference_frame(Pds3Driver):
+    assert Pds3Driver.reference_frame == 'MOON_ME'
 
 def test_test_image_lines(Pds3Driver):
     assert Pds3Driver.image_lines == 4656
