@@ -263,6 +263,8 @@ def write_metakernel_from_kernel_list(kernels):
     : str
       Returns string representation of a Naif Metakernel file
     """
+
+    kernels = [os.path.abspath(k) for k in kernels]
     common_prefix = os.path.commonprefix(kernels)
 
     kernels = ["'"+"$PREFIX"+k[len(common_prefix):]+"'" for k in kernels]
