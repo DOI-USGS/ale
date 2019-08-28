@@ -325,7 +325,7 @@ Bodies: MERCURY BARYCENTER (1) w.r.t. SOLAR SYSTEM BARYCENTER (0)
     expected_tree.add_edge(-236, 399, kernel='msgr_20040803_20150430_od431sc_2.bsp')
 
     with patch('subprocess.run', side_effect = [de430_mock, msgr_20040803_20150430_od431sc_2_mock]) as run_mock:
-        dep_tree = util.create_spk_dependency_tree(['de430.bsp', 'msgr_sc_EN1072174528M.bsp'], 'spk')
+        dep_tree = util.create_spk_dependency_tree(['de430.bsp', 'msgr_sc_EN1072174528M.bsp'])
         run_mock.assert_any_call(["brief", "-c de430.bsp"],
                                  capture_output=True,
                                  check=True,

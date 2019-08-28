@@ -281,7 +281,7 @@ def get_ck_frames(kernel):
     # Sort the output list for testability
     return sorted(list(ids))
 
-def create_spk_dependency_tree(kernels, type):
+def create_spk_dependency_tree(kernels):
     """
     construct the dependency tree for the body states in a set of kernels.
 
