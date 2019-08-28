@@ -18,7 +18,7 @@ def test_kernels():
     kernels = get_image_kernels('EN1072174528M')
     updated_kernels, binary_kernels = convert_kernels(kernels)
     spice.furnsh(updated_kernels)
-    yield
+    yield updated_kernels
     spice.unload(updated_kernels)
     for kern in binary_kernels:
         os.remove(kern)
@@ -36,7 +36,6 @@ def driver(request):
 def test_short_mission_name(driver):
     assert driver.short_mission_name=='mes'
 
-
 def test_no_metakernels(driver, tmpdir, monkeypatch):
     monkeypatch.setenv('ALESPICEROOT', str(tmpdir))
     reload(ale)
@@ -53,11 +52,10 @@ def test_no_spice_root(driver, monkeypatch):
         with driver as failure:
             pass
 
-def test_load():
-    updated_kernels, _ = convert_kernels(get_image_kernels('EN1072174528M'))
+def test_load(test_kernels):
     label_file = get_image_label('EN1072174528M')
 
-    usgscsm_isd_str = ale.loads(label_file, props={'kernels': updated_kernels}, formatter='usgscsm')
+    usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels}, formatter='usgscsm')
     usgscsm_isd_obj = json.loads(usgscsm_isd_str)
 
     assert usgscsm_isd_obj['name_platform'] == 'MESSENGER'
