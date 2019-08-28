@@ -382,3 +382,29 @@ SPK_KERNEL             = theoutput.bsp
    SOURCE_SPK_KERNEL   = de430.bsp
       INCLUDE_COMMENTS = no
 """
+
+def test_get_ck_frames():
+    msgr_0905_v02_output = """
+CKBRIEF -- Version 6.1.0, June 27, 2014 -- Toolkit Version N0066
+
+
+Summary for: msgr_0905_v02.bc
+
+Objects  Interval Begin ET        Interval End ET          AV
+-------- ------------------------ ------------------------ ---
+-236001  NEED LSK AND SCLK FILES  NEED LSK AND SCLK FILES  Y
+-236002  NEED LSK AND SCLK FILES  NEED LSK AND SCLK FILES  Y
+-236002  NEED LSK AND SCLK FILES  NEED LSK AND SCLK FILES  Y
+-236000  NEED LSK AND SCLK FILES  NEED LSK AND SCLK FILES  Y
+-236002  NEED LSK AND SCLK FILES  NEED LSK AND SCLK FILES  Y
+
+"""
+    msgr_0905_v02_mock = MagicMock(spec=subprocess.CompletedProcess)
+    msgr_0905_v02_mock.stdout = msgr_0905_v02_output
+    with patch('subprocess.run', side_effect = [msgr_0905_v02_mock]) as run_mock:
+        frames = util.get_ck_frames('msgr_0905_v02.bc')
+        run_mock.assert_any_call(["ckbrief", "-t msgr_0905_v02.bc"],
+                                 capture_output=True,
+                                 check=True,
+                                 text=True)
+    assert frames == [-236002, -236001, -236000]

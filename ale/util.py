@@ -257,6 +257,30 @@ def write_metakernel_from_cube(cube, mkpath=None):
 
     return body
 
+def get_ck_frames(kernel):
+    """
+    Get all of the reference frames defined in a kernel.
+
+    Parameters
+    ----------
+    kernel : str
+             The path to the kernel
+
+    Returns
+    -------
+    ids : list
+          The set of reference frames IDs defined in the kernel
+    """
+    ckbrief = subprocess.run(["ckbrief", "-t {}".format(kernel)],
+                             capture_output=True,
+                             check=True,
+                             text=True)
+    ids = set()
+    for id in re.findall(r'^(-?[0-9]+)', ckbrief.stdout, flags=re.MULTILINE):
+        ids.add(int(id))
+    # Sort the output list for testability
+    return sorted(list(ids))
+
 def create_spk_dependency_tree(kernels, type):
     """
     construct the dependency tree for the body states in a set of kernels.
