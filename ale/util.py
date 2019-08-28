@@ -169,7 +169,7 @@ def expandvars(path, env_dict=os.environ, default=None, case_sensative=True):
 
 def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
     """
-    
+    Parses a cube label to obtain the kernels from the Kernels group.
     
     Parameters
     ----------
