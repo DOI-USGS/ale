@@ -2,14 +2,12 @@ import pytest
 
 import ale
 from ale.drivers import co_drivers
-
 from unittest.mock import PropertyMock, patch
 
 # 'Mock' the spice module where it is imported
 from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
-
 co_drivers.spice = simplespice
 
 from ale.drivers.co_drivers import CassiniIssPds3LabelNaifSpiceDriver

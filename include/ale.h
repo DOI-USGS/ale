@@ -1,7 +1,7 @@
 #ifndef ALE_INCLUDE_ALE_H
 #define ALE_INCLUDE_ALE_H
 
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
 
@@ -116,7 +116,7 @@ namespace ale {
    *@return
    */
   double interpolate(std::vector<double> points, std::vector<double> times, double time, interpolation interp, int d);
-  std::string load(std::string filename);
+  std::string load(std::string filename, std::string props="", std::string formatter="usgscsm");
 }
 
 #endif // ALE_H
