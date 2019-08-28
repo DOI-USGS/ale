@@ -335,3 +335,50 @@ Bodies: MERCURY BARYCENTER (1) w.r.t. SOLAR SYSTEM BARYCENTER (0)
                                  check=True,
                                  text=True)
     assert nx.is_isomorphic(dep_tree, expected_tree)
+
+def test_spkmerge_config_string():
+    dep_tree = nx.DiGraph()
+    dep_tree.add_edge(1, 0, kernel='msgr_20040803_20150430_od431sc_2.bsp')
+    dep_tree.add_edge(2, 0, kernel='de430.bsp')
+    dep_tree.add_edge(3, 0, kernel='msgr_20040803_20150430_od431sc_2.bsp')
+    dep_tree.add_edge(4, 0, kernel='de430.bsp')
+    dep_tree.add_edge(5, 0, kernel='de430.bsp')
+    dep_tree.add_edge(6, 0, kernel='de430.bsp')
+    dep_tree.add_edge(7, 0, kernel='de430.bsp')
+    dep_tree.add_edge(8, 0, kernel='de430.bsp')
+    dep_tree.add_edge(9, 0, kernel='de430.bsp')
+    dep_tree.add_edge(10, 0, kernel='de430.bsp')
+    dep_tree.add_edge(199, 1, kernel='de430.bsp')
+    dep_tree.add_edge(299, 2, kernel='de430.bsp')
+    dep_tree.add_edge(301, 3, kernel='de430.bsp')
+    dep_tree.add_edge(399, 3, kernel='de430.bsp')
+    dep_tree.add_edge(-236, 1, kernel='msgr_20040803_20150430_od431sc_2.bsp')
+    dep_tree.add_edge(-236, 2, kernel='msgr_20040803_20150430_od431sc_2.bsp')
+    dep_tree.add_edge(-236, 10, kernel='msgr_20040803_20150430_od431sc_2.bsp')
+    dep_tree.add_edge(-236, 399, kernel='msgr_20040803_20150430_od431sc_2.bsp')
+
+    config_string = util.spkmerge_config_string(dep_tree,
+                                                'theoutput.bsp',
+                                                [-236, 199, 10],
+                                                'thelsk.tls',
+                                                'the start UTC string',
+                                                'the stop UTC string')
+    assert config_string == """LEAPSECONDS_KERNEL     = thelsk.tls
+SPK_KERNEL             = theoutput.bsp
+   BODIES              = 0, 1, 199, 10, -236
+   BEGIN_TIME          = the start UTC string
+   END_TIME            = the stop UTC string
+   SOURCE_SPK_KERNEL   = de430.bsp
+      INCLUDE_COMMENTS = no
+   SOURCE_SPK_KERNEL   = msgr_20040803_20150430_od431sc_2.bsp
+      INCLUDE_COMMENTS = no
+""" or config_string == """LEAPSECONDS_KERNEL     = thelsk.tls
+SPK_KERNEL             = theoutput.bsp
+   BODIES              = 0, 1, 199, 10, -236
+   BEGIN_TIME          = the start UTC string
+   END_TIME            = the stop UTC string
+   SOURCE_SPK_KERNEL   = msgr_20040803_20150430_od431sc_2.bsp
+      INCLUDE_COMMENTS = no
+   SOURCE_SPK_KERNEL   = de430.bsp
+      INCLUDE_COMMENTS = no
+"""

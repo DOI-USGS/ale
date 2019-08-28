@@ -320,15 +320,17 @@ def spkmerge_config_string(dep_tree, output_spk, bodies, lsk, start, stop):
        defines the state of the input bodies for the input time range.
     """
     input_kernels = set()
+    all_bodies = set(bodies)
     for body in bodies:
         # Everything is ultimately defined relative to
         # SOLAR SYSTEM BARYCENTER (0) so find the path to it
         dep_path = shortest_path(dep_tree, body, 0)
+        all_bodies.update(dep_path)
         for i in range(len(dep_path) - 1):
-            input_kernels.add(dep_path[dep_path[i]][dep_path[i+1]]['kernel'])
+            input_kernels.add(dep_tree[dep_path[i]][dep_path[i+1]]['kernel'])
     config =  f"LEAPSECONDS_KERNEL     = {lsk}\n"
     config += f"SPK_KERNEL             = {output_spk}\n"
-    config += f"   BODIES              = {', '.join(bodies)}\n"
+    config += f"   BODIES              = {', '.join([str(b) for b in all_bodies])}\n"
     config += f"   BEGIN_TIME          = {start}\n"
     config += f"   END_TIME            = {stop}\n"
     for kernel in input_kernels:
