@@ -17,8 +17,15 @@ class Driver():
         file : str
                path to file to be parsed
         """
+        if not props:
+            self._props = {}
+        elif isinstance(props, dict):
+            self._props = props
+        elif isinstance(props, str):
+            self._props = json.loads(props)
+        else:
+            raise Exception(f'Invalid props arg: {props}')
 
-        self._props = props
         self._num_quaternions = num_quats
         self._num_ephem = num_ephem
         self._file = file

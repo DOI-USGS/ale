@@ -1,7 +1,6 @@
 import json
 
 from ale.rotation import ConstantRotation, TimeDependentRotation
-from ale.encoders import NumpyEncoder
 
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
@@ -64,7 +63,7 @@ def to_isis(driver):
         body_rotation['CkTableOriginalSize'] = len(time_dependent_rotation.times)
         body_rotation['EphemerisTimes'] = time_dependent_rotation.times
         body_rotation['Quaternions'] = time_dependent_rotation.quats
-        
+
     if source_frame != target_frame:
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
@@ -93,4 +92,4 @@ def to_isis(driver):
     sun_position['Velocities'] = velocities
     meta_data['SunPosition'] = sun_position
 
-    return json.dumps(meta_data, cls=NumpyEncoder)
+    return meta_data
