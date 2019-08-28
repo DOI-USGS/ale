@@ -19,9 +19,10 @@ def test_kernels():
     for kern in binary_kernels:
         os.remove(kern)
 
-@pytest.fixture
-def Pds3Driver():
-    pds_label = """
+@pytest.fixture(scope="module", params=["Pds3NaifDriver"])
+def driver(request):
+    if request.param == "Pds3NaifDriver":
+        label = """
 PDS_VERSION_ID                  = PDS3
 
 /* ** FILE FORMAT ** */
@@ -178,24 +179,24 @@ Object = PROCESSING_PARAMETERS
 End_Object
 End
 """
-    return KaguyaTcPds3NaifSpiceDriver(pds_label)
+        return KaguyaTcPds3NaifSpiceDriver(label)
 
-def test_short_mission_name(Pds3Driver):
-    assert Pds3Driver.short_mission_name == 'selene'
+def test_short_mission_name(driver):
+    assert driver.short_mission_name == 'selene'
 
 # This property is not part of the base driver interface, but we mock it
 # out later, so we need to test it to ensure it returns the proper real value
-def test_reference_frame(Pds3Driver):
-    assert Pds3Driver.reference_frame == 'MOON_ME'
+def test_reference_frame(driver):
+    assert driver.reference_frame == 'MOON_ME'
 
-def test_test_image_lines(Pds3Driver):
-    assert Pds3Driver.image_lines == 4656
+def test_test_image_lines(driver):
+    assert driver.image_lines == 4656
 
-def test_image_samples(Pds3Driver):
-    assert Pds3Driver.image_samples == 3208
+def test_image_samples(driver):
+    assert driver.image_samples == 3208
 
-def test_usgscsm_distortion_model(Pds3Driver):
-    dist = Pds3Driver.usgscsm_distortion_model
+def test_usgscsm_distortion_model(driver):
+    dist = driver.usgscsm_distortion_model
     assert 'kaguyatc' in dist
     assert 'x' in dist['kaguyatc']
     assert 'y' in dist['kaguyatc']
@@ -210,37 +211,37 @@ def test_usgscsm_distortion_model(Pds3Driver):
                                     2.7251e-6,
                                    -6.1938e-6])
 
-def test_detector_start_line(Pds3Driver):
-    assert Pds3Driver.detector_start_line == 0
+def test_detector_start_line(driver):
+    assert driver.detector_start_line == 0
 
-def test_detector_start_sample(Pds3Driver):
-    assert Pds3Driver.detector_start_sample == 1
+def test_detector_start_sample(driver):
+    assert driver.detector_start_sample == 1
 
-def test_sample_summing(Pds3Driver):
-    assert Pds3Driver.sample_summing == 1
+def test_sample_summing(driver):
+    assert driver.sample_summing == 1
 
-def test_line_summing(Pds3Driver):
-    assert Pds3Driver.line_summing == 1
+def test_line_summing(driver):
+    assert driver.line_summing == 1
 
-def test_platform_name(Pds3Driver):
-    assert Pds3Driver.platform_name == 'SELENE-M'
+def test_platform_name(driver):
+    assert driver.platform_name == 'SELENE-M'
 
-def test_sensor_name(Pds3Driver):
-    assert Pds3Driver.sensor_name == 'Terrain Camera 1'
+def test_sensor_name(driver):
+    assert driver.sensor_name == 'Terrain Camera 1'
 
-def test_target_body_radii(Pds3Driver):
-    np.testing.assert_equal(Pds3Driver.target_body_radii, [1737.4, 1737.4, 1737.4])
+def test_target_body_radii(driver):
+    np.testing.assert_equal(driver.target_body_radii, [1737.4, 1737.4, 1737.4])
 
-def test_focal_length(Pds3Driver):
-    assert Pds3Driver.focal_length == 72.45
+def test_focal_length(driver):
+    assert driver.focal_length == 72.45
 
-def test_detector_center_line(Pds3Driver):
-    assert Pds3Driver.detector_center_line == 0.5
+def test_detector_center_line(driver):
+    assert driver.detector_center_line == 0.5
 
-def test_detector_center_sample(Pds3Driver):
-    assert Pds3Driver.detector_center_sample == 2048
+def test_detector_center_sample(driver):
+    assert driver.detector_center_sample == 2048
 
-def test_sensor_position(Pds3Driver):
+def test_sensor_position(driver):
     """
     Returns
     -------
@@ -250,7 +251,7 @@ def test_sensor_position(Pds3Driver):
     with patch('ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.reference_frame', \
                 new_callable=PropertyMock) as mock_reference_frame:
         mock_reference_frame.return_value = 'IAU_MOON'
-        position, velocity, time = Pds3Driver.sensor_position
+        position, velocity, time = driver.sensor_position
     image_et = spice.sct2e(-131, 922997380.174174)
     expected_state, _ = spice.spkez(301, image_et, 'IAU_MOON', 'LT+S', -131)
     expected_position = -1000 * np.asarray(expected_state[:3])
@@ -264,21 +265,21 @@ def test_sensor_position(Pds3Driver):
     np.testing.assert_almost_equal(time[0],
                                    image_et)
 
-def test_frame_chain(Pds3Driver):
+def test_frame_chain(driver):
     with patch('ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.reference_frame', \
                 new_callable=PropertyMock) as mock_reference_frame:
         mock_reference_frame.return_value = 'IAU_MOON'
-        Pds3Driver.frame_chain
-    assert Pds3Driver.frame_chain.has_node(1)
-    assert Pds3Driver.frame_chain.has_node(10020)
-    assert Pds3Driver.frame_chain.has_node(-131350)
+        driver.frame_chain
+    assert driver.frame_chain.has_node(1)
+    assert driver.frame_chain.has_node(10020)
+    assert driver.frame_chain.has_node(-131350)
     image_et = spice.sct2e(-131, 922997380.174174)
-    target_to_j2000 = Pds3Driver.frame_chain.compute_rotation(10020, 1)
+    target_to_j2000 = driver.frame_chain.compute_rotation(10020, 1)
     target_to_j2000_mat = spice.pxform('IAU_MOON', 'J2000', image_et)
     target_to_j2000_quats = spice.m2q(target_to_j2000_mat)
     np.testing.assert_almost_equal(target_to_j2000.quats[0],
                                    -np.roll(target_to_j2000_quats, -1))
-    sensor_to_j2000 = Pds3Driver.frame_chain.compute_rotation(-131350, 1)
+    sensor_to_j2000 = driver.frame_chain.compute_rotation(-131350, 1)
     sensor_to_j2000_mat = spice.pxform('LISM_TC1_HEAD', 'J2000', image_et)
     sensor_to_j2000_quats = spice.m2q(sensor_to_j2000_mat)
     np.testing.assert_almost_equal(sensor_to_j2000.quats[0],
@@ -286,11 +287,11 @@ def test_frame_chain(Pds3Driver):
 
 
 
-def test_sun_position(Pds3Driver):
+def test_sun_position(driver):
     with patch('ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.reference_frame', \
                 new_callable=PropertyMock) as mock_reference_frame:
         mock_reference_frame.return_value = 'IAU_MOON'
-        position, velocity, time = Pds3Driver.sun_position
+        position, velocity, time = driver.sun_position
     image_et = spice.sct2e(-131, 922997380.174174) + (0.0065 * 4656)/2
     expected_state, _ = spice.spkez(10, image_et, 'IAU_MOON', 'NONE', 301)
     expected_position = 1000 * np.asarray(expected_state[:3])
@@ -304,16 +305,16 @@ def test_sun_position(Pds3Driver):
     np.testing.assert_almost_equal(time,
                                    [image_et])
 
-def test_target_name(Pds3Driver):
-    assert Pds3Driver.target_name == 'MOON'
+def test_target_name(driver):
+    assert driver.target_name == 'MOON'
 
-def test_target_frame_id(Pds3Driver):
-    assert Pds3Driver.target_frame_id == 10020
+def test_target_frame_id(driver):
+    assert driver.target_frame_id == 10020
 
-def test_sensor_frame_id(Pds3Driver):
-    assert Pds3Driver.sensor_frame_id == -131350
+def test_sensor_frame_id(driver):
+    assert driver.sensor_frame_id == -131350
 
-def test_isis_naif_keywords(Pds3Driver):
+def test_isis_naif_keywords(driver):
     expected_keywords = {
         'BODY301_RADII' : [1737.4, 1737.4, 1737.4],
         'BODY_FRAME_CODE' : 10020,
@@ -324,37 +325,37 @@ def test_isis_naif_keywords(Pds3Driver):
         'INS-131351_BORESIGHT_SAMPLE' : 2048.5,
         'INS-131351_BORESIGHT_LINE' : 1.0
     }
-    assert set(Pds3Driver.isis_naif_keywords.keys()) == set(expected_keywords.keys())
-    for key, value in Pds3Driver.isis_naif_keywords.items():
+    assert set(driver.isis_naif_keywords.keys()) == set(expected_keywords.keys())
+    for key, value in driver.isis_naif_keywords.items():
         if isinstance(value, np.ndarray):
             np.testing.assert_almost_equal(value, expected_keywords[key])
         else:
             assert value == expected_keywords[key]
 
-def test_sensor_model_version(Pds3Driver):
-    assert Pds3Driver.sensor_model_version == 1
+def test_sensor_model_version(driver):
+    assert driver.sensor_model_version == 1
 
-def test_focal2pixel_lines(Pds3Driver):
-    np.testing.assert_almost_equal(Pds3Driver.focal2pixel_lines,
+def test_focal2pixel_lines(driver):
+    np.testing.assert_almost_equal(driver.focal2pixel_lines,
                                    [0.0, -142.857142857, 0.0])
 
-def test_focal2pixel_samples(Pds3Driver):
-    np.testing.assert_almost_equal(Pds3Driver.focal2pixel_samples,
+def test_focal2pixel_samples(driver):
+    np.testing.assert_almost_equal(driver.focal2pixel_samples,
                                    [0.0, 0.0, -142.857142857])
 
-def test_pixel2focal_x(Pds3Driver):
-    np.testing.assert_almost_equal(Pds3Driver.pixel2focal_x,
+def test_pixel2focal_x(driver):
+    np.testing.assert_almost_equal(driver.pixel2focal_x,
                                    [0.0, 0.0, -0.007])
 
-def test_pixel2focal_y(Pds3Driver):
-    np.testing.assert_almost_equal(Pds3Driver.pixel2focal_y,
+def test_pixel2focal_y(driver):
+    np.testing.assert_almost_equal(driver.pixel2focal_y,
                                    [0.0, -0.007, 0.0])
 
-def test_ephemeris_start_time(Pds3Driver):
-    assert Pds3Driver.ephemeris_start_time == 292234259.82293594
+def test_ephemeris_start_time(driver):
+    assert driver.ephemeris_start_time == 292234259.82293594
 
-def test_ephemeris_stop_time(Pds3Driver):
-    assert Pds3Driver.ephemeris_stop_time == 292234290.08693594
+def test_ephemeris_stop_time(driver):
+    assert driver.ephemeris_stop_time == 292234290.08693594
 
-def test_center_ephemeris_time(Pds3Driver):
-    assert Pds3Driver.center_ephemeris_time == 292234274.9549359
+def test_center_ephemeris_time(driver):
+    assert driver.center_ephemeris_time == 292234274.9549359
