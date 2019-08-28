@@ -102,9 +102,9 @@ def convert_kernels(kernels):
     updated_kernels = []
     for kernel in kernels:
         split_kernel = os.path.splitext(kernel)
-        if split_kernel[1] in ext_map:
+        if split_kernel[1].lower() in ext_map:
             subprocess.call(['tobin', os.path.join(data_root, kernel)])
-            kernel = split_kernel[0] + ext_map[split_kernel[1]]
+            kernel = split_kernel[0] + ext_map[split_kernel[1].lower()]
             binary_kernels.append(kernel)
         updated_kernels.append(kernel)
     return updated_kernels, binary_kernels

@@ -1,10 +1,7 @@
 import pytest
-import pvl
 import os
-import subprocess
 import numpy as np
 import spiceypy as spice
-
 
 from conftest import get_image_kernels, convert_kernels
 
@@ -250,15 +247,11 @@ End
 def test_short_mission_name(Pds3Driver):
     assert Pds3Driver.short_mission_name=='mes'
 
-@pytest.fixture
-def IsisLabelDriver():
-    return MessengerMdisIsisLabelNaifSpiceDriver("")
-
 def test_test_image_lines(Pds3Driver):
     assert Pds3Driver.image_lines == 512
 
 def test_image_samples(Pds3Driver):
-    assert Pds3Driver.image_lines == 512
+    assert Pds3Driver.image_samples == 512
 
 def test_usgscsm_distortion_model(Pds3Driver):
     dist = Pds3Driver.usgscsm_distortion_model
@@ -360,7 +353,7 @@ def test_frame_chain(Pds3Driver):
 def test_sun_position(Pds3Driver):
     position, velocity, time = Pds3Driver.sun_position
     image_et = spice.scs2e(-236, '2/0072174528:989000') + 0.0005
-    expected_state, _ = spice.spkez(10, image_et, 'IAU_MERCURY', 'LT+S', 199)
+    expected_state, _ = spice.spkez(10, image_et, 'IAU_MERCURY', 'NONE', 199)
     expected_position = 1000 * np.asarray(expected_state[:3])
     expected_velocity = 1000 * np.asarray(expected_state[3:])
     np.testing.assert_allclose(position,
