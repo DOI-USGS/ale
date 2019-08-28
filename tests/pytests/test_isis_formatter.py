@@ -4,7 +4,7 @@ import numpy as np
 
 from ale.formatters import isis_formatter
 from ale.base.base import Driver
-from ale.transformation import FrameNode
+from ale.transformation import FrameChain
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
 class TestDriver(Driver):
@@ -74,24 +74,27 @@ class TestDriver(Driver):
 
     @property
     def frame_chain(self):
-        j2000 = FrameNode(1)
+        frame_chain = FrameChain()
+
         body_rotation = TimeDependentRotation(
             np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
             np.array([0, 1]),
             100,
             1
         )
-        body_fixed = FrameNode(100, parent=j2000, rotation=body_rotation)
+        frame_chain.add_edge(100, 1, rotation=body_rotation)
+
         spacecraft_rotation = TimeDependentRotation(
             np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
             np.array([0, 1]),
             1000,
             1
         )
-        spacecraft = FrameNode(1000, parent=j2000, rotation=spacecraft_rotation)
+        frame_chain.add_edge(1000, 1, rotation=spacecraft_rotation)
+
         sensor_rotation = ConstantRotation(np.array([0, 0, 0, 1]), 1010, 1000)
-        sensor = FrameNode(1010, parent=spacecraft, rotation=sensor_rotation)
-        return j2000
+        frame_chain.add_edge(1010, 1000, rotation=sensor_rotation)
+        return frame_chain
 
     @property
     def sun_position(self):
@@ -153,11 +156,11 @@ def driver():
     return TestDriver('')
 
 def test_camera_version(driver):
-    meta_data = json.loads(isis_formatter.to_isis(driver))
+    meta_data = isis_formatter.to_isis(driver)
     assert meta_data['CameraVersion'] == 1
 
 def test_instrument_pointing(driver):
-    meta_data = json.loads(isis_formatter.to_isis(driver))
+    meta_data = isis_formatter.to_isis(driver)
     pointing = meta_data['InstrumentPointing']
     assert pointing['TimeDependentFrames'] == [1000, 1]
     assert pointing['ConstantFrames'] == [1010, 1000]
@@ -169,7 +172,7 @@ def test_instrument_pointing(driver):
     np.testing.assert_equal(pointing['Quaternions'], np.array([[0, 0, 0, -1], [0, 0, 0, -1]]))
 
 def test_instrument_position(driver):
-    meta_data = json.loads(isis_formatter.to_isis(driver))
+    meta_data = isis_formatter.to_isis(driver)
     position = meta_data['InstrumentPosition']
     assert position['SpkTableStartTime'] == 800
     assert position['SpkTableEndTime'] == 900
@@ -179,7 +182,7 @@ def test_instrument_position(driver):
     np.testing.assert_equal(position['Velocities'], np.array([[0, -1, -2], [-3, -4, -5]]))
 
 def test_body_rotation(driver):
-    meta_data = json.loads(isis_formatter.to_isis(driver))
+    meta_data = isis_formatter.to_isis(driver)
     rotation = meta_data['BodyRotation']
     assert rotation['TimeDependentFrames'] == [100, 1]
     assert rotation['CkTableStartTime'] == 0
@@ -189,7 +192,7 @@ def test_body_rotation(driver):
     np.testing.assert_equal(rotation['Quaternions'], np.array([[0, 0, 0, -1], [0, 0, 0, -1]]))
 
 def test_sun_position(driver):
-    meta_data = json.loads(isis_formatter.to_isis(driver))
+    meta_data = isis_formatter.to_isis(driver)
     position = meta_data['SunPosition']
     assert position['SpkTableStartTime'] == 600
     assert position['SpkTableEndTime'] == 700
@@ -199,7 +202,7 @@ def test_sun_position(driver):
     np.testing.assert_equal(position['Velocities'], np.array([[0, -1, -2], [-3, -4, -5]]))
 
 def test_naif_keywords(driver):
-    meta_data = json.loads(isis_formatter.to_isis(driver))
+    meta_data = isis_formatter.to_isis(driver)
     assert meta_data['NaifKeywords'] == {
         'keyword_1' : 0,
         'keyword_2' : 'test'

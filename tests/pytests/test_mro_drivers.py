@@ -4,17 +4,13 @@ import pytest
 
 import ale
 from ale.drivers import mro_drivers
-from ale.base import data_naif
-from ale.base import label_pds3
 
 # 'Mock' the spice module where it is imported
 from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
 
-data_naif.spice = simplespice
 mro_drivers.spice = simplespice
-label_pds3.spice = simplespice
 
 from ale.drivers.mro_drivers import MroCtxPds3LabelNaifSpiceDriver
 from ale.drivers.mro_drivers import MroCtxIsisLabelNaifSpiceDriver
@@ -24,6 +20,9 @@ MroCtxPds3LabelNaifSpiceDriver.metakernel = get_mockkernels
 @pytest.fixture
 def Pds3NaifDriver():
     return MroCtxPds3LabelNaifSpiceDriver("")
+
+def test_short_mission_name(Pds3NaifDriver):
+    assert Pds3NaifDriver.short_mission_name=='mro'
 
 @pytest.fixture
 def IsisLabelNaifDriver():
@@ -40,9 +39,6 @@ def test_spacecraft_name_pds3(Pds3NaifDriver):
 @patch('ale.base.label_pds3.Pds3Label.line_exposure_duration', 12.1)
 def test_exposure_duration_pds3(Pds3NaifDriver):
     assert Pds3NaifDriver.exposure_duration == 12.1
-
-def test_detector_start_line_pds3(Pds3NaifDriver):
-    assert Pds3NaifDriver.detector_start_line == 1
 
 def test_detector_start_sample_pds3(Pds3NaifDriver):
     # I am not sure how to accomplish this with a fixture and
@@ -66,9 +62,6 @@ def test_ephemeris_start_time_isis(IsisLabelNaifDriver):
     with patch.dict(IsisLabelNaifDriver.label, {'IsisCube' : {'Instrument' :
         {'SpacecraftClockCount' : 800}}}) as f:
         assert IsisLabelNaifDriver.ephemeris_start_time == 0.1
-
-def test_detector_start_line_isis(IsisLabelNaifDriver):
-    assert IsisLabelNaifDriver.detector_start_line == 1
 
 def test_detector_start_sample_isis(IsisLabelNaifDriver):
     with patch.dict(IsisLabelNaifDriver.label, {'IsisCube' : {'Instrument' :

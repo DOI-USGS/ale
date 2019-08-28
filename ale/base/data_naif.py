@@ -1,8 +1,11 @@
 import spiceypy as spice
 import numpy as np
+
+import ale
 from ale.base.type_sensor import Framer
-from ale.transformation import FrameNode
+from ale.transformation import FrameChain
 from ale.rotation import TimeDependentRotation
+from ale import util
 
 class NaifSpice():
     def __enter__(self):
@@ -10,8 +13,8 @@ class NaifSpice():
         Called when the context is created. This is used
         to get the kernels furnished.
         """
-        if self.metakernel:
-            spice.furnsh(self.metakernel)
+        if self.kernels:
+            [spice.furnsh(k) for k in self.kernels]
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -20,11 +23,43 @@ class NaifSpice():
         this is done, the object is out of scope and the
         kernels can be unloaded.
         """
-        spice.unload(self.metakernel)
+        if self.kernels:
+            [spice.unload(k) for k in self.kernels]
 
     @property
-    def metakernel(self):
-        pass
+    def kernels(self):
+        if not hasattr(self, '_kernels'):
+            if 'kernels' in self._props.keys():
+                self._kernels =  self._props['kernels']
+            else:
+                if not ale.spice_root:
+                    raise EnvironmentError(f'ale.spice_root is not set, cannot search for metakernels. ale.spice_root = "{ale.spice_root}"')
+
+                search_results = util.get_metakernels(ale.spice_root, missions=self.short_mission_name, years=self.utc_start_time.year, versions='latest')
+
+                if search_results['count'] == 0:
+                    raise ValueError(f'Failed to find metakernels. mission: {self.short_mission_name}, year:{self.utc_start_time.year}, versions="latest" spice root = "{ale.spice_root}"')
+                self._kernels = [search_results['data'][0]['path']]
+        return self._kernels
+
+    @property
+    def light_time_correction(self):
+        """
+        Returns the type of light time correciton and abberation correction to
+        use in NAIF calls.
+
+        This defaults to light time correction and abberation correction (LT+S),
+        concrete drivers should override this if they need to either not use
+        light time correction or use a different type of light time correction.
+
+        Returns
+        -------
+        : str
+          The light time and abberation correction string for use in NAIF calls.
+          See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/abcorr.html
+          for the different options available.
+        """
+        return 'LT+S'
 
     @property
     def odtx(self):
@@ -254,10 +289,13 @@ class NaifSpice():
         sun_state, _ = spice.spkezr("SUN",
                                      self.center_ephemeris_time,
                                      self.reference_frame,
-                                     'NONE',
+                                     self.light_time_correction,
                                      self.target_name)
+        positions = 1000 * np.asarray([sun_state[:3]])
+        velocities = 1000 * np.asarray([sun_state[3:6]])
+        times = np.asarray([self.center_ephemeris_time])
 
-        return [sun_state[:4].tolist()], [sun_state[3:6].tolist()], [self.center_ephemeris_time]
+        return positions, velocities, times
 
     @property
     def sensor_position(self):
@@ -279,83 +317,29 @@ class NaifSpice():
             ephem = self.ephemeris_time
             pos = []
             vel = []
+
             for time in ephem:
-                state, _ = spice.spkezr(self.spacecraft_name,
-                                        time,
-                                        self.reference_frame,
-                                        'NONE',
-                                        self.target_name,)
+                # spkezr returns a vector from the observer's location to the aberration-corrected
+                # location of the target. For more information, see:
+                # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
+                state, _ = spice.spkezr(self.target_name,
+                                       time,
+                                       self.reference_frame,
+                                       self.light_time_correction,
+                                       self.spacecraft_name,)
                 pos.append(state[:3])
                 vel.append(state[3:])
-            # By default, spice works in km
-            self._position = [p * 1000 for p in pos]
-            self._velocity = [v * 1000 for v in vel]
+            # By default, spice works in km, and the vector returned by spkezr points the opposite
+            # direction to what ALE needs, so it must be multiplied by (-1)
+            self._position = [p * -1000 for p in pos]
+            self._velocity = [v * -1000 for v in vel]
         return self._position, self._velocity, self.ephemeris_time
 
     @property
     def frame_chain(self):
-        """
-        Return the root node of the rotation frame tree/chain.
-
-        The root node is the J2000 reference frame. The other nodes in the
-        tree can be accessed via the methods in the FrameNode class.
-
-        This property expects the ephemeris_time property/attribute to be defined.
-        It should be a list of the ephemeris seconds past the J2000 epoch for each
-        exposure in the image.
-
-        Returns
-        -------
-        FrameNode
-            The root node of the frame tree. This will always be the J2000 reference frame.
-        """
-        if not hasattr(self, '_root_frame'):
-            j2000_id = 1 #J2000 is our root reference frame
-            self._root_frame = FrameNode(j2000_id)
-
-            sensor_quats = np.zeros((len(self.ephemeris_time), 4))
-            sensor_times = np.array(self.ephemeris_time)
-            body_quats = np.zeros((len(self.ephemeris_time), 4))
-            body_times = np.array(self.ephemeris_time)
-            for i, time in enumerate(self.ephemeris_time):
-                sensor2j2000 = spice.pxform(
-                    spice.frmnam(self.sensor_frame_id),
-                    spice.frmnam(j2000_id),
-                    time)
-                q_sensor = spice.m2q(sensor2j2000)
-                sensor_quats[i,:3] = q_sensor[1:]
-                sensor_quats[i,3] = q_sensor[0]
-
-                body2j2000 = spice.pxform(
-                    spice.frmnam(self.target_frame_id),
-                    spice.frmnam(j2000_id),
-                    time)
-                q_body = spice.m2q(body2j2000)
-                body_quats[i,:3] = q_body[1:]
-                body_quats[i,3] = q_body[0]
-
-            sensor2j2000_rot = TimeDependentRotation(
-                sensor_quats,
-                sensor_times,
-                self.sensor_frame_id,
-                j2000_id
-            )
-            sensor_node = FrameNode(
-                self.sensor_frame_id,
-                parent=self._root_frame,
-                rotation=sensor2j2000_rot)
-
-            body2j2000_rot = TimeDependentRotation(
-                body_quats,
-                body_times,
-                self.target_frame_id,
-                j2000_id
-            )
-            body_node = FrameNode(
-                self.target_frame_id,
-                parent=self._root_frame,
-                rotation=body2j2000_rot)
-        return self._root_frame
+        if not hasattr(self, '_frame_chain'):
+            self._frame_chain = FrameChain.from_spice(frame_changes = [(1, self.sensor_frame_id), (1, self.target_frame_id)], ephemeris_time=self.ephemeris_time)
+        return self._frame_chain
 
     @property
     def sensor_orientation(self):
@@ -414,24 +398,7 @@ class NaifSpice():
         : double
           Ephemeris stop time of the image
         """
-        if self.spacecraft_clock_stop_count:
-            return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_stop_count)
-        else:
-            return spice.str2et(self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S"))
-
-    @property
-    def center_ephemeris_time(self):
-        """
-        Returns the average of the start and stop ephemeris times. Expects
-        ephemeris start and stop times to be defined. These should be double precision
-        numbers containing the ephemeris start and stop times of the image.
-
-        Returns
-        -------
-        : double
-          Center ephemeris time for an image
-        """
-        return (self.ephemeris_start_time + self.ephemeris_stop_time)/2
+        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_stop_count)
 
     @property
     def detector_center_sample(self):
@@ -475,7 +442,7 @@ class NaifSpice():
         naif_keywords['INS{}_ITRANSL'.format(self.ikid)] = self.focal2pixel_lines
         naif_keywords['INS{}_ITRANSS'.format(self.ikid)] = self.focal2pixel_samples
         naif_keywords['INS{}_FOCAL_LENGTH'.format(self.ikid)] = self.focal_length
-        naif_keywords['INS{}_BORESIGHT_SAMPLE'.format(self.ikid)] = self.detector_center_sample
-        naif_keywords['INS{}_BORESIGHT_LINE'.format(self.ikid)] = self.detector_center_line
+        naif_keywords['INS{}_BORESIGHT_SAMPLE'.format(self.ikid)] = self.detector_center_sample + 0.5
+        naif_keywords['INS{}_BORESIGHT_LINE'.format(self.ikid)] = self.detector_center_line + 0.5
 
         return naif_keywords

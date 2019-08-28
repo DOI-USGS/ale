@@ -2,14 +2,14 @@ import os
 from glob import glob
 import numpy as np
 import spiceypy as spice
-from ale import config
+
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.type_sensor import LineScanner
 
 
-class KaguyaTcPds3NaifSpiceDriver(Pds3Label,NaifSpice, LineScanner, Driver):
+class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
     """
     Driver for a PDS3 Kaguya Terrain Camera (TC) images. Specifically level2b0 mono and stereo images.
 
@@ -23,25 +23,6 @@ class KaguyaTcPds3NaifSpiceDriver(Pds3Label,NaifSpice, LineScanner, Driver):
       Therefore, methods normally in the Distortion classes are reimplemented here.
     """
 
-    @property
-    def metakernel(self):
-        """
-        Returns latest instrument metakernels
-
-        Returns
-        -------
-        : string
-          Path to latest metakernel file
-        """
-        metakernel_dir = config.kaguya
-        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
-        if not hasattr(self, '_metakernel'):
-            self._metakernel = None
-            for mk in mks:
-                if str(self.utc_start_time.year) in os.path.basename(mk):
-                    self._metakernel = mk
-        return self._metakernel
-
 
     @property
     def utc_start_time(self):
@@ -49,7 +30,7 @@ class KaguyaTcPds3NaifSpiceDriver(Pds3Label,NaifSpice, LineScanner, Driver):
         Returns corrected utc start time.
 
         If no corrected form is found, defaults to the form specified in parent class.
-        
+
         Returns
         -------
         : str
@@ -155,7 +136,7 @@ class KaguyaTcPds3NaifSpiceDriver(Pds3Label,NaifSpice, LineScanner, Driver):
         No NAIF code exists for the spacecraft name 'SELENE-M.'  The NAIF code
         exists only for 'SELENE' or 'KAGUYA' -- 'SELENE' is captured as
         'MISSION_NAME'
-        
+
         Returns
         -------
         : str
@@ -219,26 +200,34 @@ class KaguyaTcPds3NaifSpiceDriver(Pds3Label,NaifSpice, LineScanner, Driver):
     @property
     def detector_center_line(self):
         """
+        Returns the center detector line of the detector. Expects tc_id to be
+        defined. This should be a string of the form LISM_TC1 or LISM_TC2.
+
+        We subtract 0.5 from the center line because as per the IK:
+        Center of the first pixel is defined as "1.0".
+
         Returns
         -------
         : int
           The detector line of the principle point
         """
-        return 0
+        return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[0] - 0.5
 
     @property
     def detector_center_sample(self):
         """
-        Returnce the center detector sample of the image. Expects tc_id to be
+        Returns the center detector sample of the detector. Expects tc_id to be
         defined. This should be a string of the form LISM_TC1 or LISM_TC2.
+
+        We subtract 0.5 from the center sample because as per the IK:
+        Center of the first pixel is defined as "1.0".
 
         Returns
         -------
         : int
           The detector sample of the principle point
         """
-        # Pixels are 0 based, not one based, so subtract 1
-        return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[0]-1
+        return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[0] - 0.5
 
     @property
     def _sensor_orientation(self):
@@ -480,16 +469,6 @@ class KaguyaTcPds3NaifSpiceDriver(Pds3Label,NaifSpice, LineScanner, Driver):
           Detector sample corresponding to the first image sample
         """
         return self.label["FIRST_PIXEL_NUMBER"]
-
-    @property
-    def detector_start_line(self):
-        """
-        Returns
-        -------
-        : int
-          Detector line corresponding to the first image sample
-        """
-        return 1
 
 
     @property
