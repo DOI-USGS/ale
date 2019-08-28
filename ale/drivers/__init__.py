@@ -56,9 +56,6 @@ def load(label, props={}, formatter='usgscsm', verbose=False):
     if isinstance(formatter, str):
         formatter = __formatters__[formatter]
 
-    if props and isinstance(props, str):
-        props = json.loads(props)
-
     drivers = chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.isclass(x) and "_driver" in x.__module__) for dmod in __driver_modules__)
     drivers = sort_drivers([d[1] for d in drivers])
 
