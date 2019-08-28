@@ -41,6 +41,17 @@ class IsisLabel():
         return self.label['IsisCube']['Instrument']['SpacecraftName']
 
     @property
+    def spacecraft_name(self):
+        """
+        Returns the name of the spacecraft
+        Returns
+        -------
+        : str
+        Full name of the spacecraft
+        """
+        return self.platform_name
+
+    @property
     def sensor_name(self):
         """
         Returns the name of the instrument

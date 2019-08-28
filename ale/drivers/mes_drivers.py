@@ -294,13 +294,12 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
         : int
           Naif ID code used in calculating focal length
         """
-        if isinstance(self, Framer):
+        if(self.instrument_id == 'MSGR_MDIS_WAC'):
             fn = self.label['IsisCube']['BandBin']['Number']
             if fn == 'N/A':
                 fn = 0
-        else:
-            fn = 0
-        return self.ikid - int(fn)
+            return self.ikid - int(fn)
+        return self.ikid
 
     @property
     def focal_length(self):
@@ -367,7 +366,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
         : float
           detector center sample
         """
-        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0]) - 0.5
+        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 3)[0]) - 0.5
 
 
     @property
@@ -385,7 +384,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
         : float
           detector center line
         """
-        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1]) - 0.5
+        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 3)[1]) - 0.5
 
     @property
     def sensor_model_version(self):
@@ -396,3 +395,15 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
           ISIS sensor model version
         """
         return 2
+
+    @property
+    def pixel_size(self):
+        """
+        Overriden because the MESSENGER IK uses PIXEL_PITCH and the units
+        are already millimeters
+
+        Returns
+        -------
+        : float pixel size
+        """
+        return spice.gdpool('INS{}_PIXEL_PITCH'.format(self.ikid), 0, 1)

@@ -9,6 +9,7 @@ import spiceypy as spice
 from conftest import get_image_kernels, convert_kernels
 
 from ale.drivers.mes_drivers import MessengerMdisPds3NaifSpiceDriver
+from ale.drivers.mes_drivers import MessengerMdisIsisLabelNaifSpiceDriver
 
 @pytest.fixture(scope="module", autouse=True)
 def test_kernels():
@@ -247,20 +248,124 @@ End
 """
     return MessengerMdisPds3NaifSpiceDriver(pds_label)
 
-def test_short_mission_name(Pds3Driver):
-    assert Pds3Driver.short_mission_name=='mes'
-
 @pytest.fixture
 def IsisLabelDriver():
-    return MessengerMdisIsisLabelNaifSpiceDriver("")
+    isis_label = """
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 512
+    TileLines   = 512
 
-def test_test_image_lines(Pds3Driver):
+    Group = Dimensions
+      Samples = 512
+      Lines   = 512
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName        = Messenger
+    InstrumentName        = "MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA"
+    InstrumentId          = MDIS-NAC
+    TargetName            = Mercury
+    OriginalTargetName    = MERCURY
+    StartTime             = 2015-04-24T04:42:19.666463
+    StopTime              = 2015-04-24T04:42:19.667463
+    SpacecraftClockCount  = 2/0072174528:989000
+    MissionPhaseName      = "MERCURY ORBIT YEAR 5"
+    ExposureDuration      = 1 <MS>
+    ExposureType          = AUTO
+    DetectorTemperature   = -11.62 <DEGC>
+    FocalPlaneTemperature = 4.07 <DEGC>
+    FilterTemperature     = N/A
+    OpticsTemperature     = 17.08 <DEGC>
+    AttitudeQuality       = Ok
+    FilterWheelPosition   = 17348
+    PivotPosition         = 15
+    FpuBinningMode        = 1
+    PixelBinningMode      = 0
+    SubFrameMode          = 0
+    JailBars              = 0
+    DpuId                 = DPU-A
+    PivotAngle            = 0.04119873046875 <Degrees>
+    Unlutted              = 1
+    LutInversionTable     = $messenger/calibration/LUT_INVERT/MDISLUTINV_0.TAB
+  End_Group
+
+  Group = Archive
+    DataSetId                 = MESS-E/V/H-MDIS-2-EDR-RAWDATA-V1.0
+    DataQualityId             = 0000001000000000
+    ProducerId                = "APPLIED COHERENT TECHNOLOGY CORPORATION"
+    EdrSourceProductId        = 1072174528_IM6
+    ProductId                 = EN1072174528M
+    SequenceName              = N/A
+    ObservationId             = 8386282
+    ObservationType           = (Monochrome, "Ridealong NAC")
+    SiteId                    = N/A
+    MissionElapsedTime        = 72174528
+    EdrProductCreationTime    = 2015-04-30T18:25:23
+    ObservationStartTime      = 2015-04-24T04:42:19.666463
+    SpacecraftClockStartCount = 2/0072174528:989000
+    SpacecraftClockStopCount  = 2/0072174528:990000
+    Exposure                  = 1
+    CCDTemperature            = 1139
+    OriginalFilterNumber      = 0
+    OrbitNumber               = 4086
+    YearDoy                   = 2015114
+    SourceProductId           = ("EN1072174528M", "MDISLUTINV_0")
+  End_Group
+
+  Group = BandBin
+    Name   = "748 BP 53"
+    Number = 2
+    Center = 747.7 <NM>
+    Width  = 52.6 <NM>
+  End_Group
+
+  Group = Kernels
+    NaifIkCode = -236820
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 1114113
+  Bytes     = 7944
+End_Object
+End
+"""
+    return MessengerMdisIsisLabelNaifSpiceDriver(isis_label)
+
+def test_short_mission_name(Pds3Driver, IsisLabelDriver):
+    assert Pds3Driver.short_mission_name=='mes'
+    assert IsisLabelDriver.short_mission_name=='mes'
+
+def test_test_image_lines_pds(Pds3Driver):
     assert Pds3Driver.image_lines == 512
 
-def test_image_samples(Pds3Driver):
-    assert Pds3Driver.image_lines == 512
+def test_image_lines_isis(IsisLabelDriver):
+    assert IsisLabelDriver.image_lines == 512
 
-def test_usgscsm_distortion_model(Pds3Driver):
+def test_image_samples_pds(Pds3Driver):
+    assert Pds3Driver.image_samples == 512
+
+def test_image_samples_isis(IsisLabelDriver):
+    assert IsisLabelDriver.image_samples == 512
+
+def test_usgscsm_distortion_model_pds(Pds3Driver):
     dist = Pds3Driver.usgscsm_distortion_model
     assert 'transverse' in dist
     assert 'x' in dist['transverse']
@@ -288,37 +393,95 @@ def test_usgscsm_distortion_model(Pds3Driver):
                                     0.0,
                                     1.0040104714688569E-5])
 
-def test_detector_start_line(Pds3Driver):
+def test_usgscsm_distortion_model_isis(IsisLabelDriver):
+    dist = IsisLabelDriver.usgscsm_distortion_model
+    assert 'transverse' in dist
+    assert 'x' in dist['transverse']
+    assert 'y' in dist['transverse']
+    np.testing.assert_almost_equal(dist['transverse']['x'],
+                                   [0.0,
+                                    1.0018542696238023333,
+                                    0.0,
+                                    0.0,
+                                   -5.0944404749411114E-4,
+                                    0.0,
+                                    1.0040104714688569E-5,
+                                    0.0,
+                                    1.0040104714688569E-5,
+                                    0.0])
+    np.testing.assert_almost_equal(dist['transverse']['y'],
+                                   [0.0,
+                                    0.0,
+                                    1.0,
+                                    9.06001059499675E-4,
+                                    0.0,
+                                    3.5748426266207586E-4,
+                                    0.0,
+                                    1.0040104714688569E-5,
+                                    0.0,
+                                    1.0040104714688569E-5])
+
+def test_detector_start_line_pds(Pds3Driver):
     assert Pds3Driver.detector_start_line == 1
 
-def test_detector_start_sample(Pds3Driver):
+def test_detector_start_line_isis(IsisLabelDriver):
+    assert IsisLabelDriver.detector_start_line == 1
+
+def test_detector_start_sample_pds(Pds3Driver):
     assert Pds3Driver.detector_start_sample == 9
 
-def test_sample_summing(Pds3Driver):
+def test_detector_start_sample_isis(IsisLabelDriver):
+    assert IsisLabelDriver.detector_start_sample == 9
+
+def test_sample_summing_pds(Pds3Driver):
     assert Pds3Driver.sample_summing == 2
 
-def test_line_summing(Pds3Driver):
+def test_sample_summing_isis(IsisLabelDriver):
+    assert IsisLabelDriver.sample_summing == 1
+
+def test_line_summing_pds(Pds3Driver):
     assert Pds3Driver.line_summing == 2
 
-def test_platform_name(Pds3Driver):
+def test_line_summing_isis(IsisLabelDriver):
+    assert IsisLabelDriver.line_summing == 1
+
+def test_platform_name_pds(Pds3Driver):
     assert Pds3Driver.platform_name == 'MESSENGER'
 
-def test_sensor_name(Pds3Driver):
+def test_platform_name_isis(IsisLabelDriver):
+    assert IsisLabelDriver.platform_name == 'Messenger'
+
+def test_sensor_name_pds(Pds3Driver):
     assert Pds3Driver.sensor_name == 'MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA'
 
-def test_target_body_radii(Pds3Driver):
+def test_sensor_name_isis(IsisLabelDriver):
+    assert IsisLabelDriver.sensor_name == 'MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA'
+
+def test_target_body_radii_pds(Pds3Driver):
     np.testing.assert_equal(Pds3Driver.target_body_radii, [2439.4, 2439.4, 2439.4])
 
-def test_focal_length(Pds3Driver):
+def test_target_body_radii_isis(IsisLabelDriver):
+    np.testing.assert_equal(IsisLabelDriver.target_body_radii, [2439.4, 2439.4, 2439.4])
+
+def test_focal_length_pds(Pds3Driver):
     assert Pds3Driver.focal_length == 549.5535053027719
 
-def test_detector_center_line(Pds3Driver):
+def test_focal_length_isis(IsisLabelDriver):
+    assert IsisLabelDriver.focal_length == 549.5535053027719
+
+def test_detector_center_line_pds(Pds3Driver):
     assert Pds3Driver.detector_center_line == 512
 
-def test_detector_center_sample(Pds3Driver):
+def test_detector_center_line_isis(IsisLabelDriver):
+    assert IsisLabelDriver.detector_center_line == 512
+
+def test_detector_center_sample_pds(Pds3Driver):
     assert Pds3Driver.detector_center_sample == 512
 
-def test_sensor_position(Pds3Driver):
+def test_detector_center_sample_isis(IsisLabelDriver):
+    assert IsisLabelDriver.detector_center_sample == 512
+
+def test_sensor_position_pds(Pds3Driver):
     """
     Returns
     -------
@@ -339,7 +502,22 @@ def test_sensor_position(Pds3Driver):
     np.testing.assert_almost_equal(time,
                                    [image_et])
 
-def test_frame_chain(Pds3Driver):
+def test_sensor_position_isis(IsisLabelDriver):
+    position, velocity, time = IsisLabelDriver.sensor_position
+    image_et = spice.scs2e(-236, '2/0072174528:989000') + 0.0005
+    expected_state, _ = spice.spkez(199, image_et, 'IAU_MERCURY', 'LT+S', -236)
+    expected_position = -1000 * np.asarray(expected_state[:3])
+    expected_velocity = -1000 * np.asarray(expected_state[3:])
+    np.testing.assert_allclose(position,
+                               [expected_position],
+                               rtol=1e-8)
+    np.testing.assert_allclose(velocity,
+                               [expected_velocity],
+                               rtol=1e-8)
+    np.testing.assert_almost_equal(time,
+                                   [image_et])
+
+def test_frame_chain_pds(Pds3Driver):
     assert Pds3Driver.frame_chain.has_node(1)
     assert Pds3Driver.frame_chain.has_node(10011)
     assert Pds3Driver.frame_chain.has_node(-236820)
@@ -355,9 +533,23 @@ def test_frame_chain(Pds3Driver):
     np.testing.assert_almost_equal(sensor_to_j2000.quats,
                                    [-np.roll(sensor_to_j2000_quats, -1)])
 
+def test_frame_chain_isis(IsisLabelDriver):
+    assert IsisLabelDriver.frame_chain.has_node(1)
+    assert IsisLabelDriver.frame_chain.has_node(10011)
+    assert IsisLabelDriver.frame_chain.has_node(-236820)
+    image_et = spice.scs2e(-236, '2/0072174528:989000') + 0.0005
+    target_to_j2000 = IsisLabelDriver.frame_chain.compute_rotation(10011, 1)
+    target_to_j2000_mat = spice.pxform('IAU_MERCURY', 'J2000', image_et)
+    target_to_j2000_quats = spice.m2q(target_to_j2000_mat)
+    np.testing.assert_almost_equal(target_to_j2000.quats,
+                                   [-np.roll(target_to_j2000_quats, -1)])
+    sensor_to_j2000 = IsisLabelDriver.frame_chain.compute_rotation(-236820, 1)
+    sensor_to_j2000_mat = spice.pxform('MSGR_MDIS_NAC', 'J2000', image_et)
+    sensor_to_j2000_quats = spice.m2q(sensor_to_j2000_mat)
+    np.testing.assert_almost_equal(sensor_to_j2000.quats,
+                                   [-np.roll(sensor_to_j2000_quats, -1)])
 
-
-def test_sun_position(Pds3Driver):
+def test_sun_position_pds(Pds3Driver):
     position, velocity, time = Pds3Driver.sun_position
     image_et = spice.scs2e(-236, '2/0072174528:989000') + 0.0005
     expected_state, _ = spice.spkez(10, image_et, 'IAU_MERCURY', 'LT+S', 199)
@@ -372,16 +564,40 @@ def test_sun_position(Pds3Driver):
     np.testing.assert_almost_equal(time,
                                    [image_et])
 
-def test_target_name(Pds3Driver):
+def test_sun_position_isis(IsisLabelDriver):
+    position, velocity, time = IsisLabelDriver.sun_position
+    image_et = spice.scs2e(-236, '2/0072174528:989000') + 0.0005
+    expected_state, _ = spice.spkez(10, image_et, 'IAU_MERCURY', 'LT+S', 199)
+    expected_position = 1000 * np.asarray(expected_state[:3])
+    expected_velocity = 1000 * np.asarray(expected_state[3:])
+    np.testing.assert_allclose(position,
+                               [expected_position],
+                               rtol=1e-8)
+    np.testing.assert_allclose(velocity,
+                               [expected_velocity],
+                               rtol=1e-8)
+    np.testing.assert_almost_equal(time,
+                                   [image_et])
+
+def test_target_name_pds(Pds3Driver):
     assert Pds3Driver.target_name == 'MERCURY'
 
-def test_target_frame_id(Pds3Driver):
+def test_target_name_isis(IsisLabelDriver):
+    assert IsisLabelDriver.target_name == 'Mercury'
+
+def test_target_frame_id_pds(Pds3Driver):
     assert Pds3Driver.target_frame_id == 10011
 
-def test_sensor_frame_id(Pds3Driver):
+def test_target_frame_id_isis(IsisLabelDriver):
+    assert IsisLabelDriver.target_frame_id == 10011
+
+def test_sensor_frame_id_pds(Pds3Driver):
     assert Pds3Driver.sensor_frame_id == -236820
 
-def test_isis_naif_keywords(Pds3Driver):
+def test_sensor_frame_id_isis(IsisLabelDriver):
+    assert IsisLabelDriver.sensor_frame_id == -236820
+
+def test_isis_naif_keywords_pds(Pds3Driver):
     expected_keywords = {
         'BODY199_RADII' : Pds3Driver.target_body_radii,
         'BODY_FRAME_CODE' : 10011,
@@ -399,30 +615,76 @@ def test_isis_naif_keywords(Pds3Driver):
         else:
             assert value == expected_keywords[key]
 
-def test_sensor_model_version(Pds3Driver):
+def test_isis_naif_keywords_isis(IsisLabelDriver):
+    expected_keywords = {
+        'BODY199_RADII' : IsisLabelDriver.target_body_radii,
+        'BODY_FRAME_CODE' : 10011,
+        'INS-236820_PIXEL_SIZE' : 0.014,
+        'INS-236820_ITRANSL' : [0.0, 0.0, 71.42857143],
+        'INS-236820_ITRANSS' : [0.0, 71.42857143, 0.0],
+        'INS-236820_FOCAL_LENGTH' : 549.5535053027719,
+        'INS-236820_BORESIGHT_SAMPLE' : 512.5,
+        'INS-236820_BORESIGHT_LINE' : 512.5
+    }
+    assert set(IsisLabelDriver.isis_naif_keywords.keys()) == set(expected_keywords.keys())
+    for key, value in IsisLabelDriver.isis_naif_keywords.items():
+        if isinstance(value, np.ndarray):
+            np.testing.assert_almost_equal(value, expected_keywords[key])
+        else:
+            assert value == expected_keywords[key]
+
+def test_sensor_model_version_pds(Pds3Driver):
     assert Pds3Driver.sensor_model_version == 2
 
-def test_focal2pixel_lines(Pds3Driver):
+def test_sensor_model_version_isis(IsisLabelDriver):
+    assert IsisLabelDriver.sensor_model_version == 2
+
+def test_focal2pixel_lines_pds(Pds3Driver):
     np.testing.assert_almost_equal(Pds3Driver.focal2pixel_lines,
                                    [0.0, 0.0, 71.42857143])
 
-def test_focal2pixel_samples(Pds3Driver):
+def test_focal2pixel_lines_isis(IsisLabelDriver):
+    np.testing.assert_almost_equal(IsisLabelDriver.focal2pixel_lines,
+                                    [0.0, 0.0, 71.42857143])
+
+def test_focal2pixel_samples_pds(Pds3Driver):
     np.testing.assert_almost_equal(Pds3Driver.focal2pixel_samples,
                                    [0.0, 71.42857143, 0.0])
 
-def test_pixel2focal_x(Pds3Driver):
+def test_focal2pixel_samples_isis(IsisLabelDriver):
+    np.testing.assert_almost_equal(IsisLabelDriver.focal2pixel_samples,
+                                   [0.0, 71.42857143, 0.0])
+
+def test_pixel2focal_x_pds(Pds3Driver):
     np.testing.assert_almost_equal(Pds3Driver.pixel2focal_x,
                                    [0.0, 0.014, 0.0])
 
-def test_pixel2focal_y(Pds3Driver):
+def test_pixel2focal_x_isis(IsisLabelDriver):
+    np.testing.assert_almost_equal(IsisLabelDriver.pixel2focal_x,
+                                   [0.0, 0.014, 0.0])
+
+def test_pixel2focal_y_pds(Pds3Driver):
     np.testing.assert_almost_equal(Pds3Driver.pixel2focal_y,
                                    [0.0, 0.0, 0.014])
 
-def test_ephemeris_start_time(Pds3Driver):
+def test_pixel2focal_y_isis(IsisLabelDriver):
+    np.testing.assert_almost_equal(IsisLabelDriver.pixel2focal_y,
+                                   [0.0, 0.0, 0.014])
+
+def test_ephemeris_start_time_pds(Pds3Driver):
     assert Pds3Driver.ephemeris_start_time == 483122606.8520247
 
-def test_ephemeris_stop_time(Pds3Driver):
+def test_ephemeris_start_time_isis(IsisLabelDriver):
+    assert IsisLabelDriver.ephemeris_start_time == 483122606.8520247
+
+def test_ephemeris_stop_time_pds(Pds3Driver):
     assert Pds3Driver.ephemeris_stop_time == 483122606.85302466
 
-def test_center_ephemeris_time(Pds3Driver):
+def test_ephemeris_stop_time_isis(IsisLabelDriver):
+    assert IsisLabelDriver.ephemeris_stop_time == 483122606.85302466
+
+def test_center_ephemeris_time_pds(Pds3Driver):
     assert Pds3Driver.center_ephemeris_time == 483122606.85252464
+
+def test_center_ephemeris_time_isis(IsisLabelDriver):
+    assert IsisLabelDriver.center_ephemeris_time == 483122606.85252464
