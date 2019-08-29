@@ -337,7 +337,7 @@ def create_spk_dependency_tree(kernels):
                                check=True,
                                text=True)
         for body, rel_body in re.findall(r'\((.*)\).*w\.r\.t\..*\((.*)\)', brief.stdout):
-            dep_tree.add_edge(body, rel_body, kernel=kernel)
+            dep_tree.add_edge(int(body), int(rel_body), kernel=kernel)
 
     return dep_tree
 
