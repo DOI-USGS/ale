@@ -1,194 +1,184 @@
 import numpy as np
+from numpy.polynomial.polynomial import polyval, polyder
+import networkx as nx
+from networkx.algorithms.shortest_paths.generic import shortest_path
+
+import spiceypy as spice
 
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
-class FrameNode():
+def create_rotations(rotation_table):
     """
-    A single frame in a frame tree. This class is largely adapted from the Node
-    class in the vispy scene graph implementation.
+    Convert an ISIS rotation table into rotation objects.
+
+    Parameters
+    ----------
+    rotation_table : dict
+                     The rotation ISIS table as a dictionary
+
+    Returns
+    -------
+    : list
+      A list of time dependent or constant rotation objects from the table. This
+      list will always have either 1 or 2 elements. The first rotation will be
+      time dependent and the second rotation will be constant. The rotations will
+      be ordered such that the reference frame the first rotation rotates to is
+      the reference frame the second rotation rotates from.
+    """
+    rotations = []
+    root_frame = rotation_table['TimeDependentFrames'][-1]
+    last_time_dep_frame = rotation_table['TimeDependentFrames'][0]
+    # Case 1: It's a table of quaternions and times
+    if 'J2000Q0' in rotation_table:
+        # SPICE quaternions are (W, X, Y, Z) and ALE uses (X, Y, Z, W).
+        quats = np.array([rotation_table['J2000Q1'],
+                          rotation_table['J2000Q2'],
+                          rotation_table['J2000Q3'],
+                          rotation_table['J2000Q0']]).T
+        time_dep_rot = TimeDependentRotation(quats,
+                                             rotation_table['ET'],
+                                             root_frame,
+                                             last_time_dep_frame)
+        rotations.append(time_dep_rot)
+    # Case 2: It's a table of Euler angle coefficients
+    elif 'J2000Ang1' in rotation_table:
+        ephemeris_times = np.linspace(rotation_table['CkTableStartTime'],
+                                      rotation_table['CkTableEndTime'],
+                                      rotation_table['CkTableOriginalSize'])
+        base_time = rotation_table['J2000Ang1'][-1]
+        time_scale = rotation_table['J2000Ang2'][-1]
+        scaled_times = (ephemeris_times - base_time) / time_scale
+        coeffs = np.array([rotation_table['J2000Ang1'][:-1],
+                           rotation_table['J2000Ang2'][:-1],
+                           rotation_table['J2000Ang3'][:-1]]).T
+        angles = polyval(scaled_times, coeffs).T
+        # ISIS is hard coded to ZXZ (313) Euler angle axis order.
+        # SPICE also interprets Euler angle rotations as negative rotations,
+        # so negate them before passing to scipy.
+        time_dep_rot = TimeDependentRotation.from_euler('zxz',
+                                                        -angles,
+                                                        ephemeris_times,
+                                                        root_frame,
+                                                        last_time_dep_frame)
+        rotations.append(time_dep_rot)
+
+    if 'ConstantRotation' in rotation_table:
+        last_constant_frame = rotation_table['ConstantFrames'][0]
+        rot_mat =  np.reshape(np.array(rotation_table['ConstantRotation']), (3, 3))
+        constant_rot = ConstantRotation.from_matrix(rot_mat,
+                                                    last_time_dep_frame,
+                                                    last_constant_frame)
+        rotations.append(constant_rot)
+    return rotations
+
+class FrameChain(nx.DiGraph):
+    """
+    This class is responsible for handling rotations between reference frames.
+    Every node is the reference frame and every edge represents the rotation to
+    between those two nodes. Each edge is directional, where the source --> destination
+    is one rotation and destination --> source is the inverse of that rotation.
 
     Attributes
     __________
-    id : int
-         The NAIF ID code for the frame
-    parent : FrameNode
-             The parent node in the frame tree
-    children : List of FrameNode
-               The children nodes in the frame tree
-    rotation : ConstantRotation or TimeDependentRotation
-               The rotation from this frame to the frame of the parent node
+    frame_changes : list
+                    A list of tuples that represent the rotation from one frame
+                    to another. These tuples should all be NAIF codes for
+                    reference frames
+    ephemeris_time : list
+                     A of ephemeris times that need to be rotated for each set
+                     of frame rotations in the frame chain
     """
+    @classmethod
+    def from_spice(cls, *args, frame_changes=[], ephemeris_time=[], **kwargs):
+        frame_chain = cls()
 
-    def __init__(self, id, parent=None, rotation=None):
-        """
-        Construct a frame node with or without a parent. If a parent is specified
-        then a rotation from this frame to the parent node's frame must be
-        specified and visa-versa.
+        times = np.array(ephemeris_time)
+        quats = np.zeros((len(times), 4))
 
-        Parameters
-        ----------
-        id : int
-             The NAIF ID code for the frame
-        parent : FrameNode
-                 The parent node in the frame chain
-        rotation : ConstantRotation or TimeDependentRotation
-                   The rotation from this frame to the frame of the parent node
-        """
+        for s, d in frame_changes:
+            for i, time in enumerate(times):
+                rotation_matrix = spice.pxform(spice.frmnam(s), spice.frmnam(d), time)
+                quat_from_rotation = spice.m2q(rotation_matrix)
+                quats[i,:3] = quat_from_rotation[1:]
+                quats[i,3] = quat_from_rotation[0]
+            rotation = TimeDependentRotation(quats, times, s, d)
+            frame_chain.add_edge(s, d, rotation=rotation)
+        return frame_chain
 
-        if (parent is None) != (rotation is None):
-            raise TypeError("parent and rotation must both be entered or both be None.")
+    @classmethod
+    def from_isis_tables(cls, *args, inst_pointing={}, body_orientation={}, **kwargs):
+        frame_chain = cls()
 
-        self.children = []
-        self.id = id
-        if parent is not None:
-            self.parent = parent
-        if rotation is not None:
-            self.rotation = rotation
+        for rotation in create_rotations(inst_pointing):
+            frame_chain.add_edge(rotation.source,
+                                 rotation.dest,
+                                 rotation=rotation)
 
-    def __repr__(self):
-        return f'ID:{self.id}\nChildren:{self.children}'
+        for rotation in create_rotations(body_orientation):
+            frame_chain.add_edge(rotation.source,
+                                 rotation.dest,
+                                 rotation=rotation)
+        return frame_chain
 
-    def __del__(self):
-        """
-        Custom deletor for a FrameNode. The child node is always responsible
-        for updating the parent nodes. So this removes this node from the
-        children of its parent node.
-        """
-        if self.parent is not None:
-            self.parent.children.remove(self)
+    def add_edge(self, s, d, rotation, **kwargs):
+        super(FrameChain, self).add_edge(s, d, rotation=rotation, **kwargs)
+        super(FrameChain, self).add_edge(d, s, rotation=rotation.inverse(), **kwargs)
 
-    @property
-    def parent(self):
-        """
-        The parent node of this node. Returns None if this is a root node.
-        """
-        if hasattr(self, '_parent'):
-            return self._parent
-        else:
-            return None
-
-    @parent.setter
-    def parent(self, new_parent):
-        """
-        Sets a new parent node. The child node is always responsible for
-        updating the parent node. So, this removes this node from the children
-        of the old parent and adds it to the children of the new parent.
-        """
-        if self.parent is not None:
-            self._parent.children.remove(self)
-
-        new_parent.children.append(self)
-        self._parent = new_parent
-
-    def parent_nodes(self):
-        """
-        Returns the ordered list of parents starting with this node going to
-        the root node.
-        """
-        chain = [self]
-        current_parent = self.parent
-        while current_parent is not None:
-            chain.append(current_parent)
-            current_parent = current_parent.parent
-        return chain
-
-    def find_child_frame(self, id):
-        """
-        Find a child frame by its frame ID.
-
-        Recursively search this frame and all of its children for a specific
-        reference frame.
-
-        Parameters
-        ----------
-        id : int
-            The NAIF frame ID of the frame to find
-
-        Returns
-        -------
-        FrameNode
-            The specified frame. If no child frame with the given ID exists,
-            None is returned.
-        """
-        if self.id == id:
-            return self
-        node = None
-        for child in self.children:
-            node = child.find_child_frame(id)
-            if node is not None:
-                return node
-        return node
-
-    def path_to(self, other):
-        """
-        Returns the path to another node as two lists. The first list
-        starts with this node and ends with the common parent. The second
-        list contains the remainder of the path.
-
-        Parameters
-        ----------
-        other : FrameNode
-                The other node to find the path to.
-        """
-        parents_1 = self.parent_nodes()
-        parents_2 = other.parent_nodes()
-        common_parent = None
-        for node in parents_1:
-            if node in parents_2:
-                common_parent = node
-                break
-        if common_parent is None:
-            raise RuntimeError('No common parent between nodes')
-
-        first_path = parents_1[:parents_1.index(common_parent)+1]
-        second_path = parents_2[:parents_2.index(common_parent)][::-1]
-
-        return first_path, second_path
-
-    def rotation_to(self, other):
+    def compute_rotation(self, source, destination):
         """
         Returns the rotation to another node. Returns the identity rotation
         if the other node is this node.
 
         Parameters
         ----------
-        other : FrameNode
-                The other node to find the rotation to.
+        source : int
+                 Integer id for the source node to rotate from
+        destination : int
+                      Integer id for the node to rotate into from the source node
+
+        Returns
+        -------
+        rotation : Object
+                   Returns either a TimeDependentRotation object or ConstantRotation
+                   object depending on the number of rotations being multiplied
+                   together
         """
-        if other == self:
-            return ConstantRotation(np.array([0, 0, 0, 1]), self.id, other.id)
-        forward_path, reverse_path = self.path_to(other)
-        rotations = [node.rotation for node in forward_path[:-1]]
-        rotations.extend([node.rotation.inverse() for node in reverse_path])
+        if source == destination:
+            return ConstantRotation(np.array([0, 0, 0, 1]), source, destination)
+
+        path = shortest_path(self, source, destination)
+        rotations = [self.edges[path[i], path[i+1]]['rotation'] for i in range(len(path) - 1)]
         rotation = rotations[0]
         for next_rotation in rotations[1:]:
             rotation = next_rotation * rotation
         return rotation
 
-    def last_time_dependent_frame_between(self, other):
+    def last_time_dependent_frame_between(self, source, destination):
         """
-        Find the last time dependent frame between this frame and another frame.
+        Find the last time dependent frame between the source frame and the
+        destination frame.
 
         Parameters
         ----------
-        other : FrameNode
-            The frame to find the last time dependent frame between
+        source : int
+                 Integer id of the source node
+
+        destination : int
+                      Integer of the destination node
 
         Returns
         -------
-        FrameNode
-            The first frame between the this frame and the other frame such
-            that the rotation from this frame to the in-between frame is time
-            dependent and the rotation from the in-between frame to the other
-            frame is constant. If there are no time dependent frames between
-            this frame and the other frame, this frame is returned.
+        : tuple, None
+          Returns the source node id, destination node id, and edge dictionary
+          which contains the rotation from source to destination.
         """
-        forward_path, reverse_path = self.path_to(other)
-        # Reverse search the rotation chain for the last time dependent rotation
-        for node in reverse_path[::-1]:
-            if isinstance(node.rotation, TimeDependentRotation):
-                return node
-        for node in forward_path[:-1][::-1]:
-            if isinstance(node.rotation, TimeDependentRotation):
-                return node.parent
-        return self
+        path = shortest_path(self, source, destination)
+        # Reverse the path to search bottom up to find the last time dependent
+        # frame between the source and destination
+        path.reverse()
+        for i in range(len(path) - 1):
+            edge = self.edges[path[i+1], path[i]]
+            if isinstance(edge['rotation'], TimeDependentRotation):
+                return path[i+1], path[i], edge
+
+        return None

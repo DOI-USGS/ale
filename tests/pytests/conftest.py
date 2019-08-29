@@ -2,6 +2,9 @@ import subprocess
 import os
 import re
 import numpy as np
+import ale
+
+from glob import glob
 
 class SimpleSpice():
     def scs2e(self, *args):

@@ -4,7 +4,7 @@ import sys
 from setuptools import setup, find_packages
 
 NAME = "Ale"
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 
 # To install the library, run the following
 #
@@ -17,11 +17,13 @@ setup(
     name=NAME,
     version=VERSION,
     description="Abstraction Layer for Ephemerides",
-    author_email="jlaura@usgs.gov",
+    author="USGS ASC Development Team",
+    author_email="",
     url="",
     keywords=[""],
     packages=find_packages(),
     long_description="""\
     An Abstraction library for reading, writing and computing ephemeris data
-    """
+    """,
+    package_data={'': ['config.yml']}
 )

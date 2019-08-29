@@ -5,7 +5,6 @@ import numpy as np
 import pvl
 import spiceypy as spice
 
-from ale import config
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
@@ -15,7 +14,7 @@ from ale.base.type_distortion import RadialDistortion
 from ale.base.type_sensor import LineScanner
 
 
-class MroCtxIsisLabelIsisSpiceDriver(Driver, IsisSpice, LineScanner, RadialDistortion):
+class MroCtxIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, RadialDistortion, Driver):
 
     @property
     def instrument_id(self):
@@ -29,7 +28,10 @@ class MroCtxIsisLabelIsisSpiceDriver(Driver, IsisSpice, LineScanner, RadialDisto
         : str
           instrument id
         """
-        return "N/A"
+        id_lookup = {
+        "CTX" : "MRO_CTX"
+        }
+        return id_lookup[super().instrument_id]
 
     @property
     def spacecraft_id(self):
@@ -39,52 +41,33 @@ class MroCtxIsisLabelIsisSpiceDriver(Driver, IsisSpice, LineScanner, RadialDisto
         : int
           Naif ID code for the spacecraft
         """
-        return "N/A"
+        return "-74"
 
     @property
-    def ikid(self):
+    def sensor_name(self):
         """
-        Returns
-        -------
-        : int
-          Naif ID code for the instrument
+        ISIS doesn't propergate this to the ingested cube label, so hard-code it.
         """
-        return int(self.label["IsisCube"]["Kernels"]["NaifFrameCode"])
+        return "CONTEXT CAMERA"
+
 
     @property
-    def line_exposure_duration(self):
+    def detector_center_sample(self):
         """
+        The center of the CCD in detector pixels
+        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.
+
         Returns
         -------
-        : float
-          Line exposure duration in seconds
+        float :
+            The center sample of the CCD
         """
-        return self.label["IsisCube"]["Instrument"]["LineExposureDuration"].value * 0.001 # Scale to seconds
+        return super().detector_center_sample - 0.5
 
-
-class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDistortion, Driver):
+class MroCtxIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDistortion, Driver):
     """
     Driver for reading CTX ISIS labels.
     """
-
-    @property
-    def metakernel(self):
-        """
-        Returns latest instrument metakernels
-
-        Returns
-        -------
-        : string
-          Path to latest metakernel file
-        """
-        metakernel_dir = config.mro
-        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
-        if not hasattr(self, '_metakernel'):
-            self._metakernel = None
-            for mk in mks:
-                if str(self.utc_start_time.year) in os.path.basename(mk):
-                    self._metakernel = mk
-        return self._metakernel
 
     @property
     def instrument_id(self):
@@ -157,16 +140,6 @@ class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDi
         return name_lookup[super().platform_name]
 
     @property
-    def detector_start_line(self):
-        """
-        Returns
-        -------
-        : int
-          The starting detector line of the image
-        """
-        return 1
-
-    @property
     def detector_start_sample(self):
         """
         Returns
@@ -175,6 +148,19 @@ class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDi
           The starting detector sample of the image
         """
         return self.label['IsisCube']['Instrument']['SampleFirstPixel']
+
+    @property
+    def detector_center_sample(self):
+        """
+        The center of the CCD in detector pixels
+        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.
+
+        Returns
+        -------
+        float :
+            The center sample of the CCD
+        """
+        return super().detector_center_sample - 0.5
 
     @property
     def sensor_model_version(self):
@@ -186,30 +172,11 @@ class MroCtxIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, LineScanner, RadialDi
         """
         return 1
 
-class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, LineScanner, RadialDistortion, Driver):
+class MroCtxPds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistortion, Driver):
     """
     Driver for reading CTX PDS3 labels. Requires a Spice mixin to acquire addtional
     ephemeris and instrument data located exclusively in spice kernels.
     """
-
-    @property
-    def metakernel(self):
-        """
-        Returns latest instrument metakernels
-
-        Returns
-        -------
-        : string
-          Path to latest metakernel file
-        """
-        metakernel_dir = config.mro
-        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
-        if not hasattr(self, '_metakernel'):
-            self._metakernel = None
-            for mk in mks:
-                if str(self.utc_start_time.year) in os.path.basename(mk):
-                    self._metakernel = mk
-        return self._metakernel
 
     @property
     def instrument_id(self):
@@ -251,16 +218,6 @@ class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, LineScanner, RadialDi
         return name_lookup[super().spacecraft_name]
 
     @property
-    def detector_start_line(self):
-        """
-        Returns
-        -------
-        : int
-          Starting detector line for the image
-        """
-        return 1
-
-    @property
     def detector_start_sample(self):
         """
         Returns
@@ -269,6 +226,19 @@ class MroCtxPds3LabelNaifSpiceDriver(Pds3Label, NaifSpice, LineScanner, RadialDi
           Starting detector sample for the image
         """
         return self.label.get('SAMPLE_FIRST_PIXEL', 0)
+
+    @property
+    def detector_center_sample(self):
+        """
+        The center of the CCD in detector pixels
+        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.
+
+        Returns
+        -------
+        float :
+            The center sample of the CCD
+        """
+        return super().detector_center_sample - 0.5
 
     @property
     def sensor_model_version(self):

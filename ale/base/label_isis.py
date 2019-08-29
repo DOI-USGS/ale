@@ -41,6 +41,17 @@ class IsisLabel():
         return self.label['IsisCube']['Instrument']['SpacecraftName']
 
     @property
+    def spacecraft_name(self):
+        """
+        Returns the name of the spacecraft
+        Returns
+        -------
+        : str
+        Full name of the spacecraft
+        """
+        return self.platform_name
+
+    @property
     def sensor_name(self):
         """
         Returns the name of the instrument
@@ -51,6 +62,18 @@ class IsisLabel():
           Name of the sensor
         """
         return self.label['IsisCube']['Instrument']['InstrumentName']
+
+    @property
+    def sensor_model_version(self):
+        """
+        Returns the ISIS camera version
+
+        Returns
+        -------
+        : int
+          Camera version number
+        """
+        return self.label["IsisCube"]["Kernels"]["CameraVersion"]
 
     @property
     def image_lines(self):
@@ -77,6 +100,24 @@ class IsisLabel():
         return self.label['IsisCube']['Core']['Dimensions']['Samples']
 
     @property
+    def sampling_factor(self):
+        """
+        Returns the summing factor from the PDS3 label. For example a return value of 2
+        indicates that 2 lines and 2 samples (4 pixels) were summed and divided by 4
+        to produce the output pixel value.
+
+        Returns
+        -------
+        : int
+          Number of samples and lines combined from the original data to produce a single pixel in this image
+        """
+        try:
+            summing = self.label['IsisCube']['Instrument']['SummingMode']
+        except:
+            summing = 1
+        return summing
+
+    @property
     def sample_summing(self):
         """
         Returns the number of detector samples summed to produce each image sample
@@ -86,11 +127,7 @@ class IsisLabel():
         : int
           Sample summing
         """
-        try:
-            summing = self.label['IsisCube']['Instrument']['SummingMode']
-        except:
-            summing = 1
-        return summing
+        return self.sampling_factor
 
     @property
     def line_summing(self):
@@ -102,11 +139,7 @@ class IsisLabel():
         : int
           Line summing
         """
-        try:
-            summing = self.label['IsisCube']['Instrument']['SummingMode']
-        except:
-            summing = 1
-        return summing
+        return self.sampling_factor
 
     @property
     def target_name(self):
@@ -202,7 +235,7 @@ class IsisLabel():
             # Check for units on the PVL keyword
             if isinstance(exposure_duration, pvl._collections.Units):
                 units = exposure_duration.units
-                if "ms" in units.lower():
+                if "ms" in units.lower() or 'milliseconds' in units.lower():
                     exposure_duration = exposure_duration.value * 0.001
                 else:
                     # if not milliseconds, the units are probably seconds

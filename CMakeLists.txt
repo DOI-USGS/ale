@@ -7,13 +7,10 @@
 # Specify the required version of CMake.
 # cmake 3.10 required for ctest/gtest integration
 cmake_minimum_required(VERSION 3.10)
-project(ale VERSION 0.0.1 DESCRIPTION "Abstraction Library for Ephemerides ")
+project(ale VERSION 0.3.0 DESCRIPTION "Abstraction Library for Ephemerides ")
 
 # include what we need
 include(GNUInstallDirs)
-include(cmake/gtest.cmake)
-include(GoogleTest)
-include(CTest)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -37,27 +34,38 @@ target_include_directories(ale
                            ${EIGEN3_INCLUDE_DIR}
                            ${PYTHON_INCLUDE_DIR}
                            PUBLIC
-                          ${ALE_INCLUDE_DIRS})
+                           ${ALE_INCLUDE_DIRS})
 
-# Setup for GoogleTest
-find_package(Threads)
-target_link_libraries(ale
-                      PRIVATE
-                      ${GSL_LIBRARIES}
-                      ${PYTHON_LIBRARY}
-                      PUBLIC
-                      gtest ${CMAKE_THREAD_LIBS_INIT})
+ target_link_libraries(ale
+                       PRIVATE
+                       ${GSL_LIBRARIES}
+                       ${PYTHON_LIBRARY})
 
-# Setup for ctest
-enable_testing()
-add_subdirectory(tests/ctests)
+# Optional build tests
+option (BUILD_TESTS "Build tests" ON)
+if(BUILD_TESTS)
+  include(cmake/gtest.cmake)
+  include(GoogleTest)
+  include(CTest)
 
-# Setup for code coverage
-# default to off
-set(COVERAGE OFF CACHE BOOL "Coverage")
-if(COVERAGE)
-    target_compile_options(ale PRIVATE --coverage -O0)
-    target_link_libraries(ale PRIVATE --coverage -O0)
+  find_package (Threads)
+
+  target_link_libraries(ale
+                        PRIVATE
+                        ${GSL_LIBRARIES}
+                        ${PYTHON_LIBRARY}
+                        PUBLIC
+                        gtest ${CMAKE_THREAD_LIBS_INIT})
+  enable_testing()
+  add_subdirectory(tests/ctests)
+
+  # Setup for code coverage
+  # default to off
+  set(COVERAGE OFF CACHE BOOL "Coverage")
+  if(COVERAGE)
+      target_compile_options(ale PRIVATE --coverage -O0)
+      target_link_libraries(ale PRIVATE --coverage -O0)
+  endif()
 endif()
 
 # Install commands

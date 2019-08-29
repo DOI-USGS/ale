@@ -2,8 +2,6 @@ import pytest
 
 import ale
 from ale.drivers import dawn_drivers
-from ale.base import data_naif
-from ale.base import label_pds3
 
 from unittest.mock import PropertyMock, patch
 
@@ -12,9 +10,7 @@ from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
 
-data_naif.spice = simplespice
 dawn_drivers.spice = simplespice
-label_pds3.spice = simplespice
 
 from ale.drivers.dawn_drivers import DawnFcPds3NaifSpiceDriver
 
@@ -23,6 +19,9 @@ DawnFcPds3NaifSpiceDriver.metakernel = get_mockkernels
 @pytest.fixture
 def driver():
     return DawnFcPds3NaifSpiceDriver("")
+
+def test_short_mission_name(driver):
+    assert driver.short_mission_name=='dawn'
 
 @patch('ale.base.label_pds3.Pds3Label.instrument_id', 1)
 @patch('ale.base.label_pds3.Pds3Label.filter_number', 2)

@@ -5,13 +5,12 @@ import os
 from glob import glob
 
 import ale
-from ale import config
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.type_sensor import Framer
 
-class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
+class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
     """
     Dawn driver for generating an ISD from a Dawn PDS3 image.
     """
@@ -34,25 +33,6 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         filter_number = self.filter_number
 
         return "DAWN_{}_FILTER_{}".format(instrument_id, filter_number)
-
-    @property
-    def metakernel(self):
-        """
-        Returns latest instrument metakernels
-
-        Returns
-        -------
-        : string
-          Path to latest metakernel file
-        """
-        metakernel_dir = config.dawn
-        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
-        if not hasattr(self, '_metakernel'):
-            self._metakernel = None
-            for mk in mks:
-                if str(self.utc_start_time.year) in os.path.basename(mk):
-                    self._metakernel = mk
-        return self._metakernel
 
     @property
     def label(self):
@@ -127,11 +107,11 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         via a spice call but 193 ms needs to be added to
         account for the CCD being discharged or cleared.
         """
-        if not hasattr(self, '_starting_ephemeris_time'):
+        if not hasattr(self, '_ephemeris_start_time'):
             sclock = self.spacecraft_clock_start_count
-            self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
-            self._starting_ephemeris_time += 193.0 / 1000.0
-        return self._starting_ephemeris_time
+            self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
+            self._ephemeris_start_time += 193.0 / 1000.0
+        return self._ephemeris_start_time
 
     @property
     def usgscsm_distortion_model(self):
@@ -199,26 +179,6 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         return [0.0, 0.0, 1/pixel_size]
 
     @property
-    def detector_start_line(self):
-        """
-        Returns
-        -------
-        : int
-          Detector line corresponding to the first image line
-        """
-        return 1
-        
-    @property
-    def detector_start_sample(self):
-        """
-        Returns
-        -------
-        : int
-          Detector sample corresponding to the first image sample
-        """
-        return 1
-
-    @property
     def sensor_model_version(self):
         """
         Returns instrument model version
@@ -236,12 +196,17 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         Returns center detector sample acquired from Spice Kernels.
         Expects ikid to be defined. This should be the integer Naid ID code for
         the instrument.
+
+        We have to add 0.5 to the CCD Center because the Dawn IK defines the
+        detector pixels as 0.0 being the center of the first pixel so they are
+        -0.5 based.
+
         Returns
         -------
         : float
           center detector sample
         """
-        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0])
+        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[0]) + 0.5
 
     @property
     def detector_center_line(self):
@@ -249,9 +214,14 @@ class DawnFcPds3NaifSpiceDriver(Pds3Label, NaifSpice, Framer, Driver):
         Returns center detector line acquired from Spice Kernels.
         Expects ikid to be defined. This should be the integer Naid ID code for
         the instrument.
+
+        We have to add 0.5 to the CCD Center because the Dawn IK defines the
+        detector pixels as 0.0 being the center of the first pixel so they are
+        -0.5 based.
+
         Returns
         -------
         : float
           center detector line
         """
-        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
+        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[1]) + 0.5
