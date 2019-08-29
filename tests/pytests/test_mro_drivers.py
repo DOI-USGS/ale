@@ -1,79 +1,59 @@
 from unittest.mock import patch
+import unittest
+import json
+import os
 
 import pytest
 
 import ale
-from ale.drivers import mro_drivers
-from ale.base import data_naif
-from ale.base import label_pds3
+
+import spiceypy as spice
 
 # 'Mock' the spice module where it is imported
-from conftest import SimpleSpice, get_mockkernels
+from conftest import get_image_kernels, convert_kernels, get_image_label
 
-simplespice = SimpleSpice()
+from ale.drivers.mro_drivers import MroCtxPds3LabelNaifSpiceDriver, MroCtxIsisLabelNaifSpiceDriver
+#
+# @pytest.fixture(scope="module", autouse=True)
+# def mro_kernels():
+#     kernels = get_image_kernels('B10_013341_1010_XN_79S172W')
+#     updated_kernels, binary_kernels = convert_kernels(kernels)
+#     spice.furnsh(updated_kernels)
+#     yield updated_kernels
+#     spice.unload(updated_kernels)
+#     for kern in binary_kernels:
+#         os.remove(kern)
+#
+# def test_mro_load(mro_kernels):
+#     label_file = get_image_label('B10_013341_1010_XN_79S172W', 'pds3')
+#
+#     usgscsm_isd_str = ale.loads(label_file, props={'kernels': mro_kernels}, formatter='usgscsm')
+#     usgscsm_isd_obj = json.loads(usgscsm_isd_str)
+#
+#     assert usgscsm_isd_obj['name_platform'] == 'MARS RECONNAISSANCE ORBITER'
+#     assert usgscsm_isd_obj['name_sensor'] == 'CONTEXT CAMERA'
+#     assert usgscsm_isd_obj['name_model'] == 'USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL'
 
-data_naif.spice = simplespice
-mro_drivers.spice = simplespice
-label_pds3.spice = simplespice
+class testMroClass(unittest.TestCase):
 
-from ale.drivers.mro_drivers import MroCtxPds3LabelNaifSpiceDriver
-from ale.drivers.mro_drivers import MroCtxIsisLabelNaifSpiceDriver
+    def setUp(self):
+        kernels = get_image_kernels('B10_013341_1010_XN_79S172W')
+        updated_kernels, binary_kernels = convert_kernels(kernels)
+        self.test_kernels = updated_kernels
+        self.binary_kernels = binary_kernels
+        spice.furnsh(updated_kernels)
 
-MroCtxPds3LabelNaifSpiceDriver.metakernel = get_mockkernels
+    def tearDown(self):
+        spice.unload(self.test_kernels)
+        for kern in self.binary_kernels:
+            os.remove(kern)
 
-@pytest.fixture
-def Pds3NaifDriver():
-    return MroCtxPds3LabelNaifSpiceDriver("")
+    def test_mro_load(self):
+        label_file = get_image_label('B10_013341_1010_XN_79S172W', 'pds3')
 
-@pytest.fixture
-def IsisLabelNaifDriver():
-    return MroCtxIsisLabelNaifSpiceDriver("")
+        usgscsm_isd_str = ale.loads(label_file, props={'kernels': self.test_kernels}, formatter='usgscsm')
+        usgscsm_isd_obj = json.loads(usgscsm_isd_str)
 
-@patch('ale.base.label_pds3.Pds3Label.instrument_id', 'CONTEXT CAMERA')
-def test_instrument_id_pds3(Pds3NaifDriver):
-    assert Pds3NaifDriver.instrument_id == 'MRO_CTX'
-
-@patch('ale.base.label_pds3.Pds3Label.spacecraft_name', 'MARS_RECONNAISSANCE_ORBITER')
-def test_spacecraft_name_pds3(Pds3NaifDriver):
-    assert Pds3NaifDriver.spacecraft_name == 'MRO'
-
-@patch('ale.base.label_pds3.Pds3Label.line_exposure_duration', 12.1)
-def test_exposure_duration_pds3(Pds3NaifDriver):
-    assert Pds3NaifDriver.exposure_duration == 12.1
-
-def test_detector_start_line_pds3(Pds3NaifDriver):
-    assert Pds3NaifDriver.detector_start_line == 1
-
-def test_detector_start_sample_pds3(Pds3NaifDriver):
-    # I am not sure how to accomplish this with a fixture and
-    # a decorator. Therefore, using a context
-    with patch.dict(Pds3NaifDriver.label, SAMPLE_FIRST_PIXEL=0) as f:
-        assert Pds3NaifDriver.detector_start_sample == 0
-
-def test_sensor_model_version_pds3(Pds3NaifDriver):
-    assert Pds3NaifDriver.sensor_model_version == 1
-
-@patch('ale.base.label_isis.IsisLabel.instrument_id', 'CTX')
-def test_instrument_id_isis(IsisLabelNaifDriver):
-    assert IsisLabelNaifDriver.instrument_id == 'MRO_CTX'
-
-@patch('ale.base.label_isis.IsisLabel.platform_name', 'Mars_Reconnaissance_Orbiter')
-def test_spacecraft_name_isis(IsisLabelNaifDriver):
-    assert IsisLabelNaifDriver.spacecraft_name == 'MRO'
-
-@patch('ale.base.label_isis.IsisLabel.platform_name', 'Mars_Reconnaissance_Orbiter')
-def test_ephemeris_start_time_isis(IsisLabelNaifDriver):
-    with patch.dict(IsisLabelNaifDriver.label, {'IsisCube' : {'Instrument' :
-        {'SpacecraftClockCount' : 800}}}) as f:
-        assert IsisLabelNaifDriver.ephemeris_start_time == 0.1
-
-def test_detector_start_line_isis(IsisLabelNaifDriver):
-    assert IsisLabelNaifDriver.detector_start_line == 1
-
-def test_detector_start_sample_isis(IsisLabelNaifDriver):
-    with patch.dict(IsisLabelNaifDriver.label, {'IsisCube' : {'Instrument' :
-        {'SampleFirstPixel' : 0}}}) as f:
-        assert IsisLabelNaifDriver.detector_start_sample == 0
-
-def test_sensor_model_version_isis(IsisLabelNaifDriver):
-    assert IsisLabelNaifDriver.sensor_model_version == 1
+        assert usgscsm_isd_obj['name_platform'] == 'MARS RECONNAISSANCE ORBITER'
+        assert usgscsm_isd_obj['name_sensor'] == 'CONTEXT CAMERA'
+        assert usgscsm_isd_obj['name_model'] == 'USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL'
