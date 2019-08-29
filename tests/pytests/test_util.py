@@ -6,6 +6,7 @@ import tempfile
 import spiceypy as spice
 import pvl
 from unittest import mock
+from collections import OrderedDict
 
 import ale
 from ale import util
@@ -15,12 +16,12 @@ def cube_kernels():
    return """
     Object = IsisCube
     Group = Kernels
-      TargetAttitudeShape = attitudeshape
-      TargetPosition = (targetposition0, targetposition1)
-      Instrument = instrument
-      InstrumentPointing = (Table, instrumentpointing0, instrumentpointing1)
-      SpacecraftClock = clock
-      InstrumentPosition = instrumentposition
+      TargetAttitudeShape = $base/attitudeshape
+      TargetPosition = ($messenger/targetposition0, $messenger/targetposition1)
+      Instrument = $messenger/instrument
+      InstrumentPointing = (Table, $messenger/instrumentpointing0, $messenger/instrumentpointing1)
+      SpacecraftClock = $base/clock
+      InstrumentPosition = $messenger/instrumentposition
       InstrumentAddendum = Null
       ShapeModel = Null
     End_Group
@@ -69,13 +70,58 @@ def pvl_three_group():
       delsystem32 = yes
     End_Group
     """
+    
+@pytest.fixture
+def pvl_four_group():
+    # Mock of the DataDirectory group
+    return """
+    Group = DataDirectory
+      Base         = $ISIS3DATA/base
+      Messenger    = $ISIS3DATA/messenger
+    EndGroup
+    """
 
-def test_kernel_from_cube_order(cube_kernels):
+def test_kernel_from_cube_list(cube_kernels):
     with tempfile.NamedTemporaryFile('r+') as cube:
         cube.write(cube_kernels)
         cube.flush()
         kernels = util.generate_kernels_from_cube(cube.name)
-    assert kernels == ['targetposition0', 'targetposition1','instrumentposition', 'instrumentpointing0', 'instrumentpointing1', 'attitudeshape', 'instrument', 'clock']
+    assert kernels == ['$messenger/targetposition0', '$messenger/targetposition1','$messenger/instrumentposition', '$messenger/instrumentpointing0', '$messenger/instrumentpointing1', '$base/attitudeshape', '$messenger/instrument', '$base/clock']
+    
+def test_kernel_from_cube_list_expanded(monkeypatch, tmpdir, pvl_four_group, cube_kernels):
+    monkeypatch.setenv('ISISROOT', str(tmpdir))
+    monkeypatch.setenv('ISIS3DATA', '/test/path')
+
+    with open(tmpdir.join('IsisPreferences'), 'w+') as pvl_isisroot_file:
+        pvl_isisroot_file.write(pvl_four_group)
+        pvl_isisroot_file.flush()
+    
+    with tempfile.NamedTemporaryFile('r+') as cube:
+        cube.write(cube_kernels)
+        cube.flush()
+        kernels = util.generate_kernels_from_cube(cube.name, expand=True)
+    assert kernels == ['/test/path/messenger/targetposition0', '/test/path/messenger/targetposition1', '/test/path/messenger/instrumentposition', '/test/path/messenger/instrumentpointing0', '/test/path/messenger/instrumentpointing1', '/test/path/base/attitudeshape', '/test/path/messenger/instrument', '/test/path/base/clock']
+    
+def test_kernel_from_cube_dict(cube_kernels):
+    with tempfile.NamedTemporaryFile('r+') as cube:
+        cube.write(cube_kernels)
+        cube.flush()
+        kernels = util.generate_kernels_from_cube(cube.name, format_as='dict')
+    assert kernels == OrderedDict([('TargetPosition', ['$messenger/targetposition0', '$messenger/targetposition1']), ('InstrumentPosition', ['$messenger/instrumentposition']), ('InstrumentPointing', ['$messenger/instrumentpointing0', '$messenger/instrumentpointing1']), ('Frame', [None]), ('TargetAttitudeShape', ['$base/attitudeshape']), ('Instrument', ['$messenger/instrument']), ('InstrumentAddendum', [None]), ('LeapSecond', [None]), ('SpacecraftClock', ['$base/clock']), ('Extra', [None]), ('Clock', [None])])
+    
+def test_kernel_from_cube_dict_expanded(monkeypatch, tmpdir, pvl_four_group, cube_kernels):
+    monkeypatch.setenv('ISISROOT', str(tmpdir))
+    monkeypatch.setenv('ISIS3DATA', '/test/path')
+
+    with open(tmpdir.join('IsisPreferences'), 'w+') as pvl_isisroot_file:
+        pvl_isisroot_file.write(pvl_four_group)
+        pvl_isisroot_file.flush()
+        
+    with tempfile.NamedTemporaryFile('r+') as cube:
+        cube.write(cube_kernels)
+        cube.flush()
+        kernels = util.generate_kernels_from_cube(cube.name, expand=True, format_as='dict')
+    assert kernels == OrderedDict([('TargetPosition', ['/test/path/messenger/targetposition0', '/test/path/messenger/targetposition1']), ('InstrumentPosition', ['/test/path/messenger/instrumentposition']), ('InstrumentPointing', ['/test/path/messenger/instrumentpointing0', '/test/path/messenger/instrumentpointing1']), ('Frame', [None]), ('TargetAttitudeShape', ['/test/path/base/attitudeshape']), ('Instrument', ['/test/path/messenger/instrument']), ('InstrumentAddendum', [None]), ('LeapSecond', [None]), ('SpacecraftClock', ['/test/path/base/clock']), ('Extra', [None]), ('Clock', [None])])
 
 def test_kernel_from_cube_no_kernel_group():
     with pytest.raises(KeyError):
