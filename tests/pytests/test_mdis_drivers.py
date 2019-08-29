@@ -21,7 +21,7 @@ def test_kernels():
     for kern in binary_kernels:
         os.remove(kern)
 
-@pytest.fixture(scope="module", params=["Pds3NaifDriver", "IsisNaifDriver"])
+@pytest.fixture(params=["Pds3NaifDriver", "IsisNaifDriver"])
 def driver(request):
     if request.param == "IsisNaifDriver":
         label = get_image_label("EN1072174528M", "isis3")

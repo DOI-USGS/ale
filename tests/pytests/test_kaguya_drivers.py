@@ -2,10 +2,14 @@ import pytest
 import os
 import numpy as np
 import spiceypy as spice
+from importlib import reload
+import json
 
 from unittest.mock import PropertyMock, patch
 
-from conftest import get_image_kernels, convert_kernels
+from conftest import get_image_label, get_image_kernels, convert_kernels
+
+import ale
 
 from ale.drivers.selene_drivers import KaguyaTcPds3NaifSpiceDriver
 
@@ -14,175 +18,48 @@ def test_kernels():
     kernels = get_image_kernels('TC1S2B0_01_06691S820E0465')
     updated_kernels, binary_kernels = convert_kernels(kernels)
     spice.furnsh(updated_kernels)
-    yield
+    yield updated_kernels
     spice.unload(updated_kernels)
     for kern in binary_kernels:
         os.remove(kern)
 
-@pytest.fixture(scope="module", params=["Pds3NaifDriver"])
+@pytest.fixture(params=["Pds3NaifDriver"])
 def driver(request):
     if request.param == "Pds3NaifDriver":
-        label = """
-PDS_VERSION_ID                  = PDS3
-
-/* ** FILE FORMAT ** */
-RECORD_TYPE                     = UNDEFINED
-FILE_NAME                       = TC1S2B0_01_06691S820E0465.img
-PRODUCT_ID                      = TC1S2B0_01_06691S820E0465
-DATA_FORMAT                     = PDS
-
-/* ** POINTERS TO START BYTE OFFSET OF OBJECTS IN FILE ** */
-^IMAGE                          = 7599 <BYTES>
-
-/* ** GENERAL DATA DESCRIPTION PARAMETERS ** */
-SOFTWARE_NAME                   = "RGC_TC_s_Level2B0 (based on RGC_TC_MI
-                                   version 2.10.1)"
-SOFTWARE_VERSION                = 1.0.0
-PROCESS_VERSION_ID              = L2B
-PRODUCT_CREATION_TIME           = 2013-06-10T09:23:07Z
-PROGRAM_START_TIME              = 2013-06-10T09:23:01Z
-PRODUCER_ID                     = LISM
-PRODUCT_SET_ID                  = TC_s_Level2B0
-PRODUCT_VERSION_ID              = 01
-REGISTERED_PRODUCT              = Y
-ILLUMINATION_CONDITION          = MORNING
-LEVEL2A_FILE_NAME               = TC1S2A0_02TLF06691_001_0001.img
-SPICE_METAKERNEL_FILE_NAME      = RGC_INF_TCv401IK_MIv200IK_SPv105IK_RISE100h-
-                                  _02_LongCK_D_V02_de421_110706.mk
-
-/* ** SCENE RELATED PARAMETERS ** */
-MISSION_NAME                    = SELENE
-SPACECRAFT_NAME                 = SELENE-M
-DATA_SET_ID                     = TC1_Level2B
-INSTRUMENT_NAME                 = "Terrain Camera 1"
-INSTRUMENT_ID                   = TC1
-MISSION_PHASE_NAME              = Extended
-REVOLUTION_NUMBER               = 6691
-STRIP_SEQUENCE_NUMBER           = 1
-SCENE_SEQUENCE_NUMBER           = 1
-UPPER_LEFT_DAYTIME_FLAG         = Day
-UPPER_RIGHT_DAYTIME_FLAG        = Day
-LOWER_LEFT_DAYTIME_FLAG         = Day
-LOWER_RIGHT_DAYTIME_FLAG        = Day
-TARGET_NAME                     = MOON
-OBSERVATION_MODE_ID             = NORMAL
-SENSOR_DESCRIPTION              = "Imagery type:Pushbroom.
-                                   ImageryMode:Mono,Stereo.
-                                   ExposureTimeMode:Long,Middle,Short.
-                                   CompressionMode:NonComp,DCT. Q-table:32
-                                   patterns. H-table:4 patterns.
-                                   SwathMode:F(Full),N(Nominal),H(Half). First
-                                   pixel number:1(F),297(N),1172(H)."
-SENSOR_DESCRIPTION2             = "Pixel size:7x7[micron^2](TC1/TC2).
-                                   Wavelength range:430-850[nm](TC1/TC2). A/D
-                                   rate:10[bit](TC1/TC2). Slant
-                                   angle:+/-15[degree] (from nadir to +x of
-                                   S/C)(TC1/TC2). Focal
-                                   length:72.45/72.63[mm](TC1/TC2). F
-                                   number:3.97/3.98(TC1/TC2)."
-DETECTOR_STATUS                 = (TC1:ON, TC2:OFF, MV:OFF, MN:OFF, SP:ON)
-EXPOSURE_MODE_ID                = LONG
-LINE_EXPOSURE_DURATION          = 6.500000 <msec>
-SPACECRAFT_CLOCK_START_COUNT    = 922997380.1775 <sec>
-SPACECRAFT_CLOCK_STOP_COUNT     = 922997410.4350 <sec>
-CORRECTED_SC_CLOCK_START_COUNT  = 922997380.174174 <sec>
-CORRECTED_SC_CLOCK_STOP_COUNT   = 922997410.431674 <sec>
-START_TIME                      = 2009-04-05T20:09:53.610804Z
-STOP_TIME                       = 2009-04-05T20:10:23.868304Z
-CORRECTED_START_TIME            = 2009-04-05T20:09:53.607478Z
-CORRECTED_STOP_TIME             = 2009-04-05T20:10:23.864978Z
-LINE_SAMPLING_INTERVAL          = 6.500000 <msec>
-CORRECTED_SAMPLING_INTERVAL     = 6.500000 <msec>
-UPPER_LEFT_LATITUDE             = -81.172073 <deg>
-UPPER_LEFT_LONGITUDE            = 44.883039 <deg>
-UPPER_RIGHT_LATITUDE            = -81.200350 <deg>
-UPPER_RIGHT_LONGITUDE           = 48.534829 <deg>
-LOWER_LEFT_LATITUDE             = -82.764677 <deg>
-LOWER_LEFT_LONGITUDE            = 43.996992 <deg>
-LOWER_RIGHT_LATITUDE            = -82.797271 <deg>
-LOWER_RIGHT_LONGITUDE           = 48.427901 <deg>
-LOCATION_FLAG                   = D
-ROLL_CANT                       = NO
-SCENE_CENTER_LATITUDE           = -81.988555 <deg>
-SCENE_CENTER_LONGITUDE          = 46.482457 <deg>
-INCIDENCE_ANGLE                 = 83.460 <deg>
-EMISSION_ANGLE                  = 15.557 <deg>
-PHASE_ANGLE                     = 68.069 <deg>
-SOLAR_AZIMUTH_ANGLE             = 4.187 <deg>
-FOCAL_PLANE_TEMPERATURE         = 19.73 <degC>
-TELESCOPE_TEMPERATURE           = 19.91 <degC>
-SATELLITE_MOVING_DIRECTION      = +1
-FIRST_SAMPLED_LINE_POSITION     = UPPERMOST
-FIRST_DETECTOR_ELEMENT_POSITION = LEFT
-A_AXIS_RADIUS                   = 1737.400 <km>
-B_AXIS_RADIUS                   = 1737.400 <km>
-C_AXIS_RADIUS                   = 1737.400 <km>
-DEFECT_PIXEL_POSITION           = N/A
-
-/* ** CAMERA RELATED PARAMETERS ** */
-SWATH_MODE_ID                   = FULL
-FIRST_PIXEL_NUMBER              = 1
-LAST_PIXEL_NUMBER               = 3208
-SPACECRAFT_ALTITUDE             = 52.939 <km>
-SPACECRAFT_GROUND_SPEED         = 1.603 <km/sec>
-TC1_TELESCOPE_TEMPERATURE       = 20.06 <degC>
-TC2_TELESCOPE_TEMPERATURE       = 19.72 <degC>
-DPU_TEMPERATURE                 = 14.60 <degC>
-TM_TEMPERATURE                  = 19.72 <degC>
-TM_RADIATOR_TEMPERATURE         = 18.01 <degC>
-Q_TABLE_ID                      = N/A
-HUFFMAN_TABLE_ID                = N/A
-DATA_COMPRESSION_PERCENT_MEAN   = 100.0
-DATA_COMPRESSION_PERCENT_MAX    = 100.0
-DATA_COMPRESSION_PERCENT_MIN    = 100.0
-
-/* ** DESCRIPTION OF OBJECTS CONTAINED IN THE FILE ** */
-Object = IMAGE
-  ENCODING_TYPE                  = N/A
-  ENCODING_COMPRESSION_PERCENT   = 100.0
-  NOMINAL_LINE_NUMBER            = 4088
-  NOMINAL_OVERLAP_LINE_NUMBER    = 568
-  OVERLAP_LINE_NUMBER            = 568
-  LINES                          = 4656
-  LINE_SAMPLES                   = 3208
-  SAMPLE_TYPE                    = MSB_INTEGER
-  SAMPLE_BITS                    = 16
-  IMAGE_VALUE_TYPE               = RADIANCE
-  UNIT                           = W/m**2/micron/sr
-  SCALING_FACTOR                 = 1.30000e-02
-  OFFSET                         = 0.00000e+00
-  MIN_FOR_STATISTICAL_EVALUATION = 0
-  MAX_FOR_STATISTICAL_EVALUATION = 32767
-  SCENE_MAXIMUM_DN               = 3612
-  SCENE_MINIMUM_DN               = 0
-  SCENE_AVERAGE_DN               = 401.1
-  SCENE_STDEV_DN                 = 420.5
-  SCENE_MODE_DN                  = 0
-  SHADOWED_AREA_MINIMUM          = 0
-  SHADOWED_AREA_MAXIMUM          = 0
-  SHADOWED_AREA_PERCENTAGE       = 12
-  INVALID_TYPE                   = (SATURATION, MINUS, DUMMY_DEFECT, OTHER)
-  INVALID_VALUE                  = (-20000, -21000, -22000, -23000)
-  INVALID_PIXELS                 = (3314, 0, 0, 0)
-End_Object
-
-Object = PROCESSING_PARAMETERS
-  DARK_FILE_NAME                = TC1_DRK_04740_07536_L_N_b05.csv
-  FLAT_FILE_NAME                = TC1_FLT_04740_07536_N_N_b05.csv
-  EFFIC_FILE_NAME               = TC1_EFF_PRFLT_N_N_v01.csv
-  NONLIN_FILE_NAME              = TC1_NLT_PRFLT_N_N_v01.csv
-  RAD_CNV_COEF                  = 3.790009 <W/m**2/micron/sr>
-  L2A_DEAD_PIXEL_THRESHOLD      = 30
-  L2A_SATURATION_THRESHOLD      = 1023
-  DARK_VALID_MINIMUM            = -5
-  RADIANCE_SATURATION_THRESHOLD = 425.971000 <W/m**2/micron/sr>
-End_Object
-End
-"""
+        label = get_image_label("TC1S2B0_01_06691S820E0465", "pds3")
         return KaguyaTcPds3NaifSpiceDriver(label)
 
 def test_short_mission_name(driver):
     assert driver.short_mission_name == 'selene'
+
+def test_no_metakernels(driver, tmpdir, monkeypatch):
+    monkeypatch.setenv('ALESPICEROOT', str(tmpdir))
+    reload(ale)
+
+    with pytest.raises(ValueError):
+        with driver as failure:
+            pass
+
+def test_no_spice_root(driver, monkeypatch):
+    monkeypatch.delenv('ALESPICEROOT', raising=False)
+    reload(ale)
+
+    with pytest.raises(EnvironmentError):
+        with driver as failure:
+            pass
+
+def test_load(test_kernels):
+    label_file = get_image_label('TC1S2B0_01_06691S820E0465')
+
+    with patch('ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.reference_frame', \
+                new_callable=PropertyMock) as mock_reference_frame:
+        mock_reference_frame.return_value = 'IAU_MOON'
+        usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels}, formatter='usgscsm')
+    usgscsm_isd_obj = json.loads(usgscsm_isd_str)
+
+    assert usgscsm_isd_obj['name_platform'] == 'SELENE-M'
+    assert usgscsm_isd_obj['name_sensor'] == 'Terrain Camera 1'
+    assert usgscsm_isd_obj['name_model'] == 'USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL'
 
 # This property is not part of the base driver interface, but we mock it
 # out later, so we need to test it to ensure it returns the proper real value
