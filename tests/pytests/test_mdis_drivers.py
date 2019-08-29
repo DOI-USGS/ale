@@ -4,10 +4,12 @@ import os
 import subprocess
 import numpy as np
 import spiceypy as spice
+from importlib import reload
+import json
 
+from conftest import get_image_label, get_image_kernels, convert_kernels
 
-from conftest import get_image_kernels, convert_kernels
-
+import ale
 from ale.drivers.mes_drivers import MessengerMdisPds3NaifSpiceDriver
 from ale.drivers.mes_drivers import MessengerMdisIsisLabelNaifSpiceDriver
 
@@ -16,7 +18,7 @@ def test_kernels():
     kernels = get_image_kernels('EN1072174528M')
     updated_kernels, binary_kernels = convert_kernels(kernels)
     spice.furnsh(updated_kernels)
-    yield
+    yield updated_kernels
     spice.unload(updated_kernels)
     for kern in binary_kernels:
         os.remove(kern)
@@ -24,333 +26,41 @@ def test_kernels():
 @pytest.fixture(scope="module", params=["Pds3NaifDriver", "IsisNaifDriver"])
 def driver(request):
     if request.param == "IsisNaifDriver":
-        label = """
-Object = IsisCube
-Object = Core
-StartByte   = 65537
-Format      = Tile
-TileSamples = 512
-TileLines   = 512
-
-Group = Dimensions
-  Samples = 512
-  Lines   = 512
-  Bands   = 1
-End_Group
-
-Group = Pixels
-  Type       = Real
-  ByteOrder  = Lsb
-  Base       = 0.0
-  Multiplier = 1.0
-End_Group
-End_Object
-
-Group = Instrument
-SpacecraftName        = Messenger
-InstrumentName        = "MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA"
-InstrumentId          = MDIS-NAC
-TargetName            = Mercury
-OriginalTargetName    = MERCURY
-StartTime             = 2015-04-24T04:42:19.666463
-StopTime              = 2015-04-24T04:42:19.667463
-SpacecraftClockCount  = 2/0072174528:989000
-MissionPhaseName      = "MERCURY ORBIT YEAR 5"
-ExposureDuration      = 1 <MS>
-ExposureType          = AUTO
-DetectorTemperature   = -11.62 <DEGC>
-FocalPlaneTemperature = 4.07 <DEGC>
-FilterTemperature     = N/A
-OpticsTemperature     = 17.08 <DEGC>
-AttitudeQuality       = Ok
-FilterWheelPosition   = 17348
-PivotPosition         = 15
-FpuBinningMode        = 1
-PixelBinningMode      = 0
-SubFrameMode          = 0
-JailBars              = 0
-DpuId                 = DPU-A
-PivotAngle            = 0.04119873046875 <Degrees>
-Unlutted              = 1
-LutInversionTable     = $messenger/calibration/LUT_INVERT/MDISLUTINV_0.TAB
-End_Group
-
-Group = Archive
-DataSetId                 = MESS-E/V/H-MDIS-2-EDR-RAWDATA-V1.0
-DataQualityId             = 0000001000000000
-ProducerId                = "APPLIED COHERENT TECHNOLOGY CORPORATION"
-EdrSourceProductId        = 1072174528_IM6
-ProductId                 = EN1072174528M
-SequenceName              = N/A
-ObservationId             = 8386282
-ObservationType           = (Monochrome, "Ridealong NAC")
-SiteId                    = N/A
-MissionElapsedTime        = 72174528
-EdrProductCreationTime    = 2015-04-30T18:25:23
-ObservationStartTime      = 2015-04-24T04:42:19.666463
-SpacecraftClockStartCount = 2/0072174528:989000
-SpacecraftClockStopCount  = 2/0072174528:990000
-Exposure                  = 1
-CCDTemperature            = 1139
-OriginalFilterNumber      = 0
-OrbitNumber               = 4086
-YearDoy                   = 2015114
-SourceProductId           = ("EN1072174528M", "MDISLUTINV_0")
-End_Group
-
-Group = BandBin
-Name   = "748 BP 53"
-Number = 2
-Center = 747.7 <NM>
-Width  = 52.6 <NM>
-End_Group
-
-Group = Kernels
-NaifIkCode = -236820
-End_Group
-End_Object
-
-Object = Label
-Bytes = 65536
-End_Object
-
-Object = OriginalLabel
-Name      = IsisCube
-StartByte = 1114113
-Bytes     = 7944
-End_Object
-End
-"""
+        label = get_image_label("EN1072174528M", "isis3")
         return MessengerMdisIsisLabelNaifSpiceDriver(label)
 
     else:
-        label = """
-PDS_VERSION_ID               = PDS3
-
-/* ** FILE FORMAT ** */
-RECORD_TYPE                  = FIXED_LENGTH
-RECORD_BYTES                 = 512
-FILE_RECORDS                 = 0526
-LABEL_RECORDS                = 0014
-
-/* ** POINTERS TO START BYTE OFFSET OF OBJECTS IN IMAGE FILE ** */
-^IMAGE                       = 0015
-
-/* ** GENERAL DATA DESCRIPTION PARAMETERS ** */
-MISSION_NAME                 = MESSENGER
-INSTRUMENT_HOST_NAME         = MESSENGER
-DATA_SET_ID                  = MESS-E/V/H-MDIS-2-EDR-RAWDATA-V1.0
-DATA_QUALITY_ID              = 0000001000000000
-PRODUCT_ID                   = EN1072174528M
-PRODUCT_VERSION_ID           = 3
-SOURCE_PRODUCT_ID            = 1072174528_IM6
-PRODUCER_INSTITUTION_NAME    = "APPLIED COHERENT TECHNOLOGY CORPORATION"
-SOFTWARE_NAME                = MDIS2EDR
-SOFTWARE_VERSION_ID          = 1.1
-MISSION_PHASE_NAME           = "MERCURY ORBIT YEAR 5"
-TARGET_NAME                  = MERCURY
-SEQUENCE_NAME                = N/A
-OBSERVATION_ID               = 8386282
-OBSERVATION_TYPE             = (Monochrome, "Ridealong NAC")
-SITE_ID                      = N/A
-
-/* ** TIME PARAMETERS ** */
-START_TIME                   = 2015-04-24T04:42:19.666463
-STOP_TIME                    = 2015-04-24T04:42:19.667463
-SPACECRAFT_CLOCK_START_COUNT = 2/0072174528:989000
-SPACECRAFT_CLOCK_STOP_COUNT  = 2/0072174528:990000
-ORBIT_NUMBER                 = 4086
-PRODUCT_CREATION_TIME        = 2015-04-30T18:25:23
-
-/* **  INSTRUMENT ENGINEERING PARAMETERS ** */
-INSTRUMENT_NAME              = "MERCURY DUAL IMAGING SYSTEM NARROW ANGLE
-                                CAMERA"
-INSTRUMENT_ID                = MDIS-NAC
-FILTER_NAME                  = "748 BP 53"
-FILTER_NUMBER                = N/A
-CENTER_FILTER_WAVELENGTH     = 747.7 <NM>
-BANDWIDTH                    = 52.6 <NM>
-EXPOSURE_DURATION            = 1 <MS>
-EXPOSURE_TYPE                = AUTO
-DETECTOR_TEMPERATURE         = -11.62 <DEGC>
-FOCAL_PLANE_TEMPERATURE      = 4.07 <DEGC>
-FILTER_TEMPERATURE           = N/A
-OPTICS_TEMPERATURE           = 17.08 <DEGC>
-
-/* ** INSTRUMENT RAW PARAMETERS ** */
-MESS:MET_EXP                 = 72174528
-MESS:IMG_ID_LSB              = 63210
-MESS:IMG_ID_MSB              = 127
-MESS:ATT_CLOCK_COUNT         = 72174526
-MESS:ATT_Q1                  = -0.21372859
-MESS:ATT_Q2                  = 0.89161116
-MESS:ATT_Q3                  = 0.18185951
-MESS:ATT_Q4                  = -0.35535437
-MESS:ATT_FLAG                = 6
-MESS:PIV_POS_MOTOR           = 24711
-MESS:PIV_GOAL                = N/A
-MESS:PIV_POS                 = 15
-MESS:PIV_READ                = 20588
-MESS:PIV_CAL                 = -26758
-MESS:FW_GOAL                 = 17376
-MESS:FW_POS                  = 17348
-MESS:FW_READ                 = 17348
-MESS:CCD_TEMP                = 1139
-MESS:CAM_T1                  = 532
-MESS:CAM_T2                  = 590
-MESS:EXPOSURE                = 1
-MESS:DPU_ID                  = 0
-MESS:IMAGER                  = 1
-MESS:SOURCE                  = 0
-MESS:FPU_BIN                 = 1
-MESS:COMP12_8                = 1
-MESS:COMP_ALG                = 1
-MESS:COMP_FST                = 1
-MESS:TIME_PLS                = 2
-MESS:LATCH_UP                = 0
-MESS:EXP_MODE                = 1
-MESS:PIV_STAT                = 3
-MESS:PIV_MPEN                = 0
-MESS:PIV_PV                  = 1
-MESS:PIV_RV                  = 1
-MESS:FW_PV                   = 1
-MESS:FW_RV                   = 1
-MESS:AEX_STAT                = 384
-MESS:AEX_STHR                = 5
-MESS:AEX_TGTB                = 1830
-MESS:AEX_BACB                = 240
-MESS:AEX_MAXE                = 989
-MESS:AEX_MINE                = 1
-MESS:DLNKPRIO                = 6
-MESS:WVLRATIO                = 0
-MESS:PIXELBIN                = 0
-MESS:SUBFRAME                = 0
-MESS:SUBF_X1                 = 0
-MESS:SUBF_Y1                 = 0
-MESS:SUBF_DX1                = 0
-MESS:SUBF_DY1                = 0
-MESS:SUBF_X2                 = 0
-MESS:SUBF_Y2                 = 0
-MESS:SUBF_DX2                = 0
-MESS:SUBF_DY2                = 0
-MESS:SUBF_X3                 = 0
-MESS:SUBF_Y3                 = 0
-MESS:SUBF_DX3                = 0
-MESS:SUBF_DY3                = 0
-MESS:SUBF_X4                 = 0
-MESS:SUBF_Y4                 = 0
-MESS:SUBF_DX4                = 0
-MESS:SUBF_DY4                = 0
-MESS:SUBF_X5                 = 0
-MESS:SUBF_Y5                 = 0
-MESS:SUBF_DX5                = 0
-MESS:SUBF_DY5                = 0
-MESS:CRITOPNV                = 0
-MESS:JAILBARS                = 0
-MESS:JB_X0                   = 0
-MESS:JB_X1                   = 0
-MESS:JB_SPACE                = 0
-
-/* ** GEOMETRY INFORMATION ** */
-RIGHT_ASCENSION              = 166.36588 <DEG>
-DECLINATION                  = -43.07155 <DEG>
-TWIST_ANGLE                  = 139.85881 <DEG>
-RA_DEC_REF_PIXEL             = (256.00000, 256.00000)
-RETICLE_POINT_RA             = (167.79928, 166.25168, 166.49610,
-                                164.92873) <DEG>
-RETICLE_POINT_DECLINATION    = (-42.96478, -42.01944, -44.11712,
-                                -43.14701) <DEG>
-
-/* ** TARGET PARAMETERS ** */
-SC_TARGET_POSITION_VECTOR    = (1844.15964, -966.49167, 1322.58870) <KM>
-TARGET_CENTER_DISTANCE       = 2466.63167 <KM>
-
-/* ** TARGET WITHIN SENSOR FOV ** */
-SLANT_DISTANCE               = 27.62593 <KM>
-CENTER_LATITUDE              = 46.26998 <DEG>
-CENTER_LONGITUDE             = 248.17066 <DEG>
-HORIZONTAL_PIXEL_SCALE       = 1.40755 <M>
-VERTICAL_PIXEL_SCALE         = 1.40755 <M>
-SMEAR_MAGNITUDE              = 5.46538 <PIXELS>
-SMEAR_AZIMUTH                = 116.74551 <DEG>
-NORTH_AZIMUTH                = 285.65482 <DEG>
-RETICLE_POINT_LATITUDE       = (46.27574, 46.28052, 46.25946, 46.26440) <DEG>
-RETICLE_POINT_LONGITUDE      = (248.15510, 248.17933, 248.16185,
-                                248.18619) <DEG>
-
-/* ** SPACECRAFT POSITION WITH RESPECT TO CENTRAL BODY ** */
-SUB_SPACECRAFT_LATITUDE      = 46.31528 <DEG>
-SUB_SPACECRAFT_LONGITUDE     = 248.41010 <DEG>
-SPACECRAFT_ALTITUDE          = 26.63167 <KM>
-SUB_SPACECRAFT_AZIMUTH       = 0.75989 <DEG>
-
-/* ** SPACECRAFT LOCATION ** */
-SPACECRAFT_SOLAR_DISTANCE    = 46897197.01783 <KM>
-SC_SUN_POSITION_VECTOR       = (-11803272.08016, 39512922.09768,
-                                22332909.43056) <KM>
-SC_SUN_VELOCITY_VECTOR       = (59.06790, 11.91448, -2.90638) <KM/S>
-
-/* ** VIEWING AND LIGHTING GEOMETRY (SUN ON TARGET) ** */
-SOLAR_DISTANCE               = 46897845.70492 <KM>
-SUB_SOLAR_AZIMUTH            = 179.40784 <DEG>
-SUB_SOLAR_LATITUDE           = 0.03430 <DEG>
-SUB_SOLAR_LONGITUDE          = 180.75406 <DEG>
-INCIDENCE_ANGLE              = 74.58267 <DEG>
-PHASE_ANGLE                  = 90.08323 <DEG>
-EMISSION_ANGLE               = 15.50437 <DEG>
-LOCAL_HOUR_ANGLE             = 247.41661 <DEG>
-
-Object = IMAGE
-  LINES                 = 512
-  LINE_SAMPLES          = 512
-  SAMPLE_TYPE           = UNSIGNED_INTEGER
-  SAMPLE_BITS           = 8
-  UNIT                  = N/A
-  DARK_STRIP_MEAN       = 28.711
-
-  /* ** IMAGE STATISTICS OF  ** */
-  /* ** THE EXPOSED CCD AREA ** */
-  MINIMUM               = 28.000
-  MAXIMUM               = 78.000
-  MEAN                  = 46.360
-  STANDARD_DEVIATION    = 10.323
-
-  /* ** PIXEL COUNTS ** */
-  SATURATED_PIXEL_COUNT = 0
-  MISSING_PIXELS        = 0
-End_Object
-
-/* ** GEOMETRY FOR EACH SUBFRAME ** */
-Group = SUBFRAME1_PARAMETERS
-  RETICLE_POINT_LATITUDE  = (N/A, N/A, N/A, N/A)
-  RETICLE_POINT_LONGITUDE = (N/A, N/A, N/A, N/A)
-End_Group
-
-Group = SUBFRAME2_PARAMETERS
-  RETICLE_POINT_LATITUDE  = (N/A, N/A, N/A, N/A)
-  RETICLE_POINT_LONGITUDE = (N/A, N/A, N/A, N/A)
-End_Group
-
-Group = SUBFRAME3_PARAMETERS
-  RETICLE_POINT_LATITUDE  = (N/A, N/A, N/A, N/A)
-  RETICLE_POINT_LONGITUDE = (N/A, N/A, N/A, N/A)
-End_Group
-
-Group = SUBFRAME4_PARAMETERS
-  RETICLE_POINT_LATITUDE  = (N/A, N/A, N/A, N/A)
-  RETICLE_POINT_LONGITUDE = (N/A, N/A, N/A, N/A)
-End_Group
-
-Group = SUBFRAME5_PARAMETERS
-  RETICLE_POINT_LATITUDE  = (N/A, N/A, N/A, N/A)
-  RETICLE_POINT_LONGITUDE = (N/A, N/A, N/A, N/A)
-End_Group
-End
-"""
+        label = get_image_label("EN1072174528M", "pds3")
         return MessengerMdisPds3NaifSpiceDriver(label)
 
 def test_short_mission_name(driver):
-    assert driver.short_mission_name == 'mes'
+    assert driver.short_mission_name=='mes'
+
+def test_no_metakernels(driver, tmpdir, monkeypatch):
+    monkeypatch.setenv('ALESPICEROOT', str(tmpdir))
+    reload(ale)
+
+    with pytest.raises(ValueError):
+        with driver as failure:
+            pass
+
+def test_no_spice_root(driver, monkeypatch):
+    monkeypatch.delenv('ALESPICEROOT', raising=False)
+    reload(ale)
+
+    with pytest.raises(EnvironmentError):
+        with driver as failure:
+            pass
+
+def test_load(test_kernels):
+    label_file = get_image_label('EN1072174528M')
+
+    usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels}, formatter='usgscsm')
+    usgscsm_isd_obj = json.loads(usgscsm_isd_str)
+
+    assert usgscsm_isd_obj['name_platform'] == 'MESSENGER'
+    assert usgscsm_isd_obj['name_sensor'] == 'MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA'
+    assert usgscsm_isd_obj['name_model'] == 'USGS_ASTRO_FRAME_SENSOR_MODEL'
 
 def test_test_image_lines(driver):
     assert driver.image_lines == 512

@@ -171,6 +171,27 @@ def expandvars(path, env_dict=os.environ, default=None, case_sensative=True):
 
 
 def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
+    """
+    Parses a cube label to obtain the kernels from the Kernels group.
+
+    Parameters
+    ----------
+    cube : cube
+        Path to the cube to pull the kernels from.
+    expand : bool, optional
+        Whether or not to expand variables within kernel paths based on your IsisPreferences file.
+    format_as : str, optional {'list', 'dict'}
+        How to return the kernels: either as a one-demensional ordered list, or as a dictionary
+        of kernel lists.
+
+    Returns
+    -------
+    : list
+        One-dimensional ordered list of all kernels from the Kernels group in the cube.
+    : Dictionary
+        Dictionary of lists of kernels with the keys being the Keywords from the Kernels group of
+        cube itself, and the values being the values associated with that Keyword in the cube.
+    """
     # enforce key order
     mk_paths = OrderedDict.fromkeys(
         ['TargetPosition', 'InstrumentPosition',
@@ -217,6 +238,12 @@ def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
         return kernels
     elif (format_as == 'dict'):
         # return created dict
+        if expand:
+            isisprefs = get_isis_preferences()
+            for kern_list in mk_paths:
+                for index, kern in enumerate(mk_paths[kern_list]):
+                    if kern is not None:
+                        mk_paths[kern_list][index] = expandvars(expandvars(kern, dict_to_lower(isisprefs['DataDirectory'])))
         return mk_paths
     else:
         raise Exception(f'{format_as} is not a valid return format')
@@ -361,3 +388,38 @@ def spkmerge_config_string(dep_tree, output_spk, bodies, lsk, start, stop):
         config += f"   SOURCE_SPK_KERNEL   = {kernel}\n"
         config += f"      INCLUDE_COMMENTS = no\n"
     return config
+
+def write_metakernel_from_kernel_list(kernels):
+    """
+    Parameters
+    ----------
+    kernels : str
+              list of kernel paths
+
+    Returns
+    -------
+    : str
+      Returns string representation of a Naif Metakernel file
+    """
+
+    kernels = [os.path.abspath(k) for k in kernels]
+    common_prefix = os.path.commonprefix(kernels)
+
+    kernels = ["'"+"$PREFIX"+k[len(common_prefix):]+"'" for k in kernels]
+    body = '\n\n'.join([
+            'KPL/MK',
+            f'Metakernel Generated from a kernel list by Ale',
+            '\\begindata',
+            'PATH_VALUES = (',
+            "'"+common_prefix+"'",
+            ')',
+            'PATH_SYMBOLS = (',
+            "'PREFIX'",
+            ')',
+            'KERNELS_TO_LOAD = (',
+            '\n'.join(kernels),
+            ')',
+            '\\begintext'
+        ])
+
+    return body
