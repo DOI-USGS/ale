@@ -1,25 +1,24 @@
 import pytest
 import os
 import numpy as np
+import datetime
 import spiceypy as spice
 from importlib import reload
 import json
 
 from unittest.mock import PropertyMock, patch
 
-from conftest import get_image_label, get_image_kernels, convert_kernels
+from conftest import get_image_label, get_image_kernels, convert_kernels, compare_dicts
 
 import ale
 
 from ale.drivers.selene_drivers import KaguyaTcPds3NaifSpiceDriver
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture()
 def test_kernels():
     kernels = get_image_kernels('TC1S2B0_01_06691S820E0465')
     updated_kernels, binary_kernels = convert_kernels(kernels)
-    spice.furnsh(updated_kernels)
     yield updated_kernels
-    spice.unload(updated_kernels)
     for kern in binary_kernels:
         os.remove(kern)
 
@@ -31,6 +30,28 @@ def driver(request):
 
 def test_short_mission_name(driver):
     assert driver.short_mission_name == 'selene'
+
+def test_utc_start_time(driver):
+    assert driver.utc_start_time == datetime.datetime(2009, 4, 5, 20, 9, 53, 607478, tzinfo=datetime.timezone.utc)
+
+def test_utc_stop_time(driver):
+    assert driver.utc_stop_time == datetime.datetime(2009, 4, 5, 20, 10, 23, 864978, tzinfo=datetime.timezone.utc)
+
+def test_instrument_id(driver):
+    assert driver.instrument_id == 'LISM_TC1_STF'
+
+def test_sensor_frame_id(driver):
+    with patch('ale.drivers.selene_drivers.spice.namfrm', return_value=12345) as namfrm:
+        assert driver.sensor_frame_id == 12345
+        namfrm.assert_called_with('LISM_TC1_HEAD')
+
+def test_instrument_host_name(driver):
+    assert driver.instrument_host_name == 'SELENE-M'
+
+def test_ikid(driver):
+    with patch('ale.drivers.selene_drivers.spice.bods2c', return_value=12345) as bods2c:
+        assert driver.ikid == 12345
+        bods2c.assert_called_with('LISM_TC1')
 
 def test_no_metakernels(driver, tmpdir, monkeypatch):
     monkeypatch.setenv('ALESPICEROOT', str(tmpdir))
@@ -48,191 +69,78 @@ def test_no_spice_root(driver, monkeypatch):
         with driver as failure:
             pass
 
+def test_reference_frame(driver):
+    assert driver.reference_frame == 'MOON_ME'
+
 def test_load(test_kernels):
+    isd = {
+        'radii': {
+            'semimajor': 1737.4,
+            'semiminor': 1737.4,
+            'unit': 'km'},
+        'sensor_position': {
+            'positions': np.array([[  195493.28614388,   211984.05137213, -1766966.32185819],
+                                   [  194937.01104181,   211343.39987087, -1767100.47633473],
+                                   [  194380.68920347,   210702.70097122, -1767234.22276254],
+                                   [  193824.32093681,   210061.95495794, -1767367.56104995],
+                                   [  193267.90484827,   209421.16305764, -1767500.49120063],
+                                   [  192711.44397634,   208780.32318594, -1767633.01318365]]),
+            'velocities': np.array([[-1069.71225785, -1231.97438089,  -258.37880523],
+                                    [-1069.80205939, -1232.06556741,  -257.5939851 ],
+                                    [-1069.89161639, -1232.15647191,  -256.80910187],
+                                    [-1069.98092881, -1232.24709434,  -256.02415587],
+                                    [-1070.06999666, -1232.33743471,  -255.2391471 ],
+                                    [-1070.15881991, -1232.42749298,  -254.4540759 ]]),
+             'unit': 'm'},
+         'sun_position': {
+            'positions': np.array([[9.50347435e+10, 1.15913462e+11, 3.78747288e+09]]),
+            'velocities': np.array([[ 285730.03370329, -232701.52529823, 592.79276721]]),
+            'unit': 'm'},
+         'sensor_orientation': {
+            'quaternions': np.array([[-0.19095485, -0.08452708,  0.88748467, -0.41080698],
+                                     [-0.19073945, -0.08442789,  0.88753312, -0.41082276],
+                                     [-0.19052404, -0.08432871,  0.88758153, -0.41083852],
+                                     [-0.19030862, -0.08422952,  0.88762988, -0.41085426],
+                                     [-0.19009352, -0.08412972,  0.88767854, -0.41086914],
+                                     [-0.18987892, -0.08402899,  0.88772773, -0.41088271]])},
+        'detector_sample_summing': 1,
+        'detector_line_summing': 1,
+        'focal_length_model': {
+            'focal_length': 72.45},
+        'detector_center': {
+            'line': 0.5,
+            'sample': 2048.0},
+        'starting_detector_line': 0,
+        'starting_detector_sample': 1,
+        'focal2pixel_lines': [0, -142.85714285714286, 0],
+        'focal2pixel_samples': [0, 0, -142.85714285714286],
+        'optical_distortion': {
+            'kaguyatc': {
+                'x': [-0.0009649900000000001, 0.00098441, 8.5773e-06, -3.7438e-06],
+                'y': [-0.0013796, 1.3502e-05, 2.7251e-06, -6.193800000000001e-06]}},
+        'image_lines': 400,
+        'image_samples': 3208,
+        'name_platform': 'SELENE-M',
+        'name_sensor': 'Terrain Camera 1',
+        'reference_height': {
+            'maxheight': 1000,
+            'minheight': -1000,
+            'unit': 'm'},
+        'name_model': 'USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL',
+        'interpolation_method': 'lagrange',
+        'line_scan_rate': [[0.5, -1.300000011920929, 0.006500000000000001]],
+        'starting_ephemeris_time': 292234259.82293594,
+        'center_ephemeris_time': 292234261.12293595,
+        't0_ephemeris': -1.300000011920929,
+        'dt_ephemeris': 0.5200000047683716,
+        't0_quaternion': -1.300000011920929,
+        'dt_quaternion': 0.5200000047683716}
+
     label_file = get_image_label('TC1S2B0_01_06691S820E0465')
 
     with patch('ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.reference_frame', \
                 new_callable=PropertyMock) as mock_reference_frame:
         mock_reference_frame.return_value = 'IAU_MOON'
-        usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels}, formatter='usgscsm')
-    usgscsm_isd_obj = json.loads(usgscsm_isd_str)
+        usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter='usgscsm')
 
-    assert usgscsm_isd_obj['name_platform'] == 'SELENE-M'
-    assert usgscsm_isd_obj['name_sensor'] == 'Terrain Camera 1'
-    assert usgscsm_isd_obj['name_model'] == 'USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL'
-
-# This property is not part of the base driver interface, but we mock it
-# out later, so we need to test it to ensure it returns the proper real value
-def test_reference_frame(driver):
-    assert driver.reference_frame == 'MOON_ME'
-
-def test_test_image_lines(driver):
-    assert driver.image_lines == 4656
-
-def test_image_samples(driver):
-    assert driver.image_samples == 3208
-
-def test_usgscsm_distortion_model(driver):
-    dist = driver.usgscsm_distortion_model
-    assert 'kaguyatc' in dist
-    assert 'x' in dist['kaguyatc']
-    assert 'y' in dist['kaguyatc']
-    np.testing.assert_almost_equal(dist['kaguyatc']['x'],
-                                  [-9.6499e-4,
-                                    9.8441e-4,
-                                    8.5773e-6,
-                                   -3.7438e-6])
-    np.testing.assert_almost_equal(dist['kaguyatc']['y'],
-                                  [-1.3796e-3,
-                                    1.3502e-5,
-                                    2.7251e-6,
-                                   -6.1938e-6])
-
-def test_detector_start_line(driver):
-    assert driver.detector_start_line == 0
-
-def test_detector_start_sample(driver):
-    assert driver.detector_start_sample == 1
-
-def test_sample_summing(driver):
-    assert driver.sample_summing == 1
-
-def test_line_summing(driver):
-    assert driver.line_summing == 1
-
-def test_platform_name(driver):
-    assert driver.platform_name == 'SELENE-M'
-
-def test_sensor_name(driver):
-    assert driver.sensor_name == 'Terrain Camera 1'
-
-def test_target_body_radii(driver):
-    np.testing.assert_equal(driver.target_body_radii, [1737.4, 1737.4, 1737.4])
-
-def test_focal_length(driver):
-    assert driver.focal_length == 72.45
-
-def test_detector_center_line(driver):
-    assert driver.detector_center_line == 0.5
-
-def test_detector_center_sample(driver):
-    assert driver.detector_center_sample == 2048
-
-def test_sensor_position(driver):
-    """
-    Returns
-    -------
-    : (positions, velocities, times)
-      a tuple containing a list of positions, a list of velocities, and a list of times
-    """
-    with patch('ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.reference_frame', \
-                new_callable=PropertyMock) as mock_reference_frame:
-        mock_reference_frame.return_value = 'IAU_MOON'
-        position, velocity, time = driver.sensor_position
-    image_et = spice.sct2e(-131, 922997380.174174)
-    expected_state, _ = spice.spkez(301, image_et, 'IAU_MOON', 'LT+S', -131)
-    expected_position = -1000 * np.asarray(expected_state[:3])
-    expected_velocity = -1000 * np.asarray(expected_state[3:])
-    np.testing.assert_allclose(position[0],
-                               expected_position,
-                               rtol=1e-8)
-    np.testing.assert_allclose(velocity[0],
-                               expected_velocity,
-                               rtol=1e-8)
-    np.testing.assert_almost_equal(time[0],
-                                   image_et)
-
-def test_frame_chain(driver):
-    with patch('ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.reference_frame', \
-                new_callable=PropertyMock) as mock_reference_frame:
-        mock_reference_frame.return_value = 'IAU_MOON'
-        driver.frame_chain
-    assert driver.frame_chain.has_node(1)
-    assert driver.frame_chain.has_node(10020)
-    assert driver.frame_chain.has_node(-131350)
-    image_et = spice.sct2e(-131, 922997380.174174)
-    target_to_j2000 = driver.frame_chain.compute_rotation(10020, 1)
-    target_to_j2000_mat = spice.pxform('IAU_MOON', 'J2000', image_et)
-    target_to_j2000_quats = spice.m2q(target_to_j2000_mat)
-    np.testing.assert_almost_equal(target_to_j2000.quats[0],
-                                   -np.roll(target_to_j2000_quats, -1))
-    sensor_to_j2000 = driver.frame_chain.compute_rotation(-131350, 1)
-    sensor_to_j2000_mat = spice.pxform('LISM_TC1_HEAD', 'J2000', image_et)
-    sensor_to_j2000_quats = spice.m2q(sensor_to_j2000_mat)
-    np.testing.assert_almost_equal(sensor_to_j2000.quats[0],
-                                   -np.roll(sensor_to_j2000_quats, -1))
-
-
-
-def test_sun_position(driver):
-    with patch('ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.reference_frame', \
-                new_callable=PropertyMock) as mock_reference_frame:
-        mock_reference_frame.return_value = 'IAU_MOON'
-        position, velocity, time = driver.sun_position
-    image_et = spice.sct2e(-131, 922997380.174174) + (0.0065 * 4656)/2
-    expected_state, _ = spice.spkez(10, image_et, 'IAU_MOON', 'NONE', 301)
-    expected_position = 1000 * np.asarray(expected_state[:3])
-    expected_velocity = 1000 * np.asarray(expected_state[3:])
-    np.testing.assert_allclose(position,
-                               [expected_position],
-                               rtol=1e-8)
-    np.testing.assert_allclose(velocity,
-                               [expected_velocity],
-                               rtol=1e-8)
-    np.testing.assert_almost_equal(time,
-                                   [image_et])
-
-def test_target_name(driver):
-    assert driver.target_name == 'MOON'
-
-def test_target_frame_id(driver):
-    assert driver.target_frame_id == 10020
-
-def test_sensor_frame_id(driver):
-    assert driver.sensor_frame_id == -131350
-
-def test_isis_naif_keywords(driver):
-    expected_keywords = {
-        'BODY301_RADII' : [1737.4, 1737.4, 1737.4],
-        'BODY_FRAME_CODE' : 10020,
-        'INS-131351_PIXEL_SIZE' : 0.000007,
-        'INS-131351_ITRANSL' : [0.0, -142.85714285714286, 0.0],
-        'INS-131351_ITRANSS' : [0.0, 0.0, -142.85714285714286],
-        'INS-131351_FOCAL_LENGTH' : 72.45,
-        'INS-131351_BORESIGHT_SAMPLE' : 2048.5,
-        'INS-131351_BORESIGHT_LINE' : 1.0
-    }
-    assert set(driver.isis_naif_keywords.keys()) == set(expected_keywords.keys())
-    for key, value in driver.isis_naif_keywords.items():
-        if isinstance(value, np.ndarray):
-            np.testing.assert_almost_equal(value, expected_keywords[key])
-        else:
-            assert value == expected_keywords[key]
-
-def test_sensor_model_version(driver):
-    assert driver.sensor_model_version == 1
-
-def test_focal2pixel_lines(driver):
-    np.testing.assert_almost_equal(driver.focal2pixel_lines,
-                                   [0.0, -142.857142857, 0.0])
-
-def test_focal2pixel_samples(driver):
-    np.testing.assert_almost_equal(driver.focal2pixel_samples,
-                                   [0.0, 0.0, -142.857142857])
-
-def test_pixel2focal_x(driver):
-    np.testing.assert_almost_equal(driver.pixel2focal_x,
-                                   [0.0, 0.0, -0.007])
-
-def test_pixel2focal_y(driver):
-    np.testing.assert_almost_equal(driver.pixel2focal_y,
-                                   [0.0, -0.007, 0.0])
-
-def test_ephemeris_start_time(driver):
-    assert driver.ephemeris_start_time == 292234259.82293594
-
-def test_ephemeris_stop_time(driver):
-    assert driver.ephemeris_stop_time == 292234290.08693594
-
-def test_center_ephemeris_time(driver):
-    assert driver.center_ephemeris_time == 292234274.9549359
+    assert compare_dicts(usgscsm_isd, isd) == []
