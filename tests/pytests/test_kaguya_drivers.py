@@ -80,6 +80,21 @@ def test_detector_center_sample(driver):
         assert driver.detector_center_sample == 54320.5
         gdpool.assert_called_with('INS-12345_CENTER', 0, 2)
 
+def test_reference_frame(driver):
+    assert driver.reference_frame == 'MOON_ME'
+
+def test_focal2pixel_samples(driver):
+    with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=[2]) as gdpool, \
+         patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
+        assert driver.focal2pixel_samples == [0, 0, -1/2]
+        gdpool.assert_called_with('INS-12345_PIXEL_SIZE', 0, 1)
+
+def test_focal2pixel_lines(driver):
+    with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=[2]) as gdpool, \
+         patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
+        assert driver.focal2pixel_lines == [0, -1/2, 0]
+        gdpool.assert_called_with('INS-12345_PIXEL_SIZE', 0, 1)
+
 def test_no_metakernels(driver, tmpdir, monkeypatch):
     monkeypatch.setenv('ALESPICEROOT', str(tmpdir))
     reload(ale)
@@ -95,9 +110,6 @@ def test_no_spice_root(driver, monkeypatch):
     with pytest.raises(EnvironmentError):
         with driver as failure:
             pass
-
-def test_reference_frame(driver):
-    assert driver.reference_frame == 'MOON_ME'
 
 def test_load(test_kernels):
     isd = {
