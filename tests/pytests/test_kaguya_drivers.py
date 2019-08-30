@@ -53,6 +53,33 @@ def test_ikid(driver):
         assert driver.ikid == 12345
         bods2c.assert_called_with('LISM_TC1')
 
+def test_spacecraft_name(driver):
+    assert driver.spacecraft_name == 'SELENE'
+
+def test_spacecraft_clock_start_count(driver):
+    assert driver.spacecraft_clock_start_count == 922997380.174174
+
+def test_spacecraft_clock_stop_count(driver):
+    assert driver.spacecraft_clock_stop_count == 922997410.431674
+
+def test_ephemeris_start_time(driver):
+    with patch('ale.drivers.selene_drivers.spice.sct2e', return_value=12345) as sct2e, \
+         patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
+        assert driver.ephemeris_start_time == 12345
+        sct2e.assert_called_with(-12345, 922997380.174174)
+
+def test_detector_center_line(driver):
+    with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=[54321, 12345]) as gdpool, \
+         patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
+        assert driver.detector_center_line == 12344.5
+        gdpool.assert_called_with('INS-12345_CENTER', 0, 2)
+
+def test_detector_center_sample(driver):
+    with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=[54321, 12345]) as gdpool, \
+         patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
+        assert driver.detector_center_sample == 54320.5
+        gdpool.assert_called_with('INS-12345_CENTER', 0, 2)
+
 def test_no_metakernels(driver, tmpdir, monkeypatch):
     monkeypatch.setenv('ALESPICEROOT', str(tmpdir))
     reload(ale)
