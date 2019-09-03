@@ -139,8 +139,9 @@ def convert_kernels(kernels):
         if 'x' in split_kernel[1].lower():
             bin_output = subprocess.run(['tobin', os.path.join(data_root, kernel)],
                                         capture_output=True, check=True)
+            print(type(bin_output))
             matches = re.search(r'To: (.*\.b\w*)', str(bin_output.stdout))
-            errors = bin_output.stderr
+            errors = str(bin_output.stderr)
             if errors:
                 warnings.warn(f'Recieved error {errors}')
             if not matches:
