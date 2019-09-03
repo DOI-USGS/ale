@@ -1,6 +1,7 @@
 import subprocess
 import os
 import re
+import warnings
 import numpy as np
 import ale
 
@@ -40,6 +41,24 @@ class SimpleSpice():
 
 def get_mockkernels(self, *args):
     return "some_metakernel"
+
+def compare_dicts(ldict, rdict):
+    differences = []
+    for key in rdict:
+        if key not in ldict:
+            differences.append(f'Key {key} is present in the right dict, but not the left dict.')
+    for key, item in ldict.items():
+        if key not in rdict:
+            differences.append(f'Key {key} is present in the left dict, but not the right dict.')
+        elif isinstance(item, dict):
+            differences.extend(compare_dicts(item, rdict[key]))
+        elif isinstance(item, np.ndarray):
+            if not np.allclose(item, rdict[key]):
+                differences.append(f'Array values of key {key} are not almost equal {item} : {rdict[key]}.')
+        else:
+            if item != rdict[key]:
+                differences.append(f'Values of key {key} are not equal {item} : {rdict[key]}.')
+    return differences
 
 ale_root = os.path.split(ale.__file__)[0]
 data_root = os.path.join(ale_root, '../tests/pytests/data')

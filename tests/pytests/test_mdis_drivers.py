@@ -1,7 +1,5 @@
 import pytest
-import pvl
 import os
-import subprocess
 import numpy as np
 import spiceypy as spice
 from importlib import reload
@@ -23,7 +21,7 @@ def test_kernels():
     for kern in binary_kernels:
         os.remove(kern)
 
-@pytest.fixture(scope="module", params=["Pds3NaifDriver", "IsisNaifDriver"])
+@pytest.fixture(params=["Pds3NaifDriver", "IsisNaifDriver"])
 def driver(request):
     if request.param == "IsisNaifDriver":
         label = get_image_label("EN1072174528M", "isis3")
@@ -166,7 +164,7 @@ def test_frame_chain(driver):
 def test_sun_position(driver):
     position, velocity, time = driver.sun_position
     image_et = spice.scs2e(-236, '2/0072174528:989000') + 0.0005
-    expected_state, _ = spice.spkez(10, image_et, 'IAU_MERCURY', 'LT+S', 199)
+    expected_state, _ = spice.spkez(10, image_et, 'IAU_MERCURY', 'NONE', 199)
     expected_position = 1000 * np.asarray(expected_state[:3])
     expected_velocity = 1000 * np.asarray(expected_state[3:])
     np.testing.assert_allclose(position,

@@ -212,3 +212,6 @@ dmypy.json
 # Binary Kernels
 *.bsp
 *.bc
+
+# Binary Images
+*.cub
