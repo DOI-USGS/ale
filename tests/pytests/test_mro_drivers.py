@@ -132,11 +132,9 @@ def test_kernels(scope='module'):
     for kern in binary_kernels:
         os.remove(kern)
 
-# @pytest.mark.parametrize("label_type", ['pds3', 'isis3'])
-# @pytest.mark.parametrize("formatter", ['usgscsm', 'isis'])
-def test_mro_load(test_kernels, usgscsm_compare_dict, isis_compare_dict):
-    label_type='pds3'
-    formatter='usgscsm'
+@pytest.mark.parametrize("label_type", ['pds3', 'isis3'])
+@pytest.mark.parametrize("formatter", ['usgscsm', 'isis'])
+def test_mro_load(test_kernels, label_type, formatter, usgscsm_compare_dict, isis_compare_dict):
     label_file = get_image_label('B10_013341_1010_XN_79S172W', label_type)
 
     usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels}, formatter=formatter)
