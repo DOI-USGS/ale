@@ -125,6 +125,7 @@ def isis_compare_dict():
 @pytest.fixture()
 def test_kernels():
     kernels = get_image_kernels('B10_013341_1010_XN_79S172W')
+    print(kernels)
     updated_kernels, binary_kernels = convert_kernels(kernels)
     yield updated_kernels
     for kern in binary_kernels:
