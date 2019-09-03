@@ -139,6 +139,9 @@ def test_mro_load(test_kernels, label_type, formatter, usgscsm_compare_dict, isi
     usgscsm_isd_obj = json.loads(usgscsm_isd_str)
 
     if formatter=='usgscsm':
+        # Check to change the line based on ISIS vs PDS3
+        # This is due to a processing step in mroctx2isis that removes samples
+        # based on some flags on the label
         if label_type == 'isis3':
             usgscsm_compare_dict['image_samples'] = 5000
         assert compare_dicts(usgscsm_isd_obj, usgscsm_compare_dict) == []

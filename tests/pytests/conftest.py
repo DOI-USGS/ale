@@ -137,7 +137,7 @@ def convert_kernels(kernels):
     for kernel in kernels:
         split_kernel = os.path.splitext(kernel)
         if 'x' in split_kernel[1].lower():
-            # Get the full path to the kernel then trunate it to the relative path
+            # Get the full path to the kernel then truncate it to the relative path
             path = os.path.join(data_root, kernel)
             path = os.path.relpath(path)
             bin_output = subprocess.run(['tobin', path],
