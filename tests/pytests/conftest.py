@@ -55,6 +55,9 @@ def compare_dicts(ldict, rdict):
         elif isinstance(item, np.ndarray):
             if not np.allclose(item, rdict[key]):
                 differences.append(f'Array values of key {key} are not almost equal {item} : {rdict[key]}.')
+        elif isinstance(item, str):
+            if item.lower() != rdict[key].lower():
+                differences.append(f'Values of key {key} are not equal {item} : {rdict[key]}.')
         else:
             if item != rdict[key]:
                 differences.append(f'Values of key {key} are not equal {item} : {rdict[key]}.')

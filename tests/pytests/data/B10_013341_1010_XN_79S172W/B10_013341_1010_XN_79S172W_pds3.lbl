@@ -33,7 +33,7 @@ DATA_QUALITY_DESC            = OK
 ORBIT_NUMBER                 = 13341
 
 Object = IMAGE
-  LINES             = 24576
+  LINES             = 400
   LINE_SAMPLES      = 5056
   LINE_PREFIX_BYTES = 0
   LINE_SUFFIX_BYTES = 0
