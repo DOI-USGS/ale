@@ -13,7 +13,7 @@ from ale.drivers.mes_drivers import MessengerMdisPds3NaifSpiceDriver
 from ale.drivers.mes_drivers import MessengerMdisIsisLabelNaifSpiceDriver
 
 @pytest.fixture()
-def test_kernels():
+def test_kernels(scope='module'):
     kernels = get_image_kernels('EN1072174528M')
     updated_kernels, binary_kernels = convert_kernels(kernels)
     yield updated_kernels
