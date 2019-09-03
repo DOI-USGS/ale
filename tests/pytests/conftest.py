@@ -52,7 +52,7 @@ def compare_dicts(ldict, rdict):
             differences.append(f'Key {key} is present in the left dict, but not the right dict.')
         elif isinstance(item, dict):
             differences.extend(compare_dicts(item, rdict[key]))
-        elif isinstance(item, np.ndarray):
+        elif isinstance(item, np.ndarray) or isinstance(item, list):
             if not np.allclose(item, rdict[key]):
                 differences.append(f'Array values of key {key} are not almost equal {item} : {rdict[key]}.')
         elif isinstance(item, str):
