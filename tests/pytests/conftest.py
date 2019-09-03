@@ -137,12 +137,8 @@ def convert_kernels(kernels):
     for kernel in kernels:
         split_kernel = os.path.splitext(kernel)
         if 'x' in split_kernel[1].lower():
-            try:
-                bin_output = subprocess.run(['tobin', os.path.join(data_root, kernel)],
-                                            capture_output=True, check=True)
-            except subprocess.CalledProcessError as e:
-                print(e)
-                pass
+            bin_output = subprocess.run(['tobin', os.path.join(data_root, kernel)],
+                                        capture_output=True, check=True)
             matches = re.search(r'To: (.*\.b\w*)', str(bin_output.stdout))
             errors = str(bin_output.stderr)
             if errors:
