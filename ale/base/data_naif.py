@@ -289,7 +289,7 @@ class NaifSpice():
         sun_state, _ = spice.spkezr("SUN",
                                      self.center_ephemeris_time,
                                      self.reference_frame,
-                                     self.light_time_correction,
+                                     'NONE',
                                      self.target_name)
         positions = 1000 * np.asarray([sun_state[:3]])
         velocities = 1000 * np.asarray([sun_state[3:6]])
