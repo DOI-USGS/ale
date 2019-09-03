@@ -140,6 +140,7 @@ def convert_kernels(kernels):
             bin_output = subprocess.run(['tobin', os.path.join(data_root, kernel)],
                                         capture_output=True, check=True)
             matches = re.search(r'To: (.*\.b\w*)', str(bin_output.stdout))
+            print(matches)
             errors = str(bin_output.stderr)
             if errors:
                 print(f'Recieved error {errors}')

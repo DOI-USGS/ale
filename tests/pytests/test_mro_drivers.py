@@ -126,9 +126,9 @@ def isis_compare_dict():
 def test_kernels(scope='module'):
     kernels = get_image_kernels('B10_013341_1010_XN_79S172W')
     updated_kernels, binary_kernels = convert_kernels(kernels)
-    spice.furnsh(updated_kernels)
+    # spice.furnsh(updated_kernels)
     yield updated_kernels
-    spice.unload(updated_kernels)
+    # spice.unload(updated_kernels)
     for kern in binary_kernels:
         os.remove(kern)
 
@@ -139,7 +139,7 @@ def test_mro_load(test_kernels, usgscsm_compare_dict, isis_compare_dict):
     formatter='usgscsm'
     label_file = get_image_label('B10_013341_1010_XN_79S172W', label_type)
 
-    usgscsm_isd_str = ale.loads(label_file, props={}, formatter=formatter)
+    usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels}, formatter=formatter)
     usgscsm_isd_obj = json.loads(usgscsm_isd_str)
     if formatter=='usgscsm':
         if label_type == 'isis3':
