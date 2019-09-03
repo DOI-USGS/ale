@@ -95,22 +95,6 @@ def test_focal2pixel_lines(driver):
         assert driver.focal2pixel_lines == [0, -1/2, 0]
         gdpool.assert_called_with('INS-12345_PIXEL_SIZE', 0, 1)
 
-def test_no_metakernels(driver, tmpdir, monkeypatch):
-    monkeypatch.setenv('ALESPICEROOT', str(tmpdir))
-    reload(ale)
-
-    with pytest.raises(ValueError):
-        with driver as failure:
-            pass
-
-def test_no_spice_root(driver, monkeypatch):
-    monkeypatch.delenv('ALESPICEROOT', raising=False)
-    reload(ale)
-
-    with pytest.raises(EnvironmentError):
-        with driver as failure:
-            pass
-
 def test_load(test_kernels):
     isd = {
         'radii': {
