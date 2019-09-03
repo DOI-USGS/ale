@@ -137,7 +137,7 @@ def test_mro_load(test_kernels, usgscsm_compare_dict, isis_compare_dict):
     formatter='usgscsm'
     label_file = get_image_label('B10_013341_1010_XN_79S172W', label_type)
 
-    usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels}, formatter=formatter, verbose=True)
+    usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels}, formatter=formatter)
     usgscsm_isd_obj = json.loads(usgscsm_isd_str)
     if formatter=='usgscsm':
         if label_type == 'isis3':
