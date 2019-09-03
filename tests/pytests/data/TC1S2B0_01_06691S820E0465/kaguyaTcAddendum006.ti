@@ -1,0 +1,58 @@
+\begintext 
+The instrument addendum kernel for Kaguya TC camera.
+See 02_Haruyama.etal_EPS08_SeleneLISM_60040243.pdf
+
+history 2018-10-06 Jeannie Backer - Original version.
+history 2019-04-04 Stuart Sides - Changed to only use 131351 and 131371
+history 2019-04-05 Stuart Sides - Changed TRANS X/Y S/L to reflect +-X 
+history 2019-04-11 Stuart Sides - Changed the sign on the Y coefficients
+                                  to negative to reflect that +Y is 
+history 2019-04-12 Stuart Sides - Changed the sign on the X coefficients
+                                  to negative to match the MI coordinate
+                                  system
+history 2019-04-16 Stuart Sides - Changed to boresight values to be zero
+                                  based insted on one, and added the line
+                                  boresight
+
+\begintext
+ 
+
+\begindata
+ INS-131351_PIXEL_PITCH      = 0.007
+ INS-131351_BORESIGHT_SAMPLE = 2047.5
+ INS-131351_BORESIGHT_LINE   = 0.0
+ INS-131351_FOCAL_LENGTH     = 72.45
+
+ INS-131371_PIXEL_PITCH      = 0.007
+ INS-131371_BORESIGHT_SAMPLE = 2047.5
+ INS-131371_BORESIGHT_LINE   = 0.0
+ INS-131371_FOCAL_LENGTH     = 72.63
+
+\begintext
+Calculated using pixel pitch and 1/pixel pitch
+
+\begindata
+ INS-131351_TRANSX  = ( 0.0, 0.0, -0.007 )
+ INS-131351_TRANSY  = ( 0.0, -0.007, 0.0 )
+ INS-131351_ITRANSS = ( 0.0, 0.0, -142.857142857 )
+ INS-131351_ITRANSL = ( 0.0, -142.857142857, 0.0 ) 
+
+ INS-131371_TRANSX  = ( 0.0, 0.0, -0.007 )
+ INS-131371_TRANSY  = ( 0.0, -0.007, 0.0 )
+ INS-131371_ITRANSS = ( 0.0, 0.0, -142.857142857 )
+ INS-131371_ITRANSL = ( 0.0, -142.857142857, 0.0 ) 
+
+\begintext
+
+ OBSERVER/TARGET SWAPPING, STELLAR ABERRATION & LIGHT TIME CORRECTION:
+------------------------------------------------------------------------------
+
+\begindata
+  INS-131351_SWAP_OBSERVER_TARGET = 'TRUE'
+  INS-131351_LIGHTTIME_CORRECTION = 'LT+S'
+  INS-131351_LT_SURFACE_CORRECT   = 'TRUE'
+
+  INS-131371_SWAP_OBSERVER_TARGET = 'TRUE'
+  INS-131371_LIGHTTIME_CORRECTION = 'LT+S'
+  INS-131371_LT_SURFACE_CORRECT   = 'TRUE'
+

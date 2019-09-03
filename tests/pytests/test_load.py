@@ -1,6 +1,7 @@
 import pytest
 from importlib import reload
 import json
+import os
 
 import ale
 from ale import util
@@ -10,13 +11,21 @@ from ale.base.data_isis import IsisSpice
 
 from conftest import get_image_label, get_image_kernels, convert_kernels
 
+@pytest.fixture()
+def mess_kernels():
+    kernels = get_image_kernels('EN1072174528M')
+    updated_kernels, binary_kernels = convert_kernels(kernels)
+    yield updated_kernels
+    for kern in binary_kernels:
+        os.remove(kern)
+
 def test_priority(tmpdir, monkeypatch):
     drivers = [type('FooNaifSpice', (NaifSpice,), {}), type('BarIsisSpice', (IsisSpice,), {}), type('BazNaifSpice', (NaifSpice,), {}), type('FubarIsisSpice', (IsisSpice,), {})]
     sorted_drivers = sort_drivers(drivers)
     assert all([IsisSpice in klass.__bases__ for klass in sorted_drivers[:2]])
 
-def test_mess_load():
-    updated_kernels, _ = convert_kernels(get_image_kernels('EN1072174528M'))
+def test_mess_load(mess_kernels):
+    updated_kernels = mess_kernels
     label_file = get_image_label('EN1072174528M')
 
     usgscsm_isd_str = ale.loads(label_file, props={'kernels': updated_kernels}, formatter='usgscsm')
@@ -43,13 +52,13 @@ def test_load_invalid_spice_root(monkeypatch):
         ale.load(label_file)
 
 
-def test_load_mes_from_metakernels(tmpdir, monkeypatch):
+def test_load_mes_from_metakernels(tmpdir, monkeypatch, mess_kernels):
     monkeypatch.setenv('ALESPICEROOT', str(tmpdir))
 
     # reload module to repopulate ale.spice_root
     reload(ale)
 
-    updated_kernels, _ = convert_kernels(get_image_kernels('EN1072174528M'))
+    updated_kernels = mess_kernels
     label_file = get_image_label('EN1072174528M')
     tmpdir.mkdir('mes')
     with open(tmpdir.join('mes', 'mes_2015_v1.tm'), 'w+') as mk_file:
@@ -64,13 +73,13 @@ def test_load_mes_from_metakernels(tmpdir, monkeypatch):
     assert usgscsm_isd_obj['name_model'] == 'USGS_ASTRO_FRAME_SENSOR_MODEL'
 
 
-def test_load_mes_with_no_metakernels(tmpdir, monkeypatch):
+def test_load_mes_with_no_metakernels(tmpdir, monkeypatch, mess_kernels):
     monkeypatch.setenv('ALESPICEROOT', str(tmpdir))
 
     # reload module to repopulate ale.spice_root
     reload(ale)
 
-    updated_kernels, _ = convert_kernels(get_image_kernels('EN1072174528M'))
+    updated_kernels = mess_kernels
     label_file = get_image_label('EN1072174528M')
     tmpdir.mkdir('mes')
 

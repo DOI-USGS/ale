@@ -1,5 +1,7 @@
 import subprocess
 import os
+import re
+import warnings
 import numpy as np
 import ale
 
@@ -39,6 +41,24 @@ class SimpleSpice():
 
 def get_mockkernels(self, *args):
     return "some_metakernel"
+
+def compare_dicts(ldict, rdict):
+    differences = []
+    for key in rdict:
+        if key not in ldict:
+            differences.append(f'Key {key} is present in the right dict, but not the left dict.')
+    for key, item in ldict.items():
+        if key not in rdict:
+            differences.append(f'Key {key} is present in the left dict, but not the right dict.')
+        elif isinstance(item, dict):
+            differences.extend(compare_dicts(item, rdict[key]))
+        elif isinstance(item, np.ndarray):
+            if not np.allclose(item, rdict[key]):
+                differences.append(f'Array values of key {key} are not almost equal {item} : {rdict[key]}.')
+        else:
+            if item != rdict[key]:
+                differences.append(f'Values of key {key} are not equal {item} : {rdict[key]}.')
+    return differences
 
 ale_root = os.path.split(ale.__file__)[0]
 data_root = os.path.join(ale_root, '../tests/pytests/data')
@@ -109,17 +129,18 @@ def convert_kernels(kernels):
     binary_kernels : list
                      The list of binary kernels created.
     """
-    ext_map = {
-        '.xc' : '.bc',
-        '.xsp' : '.bsp'
-    }
     binary_kernels = []
     updated_kernels = []
     for kernel in kernels:
         split_kernel = os.path.splitext(kernel)
-        if split_kernel[1] in ext_map:
-            subprocess.call(['tobin', os.path.join(data_root, kernel)])
-            kernel = split_kernel[0] + ext_map[split_kernel[1]]
-            binary_kernels.append(kernel)
+        if 'x' in split_kernel[1].lower():
+            bin_output = subprocess.run(['tobin', os.path.join(data_root, kernel)],
+                                        capture_output=True, check=True)
+            matches = re.search(r'To: (.*\.b\w*)', str(bin_output.stdout))
+            if not matches:
+                warnings.warn('Failed to convert transfer kernel, ' + kernel + ', skipping...')
+            else:
+                kernel = matches.group(1)
+                binary_kernels.append(kernel)
         updated_kernels.append(kernel)
     return updated_kernels, binary_kernels
