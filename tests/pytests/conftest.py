@@ -137,7 +137,9 @@ def convert_kernels(kernels):
     for kernel in kernels:
         split_kernel = os.path.splitext(kernel)
         if 'x' in split_kernel[1].lower():
-            bin_output = subprocess.run(['tobin', os.path.join(data_root, kernel)],
+            path = os.path.join(data_root, kernel)
+            path = os.path.relpath(path)
+            bin_output = subprocess.run(['tobin', path],
                                         capture_output=True, check=True)
             matches = re.search(r'To: (.*\.b\w*)', str(bin_output.stdout))
             print(matches)
