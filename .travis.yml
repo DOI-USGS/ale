@@ -45,7 +45,7 @@ install:
   - conda install pytest
 
 script:
-  - PYTHONPATH=. pytest tests/pytests
+  - PYTHONPATH=. pytest tests/pytests -v
   - python setup.py install # install to use python lib in c code
   - mkdir -p build
   - cd build
