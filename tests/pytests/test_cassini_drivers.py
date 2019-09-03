@@ -6,13 +6,20 @@ from ale.drivers import co_drivers
 from unittest.mock import PropertyMock, patch
 
 # 'Mock' the spice module where it is imported
-from conftest import SimpleSpice, get_mockkernels
+from conftest import get_image_label, get_image_kernels, convert_kernels
 
-simplespice = SimpleSpice()
+#simplespice = SimpleSpice()
 
-co_drivers.spice = simplespice
+#co_drivers.spice = simplespice
 
 from ale.drivers.co_drivers import CassiniIssPds3LabelNaifSpiceDriver
+
+@pytest.fixture(scope="module", autouse=True)
+def test_kernels():
+    kernels = get_image_kernels('')
+    updated_kernels, binary_kernels = convert_kernels(kernels)
+    spice.furnsh(updated_kernels)
+
 
 CassiniIssPds3LabelNaifSpiceDriver.metakernel = get_mockkernels
 
