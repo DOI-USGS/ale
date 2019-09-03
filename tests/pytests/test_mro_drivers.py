@@ -122,8 +122,8 @@ def isis_compare_dict():
                                            'Positions': [[-127065882642.08809, 139716883503.97128, -88110631411.32309]],
                                            'Velocities': [[9883022.029795825, 8990158.530556545, 882.9075473801194]]}}
 
-@pytest.fixture()
-def test_kernels(scope='module'):
+@pytest.fixture(scope='module')
+def test_kernels():
     kernels = get_image_kernels('B10_013341_1010_XN_79S172W')
     updated_kernels, binary_kernels = convert_kernels(kernels)
     # spice.furnsh(updated_kernels)
