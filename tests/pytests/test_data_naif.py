@@ -126,8 +126,8 @@ class test_data_naif(unittest.TestCase):
             center_ephemeris_time.return_value = 297088785.3061601
             sun_positions, sun_velocities, times = self.driver.sun_position
             assert len(sun_positions) == 1
-            np.testing.assert_allclose(sun_positions[0], [-1.26827682e+11,  1.39932616e+11, -8.81115103e+10], rtol=1e-7)
+            np.testing.assert_allclose(sun_positions[0], [-1.26841481e+11, 1.39920683e+11, -8.81106114e+10], rtol=1e-7)
             assert len(sun_velocities) == 1
-            np.testing.assert_allclose(sun_velocities[0], [9.89828569e+06, 8.97330870e+06, 8.81963306e+02], rtol=1e-7)
+            np.testing.assert_allclose(sun_velocities[0], [9.89744122e+06, 8.97428529e+06, 8.82936862e+02], rtol=1e-7)
             assert len(times) == 1
             np.testing.assert_allclose(times[0], 2.97088785e+08, rtol=1e-7)
