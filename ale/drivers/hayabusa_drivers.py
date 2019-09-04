@@ -12,3 +12,15 @@ class HayabusaAmicaIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Radial
     @property
     def sensor_name(self):
         return self.instrument_id
+
+    @property
+    def sensor_model_version(self):
+        return 1
+
+    @property
+    def ikid(self):
+        return self.label['IsisCube']['Kernels']['NaifFrameCode']
+
+    @property
+    def spacecraft_clock_start_count(self):
+        return str(self.label['IsisCube']['Instrument']['SpacecraftClockStartCount'].value)
