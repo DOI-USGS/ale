@@ -1,6 +1,7 @@
 import spiceypy as spice
 import numpy as np
 
+import ale
 from ale.base.type_sensor import Framer
 from ale.transformation import FrameChain
 from ale.rotation import TimeDependentRotation
@@ -31,7 +32,13 @@ class NaifSpice():
             if 'kernels' in self._props.keys():
                 self._kernels =  self._props['kernels']
             else:
-                search_results = util.get_metakernels(missions=self.short_mission_name, years=self.utc_start_time.year, versions='latest')
+                if not ale.spice_root:
+                    raise EnvironmentError(f'ale.spice_root is not set, cannot search for metakernels. ale.spice_root = "{ale.spice_root}"')
+
+                search_results = util.get_metakernels(ale.spice_root, missions=self.short_mission_name, years=self.utc_start_time.year, versions='latest')
+
+                if search_results['count'] == 0:
+                    raise ValueError(f'Failed to find metakernels. mission: {self.short_mission_name}, year:{self.utc_start_time.year}, versions="latest" spice root = "{ale.spice_root}"')
                 self._kernels = [search_results['data'][0]['path']]
         return self._kernels
 
@@ -282,7 +289,7 @@ class NaifSpice():
         sun_state, _ = spice.spkezr("SUN",
                                      self.center_ephemeris_time,
                                      self.reference_frame,
-                                     self.light_time_correction,
+                                     'NONE',
                                      self.target_name)
         positions = 1000 * np.asarray([sun_state[:3]])
         velocities = 1000 * np.asarray([sun_state[3:6]])

@@ -1,0 +1,906 @@
+KPL/IK
+
+TC/LISM/SELENE Instrument Kernel
+===========================================================================
+
+   This Terrein Camera (TC) instrument kernel (I-kernel) contains
+   the instrument mounting offset, fields-of-view specifications, and optics 
+   and detector parameters. Details of TC instrument are described in 
+   Haruyama et al., 2007. 
+
+Version and Date
+---------------------------------------------------------------------------
+   Version 3.01 -- July 14, 2009 -- S. Hara (CCS)
+
+    - Angles of LISM_LRU_TC_MI, LISM_TC1_HEAD and LISM_TC2_HEAD were updated.
+    - Comment of distortion equation is corrected.
+
+   Version 3.00 -- July 8, 2009 -- S. Hara (CCS)
+
+    - Distortion coefficients of the LISM_TC2 (-131371) were corrected.
+    - Y-AXIS angles of the LISM_TC1_HEAD and LISM_TC2_HEAD were updated
+      to correct DTM vertical offset.
+
+   Version 2.00 -- July 7, 2008 -- S. Hara (CCS)
+
+    - X-AXIS angle of the LISM_LRU_TC_MI (-131320) was corrected.
+    - Distortion coefficients of the LISM_TC2 (-131371) were corrected.
+
+   Version 1.03-- December 7, 2007 -- J. Haruyama, M. Ohtake, Y.Yokota (JAXA)
+
+    - ANGLES of the Frames (from -131310 to -131370) were updated
+      by using the laboratory measurement values. 
+    - Pixel coordinates of Along-track center are corrected.
+    - Comments were updated.
+
+   Version 1.02 -- October 10, 2007 -- Y.Yokota (JAXA)
+
+      FOV_BOUNDARY_CORNERS data for Level 2A software were corrected.
+
+   Version 1.0  -- October 2, 2007 -- Naru Hirata (Univ. of Aizu.),
+                  Jun'ichi Haruyama (JAXA), Makiko Ohtake (JAXA), 
+                  Tsuneo Matsunaga (NIES), Y.Yokota (JAXA)
+
+      Initial version after launch.
+      Preliminary versions have been developed since March 12, 2005.
+
+References
+---------------------------------------------------------------------------
+Haruyama, J. et al., " Global lunar-surface mapping experiment using the 
+Lunar Imager/Spectrometer on SELENE", Earth Planets Space, vol.59, 1-13,
+2007.
+
+
+Implementation Notes
+---------------------------------------------------------------------------
+
+
+TC NAIF IDs
+---------------------------------------------------------------------------
+
+   The following NAIF IDs are assigned to individual TC sensors:
+
+                                                  End
+                                            Start Pixel
+     Sensor                                 Pixel (+dummy)  NAIF ID
+    -----------------------------------------------------------------
+     LISM_TC1                                  1  4096      -131351
+     LISM_TC2                                  1  4096      -131371
+
+     LISM_TC1_WDF  (Double DCT Full)           1  4096      -131352
+     LISM_TC1_WTF  (Double Through Full)       1  1600      -131353
+     LISM_TC1_SDF  (Single DCT Full)           1  4096      -131354
+     LISM_TC1_STF  (Single Through Full)       1  3208      -131355
+     LISM_TC1_WDN  (Double DCT Nominal)      297  3796(+4)  -131356
+     LISM_TC1_WTN  (Double Through Nominal)  297  1896      -131357
+     LISM_TC1_SDN  (Single DCT Nominal)      297  3796(+4)  -131358
+     LISM_TC1_STN  (Single Through Nominal)  297  3504      -131359
+     LISM_TC1_WDH  (Double DCT Half)        1172  2921(+2)  -131360
+     LISM_TC1_WTH  (Double Through Half)    1172  2771      -131361
+     LISM_TC1_SDH  (Single DCT Half)        1172  2921(+2)  -131362
+     LISM_TC1_STH  (Single Through Half)    1172  2923      -131363
+     LISM_TC1_SSH  (Single SP_support Half) 1172  2921      -131364
+
+     LISM_TC2_WDF  (Double DCT Full)           1  4096      -131372
+     LISM_TC2_WTF  (Double Through Full)       1  1600      -131373
+     LISM_TC2_SDF  (Single DCT Full)           1  4096      -131374
+     LISM_TC2_STF  (Single Through Full)       1  3208      -131375
+     LISM_TC2_WDN  (Double DCT Nominal)      297  3796(+4)  -131376
+     LISM_TC2_WTN  (Double Through Nominal)  297  1896      -131377
+     LISM_TC2_SDN  (Single DCT Nominal)      297  3796(+4)  -131378
+     LISM_TC2_STN  (Single Through Nominal)  297  3504      -131379
+     LISM_TC2_WDH  (Double DCT Half)        1172  2921(+2)  -131380
+     LISM_TC2_WTH  (Double Through Half)    1172  2771      -131381
+     LISM_TC2_SDH  (Single DCT Half)        1172  2921(+2)  -131382
+     LISM_TC2_STH  (Single Through Half)    1172  2923      -131383
+     LISM_TC2_SSH  (Single SP_support Half) 1172  2921      -131384
+    -----------------------------------------------------------------
+
+      \begindata
+
+      NAIF_BODY_NAME                += ( 'LISM_TC1' )
+      NAIF_BODY_CODE                += ( -131351 )
+      NAIF_BODY_NAME                += ( 'LISM_TC2' )
+      NAIF_BODY_CODE                += ( -131371 )
+
+      NAIF_BODY_NAME                += ( 'LISM_TC1_WDF' )
+      NAIF_BODY_CODE                += ( -131352 )
+      NAIF_BODY_NAME                += ( 'LISM_TC1_WTF' )
+      NAIF_BODY_CODE                += ( -131353 )
+      NAIF_BODY_NAME                += ( 'LISM_TC1_SDF' )
+      NAIF_BODY_CODE                += ( -131354 )
+      NAIF_BODY_NAME                += ( 'LISM_TC1_STF' )
+      NAIF_BODY_CODE                += ( -131355 )
+      NAIF_BODY_NAME                += ( 'LISM_TC1_WDN' )
+      NAIF_BODY_CODE                += ( -131356 )
+      NAIF_BODY_NAME                += ( 'LISM_TC1_WTN' )
+      NAIF_BODY_CODE                += ( -131357 )
+      NAIF_BODY_NAME                += ( 'LISM_TC1_SDN' )
+      NAIF_BODY_CODE                += ( -131358 )
+      NAIF_BODY_NAME                += ( 'LISM_TC1_STN' )
+      NAIF_BODY_CODE                += ( -131359 )
+      NAIF_BODY_NAME                += ( 'LISM_TC1_WDH' )
+      NAIF_BODY_CODE                += ( -131360 )
+      NAIF_BODY_NAME                += ( 'LISM_TC1_WTH' )
+      NAIF_BODY_CODE                += ( -131361 )
+      NAIF_BODY_NAME                += ( 'LISM_TC1_SDH' )
+      NAIF_BODY_CODE                += ( -131362 )
+      NAIF_BODY_NAME                += ( 'LISM_TC1_STH' )
+      NAIF_BODY_CODE                += ( -131363 )
+      NAIF_BODY_NAME                += ( 'LISM_TC1_SSH' )
+      NAIF_BODY_CODE                += ( -131364 )
+      NAIF_BODY_NAME                += ( 'LISM_TC2_WDF' )
+      NAIF_BODY_CODE                += ( -131372 )
+      NAIF_BODY_NAME                += ( 'LISM_TC2_WTF' )
+      NAIF_BODY_CODE                += ( -131373 )
+      NAIF_BODY_NAME                += ( 'LISM_TC2_SDF' )
+      NAIF_BODY_CODE                += ( -131374 )
+      NAIF_BODY_NAME                += ( 'LISM_TC2_STF' )
+      NAIF_BODY_CODE                += ( -131375 )
+      NAIF_BODY_NAME                += ( 'LISM_TC2_WDN' )
+      NAIF_BODY_CODE                += ( -131376 )
+      NAIF_BODY_NAME                += ( 'LISM_TC2_WTN' )
+      NAIF_BODY_CODE                += ( -131377 )
+      NAIF_BODY_NAME                += ( 'LISM_TC2_SDN' )
+      NAIF_BODY_CODE                += ( -131378 )
+      NAIF_BODY_NAME                += ( 'LISM_TC2_STN' )
+      NAIF_BODY_CODE                += ( -131379 )
+      NAIF_BODY_NAME                += ( 'LISM_TC2_WDH' )
+      NAIF_BODY_CODE                += ( -131380 )
+      NAIF_BODY_NAME                += ( 'LISM_TC2_WTH' )
+      NAIF_BODY_CODE                += ( -131381 )
+      NAIF_BODY_NAME                += ( 'LISM_TC2_SDH' )
+      NAIF_BODY_CODE                += ( -131382 )
+      NAIF_BODY_NAME                += ( 'LISM_TC2_STH' )
+      NAIF_BODY_CODE                += ( -131383 )
+      NAIF_BODY_NAME                += ( 'LISM_TC2_SSH' )
+      NAIF_BODY_CODE                += ( -131384 )
+
+      \begintext
+
+
+
+Optical Parameters
+---------------------------------------------------------------------------
+
+   The following table summarizes TC individual camera optics 
+   parameters:
+
+      -----------------------------------------------------------------
+             parameter                    TC1                 TC2
+      -----------------------------------------------------------------
+      Focal Length, mm                    72.45               72.63
+      f/ratio                             f/4.0               f/4.0
+      IFOV, rad/pixel                     0.0000966           0.0000966
+      Field of view (rad)
+          Cross-track (full swath)        0.3909538           0.3909538
+          Cross-track (nominal swath)     0.3368485           0.3368485
+          Cross-track (full swath)        0.1684243           0.1684243
+          Along-track                     0.0000966           0.0000966
+      -----------------------------------------------------------------
+
+   These values are incorporated in the keywords below; pixel sizes 
+   are converted to MILLIMETERS.
+                    ^^^^^^^^^^^
+
+      \begindata
+
+      INS-131351_FOCAL_LENGTH = (  72.45     ) 
+      INS-131351_F_NUMBER     = (  4.0       )
+
+      INS-131371_FOCAL_LENGTH = (  72.63     ) 
+      INS-131371_F_NUMBER     = (  4.0       )
+
+
+      \begintext
+
+Mounting Alignment
+---------------------------------------------------------------------------
+
+Detector CCD Parameters
+---------------------------------------------------------------------------
+
+   The following table summarizes TC individual camera detector 
+   parameters. As these data show the detectors are all line arrays.
+
+
+      -----------------------------------------------------------------
+             parameter                     TC1             TC2
+      -----------------------------------------------------------------
+      Pixel Size, microns
+          Cross-track                      7.0              7.0
+          Along-track                      7.0              7.0
+      Detector Array Size
+          Cross-track                      4096             4096
+          Along-track                      1                1
+      Detector Array Center (*1)
+          Cross-track                      2048.5           2048.5
+          Along-track                      1.0              1.0
+      -----------------------------------------------------------------
+
+    (*1) Center of the first pixel is defined as "1.0".
+
+
+   These values are incorporated in the keywords below; pixel sizes 
+   are converted to MILLIMETERS.
+                    ^^^^^^^^^^^
+
+      \begindata
+
+      INS-131351_PIXEL_SAMPLES  = ( 4096        )
+      INS-131351_PIXEL_LINES    = ( 1           )
+      INS-131351_CENTER         = ( 2048.5, 1.0 )       
+      INS-131351_PIXEL_SIZE     = ( 0.007    )
+
+      INS-131371_PIXEL_SAMPLES  = ( 4096        )
+      INS-131371_PIXEL_LINES    = ( 1           )
+      INS-131371_CENTER         = ( 2048.5, 1.0 )       
+      INS-131371_PIXEL_SIZE     = ( 0.007    )
+
+      \begintext
+
+
+FOV Definitions
+---------------------------------------------------------------------------
+
+   In this section, definitions for FOVs of TC1 and TC2 are described in
+   a format consistent required by the SPICE (CSPICE) function GETFOV
+   (getfov_c).
+
+   On each focal plane of TC1 and TC2, a one-dimensional CCD is located. 
+   The direction along the row of pixels of each CCD is defined to be Y axis.
+   The +Y is the direction toward the radiator side from the CCDs. 
+   Z axis is defined to be "ideal" boresight. 
+
+
+                       Corner pixel
+                      view direction 
+                           ^
+         Boresight          \            +X
+          vector   <.        \           ^   Focal plane
+          direction  `-.      \          |
+                        `-.    \         |     .^ -Y
+                           `-.  \        |   .'
+                              `-.\    F  | .'
+                     <-----------`o.-----o'  
+                  +Z        Focal  \`-.  | . 1-line CCD
+                            point   \  `-*'
+                                     \ .'| Detector center
+                                      *  |
+                                  Corner
+                                   pixel           
+
+
+   The "actual" boresight vector (INS<INSTID>_BORESIGHT) is along the
+   view direction of the middle point of pixels of no. 2048 and no. 2049.
+
+   Corner vectors (FOV_BOUNDARY_CORNERS) are defined as line-of-sight 
+   vectors from the middle points of the upper and lower edges of corner 
+   pixels. We note that these  points are A and B, but not C and D in the
+   below diagram. These corner vectors are only used in LISM Level 2A:
+
+
+     C      A                                       A'      C'
+    /      /                                         \       \
+   o------o-------o------o-------o-----     ---o------o-------o
+   |              |              |             |              |
+   |  Pixel no.1  |  Pixel no.2  |    ....     |  Last Pixel  |
+   |              |              |             |              |
+   |              |              |             |              |
+   o------o-------o------o-------o-----     ---o------o-------o
+    \      \                                         /       /
+     D      B                                       B'      D'
+
+
+   When the coordinates of the first and last pixel of each CCD are 
+   (Xf,Yf) and (Xl,Yl) and those of the two middle pixels of the first
+   and last pixels are (Xm1,Ym1) and (Xm2,Ym2), the FOV definition can
+   be expressed as: 
+
+         INS<INSTID>_FOV_FRAME            = 'LISM_TC1_HEAD'
+         INS<INSTID>_FOV_SHAPE            = 'RECTANGLE'
+         INS<INSTID>_BORESIGHT            = (
+                                             -Xm, -(Ym1+Ym2)/2, FL 
+                                            )
+         INS<INSTID>_FOV_BOUNDARY_CORNERS = (
+                                           -(Xf-HP),     -Yf,     FL
+                                           -(Xf+HP),     -Yf,     FL
+                                           -(Xl+HP),     -Yl,     FL
+                                           -(Xl-HP),     -Yl,     FL
+                                            )
+
+   where HP is 1/2 of the pixel size [mm], and FL is the focal length.
+ 
+
+      \begindata
+
+         INS-131351_FOV_FRAME            = 'LISM_TC1_HEAD'
+         INS-131351_FOV_SHAPE            = 'RECTANGLE'
+         INS-131351_BORESIGHT            = (
+                                           -0.0725       0.0214      72.4500
+                                           )
+         INS-131351_FOV_BOUNDARY_CORNERS = (
+                                           -0.0690      14.3574      72.4500 
+                                           -0.0760      14.3574      72.4500 
+                                           -0.0760     -14.3146      72.4500 
+                                           -0.0690     -14.3146      72.4500 
+                                           )
+
+         INS-131371_FOV_FRAME            = 'LISM_TC2_HEAD'
+         INS-131371_FOV_SHAPE            = 'RECTANGLE'
+         INS-131371_BORESIGHT            = (
+                                           -0.0474       0.0126      72.6300
+                                           )
+         INS-131371_FOV_BOUNDARY_CORNERS = (
+                                           -0.0439      14.3486      72.6300 
+                                           -0.0509      14.3486      72.6300 
+                                           -0.0509     -14.3234      72.6300 
+                                           -0.0439     -14.3234      72.6300 
+                                           )
+
+         INS-131352_FOV_FRAME            = 'LISM_TC1_HEAD'
+         INS-131352_FOV_SHAPE            = 'RECTANGLE'
+         INS-131352_BORESIGHT            = (
+                                           -0.0725       0.0214      72.4500
+                                           )
+         INS-131352_FOV_BOUNDARY_CORNERS = (
+                                           -0.0690      14.3574      72.4500 
+                                           -0.0760      14.3574      72.4500 
+                                           -0.0760     -14.3146      72.4500 
+                                           -0.0690     -14.3146      72.4500 
+                                           )
+
+         INS-131353_FOV_FRAME            = 'LISM_TC1_HEAD'
+         INS-131353_FOV_SHAPE            = 'RECTANGLE'
+         INS-131353_BORESIGHT            = (
+                                           -0.0725       8.7574      72.4500
+                                           )
+         INS-131353_FOV_BOUNDARY_CORNERS = (
+                                           -0.0690      14.3574      72.4500 
+                                           -0.0760      14.3574      72.4500 
+                                           -0.0760       3.1574      72.4500 
+                                           -0.0690       3.1574      72.4500 
+                                           )
+
+         INS-131354_FOV_FRAME            = 'LISM_TC1_HEAD'
+         INS-131354_FOV_SHAPE            = 'RECTANGLE'
+         INS-131354_BORESIGHT            = (
+                                           -0.0725       0.0214      72.4500
+                                           )
+         INS-131354_FOV_BOUNDARY_CORNERS = (
+                                           -0.0690      14.3574      72.4500 
+                                           -0.0760      14.3574      72.4500 
+                                           -0.0760     -14.3146      72.4500 
+                                           -0.0690     -14.3146      72.4500 
+                                           )
+
+         INS-131355_FOV_FRAME            = 'LISM_TC1_HEAD'
+         INS-131355_FOV_SHAPE            = 'RECTANGLE'
+         INS-131355_BORESIGHT            = (
+                                           -0.0725       3.1294      72.4500
+                                           )
+         INS-131355_FOV_BOUNDARY_CORNERS = (
+                                           -0.0690      14.3574      72.4500 
+                                           -0.0760      14.3574      72.4500 
+                                           -0.0760      -8.0986      72.4500 
+                                           -0.0690      -8.0986      72.4500 
+                                           )
+
+         INS-131356_FOV_FRAME            = 'LISM_TC1_HEAD'
+         INS-131356_FOV_SHAPE            = 'RECTANGLE'
+         INS-131356_BORESIGHT            = (
+                                           -0.0725       0.0354      72.4500
+                                           )
+         INS-131356_FOV_BOUNDARY_CORNERS = (
+                                           -0.0690      12.2854      72.4500 
+                                           -0.0760      12.2854      72.4500 
+                                           -0.0760     -12.2146      72.4500 
+                                           -0.0690     -12.2146      72.4500 
+                                           )
+
+         INS-131357_FOV_FRAME            = 'LISM_TC1_HEAD'
+         INS-131357_FOV_SHAPE            = 'RECTANGLE'
+         INS-131357_BORESIGHT            = (
+                                           -0.0725       6.6854      72.4500
+                                           )
+         INS-131357_FOV_BOUNDARY_CORNERS = (
+                                           -0.0690      12.2854      72.4500 
+                                           -0.0760      12.2854      72.4500 
+                                           -0.0760       1.0854      72.4500 
+                                           -0.0690       1.0854      72.4500 
+                                           )
+
+         INS-131358_FOV_FRAME            = 'LISM_TC1_HEAD'
+         INS-131358_FOV_SHAPE            = 'RECTANGLE'
+         INS-131358_BORESIGHT            = (
+                                           -0.0725       0.0354      72.4500
+                                           )
+         INS-131358_FOV_BOUNDARY_CORNERS = (
+                                           -0.0690      12.2854      72.4500 
+                                           -0.0760      12.2854      72.4500 
+                                           -0.0760     -12.2146      72.4500 
+                                           -0.0690     -12.2146      72.4500 
+                                           )
+
+         INS-131359_FOV_FRAME            = 'LISM_TC1_HEAD'
+         INS-131359_FOV_SHAPE            = 'RECTANGLE'
+         INS-131359_BORESIGHT            = (
+                                           -0.0725       1.0574      72.4500
+                                           )
+         INS-131359_FOV_BOUNDARY_CORNERS = (
+                                           -0.0690      12.2854      72.4500 
+                                           -0.0760      12.2854      72.4500 
+                                           -0.0760     -10.1706      72.4500 
+                                           -0.0690     -10.1706      72.4500 
+                                           )
+
+         INS-131360_FOV_FRAME            = 'LISM_TC1_HEAD'
+         INS-131360_FOV_SHAPE            = 'RECTANGLE'
+         INS-131360_BORESIGHT            = (
+                                           -0.0725       0.0354      72.4500
+                                           )
+         INS-131360_FOV_BOUNDARY_CORNERS = (
+                                           -0.0690       6.1604      72.4500 
+                                           -0.0760       6.1604      72.4500 
+                                           -0.0760      -6.0896      72.4500 
+                                           -0.0690      -6.0896      72.4500 
+                                           )
+
+         INS-131361_FOV_FRAME            = 'LISM_TC1_HEAD'
+         INS-131361_FOV_SHAPE            = 'RECTANGLE'
+         INS-131361_BORESIGHT            = (
+                                           -0.0725       0.5604      72.4500
+                                           )
+         INS-131361_FOV_BOUNDARY_CORNERS = (
+                                           -0.0690       6.1604      72.4500 
+                                           -0.0760       6.1604      72.4500 
+                                           -0.0760      -5.0396      72.4500 
+                                           -0.0690      -5.0396      72.4500 
+                                           )
+
+         INS-131362_FOV_FRAME            = 'LISM_TC1_HEAD'
+         INS-131362_FOV_SHAPE            = 'RECTANGLE'
+         INS-131362_BORESIGHT            = (
+                                           -0.0725       0.0354      72.4500
+                                           )
+
+         INS-131362_FOV_BOUNDARY_CORNERS = (
+                                           -0.0690       6.1604      72.4500 
+                                           -0.0760       6.1604      72.4500 
+                                           -0.0760      -6.0896      72.4500 
+                                           -0.0690      -6.0896      72.4500 
+                                           )
+
+         INS-131363_FOV_FRAME            = 'LISM_TC1_HEAD'
+         INS-131363_FOV_SHAPE            = 'RECTANGLE'
+         INS-131363_BORESIGHT            = (
+                                           -0.0725       0.0284      72.4500
+                                           )
+         INS-131363_FOV_BOUNDARY_CORNERS = (
+                                           -0.0690       6.1604      72.4500 
+                                           -0.0760       6.1604      72.4500 
+                                           -0.0760      -6.1036      72.4500 
+                                           -0.0690      -6.1036      72.4500 
+                                           )
+
+         INS-131364_FOV_FRAME            = 'LISM_TC1_HEAD'
+         INS-131364_FOV_SHAPE            = 'RECTANGLE'
+         INS-131364_BORESIGHT            = (
+                                           -0.0725       0.0354      72.4500
+
+                                           )
+         INS-131364_FOV_BOUNDARY_CORNERS = (
+                                           -0.0690       6.1604      72.4500 
+                                           -0.0760       6.1604      72.4500 
+                                           -0.0760      -6.0896      72.4500 
+                                           -0.0690      -6.0896      72.4500 
+                                           )
+
+         INS-131372_FOV_FRAME            = 'LISM_TC2_HEAD'
+         INS-131372_FOV_SHAPE            = 'RECTANGLE'
+         INS-131372_BORESIGHT            = (
+                                           -0.0474       0.0126      72.6300 
+                                           )
+         INS-131372_FOV_BOUNDARY_CORNERS = (
+                                           -0.0439      14.3486      72.6300 
+                                           -0.0509      14.3486      72.6300 
+                                           -0.0509     -14.3234      72.6300 
+                                           -0.0439     -14.3234      72.6300 
+                                           )           
+                                                       
+         INS-131373_FOV_FRAME            = 'LISM_TC2_HEAD'
+         INS-131373_FOV_SHAPE            = 'RECTANGLE' 
+         INS-131373_BORESIGHT            = (           
+                                           -0.0474       8.7486      72.6300 
+                                           )           
+         INS-131373_FOV_BOUNDARY_CORNERS = (
+                                           -0.0439      14.3486      72.6300 
+                                           -0.0509      14.3486      72.6300 
+                                           -0.0509       3.1486      72.6300 
+                                           -0.0439       3.1486      72.6300 
+                                           )           
+                                                       
+         INS-131374_FOV_FRAME            = 'LISM_TC2_HEAD'
+         INS-131374_FOV_SHAPE            = 'RECTANGLE' 
+         INS-131374_BORESIGHT            = (           
+                                           -0.0474       0.0126      72.6300 
+                                           )           
+         INS-131374_FOV_BOUNDARY_CORNERS = (           
+                                           -0.0439      14.3486      72.6300 
+                                           -0.0509      14.3486      72.6300 
+                                           -0.0509     -14.3234      72.6300 
+                                           -0.0439     -14.3234      72.6300 
+                                           )           
+                                                       
+         INS-131375_FOV_FRAME            = 'LISM_TC2_HEAD'
+         INS-131375_FOV_SHAPE            = 'RECTANGLE' 
+         INS-131375_BORESIGHT            = (           
+                                           -0.0474       3.1206      72.6300 
+                                           )           
+         INS-131375_FOV_BOUNDARY_CORNERS = (           
+                                           -0.0439      14.3486      72.6300 
+                                           -0.0509      14.3486      72.6300 
+                                           -0.0509      -8.1074      72.6300 
+                                           -0.0439      -8.1074      72.6300 
+                                           )           
+                                                       
+         INS-131376_FOV_FRAME            = 'LISM_TC2_HEAD'
+         INS-131376_FOV_SHAPE            = 'RECTANGLE' 
+         INS-131376_BORESIGHT            = (           
+                                           -0.0474       0.0266      72.6300 
+                                           )           
+         INS-131376_FOV_BOUNDARY_CORNERS = (           
+                                           -0.0439      12.2766      72.6300 
+                                           -0.0509      12.2766      72.6300 
+                                           -0.0509     -12.2234      72.6300 
+                                           -0.0439     -12.2234      72.6300 
+                                           )           
+                                                       
+         INS-131377_FOV_FRAME            = 'LISM_TC2_HEAD'
+         INS-131377_FOV_SHAPE            = 'RECTANGLE' 
+         INS-131377_BORESIGHT            = (           
+                                           -0.0474       6.6766      72.6300 
+                                           )           
+         INS-131377_FOV_BOUNDARY_CORNERS = (           
+                                           -0.0439      12.2766      72.6300 
+                                           -0.0509      12.2766      72.6300 
+                                           -0.0509       1.0766      72.6300 
+                                           -0.0439       1.0766      72.6300 
+                                           )           
+                                                       
+         INS-131378_FOV_FRAME            = 'LISM_TC2_HEAD'
+         INS-131378_FOV_SHAPE            = 'RECTANGLE' 
+         INS-131378_BORESIGHT            = (           
+                                           -0.0474       0.0266      72.6300 
+                                           )           
+         INS-131378_FOV_BOUNDARY_CORNERS = (           
+                                           -0.0439      12.2766      72.6300 
+                                           -0.0509      12.2766      72.6300 
+                                           -0.0509     -12.2234      72.6300 
+                                           -0.0439     -12.2234      72.6300 
+                                           )           
+                                                       
+         INS-131379_FOV_FRAME            = 'LISM_TC2_HEAD'
+         INS-131379_FOV_SHAPE            = 'RECTANGLE' 
+         INS-131379_BORESIGHT            = (           
+                                           -0.0474       1.0486      72.6300 
+                                           )           
+         INS-131379_FOV_BOUNDARY_CORNERS = (           
+                                           -0.0439      12.2766      72.6300 
+                                           -0.0509      12.2766      72.6300 
+                                           -0.0509     -10.1794      72.6300 
+                                           -0.0439     -10.1794      72.6300 
+                                           )           
+                                                       
+         INS-131380_FOV_FRAME            = 'LISM_TC2_HEAD'
+         INS-131380_FOV_SHAPE            = 'RECTANGLE' 
+         INS-131380_BORESIGHT            = (           
+                                           -0.0474       0.0266      72.6300 
+                                           )           
+         INS-131380_FOV_BOUNDARY_CORNERS = (           
+                                           -0.0439       6.1516      72.6300 
+                                           -0.0509       6.1516      72.6300 
+                                           -0.0509      -6.0984      72.6300 
+                                           -0.0439      -6.0984      72.6300 
+                                           )           
+                                                       
+         INS-131381_FOV_FRAME            = 'LISM_TC2_HEAD'
+         INS-131381_FOV_SHAPE            = 'RECTANGLE' 
+         INS-131381_BORESIGHT            = (           
+                                           -0.0474       0.5516      72.6300 
+                                           )           
+         INS-131381_FOV_BOUNDARY_CORNERS = (           
+                                           -0.0439       6.1516      72.6300 
+                                           -0.0509       6.1516      72.6300 
+                                           -0.0509      -5.0484      72.6300 
+                                           -0.0439      -5.0484      72.6300 
+                                           )           
+                                                       
+         INS-131382_FOV_FRAME            = 'LISM_TC2_HEAD'
+         INS-131382_FOV_SHAPE            = 'RECTANGLE' 
+         INS-131382_BORESIGHT            = (           
+                                           -0.0474       0.0266      72.6300 
+                                           )           
+         INS-131382_FOV_BOUNDARY_CORNERS = (           
+                                           -0.0439       6.1516      72.6300 
+                                           -0.0509       6.1516      72.6300 
+                                           -0.0509      -6.0984      72.6300 
+                                           -0.0439      -6.0984      72.6300 
+
+                                           )           
+                                                       
+         INS-131383_FOV_FRAME            = 'LISM_TC2_HEAD'
+         INS-131383_FOV_SHAPE            = 'RECTANGLE' 
+         INS-131383_BORESIGHT            = (           
+                                           -0.0474       0.0196      72.6300 
+                                           )           
+         INS-131383_FOV_BOUNDARY_CORNERS = (           
+                                           -0.0439       6.1516      72.6300 
+                                           -0.0509       6.1516      72.6300 
+                                           -0.0509      -6.1124      72.6300 
+                                           -0.0439      -6.1124      72.6300 
+                                           )           
+                                                       
+         INS-131384_FOV_FRAME            = 'LISM_TC2_HEAD'
+         INS-131384_FOV_SHAPE            = 'RECTANGLE' 
+         INS-131384_BORESIGHT            = (           
+                                           -0.0474       0.0266      72.6300 
+                                           )           
+         INS-131384_FOV_BOUNDARY_CORNERS = (           
+                                           -0.0439       6.1516      72.6300 
+                                           -0.0509       6.1516      72.6300 
+                                           -0.0509      -6.0984      72.6300 
+                                           -0.0439      -6.0984      72.6300 
+                                           )
+
+      \begintext
+
+SELENE/LISM NAIF frame IDs
+---------------------------------------------------------------------------
+
+   The following NAIF IDs are assigned to individual LISM frames and sensors:
+
+      Definition of the keywords used in these assignment are attached
+      at bottom of the table.
+
+                                               NAIF ID
+      ------------------------------------------------
+       SELENE_M                                   -131
+       SELENE_M_SPACECRAFT                     -131000
+
+       LISM_LRU_SP                             -131310
+       LISM_SP                                 -131311
+       LISM_SP_HIGH                            -131312
+
+       LISM_LRU_TC_MI                          -131320
+
+       LISM_MI_V_HEAD                          -131330
+       LISM_MI_N_HEAD                          -131340
+
+       LISM_MI-VIS1                            -131331
+       LISM_MI-VIS2                            -131332
+       LISM_MI-VIS3                            -131333
+       LISM_MI-VIS4                            -131334
+       LISM_MI-VIS5                            -131335
+       LISM_MI-NIR1                            -131341
+       LISM_MI-NIR2                            -131342
+       LISM_MI-NIR3                            -131343
+       LISM_MI-NIR4                            -131344
+
+       LISM_TC1_HEAD                           -131350
+       LISM_TC2_HEAD                           -131370
+
+       LISM_TC1                                -131351
+       LISM_TC2                                -131371
+
+       LISM_TC1_WDF  (Double DCT Full)         -131352
+       LISM_TC1_WTF  (Double Through Full)     -131353
+       LISM_TC1_SDF  (Single DCT Full)         -131354
+       LISM_TC1_STF  (Single Through Full)     -131355
+       LISM_TC1_WDN  (Double DCT Nominal)      -131356
+       LISM_TC1_WTN  (Double Through Nominal)  -131357
+       LISM_TC1_SDN  (Single DCT Nominal)      -131358
+       LISM_TC1_STN  (Single Through Nominal)  -131359
+       LISM_TC1_WDH  (Double DCT Half)         -131360
+       LISM_TC1_WTH  (Double Through Half)     -131361
+       LISM_TC1_SDH  (Single DCT Half)         -131362
+       LISM_TC1_STH  (Single Through Half)     -131363
+       LISM_TC1_SSH  (Single SP_support Half)  -131364
+
+       LISM_TC2_WDF  (Double DCT Full)         -131372
+       LISM_TC2_WTF  (Double Through Full)     -131373
+       LISM_TC2_SDF  (Single DCT Full)         -131374
+       LISM_TC2_STF  (Single Through Full)     -131375
+       LISM_TC2_WDN  (Double DCT Nominal)      -131376
+       LISM_TC2_WTN  (Double Through Nominal)  -131377
+       LISM_TC2_SDN  (Single DCT Nominal)      -131378
+       LISM_TC2_STN  (Single Through Nominal)  -131379
+       LISM_TC2_WDH  (Double DCT Half)         -131380
+       LISM_TC2_WTH  (Double Through Half)     -131381
+       LISM_TC2_SDH  (Single DCT Half)         -131382
+       LISM_TC2_STH  (Single Through Half)     -131383
+       LISM_TC2_SSH  (Single SP_support Half)  -131384
+
+   Definition of the keywords
+       SELENE_M: SELENE mission
+       SELENE_M_SPACECRAFT: SELENE main satellite
+       LISM_LRU_SP: LISM Radiometer SP Unit
+       LISM_SP: SP nominal resolution
+       LISM_SP_HIGH: SP high resolution
+       LISM_LRU_TC_MI: LISM Radiometer TC/MI Unit
+       LISM_MI_V_HEAD: MI-VIS optics
+       LISM_MI_N_HEAD: MI-NIR optics
+       LISM_TC1_HEAD: TC1 optics
+       LISM_TC2_HEAD: TC2 optics
+
+SELENE/LISM Frames
+---------------------------------------------------------------------------
+
+   The following SELENE/LISM frames are defined in this kernel file:
+
+           Name                  Relative to           Type       NAIF ID
+      ======================  ===================  ============   =======
+
+      SELENE_M_SPACECRAFT     J2000                CK             -131000
+      LISM_LRU_SP             SELENE_M             FIXED          -131310
+      LISM_LRU_TC_MI          SELENE_M             FIXED          -131320
+      LISM_MI_V_HEAD          LISM_LRU_TC_MI       FIXED          -131330
+      LISM_MI_N_HEAD          LISM_LRU_TC_MI       FIXED          -131340
+      LISM_TC1_HEAD           LISM_LRU_TC_MI       FIXED          -131350
+      LISM_TC2_HEAD           LISM_LRU_TC_MI       FIXED          -131370
+
+
+SELENE/LISM Frame Tree
+--------------------------------------
+
+   The diagram below shows the SELENE/LISM frame hierarchy.
+
+
+                               "J2000" INERTIAL
+           +-----------------------------------------------------+
+           |                          |                          |
+           |<-pck                     |                          |<-pck
+           |                          |                          |
+           V                          |                          V
+       "MOON_ME"                      |                     "IAU_EARTH"
+     MOON BODY-FIXED                  |<-ck               EARTH BODY-FIXED
+     ---------------                  |                   ----------------
+                                      V
+                            "SELENE_M_SPACECRAFT"
+           +-----------------------------------------------------+
+           |                                                     |
+           |<-fixed                                              |<-fixed
+           |                                                     |
+           V                                                     V
+    "LISM_LRU_TC_MI"                                       "LISM_LRU_SP"
+    -----------------------------------------------+       -------------
+           |            |             |            |
+           |<-fixed     |             |<-fixed     |
+           |            |             |            |
+           V            |             V            |
+    "LISM_TC1_HEAD"     |      "LISM_MI_V_HEAD"    |
+    ---------------     |      --------------      |
+                        |                          |
+                        |<-fixed                   |<-fixed
+                        |                          |
+                        V                          V
+                 "LISM_TC2_HEAD"            "LISM_MI_N_HEAD"
+                 ---------------            ----------------
+
+   \begindata
+
+      FRAME_SELENE_M_SPACECRAFT       = -131000
+      FRAME_-131000_NAME              = 'SELENE_M_SPACECRAFT'
+      FRAME_-131000_CLASS             =  3
+      FRAME_-131000_CLASS_ID          = -131000
+      FRAME_-131000_CENTER            = -131
+      CK_-131000_SCLK                 = -131
+      CK_-131000_SPK                  = -131
+
+      FRAME_LISM_LRU_SP               =  -131310
+      FRAME_-131310_NAME              = 'LISM_LRU_SP'
+      FRAME_-131310_CLASS             =  4
+      FRAME_-131310_CLASS_ID          =  -131310
+      FRAME_-131310_CENTER            =  -131
+      TKFRAME_-131310_RELATIVE        = 'SELENE_M_SPACECRAFT'
+      TKFRAME_-131310_SPEC            = 'ANGLES'
+      TKFRAME_-131310_UNITS           = 'DEGREES'
+      TKFRAME_-131310_AXES            = ( 3,   2,   1   )
+      TKFRAME_-131310_ANGLES          = ( 0.1429, -0.0202, 0.0689 )
+
+
+      FRAME_LISM_LRU_TC_MI            =  -131320
+      FRAME_-131320_NAME              = 'LISM_LRU_TC_MI'
+      FRAME_-131320_CLASS             =  4
+      FRAME_-131320_CLASS_ID          =  -131320
+      FRAME_-131320_CENTER            =  -131
+      TKFRAME_-131320_RELATIVE        = 'SELENE_M_SPACECRAFT'
+      TKFRAME_-131320_SPEC            = 'ANGLES'
+      TKFRAME_-131320_UNITS           = 'DEGREES'
+      TKFRAME_-131320_AXES            = ( 3,   2,   1   )
+      TKFRAME_-131320_ANGLES          = ( 0.0099, 0.0396, -0.0179 )
+
+      FRAME_LISM_MI_V_HEAD            =  -131330
+      FRAME_-131330_NAME              = 'LISM_MI_V_HEAD'
+      FRAME_-131330_CLASS             =  4
+      FRAME_-131330_CLASS_ID          =  -131330
+      FRAME_-131330_CENTER            =  -131
+      TKFRAME_-131330_RELATIVE        = 'LISM_LRU_TC_MI'
+      TKFRAME_-131330_SPEC            = 'ANGLES'
+      TKFRAME_-131330_UNITS           = 'DEGREES'
+      TKFRAME_-131330_AXES            = ( 3,   2,   1   )
+      TKFRAME_-131330_ANGLES          = ( 0.0138, -0.0899, -0.0536 )
+
+      FRAME_LISM_MI_N_HEAD            =  -131340
+      FRAME_-131340_NAME              = 'LISM_MI_N_HEAD'
+      FRAME_-131340_CLASS             =  4
+      FRAME_-131340_CLASS_ID          =  -131340
+      FRAME_-131340_CENTER            =  -131
+      TKFRAME_-131340_RELATIVE        = 'LISM_LRU_TC_MI'
+      TKFRAME_-131340_SPEC            = 'ANGLES'
+      TKFRAME_-131340_UNITS           = 'DEGREES'
+      TKFRAME_-131340_AXES            = ( 3,   2,   1   )
+      TKFRAME_-131340_ANGLES          = ( 0.0232, -0.0068, -0.0332 )
+
+      FRAME_LISM_TC1_HEAD             =  -131350
+      FRAME_-131350_NAME              = 'LISM_TC1_HEAD'
+      FRAME_-131350_CLASS             =  4
+      FRAME_-131350_CLASS_ID          =  -131350
+      FRAME_-131350_CENTER            =  -131
+      TKFRAME_-131350_RELATIVE        = 'LISM_LRU_TC_MI'
+      TKFRAME_-131350_SPEC            = 'ANGLES'
+      TKFRAME_-131350_UNITS           = 'DEGREES'
+      TKFRAME_-131350_AXES            = ( 3,   2,   1   )
+      TKFRAME_-131350_ANGLES          = ( 0.04903647, -14.97465222, 0.05110624 )
+
+      FRAME_LISM_TC2_HEAD             =  -131370
+      FRAME_-131370_NAME              = 'LISM_TC2_HEAD'
+      FRAME_-131370_CLASS             =  4
+      FRAME_-131370_CLASS_ID          =  -131370
+      FRAME_-131370_CENTER            =  -131
+      TKFRAME_-131370_RELATIVE        = 'LISM_LRU_TC_MI'
+      TKFRAME_-131370_SPEC            = 'ANGLES'
+      TKFRAME_-131370_UNITS           = 'DEGREES'
+      TKFRAME_-131370_AXES            = ( 3,   2,   1   )
+      TKFRAME_-131370_ANGLES          = ( -0.04379912, 15.01058661, 0.09222246 )
+
+   \begintext
+
+Distortion information
+---------------------------------------------------------------------------
+  Line-of-sight vector of pixel no. n can be expressed as below.
+
+   Distortion coefficients information:
+     INS<INSTID>_DISTORTION_COEF_X  = ( a0, a1, a2, a3)
+     INS<INSTID>_DISTORTION_COEF_Y  = ( b0, b1, b2, b3),
+
+   Distance r from the center:
+     r = - (n - INS<INSTID>_CENTER) * INS<INSTID>_PIXEL_SIZE.
+
+   Line-of-sight vector v is calculated as
+     v[X] = INS<INSTID>BORESIGHT[X]
+            +a0 +a1*r +a2*r^2 +a3*r^3 ,
+     v[Y] = INS<INSTID>BORESIGHT[Y]
+            +r +a0 +a1*r +a2*r^2 +a3*r^3 ,
+     v[Z] = INS<INSTID>BORESIGHT[Z] .
+
+
+   \begindata
+
+      INS-131351_DISTORTION_COEF_X  = (
+                                      -9.6499e-4,  9.8441e-4,
+                                       8.5773e-6, -3.7438e-6
+                                      )
+      INS-131351_DISTORTION_COEF_Y  = (
+                                      -1.3796e-3,  1.3502e-5,
+                                       2.7251e-6, -6.1938e-6
+                                      )
+      INS-131371_DISTORTION_COEF_X  = (
+                                       2.9786e-3, 7.7836e-5,
+                                       3.9265e-6, -4.4088e-6
+                                      )
+      INS-131371_DISTORTION_COEF_Y  = (
+                                       9.2410e-4, -1.1994e-4,
+                                       2.9281e-5, -3.7239e-7
+                                      )
+   \begintext

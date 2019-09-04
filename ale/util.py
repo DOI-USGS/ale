@@ -10,9 +10,12 @@ import collections
 from collections import OrderedDict
 from itertools import chain
 
-from ale import spice_root
-
+import subprocess
 import re
+import networkx as nx
+from networkx.algorithms.shortest_paths.generic import shortest_path
+
+from ale import spice_root
 
 def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=set()):
     """
@@ -168,6 +171,27 @@ def expandvars(path, env_dict=os.environ, default=None, case_sensative=True):
 
 
 def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
+    """
+    Parses a cube label to obtain the kernels from the Kernels group.
+
+    Parameters
+    ----------
+    cube : cube
+        Path to the cube to pull the kernels from.
+    expand : bool, optional
+        Whether or not to expand variables within kernel paths based on your IsisPreferences file.
+    format_as : str, optional {'list', 'dict'}
+        How to return the kernels: either as a one-demensional ordered list, or as a dictionary
+        of kernel lists.
+
+    Returns
+    -------
+    : list
+        One-dimensional ordered list of all kernels from the Kernels group in the cube.
+    : Dictionary
+        Dictionary of lists of kernels with the keys being the Keywords from the Kernels group of
+        cube itself, and the values being the values associated with that Keyword in the cube.
+    """
     # enforce key order
     mk_paths = OrderedDict.fromkeys(
         ['TargetPosition', 'InstrumentPosition',
@@ -211,9 +235,15 @@ def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
         if expand:
             isisprefs = get_isis_preferences()
             kernels = [expandvars(expandvars(k, dict_to_lower(isisprefs['DataDirectory']))) for k in kernels]
-        return kernels   
+        return kernels
     elif (format_as == 'dict'):
         # return created dict
+        if expand:
+            isisprefs = get_isis_preferences()
+            for kern_list in mk_paths:
+                for index, kern in enumerate(mk_paths[kern_list]):
+                    if kern is not None:
+                        mk_paths[kern_list][index] = expandvars(expandvars(kern, dict_to_lower(isisprefs['DataDirectory'])))
         return mk_paths
     else:
         raise Exception(f'{format_as} is not a valid return format')
@@ -251,5 +281,145 @@ def write_metakernel_from_cube(cube, mkpath=None):
     if mkpath is not None:
         with open(mkpath, 'w') as f:
             f.write(body)
+
+    return body
+
+def get_ck_frames(kernel):
+    """
+    Get all of the reference frames defined in a kernel.
+
+    Parameters
+    ----------
+    kernel : str
+             The path to the kernel
+
+    Returns
+    -------
+    ids : list
+          The set of reference frames IDs defined in the kernel
+    """
+    ckbrief = subprocess.run(["ckbrief", "-t {}".format(kernel)],
+                             capture_output=True,
+                             check=True,
+                             text=True)
+    ids = set()
+    for id in re.findall(r'^(-?[0-9]+)', ckbrief.stdout, flags=re.MULTILINE):
+        ids.add(int(id))
+    # Sort the output list for testability
+    return sorted(list(ids))
+
+def create_spk_dependency_tree(kernels):
+    """
+    construct the dependency tree for the body states in a set of kernels.
+
+    Parameters
+    ----------
+    kernels : list
+              The list of kernels to evaluate the dependencies in. If two
+              kernels in this list contain the same information for the same
+              pair of bodies, then the later kernel in the list will be
+              identified in the kernel property for that edge in dep_tree.
+
+    Returns
+    -------
+    dep_tree : nx.DiGraph
+               The dependency tree for the kernels. Nodes are bodies. There is
+               an edge from one node to another if the state of the body of the
+               source node is defined relative to the state of the body of the
+               destination node. The kernel edge property identifies what kernel
+               the information for the edge is defined in.
+    """
+    dep_tree = nx.DiGraph()
+
+    for kernel in kernels:
+        brief = subprocess.run(["brief", "-c {}".format(kernel)],
+                               capture_output=True,
+                               check=True,
+                               text=True)
+        for body, rel_body in re.findall(r'\((.*)\).*w\.r\.t\..*\((.*)\)', brief.stdout):
+            dep_tree.add_edge(int(body), int(rel_body), kernel=kernel)
+
+    return dep_tree
+
+def spkmerge_config_string(dep_tree, output_spk, bodies, lsk, start, stop):
+    """
+    Create the contents of an spkmerge config file that will produce a spk that
+    completely defines the state of a list of bodies for a time range.
+
+    Parameters
+    ----------
+    dep_tree : nx.DiGraph
+               Dependency tree from create_kernel_dependency_tree that contains
+               information about what the state of different bodies are relative
+               to and where that information is stored.
+    output_spk : str
+                 The path to the SPK that will be output by spkmerge
+    bodies : list
+             The list of body ID codes that need to be defined in the kernel
+             created by spkmerge
+    lsk : str
+          The absolute path to the leap second kernel to use
+    start : str
+            The UTC start time for the kernel created by spkmerge
+    stop : str
+           The UTC stop time for the kernel created by spkmerge
+
+    Returns
+    -------
+     : str
+       The contents of an spkmerge config file that will produce a kernel that
+       defines the state of the input bodies for the input time range.
+    """
+    input_kernels = set()
+    all_bodies = set(bodies)
+    for body in bodies:
+        # Everything is ultimately defined relative to
+        # SOLAR SYSTEM BARYCENTER (0) so find the path to it
+        dep_path = shortest_path(dep_tree, body, 0)
+        all_bodies.update(dep_path)
+        for i in range(len(dep_path) - 1):
+            input_kernels.add(dep_tree[dep_path[i]][dep_path[i+1]]['kernel'])
+    config =  f"LEAPSECONDS_KERNEL     = {lsk}\n"
+    config += f"SPK_KERNEL             = {output_spk}\n"
+    config += f"   BODIES              = {', '.join([str(b) for b in all_bodies])}\n"
+    config += f"   BEGIN_TIME          = {start}\n"
+    config += f"   END_TIME            = {stop}\n"
+    for kernel in input_kernels:
+        config += f"   SOURCE_SPK_KERNEL   = {kernel}\n"
+        config += f"      INCLUDE_COMMENTS = no\n"
+    return config
+
+def write_metakernel_from_kernel_list(kernels):
+    """
+    Parameters
+    ----------
+    kernels : str
+              list of kernel paths
+
+    Returns
+    -------
+    : str
+      Returns string representation of a Naif Metakernel file
+    """
+
+    kernels = [os.path.abspath(k) for k in kernels]
+    common_prefix = os.path.commonprefix(kernels)
+
+    kernels = ["'"+"$PREFIX"+k[len(common_prefix):]+"'" for k in kernels]
+    body = '\n\n'.join([
+            'KPL/MK',
+            f'Metakernel Generated from a kernel list by Ale',
+            '\\begindata',
+            'PATH_VALUES = (',
+            "'"+common_prefix+"'",
+            ')',
+            'PATH_SYMBOLS = (',
+            "'PREFIX'",
+            ')',
+            'KERNELS_TO_LOAD = (',
+            '\n'.join(kernels),
+            ')',
+            '\\begintext'
+        ])
 
     return body

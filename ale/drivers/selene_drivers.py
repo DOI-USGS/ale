@@ -91,7 +91,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         : int
           Sensor frame id
         """
-        return spice.bods2c("LISM_{}_HEAD".format(super().instrument_id))
+        return spice.namfrm("LISM_{}_HEAD".format(super().instrument_id))
 
 
     @property
@@ -159,19 +159,6 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         return self.label.get('CORRECTED_SC_CLOCK_STOP_COUNT').value
 
     @property
-    def ephemeris_stop_time(self):
-        """
-        Returns the ephemeris stop time of the image. Expects spacecraft_id to
-        be defined. This should be the integer naif ID code of the spacecraft.
-
-        Returns
-        -------
-        : float
-          ephemeris stop time of the image
-        """
-        return spice.sct2e(self.spacecraft_id, self.spacecraft_clock_stop_count)
-
-    @property
     def spacecraft_clock_start_count(self):
         """
         The original SC_CLOCK_START_COUNT key is often incorrect and cannot be trusted.
@@ -211,7 +198,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         : int
           The detector line of the principle point
         """
-        return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[0] - 0.5
+        return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[1] - 0.5
 
     @property
     def detector_center_sample(self):
@@ -228,38 +215,6 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
           The detector sample of the principle point
         """
         return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[0] - 0.5
-
-    @property
-    def _sensor_orientation(self):
-        """
-        Returns quaternions describing the orientation of the sensor.
-        Expects ephemeris_time to be defined. This should be a list containing
-        ephemeris times during which the image was taken.
-        Expects instrument_id to be defined in the Pds3Label mixin. This should be
-        a string of the form TC1 or TC2self.
-        Expects reference_frame to be defined. This should be a string containing
-        the name of the reference_frame.
-
-        Returns
-        -------
-        : list
-          Quaternions describing the orentiation of the sensor
-        """
-        if not hasattr(self, '_orientation'):
-            ephem = self.ephemeris_time
-
-            qua = np.empty((len(ephem), 4))
-            for i, time in enumerate(ephem):
-                instrument = super().instrument_id
-                # Find the rotation matrix
-                camera2bodyfixed = spice.pxform("LISM_{}_HEAD".format(instrument),
-                                                self.reference_frame,
-                                                time)
-                q = spice.m2q(camera2bodyfixed)
-                qua[i,:3] = q[1:]
-                qua[i,3] = q[0]
-            self._orientation = qua
-        return self._orientation.tolist()
 
 
     @property

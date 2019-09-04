@@ -1,11 +1,16 @@
 import os
 from os.path import join
+import subprocess
+import networkx as nx
 
 import pytest
 import tempfile
 import spiceypy as spice
 import pvl
 from unittest import mock
+from unittest.mock import MagicMock, patch
+
+from collections import OrderedDict
 
 import ale
 from ale import util
@@ -15,12 +20,12 @@ def cube_kernels():
    return """
     Object = IsisCube
     Group = Kernels
-      TargetAttitudeShape = attitudeshape
-      TargetPosition = (targetposition0, targetposition1)
-      Instrument = instrument
-      InstrumentPointing = (Table, instrumentpointing0, instrumentpointing1)
-      SpacecraftClock = clock
-      InstrumentPosition = instrumentposition
+      TargetAttitudeShape = $base/attitudeshape
+      TargetPosition = ($messenger/targetposition0, $messenger/targetposition1)
+      Instrument = $messenger/instrument
+      InstrumentPointing = (Table, $messenger/instrumentpointing0, $messenger/instrumentpointing1)
+      SpacecraftClock = $base/clock
+      InstrumentPosition = $messenger/instrumentposition
       InstrumentAddendum = Null
       ShapeModel = Null
     End_Group
@@ -70,12 +75,57 @@ def pvl_three_group():
     End_Group
     """
 
-def test_kernel_from_cube_order(cube_kernels):
+@pytest.fixture
+def pvl_four_group():
+    # Mock of the DataDirectory group
+    return """
+    Group = DataDirectory
+      Base         = $ISIS3DATA/base
+      Messenger    = $ISIS3DATA/messenger
+    EndGroup
+    """
+
+def test_kernel_from_cube_list(cube_kernels):
     with tempfile.NamedTemporaryFile('r+') as cube:
         cube.write(cube_kernels)
         cube.flush()
         kernels = util.generate_kernels_from_cube(cube.name)
-    assert kernels == ['targetposition0', 'targetposition1','instrumentposition', 'instrumentpointing0', 'instrumentpointing1', 'attitudeshape', 'instrument', 'clock']
+    assert kernels == ['$messenger/targetposition0', '$messenger/targetposition1','$messenger/instrumentposition', '$messenger/instrumentpointing0', '$messenger/instrumentpointing1', '$base/attitudeshape', '$messenger/instrument', '$base/clock']
+
+def test_kernel_from_cube_list_expanded(monkeypatch, tmpdir, pvl_four_group, cube_kernels):
+    monkeypatch.setenv('ISISROOT', str(tmpdir))
+    monkeypatch.setenv('ISIS3DATA', '/test/path')
+
+    with open(tmpdir.join('IsisPreferences'), 'w+') as pvl_isisroot_file:
+        pvl_isisroot_file.write(pvl_four_group)
+        pvl_isisroot_file.flush()
+
+    with tempfile.NamedTemporaryFile('r+') as cube:
+        cube.write(cube_kernels)
+        cube.flush()
+        kernels = util.generate_kernels_from_cube(cube.name, expand=True)
+    assert kernels == ['/test/path/messenger/targetposition0', '/test/path/messenger/targetposition1', '/test/path/messenger/instrumentposition', '/test/path/messenger/instrumentpointing0', '/test/path/messenger/instrumentpointing1', '/test/path/base/attitudeshape', '/test/path/messenger/instrument', '/test/path/base/clock']
+
+def test_kernel_from_cube_dict(cube_kernels):
+    with tempfile.NamedTemporaryFile('r+') as cube:
+        cube.write(cube_kernels)
+        cube.flush()
+        kernels = util.generate_kernels_from_cube(cube.name, format_as='dict')
+    assert kernels == OrderedDict([('TargetPosition', ['$messenger/targetposition0', '$messenger/targetposition1']), ('InstrumentPosition', ['$messenger/instrumentposition']), ('InstrumentPointing', ['$messenger/instrumentpointing0', '$messenger/instrumentpointing1']), ('Frame', [None]), ('TargetAttitudeShape', ['$base/attitudeshape']), ('Instrument', ['$messenger/instrument']), ('InstrumentAddendum', [None]), ('LeapSecond', [None]), ('SpacecraftClock', ['$base/clock']), ('Extra', [None]), ('Clock', [None])])
+
+def test_kernel_from_cube_dict_expanded(monkeypatch, tmpdir, pvl_four_group, cube_kernels):
+    monkeypatch.setenv('ISISROOT', str(tmpdir))
+    monkeypatch.setenv('ISIS3DATA', '/test/path')
+
+    with open(tmpdir.join('IsisPreferences'), 'w+') as pvl_isisroot_file:
+        pvl_isisroot_file.write(pvl_four_group)
+        pvl_isisroot_file.flush()
+
+    with tempfile.NamedTemporaryFile('r+') as cube:
+        cube.write(cube_kernels)
+        cube.flush()
+        kernels = util.generate_kernels_from_cube(cube.name, expand=True, format_as='dict')
+    assert kernels == OrderedDict([('TargetPosition', ['/test/path/messenger/targetposition0', '/test/path/messenger/targetposition1']), ('InstrumentPosition', ['/test/path/messenger/instrumentposition']), ('InstrumentPointing', ['/test/path/messenger/instrumentpointing0', '/test/path/messenger/instrumentpointing1']), ('Frame', [None]), ('TargetAttitudeShape', ['/test/path/base/attitudeshape']), ('Instrument', ['/test/path/messenger/instrument']), ('InstrumentAddendum', [None]), ('LeapSecond', [None]), ('SpacecraftClock', ['/test/path/base/clock']), ('Extra', [None]), ('Clock', [None])])
 
 def test_kernel_from_cube_no_kernel_group():
     with pytest.raises(KeyError):
@@ -226,3 +276,182 @@ def test_get_metakernels_search_counts(tmpdir, search_kwargs, expected_count):
 
     search_result =  util.get_metakernels(str(tmpdir), **search_kwargs)
     assert search_result['count'] == expected_count
+
+def test_create_spk_dependency_tree():
+    de430_output ="""
+BRIEF -- Version 4.0.0, September 8, 2010 -- Toolkit Version N0066
+
+
+Summary for: de430.bsp
+
+Bodies: MERCURY BARYCENTER (1) w.r.t. SOLAR SYSTEM BARYCENTER (0)
+        VENUS BARYCENTER (2) w.r.t. SOLAR SYSTEM BARYCENTER (0)
+        EARTH BARYCENTER (3) w.r.t. SOLAR SYSTEM BARYCENTER (0)
+        MARS BARYCENTER (4) w.r.t. SOLAR SYSTEM BARYCENTER (0)
+        JUPITER BARYCENTER (5) w.r.t. SOLAR SYSTEM BARYCENTER (0)
+        SATURN BARYCENTER (6) w.r.t. SOLAR SYSTEM BARYCENTER (0)
+        URANUS BARYCENTER (7) w.r.t. SOLAR SYSTEM BARYCENTER (0)
+        NEPTUNE BARYCENTER (8) w.r.t. SOLAR SYSTEM BARYCENTER (0)
+        PLUTO BARYCENTER (9) w.r.t. SOLAR SYSTEM BARYCENTER (0)
+        SUN (10) w.r.t. SOLAR SYSTEM BARYCENTER (0)
+        MERCURY (199) w.r.t. MERCURY BARYCENTER (1)
+        VENUS (299) w.r.t. VENUS BARYCENTER (2)
+        MOON (301) w.r.t. EARTH BARYCENTER (3)
+        EARTH (399) w.r.t. EARTH BARYCENTER (3)
+        Start of Interval (ET)              End of Interval (ET)
+        -----------------------------       -----------------------------
+        1549 DEC 31 00:00:00.000            2650 JAN 25 00:00:00.000
+"""
+    msgr_20040803_20150430_od431sc_2_output ="""
+BRIEF -- Version 4.0.0, September 8, 2010 -- Toolkit Version N0066
+
+
+Summary for: msgr_20040803_20150430_od431sc_2.bsp
+
+Body: MESSENGER (-236) w.r.t. MERCURY BARYCENTER (1)
+      Start of Interval (ET)              End of Interval (ET)
+      -----------------------------       -----------------------------
+      2008 JAN 13 19:18:06.919            2008 JAN 15 18:52:08.364
+      2008 OCT 05 06:12:17.599            2008 OCT 07 11:08:05.670
+      2009 SEP 28 05:25:44.180            2009 OCT 01 14:07:55.870
+      2011 MAR 15 11:20:36.100            2015 APR 30 19:27:09.351
+
+Body: MESSENGER (-236) w.r.t. VENUS BARYCENTER (2)
+      Start of Interval (ET)              End of Interval (ET)
+      -----------------------------       -----------------------------
+      2006 OCT 16 19:26:46.293            2006 OCT 31 22:15:29.222
+      2007 MAY 29 09:28:46.998            2007 JUN 13 15:30:49.997
+
+Body: MESSENGER (-236) w.r.t. SUN (10)
+      Start of Interval (ET)              End of Interval (ET)
+      -----------------------------       -----------------------------
+      2004 AUG 10 04:06:05.612            2005 JUL 26 22:39:53.204
+      2005 AUG 09 16:04:35.204            2006 OCT 16 19:26:46.293
+      2006 OCT 31 22:15:29.222            2007 MAY 29 09:28:46.998
+      2007 JUN 13 15:30:49.997            2008 JAN 13 19:18:06.919
+      2008 JAN 15 18:52:08.364            2008 OCT 05 06:12:17.599
+      2008 OCT 07 11:08:05.670            2009 SEP 28 05:25:44.180
+      2009 OCT 01 14:07:55.870            2011 MAR 15 11:20:36.100
+
+Body: MESSENGER (-236) w.r.t. EARTH (399)
+      Start of Interval (ET)              End of Interval (ET)
+      -----------------------------       -----------------------------
+      2004 AUG 03 07:14:39.393            2004 AUG 10 04:06:05.612
+      2005 JUL 26 22:39:53.204            2005 AUG 09 16:04:35.204
+
+Bodies: MERCURY BARYCENTER (1) w.r.t. SOLAR SYSTEM BARYCENTER (0)
+        EARTH BARYCENTER (3) w.r.t. SOLAR SYSTEM BARYCENTER (0)
+        Start of Interval (ET)              End of Interval (ET)
+        -----------------------------       -----------------------------
+        2004 AUG 03 07:14:39.393            2015 APR 30 19:27:09.351
+
+"""
+    de430_mock = MagicMock(spec=subprocess.CompletedProcess)
+    de430_mock.stdout = de430_output
+    msgr_20040803_20150430_od431sc_2_mock = MagicMock(spec=subprocess.CompletedProcess)
+    msgr_20040803_20150430_od431sc_2_mock.stdout = msgr_20040803_20150430_od431sc_2_output
+
+    expected_tree = nx.DiGraph()
+    expected_tree.add_edge(1, 0, kernel='msgr_20040803_20150430_od431sc_2.bsp')
+    expected_tree.add_edge(2, 0, kernel='de430.bsp')
+    expected_tree.add_edge(3, 0, kernel='msgr_20040803_20150430_od431sc_2.bsp')
+    expected_tree.add_edge(4, 0, kernel='de430.bsp')
+    expected_tree.add_edge(5, 0, kernel='de430.bsp')
+    expected_tree.add_edge(6, 0, kernel='de430.bsp')
+    expected_tree.add_edge(7, 0, kernel='de430.bsp')
+    expected_tree.add_edge(8, 0, kernel='de430.bsp')
+    expected_tree.add_edge(9, 0, kernel='de430.bsp')
+    expected_tree.add_edge(10, 0, kernel='de430.bsp')
+    expected_tree.add_edge(199, 1, kernel='de430.bsp')
+    expected_tree.add_edge(299, 2, kernel='de430.bsp')
+    expected_tree.add_edge(301, 3, kernel='de430.bsp')
+    expected_tree.add_edge(399, 3, kernel='de430.bsp')
+    expected_tree.add_edge(-236, 1, kernel='msgr_20040803_20150430_od431sc_2.bsp')
+    expected_tree.add_edge(-236, 2, kernel='msgr_20040803_20150430_od431sc_2.bsp')
+    expected_tree.add_edge(-236, 10, kernel='msgr_20040803_20150430_od431sc_2.bsp')
+    expected_tree.add_edge(-236, 399, kernel='msgr_20040803_20150430_od431sc_2.bsp')
+
+    with patch('subprocess.run', side_effect = [de430_mock, msgr_20040803_20150430_od431sc_2_mock]) as run_mock:
+        dep_tree = util.create_spk_dependency_tree(['de430.bsp', 'msgr_sc_EN1072174528M.bsp'])
+        run_mock.assert_any_call(["brief", "-c de430.bsp"],
+                                 capture_output=True,
+                                 check=True,
+                                 text=True)
+        run_mock.assert_any_call(["brief", "-c msgr_sc_EN1072174528M.bsp"],
+                                 capture_output=True,
+                                 check=True,
+                                 text=True)
+    assert nx.is_isomorphic(dep_tree, expected_tree)
+
+def test_spkmerge_config_string():
+    dep_tree = nx.DiGraph()
+    dep_tree.add_edge(1, 0, kernel='msgr_20040803_20150430_od431sc_2.bsp')
+    dep_tree.add_edge(2, 0, kernel='de430.bsp')
+    dep_tree.add_edge(3, 0, kernel='msgr_20040803_20150430_od431sc_2.bsp')
+    dep_tree.add_edge(4, 0, kernel='de430.bsp')
+    dep_tree.add_edge(5, 0, kernel='de430.bsp')
+    dep_tree.add_edge(6, 0, kernel='de430.bsp')
+    dep_tree.add_edge(7, 0, kernel='de430.bsp')
+    dep_tree.add_edge(8, 0, kernel='de430.bsp')
+    dep_tree.add_edge(9, 0, kernel='de430.bsp')
+    dep_tree.add_edge(10, 0, kernel='de430.bsp')
+    dep_tree.add_edge(199, 1, kernel='de430.bsp')
+    dep_tree.add_edge(299, 2, kernel='de430.bsp')
+    dep_tree.add_edge(301, 3, kernel='de430.bsp')
+    dep_tree.add_edge(399, 3, kernel='de430.bsp')
+    dep_tree.add_edge(-236, 1, kernel='msgr_20040803_20150430_od431sc_2.bsp')
+    dep_tree.add_edge(-236, 2, kernel='msgr_20040803_20150430_od431sc_2.bsp')
+    dep_tree.add_edge(-236, 10, kernel='msgr_20040803_20150430_od431sc_2.bsp')
+    dep_tree.add_edge(-236, 399, kernel='msgr_20040803_20150430_od431sc_2.bsp')
+
+    config_string = util.spkmerge_config_string(dep_tree,
+                                                'theoutput.bsp',
+                                                [-236, 199, 10],
+                                                'thelsk.tls',
+                                                'the start UTC string',
+                                                'the stop UTC string')
+    assert config_string == """LEAPSECONDS_KERNEL     = thelsk.tls
+SPK_KERNEL             = theoutput.bsp
+   BODIES              = 0, 1, 199, 10, -236
+   BEGIN_TIME          = the start UTC string
+   END_TIME            = the stop UTC string
+   SOURCE_SPK_KERNEL   = de430.bsp
+      INCLUDE_COMMENTS = no
+   SOURCE_SPK_KERNEL   = msgr_20040803_20150430_od431sc_2.bsp
+      INCLUDE_COMMENTS = no
+""" or config_string == """LEAPSECONDS_KERNEL     = thelsk.tls
+SPK_KERNEL             = theoutput.bsp
+   BODIES              = 0, 1, 199, 10, -236
+   BEGIN_TIME          = the start UTC string
+   END_TIME            = the stop UTC string
+   SOURCE_SPK_KERNEL   = msgr_20040803_20150430_od431sc_2.bsp
+      INCLUDE_COMMENTS = no
+   SOURCE_SPK_KERNEL   = de430.bsp
+      INCLUDE_COMMENTS = no
+"""
+
+def test_get_ck_frames():
+    msgr_0905_v02_output = """
+CKBRIEF -- Version 6.1.0, June 27, 2014 -- Toolkit Version N0066
+
+
+Summary for: msgr_0905_v02.bc
+
+Objects  Interval Begin ET        Interval End ET          AV
+-------- ------------------------ ------------------------ ---
+-236001  NEED LSK AND SCLK FILES  NEED LSK AND SCLK FILES  Y
+-236002  NEED LSK AND SCLK FILES  NEED LSK AND SCLK FILES  Y
+-236002  NEED LSK AND SCLK FILES  NEED LSK AND SCLK FILES  Y
+-236000  NEED LSK AND SCLK FILES  NEED LSK AND SCLK FILES  Y
+-236002  NEED LSK AND SCLK FILES  NEED LSK AND SCLK FILES  Y
+
+"""
+    msgr_0905_v02_mock = MagicMock(spec=subprocess.CompletedProcess)
+    msgr_0905_v02_mock.stdout = msgr_0905_v02_output
+    with patch('subprocess.run', side_effect = [msgr_0905_v02_mock]) as run_mock:
+        frames = util.get_ck_frames('msgr_0905_v02.bc')
+        run_mock.assert_any_call(["ckbrief", "-t msgr_0905_v02.bc"],
+                                 capture_output=True,
+                                 check=True,
+                                 text=True)
+    assert frames == [-236002, -236001, -236000]
