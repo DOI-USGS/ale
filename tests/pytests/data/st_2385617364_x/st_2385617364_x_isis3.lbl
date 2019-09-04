@@ -1,0 +1,87 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 350
+    TileLines   = 350
+
+    Group = Dimensions
+      Samples = 700
+      Lines   = 700
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName            = HAYABUSA
+    InstrumentId              = AMICA
+    SpacecraftClockStartCount = 2385525447 <1/32sec>
+    SpacecraftClockStopCount  = 2385525829 <1/32sec>
+    StartTime                 = 2005-09-17T18:27:40
+    StopTime                  = 2005-09-17T18:27:40
+    ExposureDuration          = .0655 <SECOND>
+    TargetName                = ITOKAWA
+    TargetType                = ASTEROID
+    OriginalTargetName        = "25143 ITOKAWA"
+    Binning                   = 1
+    FirstLine                 = 164
+    LastLine                  = 863
+    FirstSample               = 164
+    LastSample                = 863
+    CcdTemperature            = -26.44
+  End_Group
+
+  Group = Archive
+    FileName            = st_2385617364_x.fit
+    DataSetId           = HAY-A-AMICA-3-HAYAMICA-V1.0
+    ProductId           = 20050917_ST_2385617364_X_FIT
+    ProductName         = 20050917:ST_2385617364_X.FIT
+    ProductCreationTime = 2008-04-08
+    SubImageCount       = 2
+    Image1Number        = 60
+    DataType            = SCIENCE
+    OutputMode          = LOSS-LESS
+    OperationType       = MEAN
+    LutNumber           = 0
+    QualityFlag         = 0
+    QualityDesc         = GOOD
+    YearDoy             = 2005260
+  End_Group
+
+  Group = BandBin
+    OriginalBand = 1
+    Name         = X
+    Number       = 5
+    Center       = 861 <nanometers>
+    Width        = 81 <nanometers>
+    Unit         = Nanometers
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode = -130102
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 2025537
+  Bytes     = 525
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 2026062
+  Bytes     = 5352
+End_Object
+End
