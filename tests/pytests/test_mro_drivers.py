@@ -1,19 +1,16 @@
-from unittest.mock import patch
-import unittest
-import json
 import os
+import json
+import unittest
+from unittest.mock import patch
 
 import pytest
 import numpy as np
-
-import ale
-
 import spiceypy as spice
 
-# 'Mock' the spice module where it is imported
-from conftest import get_image_kernels, convert_kernels, get_image_label, compare_dicts
-
+import ale
 from ale.drivers.mro_drivers import MroCtxPds3LabelNaifSpiceDriver, MroCtxIsisLabelNaifSpiceDriver, MroCtxIsisLabelIsisSpiceDriver
+
+from conftest import get_image_kernels, convert_kernels, get_image_label, compare_dicts
 
 @pytest.fixture()
 def usgscsm_compare_dict():
