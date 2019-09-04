@@ -1,0 +1,3 @@
+
+This CK was generated using the following command: {}
+/home/acpaquette/repos/ale/notebooks/ckslicer -LSK /usgs/cpkgs/isis3/data/base/kernels/lsk/naif0012.tls -SCLK /usgs/cpkgs/isis3/data/mro/kernels/sclk/MRO_SCLKSCET.00082.65536.tsc -INPUTCK /usgs/cpkgs/isis3/data/mro/kernels/ck/mro_sc_psp_090526_090601.bc -OUTPUTCK /home/acpaquette/kernel_split/mro_sc_psp_090526_090601_sliced-74000.bc -ID -74000 -TIMETYPE SCLK -START 5/0928283209.123 -STOP 5/0928284626.253

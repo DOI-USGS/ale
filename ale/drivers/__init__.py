@@ -75,6 +75,6 @@ def load(label, props={}, formatter='usgscsm', verbose=False):
                 traceback.print_exc()
     raise Exception('No Such Driver for Label')
 
-def loads(label, props='', formatter='usgscsm'):
-    res = load(label, props, formatter)
+def loads(label, props='', formatter='usgscsm', verbose=False):
+    res = load(label, props, formatter, verbose=verbose)
     return json.dumps(res, cls=AleJsonEncoder)
