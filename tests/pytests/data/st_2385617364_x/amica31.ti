@@ -1,0 +1,322 @@
+KPL/IK
+
+\beginlabel
+PDS_VERSION_ID               = PDS3
+RECORD_TYPE                  = STREAM
+RECORD_BYTES                 = "N/A"
+^SPICE_KERNEL                = "amica31.ti"
+MISSION_NAME                 = HAYABUSA
+SPACECRAFT_NAME              = HAYABUSA
+DATA_SET_ID                  = "HAY-A-SPICE-6-V1.0"
+KERNEL_TYPE_ID               = IK
+PRODUCT_ID                   = "amica31.ti"
+PRODUCT_CREATION_TIME        = 2009-11-30T13:50:41
+PRODUCER_ID                  = JAXA
+MISSION_PHASE_NAME           = "N/A"
+PRODUCT_VERSION_TYPE         = ACTUAL
+PLATFORM_OR_MOUNTING_NAME    = "HAYABUSA SPACECRAFT BUS"
+START_TIME                   = "N/A"
+STOP_TIME                    = "N/A"
+SPACECRAFT_CLOCK_START_COUNT = "N/A"
+SPACECRAFT_CLOCK_STOP_COUNT  = "N/A"
+TARGET_NAME                  = "25143 ITOKAWA"
+INSTRUMENT_NAME              = "ASTEROID MULTI-BAND IMAGING CAMERA"
+NAIF_INSTRUMENT_ID           = -130102
+SOURCE_PRODUCT_ID            = "N/A"
+NOTE                         = "See comments in the file for details"
+OBJECT                       = SPICE_KERNEL
+  INTERCHANGE_FORMAT         = ASCII
+  KERNEL_TYPE                = INSTRUMENT
+  DESCRIPTION                = "SPICE I-Kernel (IK) file containing FOV and
+reference frame definitions for the Hayabusa Asteroid Multi-band Imaging
+CAmera (AMICA) instrument, created by the Hayabusa Joint Science Team. "
+END_OBJECT                   = SPICE_KERNEL
+\endlabel
+
+
+Hayabusa NIRS Instrument and Frame Kernel Kile
+===========================================================================
+
+   This instrument kernel (I-kernel) contains the frames and FOV 
+   definitions for Hayabusa Asteroid Multi-band Imaging CAmera (AMICA).
+
+
+Version and Date
+---------------------------------------------------------------------------
+
+   Version 3.1 by Boris Semenov, NAIF/JPL, 23 Sep. 2009.
+
+        Added miscellaneous comments. File name and version were not
+        changed.
+
+   Version 3.1 by Naru Hirata, Univ. of Aizu, 25 Jul. 2008.
+
+        ***** IMPORTANT *****
+        This is a bug-fix release for v 3.0, which include wrong 
+        pointing vector angles.
+        
+        Here is the corrected line.
+        TKFRAME_-130102_ANGLES    =  ( -0.087, -0.124, -0.380)
+        
+        PLEASE REPLACE the older version, v 3.0, with a new one 
+        and DISCARD any results that depend on wrong values from 
+        the older version.
+
+
+   Version 3.0 by Naru Hirata, Univ. of Aizu, 10 Apr. 2007.
+
+       The alignments and the focal length are updated by results of 
+       in-flight calibration.
+       
+       TKFRAME_-130102_ANGLES    =  ( -0.087, -0.124, 0.380)
+       INS-130102_FOCAL_LENGTH = ( 0.1208 ) 
+
+       Original efforts on in-flight calibration were done by Etsuko 
+       Nemoto (Univ. of Aizu) and Masateru Ishiguro (Seoul National Univ.).
+       Details are described in a following paper.
+
+           Ishiguro et al. (2007)
+           Calibration and Performance of Asteroid Multi-band Imaging 
+           Camera (AMICA) onboard Hayabusa Spacecraft,
+           (in prep).
+
+   Version 2.0 by Naru Hirata, Kobe University, 19 Oct. 2005.
+
+       A definition of the camera boresight is again changed:
+       INS-130102_CENTER         = ( 511.5, 511.5 )
+
+       Asignments of IDs are changed:
+                                               NAIF ID
+      ------------------------------------------------
+       HAYABUSA                                   -130
+       HAYABUSA_SC_BUS_PRIME                   -130000
+
+       IDs for ONC/AMICA                       -1301xx
+       HAYABUSA_AMICA_IDEAL                    -130101
+       HAYABUSA_AMICA                          -130102
+      ------------------------------------------------
+
+
+   Version 1.0 by Naru Hirata, Kobe University, 3 Sept. 2005.
+
+        Modified the values of alignment and focal length:
+
+        TKFRAME_-130001_RELATIVE  = 'HAYABUSA_AMICA_IDEAL'
+        TKFRAME_-130001_ANGLES    =  ( -0.1047822858, -0.1069183120, -0.45)
+        TKFRAME_-130001_AXES      = (     1,     2,    3 )
+        TKFRAME_-130001_UNITS     = 'DEGREES'
+
+        INS-130001_FOCAL_LENGTH   = (  0.1204711614      ) 
+        INS-130001_F_NUMBER       = (  8.0       )
+
+
+   Version 0.4 by Naru Hirata, Kobe University, 27 July 2005.
+   
+        Modified the values of alignment:
+ 
+        TKFRAME_-130001_ANGLES    = (  0.0, 180.0, -90.0 )
+        TKFRAME_-130001_AXES      = (     1,     2,    3 )
+
+        TKFRAME_-130001_ANGLES    = ( -90.0, 180.0, 180.0 )
+        TKFRAME_-130001_AXES      = (     3,     2,   3 )
+
+   
+   Version 0.3 (prototype) by Shingo Kobayashi, Univ. of Aizu, 21 July 2005.
+   
+        Added to a new item as follows:
+
+        INS-130001_UPVECTOR       = ( 0.0 -1.0 0.0 )
+   
+
+   Version 0.2 (prototype) by Naru Hirata, Kobe University, 24 June 2005.
+
+        Added to some new items as follows:
+
+        INS-130001_PIXEL_SAMPLES  = ( 1024         )
+        INS-130001_PIXEL_LINES    = ( 1024         )
+        INS-130001_CENTER         = ( 512.5, 512.5 )       
+        INS-130001_PIXEL_SIZE     = ( 0.000012     )
+
+   Version 0.1 (prototype) by Naru Hirata, Kobe University, 5 June 2004.
+   Version 0.0 (prototype) by Naru Hirata, Kobe University, 25 May 2004.
+
+
+Implementation Notes
+---------------------------------------------------------------------------
+
+   Applications that need SPICE I-kernel data must ``load'' the
+   I-kernel file, normally during program initialization. Loading the
+   kernel using the SPICELIB routine FURNSH causes the data items and
+   their associated values present in the kernel to become associated
+   with a data structure called the ``kernel pool''. The application
+   program may then obtain the value(s) for any IK data item using the
+   SPICELIB routines GDPOOL, GIPOOL, GCPOOL. Routine GETFOV may be used
+   if the file contains instrument field-of-view (FOV) specification.
+   The frame definitions information is accessed via any interfaces
+   utilizing SPICE frames subsystem (PXFORM, etc).
+
+   This file was created with, and can be updated with a text editor or
+   word processor.
+
+
+Conventions for Specifying Data
+---------------------------------------------------------------------------
+
+   Instrument data items are specified using ``keyword=value''
+   assignments. All keywords referencing instrument values in this
+   I-kernel start with the characters `INS' followed by the NAIF
+   instrument ID code for AMICA, -130102. The remainder of the keyword
+   is an underscore character followed by the unique name of the data
+   item. For example, AMICA boresight vector is specified by
+
+               INS-130102_BORESIGHT
+
+   The upper bound on the length of all keywords is 32 characters.
+
+
+Hayabusa Spacecraft Frame Definition
+---------------------------------------------------------------------------
+
+   This HAYABUSA_SC_BUS_PRIME frame definition is a copy of the
+   definition provided in the main Hayabusa FK file. It is included in
+   this IK file for historical reasons.
+
+\begindata
+
+   FRAME_HAYABUSA_SC_BUS_PRIME  = -130000
+   FRAME_-130000_NAME        = 'HAYABUSA_SC_BUS_PRIME'
+   FRAME_-130000_CLASS       = 3
+   FRAME_-130000_CLASS_ID    = -130000
+   FRAME_-130000_CENTER      = -130
+   CK_-130000_SCLK           = -130
+   CK_-130000_SPK            = -130
+
+\begintext
+
+
+AMICA Frame Definitions
+---------------------------------------------------------------------------
+
+   Two frames are defined for AMICA: HAYABUSA_AMICA_IDEAL and
+   HAYABUSA_AMICA. 
+
+   The HAYABUSA_AMICA_IDEAL frame incorporates the ideal fixed
+   instrument alignment relative to the spacecraft frame,
+   HAYABUSA_SC_BUS_PRIME. The +Z axis of the HAYABUSA_AMICA_IDEAL frame
+   is along the ideally-mounted instrument boresight.
+
+   The HAYABUSA_AMICA frame incorporates the the actual instrument
+   misalignment relative to its ideal orientation represented by the
+   HAYABUSA_AMICA_IDEAL frame. The +Z axis of this frame is along the
+   actual instrument boresight.
+
+   Both frames are defined as fixed offset frames with their
+   orientation specified using Euler angles.
+ 
+   Note that angles in the frame definitions are specified for "from
+   instrument to base (relative to) frame" transformation.
+
+   It is also noted that these instrument frames are different from the
+   frame definitions for mechanical design, which are officially referred
+   in printed materials. The boresight of the camera points the -Z axis in 
+   the coordinates for mechanical design, while it points the +Z axis 
+   in the SPICE instrument frame.
+
+\begindata
+
+   FRAME_HAYABUSA_AMICA      = -130102
+   FRAME_-130102_NAME        = 'HAYABUSA_AMICA'
+   FRAME_-130102_CLASS       = 4
+   FRAME_-130102_CLASS_ID    = -130102
+   FRAME_-130102_CENTER      = -130
+   TKFRAME_-130102_SPEC      = 'ANGLES'
+   TKFRAME_-130102_RELATIVE  = 'HAYABUSA_AMICA_IDEAL'
+   TKFRAME_-130102_ANGLES    =  ( -0.087, -0.124, -0.380)
+   TKFRAME_-130102_AXES      = (     1,     2,    3 )
+   TKFRAME_-130102_UNITS     = 'DEGREES'
+   
+   FRAME_HAYABUSA_AMICA_IDEAL = -130101
+   FRAME_-130101_NAME        = 'HAYABUSA_AMICA_IDEAL'
+   FRAME_-130101_CLASS       = 4
+   FRAME_-130101_CLASS_ID    = -130101
+   FRAME_-130101_CENTER      = -130
+   TKFRAME_-130101_SPEC      = 'ANGLES'
+   TKFRAME_-130101_RELATIVE  = 'HAYABUSA_SC_BUS_PRIME'
+   TKFRAME_-130101_ANGLES    = (  0.0, 180.0, -90.0 )
+   TKFRAME_-130101_AXES      = (     1,     2,    3 )
+   TKFRAME_-130101_UNITS     = 'DEGREES'
+
+\begintext
+   
+
+AMICA Field-Of-View Definition
+---------------------------------------------------------------------------
+
+   The AMICA FOV is defined using a corner-style definition as a 5.83 by
+   5.83 degrees square pyramid centered around the boresight that points
+   along the +Z axis of the HAYABUSA_AMICA frame. FOV corner directions
+   are defined assuming that:
+   
+    - FOV has square shape with its sides along X and Y axes of the
+      instrument's frame;
+
+    - FOV angular size in X direction is 5.83 degrees; in Y direction
+      -- 5.83 degrees;
+
+    - boresight vector intersects FOV exactly in the center of the
+      rectangle;
+
+   The FOV shape is set to 'POLYGON'; it could also have been set to
+   'RECTANGLE'. Corner directions are given counterclockwise as seen
+   from boresight.
+   
+\begindata
+   
+    INS-130102_PIXEL_SAMPLES  = ( 1024         )
+    INS-130102_PIXEL_LINES    = ( 1024         )
+    INS-130102_CENTER         = ( 511.5, 511.5 )       
+    INS-130102_PIXEL_SIZE     = ( 0.000012     )
+   
+    INS-130102_FOV_FRAME      = 'HAYABUSA_AMICA'
+    INS-130102_FOV_SHAPE      = 'POLYGON'
+    INS-130102_BORESIGHT      = ( 0.0 0.0 1.0 )
+    INS-130102_UPVECTOR       = ( 0.0 -1.0 0.0 )
+                                     
+    INS-130102_FOV_BOUNDARY_CORNERS = ( 
+                                          0.006144   0.006144   0.1204711614
+                                         -0.006144   0.006144   0.1204711614
+                                         -0.006144  -0.006144   0.1204711614
+                                          0.006144  -0.006144   0.1204711614
+                                       )
+
+\begintext
+
+
+AMICA Optical Parameters
+---------------------------------------------------------------------------
+
+   The following table summarizes a camera optics parameters:
+
+      -----------------------------------------------------------------
+             parameter                ONC-T(AMICA)
+      -----------------------------------------------------------------
+      Focal Length, mm                120.8
+      f/ratio                         f/8.0
+      IFOV, arcsec/pixel               20.47
+      Field of view (degree)
+          Horizontal                    5.7
+          Vertical                      5.7
+      -----------------------------------------------------------------
+
+
+   These values are incorporated in the keywords below; focal lengths
+   and aperture are converted to METERS.
+
+\begindata
+
+    INS-130102_FOCAL_LENGTH = ( 0.1208 ) 
+    INS-130102_F_NUMBER     = (  8.0       )
+
+\begintext
+
+End of IK file.
