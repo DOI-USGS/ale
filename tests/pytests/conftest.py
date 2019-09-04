@@ -52,9 +52,12 @@ def compare_dicts(ldict, rdict):
             differences.append(f'Key {key} is present in the left dict, but not the right dict.')
         elif isinstance(item, dict):
             differences.extend(compare_dicts(item, rdict[key]))
-        elif isinstance(item, np.ndarray):
+        elif isinstance(item, np.ndarray) or isinstance(item, list):
             if not np.allclose(item, rdict[key]):
                 differences.append(f'Array values of key {key} are not almost equal {item} : {rdict[key]}.')
+        elif isinstance(item, str):
+            if item.lower() != rdict[key].lower():
+                differences.append(f'Values of key {key} are not equal {item} : {rdict[key]}.')
         else:
             if item != rdict[key]:
                 differences.append(f'Values of key {key} are not equal {item} : {rdict[key]}.')
@@ -134,7 +137,10 @@ def convert_kernels(kernels):
     for kernel in kernels:
         split_kernel = os.path.splitext(kernel)
         if 'x' in split_kernel[1].lower():
-            bin_output = subprocess.run(['tobin', os.path.join(data_root, kernel)],
+            # Get the full path to the kernel then truncate it to the relative path
+            path = os.path.join(data_root, kernel)
+            path = os.path.relpath(path)
+            bin_output = subprocess.run(['tobin', path],
                                         capture_output=True, check=True)
             matches = re.search(r'To: (.*\.b\w*)', str(bin_output.stdout))
             if not matches:

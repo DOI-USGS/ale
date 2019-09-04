@@ -1,0 +1,371 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 1000
+    TileLines   = 1024
+
+    Group = Dimensions
+      Samples = 5000
+      Lines   = 400
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = SignedWord
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName        = Mars_Reconnaissance_Orbiter
+    InstrumentId          = CTX
+    TargetName            = Mars
+    MissionPhaseName      = ESP
+    StartTime             = 2009-06-01T00:38:16.057
+    SpacecraftClockCount  = 0928283918:060
+    OffsetModeId          = 196/202/188
+    LineExposureDuration  = 1.877 <MSEC>
+    FocalPlaneTemperature = 295.2 <K>
+    SampleBitModeId       = SQROOT
+    SpatialSumming        = 1
+    SampleFirstPixel      = 0
+  End_Group
+
+  Group = Archive
+    DataSetId           = MRO-M-CTX-2-EDR-L0-V1.0
+    ProductId           = B10_013341_1010_XN_79S172W
+    ProducerId          = MRO_CTX_TEAM
+    ProductCreationTime = 2009-12-02T19:21:25
+    OrbitNumber         = 13341
+  End_Group
+
+  Group = BandBin
+    FilterName = BroadBand
+    Center     = 0.65 <micrometers>
+    Width      = 0.15 <micrometers>
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -74021
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = $base/kernels/pck/pck00009.tpc
+    TargetPosition            = (Table, $base/kernels/spk/de430.bsp,
+                                 $base/kernels/spk/mar097.bsp)
+    InstrumentPointing        = (Table,
+                                 $mro/kernels/ck/mro_sc_psp_090526_090601.bc,
+                                 $mro/kernels/fk/mro_v15.tf)
+    Instrument                = Null
+    SpacecraftClock           = $mro/kernels/sclk/MRO_SCLKSCET.00082.65536.tsc
+    InstrumentPosition        = (Table,
+                                 $mro/kernels/spk/mro_psp11_ssd_mro110c.bsp)
+    InstrumentAddendum        = $mro/kernels/iak/mroctxAddendum005.ti
+    ShapeModel                = $base/dems/molaMarsPlanetaryRadius0005.cub
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name      = "Ctx Prefix Dark Pixels"
+  StartByte = 245826082
+  Bytes     = 2359296
+  Records   = 24576
+  ByteOrder = Lsb
+
+  Group = Field
+    Name = DarkPixels
+    Type = Integer
+    Size = 24
+  End_Group
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 248187092
+  Bytes               = 14848
+  Records             = 232
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-74000, -74900, 1)
+  ConstantFrames      = (-74021, -74020, -74699, -74690, -74000)
+  ConstantRotation    = (0.99999956087984, -1.51960241928036e-05,
+                         9.37021451059404e-04, 1.52765520753568e-05,
+                         0.99999999619106, -8.59331791187956e-05,
+                         -9.3702014164768e-04, 8.59474558407972e-05,
+                         0.99999955730305)
+  CkTableStartTime    = 297088762.24158
+  CkTableEndTime      = 297088808.37074
+  CkTableOriginalSize = 24577
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = ($mro/kernels/ck/mro_sc_psp_090526_090601.bc,
+                         $mro/kernels/fk/mro_v15.tf)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 248201940
+  Bytes                = 672
+  Records              = 12
+  ByteOrder            = Lsb
+  CacheType            = HermiteSpline
+  SpkTableStartTime    = 297088762.24158
+  SpkTableEndTime      = 297088808.37074
+  SpkTableOriginalSize = 24577.0
+  Description          = "Created by spiceinit"
+  Kernels              = $mro/kernels/spk/mro_psp11_ssd_mro110c.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 248202612
+  Bytes               = 128
+  Records             = 2
+  ByteOrder           = Lsb
+  TimeDependentFrames = (10014, 1)
+  CkTableStartTime    = 297088762.24158
+  CkTableEndTime      = 297088808.37074
+  CkTableOriginalSize = 2
+  FrameTypeCode       = 2
+  PoleRa              = (317.68143, -0.1061, 0.0)
+  PoleDec             = (52.8865, -0.0609, 0.0)
+  PrimeMeridian       = (176.63, 350.89198226, 0.0)
+  Description         = "Created by spiceinit"
+  Kernels             = ($base/kernels/spk/de430.bsp,
+                         $base/kernels/spk/mar097.bsp,
+                         $base/kernels/pck/pck00009.tpc)
+  SolarLongitude      = 276.65516622386
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 248202740
+  Bytes                = 112
+  Records              = 2
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 297088762.24158
+  SpkTableEndTime      = 297088808.37074
+  SpkTableOriginalSize = 2.0
+  Description          = "Created by spiceinit"
+  Kernels              = ($base/kernels/spk/de430.bsp,
+                          $base/kernels/spk/mar097.bsp)
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 248202852
+  Bytes     = 1472
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 248185378
+  Bytes     = 1714
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE                            = 499
+  BODY499_RADII                        = (3396.19, 3396.19, 3376.2)
+  BODY_FRAME_CODE                      = 10014
+  INS-74021_FOCAL_LENGTH               = 352.9271664
+  INS-74021_PIXEL_PITCH                = 0.007
+  CLOCK_ET_-74_0928283918:060_COMPUTED = 74d83dfa36b5b141
+  INS-74021_TRANSX                     = (0.0, 0.0, 0.007)
+  INS-74021_TRANSY                     = (0.0, 0.007, 0.0)
+  INS-74021_ITRANSS                    = (0.0, 0.0, 142.85714285714)
+  INS-74021_ITRANSL                    = (0.0, 142.85714285714, 0.0)
+  INS-74021_BORESIGHT_SAMPLE           = 2543.46099
+  INS-74021_BORESIGHT_LINE             = 0.430442527
+  INS-74021_OD_K                       = (-0.0073433925920055,
+                                          2.83758786362417e-05,
+                                          1.28419891240271e-08)
+End_Object
+End
