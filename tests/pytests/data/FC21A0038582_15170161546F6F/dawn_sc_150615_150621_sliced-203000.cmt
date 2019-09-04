@@ -1,4 +1,0 @@
-This CK is for testing with the image: /home/pgiroux/repos/ale/tests/pytests/data/FC21A0038582_15170161546F6F/FC21A0038582_15170161546F6F.cub
-
-This CK was generated using the following command: {}
-/home/pgiroux/repos/ale/ckslicer -LSK /usgs/cpkgs/isis3/data/base/kernels/lsk/naif0012.tls -SCLK /usgs/cpkgs/isis3/data/dawn/kernels/sclk/DAWN_203_SCLKSCET.00091.tsc -INPUTCK /usgs/cpkgs/isis3/data/dawn/kernels/ck/dawn_sc_150615_150621.bc -OUTPUTCK /home/pgiroux/repos/ale/tests/pytests/data/FC21A0038582_15170161546F6F/dawn_sc_150615_150621_sliced-203000.bc -ID -203000 -TIMETYPE SCLK -START 1/0488001136.002 -STOP 1/0488004091.183
