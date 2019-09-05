@@ -3819,15 +3819,15 @@ BEGIN_ARRAY 4 3601
 END_ARRAY 4 3601
 TOTAL_ARRAYS 4
  ~NAIF/SPC BEGIN COMMENTS~
-; /home/kberry/kernel_split/N1702360370_1.bsp LOG FILE
+; /home/kberry/kernel_slice_smaller/N1702360370_1.bsp LOG FILE
 
-; Created 2019-09-04/14:38:30.00.
+; Created 2019-09-05/15:12:52.00.
 ;
 ; BEGIN SPKMERGE COMMANDS
 
 LEAPSECONDS_KERNEL   = /usgs/cpkgs/isis3/data/base/kernels/lsk/naif0012.tls
 
-SPK_KERNEL           = /home/kberry/kernel_split/N1702360370_1.bsp
+SPK_KERNEL           = /home/kberry/kernel_slice_smaller/N1702360370_1.bsp
 SOURCE_SPK_KERNEL = /usgs/cpkgs/isis3/data/cassini/kernels/spk/180628RU_SCPSE_11337_11357.bsp
     INCLUDE_COMMENTS = NO
     BODIES           = 6, 10, -82, 602
