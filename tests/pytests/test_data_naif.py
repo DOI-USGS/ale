@@ -26,7 +26,8 @@ class test_data_naif(unittest.TestCase):
         self.driver.spacecraft_clock_start_count = '0'
         self.driver.spacecraft_clock_stop_count = '1/60000'
         # Center ET obtained from B10_013341_1010_XN_79S172W Label
-        self.driver.center_ephemeris_time = 297088785.3061601
+        # self.driver.center_ephemeris_time = 297088785.3061601
+        self.driver.center_ephemeris_time = 297088762.61698407
 
     def tearDown(self):
         spice.unload(self.updated_kernels)
@@ -86,8 +87,8 @@ class test_data_naif(unittest.TestCase):
     def test_sun_position(self):
         sun_positions, sun_velocities, times = self.driver.sun_position
         assert len(sun_positions) == 1
-        np.testing.assert_allclose(sun_positions[0], [-1.26841481e+11, 1.39920683e+11, -8.81106114e+10])
+        np.testing.assert_allclose(sun_positions[0], [-127052102329.16032, 139728839049.65073, -88111530293.94502])
         assert len(sun_velocities) == 1
-        np.testing.assert_allclose(sun_velocities[0], [9.89744122e+06, 8.97428529e+06, 8.82936862e+02])
+        np.testing.assert_allclose(sun_velocities[0], [9883868.06162645, 8989183.29614645, 881.9339912834714])
         assert len(times) == 1
-        np.testing.assert_allclose(times[0], 2.97088785e+08)
+        np.testing.assert_allclose(times[0], 297088762.61698407)
