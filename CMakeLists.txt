@@ -18,6 +18,7 @@ set(CMAKE_CXX_STANDARD 11)
 find_package(GSL    REQUIRED)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 find_package(PythonLibs REQUIRED COMPONENTS Development Interpreter Compiler)
+find_package(nlohmann_json REQUIRED)
 
 # Library setup
 add_library(ale SHARED
@@ -25,8 +26,7 @@ add_library(ale SHARED
 set_target_properties(ale PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION 1)
-set(ALE_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include/"
-                     "${CMAKE_CURRENT_SOURCE_DIR}/include/json")
+set(ALE_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 
 target_include_directories(ale
                            PRIVATE
@@ -39,7 +39,8 @@ target_include_directories(ale
  target_link_libraries(ale
                        PRIVATE
                        ${GSL_LIBRARIES}
-                       ${PYTHON_LIBRARY})
+                       ${PYTHON_LIBRARY}
+                       nlohmann_json::nlohmann_json)
 
 # Optional build tests
 option (BUILD_TESTS "Build tests" ON)
