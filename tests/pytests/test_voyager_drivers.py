@@ -24,9 +24,9 @@ def isis_compare_dict():
                      'INS-32101_FOCAL_LENGTH': 1503.49,
                      'INS-32101_BORESIGHT_SAMPLE': 500,
                      'INS-32101_BORESIGHT_LINE': 500},
-    'InstrumentPointing': {'TimeDependentFrames': [-32100, 2, 1], # correct [-32100, 2, 1]
+    'InstrumentPointing': {'TimeDependentFrames': [-32100, 2, 1],
                            'ConstantFrames': [-32101, -32100],
-                           'CkTableStartTime': -646346832.89712, # On cube is -646346832.89712
+                           'CkTableStartTime': -646346832.89712,
                            'CkTableEndTime': -646346832.89712,
                            'CkTableOriginalSize': 1,
                            'EphemerisTimes': [-646346832.89712],
