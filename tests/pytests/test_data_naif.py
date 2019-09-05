@@ -26,7 +26,6 @@ class test_data_naif(unittest.TestCase):
         self.driver.spacecraft_clock_start_count = '0'
         self.driver.spacecraft_clock_stop_count = '1/60000'
         # Center ET obtained from B10_013341_1010_XN_79S172W Label
-        # self.driver.center_ephemeris_time = 297088785.3061601
         self.driver.center_ephemeris_time = 297088762.61698407
 
     def tearDown(self):
