@@ -1,0 +1,164 @@
+\begintext
+
+
+ IAK Overview
+---------------------------------------------------------------------------
+
+  This kernel contains constants and parameters used in Integrated
+  Software for Imagers and Spectrometers (ISIS), created and managed by the 
+  USGS Astrogeology Research Program in Flagstaff, AZ. For more information 
+  about the constants derived here, please see:
+
+   1. Speyerer et al. (2013) Pre-Flight and On-Orbit Geometric Calibration
+      of the Lunar Reconnaissance Orbiter Camera
+   2. Anderson el al. (2013) Analysis of Light Time and Stellar Aberration 
+      Corrections in ISIS Using Lunar Reconnaissance Orbiter Narrow Angle 
+      Camera Images. 44th Lunar and Planetary Science Conference, #2318
+
+
+
+ LROC NAC Timing Offsets:
+---------------------------------------------------------------------------
+
+
+  newLineTime = oldLineTime * ( 1.0 + MULTIPLI_LINE_ERROR) + ADDITIVE_LINE_ERROR
+  newStartTime = oldStartTime + CONSTANT_TIME_OFFSET + ADDITIONAL_PREROLL * newLineTime
+
+\begindata
+
+  INS-85600_CONSTANT_TIME_OFFSET = ( 0.0    )
+  INS-85600_ADDITIONAL_PREROLL   = ( 1024   )
+  INS-85600_ADDITIVE_LINE_ERROR  = ( 0.0    )
+  INS-85600_MULTIPLI_LINE_ERROR  = ( 0.0045 )
+  
+  INS-85610_CONSTANT_TIME_OFFSET = ( 0.0    )
+  INS-85610_ADDITIONAL_PREROLL   = ( 1024   )
+  INS-85610_ADDITIVE_LINE_ERROR  = ( 0.0    )
+  INS-85610_MULTIPLI_LINE_ERROR  = ( 0.0045 )
+  
+\begintext
+
+ LROC CK Definitions:
+---------------------------------------------------------------------------
+
+  These are the parameters required for writing c-kernels.  Isis will
+  create a ck with the same frame endpoints as the mission ck.  For
+  the LRO spacecraft the ck frame is LRO_SC_BUS (-85000), and the
+  ck reference frame is J2000 (1).
+
+\begindata
+  INS-85600_CK_FRAME_ID=-85000
+  INS-85600_CK_REFERENCE_ID=1
+
+  INS-85610_CK_FRAME_ID=-85000
+  INS-85610_CK_REFERENCE_ID=1
+  
+  INS-85620_CK_FRAME_ID=-85000
+  INS-85620_CK_REFERENCE_ID=1
+  
+  INS-85621_CK_FRAME_ID=-85000
+  INS-85621_CK_REFERENCE_ID=1
+  
+  INS-85626_CK_FRAME_ID=-85000
+  INS-85626_CK_REFERENCE_ID=1
+  
+  INS-85631_CK_FRAME_ID=-85000
+  INS-85631_CK_REFERENCE_ID=1
+  
+  INS-85632_CK_FRAME_ID=-85000
+  INS-85632_CK_REFERENCE_ID=1
+  
+  INS-85633_CK_FRAME_ID=-85000
+  INS-85633_CK_REFERENCE_ID=1
+  
+  INS-85634_CK_FRAME_ID=-85000
+  INS-85634_CK_REFERENCE_ID=1
+  
+  INS-85635_CK_FRAME_ID=-85000
+  INS-85635_CK_REFERENCE_ID=1
+  
+  INS-85641_CK_FRAME_ID=-85000
+  INS-85641_CK_REFERENCE_ID=1
+  
+  INS-85642_CK_FRAME_ID=-85000
+  INS-85642_CK_REFERENCE_ID=1
+\begintext
+
+
+ LROC OBSERVER/TARGET SWAPPING, STELLAR ABERRATION & LIGHT TIME CORRECTION:
+---------------------------------------------------------------------------
+
+  A future release of ISIS will support accurate light time measurements to
+  the surface.  The constants below define the proper settings to use when 
+  working with LROC NAC and WAC images at this time (20 November 2012).
+  
+  For now, the light time correction is disabled.  Turning it on with the 
+  current software will cause sizable (>100 m) offsets when map projecting
+  an image. Please see [2] for more information regarding these settings.
+  
+
+    +----------------------------+-----------+
+    |        FRAME NAME          |  NAIF ID  |
+    +----------------------------+-----------+
+    |  LRO_LROCNACL              |   85600   |
+    |  LRO_LROCNACR              |   85610   |
+    |  LRO_LROCWAC_VIS           |   85621   |
+    |  LRO_LROCWAC_UV            |   85626   |
+    |  LRO_LROCWAC_VIS_FILTER_1  |   85631   |
+    |  LRO_LROCWAC_VIS_FILTER_2  |   85632   |
+    |  LRO_LROCWAC_VIS_FILTER_3  |   85633   |
+    |  LRO_LROCWAC_VIS_FILTER_4  |   85634   |
+    |  LRO_LROCWAC_VIS_FILTER_5  |   85635   |
+    |  LRO_LROCWAC_UV_FILTER_1   |   85641   |
+    |  LRO_LROCWAC_UV_FILTER_2   |   85642   |
+    +----------------------------+-----------+
+
+\begindata
+
+  INS-85600_SWAP_OBSERVER_TARGET = 'TRUE'
+  INS-85600_LIGHTTIME_CORRECTION = 'NONE'
+  INS-85600_LT_SURFACE_CORRECT   = 'TRUE'
+
+  INS-85610_SWAP_OBSERVER_TARGET = 'TRUE'
+  INS-85610_LIGHTTIME_CORRECTION = 'NONE'
+  INS-85610_LT_SURFACE_CORRECT   = 'TRUE'
+
+  INS-85621_SWAP_OBSERVER_TARGET = 'TRUE'
+  INS-85621_LIGHTTIME_CORRECTION = 'NONE'
+  INS-85621_LT_SURFACE_CORRECT   = 'TRUE'
+
+  INS-85626_SWAP_OBSERVER_TARGET = 'TRUE'
+  INS-85626_LIGHTTIME_CORRECTION = 'NONE'
+  INS-85626_LT_SURFACE_CORRECT   = 'TRUE'
+
+  INS-85631_SWAP_OBSERVER_TARGET = 'TRUE'
+  INS-85631_LIGHTTIME_CORRECTION = 'NONE'
+  INS-85631_LT_SURFACE_CORRECT   = 'TRUE'
+
+  INS-85632_SWAP_OBSERVER_TARGET = 'TRUE'
+  INS-85632_LIGHTTIME_CORRECTION = 'NONE'
+  INS-85632_LT_SURFACE_CORRECT   = 'TRUE'
+
+  INS-85633_SWAP_OBSERVER_TARGET = 'TRUE'
+  INS-85633_LIGHTTIME_CORRECTION = 'NONE'
+  INS-85633_LT_SURFACE_CORRECT   = 'TRUE'
+
+  INS-85634_SWAP_OBSERVER_TARGET = 'TRUE'
+  INS-85634_LIGHTTIME_CORRECTION = 'NONE'
+  INS-85634_LT_SURFACE_CORRECT   = 'TRUE'
+
+  INS-85635_SWAP_OBSERVER_TARGET = 'TRUE'
+  INS-85635_LIGHTTIME_CORRECTION = 'NONE'
+  INS-85635_LT_SURFACE_CORRECT   = 'TRUE'
+
+  INS-85641_SWAP_OBSERVER_TARGET = 'TRUE'
+  INS-85641_LIGHTTIME_CORRECTION = 'NONE'
+  INS-85641_LT_SURFACE_CORRECT   = 'TRUE'
+
+  INS-85642_SWAP_OBSERVER_TARGET = 'TRUE'
+  INS-85642_LIGHTTIME_CORRECTION = 'NONE'
+  INS-85642_LT_SURFACE_CORRECT   = 'TRUE'
+
+\begintext
+
+

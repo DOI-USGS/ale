@@ -1,0 +1,1738 @@
+KPL/IK
+
+\beginlabel
+PDS_VERSION_ID               = PDS3
+RECORD_TYPE                  = STREAM
+RECORD_BYTES                 = "N/A"
+^SPICE_KERNEL                = "lro_lroc_v18.ti"
+MISSION_NAME                 = "LUNAR RECONNAISSANCE ORBITER"
+SPACECRAFT_NAME              = "LUNAR RECONNAISSANCE ORBITER"
+DATA_SET_ID                  = "LRO-L-SPICE-6-V1.0"
+KERNEL_TYPE_ID               = IK
+PRODUCT_ID                   = "lro_lroc_v18.ti"
+PRODUCT_CREATION_TIME        = 2014-03-24T12:52:24
+PRODUCER_ID                  = "LROC SOC/ASU"
+MISSION_PHASE_NAME           = {
+                               LAUNCH,
+                               CRUISE,
+                               "LUNAR ORBIT ACQUISITION",
+                               COMMISSIONING,
+                               "NOMINAL MISSION",
+                               "SCIENCE MISSION",
+                               "EXTENDED MISSION"
+                               }
+PRODUCT_VERSION_TYPE         = ACTUAL
+PLATFORM_OR_MOUNTING_NAME    = "LRO ORBITER"
+START_TIME                   = "N/A"
+STOP_TIME                    = "N/A"
+SPACECRAFT_CLOCK_START_COUNT = "N/A"
+SPACECRAFT_CLOCK_STOP_COUNT  = "N/A"
+TARGET_NAME                  = MOON
+INSTRUMENT_NAME              = "LUNAR RECONNAISSANCE ORBITER CAMERA"
+NAIF_INSTRUMENT_ID           = {
+                               -85600,
+                               -85610,
+                               -85620,
+                               -85621,
+                               -85626,
+                               -85631,
+                               -85632,
+                               -85633,
+                               -85634,
+                               -85635,
+                               -85641,
+                               -85642
+                               }
+SOURCE_PRODUCT_ID            = "N/A"
+NOTE                         = "See comments in the file for details"
+OBJECT                       = SPICE_KERNEL
+  INTERCHANGE_FORMAT         = ASCII
+  KERNEL_TYPE                = INSTRUMENT
+  DESCRIPTION                = "SPICE IK file containing FOV and internal
+                               geometry parameters for the LROC Narrow 
+                               Angle Camera (NAC) and LROC Wide Angle
+                               Camera (WAC)."
+END_OBJECT                   = SPICE_KERNEL
+\endlabel
+
+
+===========================================================================
+  $Id: lro_lroc_v18.ti,v 1.8 2014/03/24 12:52:24 espeyerer Exp espeyerer $
+===========================================================================
+
+Lunar Reconnaissance Orbiter Camera (LROC) Instrument Kernel
+===========================================================================
+
+ This Lunar Reconnaissance Orbiter Camera instrument kernel (I-kernel)
+ contains the instrument geometric parameters for the LROC Narrow Angle
+ Camera (NAC) and LROC Wide Angle Camera (WAC).
+
+
+Version and Date
+---------------------------------------------------------------------------
+
+ Version 18.0 -- March 24, 2014     -- Emerson Speyerer, ASU
+
+         Updated the focal length and boresight parameters for the 360nm 
+         band to use the correct NAIF ID 
+
+ Version 17.0 -- November 1, 2013   -- Emerson Speyerer, ASU
+         
+         Added documentation for loading a kernel into MICE (MATLAB SPICE
+         utility)
+          
+         Reformatted background documentation for readability
+         
+         Changed the modeled NAC-R boresight sample to account for sample
+         mirroring during EDR and CDR generation
+         
+         Added wavelength dependent internal orientation parameters (focal 
+         length, boresight, distortion coefficients) for the LROC WAC
+         
+         Moved deprecated WAC VIS and UV parameters with the prefix of
+         INS-85621 and INS-85626 to the end of the IK for clarity.  These 
+         parameters remain in order to maintain backwards compatibility 
+         with older software packages (ISIS 3.4.4 or earlier)
+         
+         Changed WAC pixel size value to keep the units consistent with 
+         the NAC and previous documentation
+         
+         Updated the center line and sample for NAC and WAC detector to
+         correspond to the LROC pixel coordinate definition
+         
+         Updated IFOV values for the NAC and changed the parameter from a 
+         two entry array to a single value to match the WAC IFOV parameters
+         
+         Replaced the field of view parameters for each camera with a 10 
+         point polygon.  The new WAC field of views are broken up into 
+         individual bands
+
+ Version 16.0 -- November 1, 2010   -- Emerson Speyerer, ASU
+	     
+         Improved documentation and updated WAC field of view dimensions
+         and sensor parameters
+ 
+ Version 15.0 -- August 25, 2010    -- Jeff Anderson, USGS
+ 
+         Improved WAC documentation and updated values to reflect corrected
+         detector offsets used in the WAC camera model
+ 
+ Version 14.0 -- August 18, 2010    -- Kris Becker, USGS
+ 
+         Changed the sign of the NACL and NACR distortion parameters to
+         match the calibration report.  Add additional keywords/values for 
+         the WAC to more fully describe the WAC detector/filter design
+ 
+ Version 13.0 -- May 13, 2010       -- Ernest Bowman-Cisneros, ASU
+         
+         Incorporating comments from NAIF regarding content and structure
+         of kernel file
+ 
+ Version 12.0 -- May 10, 2010       -- Jacob Danton, ASU
+         
+         Incorporating changes from ASU development work
+ 
+ Version 11.0 -- February 17, 2010  -- Jacob Danton, ASU
+         
+         Refinements of changes provided by USGS
+ 
+ Version 10.0 -- February 12, 2010  -- Jacob Danton, ASU
+         
+         Refinements of changes provided by USGS
+ 
+ Version  9.0 -- February 12, 2010  -- Jacob Danton, ASU
+         
+         Incorporating changes from Kris Becker, USGS
+ 
+ Version  8.0 -- August 25, 2009    -- Jacob Danton, ASU
+         
+         Refinement on changes to support lrowaccal
+ 
+ Version  7.0 -- August 5, 2009     -- Jacob Danton, ASU
+         
+         Changes to support lrowaccal to look for different BW cubes for
+         different filters
+ 
+ Version  6.0 -- July 30, 2009      -- Jacob Danton, ASU
+         
+         Incorporating changes from ASU development work
+ 
+ Version  5.0 -- July 20, 2009      -- Jacob Danton, ASU
+         
+         Change values for the variables INS-85610_ITRANSS/ITRANSL and
+         INS-85610_TRANX/TRANY
+ 
+ Version  4.0 -- July 20, 2009      -- Jacob Danton, ASU
+         
+         Incorporating changes from ASU development work
+ 
+ Version  3.0 -- February 12, 2009  -- Jacob Danton, ASU
+         
+         Refinement of values based on developement work, including
+         feedback from USGS
+ 
+ Version  2.0 -- February 12, 2009  -- Jacob Danton, ASU
+         
+         First large scale changes to support development work on
+         autotarget application
+ 
+ Version  1.0 -- April 7, 2006      -- Ernest Bowman-Cisneros, ASU
+ 
+         Initial release
+
+
+ References
+---------------------------------------------------------------------------
+
+   1. Kernel Pool Required Reading, available online at
+      http://naif.jpl.nasa.gov
+   2. LRO Frames Definition Kernel (FK), latest version
+   3. Robinson et al. (2010) Lunar Reconnaissance Orbiter Camera (LROC)
+      Instrument Overview, Space Science Reviews 150, 81-124, 
+      DOI: 10.1007/s11214-010-9634-2
+   4. Speyerer et al. (2013) Pre-Flight and On-Orbit Geometric Calibration
+      of the Lunar Reconnaissance Orbiter Camera
+   5. LRO Wide Angle Geometric Calibration, P. Thomas, LROC Internal
+      Report, July 14, 2008
+   6. LRO NAC Geometric Calibration, S. Brylow, D. Humm, M. Robinson,
+      P. Thomas, M. Tschimmel, LROC Internal Report, July 14, 2008
+
+
+ Contact Information
+---------------------------------------------------------------------------
+   Direct questions, comments or concerns about the contents of this kernel
+   should be sent to:
+
+   Ernest Bowman-Cisneros, ASU, lroc-dn@ser.asu.edu
+
+
+ Implementation Notes
+---------------------------------------------------------------------------
+
+   This file is used by the SPICE system as follows: programs that make use
+   of this frame kernel must "load" the kernel normally during program
+   initialization.  Loading the kernel associates the data items with
+   their names in a data structure called the "kernel pool".  The SPICELIB
+   routine FURNSH loads a kernel into the pool as shown below:
+
+      FORTRAN: (SPICELIB)
+
+         CALL FURNSH ( frame_kernel_name )
+
+      C: (CSPICE)
+
+         furnsh_c ( frame_kernel_name );
+
+      IDL: (ICY)
+
+         cspice_furnsh, frame_kernel_name
+
+      MATLAB: (MICE)
+
+         cspice_furnsh( 'frame_kernel_name' );
+         
+   In order for a program or routine to extract data from the pool, the
+   SPICELIB routines GDPOOL, GIPOOL, and GCPOOL are used.  See [1] for
+   more details.
+
+   This file was created and may be updated with a text editor or word
+   processor.
+
+
+ Naming Conventions
+---------------------------------------------------------------------------
+
+   All names referencing values in this Instrument Kernel (IK) start with 
+   the characters 'INS' followed by the NAIF LRO spacecraft ID number (-85) 
+   and then followed by a NAIF three digit code for an LROC camera or 
+   specific WAC filter:
+   
+         Table 1: LROC Instrument IDs
+         -----------------------------   -----------   ------------
+                  Frame Name               NAIF ID        Comments
+         -----------------------------   -----------   ------------
+           LRO_LROCNACL                    -85600
+           LRO_LROCNACR                    -85610
+           LRO_LROCWAC                     -85620      *Deprecated*
+           LRO_LROCWAC_VIS                 -85621      *Deprecated*
+           LRO_LROCWAC_UV                  -85626      *Deprecated*
+           LRO_LROCWAC_VIS_FILTER_1        -85631         415 nm
+           LRO_LROCWAC_VIS_FILTER_2        -85632         566 nm
+           LRO_LROCWAC_VIS_FILTER_3        -85633         604 nm
+           LRO_LROCWAC_VIS_FILTER_4        -85634         643 nm
+           LRO_LROCWAC_VIS_FILTER_5        -85635         689 nm
+           LRO_LROCWAC_UV_FILTER_1         -85641         321 nm
+           LRO_LROCWAC_UV_FILTER_2         -85642         360 nm
+         -----------------------------   -----------   ------------
+
+   The remainder of the name is an underscore character followed by the
+   unique name of the data item.  For example, the focal length in the
+   LRO_LROCNACL frame (see [2]) is specified by:
+
+      INS-85600_FOCAL_LENGTH
+
+   The upper bound on the length of the name of any data item identifier
+   is 32 characters.
+
+   If the same item is included in more than one file, or if the same item
+   appears more than once within a single file, the latest value supersedes
+   any earlier values.
+
+
+ LROC Description
+---------------------------------------------------------------------------
+
+   From [3]:
+
+   The two NACs, designated NAC-Left (NAC-L) and NAC-Right (NAC-R), are
+   designed to provide 0.5 m scale panchromatic images over a combined 5-km
+   swath from an altitude of 50 km. Each NAC utilizes a 700-mm focal-length 
+   telescope that images onto a 5064-pixel charge coupled device (CCD) 
+   line-array, providing an IFOV of 10 microradians and a cross-track 
+   field-of-view of 2.86 degrees each, which yields a total ground track 
+   swath-width for both cameras of 5-km at the nominal 50-km altitude. Each 
+   NAC internal buffer holds 256 MB of uncompressed data, enough for a 
+   full-swath image 25-km in length or a 2x binned image 52-km long. The 
+   NAC data are sampled to 12-bits, then companded (bit compression) to 
+   8-bits. Prior to downlink an additional lossless first-difference 
+   Huffman compression is applied.
+
+   The WAC is designed to provide global imaging at a scale of 100 m/pixel
+   in seven color bands over a 105-km swath in monochrome mode and 57-km
+   in color mode from an altitude of 50 km. The LROC WAC uses a 1024 by 
+   1024 pixel CCD that has seven narrow-band interference filters bonded 
+   to the detector. Two of the filters are in the ultraviolet (UV) and five 
+   are in the visible. The WAC has two short-focal-length lenses, one UV 
+   and one visible, both of which image onto the same detector. From the 
+   nominal 50-km altitude orbit in monochrome imaging mode, the WAC will 
+   provide a nadir pixel scale of 75 m/pixel at nadir (98 m/pixel at far 
+   field). In the UV system, the nadir pixel scale is 384 m/pixel. The 
+   seven-band color filter array provides different sections of the CCD 
+   with different bandpasses. Repeated imaging at a rate such that each of 
+   the narrow framelets (14 lines x 1024 samples for VIS and 16 lines x 512 
+   samples for UV) of each color band overlap provides continuous coverage 
+   in any one color ("push-frame imaging"). The layout of the WAC filters 
+   is similar to the MRO MARCI instrument as described in Bell et al. 
+   (2009). WAC pixel values are digitized to 11-bits and subsequently 
+   companded to 8-bit values. After transmission to the SCS, the WAC data 
+   have a lossless first-difference Huffman compression that is applied 
+   prior to downlink.
+
+ LROC Geometric Calibration
+---------------------------------------------------------------------------
+
+   From [4]:
+
+   Prior to launch, the interior orientation parameters (i.e. principal
+   point, calibrated focal length and optical distortion) for all three 
+   cameras were characterized at Malin Space Science Systems in San Diego, 
+   CA. Due to the large minimum focusing distance, the NACs could not 
+   directly image a calibration target inside the laboratory environment. 
+   Therefore, the LROC team adopted a goniometric calibration technique 
+   [Hallert, 1960; Schuster and Braunecker, 2000] in which a collimator 
+   projects a target that is subsequently imaged by the camera that is 
+   attached to a rotary stage to enable precise measurements across the 
+   detector. Once installed on the spacecraft, the instrument integration 
+   team measured the relative pointing of each instrument with respect to 
+   the reference frame of the spacecraft bus. The NAC and WAC camera model
+   incorporated these orientation parameters through variables defined 
+   inside the text based LROC Instrument Kernel (this file) and LRO Frames 
+   Kernel [2].
+
+
+   The mission architecture and instrument suite of LRO enable precise and 
+   accurate measurements of the lunar surface. Leveraging the precision
+   orbit determination efforts led by the LOLA and GRAIL team and the 
+   precise LROC WAC-derived global terrain model (GLD100) [Mazarico et al. 
+   2011; Scholten et al. 2012; Mazarico et al. 2013], the LROC team 
+   improved the exterior orientation parameters for all three cameras and 
+   refined the interior orientation parameters for the WAC. This work is 
+   based on locating a small set of independent ground control points in 
+   high-resolution images and measuring the offsets between many thousands 
+   co-registered orthorectified images.
+
+
+   Notes concerning pre-flight WAC measurements:
+   ---------------------------------------------
+
+   The pre-flight derived optical parameters (e.g., boresight, sample 
+   offsets, line offsets, and distortion coefficients) for the WAC were 
+   computed in the laboratory using Ground Support Equipment (GSE) [5]. The
+   laboratory GSE produced 1032 sample x 128 line calibration images
+   which were used to compute the pre-flight WAC optical parameters.  All
+   optical parameters documented in the calibration report [5] are relative 
+   to these 1032 x 128 images.
+
+   It is important to note after the WAC was integrated with the spacecraft
+   it read out only selected areas (framelets) of the detector which were  
+   1024 samples wide, not 1032.  In flight offsets were computed in order 
+   to update the GSE optical parameters from a 1032 sample system to a 1024 
+   sample system.  The updates from GSE 1032 coordinates to detector 1024 
+   coordinates occurred in version 15 of this kernel.
+
+
+ Pixel Coordinate Definition:
+---------------------------------------------------------------------------
+
+   The LROC NAC and WAC images are composed of a raster of pixels.  These
+   pixels represent finite areas and not discrete points. The center of the 
+   upper left pixel is defined as line and sample (1.0, 1.0).  The upper 
+   left corner of the upper left pixel has the coordinates (0.5, 0.5), 
+   while the lower right corner of the upper left pixel has the coordinates 
+   (1.499,1.499). The sample and line numbers increase as one progresses to 
+   the right and down in the image or detector.
+
+         Figure 1: LROC Pixel Definition
+         
+         (0.5,0.5)
+              *-------------------*-------------------*---->
+              |                   |                   |
+              |                   |                   |    Sample
+              |                   |                   |  Coordinate
+              |       (1,1)       |       (2,1)       |     (+)
+              |         *         |         *         |
+              |                   |                   |
+              |                   |                   |
+              |                   |                   |
+              |      (1.499,1.499)|                   |
+              *-------------------*-------------------*---
+              |                   | (1.5,1.5)         |
+              |                   |                   |
+              |
+              v   Line Coordinate (+)
+
+
+
+ LROC First Order Optical Parameters:
+---------------------------------------------------------------------------
+
+   The following section contains the first order optical parameters for
+   the two LROC NACs and WAC measured prior to launch at Malin Space
+   Science Systems and from models derived from on-orbit observations. The
+   first order optical parameters for the WAC are wavelength dependent due
+   to chromatic aberrations in the WAC visible and ultraviolet optical 
+   system. 
+   
+   From [4]:
+   
+   As white light enters the optical system, the light refracts at 
+   different magnitudes as a function of wavelength causing the single 
+   original incident ray to disperse in a spectral spread of color 
+   [Mahajan, 1998; Fiete, 2013]. This lateral chromatic aberration effect, 
+   also known as “chromatic difference in magnification” introduces 
+   variation to the effective focal length for each WAC band. As a second 
+   order effect, the slight changes to the magnification causes small 
+   variations in the point of refraction as the light passes through the 
+   various optical elements thus introducing small differences in the 
+   computed optical distortion coefficients [Sidney, 2002; Mallon and
+   Whelan, 2007; Wighton et al., 2011].
+
+   Please refer to the "Pre-Flight and On-Orbit Geometric Calibration of
+   the Lunar Reconnaissance Orbiter Camera" [3] and "Lunar Reconnaissance 
+   Orbiter Camera (LROC) Instrument Overview" [4] papers for more 
+   information about the values described here and the methods used to 
+   derive them.
+   
+   Optical Parameter Definitions:
+
+         Effective Focal Length: Distance along the optical axis from the
+            perspective center to the detector (units of mm)
+   
+         F/ratio (or f-number): Ratio of the effective focal length to the
+            dimeter of the entrance pupil (effective aperture)
+   
+         Spectral Band: Wavelength range (or spectral response) of the
+            optics
+
+         Boresight Line and Sample (principal point): Point at which the
+            optical axis intersects the detector array
+            
+         IFOV (Instantaneous field of view): Angle subtended by a single
+            detector element on the axis of the optical system
+
+   Narrow Angle Camera (NAC):
+
+         Table 2: First Order NAC Optical Parameters
+         -------------------------------   -----------   -----------
+                 Parameter, Unit              NAC-L         NAC-R
+         -------------------------------   -----------   -----------
+          Effective Focal Length, mm          699.62       701.57
+            Estimated Uncertainty, mm           0.08         0.09
+          F/Ratio, unitless                    3.577        3.590
+          Spectral Band, nm                  400-760      400-760
+          Boresight Sample, pixel               2548         2496
+          Boresight Line, pixel                    0            0
+          IFOV, radians/pixel
+              Cross-track                   10.0054E-6   9.9776E-6
+              Along-track                   10.0054E-6   9.9776E-6
+         -------------------------------   -----------   ---------
+         
+   Wide Angle Camera (WAC):
+
+         Table 3: Wavelength Dependent WAC Focal Lengths
+         --------   ------------   ------------------------------
+          Filter     Wavelength      Effective Focal Length, mm
+         --------   ------------   ------------------------------
+           Vis 1       415 nm                5.9983909
+           Vis 2       566 nm                6.0193387
+           Vis 3       604 nm                6.0247535
+           Vis 4       643 nm                6.0308669
+           Vis 5       689 nm                6.0377111
+
+           UV 1        321 nm                4.6690884
+           UV 2        360 nm                4.7120818
+         --------   ------------   ------------------------------
+
+
+         Table 4: Wavelength Dependent Boresight
+         --------   ------------   ---------------   ---------------
+          Filter     Wavelength     Sample, pixel      Line, pixel
+         --------   ------------   ---------------   ---------------
+           Vis 1       415 nm         509.5696          775.8181
+           Vis 2       566 nm         509.5445          775.7541
+           Vis 3       604 nm         509.5379          775.7578
+           Vis 4       643 nm         509.5297          775.7545
+           Vis 5       689 nm         509.5314          775.7604
+
+           UV 1        321 nm         513.5482          295.4784
+           UV 2        360 nm         513.5601          295.4764
+         --------   ------------   ---------------   ---------------
+         
+
+         Table 5: LROC WAC IFOV (Cross-track and along-track values
+         are the same) with and without the 4x4 pixel averaging for the UV.
+         --------   ------------   ---------------   ---------------
+          Filter     Wavelength         IFOV,        IFOV (averaged)
+                                    radians/pixel     radians/pixel
+         --------   ------------   ---------------   ---------------
+           Vis 1       415 nm         1.5004E-3           n/a
+           Vis 2       566 nm         1.4952E-3           n/a
+           Vis 3       604 nm         1.4938E-3           n/a
+           Vis 4       643 nm         1.4923E-3           n/a
+           Vis 5       689 nm         1.4906E-3           n/a
+
+           UV 1        321 nm         1.9276E-3        7.7101E-3
+           UV 2        360 nm         1.9100E-3        7.6398E-3
+         --------   ------------   ---------------   ---------------
+
+         The F/ratio was measured prior to launch to be 5.052 for the 
+         visible bands and 5.650 for the UV bands. Additional information
+         about the individual WAC filters can be found in the filter
+         section of this IK.
+
+   The NAC and WAC parameter values above are given in the keywords below 
+   in the same units.
+          
+   Narrow Angle Camera Left (NAC-L):
+        
+         \begindata
+         INS-85600_FOCAL_LENGTH       = 699.62
+         INS-85600_F/RATIO            = 3.577
+         INS-85600_WAVELENGTH_RANGE   = ( 400 760 )
+         INS-85600_BORESIGHT_SAMPLE   = 2548
+         INS-85600_BORESIGHT_LINE     = 0
+         INS-85600_IFOV               = 10.0054E-6
+         \begintext
+    
+   Narrow Angle Camera Right (NAC-R):
+     
+         \begindata
+         INS-85610_FOCAL_LENGTH       = 701.57
+         INS-85610_F/RATIO            = 3.590
+         INS-85610_WAVELENGTH_RANGE   = ( 400 760 )
+         INS-85610_BORESIGHT_SAMPLE   = 2496
+         INS-85610_BORESIGHT_LINE     = 0
+         INS-85610_IFOV               = 9.9776E-6
+         \begintext
+          
+
+   Wide Angle Camera VIS Filter 1 (415nm):
+         
+         \begindata
+         INS-85631_FOCAL_LENGTH      = 5.9983909
+         INS-85631_F/RATIO           = 5.052
+         INS-85631_BORESIGHT_SAMPLE  = 509.5696
+         INS-85631_BORESIGHT_LINE    = 775.8181
+         INS-85631_IFOV              = 1.5004E-3
+         \begintext
+
+   Wide Angle Camera VIS Filter 2 (566nm):
+  
+         \begindata
+         INS-85632_FOCAL_LENGTH      = 6.0193387
+         INS-85632_F/RATIO           = 5.052
+         INS-85632_BORESIGHT_SAMPLE  = 509.5445
+         INS-85632_BORESIGHT_LINE    = 775.7541
+         INS-85632_IFOV              = 1.4952E-3
+         \begintext
+
+   Wide Angle Camera VIS Filter 3 (604nm):
+  
+         \begindata
+         INS-85633_FOCAL_LENGTH      = 6.0247535
+         INS-85633_F/RATIO           = 5.052
+         INS-85633_BORESIGHT_SAMPLE  = 509.5379
+         INS-85633_BORESIGHT_LINE    = 775.7578
+         INS-85633_IFOV              = 1.4938E-3
+         \begintext
+
+   Wide Angle Camera VIS Filter 4 (643nm):
+  
+         \begindata
+         INS-85634_FOCAL_LENGTH      = 6.0308669
+         INS-85634_F/RATIO           = 5.052
+         INS-85634_BORESIGHT_SAMPLE  = 509.5297
+         INS-85634_BORESIGHT_LINE    = 775.7545
+         INS-85634_IFOV              = 1.4923E-3
+         \begintext
+   
+   Wide Angle Camera VIS Filter 5 (689nm):
+  
+         \begindata
+         INS-85635_FOCAL_LENGTH      = 6.0377111
+         INS-85635_F/RATIO           = 5.052
+         INS-85635_BORESIGHT_SAMPLE  = 509.5314
+         INS-85635_BORESIGHT_LINE    = 775.7604
+         INS-85635_IFOV              = 1.4906E-3
+         \begintext
+
+   Wide Angle Camera UV Filter 1 (321nm):
+  
+         \begindata
+         INS-85641_FOCAL_LENGTH      = 4.6690884
+         INS-85641_F/RATIO           = 5.650
+         INS-85641_BORESIGHT_SAMPLE  = 513.5482
+         INS-85641_BORESIGHT_LINE    = 295.4784
+         INS-85641_IFOV              = 1.9276E-3
+         \begintext
+
+   Wide Angle Camera UV Filter 2 (360nm):
+  
+         \begindata
+         INS-85642_FOCAL_LENGTH      = 4.7120818
+         INS-85642_F/RATIO           = 5.650
+         INS-85642_BORESIGHT_SAMPLE  = 513.5601
+         INS-85642_BORESIGHT_LINE    = 295.4764
+         INS-85642_IFOV              = 1.9100E-3
+         \begintext
+         
+
+ LROC Detector Parameters:
+---------------------------------------------------------------------------
+
+   The following section contains the sensor parameters for the LROC NAC 
+   and WAC. Both NACs use a Kodak KLI-5001G detector with a pixel pitch of
+   7 um (7*10^-3 mm), while the common detector used for the WAC Vis and UV
+   bands has a pixel pitch of 9um (9*10^-3 mm).
+   
+         Table 5: LROC Detector Parameters
+         -------------------------------   ---------   ---------
+                 Parameter, Units             NAC         WAC
+         -------------------------------   ---------   ---------
+                 Pixel pitch, mm            7.0E-3      9.0E-3
+                 Samples, pixels             5064        1024
+                  Lines, pixels                 1        1024
+             CCD Center sample, pixel        2532.5      512.5
+              CCD Center line, pixel            1        512.5
+         -------------------------------   ---------   ---------
+
+   The following NAIF keywords define the sensor:
+
+   Narrow Angle Camera Left (NAC-L):
+        
+         \begindata
+         INS-85600_PIXEL_SAMPLES     = 5064
+         INS-85600_PIXEL_LINES       = 1
+         INS-85600_PIXEL_PITCH       = 7.0E-3
+         INS-85600_PIXEL_SIZE        = ( 7.0E-3 7.0E-3 )
+         INS-85600_CCD_CENTER        = ( 2532.5 1.0 )
+         \begintext
+
+   Narrow Angle Camera Right (NAC-R):
+         
+         \begindata
+         INS-85610_PIXEL_SAMPLES     = 5064
+         INS-85610_PIXEL_LINES       = 1
+         INS-85610_PIXEL_PITCH       = 7.0E-3
+         INS-85610_PIXEL_SIZE        = ( 7.0E-3 7.0E-3 )
+         INS-85610_CCD_CENTER        = ( 2532.5 1.0 )
+         \begintext
+
+   Wide Angle Camera VIS Filter 1 (415nm):
+
+         \begindata
+         INS-85631_PIXEL_SAMPLES     = 1024
+         INS-85631_PIXEL_LINES       = 1024
+         INS-85631_PIXEL_PITCH       = 9.0E-3
+         INS-85631_PIXEL_SIZE        = ( 9.0E-3 9.0E-3 )
+         INS-85631_CCD_CENTER        = ( 512.5  512.5  )
+         \begintext
+ 
+   Wide Angle Camera VIS Filter 2 (566nm):
+
+         \begindata
+         INS-85632_PIXEL_SAMPLES     = 1024
+         INS-85632_PIXEL_LINES       = 1024
+         INS-85632_PIXEL_PITCH       = 9.0E-3
+         INS-85632_PIXEL_SIZE        = ( 9.0E-3 9.0E-3 )
+         INS-85632_CCD_CENTER        = ( 512.5  512.5  )
+         \begintext
+         
+   Wide Angle Camera VIS Filter 3 (604nm):
+
+         \begindata
+         INS-85633_PIXEL_SAMPLES     = 1024
+         INS-85633_PIXEL_LINES       = 1024
+         INS-85633_PIXEL_PITCH       = 9.0E-3
+         INS-85633_PIXEL_SIZE        = ( 9.0E-3 9.0E-3 )
+         INS-85633_CCD_CENTER        = ( 512.5  512.5  )
+         \begintext
+         
+   Wide Angle Camera VIS Filter 4 (643nm):
+
+         \begindata
+         INS-85634_PIXEL_SAMPLES     = 1024
+         INS-85634_PIXEL_LINES       = 1024
+         INS-85634_PIXEL_PITCH       = 9.0E-3
+         INS-85634_PIXEL_SIZE        = ( 9.0E-3 9.0E-3 )
+         INS-85634_CCD_CENTER        = ( 512.5  512.5  )
+         \begintext
+         
+   Wide Angle Camera VIS Filter 5 (689nm):
+
+         \begindata
+         INS-85635_PIXEL_SAMPLES     = 1024
+         INS-85635_PIXEL_LINES       = 1024
+         INS-85635_PIXEL_PITCH       = 9.0E-3
+         INS-85635_PIXEL_SIZE        = ( 9.0E-3 9.0E-3 )
+         INS-85635_CCD_CENTER        = ( 512.5  512.5  )
+         \begintext
+
+
+   Wide Angle Camera UV Filter 1 (321nm):
+
+         \begindata
+         INS-85641_PIXEL_SAMPLES     = 1024
+         INS-85641_PIXEL_LINES       = 1024
+         INS-85641_PIXEL_PITCH       = 9.0E-3
+         INS-85641_PIXEL_SIZE        = ( 9.0E-3 9.0E-3 )
+         INS-85641_CCD_CENTER        = ( 512.5  512.5  )
+         \begintext
+ 
+   Wide Angle Camera UV Filter 2 (360nm):
+
+         \begindata
+         INS-85642_PIXEL_SAMPLES     = 1024
+         INS-85642_PIXEL_LINES       = 1024
+         INS-85642_PIXEL_PITCH       = 9.0E-3
+         INS-85642_PIXEL_SIZE        = ( 9.0E-3 9.0E-3 )
+         INS-85642_CCD_CENTER        = ( 512.5  512.5  )
+         \begintext
+
+
+
+ LROC NAC Detector Layout:
+---------------------------------------------------------------------------
+
+   The following section contains the layout information for the LROC 
+   NAC-Left and NAC-Right detectors. Figure 2 depicts the layout for the 
+   two NAC instruments.  The “1” in the figure identifies the location of 
+   the first pixel in the 5064 sample array for all NAC EDR and CDR 
+   products. Note: the first pixel for the NAC-R is captured on the 
+   opposite side, but the image is flipped when generating the EDR and 
+   subsequent CDR products. The change in orientation also causes the 
+   positive y-axis to flip from positive right to positive left.
+
+
+
+         Figure 2: Overall NAC detector layout (not to scale)
+
+                    NAC-Left                    NAC-Right              ∧
+                                                                       |
+                                   [1--------------B--------------*]  Dir.
+        [1--------------B---------------]                              of
+         *                           <-->  ~130 pixel overlap         flight
+                                                                       |
+                        x--->                  <---x                   V
+                      +Y,NAC-L                +Y,NAC-R
+
+            1 = Sample #1 in LROC NAC-Left and Right EDR/CDR Files
+            * = Sample #1 in original LROC NAC Science Files
+            B = NAC boresight
+        x---> = Positive Y axis for each NAC
+
+   
+   Given the geometry of the detector and optical system, sample 1 on the
+   NAC-L detector has a focal plane coordinate of -17.829 mm and the sample
+   1 on the NAC-R detector has a focal plane coordinate of 17.465 mm.
+
+   The NACs are mounted off nadir at 1.39° in opposite directions to provide
+   a 5.67° combined across-track FOV (~10,000 pixels) with ~135 pixels of
+   overlap between image pairs [3]. The NACs were set slightly offset 
+   (0.08°) in the down-track direction to enable jitter analysis during 
+   post-processing. This overlap is not constant and is characterized with 
+   a set of dynamic frames which the LROC team distributes through a set of 
+   CKs (soc31 and lrolc) and the current frames kernel 
+   (lro_frames_2014011_v01.tf or later). Please use this IK with the latest 
+   LRO FK and the LROC generated CKs to ensure proper image 
+   orthorectification.
+
+
+ LROC WAC Detector Layout:
+---------------------------------------------------------------------------
+
+   The following section contains the detector layout information for the 
+   LROC WAC.
+   
+   From [4]:
+   
+   The WAC is a push-frame camera capable of providing images in seven 
+   different color bands: 321, 360, 415, 566, 604, 643, and 689 nm. Like a 
+   push-broom camera, the WAC uses the motion of the spacecraft to build a 
+   complete 2-dimensional image. However, instead of capturing a single 
+   line, a push-frame camera acquires multiple lines, called framelets, 
+   during each integration. Light enters the WAC through two sets of 
+   optics, one designed for the visible bands and the second for the two 
+   ultraviolet wavelengths. At the base of the ultraviolet optics is a 
+   prism that redirects the light to a common CCD mounted under the visible 
+   optics. Seven narrow-band interference filters bonded over the detector 
+   array enable the WAC to acquire color images. The camera operates in two 
+   modes: monochrome and color. In the monochrome mode, nominally the 643nm 
+   band, the WAC acquires framelets that consist of 1024 samples and 14 
+   lines. In color mode, the WAC acquires framelets for all seven bands, 
+   however due to limitations in the readout rate of the CCD array each 
+   visible framelet is limited to 704 samples and 14 lines. During the read 
+   out of the two ultraviolet framelets, which are each 512 samples and 16 
+   lines, the framelets are binned (pixel averaging) on the spacecraft 
+   (4 × 4 pixels) resulting in a 128 × 4 pixel UV framelet. This strategy 
+   increases the signal-to-noise ratio for both ultraviolet bands, but 
+   reduces the ground sampling distance.
+   
+   
+         Figure 3: WAC Detector Layout (not to scale)
+         +----------------------------------------------------+
+         |                                                    |
+         |              <-UV mono/color 512 px->              |
+         |                                                    |
+         |              [------- 321 nm -------]              |
+         |                                                    |
+         |              [------- 360 nm -------]              |
+         |                                                    |
+         |                                                    |
+         |                                                    |
+         |                                                    |
+         |                                                    |
+         |  <--------VIS mono  mode (1024 samples)--------->  |
+         |          <-VIS color mode (704 samples)->          |
+         |                                                    |
+         | [<----- [------------ 415 nm ------------] ----->] |
+         | [<----- [------------ 566 nm ------------] ----->] |
+         | [<----- [------------ 604 nm ------------] ----->] |
+         | [<----- [------------ 643 nm ------------] ----->] |
+         | [<----- [------------ 689 nm ------------] ----->] |
+         |                                                    |
+         |                                                    |
+         +----------------------------------------------------+
+         
+         
+   Visible Filters
+   ---------------
+
+         Table 6: WAC Visible Filter
+         --------  ------ -------------- ------------ ------- -------
+          Filter    Band   Band Center,   Bandwidth,   Start    End
+            #         #        nm             nm       Line     Line
+         --------  ------ -------------- ------------ ------- -------
+            1         3        415            36        703     716
+            2         4        566            20        728     741
+            3         5        604            20        754     767
+            4         6        643            23        781     794
+            5         7        689            39        806     819
+         --------  ------ -------------- ------------ ------- -------
+
+         
+         Figure 4: VIS filter layout summarized in table 6
+
+                                      ^
+         Line Number                  | s/c velocity
+         -----------                  v
+           703 +-----------------------------------------------+
+               |                                               |
+               | VIS Filter 1                                  | 14 rows
+               |                                               |
+           716 +-----------------------------------------------+
+           728 +---------------------------------(11 dark rows)+
+               |                                               |
+               | VIS Filter 2                                  | 14 rows
+               |                    +Xvis                      |
+           741 +---------------       ^        ----------------+
+      1    754 +---------------       |        ---(12 dark rows)+
+      1        |                      |                        |
+      7        | VIS Filter 3         x---->                   | 14 rows
+               |                  +Zvis  +Yvis                 |
+      l    767 +--------------                 ----------------+
+      i    781 +---------------------------------(13 dark rows)+
+      n        |                                               |
+      e        | VIS Filter 4                                  | 14 rows
+      s        |                                               |
+           794 +-----------------------------------------------+
+           806 +---------------------------------(11 dark rows)+
+               |                                               |
+               | VIS Filter 5                                  | 14 rows
+               |                                               |
+           819 +-----------------------------------------------+
+                            704 or 1024 columns
+
+   
+   The set of keywords below contains wavelength center, bandwidth and
+   detector offsets for each VIS filter.
+
+         \begindata
+         
+         INS-85631_FILTER_BANDID     = 3
+         INS-85631_FILTER_BANDCENTER = 415
+         INS-85631_FILTER_BANDWIDTH  = 36
+         INS-85631_FILTER_OFFSET     = 703
+
+         INS-85632_FILTER_BANDID     = 4
+         INS-85632_FILTER_BANDCENTER = 566
+         INS-85632_FILTER_BANDWIDTH  = 20
+         INS-85632_FILTER_OFFSET     = 728
+
+         INS-85633_FILTER_BANDID     = 5
+         INS-85633_FILTER_BANDCENTER = 604
+         INS-85633_FILTER_BANDWIDTH  = 20
+         INS-85633_FILTER_OFFSET     = 754
+
+         INS-85634_FILTER_BANDID     = 6
+         INS-85634_FILTER_BANDCENTER = 643
+         INS-85634_FILTER_BANDWIDTH  = 23
+         INS-85634_FILTER_OFFSET     = 781
+
+         INS-85635_FILTER_BANDID     = 7
+         INS-85635_FILTER_BANDCENTER = 689
+         INS-85635_FILTER_BANDWIDTH  = 39
+         INS-85635_FILTER_OFFSET     = 806
+         
+         \begintext
+
+   The following parameters describe the how the line and samples in each
+   WAC framelet are translated into line and samples on the detector array.
+   Due to readout limitations, WAC color observations do not read out all 
+   1024 samples.  Instead, the middle 704 samples are read from the
+   detector.
+
+   The WAC can acquire images in several difference operation modes: Color 
+   (VIS and UV), VIS only, UV Only, BW (704 samples), and BW (1024 
+   samples). Typically, WAC images are acquired in either Color mode or in 
+   BW mode #3 where all 1024 samples are captured. BW modes #2 and $3 are 
+   also referred to as polar mode since they are used primarily for 
+   gathering multi-temporal sequences of the polar regions.  The following 
+   tables and parameters define the sample offsets for each mode id and 
+   mode number. The sample offset refers to the number of samples skipped 
+   on the left side of the WAC CCD.
+
+
+         Table 7: WAC operating mode and sample offset for VIS bands
+         -------------------- ------  ---------- ---------- ---------------
+          INSTRUMENT_MODE_ID   MODE    COMPRESS   IMAGE NS   SAMPLE OFFSET
+         -------------------- ------  ---------- ---------- ---------------
+                 COLOR           0         no        704           160
+		 COLOR           1        yes        704           160
+                  VIS            0         no        704           160
+		  VIS            1        yes        704           160
+                   BW            0         no        704           160
+                   BW            1        yes        704           160
+                   BW            2         no       1024            0
+                   BW            3        yes       1024            0
+         -------------------- ------  ---------- ---------- --------------- 
+
+         \begindata
+
+         INS-85631_COLOR_SAMPLE_OFFSET = 160
+         INS-85631_VIS_SAMPLE_OFFSET   = 160
+         INS-85631_BW0_SAMPLE_OFFSET   = 160
+         INS-85631_BW1_SAMPLE_OFFSET   = 160
+         INS-85631_BW2_SAMPLE_OFFSET   = 0
+         INS-85631_BW3_SAMPLE_OFFSET   = 0
+
+         INS-85632_COLOR_SAMPLE_OFFSET = 160
+         INS-85632_VIS_SAMPLE_OFFSET   = 160
+         INS-85632_BW0_SAMPLE_OFFSET   = 160
+         INS-85632_BW1_SAMPLE_OFFSET   = 160
+         INS-85632_BW2_SAMPLE_OFFSET   = 0
+         INS-85632_BW3_SAMPLE_OFFSET   = 0
+
+         INS-85633_COLOR_SAMPLE_OFFSET = 160
+         INS-85633_VIS_SAMPLE_OFFSET   = 160
+         INS-85633_BW0_SAMPLE_OFFSET   = 160
+         INS-85633_BW1_SAMPLE_OFFSET   = 160
+         INS-85633_BW2_SAMPLE_OFFSET   = 0
+         INS-85633_BW3_SAMPLE_OFFSET   = 0
+
+         INS-85634_COLOR_SAMPLE_OFFSET = 160
+         INS-85634_VIS_SAMPLE_OFFSET   = 160
+         INS-85634_BW0_SAMPLE_OFFSET   = 160
+         INS-85634_BW1_SAMPLE_OFFSET   = 160
+         INS-85634_BW2_SAMPLE_OFFSET   = 0
+         INS-85634_BW3_SAMPLE_OFFSET   = 0
+
+         INS-85635_COLOR_SAMPLE_OFFSET = 160
+         INS-85635_VIS_SAMPLE_OFFSET   = 160
+         INS-85635_BW0_SAMPLE_OFFSET   = 160
+         INS-85635_BW1_SAMPLE_OFFSET   = 160
+         INS-85635_BW2_SAMPLE_OFFSET   = 0
+         INS-85635_BW3_SAMPLE_OFFSET   = 0
+
+         \begintext
+
+    UV Filters
+   ------------
+
+         Table 8: WAC UV Filter
+         --------  ------ -------------- ------------ ------- -------
+          Filter    Band   Band Center,   Bandwidth,   Start    End
+            #         #        nm             nm       Line     Line
+         --------  ------ -------------- ------------ ------- -------
+            1         1       321             32        244     259
+            2         2       360             15        302     317
+         --------  ------ -------------- ------------ ------- -------
+
+         Figure 4: UV filter layout summarized in table 8
+
+                                    ^
+         Line Number                | s/c velocity
+         -----------                v
+       7
+       4    244 +-----------------------------------------------+
+                | UV Filter 1                                   | 16 rows
+       l    259 |-----------------------------------------------|
+       i    302 +---------------------------------(42 dark rows)+
+       n        | UV Filter 2                                   | 16 rows
+       e    317 +-----------------------------------------------+
+       s                          512 columns
+
+   
+   Note:All values for the UV filters are before averaging. All images have
+   4x4 pixel averaging performed on chip, and thus the UV are 128 pixels by 
+   4 lines.
+
+   The set of keywords below contains wavelength center, bandwidth and
+   detector row ranges for each UV filter.
+
+         \begindata
+
+         INS-85641_FILTER_BANDID     = 1
+         INS-85641_FILTER_BANDCENTER = 321
+         INS-85641_FILTER_BANDWIDTH  = 32
+         INS-85641_FILTER_OFFSET     = 244
+
+         INS-85642_FILTER_BANDID     = 2
+         INS-85642_FILTER_BANDCENTER = 360
+         INS-85642_FILTER_BANDWIDTH  = 15
+         INS-85642_FILTER_OFFSET     = 302
+
+        \begintext
+
+   The following parameters describe how the line and samples in each
+   WAC UV framelet are translated into line and samples on the detector 
+   array in natve pixel geometry (before averaging).
+
+         Table 9: WAC operating mode and sample offset for UV bands
+         --------------------  --------  ----------  ---------------
+          INSTRUMENT_MODE_ID     MODE      NATIVE     SAMPLE OFFSET
+                                          IMAGE NS
+         --------------------  --------  ----------  ---------------
+                 COLOR          0 or 1      512           264
+                   UV           0 or 1      512           264
+         --------------------  --------  ----------  ---------------
+
+         \begindata
+
+         INS-85641_COLOR_SAMPLE_OFFSET = 264
+         INS-85641_UV_SAMPLE_OFFSET    = 264
+         INS-85641_BW0_SAMPLE_OFFSET   = 264
+         INS-85641_BW1_SAMPLE_OFFSET   = 264
+         INS-85641_BW2_SAMPLE_OFFSET   = 0
+         INS-85641_BW3_SAMPLE_OFFSET   = 0
+
+         INS-85642_COLOR_SAMPLE_OFFSET = 264
+         INS-85642_UV_SAMPLE_OFFSET    = 264
+         INS-85642_BW0_SAMPLE_OFFSET   = 264
+         INS-85642_BW1_SAMPLE_OFFSET   = 264
+         INS-85642_BW2_SAMPLE_OFFSET   = 0
+         INS-85642_BW3_SAMPLE_OFFSET   = 0
+
+         \begintext
+
+
+
+
+
+ LROC Field of View Parameters:
+---------------------------------------------------------------------------
+
+   This section contains definitions for both NACs and each WAC filter
+   field of views (FOVs). These definitions are provided in a format 
+   consistent with the format required by the SPICE (CSPICE) function 
+   GETFOV (getfov_c).
+   
+   This kernel defines the FOV for each NAC camera as well as each of the
+   LROC WAC filters:
+   
+
+         Table 8: LROC FOV IDs
+         -------------  --------------------------
+             Name                 Frame
+         -------------  --------------------------
+             NAC-L            LRO_LROCNACL
+             NAC-R            LRO_LROCNACL
+          WAC (415 nm)   LRO_LROCWAC_VIS_FILTER_1
+          WAC (566 nm)   LRO_LROCWAC_VIS_FILTER_2
+          WAC (604 nm)   LRO_LROCWAC_VIS_FILTER_3
+          WAC (643 nm)   LRO_LROCWAC_VIS_FILTER_4
+          WAC (689 nm)   LRO_LROCWAC_VIS_FILTER_5
+          WAC (321 nm)   LRO_LROCWAC_UV_FILTER_1
+          WAC (360 nm)   LRO_LROCWAC_UV_FILTER_2
+         -------------  --------------------------
+
+
+   Each of the LROC FOVs is defined by a polygon made of 10 points.  For 
+   the two NACs, point 1, 5, 6, 10 describe the instantaneous FOV for the 
+   entire line array.  Points 2, 4, 7, and 9 describe the instantaneous FOV
+   for the unmasked portion of the array.  Points 3 and 8 are midpoints
+   measurements located at the boresight sample. Each point takes into 
+   account the location of the NAC boresight and optical distortion.
+
+
+         Figure 10: NAC FOV Definition
+
+         1    2                     3                      4    5
+         *----*---------------------*----------------------*----*
+         |mask                                              mask|
+         |mask                                              mask|
+         *----*---------------------*----------------------*----*
+         10   9                     8                      7    6
+        
+
+   
+   For the WAC FOV parameters, point 1, 5, 6, 10 describe the corners of
+   the instantaneous FOV for monochrome framelet, while points 2, 4, 7, and 
+   8 describe the instantaneous FOV for the portion of the array read 
+   during color observation.  Points 3 and 8 are midpoints measurements 
+   located at the boresight sample. All points can be used to get get the 
+   general shape of the individual framelet. Each point takes into account 
+   the location of the wavelength dependent boresight, focal length and
+   optical distortion and exclude masked pixels.
+   
+
+         Figure 7: WAC FOV Definition
+
+         1        2                 3                  4        5
+         *--------*-----------------*------------------*--------*
+         |  mono                                          mono  |
+         |  only                                          only  |
+         *--------*-----------------*------------------*--------*
+         10       9                 8                  7        6
+         
+         <-------------------- Mono  Image --------------------->
+                   <---------- Color Image ----------->
+
+
+
+   Narrow Angle Camera Left (NAC-L):
+         \begindata
+         INS-85600_FOV_FRAME            = 'LRO_LROCNACL'
+         INS-85600_FOV_SHAPE            = 'POLYGON'
+         INS-85600_BORESIGHT            = ( 0.0 0.0 1.0 )
+         INS-85600_FOV_BOUNDARY_CORNERS = (  4.9738E-6 -2.5336E-2 1.0
+                                             4.9747E-6 -2.4943E-2 1.0
+                                             5.0027E-6  0.0000E+0 1.0
+                                             4.9750E-6  2.4805E-2 1.0
+                                             4.9745E-6  2.5032E-2 1.0
+                                            -4.9745E-6  2.5032E-2 1.0
+                                            -4.9750E-6  2.4805E-2 1.0
+                                            -5.0027E-6  0.0000E+0 1.0
+                                            -4.9747E-6 -2.4943E-2 1.0
+                                            -4.9738E-6 -2.5336E-2 1.0 )
+         \begintext
+
+
+   Narrow Angle Camera Right (NAC-R):
+         \begindata
+         INS-85610_FOV_FRAME            = 'LRO_LROCNACR'
+         INS-85610_FOV_SHAPE            = 'POLYGON'
+         INS-85610_BORESIGHT            = ( 0.0 0.0 1.0 )
+         INS-85610_FOV_BOUNDARY_CORNERS = ( -4.9595E-6 -2.5472E-2 1.0
+                                            -4.9604E-6 -2.5080E-2 1.0
+                                            -4.9888E-6  0.0000E+0 1.0
+                                            -4.9616E-6  2.4520E-2 1.0
+                                            -4.9611E-6  2.4756E-2 1.0
+                                             4.9611E-6  2.4756E-2 1.0
+                                             4.9616E-6  2.4520E-2 1.0
+                                             4.9888E-6  0.0000E+0 1.0
+                                             4.9604E-6 -2.5080E-2 1.0
+                                             4.9595E-6 -2.5472E-2 1.0 )
+         \begintext
+
+   Wide Angle Camera VIS Filter 1 (415nm):
+         \begindata
+         INS-85631_FOV_FRAME            = 'LRO_LROCWAC_VIS_FILTER_1'
+         INS-85631_FOV_SHAPE            = 'POLYGON'
+         INS-85631_BORESIGHT            = ( 0.0 0.0 1.0 )
+         INS-85631_FOV_BOUNDARY_CORNERS = (  1.4621E-1 -9.9906E-1 1.0
+                                             1.2423E-1 -5.9295E-1 1.0
+                                             1.0979E-1  0.0000E+0 1.0
+                                             1.2471E-1  6.0358E-1 1.0
+                                             1.4811E-1  1.0300E+0 1.0
+                                             1.2136E-1  1.0275E+0 1.0
+                                             1.0224E-1  6.0239E-1 1.0
+                                             9.0048E-2  0.0000E+0 1.0
+                                             1.0185E-1 -5.9179E-1 1.0
+                                             1.1981E-1 -9.9659E-1 1.0 )
+         \begintext
+
+   Wide Angle Camera VIS Filter 2 (566nm):
+         \begindata
+         INS-85632_FOV_FRAME            = 'LRO_LROCWAC_VIS_FILTER_2'
+         INS-85632_FOV_SHAPE            = 'POLYGON'
+         INS-85632_BORESIGHT            = ( 0.0 0.0 1.0 )
+         INS-85632_FOV_BOUNDARY_CORNERS = (  9.4975E-2 -9.8954E-1 1.0
+                                             8.0858E-2 -5.8847E-1 1.0
+                                             7.1551E-2  0.0000E+0 1.0
+                                             8.1173E-2  5.9911E-1 1.0
+                                             9.6197E-2  1.0202E+0 1.0
+                                             6.9902E-2  1.0186E+0 1.0
+                                             5.9004E-2  5.9838E-1 1.0
+                                             5.2021E-2  0.0000E+0 1.0
+                                             5.8776E-2 -5.8776E-1 1.0
+                                             6.9015E-2 -9.8803E-1 1.0 )
+         \begintext
+
+   Wide Angle Camera VIS Filter 3 (604 nm):
+         \begindata
+         INS-85633_FOV_FRAME            = 'LRO_LROCWAC_VIS_FILTER_3'
+         INS-85633_FOV_SHAPE            = 'POLYGON'
+         INS-85633_BORESIGHT            = ( 0.0 0.0 1.0 )
+         INS-85633_FOV_BOUNDARY_CORNERS = (  4.3116E-2 -9.8593E-1 1.0
+                                             3.6725E-2 -5.8661E-1 1.0
+                                             3.2517E-2  0.0000E+0 1.0
+                                             3.6867E-2  5.9723E-1 1.0
+                                             4.3670E-2  1.0165E+0 1.0
+                                             1.7568E-2  1.0159E+0 1.0
+                                             1.4833E-2  5.9696E-1 1.0
+                                             1.3084E-2  0.0000E+0 1.0
+                                             1.4776E-2 -5.8635E-1 1.0
+                                             1.7345E-2 -9.8538E-1 1.0  )
+         \begintext
+
+   Wide Angle Camera VIS Filter 4 (643 nm):
+         \begindata
+         INS-85634_FOV_FRAME            = 'LRO_LROCWAC_VIS_FILTER_4'
+         INS-85634_FOV_SHAPE            = 'POLYGON'
+         INS-85634_BORESIGHT            = ( 0.0 0.0 1.0 )
+         INS-85634_FOV_BOUNDARY_CORNERS = ( -1.0367E-2 -9.8327E-1 1.0
+                                            -8.8386E-3 -5.8558E-1 1.0
+                                            -7.8282E-3  0.0000E+0 1.0
+                                            -8.8728E-3  5.9620E-1 1.0
+                                            -1.0500E-2  1.0138E+0 1.0
+                                            -3.6536E-2  1.0142E+0 1.0
+                                            -3.0873E-2  5.9641E-1 1.0
+                                            -2.7237E-2  0.0000E+0 1.0
+                                            -3.0754E-2 -5.8578E-1 1.0
+                                            -3.6074E-2 -9.8369E-1 1.0 )
+         \begintext
+
+   Wide Angle Camera VIS Filter 5 (689nm):
+         \begindata
+         INS-85635_FOV_FRAME            = 'LRO_LROCWAC_VIS_FILTER_5'
+         INS-85635_FOV_SHAPE            = 'POLYGON'
+         INS-85635_BORESIGHT            = ( 0.0 0.0 1.0 )
+         INS-85635_FOV_BOUNDARY_CORNERS = (  -5.9730E-2 -9.8274E-1 1.0
+                                            -5.0927E-2 -5.8529E-1 1.0
+                                            -4.5114E-2  0.0000E+0 1.0
+                                            -5.1124E-2  5.9590E-1 1.0
+                                            -6.0494E-2  1.0132E+0 1.0
+                                            -8.6619E-2  1.0146E+0 1.0
+                                            -7.3181E-2  5.9654E-1 1.0
+                                            -6.4564E-2  0.0000E+0 1.0
+                                            -7.2899E-2 -5.8591E-1 1.0
+                                            -8.5523E-2 -9.8406E-1 1.0 )
+         \begintext
+
+   Wide Angle Camera UV Filter 1 (321 nm):
+         \begindata
+         INS-85641_FOV_FRAME            = 'LRO_LROCWAC_UV_FILTER_1'
+         INS-85641_FOV_SHAPE            = 'POLYGON'
+         INS-85641_BORESIGHT            = ( 0.0 0.0 1.0 )
+         INS-85641_FOV_BOUNDARY_CORNERS = (  1.1130E-1 -5.5241E-1 1.0
+                                             1.1130E-1 -5.5241E-1 1.0
+                                             9.6841E-2  0.0000E+0 1.0
+                                             1.1189E-1  5.6405E-1 1.0
+                                             1.1189E-1  5.6405E-1 1.0
+                                             8.4782E-2  5.6245E-1 1.0
+                                             8.4782E-2  5.6245E-1 1.0
+                                             7.3427E-2  0.0000E+0 1.0
+                                             8.4343E-2 -5.5087E-1 1.0
+                                             8.4343E-2 -5.5087E-1 1.0 )
+         \begintext
+
+   Wide Angle Camera UV Filter 2 (321nm):
+         \begindata
+         INS-85642_FOV_FRAME            = 'LRO_LROCWAC_UV_FILTER_2'
+         INS-85642_FOV_SHAPE            = 'POLYGON'
+         INS-85642_BORESIGHT            = ( 0.0 0.0 1.0 )
+         INS-85642_FOV_BOUNDARY_CORNERS = ( -1.7570E-2 -5.4320E-1 1.0
+                                            -1.7570E-2 -5.4320E-1 1.0
+                                            -1.5327E-2  0.0000E+0 1.0
+                                            -1.7659E-2  5.5449E-1 1.0
+                                            -1.7659E-2  5.5449E-1 1.0
+                                            -4.4109E-2  5.5498E-1 1.0
+                                            -4.4109E-2  5.5498E-1 1.0
+                                            -3.8276E-2  0.0000E+0 1.0
+                                            -4.3886E-2 -5.4367E-1 1.0
+                                            -4.3886E-2 -5.4367E-1 1.0 )
+         \begintext
+
+
+LROC NAC Distortion Model Parameters
+---------------------------------------------------------------------------
+
+   Following the geometric calibration described above and in [4], optical
+   distortion coefficients were modeled prior to launch for each NAC. 
+   
+   The LROC NAC distortion model has the following form:
+
+      xd = (sample - BORESIGHT_SAMPLE) * PIXEL_PITCH
+      r  = xd
+
+      xc = xd / (1+k1*r^2)
+
+   where "xd" is the distorted position (the measured position), "k1" is 
+   the distortion coefficients, and "r" is the distance from the optical 
+   center, and "xc" is the corrected focal plane positions in mm.  Recall 
+   the NAC CCDs are line scan cameras (single line CCD) so yd = 0 and 
+   subsequently yc = 0 is always true.
+
+   The keywords below contain the unitless optical distortion coefficients
+   for each NAC:
+
+   Narrow Angle Camera Left (NAC-L):
+         \begindata
+         INS-85600_OD_K                 = 1.81E-5
+         \begintext
+
+   Narrow Angle Camera Right (NAC-R):
+         \begindata
+         INS-85610_OD_K                 = 1.83E-5
+         \begintext
+
+
+   The NAC camera model uses the following keywords to compute focal plane
+   coordinates from CCD coordinates:
+
+   Narrow Angle Camera Left (NAC-L):
+         \begindata
+         INS-85600_TRANSX               = ( 0.0  0.0     7.0E-3 )
+         INS-85600_TRANSY               = ( 0.0  7.0E-3  0.0    )
+         \begintext
+
+   Narrow Angle Camera Right (NAC-R):
+         \begindata
+         INS-85610_TRANSX               = ( 0.0  0.0,   -7.0E-3 )
+         INS-85610_TRANSY               = ( 0.0 -7.0E-3  0.0    )
+         \begintext
+
+   The NAC camera model uses the following keywords to compute CCD 
+   coordinates from focal plane coordinates:
+
+   Narrow Angle Camera Left (NAC-L):
+         \begindata
+         INS-85600_ITRANSS              = ( 0.0    0.0     142.857  )
+         INS-85600_ITRANSL              = ( 0.0  142.857     0.0    )
+         \begintext
+
+   Narrow Angle Camera Right (NAC-R):
+         \begindata
+         INS-85610_ITRANSS              = ( 0.0    0.0    -142.8571 )
+         INS-85610_ITRANSL              = ( 0.0 -142.8571    0.0    )
+         \begintext
+
+
+LROC WAC Distortion Model Parameters
+---------------------------------------------------------------------------
+
+   Following the geometric calibration described above and in [4], optical
+   distortion coefficients were modeled in-flight by registering thousands 
+   of WAC and NAC images. This model resulted in a distortion model with 
+   the following form (note: the form of the equation differs from the 
+   equation used for the NAC optical distortion):
+   
+      xc=xd*(1+k1*r^2+k2*r^4+k3*r^6)
+      yc=yd*(1+k1*r^2+k2*r^4+k3*r^6)
+      
+      where r=sqrt (xd^2 + yd^2)
+
+   where "xd" and "yd" are the distorted position (the measured position), 
+   "k1", "k2" and "k3" are the distortion coefficients, "r" is the distance 
+   from the optical center, and "xc" and "yc" are the corrected focal plane 
+   positions in mm.  The following equations are used to calculate the
+   distorted position from the framelet line and sample in the image:
+   
+   WAC-VIS (415, 566, 604, 643, and 689 nm):
+      xd = (sample + SAMPLE_OFFSET - BORESIGHT_SAMPLE - 1) * PIXEL_PITCH
+      yd = ( line  + FILTER_OFFSET -  BORESIGHT_LINE  - 1) * PIXEL_PITCH
+      
+   WAC-UV (321 and 360 nm):
+      xd = ((sample*4)+SAMPLE_OFFSET-BORESIGHT_SAMPLE-2.5) * PIXEL_PITCH
+      yd = ((line*4)  +FILTER_OFFSET- BORESIGHT_LINE -2.5) * PIXEL_PITCH
+
+   The keywords below contain the unitless optical distortion coefficients
+   for each WAC band:
+
+   Wide Angle Camera VIS Filter 1 (415nm):
+         \begindata
+         INS-85631_OD_K  = ( 0.011386711675385400
+                             0.000147045813479870
+                             5.038005020438670E-6 )
+         \begintext
+
+   Wide Angle Camera VIS Filter 2 (566nm):
+         \begindata
+         INS-85632_OD_K  = ( 0.011330137284110200
+                             0.000147788496863675
+                             4.870907327326350E-6 )
+         \begintext
+
+   Wide Angle Camera VIS Filter 3 (604nm):
+         \begindata
+         INS-85633_OD_K  = ( 0.011302901258765900
+                             0.000147434788741622
+                             4.928415719467750E-6 )
+         \begintext
+
+   Wide Angle Camera VIS Filter 4 (643nm):
+         \begindata
+         INS-85634_OD_K  = ( 0.011310945216635900
+                             0.000144463288593614
+                             4.887542512911270E-6 )
+         \begintext
+
+   Wide Angle Camera VIS Filter 5 (689nm):
+         \begindata
+         INS-85635_OD_K  = ( 0.011256422654674700
+                             0.000146609439724495
+                             4.808691643457560E-6 )
+         \begintext
+
+   Wide Angle Camera UV Filter 1 (315nm):
+         \begindata
+         INS-85641_OD_K  = ( 0.025824582751554600
+                             4.661394835922340E-5
+                             0.000144650735580122 )
+         \begintext
+
+   Wide Angle Camera UV Filter 2 (360nm):
+         \begindata
+         INS-85642_OD_K  = ( 0.025144400734802000
+                             0.000226010616709640
+                             0.000124071862326273 )
+         \begintext
+
+
+   The LROC WAC Camera Model in ISIS uses the following keywords to compute
+   focal plane coordinates from CCD coordinates (these values include a 
+   slight twist due to decentering in the optics):
+   
+   Wide Angle Camera VIS Filter 1 (415nm):
+         \begindata
+         INS-85631_TRANSX   = ( 0.0  0.000000590365231 -0.008999999980637 )
+         INS-85631_TRANSY   = ( 0.0  0.008999999980637  0.000000590365231 )
+         \begintext
+
+   Wide Angle Camera VIS Filter 2 (566nm):
+         \begindata
+         INS-85632_TRANSX   = ( 0.0  0.000000216143494 -0.008999999997405 )
+         INS-85632_TRANSY   = ( 0.0  0.008999999997405  0.000000216143494 )
+         \begintext
+
+   Wide Angle Camera VIS Filter 3 (604nm):
+         \begindata
+         INS-85633_TRANSX   = ( 0.0 -0.000000085741007 -0.008999999999592 )
+         INS-85633_TRANSY   = ( 0.0  0.008999999999592 -0.000000085741007 )
+         \begintext
+
+   Wide Angle Camera VIS Filter 4 (643nm):
+         \begindata
+         INS-85634_TRANSX   = ( 0.0 -0.000002600831484 -0.008999999624204 )
+         INS-85634_TRANSY   = ( 0.0  0.008999999624204 -0.000002600831484 )
+         \begintext
+
+   Wide Angle Camera VIS Filter 5 (689nm):
+         \begindata
+         INS-85635_TRANSX   = ( 0.0 -0.000000668455587 -0.008999999975176 )
+         INS-85635_TRANSY   = ( 0.0  0.008999999975176 -0.000000668455587 )
+         \begintext
+
+   Wide Angle Camera UV Filter 1 (315nm):
+         \begindata
+         INS-85641_TRANSX   = ( 0.0  0.000000311994535 -0.008999999994592 )
+         INS-85641_TRANSY   = ( 0.0  0.008999999994592  0.000000311994535 )
+         \begintext
+
+   Wide Angle Camera UV Filter 2 (360nm):
+         \begindata
+         INS-85642_TRANSX   = ( 0.0  0.000001425859353 -0.008999999887051 )
+         INS-85642_TRANSY   = ( 0.0  0.008999999887051  0.000001425859353 )
+         \begintext
+
+
+   The LROC WAC Camera Model in ISIS uses the following keywords to compute 
+   CCD coordinates from focal plane coordinates (these values include a 
+   slight twist due to decentering in the optics):
+
+
+   Wide Angle Camera VIS Filter 1 (415nm):
+         \begindata
+         INS-85631_ITRANSS  = ( 0.0    0.0072884596481  111.1111108720638 )
+         INS-85631_ITRANSL  = ( 0.0 -111.1111108720638    0.0072884596481 )
+         \begintext
+
+   Wide Angle Camera VIS Filter 2 (566nm):
+         \begindata
+         INS-85632_ITRANSS  = ( 0.0    0.0026684381921  111.1111110790686 )
+         INS-85632_ITRANSL  = ( 0.0 -111.1111110790686    0.0026684381921 )
+         \begintext
+
+   Wide Angle Camera VIS Filter 3 (604nm):
+         \begindata
+         INS-85633_ITRANSS  = ( 0.0   -0.0010585309475  111.1111111060689 )
+         INS-85633_ITRANSL  = ( 0.0 -111.1111111060689   -0.0010585309475 )
+         \begintext
+
+   Wide Angle Camera VIS Filter 4 (643nm):
+         \begindata
+         INS-85634_ITRANSS  = ( 0.0   -0.0321090306666  111.1111064716567 )
+         INS-85634_ITRANSL  = ( 0.0 -111.1111064716567   -0.0321090306666 )
+         \begintext
+
+   Wide Angle Camera VIS Filter 5 (689nm):
+         \begindata
+         INS-85635_ITRANSS  = ( 0.0   -0.0082525381149  111.1111108046414 )
+         INS-85635_ITRANSL  = ( 0.0 -111.1111108046414   -0.0082525381149 )
+         \begintext
+
+   Wide Angle Camera UV Filter 1 (315nm):
+         \begindata
+         INS-85641_ITRANSS  = ( 0.0   -0.0038517843825  111.1111110443480 )
+         INS-85641_ITRANSL  = ( 0.0 -111.1111110443480   -0.0038517843825 )
+         \begintext
+
+   Wide Angle Camera UV Filter 2 (360nm):
+         \begindata
+         INS-85642_ITRANSS  = ( 0.0    0.0176032018930  111.1111097166839 )
+         INS-85642_ITRANSL  = ( 0.0 -111.1111097166839    0.0176032018930 )
+         \begintext
+
+
+Deprecated LROC WAC Optical Parameters
+---------------------------------------------------------------------------
+
+   This section contains the deprecated optical parameters for the LROC
+   WAC. These values were defined in v16 and earlier versions of the LROC 
+   IK.  These values remain in the IK so that scripts and older versions
+   of ISIS (3.4.4 and prior) continue to run. However, these values should 
+   not be used if at all possible.
+
+         Table 11: First Order WAC Optical Parameters (*Deprecated*)
+         -------------------------------   ---------   ---------
+                 Parameter, Units           WAC-VIS      WAC-UV
+         -------------------------------   ---------   ---------
+          Effective Focal Length, mm         6.013       4.693
+          F/Ratio, unitless                  5.052       5.650
+          Spectral Band, nm           #see section describing filters#
+          Boresight Sample, pixel            513.9       515.3
+          Boresight Line, pixel              778.2       298.1
+         -------------------------------   ---------   ---------
+
+
+   Wide Angle Camera Visible Bands (WAC-VIS):
+         
+         First Order Optical Parameters:
+         \begindata
+         INS-85621_FOCAL_LENGTH          = 6.013
+         INS-85621_F/RATIO               = 5.052
+         INS-85621_BORESIGHT_SAMPLE      = 513.9
+         INS-85621_BORESIGHT_LINE        = 778.2
+         INS-85621_IFOV                  = 0.001498
+         \begintext
+
+         Detector Parameters:
+         \begindata
+         INS-85621_PIXEL_SAMPLES         = 1024
+         INS-85621_PIXEL_LINES           = 1024
+         INS-85621_PIXEL_PITCH           = 0.009
+         INS-85621_PIXEL_SIZE            = ( 9  9 )
+         INS-85621_CCD_CENTER            = ( 511.5 511.5 )
+         \begintext
+
+         Detector Layout:
+         \begindata
+         INS-85621_FILTER_BANDID         = (3 4 5 6 7)
+         INS-85621_FILTER_BANDCENTER     = (415 566 604 643 689)
+         INS-85621_FILTER_BANDWIDTH      = (36 20 20 23 39)
+         INS-85621_FILTER_OFFSET         = (703  728  754  781 806)
+         INS-85621_COLOR_SAMPLE_OFFSET   = 160
+         INS-85621_VIS_SAMPLE_OFFSET     = 160
+         INS-85621_BW0_SAMPLE_OFFSET     = 160
+         INS-85621_BW1_SAMPLE_OFFSET     = 160
+         INS-85621_BW2_SAMPLE_OFFSET     = 0
+         INS-85621_BW3_SAMPLE_OFFSET     = 0
+         \begintext
+
+         FOV parameters:
+         \begindata
+         INS-85621_FOV_FRAME             = 'LRO_LROCWAC_VIS'
+         INS-85621_FOV_SHAPE             = 'RECTANGLE'
+         INS-85621_BORESIGHT             = ( 0.0 0.0 1.0 )
+         INS-85621_FOV_CLASS_SPEC        = 'ANGLES'
+         INS-85621_FOV_REF_VECTOR        = ( 0.0 1.0 0.0 )
+         INS-85621_FOV_REF_ANGLE         = 45.8
+         INS-85621_FOV_CROSS_ANGLE       = 45.8
+         INS-85621_FOV_ANGLE_UNITS       = 'DEGREES'
+         INS-85621_FOV_ANGULAR_SIZE      = ( 1.60  0.0210 )
+         \begintext
+
+         Optical Distortion Parameters:
+         \begindata
+         INS-85621_OD_K                  = ( -0.0099 -0.0005 )
+         INS-85621_TRANSX                = ( 0.0  0.0    -0.009 )
+         INS-85621_TRANSY                = ( 0.0  0.009   0.0 )
+         INS-85621_ITRANSS               = ( 0.0 0.0 111.11111111111 )
+         INS-85621_ITRANSL               = ( 0.0 -111.11111111111 0.0 )
+         \begintext
+
+   Wide Angle Camera Ultraviolet Bands (WAC-UV):
+         
+         First Order Optical Parameters:
+         \begindata
+         INS-85626_FOCAL_LENGTH          = 4.693
+         INS-85626_F/RATIO               = 5.65
+         INS-85626_BORESIGHT_SAMPLE      = 515.3
+         INS-85626_BORESIGHT_LINE        = 298.1
+         INS-85626_IFOV                  = 0.00198
+         \begintext
+
+         Detector Parameters:
+         \begindata
+         INS-85626_PIXEL_SAMPLES         = 1024
+         INS-85626_PIXEL_LINES           = 1024
+         INS-85626_PIXEL_PITCH           = 0.009
+         INS-85626_PIXEL_SIZE            = ( 9 9 )
+         INS-85626_CCD_CENTER            = ( 511.5  511.5 )
+         \begintext
+
+         Detector Layout:
+         \begindata
+         INS-85626_FILTER_BANDID         = (1 2)
+         INS-85626_FILTER_BANDCENTER     = (321 360)
+         INS-85626_FILTER_BANDWIDTH      = (32 15)
+         INS-85626_FILTER_OFFSET         = (244  302)
+         INS-85626_COLOR_SAMPLE_OFFSET   = 264
+         INS-85626_UV_SAMPLE_OFFSET      = 264
+         INS-85626_BW0_SAMPLE_OFFSET     = 264
+         INS-85626_BW1_SAMPLE_OFFSET     = 264
+         INS-85626_BW2_SAMPLE_OFFSET     = 0
+         INS-85626_BW3_SAMPLE_OFFSET     = 0
+         \begintext
+
+         FOV parameters:
+         \begindata
+         INS-85626_FOV_FRAME             = 'LRO_LROCWAC_UV'
+         INS-85626_FOV_SHAPE             = 'RECTANGLE'
+         INS-85626_BORESIGHT             = ( 0.0 0.0 1.0 )
+         INS-85626_FOV_CLASS_SPEC        = 'ANGLES'
+         INS-85626_FOV_REF_VECTOR        = ( 0.0 1.0 0.0 )
+         INS-85626_FOV_REF_ANGLE         = 30.1
+         INS-85626_FOV_CROSS_ANGLE       = 30.1
+         INS-85626_FOV_ANGLE_UNITS       = 'DEGREES'
+         INS-85626_FOV_ANGULAR_SIZE      = ( 1.05  0.0307 )
+         \begintext
+
+         Optical Distortion Parameters:
+         \begindata
+         INS-85626_OD_K                  = ( -0.024 -0.0007 )
+         INS-85626_TRANSX                = ( 0.0  0.0    -0.009 )
+         INS-85626_TRANSY                = ( 0.0  0.009   0.0 )
+         INS-85626_ITRANSS               = ( 0.0 0.0 111.11111111111 )
+         INS-85626_ITRANSL               = ( 0.0 -111.11111111111 0.0 )
+         \begintext
+
+
+
+===========================================================================
+
+Platform ID
+---------------------------------------------------------------------------
+
+  \begindata
+
+  INS-85600_PLATFORM_ID           = -85000
+  INS-85610_PLATFORM_ID           = -85000
+  INS-85620_PLATFORM_ID           = -85000
+  INS-85621_PLATFORM_ID           = -85620
+  INS-85626_PLATFORM_ID           = -85620
+  INS-85631_PLATFORM_ID           = -85620
+  INS-85632_PLATFORM_ID           = -85620
+  INS-85633_PLATFORM_ID           = -85620
+  INS-85634_PLATFORM_ID           = -85620
+  INS-85635_PLATFORM_ID           = -85620
+  INS-85641_PLATFORM_ID           = -85620
+  INS-85642_PLATFORM_ID           = -85620
+
+  \begintext
+
+NAIF ID Code to Name Mapping
+---------------------------------------------------------------------------
+
+   \begindata
+   
+   NAIF_BODY_NAME += 'LRO_LROCNACL'
+   NAIF_BODY_CODE += -85600
+
+   NAIF_BODY_NAME += 'LRO_LROCNACR'
+   NAIF_BODY_CODE += -85610
+
+   NAIF_BODY_NAME += 'LRO_LROCWAC'
+   NAIF_BODY_CODE += -85620
+
+   NAIF_BODY_NAME += 'LRO_LROCWAC_VIS'
+   NAIF_BODY_CODE += -85621
+      
+   NAIF_BODY_NAME += 'LRO_LROCWAC_UV'
+   NAIF_BODY_CODE += -85626
+
+   NAIF_BODY_NAME += 'LRO_LROCWAC_VIS_FILTER_1'
+   NAIF_BODY_CODE += -85631
+
+   NAIF_BODY_NAME += 'LRO_LROCWAC_VIS_FILTER_2'
+   NAIF_BODY_CODE += -85632
+
+   NAIF_BODY_NAME += 'LRO_LROCWAC_VIS_FILTER_3'
+   NAIF_BODY_CODE += -85633
+
+   NAIF_BODY_NAME += 'LRO_LROCWAC_VIS_FILTER_4'
+   NAIF_BODY_CODE += -85634
+
+   NAIF_BODY_NAME += 'LRO_LROCWAC_VIS_FILTER_5'
+   NAIF_BODY_CODE += -85635
+
+   NAIF_BODY_NAME += 'LRO_LROCWAC_UV_FILTER_1'
+   NAIF_BODY_CODE += -85641
+
+   NAIF_BODY_NAME += 'LRO_LROCWAC_UV_FILTER_2'
+   NAIF_BODY_CODE += -85642
+
+  \begintext
+
+===========================================================================
