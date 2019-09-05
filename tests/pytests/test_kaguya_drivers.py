@@ -69,13 +69,13 @@ def test_ephemeris_start_time(driver):
         sct2e.assert_called_with(-12345, 922997380.174174)
 
 def test_detector_center_line(driver):
-    with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=[54321, 12345]) as gdpool, \
+    with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=np.array([54321, 12345])) as gdpool, \
          patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
         assert driver.detector_center_line == 12344.5
         gdpool.assert_called_with('INS-12345_CENTER', 0, 2)
 
 def test_detector_center_sample(driver):
-    with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=[54321, 12345]) as gdpool, \
+    with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=np.array([54321, 12345])) as gdpool, \
          patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
         assert driver.detector_center_sample == 54320.5
         gdpool.assert_called_with('INS-12345_CENTER', 0, 2)
@@ -84,13 +84,13 @@ def test_reference_frame(driver):
     assert driver.reference_frame == 'MOON_ME'
 
 def test_focal2pixel_samples(driver):
-    with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=[2]) as gdpool, \
+    with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=np.array([2])) as gdpool, \
          patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
         assert driver.focal2pixel_samples == [0, 0, -1/2]
         gdpool.assert_called_with('INS-12345_PIXEL_SIZE', 0, 1)
 
 def test_focal2pixel_lines(driver):
-    with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=[2]) as gdpool, \
+    with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=np.array([2])) as gdpool, \
          patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
         assert driver.focal2pixel_lines == [0, -1/2, 0]
         gdpool.assert_called_with('INS-12345_PIXEL_SIZE', 0, 1)
@@ -116,8 +116,8 @@ def test_load(test_kernels):
                                     [-1070.15881991, -1232.42749298,  -254.4540759 ]]),
              'unit': 'm'},
          'sun_position': {
-            'positions': np.array([[9.50347435e+10, 1.15913462e+11, 3.78747288e+09]]),
-            'velocities': np.array([[ 285730.03370329, -232701.52529823, 592.79276721]]),
+            'positions': np.array([[9.50465237e+10, 1.15903815e+11, 3.78729685e+09]]),
+            'velocities': np.array([[285707.13474515, -232731.15884149, 592.91742112]]),
             'unit': 'm'},
          'sensor_orientation': {
             'quaternions': np.array([[-0.19095485, -0.08452708,  0.88748467, -0.41080698],
