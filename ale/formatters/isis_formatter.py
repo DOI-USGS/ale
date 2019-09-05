@@ -81,6 +81,7 @@ def to_isis(driver):
     instrument_position['SpkTableEndTime'] = times[-1]
     instrument_position['SpkTableOriginalSize'] = len(times)
     instrument_position['EphemerisTimes'] = times
+    # Rotate positions and velocities into J2000 then scale into kilometers
     positions = j2000_rotation._rots.apply(positions) * 1/1000
     instrument_position['Positions'] = positions
     velocities = j2000_rotation._rots.apply(velocities) * 1/1000
@@ -93,6 +94,7 @@ def to_isis(driver):
     sun_position['SpkTableEndTime'] = times[-1]
     sun_position['SpkTableOriginalSize'] = len(times)
     sun_position['EphemerisTimes'] = times
+    # Rotate positions and velocities into J2000 then scale into kilometers
     positions = j2000_rotation._rots.apply(positions) * 1/1000
     sun_position['Positions'] = positions
     velocities = j2000_rotation._rots.apply(velocities) * 1/1000
