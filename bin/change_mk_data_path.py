@@ -26,7 +26,7 @@ for mk in mks:
         print(f'No path values in {mk}')
 
     for i in lines_to_change:
-        lines[i] = f'      PATH_VALUES     = ( \'{new_data_dir}\' )\n'
+        lines[i] = f'      PATH_VALUES     = ( \'{args.new_data_path}\' )\n'
     with open(mk, 'w') as f:
         f.write(''.join(lines))
 

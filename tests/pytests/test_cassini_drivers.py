@@ -1,28 +1,25 @@
 import pytest
 
 import ale
-from ale.drivers import cassini_drivers
-from ale.base import data_naif
-from ale.base import label_pds3
-
+from ale.drivers import co_drivers
 from unittest.mock import PropertyMock, patch
 
 # 'Mock' the spice module where it is imported
 from conftest import SimpleSpice, get_mockkernels
 
 simplespice = SimpleSpice()
+co_drivers.spice = simplespice
 
-data_naif.spice = simplespice
-cassini_drivers.spice = simplespice
-label_pds3.spice = simplespice
-
-from ale.drivers.cassini_drivers import CassiniIssPds3LabelNaifSpiceDriver
+from ale.drivers.co_drivers import CassiniIssPds3LabelNaifSpiceDriver
 
 CassiniIssPds3LabelNaifSpiceDriver.metakernel = get_mockkernels
 
 @pytest.fixture
 def driver():
     return CassiniIssPds3LabelNaifSpiceDriver("")
+
+def test_short_mission_name(driver):
+    assert driver.short_mission_name=='co'
 
 def test_instrument_id(driver):
     with patch('ale.base.label_pds3.Pds3Label.instrument_id', new_callable=PropertyMock) as mock_instrument_id:

@@ -8,6 +8,7 @@ dependencies:
   - eigen
   - gsl
   - jupyter
+  - nlohmann_json
   - numba
   - numpy
   - openblas>=0.3.0
@@ -19,4 +20,3 @@ dependencies:
   - quaternion
   - pyyaml
   - networkx
-  - pysis

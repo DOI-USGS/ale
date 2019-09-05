@@ -1,119 +1,169 @@
 import pytest
+import os
 import numpy as np
-import pvl
-
-import ale
-from ale.drivers import kaguya_drivers
-from ale.base import data_naif
-from ale.base import label_pds3
+import datetime
+import spiceypy as spice
+from importlib import reload
+import json
 
 from unittest.mock import PropertyMock, patch
 
-# 'Mock' the spice module where it is imported
-from conftest import SimpleSpice, get_mockkernels
+from conftest import get_image_label, get_image_kernels, convert_kernels, compare_dicts
 
-simplespice = SimpleSpice()
+import ale
 
-data_naif.spice = simplespice
-kaguya_drivers.spice = simplespice
-label_pds3.spice = simplespice
+from ale.drivers.selene_drivers import KaguyaTcPds3NaifSpiceDriver
 
-from ale.drivers.kaguya_drivers import KaguyaTcPds3NaifSpiceDriver
+@pytest.fixture()
+def test_kernels():
+    kernels = get_image_kernels('TC1S2B0_01_06691S820E0465')
+    updated_kernels, binary_kernels = convert_kernels(kernels)
+    yield updated_kernels
+    for kern in binary_kernels:
+        os.remove(kern)
 
-KaguyaTcPds3NaifSpiceDriver.metakernel = get_mockkernels
+@pytest.fixture(params=["Pds3NaifDriver"])
+def driver(request):
+    if request.param == "Pds3NaifDriver":
+        label = get_image_label("TC1S2B0_01_06691S820E0465", "pds3")
+        return KaguyaTcPds3NaifSpiceDriver(label)
 
-@pytest.fixture
-def driver():
-    return KaguyaTcPds3NaifSpiceDriver("")
+def test_short_mission_name(driver):
+    assert driver.short_mission_name == 'selene'
 
-@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
+def test_utc_start_time(driver):
+    assert driver.utc_start_time == datetime.datetime(2009, 4, 5, 20, 9, 53, 607478, tzinfo=datetime.timezone.utc)
+
+def test_utc_stop_time(driver):
+    assert driver.utc_stop_time == datetime.datetime(2009, 4, 5, 20, 10, 23, 864978, tzinfo=datetime.timezone.utc)
+
 def test_instrument_id(driver):
-    with patch.dict(driver.label, {'SWATH_MODE_ID':'NOMINAL', 'PRODUCT_SET_ID':'TC_w_Level2B0' }) as f:
-        assert driver.instrument_id == 'LISM_123_WTN'
+    assert driver.instrument_id == 'LISM_TC1_STF'
 
-@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
+def test_sensor_frame_id(driver):
+    with patch('ale.drivers.selene_drivers.spice.namfrm', return_value=12345) as namfrm:
+        assert driver.sensor_frame_id == 12345
+        namfrm.assert_called_with('LISM_TC1_HEAD')
+
+def test_instrument_host_name(driver):
+    assert driver.instrument_host_name == 'SELENE-M'
+
 def test_ikid(driver):
-    assert driver.ikid == -12345
+    with patch('ale.drivers.selene_drivers.spice.bods2c', return_value=12345) as bods2c:
+        assert driver.ikid == 12345
+        bods2c.assert_called_with('LISM_TC1')
 
-def test_spacecraft_clock_stop_count(driver):
-    with patch.dict(driver.label, {'CORRECTED_SC_CLOCK_STOP_COUNT':
-        pvl._collections.Units(value=105, units='<sec>')}) as f:
-        assert driver.spacecraft_clock_stop_count == 105
+def test_spacecraft_name(driver):
+    assert driver.spacecraft_name == 'SELENE'
 
 def test_spacecraft_clock_start_count(driver):
-    with patch.dict(driver.label, {'CORRECTED_SC_CLOCK_START_COUNT':
-        pvl._collections.Units(value=501, units='<sec>')}) as f:
-        assert driver.spacecraft_clock_start_count == 501
+    assert driver.spacecraft_clock_start_count == 922997380.174174
 
-def test_ephemeris_stop_time(driver):
-    with patch.dict(driver.label, {'CORRECTED_SC_CLOCK_STOP_COUNT':
-                                   pvl._collections.Units(value=501, units='<sec>')}) as f:
-        assert driver.ephemeris_stop_time == 0.1
+def test_spacecraft_clock_stop_count(driver):
+    assert driver.spacecraft_clock_stop_count == 922997410.431674
 
 def test_ephemeris_start_time(driver):
-    with patch.dict(driver.label, {'CORRECTED_SC_CLOCK_START_COUNT':
-                                   pvl._collections.Units(value=501, units='<sec>')}) as f:
-        assert driver.ephemeris_start_time == 0.1
+    with patch('ale.drivers.selene_drivers.spice.sct2e', return_value=12345) as sct2e, \
+         patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
+        assert driver.ephemeris_start_time == 12345
+        sct2e.assert_called_with(-12345, 922997380.174174)
 
-@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
 def test_detector_center_line(driver):
-    assert driver.detector_center_line == 0.5
+    with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=[54321, 12345]) as gdpool, \
+         patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
+        assert driver.detector_center_line == 12344.5
+        gdpool.assert_called_with('INS-12345_CENTER', 0, 2)
 
-@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
 def test_detector_center_sample(driver):
-    assert driver.detector_center_sample == 0.5
-
-@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
-@patch('ale.base.label_pds3.Pds3Label.target_name', 'MOON')
-def test_sensor_orientation(driver):
-    with patch('ale.base.type_sensor.LineScanner.ephemeris_time', new_callable=PropertyMock) as mock_time:
-        mock_time.return_value = np.linspace(100,200,2)
-        assert driver._sensor_orientation == [[2,3,4,1], [2,3,4,1]]
+    with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=[54321, 12345]) as gdpool, \
+         patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
+        assert driver.detector_center_sample == 54320.5
+        gdpool.assert_called_with('INS-12345_CENTER', 0, 2)
 
 def test_reference_frame(driver):
-    with patch('ale.base.label_pds3.Pds3Label.target_name', new_callable=PropertyMock) as mock_target_name:
-        mock_target_name.return_value = 'MOOn'
-        assert driver.reference_frame == 'MOON_ME'
-        mock_target_name.return_value = 'sun'
-        assert driver.reference_frame == 'NO TARGET'
+    assert driver.reference_frame == 'MOON_ME'
 
-@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
 def test_focal2pixel_samples(driver):
-    assert driver.focal2pixel_samples == [0, 0, -1]
+    with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=[2]) as gdpool, \
+         patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
+        assert driver.focal2pixel_samples == [0, 0, -1/2]
+        gdpool.assert_called_with('INS-12345_PIXEL_SIZE', 0, 1)
 
-@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
 def test_focal2pixel_lines(driver):
-    assert driver.focal2pixel_lines == [0, -1, 0]
+    with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=[2]) as gdpool, \
+         patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
+        assert driver.focal2pixel_lines == [0, -1/2, 0]
+        gdpool.assert_called_with('INS-12345_PIXEL_SIZE', 0, 1)
 
-@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
-def test_odkx(driver):
-    assert driver._odkx == [1, 1, 1, 1]
+def test_load(test_kernels):
+    isd = {
+        'radii': {
+            'semimajor': 1737.4,
+            'semiminor': 1737.4,
+            'unit': 'km'},
+        'sensor_position': {
+            'positions': np.array([[  195493.28614388,   211984.05137213, -1766966.32185819],
+                                   [  194937.01104181,   211343.39987087, -1767100.47633473],
+                                   [  194380.68920347,   210702.70097122, -1767234.22276254],
+                                   [  193824.32093681,   210061.95495794, -1767367.56104995],
+                                   [  193267.90484827,   209421.16305764, -1767500.49120063],
+                                   [  192711.44397634,   208780.32318594, -1767633.01318365]]),
+            'velocities': np.array([[-1069.71225785, -1231.97438089,  -258.37880523],
+                                    [-1069.80205939, -1232.06556741,  -257.5939851 ],
+                                    [-1069.89161639, -1232.15647191,  -256.80910187],
+                                    [-1069.98092881, -1232.24709434,  -256.02415587],
+                                    [-1070.06999666, -1232.33743471,  -255.2391471 ],
+                                    [-1070.15881991, -1232.42749298,  -254.4540759 ]]),
+             'unit': 'm'},
+         'sun_position': {
+            'positions': np.array([[9.50347435e+10, 1.15913462e+11, 3.78747288e+09]]),
+            'velocities': np.array([[ 285730.03370329, -232701.52529823, 592.79276721]]),
+            'unit': 'm'},
+         'sensor_orientation': {
+            'quaternions': np.array([[-0.19095485, -0.08452708,  0.88748467, -0.41080698],
+                                     [-0.19073945, -0.08442789,  0.88753312, -0.41082276],
+                                     [-0.19052404, -0.08432871,  0.88758153, -0.41083852],
+                                     [-0.19030862, -0.08422952,  0.88762988, -0.41085426],
+                                     [-0.19009352, -0.08412972,  0.88767854, -0.41086914],
+                                     [-0.18987892, -0.08402899,  0.88772773, -0.41088271]])},
+        'detector_sample_summing': 1,
+        'detector_line_summing': 1,
+        'focal_length_model': {
+            'focal_length': 72.45},
+        'detector_center': {
+            'line': 0.5,
+            'sample': 2048.0},
+        'starting_detector_line': 0,
+        'starting_detector_sample': 1,
+        'focal2pixel_lines': [0, -142.85714285714286, 0],
+        'focal2pixel_samples': [0, 0, -142.85714285714286],
+        'optical_distortion': {
+            'kaguyatc': {
+                'x': [-0.0009649900000000001, 0.00098441, 8.5773e-06, -3.7438e-06],
+                'y': [-0.0013796, 1.3502e-05, 2.7251e-06, -6.193800000000001e-06]}},
+        'image_lines': 400,
+        'image_samples': 3208,
+        'name_platform': 'SELENE-M',
+        'name_sensor': 'Terrain Camera 1',
+        'reference_height': {
+            'maxheight': 1000,
+            'minheight': -1000,
+            'unit': 'm'},
+        'name_model': 'USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL',
+        'interpolation_method': 'lagrange',
+        'line_scan_rate': [[0.5, -1.300000011920929, 0.006500000000000001]],
+        'starting_ephemeris_time': 292234259.82293594,
+        'center_ephemeris_time': 292234261.12293595,
+        't0_ephemeris': -1.300000011920929,
+        'dt_ephemeris': 0.5200000047683716,
+        't0_quaternion': -1.300000011920929,
+        'dt_quaternion': 0.5200000047683716}
 
-@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
-def test_odky(driver):
-    assert driver._odky == [1, 1, 1, 1]
+    label_file = get_image_label('TC1S2B0_01_06691S820E0465')
 
-def test_line_exposure_duration(driver):
-    with patch.dict(driver.label, {'CORRECTED_SAMPLING_INTERVAL':
-        pvl._collections.Units(value=1000, units='<msec>')}) as f:
-        assert driver.line_exposure_duration == 1
-    with patch.dict(driver.label, {'CORRECTED_SAMPLING_INTERVAL':
-        [pvl._collections.Units(value=10000, units='<msec>'), 1]}) as f:
-         assert driver.line_exposure_duration == 10
+    with patch('ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.reference_frame', \
+                new_callable=PropertyMock) as mock_reference_frame:
+        mock_reference_frame.return_value = 'IAU_MOON'
+        usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter='usgscsm')
 
-@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
-def test_focal_length(driver):
-    assert driver.focal_length == 1
-
-@patch('ale.base.label_pds3.Pds3Label.instrument_id', 123)
-def test_usgscsm_distortion_model(driver):
-    distortion_model = driver.usgscsm_distortion_model
-    assert distortion_model['kaguyatc']['x'] == [1, 1, 1, 1]
-    assert distortion_model['kaguyatc']['y'] == [1, 1, 1, 1]
-
-def test_detector_start_sample(driver):
-    with patch.dict(driver.label, {'FIRST_PIXEL_NUMBER': 123}) as f:
-        assert driver.detector_start_sample == 123
-
-def test_sensor_model_version(driver):
-    assert driver.sensor_model_version == 1
+    assert compare_dicts(usgscsm_isd, isd) == []

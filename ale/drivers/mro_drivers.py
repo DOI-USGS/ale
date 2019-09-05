@@ -5,7 +5,6 @@ import numpy as np
 import pvl
 import spiceypy as spice
 
-from ale import config
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
@@ -51,7 +50,6 @@ class MroCtxIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, RadialDi
         """
         return "CONTEXT CAMERA"
 
-
     @property
     def detector_center_sample(self):
         """
@@ -69,25 +67,6 @@ class MroCtxIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDi
     """
     Driver for reading CTX ISIS labels.
     """
-
-    @property
-    def metakernel(self):
-        """
-        Returns latest instrument metakernels
-
-        Returns
-        -------
-        : string
-          Path to latest metakernel file
-        """
-        metakernel_dir = config.mro
-        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
-        if not hasattr(self, '_metakernel'):
-            self._metakernel = None
-            for mk in mks:
-                if str(self.utc_start_time.year) in os.path.basename(mk):
-                    self._metakernel = mk
-        return self._metakernel
 
     @property
     def instrument_id(self):
@@ -199,25 +178,6 @@ class MroCtxPds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDi
     """
 
     @property
-    def metakernel(self):
-        """
-        Returns latest instrument metakernels
-
-        Returns
-        -------
-        : string
-          Path to latest metakernel file
-        """
-        metakernel_dir = config.mro
-        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
-        if not hasattr(self, '_metakernel'):
-            self._metakernel = None
-            for mk in mks:
-                if str(self.utc_start_time.year) in os.path.basename(mk):
-                    self._metakernel = mk
-        return self._metakernel
-
-    @property
     def instrument_id(self):
         """
         Returns an instrument id for uniquely identifying the instrument, but often
@@ -288,3 +248,15 @@ class MroCtxPds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDi
           ISIS sensor model version
         """
         return 1
+
+    @property
+    def platform_name(self):
+        """
+        Returns the name of the platform which the instrument is mounted on
+
+        Returns
+        -------
+        : str
+          platform name
+        """
+        return self.label['SPACECRAFT_NAME']

@@ -9,13 +9,11 @@ import spiceypy as spice
 
 from conftest import get_image_kernels, convert_kernels
 
+from unittest.mock import patch, call
+
+from ale.base.data_naif import NaifSpice
 from ale.base import data_naif
-
-# 'Mock' the spice module where it is imported
-from conftest import SimpleSpice
-
-simplespice = SimpleSpice()
-data_naif.spice = simplespice
+from ale.base import base
 
 class test_data_naif(unittest.TestCase):
 

@@ -5,7 +5,6 @@ import pvl
 import spiceypy as spice
 import numpy as np
 
-from ale import config
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
@@ -22,24 +21,6 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
     Driver for reading MDIS PDS3 labels. Requires a Spice mixin to acquire addtional
     ephemeris and instrument data located exclusively in spice kernels.
     """
-
-    @property
-    def metakernel(self):
-        """
-        Returns latest instrument metakernels
-
-        Returns
-        -------
-        : string
-          Path to latest metakernel file
-        """
-        metakernel_dir = config.mdis
-        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
-        if not hasattr(self, '_metakernel'):
-            for mk in mks:
-                if str(self.utc_start_time.year) in os.path.basename(mk):
-                    self._metakernel = mk
-        return self._metakernel
 
     @property
     def spacecraft_name(self):
@@ -126,7 +107,7 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         : double
           focal length in meters
         """
-        coeffs = spice.gdpool('INS{}_FL_TEMP_COEFFS '.format(self.fikid), 0, 5)
+        coeffs = spice.gdpool('INS{}_FL_TEMP_COEFFS '.format(self.fikid), 0, 6)
 
         # reverse coeffs, MDIS coeffs are listed a_0, a_1, a_2 ... a_n where
         # numpy wants them a_n, a_n-1, a_n-2 ... a_0
@@ -226,30 +207,24 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
                 }
             }
 
+    @property
+    def pixel_size(self):
+        """
+        Overriden because the MESSENGER IK uses PIXEL_PITCH and the units
+        are already millimeters
+
+        Returns
+        -------
+        : float pixel size
+        """
+        return spice.gdpool('INS{}_PIXEL_PITCH'.format(self.ikid), 0, 1)
+
 
 class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver):
     """
     Driver for reading MDIS ISIS3 Labels. These are Labels that have been ingested
     into ISIS from PDS EDR images but have not been spiceinit'd yet.
     """
-
-    @property
-    def metakernel(self):
-        """
-        Returns latest instrument metakernels
-
-        Returns
-        -------
-        : string
-          Path to latest metakernel file
-        """
-        metakernel_dir = config.mdis
-        mks = sorted(glob(os.path.join(metakernel_dir,'*.tm')))
-        if not hasattr(self, '_metakernel'):
-            for mk in mks:
-                if str(self.utc_start_time.year) in os.path.basename(mk):
-                    self._metakernel = mk
-        return self._metakernel
 
     @property
     def instrument_id(self):
@@ -319,13 +294,12 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
         : int
           Naif ID code used in calculating focal length
         """
-        if isinstance(self, Framer):
+        if(self.instrument_id == 'MSGR_MDIS_WAC'):
             fn = self.label['IsisCube']['BandBin']['Number']
             if fn == 'N/A':
                 fn = 0
-        else:
-            fn = 0
-        return self.ikid - int(fn)
+            return self.ikid - int(fn)
+        return self.ikid
 
     @property
     def focal_length(self):
@@ -392,7 +366,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
         : float
           detector center sample
         """
-        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0]) - 0.5
+        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 3)[0]) - 0.5
 
 
     @property
@@ -410,7 +384,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
         : float
           detector center line
         """
-        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1]) - 0.5
+        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 3)[1]) - 0.5
 
     @property
     def sensor_model_version(self):
@@ -421,3 +395,34 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
           ISIS sensor model version
         """
         return 2
+
+    @property
+    def pixel_size(self):
+        """
+        Overriden because the MESSENGER IK uses PIXEL_PITCH and the units
+        are already millimeters
+
+        Returns
+        -------
+        : float pixel size
+        """
+        return spice.gdpool('INS{}_PIXEL_PITCH'.format(self.ikid), 0, 1)
+
+    @property
+    def sampling_factor(self):
+        """
+        Returns the summing factor from the PDS3 label. For example a return value of 2
+        indicates that 2 lines and 2 samples (4 pixels) were summed and divided by 4
+        to produce the output pixel value.
+
+        NOTE: This is overwritten for the messenger driver as the value is stored in "MESS:PIXELBIN"
+
+        Returns
+        -------
+        : int
+          Number of samples and lines combined from the original data to produce a single pixel in this image
+        """
+        pixel_bin = self.label['IsisCube']['Instrument']['PixelBinningMode']
+        if pixel_bin == 0:
+            pixel_bin = 1
+        return pixel_bin * 2

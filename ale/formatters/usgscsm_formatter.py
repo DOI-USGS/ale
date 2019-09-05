@@ -5,7 +5,6 @@ from scipy.interpolate import interp1d, BPoly
 from ale.transformation import FrameChain
 
 from ale.base.type_sensor import LineScanner, Framer
-from ale.encoders import NumpyEncoder
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
 def to_usgscsm(driver):
@@ -147,4 +146,4 @@ def to_usgscsm(driver):
         raise Exception('No CSM sensor model name found!')
 
     # Convert to JSON object
-    return json.dumps(isd_data, cls=NumpyEncoder)
+    return isd_data

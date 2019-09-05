@@ -4,7 +4,6 @@ import pvl
 import spiceypy as spice
 from glob import glob
 
-from ale import config
 from ale.util import get_metakernels
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
@@ -41,28 +40,6 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
             return "LRO_LROCNACL"
         elif instrument == "LROC" and frame_id == "RIGHT":
             return "LRO_LROCNACR"
-
-
-    @property
-    def metakernel(self):
-        """
-        Returns latest instrument metakernels
-
-        Returns
-        -------
-        : str
-          Path to latest metakernel file
-        """
-        metakernel_dir = config.lro
-
-        mks = sorted(glob(os.path.join(metakernel_dir, '*.tm')))
-        if not hasattr(self, '_metakernel'):
-            self._metakernel = None
-            for mk in mks:
-                if str(self.utc_start_time.year) in os.path.basename(mk):
-                    self._metakernel = mk
-        return self._metakernel
-
 
     @property
     def spacecraft_name(self):
@@ -224,6 +201,11 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
            Returns the additionl preroll.
          """
         return 1024.0
+
+    @property
+    def mission_name(self):
+        return self.label['MISSION_NAME']
+
 
     @property
     def sampling_factor(self):

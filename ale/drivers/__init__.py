@@ -12,9 +12,11 @@ import numpy as np
 import datetime
 from datetime import datetime, date
 import traceback
+from collections import OrderedDict
 
 from ale.formatters.usgscsm_formatter import to_usgscsm
 from ale.formatters.isis_formatter import to_isis
+from ale.base.data_isis import IsisSpice
 
 from abc import ABC
 
@@ -25,28 +27,24 @@ __driver_modules__ = [importlib.import_module('.'+m, package='ale.drivers') for 
 __formatters__ = {'usgscsm': to_usgscsm,
                   'isis': to_isis}
 
-drivers = dict(chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.isclass(x) and "_driver" in x.__module__) for dmod in __driver_modules__))
+def sort_drivers(drivers=[]):
+    return list(sorted(drivers, key=lambda x:IsisSpice in x.__bases__, reverse=True))
 
-class JsonEncoder(json.JSONEncoder):
+class AleJsonEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        if isinstance(obj, np.int64):
-            return int(obj)
-        if isinstance(obj, datetime.datetime):
-            return obj.__str__()
-        if isinstance(obj, bytes):
-            return obj.decode("utf-8")
-        if isinstance(obj, pvl.PVLModule):
-            return pvl.dumps(obj)
         if isinstance(obj, set):
             return list(obj)
-        if isinstance(obj, np.nan):
-            return None
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, datetime.date):
+            return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
-
-def load(label, formatter='usgscsm'):
+def load(label, props={}, formatter='usgscsm', verbose=False):
     """
     Attempt to load a given label from all possible drivers
 
@@ -58,18 +56,25 @@ def load(label, formatter='usgscsm'):
     if isinstance(formatter, str):
         formatter = __formatters__[formatter]
 
-    for name, driver in drivers.items():
-        print(f'Trying {name}')
+    drivers = chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.isclass(x) and "_driver" in x.__module__) for dmod in __driver_modules__)
+    drivers = sort_drivers([d[1] for d in drivers])
+
+    for driver in drivers:
+        if verbose:
+            print(f'Trying {driver}')
         try:
-            res = driver(label)
+            res = driver(label, props=props)
+            # get instrument_id to force early failure
+            res.instrument_id
+
             with res as driver:
                 return formatter(driver)
         except Exception as e:
-            print(f'Failed: {e}\n')
-            traceback.print_exc()
+            if verbose:
+                print(f'Failed: {e}\n')
+                traceback.print_exc()
     raise Exception('No Such Driver for Label')
 
-
-def loads(label, formatter='usgscsm'):
-    res = load(label, formatter)
-    return json.dumps(res, cls=JsonEncoder)
+def loads(label, props='', formatter='usgscsm', verbose=False):
+    res = load(label, props, formatter, verbose=verbose)
+    return json.dumps(res, cls=AleJsonEncoder)

@@ -1,18 +1,7 @@
 import pytest
-from ale.drivers import isis_ideal_drivers
-from ale.base import data_isis
-from ale.base import label_isis
 from ale.drivers.isis_ideal_drivers import IdealLsIsisLabelIsisSpiceDriver
 
-from conftest import SimpleSpice
 from unittest.mock import patch
-
-
-simplespice = SimpleSpice()
-
-isis_ideal_drivers.spice = simplespice
-data_isis.spice = simplespice
-label_isis.spice = simplespice
 
 @pytest.fixture
 def IdealDriver():
@@ -27,7 +16,7 @@ def test_sensor_name(IdealDriver):
 @patch('ale.drivers.isis_ideal_drivers.IdealLsIsisLabelIsisSpiceDriver.ephemeris_start_time', 451262458.99571)
 def test_ephemeris_start_time(IdealDriver):
     assert IdealDriver.ephemeris_start_time == 451262458.99571
-    
+
 
 @patch('ale.drivers.isis_ideal_drivers.IdealLsIsisLabelIsisSpiceDriver.ephemeris_stop_time', 451262459.29003815)
 def test_ephemeris_stop_time(IdealDriver):
@@ -61,4 +50,3 @@ def test_pixel2focal_x(IdealDriver):
 @patch('ale.drivers.isis_ideal_drivers.IdealLsIsisLabelIsisSpiceDriver.pixel2focal_y', 0)
 def test_pixel2focal_y(IdealDriver):
     assert IdealDriver.pixel2focal_y == 0
-

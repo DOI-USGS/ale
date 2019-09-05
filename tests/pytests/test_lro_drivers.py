@@ -1,33 +1,26 @@
 import pytest
 
-# 'Mock' the spice module where it is imported
-from conftest import SimpleSpice, get_mockkernels
-
-from collections import namedtuple
-
-import ale
-from ale.drivers import lro_drivers
-from ale.base import data_naif
-from ale.base import label_pds3
-
 from unittest.mock import PropertyMock, patch
 
+import ale
 from ale import util
-
+from ale.drivers import lro_drivers
 from ale.drivers.lro_drivers import LroLrocPds3LabelNaifSpiceDriver
 
+# 'Mock' the spice module where it is imported
+from conftest import SimpleSpice, get_mockkernels
+from collections import namedtuple
 
 simplespice = SimpleSpice()
-data_naif.spice = simplespice
 lro_drivers.spice = simplespice
-label_pds3.spice = simplespice
-
 LroLrocPds3LabelNaifSpiceDriver.metakernel = get_mockkernels
 
 @pytest.fixture
 def driver():
     return LroLrocPds3LabelNaifSpiceDriver("")
 
+def test_short_mission_name(driver):
+    assert driver.short_mission_name=='lro'
 
 @patch('ale.base.label_pds3.Pds3Label.instrument_id', 'LROC')
 def test_instrument_id_left(driver):
