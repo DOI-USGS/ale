@@ -26,6 +26,7 @@ def to_isis(driver):
 
     frame_chain = driver.frame_chain
     sensor_frame = driver.sensor_frame_id
+    target_frame = driver.target_frame_id
 
     instrument_pointing = {}
     source_frame, destination_frame, time_dependent_sensor_frame = frame_chain.last_time_dependent_frame_between(sensor_frame, 1)
@@ -39,7 +40,7 @@ def to_isis(driver):
         instrument_pointing['CkTableEndTime'] = time_dependent_rotation.times[-1]
         instrument_pointing['CkTableOriginalSize'] = len(time_dependent_rotation.times)
         instrument_pointing['EphemerisTimes'] = time_dependent_rotation.times
-        instrument_pointing['Quaternions'] = time_dependent_rotation.quats
+        instrument_pointing['Quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
 
     if source_frame != sensor_frame:
         # Reverse the frame order because ISIS orders frames as
@@ -62,7 +63,7 @@ def to_isis(driver):
         body_rotation['CkTableEndTime'] = time_dependent_rotation.times[-1]
         body_rotation['CkTableOriginalSize'] = len(time_dependent_rotation.times)
         body_rotation['EphemerisTimes'] = time_dependent_rotation.times
-        body_rotation['Quaternions'] = time_dependent_rotation.quats
+        body_rotation['Quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
 
     if source_frame != target_frame:
         # Reverse the frame order because ISIS orders frames as
@@ -72,13 +73,17 @@ def to_isis(driver):
         body_rotation['ConstantRotation'] = constant_rotation.rotation_matrix()
     meta_data['BodyRotation'] = body_rotation
 
+    j2000_rotation = frame_chain.compute_rotation(target_frame, 1)
+
     instrument_position = {}
     positions, velocities, times = driver.sensor_position
     instrument_position['SpkTableStartTime'] = times[0]
     instrument_position['SpkTableEndTime'] = times[-1]
     instrument_position['SpkTableOriginalSize'] = len(times)
     instrument_position['EphemerisTimes'] = times
+    positions = j2000_rotation._rots.apply(positions) * 1/1000
     instrument_position['Positions'] = positions
+    velocities = j2000_rotation._rots.apply(velocities) * 1/1000
     instrument_position['Velocities'] = velocities
     meta_data['InstrumentPosition'] = instrument_position
 
@@ -88,7 +93,9 @@ def to_isis(driver):
     sun_position['SpkTableEndTime'] = times[-1]
     sun_position['SpkTableOriginalSize'] = len(times)
     sun_position['EphemerisTimes'] = times
+    positions = j2000_rotation._rots.apply(positions) * 1/1000
     sun_position['Positions'] = positions
+    velocities = j2000_rotation._rots.apply(velocities) * 1/1000
     sun_position['Velocities'] = velocities
     meta_data['SunPosition'] = sun_position
 
