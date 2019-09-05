@@ -23,8 +23,8 @@ def usgscsm_compare_dict():
                'velocities': [np.array([-6890.54418209, -2939.21925245,    21.83699238])], 
                'unit': 'm'}, 
             'sun_position': 
-              {'positions': [np.array([-2.30714008e+11, -1.39662228e+12,  3.09872114e+11])], 
-               'velocities': [np.array([-7.41139016e+07,  1.22563268e+07,  3.85603215e+03])], 
+              {'positions': [np.array([-2.30750862e+11, -1.39662303e+12, 3.09841240e+11])], 
+               'velocities': [np.array([-7.41107317e+07, 1.22577658e+07, 3.91731010e+03])], 
                'unit': 'm'}, 
             'sensor_orientation': 
               {'quaternions': [[-0.21183452, -0.66567547, -0.69966839,  0.14988809]]}, 
