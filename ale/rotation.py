@@ -155,7 +155,7 @@ class TimeDependentRotation:
         rot = Rotation.from_euler(sequence, np.asarray(euler), degrees=degrees)
         return TimeDependentRotation(rot.as_quat(), times, source, dest)
 
-    def __init__(self, quats, times, source, dest):
+    def __init__(self, quats, times, source, dest, av=None):
         """
         Construct a time dependent rotation
 
@@ -173,14 +173,28 @@ class TimeDependentRotation:
                  The NAIF ID code for the source frame
         dest : int
                The NAIF ID code for the destination frame
+        av : 2darray
+             The angular velocity of the rotation at each time as a 2d numpy array.
+             If not entered, then angular velocity will be computed by assuming constant
+             angular velocity between times.
         """
         self.source = source
         self.dest = dest
-        self.quats = np.asarray(quats)
-        self.times = np.asarray(times)
+        self.quats = quats
+        self.times = np.atleast_1d(times)
+        if av is not None:
+            self.av = av
+        elif len(self.times) > 1:
+            rotvecs = (self._rots[1:] * self._rots[:-1].inv()).as_rotvec()
+            steps = self.times[1:] - self.times[:-1]
+            between_av = rotvecs / steps[:, None]
+            # Assume the last rotation has the same angular velocity as the second to last
+            self.av = np.vstack([between_av, between_av[0]])
+        else:
+            self.av = np.zeros((1, 3))
 
     def __repr__(self):
-        return f'Time Dependent Rotation Source: {self.source}, Destination: {self.dest}, Quat: {self.quats}'
+        return f'Time Dependent Rotation Source: {self.source}, Destination: {self.dest}, Quats: {self.quats}, AV: {self.av}, Times: {self.times}'
 
     @property
     def quats(self):
@@ -202,7 +216,7 @@ class TimeDependentRotation:
                     The new quaternions as a 2d array. The quaternions must be
                     in scalar last format (x, y, z, w).
         """
-        self._rots = Rotation.from_quat(np.asarray(new_quats))
+        self._rots = Rotation.from_quat(new_quats)
 
     def inverse(self):
         """
@@ -234,22 +248,16 @@ class TimeDependentRotation:
          : 2darray
            The angular velocity vectors
         """
-        vec_times = np.asarray(times)
-        if vec_times.ndim < 1:
-            vec_times = np.asarray([times])
-        elif vec_times.ndim > 1:
+        vec_times = np.atleast_1d(times)
+        if vec_times.ndim > 1:
             raise ValueError('Input times must be either a float or a 1d iterable of floats')
-        if len(self.times) < 2:
-            return Rotation.from_quat(np.repeat(self.quats, len(vec_times), 0)), np.zeros((len(vec_times), 3))
         else:
             idx = np.searchsorted(self.times, vec_times) - 1
             idx[idx >= len(self.times) - 1] = len(self.times) - 2
             idx[idx < 0] = 0
-            steps = self.times[idx+1] - self.times[idx]
-            rotvecs = (self._rots[idx + 1] * self._rots[idx].inv()).as_rotvec()
-            alpha = (vec_times - self.times[idx]) / steps
-            interp_rots = Rotation.from_rotvec(rotvecs * alpha[:, None]) * self._rots[idx]
-            interp_av = rotvecs / steps[:, None]
+            interp_av = self.av[idx]
+            rotvecs = interp_av * (vec_times - self.times[idx])[:, None]
+            interp_rots = Rotation.from_rotvec(rotvecs) * self._rots[idx]
             return interp_rots, interp_av
 
     def reinterpolate(self, times):
