@@ -1,0 +1,4 @@
+This CK is for testing with the image: /home/kberry/dev/knoten/knoten/examples/data/N1702360370_1.cub
+
+This CK was generated using the following command: {}
+/scratch/localhome/kberry/Downloads/ckslicer -LSK /usgs/cpkgs/isis3/data/base/kernels/lsk/naif0012.tls -SCLK /usgs/cpkgs/isis3/data/cassini/kernels/sclk/cas00172.tsc -INPUTCK /usgs/cpkgs/isis3/data/cassini/kernels/ck/11344_11349ra.bc -OUTPUTCK /home/kberry/kernel_split/11344_11349ra_sliced-82000.bc -ID -82000 -TIMETYPE SCLK -START 1/1702355515.075 -STOP 1/1702365221.007
