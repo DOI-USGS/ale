@@ -24,53 +24,9 @@ def driver(request):
         label = get_image_label("M103595705LE", "pds3")
         return LroLrocPds3LabelNaifSpiceDriver(label)
 
-def test_short_mission_name(driver):
-    assert driver.short_mission_name=='lro'
-
-def test_instrument_id_left(driver):
-    driver.label['FRAME_ID'] = 'LEFT'
-    assert driver.instrument_id == 'LRO_LROCNACL'
-
-def test_instrument_id_right(driver):
-    driver.label['FRAME_ID'] = 'RIGHT'
-    assert driver.instrument_id == 'LRO_LROCNACR'
-
-def test_spacecraft_name(driver):
-    assert driver.spacecraft_name == 'LRO'
-
-def test_sensor_model_version(driver):
-    assert driver.sensor_model_version == 2
-
-def test_odtk(driver):
-    with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool, \
-         patch('ale.drivers.lro_drivers.spice.bods2c', return_value=-12345) as bods2c:
-        assert driver.odtk == [1.0]
-        gdpool.assert_called_with('INS-12345_OD_K', 0, 1)
-
-def test_usgscsm_distortion_model(driver):
-    with patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.odtk', \
-               new_callable=PropertyMock) as odtk:
-        odtk.return_value = [1.0]
-        distortion_model = driver.usgscsm_distortion_model
-        assert distortion_model['lrolrocnac']['coefficients'] == [1.0]
-
-def test_ephemeris_start_time(driver):
-    with patch('ale.drivers.lro_drivers.spice.scs2e', return_value=5) as scs2e, \
-         patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.exposure_duration', \
-               new_callable=PropertyMock) as exposure_duration, \
-         patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.spacecraft_id', \
-               new_callable=PropertyMock) as spacecraft_id:
-        exposure_duration.return_value = 0.1
-        spacecraft_id.return_value = 1234
-        assert driver.ephemeris_start_time == 107.4
-        scs2e.assert_called_with(1234, "1/270649237:07208")
-
-@patch('ale.base.label_pds3.Pds3Label.exposure_duration', 1)
-def test_exposure_duration(driver):
-    assert driver.exposure_duration == 1.0045
-
-def test_load(test_kernels):
-    isd = {
+@pytest.fixture()
+def usgscsm_comparison_isd():
+    return {
         'radii': {
             'semimajor': 1737.4,
             'semiminor': 1737.4,
@@ -132,7 +88,54 @@ def test_load(test_kernels):
         't0_quaternion': -0.20668596029281616,
         'dt_quaternion': 0.08267437219619751}
 
+def test_short_mission_name(driver):
+    assert driver.short_mission_name=='lro'
+
+def test_instrument_id_left(driver):
+    driver.label['FRAME_ID'] = 'LEFT'
+    assert driver.instrument_id == 'LRO_LROCNACL'
+
+def test_instrument_id_right(driver):
+    driver.label['FRAME_ID'] = 'RIGHT'
+    assert driver.instrument_id == 'LRO_LROCNACR'
+
+def test_spacecraft_name(driver):
+    assert driver.spacecraft_name == 'LRO'
+
+def test_sensor_model_version(driver):
+    assert driver.sensor_model_version == 2
+
+def test_odtk(driver):
+    with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool, \
+         patch('ale.drivers.lro_drivers.spice.bods2c', return_value=-12345) as bods2c:
+        assert driver.odtk == [1.0]
+        gdpool.assert_called_with('INS-12345_OD_K', 0, 1)
+
+def test_usgscsm_distortion_model(driver):
+    with patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.odtk', \
+               new_callable=PropertyMock) as odtk:
+        odtk.return_value = [1.0]
+        distortion_model = driver.usgscsm_distortion_model
+        assert distortion_model['lrolrocnac']['coefficients'] == [1.0]
+
+def test_ephemeris_start_time(driver):
+    with patch('ale.drivers.lro_drivers.spice.scs2e', return_value=5) as scs2e, \
+         patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.exposure_duration', \
+               new_callable=PropertyMock) as exposure_duration, \
+         patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.spacecraft_id', \
+               new_callable=PropertyMock) as spacecraft_id:
+        exposure_duration.return_value = 0.1
+        spacecraft_id.return_value = 1234
+        assert driver.ephemeris_start_time == 107.4
+        scs2e.assert_called_with(1234, "1/270649237:07208")
+
+def test_exposure_duration(driver):
+    with patch('ale.base.label_pds3.Pds3Label.exposure_duration', \
+               new_callable=PropertyMock) as exposure_duration:
+        exposure_duration.return_value = 1
+        assert driver.exposure_duration == 1.0045
+
+def test_load(test_kernels, usgscsm_comparison_isd):
     label_file = get_image_label('M103595705LE')
     usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter='usgscsm')
-
-    assert compare_dicts(usgscsm_isd, isd) == []
+    assert compare_dicts(usgscsm_isd, usgscsm_comparison_isd) == []
