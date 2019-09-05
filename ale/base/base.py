@@ -308,3 +308,23 @@ class Driver(ABC):
           Center ephemeris time for an image
         """
         return (self.ephemeris_start_time + self.ephemeris_stop_time) / 2
+
+    @property
+    def instrument_id(self):
+        raise NotImplementedError
+
+    @property
+    def spacecraft_name(self):
+        raise NotImplementedError
+
+    @property
+    def spacecraft_clock_start_count(self):
+        raise NotImplementedError
+
+    @property
+    def spacecraft_clock_stop_count(self):
+        raise NotImplementedError
+
+    @property
+    def short_mission_name(self):
+        return self.__module__.split('.')[-1].split('_')[0]
