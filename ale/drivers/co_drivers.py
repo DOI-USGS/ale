@@ -11,8 +11,6 @@ from ale.base.label_pds3 import Pds3Label
 from ale.base.type_distortion import RadialDistortion
 from ale.base.type_sensor import Framer
 
-from ale.util import find_latest_metakernel
-
 from ale.rotation import ConstantRotation
 from ale.transformation import FrameChain
 from scipy.spatial.transform import Rotation

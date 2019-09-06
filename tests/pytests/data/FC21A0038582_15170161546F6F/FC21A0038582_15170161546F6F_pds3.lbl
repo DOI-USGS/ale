@@ -1,0 +1,375 @@
+PDS_VERSION_ID                = PDS3
+LABEL_REVISION_NOTE           = "20080201, PGM, DAWN FC V1.5"
+
+/* FILE CHARACTERISTICS */
+
+RECORD_TYPE                   = FIXED_LENGTH
+RECORD_BYTES                  = 512
+FILE_RECORDS                  = 4301
+LABEL_RECORDS                 = 24
+FILE_NAME                     = "FC21A0038582_15170161546F6F.IMG"
+
+/* POINTERS TO DATA OBJECTS */
+
+^IMAGE                        = 26
+^FRAME_2_IMAGE                = 4122
+^FRAME_3_IMAGE                = 4205
+^FRAME_4_IMAGE                = 4238
+^FRAME_5_IMAGE                = 4270
+^HISTORY                      = 25
+
+/* SOFTWARE */
+
+SOFTWARE_DESC                 = "TRAP.EXE"
+SOFTWARE_LICENSE_TYPE         = "COMMERCIAL"
+SOFTWARE_ID                   = "TRAP"
+SOFTWARE_NAME                 = "TRAP"
+SOFTWARE_VERSION_ID           = "Trap v4.10"
+SOFTWARE_RELEASE_DATE         = 2016-03-17
+
+/*   TELEMETRY IDENTIFICATION   */
+
+TELEMETRY_FORMAT_ID           = "309"
+
+/*   PRODUCT IDENTIFICATION   */
+
+DATA_SET_NAME                 = "DAWN FC2 RAW (EDR) CERES IMAGES V1.0"
+DATA_SET_ID                   = "DAWN-A-FC2-2-EDR-CERES-IMAGES-V1.0"
+PRODUCT_ID                    = "0038582"
+PRODUCT_TYPE                  = "DATA"
+STANDARD_DATA_PRODUCT_ID      = "FC_IMAGE"
+PRODUCER_FULL_NAME            = "PABLO GUTIERREZ-MARQUES"
+PRODUCER_INSTITUTION_NAME     =
+    "MAX PLANCK INSTITUT FUER SONNENSYSTEMFORSCHUNG"
+PRODUCT_CREATION_TIME         = 2016-04-06T15:24:21.000
+PRODUCT_VERSION_ID            = "F"
+RELEASE_ID                    = "N/A"
+
+/*   MISSION IDENTIFICATION   */
+
+INSTRUMENT_HOST_ID            = "DAWN"
+INSTRUMENT_HOST_NAME          = "DAWN"
+MISSION_ID                    = "DAWN"
+MISSION_NAME                  = "DAWN MISSION TO VESTA AND CERES"
+MISSION_PHASE_NAME            = "CERES SCIENCE SURVEY (CSS)"
+
+/*   INSTRUMENT DESCRIPTION   */
+
+INSTRUMENT_ID                 = "FC2"
+INSTRUMENT_NAME               = "FRAMING CAMERA 2"
+OBSERVATION_ID                = "FC2_CSS_C5NadirSouthColor_001"
+OBSERVATION_TYPE              = "N/A"
+INSTRUMENT_TYPE               = "FRAME CCD REFRACTING TELESCOPE"
+DETECTOR_DESC                 = "1092x1056 PIXELS FRONTLIT FRAMETRANSFER CCD"
+DETECTOR_TYPE                 = "SI CCD"
+DETECTOR_TEMPERATURE          = 217.927 <kelvin>
+
+/*   TIME IDENTIFICATION   */
+
+SPACECRAFT_CLOCK_START_COUNT  = "488002612:246"
+SPACECRAFT_CLOCK_STOP_COUNT   = "488002614:244"
+START_TIME                    = 2015-170T16:15:46.345
+DAWN:ALT_START_TIME           = 2015-06-19T16:15:46.345
+STOP_TIME                     = 2015-170T16:15:48.337
+DAWN:ALT_STOP_TIME            = 2015-06-19T16:15:48.337
+
+/*   SYSTEM HARDWARE AND SOFTWARE CONFIGURATION   */
+
+DAWN:DPU_HARDWARE_ID          = "1.04"
+DAWN:DPU_SOFTWARE_VERSION     = "3.09"
+DAWN:UDPLIB_SOFTWARE_VERSION  = "3.09.03"
+DAWN:PCU_HARDWARE_ID          = 2.04
+DAWN:FEE_HARDWARE_ID          = "017.09.09"
+DAWN:MCU_HARDWARE_ID          = "12"
+
+/*   MECHANISM STATUS   */
+
+DAWN:FILTER_ENCODER           = 23
+FILTER_NUMBER                 = "6"
+DAWN:FRONT_DOOR_ENCODER       = 53
+DAWN:FRONT_DOOR_STATUS_ID     = OPEN
+
+/*   IMAGE ACQUISITION OPTIONS   */
+
+DAWN:DATA_ROUTING_ID          = "SCIENCE 2"
+EXPOSURE_DURATION             = 1800.000 <millisecond>
+DAWN:USE_PRE_CLEAR            = ON
+DAWN:IMAGE_ACQUIRE_MODE       = NORMAL
+DAWN:CALLAMP_STROBE_TIME      = "N/A"
+DAWN:CALLAMP_DELAY_TIME       = "N/A"
+DAWN:CALLAMP_FREQUENCY        = "N/A"
+DAWN:CALLAMP_DUTY             = "N/A"
+
+/*   POWER CONVERTER SWITCH STATUS   */
+
+DAWN:FEE_FLAG                 = ON
+DAWN:HEATER0_FLAG             = OFF
+DAWN:HEATER1_FLAG             = OFF
+DAWN:CALLAMP_ENABLE_FLAG      = OFF
+DAWN:MCU_MOTOR_POWER_FLAG     = ON
+DAWN:MCU_FLAG                 = ON
+DAWN:FSA_SHOOT_FLAG           = OFF
+DAWN:FSA_SHOOT_ENABLE_FLAG    = OFF
+
+/*   POWER SYSTEM STATUS   */
+
+DAWN:V_28                     = 30.080 <volt>
+DAWN:V_16                     = 16.120 <volt>
+DAWN:V_12                     = 12.079 <volt>
+DAWN:V_5                      = 5.181 <volt>
+DAWN:V_M5                     = -5.045 <volt>
+DAWN:V_5_ANALOG               = 5.292 <volt>
+DAWN:V_M5_ANALOG              = -5.161 <volt>
+DAWN:V_3_3                    = 3.335 <volt>
+DAWN:V_2_5                    = 2.506 <volt>
+DAWN:I_28                     = 563.200 <milliampere>
+DAWN:I_16                     = 58.545 <milliampere>
+DAWN:I_12                     = 82.380 <milliampere>
+DAWN:I_5                      = 301.300 <milliampere>
+DAWN:I_M5                     = -88.905 <milliampere>
+DAWN:I_5_ANALOG               = 249.200 <milliampere>
+DAWN:I_M5_ANALOG              = -27.150 <milliampere>
+DAWN:I_3_3                    = 240.300 <milliampere>
+DAWN:I_2_5                    = 665.550 <milliampere>
+
+/*   CALIBRATED TEMPERATURES   */
+
+DAWN:T_CCD                    = 217.927 <kelvin>
+DAWN:T_DPU                    = 292.427 <kelvin>
+DAWN:T_DCDC                   = 284.224 <kelvin>
+DAWN:T_F12                    = 289.181 <kelvin>
+DAWN:T_CSC                    = 289.223 <kelvin>
+DAWN:T_COVER_MOTOR            = 244.295 <kelvin>
+DAWN:T_LENS_BARREL            = 248.285 <kelvin>
+DAWN:T_BAFFLE                 = 243.295 <kelvin>
+DAWN:T_FILTER_MOTOR           = 255.267 <kelvin>
+DAWN:T_STRUCTURE              = 255.267 <kelvin>
+DAWN:T_RAD_MOTOR              = 201.400 <kelvin>
+
+/*   TEST SETUP CONFIGURATION   */
+
+DAWN:PURPOSE                  = "N/A"
+DAWN:OPERATOR                 = "N/A"
+DAWN:SUBJECT                  = "N/A"
+DAWN:TEST_LAMP                = "N/A"
+DAWN:TARGET                   = "N/A"
+DAWN:CHAMBER                  = "N/A"
+
+/*   POINTING   */
+
+RIGHT_ASCENSION               = 289.753 <degree>
+DECLINATION                   = 64.400 <degree>
+TWIST_ANGLE                   = 95.606 <degree>
+CELESTIAL_NORTH_CLOCK_ANGLE   = 275.606 <degree>
+QUATERNION                    = (
+    0.5213655224
+    , -0.1747575947
+    , 0.1361764644
+    , -0.8240714445
+)
+
+/*   SPICE KERNELS   */
+
+SPICE_FILE_NAME               = (
+    "sclk\DAWN_203_SCLKSCET.00065.tsc"
+    , "lsk\naif0011.tls"
+    , "spk\dawn_rec_150509-150630_150730_v1.bsp"
+    , "ck\dawn_sc_150615_150621.bc"
+    , "ik\dawn_fc_v10.mk"
+    , "fk\dawn_v13.tf"
+    , "fk\dawn_ceres_v00.tf"
+    , "pck\pck00010.tpc"
+    , "spk\de421.bsp"
+    , "pck\dawn_ceres_v05.tpc"
+    , "spk\sb_ceres_140724.bsp"
+    , "fk\dawn_ceres_v00.tf"
+)
+
+/*   COORDINATE SYSTEM   */
+
+COORDINATE_SYSTEM_NAME        = "CERES_FIXED"
+COORDINATE_SYSTEM_CENTER_NAME = "CERES"
+DESCRIPTION                   = ""
+
+/*   ORBIT GEOMETRY   */
+
+SUB_SPACECRAFT_LATITUDE       = "N/A"
+SUB_SPACECRAFT_LONGITUDE      = "N/A"
+SUB_SPACECRAFT_AZIMUTH        = "N/A"
+SPACECRAFT_ALTITUDE           = "N/A"
+TARGET_CENTER_DISTANCE        = "N/A"
+ORBIT_NUMBER                  = "N/A"
+SC_TARGET_POSITION_VECTOR     = (
+    "N/A"
+    , "N/A"
+    , "N/A"
+)
+SC_TARGET_VELOCITY_VECTOR     = (
+    "N/A"
+    , "N/A"
+    , "N/A"
+)
+LOCAL_HOUR_ANGLE              = "N/A"
+SUB_SOLAR_LATITUDE            = "N/A"
+SUB_SOLAR_LONGITUDE           = "N/A"
+SUB_SOLAR_AZIMUTH             = "N/A"
+SOLAR_LONGITUDE               = "N/A"
+SOLAR_ELONGATION              = "N/A"
+TARGET_NAME                   = "1 CERES"
+TARGET_TYPE                   = "ASTEROID"
+
+/*   SOLAR GEOMETRY   */
+
+SPACECRAFT_SOLAR_DISTANCE     = "N/A"
+SC_SUN_POSITION_VECTOR        = (
+    "N/A"
+    , "N/A"
+    , "N/A"
+)
+SC_SUN_VELOCITY_VECTOR        = (
+    "N/A"
+    , "N/A"
+    , "N/A"
+)
+
+/*   ILLUMINATION   */
+
+INCIDENCE_ANGLE               = "N/A"
+EMISSION_ANGLE                = "N/A"
+PHASE_ANGLE                   = "N/A"
+
+/*   IMAGE PARAMETERS   */
+
+SAMPLE_DISPLAY_DIRECTION      = "RIGHT"
+LINE_DISPLAY_DIRECTION        = "UP"
+SLANT_DISTANCE                = "N/A"
+MINIMUM_LATITUDE              = "N/A"
+CENTER_LATITUDE               = "N/A"
+MAXIMUM_LATITUDE              = "N/A"
+WESTERNMOST_LONGITUDE         = "N/A"
+CENTER_LONGITUDE              = "N/A"
+EASTERNMOST_LONGITUDE         = "N/A"
+HORIZONTAL_PIXEL_SCALE        = "N/A"
+VERTICAL_PIXEL_SCALE          = "N/A"
+RETICLE_POINT_RA              = (
+)
+RETICLE_POINT_DECLINATION     = (
+)
+RETICLE_POINT_LONGITUDE       = (
+)
+RETICLE_POINT_LATITUDE        = (
+)
+NORTH_AZIMUTH                 = "N/A"
+
+/* IMAGE OBJECT */
+
+OBJECT                        = IMAGE
+    INTERCHANGE_FORMAT        = BINARY
+    LINE_SAMPLES              = 1024
+    LINES                     = 1024
+    BANDS                     = 1
+    SAMPLE_BITS               = 16
+    SAMPLE_TYPE               = "LSB_UNSIGNED_INTEGER"
+    FIRST_LINE                = 17
+    FIRST_LINE_SAMPLE         = 35
+    UNIT                      = "DU"
+    INST_CMPRS_NAME           =
+    "SET PARTITIONING IN HIERARCHICAL TREES (SPIHT TAP)"
+    INST_CMPRS_RATIO          =  2.52
+    INST_CMPRS_TYPE           = "LOSSLESS"
+    PIXEL_AVERAGING_WIDTH     = 1
+    PIXEL_AVERAGING_HEIGHT    = 1
+END_OBJECT                    = IMAGE
+
+
+/* FRAME_2_IMAGE OBJECT */
+
+OBJECT                        = FRAME_2_IMAGE
+    INTERCHANGE_FORMAT        = BINARY
+    LINE_SAMPLES              = 10
+    LINES                     = 1054
+    BANDS                     = 1
+    SAMPLE_BITS               = 32
+    SAMPLE_TYPE               = "PC_REAL"
+    FIRST_LINE                = 2
+    FIRST_LINE_SAMPLE         = 2
+    UNIT                      = "DU"
+    INST_CMPRS_NAME           = "N/A"
+    INST_CMPRS_RATIO          =  0.00
+    INST_CMPRS_TYPE           = "LOSSLESS"
+    PIXEL_AVERAGING_WIDTH     = 1
+    PIXEL_AVERAGING_HEIGHT    = 1
+END_OBJECT                    = FRAME_2_IMAGE
+
+
+/* FRAME_3_IMAGE OBJECT */
+
+OBJECT                        = FRAME_3_IMAGE
+    INTERCHANGE_FORMAT        = BINARY
+    LINE_SAMPLES              = 8
+    LINES                     = 1054
+    BANDS                     = 1
+    SAMPLE_BITS               = 16
+    SAMPLE_TYPE               = "LSB_UNSIGNED_INTEGER"
+    FIRST_LINE                = 2
+    FIRST_LINE_SAMPLE         = 16
+    UNIT                      = "DU"
+    INST_CMPRS_NAME           = "N/A"
+    INST_CMPRS_RATIO          =  0.00
+    INST_CMPRS_TYPE           = "LOSSLESS"
+    PIXEL_AVERAGING_WIDTH     = 1
+    PIXEL_AVERAGING_HEIGHT    = 1
+END_OBJECT                    = FRAME_3_IMAGE
+
+
+/* FRAME_4_IMAGE OBJECT */
+
+OBJECT                        = FRAME_4_IMAGE
+    INTERCHANGE_FORMAT        = BINARY
+    LINE_SAMPLES              = 1024
+    LINES                     = 8
+    BANDS                     = 1
+    SAMPLE_BITS               = 16
+    SAMPLE_TYPE               = "LSB_UNSIGNED_INTEGER"
+    FIRST_LINE                = 3
+    FIRST_LINE_SAMPLE         = 35
+    UNIT                      = "DU"
+    INST_CMPRS_NAME           = "N/A"
+    INST_CMPRS_RATIO          =  0.00
+    INST_CMPRS_TYPE           = "LOSSLESS"
+    PIXEL_AVERAGING_WIDTH     = 1
+    PIXEL_AVERAGING_HEIGHT    = 1
+END_OBJECT                    = FRAME_4_IMAGE
+
+
+/* FRAME_5_IMAGE OBJECT */
+
+OBJECT                        = FRAME_5_IMAGE
+    INTERCHANGE_FORMAT        = BINARY
+    LINE_SAMPLES              = 1024
+    LINES                     = 8
+    BANDS                     = 1
+    SAMPLE_BITS               = 16
+    SAMPLE_TYPE               = "LSB_UNSIGNED_INTEGER"
+    FIRST_LINE                = 1047
+    FIRST_LINE_SAMPLE         = 35
+    UNIT                      = "DU"
+    INST_CMPRS_NAME           = "N/A"
+    INST_CMPRS_RATIO          =  0.00
+    INST_CMPRS_TYPE           = "LOSSLESS"
+    PIXEL_AVERAGING_WIDTH     = 1
+    PIXEL_AVERAGING_HEIGHT    = 1
+END_OBJECT                    = FRAME_5_IMAGE
+
+END
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             OBJECT                        = HISTORY
+GROUP                         = LEVEL_1A_GENERATION
+    VERSION_DATE              = 2016-03-17
+    DATE_TIME                 = 2016-04-06T15:24:21.000Z
+    SOFTWARE_DESC             = "TRAP.EXE"
+    GROUP                     = PARAMETERS
+        FILENAME              = "FC21A0038582_15170161546F6F.IMG"
+    END_GROUP                 = PARAMETERS
+END_GROUP                     = LEVEL_1A_GENERATION
+END_OBJECT                    = HISTORY
+END
