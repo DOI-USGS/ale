@@ -17,7 +17,7 @@ set(CMAKE_CXX_STANDARD 11)
 # Third Party Dependencies
 find_package(GSL    REQUIRED)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
-find_package(PythonLibs REQUIRED COMPONENTS Development Interpreter Compiler)
+find_package(Python 3 REQUIRED COMPONENTS Development)
 find_package(nlohmann_json REQUIRED)
 
 # Library setup
@@ -29,17 +29,15 @@ set_target_properties(ale PROPERTIES
 set(ALE_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 
 target_include_directories(ale
-                           PRIVATE
-                           ${GSL_INCLUDE_DIRS}
-                           ${EIGEN3_INCLUDE_DIR}
-                           ${PYTHON_INCLUDE_DIR}
                            PUBLIC
                            ${ALE_INCLUDE_DIRS})
 
  target_link_libraries(ale
                        PRIVATE
-                       ${GSL_LIBRARIES}
-                       ${PYTHON_LIBRARY}
+                       GSL::gsl
+                       GSL::gslcblas
+                       Eigen3::Eigen
+                       Python::Python
                        nlohmann_json::nlohmann_json)
 
 # Optional build tests
@@ -53,7 +51,8 @@ if(BUILD_TESTS)
 
   target_link_libraries(ale
                         PRIVATE
-                        ${GSL_LIBRARIES}
+                        GSL::gsl
+                        GSL::gslcblas
                         ${PYTHON_LIBRARY}
                         PUBLIC
                         gtest ${CMAKE_THREAD_LIBS_INIT})
