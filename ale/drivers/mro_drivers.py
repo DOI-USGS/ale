@@ -50,7 +50,6 @@ class MroCtxIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, RadialDi
         """
         return "CONTEXT CAMERA"
 
-
     @property
     def detector_center_sample(self):
         """
@@ -249,3 +248,15 @@ class MroCtxPds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDi
           ISIS sensor model version
         """
         return 1
+
+    @property
+    def platform_name(self):
+        """
+        Returns the name of the platform which the instrument is mounted on
+
+        Returns
+        -------
+        : str
+          platform name
+        """
+        return self.label['SPACECRAFT_NAME']

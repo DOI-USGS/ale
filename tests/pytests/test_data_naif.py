@@ -1,54 +1,93 @@
+import os
+
 import pytest
+import unittest
+from unittest.mock import patch, PropertyMock
 
 import numpy as np
+import spiceypy as spice
+
+from conftest import get_image_kernels, convert_kernels
 
 from unittest.mock import patch, call
 
 from ale.base.data_naif import NaifSpice
-from ale.base import data_naif
-from ale.base import base
 
-@pytest.fixture
-def test_naif_data():
-    naif_data = NaifSpice()
-    naif_data.instrument_id = "INSTRUMENT"
-    naif_data.target_name = "TARGET"
-    naif_data.ephemeris_time = [0, 1]
+class test_data_naif(unittest.TestCase):
 
-    return naif_data
+    def setUp(self):
+        kernels = get_image_kernels('B10_013341_1010_XN_79S172W')
+        self.updated_kernels, self.binary_kernels = convert_kernels(kernels)
+        spice.furnsh(self.updated_kernels)
+        self.driver = NaifSpice()
+        self.driver.instrument_id = 'MRO_CTX'
+        self.driver.spacecraft_name = 'MRO'
+        self.driver.target_name = 'Mars'
+        self.driver.spacecraft_clock_start_count = '0'
+        self.driver.spacecraft_clock_stop_count = '1/60000'
+        # Center ET obtained from B10_013341_1010_XN_79S172W Label
+        self.driver.center_ephemeris_time = 297088762.61698407
 
-@pytest.fixture
-def test_naif_data_with_kernels():
-    kernels = ['one', 'two', 'three','four']
-    FakeNaifDriver = type("FakeNaifDriver", (base.Driver, data_naif.NaifSpice), {})
-    return FakeNaifDriver("", props={'kernels': kernels})
+    def tearDown(self):
+        spice.unload(self.updated_kernels)
+        for kern in self.binary_kernels:
+            os.remove(kern)
 
-def test_target_id(test_naif_data):
-    with patch('spiceypy.bods2c', return_value=-12345) as bods2c:
-        assert test_naif_data.target_id == -12345
-        bods2c.assert_called_once_with("TARGET")
+    def test_ikid(self):
+        assert self.driver.ikid == -74021
 
-def test_pixel_size(test_naif_data):
-    with patch('spiceypy.bods2c', return_value=-12345) as bods2c, \
-         patch('spiceypy.gdpool', return_value=[1]) as gdpool:
-        assert test_naif_data.pixel_size == (0.001)
-        bods2c.assert_called_once_with("INSTRUMENT")
-        gdpool.assert_called_once_with("INS-12345_PIXEL_SIZE", 0, 1)
+    def test_spacecraft_id(self):
+        assert self.driver.spacecraft_id == -74
 
-def test_radii(test_naif_data):
-    with patch('spiceypy.bodvrd', return_value=(3, np.arange(3))) as bodvrd:
-        np.testing.assert_equal(test_naif_data.target_body_radii, np.arange(3))
-        bodvrd.assert_called_once_with("TARGET", "RADII", 3)
+    def test_target_frame_id(self):
+        with patch('ale.base.data_naif.NaifSpice.target_id', new_callable=PropertyMock) as target_id:
+            target_id.return_value = 499
+            assert self.driver.target_frame_id == 10014
 
-def test_target_frame_id(test_naif_data):
-    with patch('spiceypy.bods2c', return_value=12345) as bods2c, \
-         patch('spiceypy.cidfrm', return_value=(-12345, "TEST_FRAME")) as cidfrm:
-        assert test_naif_data.target_frame_id == -12345
-        bods2c.assert_called_once_with("TARGET")
-        cidfrm.assert_called_once_with(12345)
+    def test_sensor_frame_id(self):
+        assert self.driver.sensor_frame_id == -74021
 
-def test_spice_kernel_list(test_naif_data_with_kernels):
-    with patch('spiceypy.furnsh') as furnsh:
-        with test_naif_data_with_kernels as t:
-            assert furnsh.call_args_list == [call('one'), call('two'), call('three'), call('four')]
+    def test_focal2pixel_lines(self):
+        np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0.0, 142.85714285714, 0.0])
 
+    def test_focal2pixel_samples(self):
+        np.testing.assert_array_equal(self.driver.focal2pixel_samples, [0.0, 0.0, 142.85714285714])
+
+    def test_pixel2focal_x(self):
+        np.testing.assert_array_equal(self.driver.pixel2focal_x, [0.0, 0.0, 0.007])
+
+    def test_pixel2focal_y(self):
+        np.testing.assert_array_equal(self.driver.pixel2focal_y, [0.0, 0.007, 0.0])
+
+    def test_focal_length(self):
+        assert self.driver.focal_length == 352.9271664
+
+    def test_pixel_size(self):
+        assert self.driver.pixel_size == 7e-06
+
+    def test_target_body_radii(self):
+        np.testing.assert_array_equal(self.driver.target_body_radii, [3396.19, 3396.19, 3376.2 ])
+
+    def test_reference_frame(self):
+        assert self.driver.reference_frame == 'IAU_Mars'
+
+    def test_ephemeris_start_time(self):
+        assert self.driver.ephemeris_start_time == -631195148.8160816
+
+    def test_ephemeris_stop_time(self):
+        assert self.driver.ephemeris_stop_time == -631135148.8160615
+
+    def test_detector_center_sample(self):
+        assert self.driver.detector_center_sample == 2543.46099
+
+    def test_detector_center_line(self):
+        assert self.driver.detector_center_line == 0.430442527
+
+    def test_sun_position(self):
+        sun_positions, sun_velocities, times = self.driver.sun_position
+        assert len(sun_positions) == 1
+        np.testing.assert_allclose(sun_positions[0], [-127052102329.16032, 139728839049.65073, -88111530293.94502])
+        assert len(sun_velocities) == 1
+        np.testing.assert_allclose(sun_velocities[0], [9883868.06162645, 8989183.29614645, 881.9339912834714])
+        assert len(times) == 1
+        np.testing.assert_allclose(times[0], 297088762.61698407)
