@@ -24,8 +24,8 @@ def usgscsm_compare_dict():
         'velocities': [[-104.55545524,  -85.0501252 ,   -5.78752004]],
         'unit': 'm'},
     'sun_position': {
-        'positions': [[3.60765914e+11, 2.46635288e+11, 3.05968433e+10]],
-        'velocities': [[ 4.74290737e+07, -6.93754626e+07,  1.94412162e+02]],
+        'positions': [[3.60779830e+11, 2.46614935e+11, 3.05966427e+10]],
+        'velocities': [[ 4.74251599e+07, -6.93781387e+07,  1.94478534e+02]],
         'unit': 'm'},
     'sensor_orientation': {
         'quaternions': [[ 0.00184844,  0.02139268, -0.27802966, -0.96033246]]},
@@ -65,6 +65,7 @@ def test_kernels():
 def test_dawn_load(test_kernels, usgscsm_compare_dict):
     label_file = get_image_label('FC21A0038582_15170161546F6F')
     usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter='usgscsm')
+    print(usgscsm_isd)
     assert compare_dicts(usgscsm_isd, usgscsm_compare_dict) == []
 
 

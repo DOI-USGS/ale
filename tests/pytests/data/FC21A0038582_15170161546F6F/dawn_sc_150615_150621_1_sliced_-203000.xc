@@ -5886,7 +5886,7 @@ BEGIN_ARRAY 1 5866
 END_ARRAY 1 5866
 TOTAL_ARRAYS 1
  ~NAIF/SPC BEGIN COMMENTS~
-This CK is for testing with the image: /home/pgiroux/repos/ale/tests/pytests/data/temp_dawn/FC21A0038582_15170161546F6F.cub
+This CK is for testing with the image: /home/pgiroux/Desktop/FC21A0038582_15170161546F6F.cub
 
 This CK was generated using the following command: {}
  ~NAIF/SPC END COMMENTS~
