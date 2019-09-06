@@ -17,7 +17,7 @@ set(CMAKE_CXX_STANDARD 11)
 # Third Party Dependencies
 find_package(GSL    REQUIRED)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
-find_package(Python 3 REQUIRED COMPONENTS Development)
+find_package(Python REQUIRED COMPONENTS Development)
 find_package(nlohmann_json REQUIRED)
 
 # Library setup
