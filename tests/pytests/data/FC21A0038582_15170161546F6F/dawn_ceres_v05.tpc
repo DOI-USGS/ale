@@ -1,0 +1,459 @@
+KPL/PCK
+
+\beginlabel
+PDS_VERSION_ID               = PDS3
+RECORD_TYPE                  = STREAM
+RECORD_BYTES                 = "N/A"
+^SPICE_KERNEL                = "dawn_ceres_v05.tpc"
+MISSION_NAME                 = "DAWN MISSION TO VESTA AND CERES"
+SPACECRAFT_NAME              = DAWN
+DATA_SET_ID                  = "DAWN-M/A-SPICE-6-V1.0"
+KERNEL_TYPE_ID               = PCK
+PRODUCT_ID                   = "dawn_ceres_v05.tpc"
+PRODUCT_CREATION_TIME        = 2015-10-19T11:30:28
+PRODUCER_ID                  = "NAIF/JPL"
+MISSION_PHASE_NAME           = {
+                               "INITIAL CHECKOUT (ICO)",
+                               "EARTH-MARS CRUISE (EMC)",
+                               "MARS GRAVITY ASSIST (MGA)",
+                               "MARS-VESTA CRUISE (MVC)",
+                               "VESTA ENCOUNTER",
+                               "VESTA-CERES CRUISE (VCC)",
+                               "CERES ENCOUNTER",
+                               "END OF MISSION"
+                               }
+PRODUCT_VERSION_TYPE         = ACTUAL
+PLATFORM_OR_MOUNTING_NAME    = "N/A"
+START_TIME                   = "N/A"
+STOP_TIME                    = "N/A"
+SPACECRAFT_CLOCK_START_COUNT = "N/A"
+SPACECRAFT_CLOCK_STOP_COUNT  = "N/A"
+TARGET_NAME                  = "1 CERES"
+INSTRUMENT_NAME              = "N/A"
+NAIF_INSTRUMENT_ID           = "N/A"
+SOURCE_PRODUCT_ID            = "N/A"
+NOTE                         = "See comments in the file for details"
+OBJECT                       = SPICE_KERNEL
+  INTERCHANGE_FORMAT         = ASCII
+  KERNEL_TYPE                = TARGET_CONSTANTS
+  DESCRIPTION                = "SPICE PCK file containing constants for
+Ceres, created by NAIF, JPL. This PCK incorporates shape and rotation
+constants from the ``Ceres Coordinate System Description'' document dated
+14-Oct-2015. "
+END_OBJECT                   = SPICE_KERNEL
+\endlabel
+
+
+Asteroid Ceres P_constants (PcK) SPICE kernel file
+===========================================================================
+ 
+ 
+Organization
+--------------------------------------------------------
+ 
+     The sections of this file are as follows.
+ 
+     Introductory Information:
+ 
+         --   Version description
+ 
+         --   Disclaimer
+ 
+         --   Sources
+ 
+     Pck Data:
+ 
+         --   Orientation constants for asteroid Ceres
+ 
+         --   Radii for asteroid Ceres
+
+         --   GM for asteroid Ceres
+
+
+Version Description
+--------------------------------------------------------
+ 
+
+     Version 0.5 -- October 16, 2015  -- Carol Raymond, DAWN; Boris Semenov,
+                                      NAIF
+
+        Ceres rotation constants and radii were updated based on [6];
+        Ceres GM was updated based on [7]. A typo in the shape section
+        comments for versions 0.3 and 0.4 was fixed ("as a sphere with a
+        radius of 480 km" -> "as a sphere with a radius of 470 km")
+
+     Version 0.4 -- July 15, 2015  -- Don Han, DAWN NAV; Boris Semenov,
+                                      NAIF
+
+        Fixed typo in Ceres rotation rate in BODY2000001_PM: 951.1532 ->
+        952.1532.
+
+     Version 0.3 -- June 11, 2015  -- Don Han, DAWN NAV; Boris Semenov,
+                                      NAIF
+
+        Ceres rotation constants and radii were updated based on [5].
+
+     Version 0.2 -- March 2, 2015  -- Don Han, DAWN NAV; Boris Semenov,
+                                      NAIF
+
+        Ceres rotation constants were updated based on [4]; Keyword for
+        Ceres GM was added to the file and set to the value from [4].
+
+     Version 0.1 -- February 25, 2011 -- Boris Semenov, NAIF
+
+        Ceres pole orientation constants and radii were set to the
+        values from [3].
+
+     Version 0.0 -- October 12, 2004 -- Boris Semenov, NAIF
+     
+        Initial PCK containing draft values for the pole direction,
+        rotation period and shape (from [1] and [2]) and placeholder
+        value for prime meridian.
+     
+ 
+Disclaimer
+--------------------------------------------------------
+ 
+     This constants file may not contain the parameter values that you
+     prefer. Note that this file may be readily modified by you or
+     anyone else. NAIF suggests that you inspect this file visually
+     before proceeding with any critical or extended data processing.
+ 
+     NAIF requests that you update the ``Version Description'' section
+     if you modify the file.
+ 
+ 
+Sources
+--------------------------------------------------------
+ 
+     The sources for the constants listed in this and the earlier
+     versions of this file are:
+ 
+        1) Saint-Pe, O., M. Combes, F. Rigaut (1993). Ceres surface 
+           properties by high-resolution imaging from Earth. Icarus 105, 
+           271-281.
+
+        2) JPL Solar System Dynamic Group Horizon's System.
+
+        3) "Dawn Planetary Constants and Models Document", Revision 2.0, 
+           Feb 16, 2011
+
+        4) "DAWN Planetary Constants and Models Document", Revision 4.0, 
+           Mar 2, 2015
+
+        5) "DAWN Planetary Constants and Models Document", Revision 5.0, 
+           Jun 10, 2015
+
+        6) "Ceres Coordinate System Description", C. Raymond, JPL and
+           T. Roatsch, DLR, 14-OCT-2015, in PDS peer-review, to be
+           archived.
+
+        7) "Physical Properties of Ceres from the Dawn Mission", R. Park, 
+           et al., Geophys. Res. Let., to be submitted, Oct. 2015
+
+
+Orientation constants for asteroid Ceres
+--------------------------------------------------------
+ 
+     The inertial reference frame for Ceres constants is J2000; this is
+     the default reference frame for PCK orientation data.
+ 
+     The epoch of the constants is J2000; this is Julian ephemeris date
+     (JED) 2451545.0.
+ 
+     The NAIF integer code for Ceres is 2000001. See the NAIF_IDs
+     required reading for further information on NAIF integer codes.
+
+
+Values in the Version 0.0
+ 
+     The PCK version 0.0 provided the pole direction RA = 300.4 deg and
+     DEC = 53.1 deg (derived from the ecliptic equinox B1950.0 latitude
+     = 70 deg and longitude = 332 deg values given in [1]), the W1 term
+     = 952.06611570 deg/day (derived from the rotation period of 9.075
+     hours provided in [2]), and the W0 term arbitrarily set to 0.
+
+     The corresponding keywords were set as follows:
+
+        body2000001_pole_ra    = ( 300.4       0.0       0.0 )
+        body2000001_pole_dec   = (  53.1       0.0       0.0 )
+        body2000001_pm         = (   0.0     952.0661157 0.0 )
+
+
+Values in the Version 0.1
+
+     In the PCK version 0.1 the pole direction, prime meridian
+     location, and rotation period were set to the following values
+     from [3]:
+
+        6.3 Ceres Pole and Prime Meridian
+
+        The Ceres pole and prime meridian values are shown below.
+
+        RA  Ceres   291 deg              Right Ascension in EME2000 [17]
+        DEC Ceres    59 deg              Declination in EME2000
+        W   Ceres     0 + w * D deg      Prime Meridian
+        w   Ceres   951.5418502 deg/day  Rotation rate
+        ...
+
+        9 References
+
+        ...
+        17. "Ceres: High-resolution imaging with HGA and the determination 
+            of physical properties," J. W. Parker et al., Advances in 
+            Space Research 38 (2006) 2039-2042.
+        18. "Differentiation of the asteroid Ceres as revealed by its 
+            shape", P. C. Thomas, et al, Nature, 437, 224, 2005.
+        ..."
+
+     The corresponding keywords were set as follows:
+
+        body2000001_pole_ra    = ( 291.0       0.0       0.0 )
+        body2000001_pole_dec   = (  59.0       0.0       0.0 )
+        body2000001_pm         = (   0.0     951.5418502 0.0 )
+
+
+Values in the Version 0.2
+
+     In the PCK version 0.2 the pole direction, prime meridian
+     location, and rotation period were set to the following values from
+     [4]:
+
+        6.3 Ceres Pole and Prime Meridian
+
+        The Ceres pole and prime meridian values are shown below.
+
+        RA  Ceres   291.82 deg           Right Ascension in EME2000 [29]
+        DEC Ceres    66.88 deg           Declination in EME2000 [29]
+        W   Ceres   353.7987 + w * D deg Prime Meridian [*]
+        w   Ceres   952.055 deg/day      Rotation rate [29]
+
+        [*] This document overlooked the Ceres prime meridian and
+        rotation rate recommended by Archinal et. al. [28] in IAU
+        working group report and listed the prime meridian with zero
+        offset until revision 4 date. While updating the prime meridian
+        definition, Dawn project decided to update other physical
+        parameters of Ceres by navigation team~s latest estimation
+        result. The rotation rate is from navigation team report [29]
+        and the prime meridian offset was calculated to match the value
+        from IAU recommendation [28] at the time of RC2 (2015/02/20
+        12:00:00 UTC).
+
+        ...
+
+        9 References
+
+        29. "Ceres Parameters from OD", Brian Kennedy, JPL internal 
+            E-mail, Feb. 26, 2015
+
+     The corresponding keywords were set as follows:
+
+        body2000001_pole_ra    = ( 291.82      0.0       0.0 )
+        body2000001_pole_dec   = (  66.88      0.0       0.0 )
+        body2000001_pm         = ( 353.7987  952.055     0.0 )
+
+
+Values in the Versions 0.3 and 0.4
+
+     In the PCK versions 0.3 and 0.4 the pole direction, prime meridian
+     location, and rotation period were set to the following values from
+     [5]:
+
+        6.3 Ceres Pole and Prime Meridian
+
+        The Ceres pole and prime meridian values are shown below.
+
+        RA  Ceres   291.41 deg           Right Ascension in EME2000 [31] 
+        DEC Ceres    66.79 deg           Declination in EME2000 [31] 
+        W   Ceres   170.9 + w * D deg    Prime Meridian [30] 
+        w   Ceres   952.1532 deg/day     Rotation rate [30] 
+
+        ...
+
+        9 References
+
+        30. "Ceres lightcurve analysis ~ Period determination", 
+            M. A. Chamberlain, et al., Icarus 188, 2007
+
+        31. "Shape model and rotational state of dwarf planet Ceres 
+            from Dawn-FC RC3 stereo images", Frank Preusker, Dawn 
+            internal presentation, May 26, 2015 
+
+     The corresponding keywords were set as follows:
+ 
+        body2000001_pole_ra    = ( 291.41     0.0          0.0 )
+        body2000001_pole_dec   = (  66.79     0.0          0.0 )
+        body2000001_pm         = ( 170.9    952.1532       0.0 )
+
+
+
+Values in the Current Version 0.5
+
+     In the current PCK version 0.5 the pole direction, prime meridian
+     location, and rotation period are set to the values obtained from
+     the Dawn Approach, RC3 and Survey mission phases, as summarized in
+     [6]:
+
+        ...
+
+        Table 1: Comparison of pre-Dawn and post-Survey Dawn coordinate
+        systems; row 2 -- "Dawn Update":
+
+        RA  Ceres   291.418 deg           Right Ascension in EME2000
+        DEC Ceres    66.764 deg           Declination in EME2000
+        W   Ceres   170.650 + w * D deg   Prime Meridian
+        w   Ceres   952.1532 deg/day      Rotation rate
+
+        ...
+
+        References:
+ 
+        "Shape model and rotational state of dwarf planet Ceres from 
+        Dawn FC stereo images", Frank Preusker, et al., Euro. Plan. 
+        Sci. Congress, Oct. 2015   
+        ..."
+
+     \begindata
+ 
+        BODY2000001_POLE_RA    = ( 291.418     0.0          0.0 )
+        BODY2000001_POLE_DEC   = (  66.764     0.0          0.0 )
+        BODY2000001_PM         = ( 170.65    952.1532       0.0 )
+
+     \begintext
+
+
+Radii for asteroid Ceres
+--------------------------------------------------------
+     
+
+Values in the Version 0.0
+
+     In the PCK version 0.0 the radii were set to the following values
+     from [2]:
+
+        body2000001_radii      = ( 475.0     475.0     475.0 )
+
+
+Values in the Versions 0.1 and 0.2
+
+     In the versions 0.1 and 0.2 the radii were set to the following
+     values from [3]/[4]:
+
+        6.4 Ceres Shape Parameters
+
+        The Ceres shape is described by an oblate spheroid with values
+        487.3 km and 454.7 km [18] or as a sphere with a radius of 480
+        km. ...
+
+        9 References
+
+        ...
+        18. "Differentiation of the asteroid Ceres as revealed by its 
+            shape", P. C. Thomas, et al, Nature, 437, 224, 2005.
+        ..."
+
+     The corresponding keyword was set as follows:
+
+        body2000001_radii      = ( 487.3     487.3     454.7 )
+
+
+Values in the Versions 0.3 and 0.4
+
+     In the PCK versions 0.3 and 0.4 the radii were set to the following
+     values from [5]:
+
+        6.4 Ceres Shape Parameters
+
+        The Ceres shape is described by triaxial ellipsoid with values
+        482.64 km, 480.60 km, 445.57 km [31] or as a sphere with a
+        radius of 470 km. ...
+
+        9 References
+
+        ...
+        31. "Shape model and rotational state of dwarf planet Ceres 
+            from Dawn-FC RC3 stereo images", Frank Preusker, Dawn 
+            internal presentation, May 26, 2015 
+        ..."
+
+     The corresponding keyword was set as follows:
+ 
+        body2000001_radii      = ( 482.64  480.60  445.57 )
+
+
+Values in the Current Version 0.5
+
+     In the current PCK version 0.5 the radii are set to the spheroid
+     values from [6]:
+
+        Table 1: Comparison of pre-Dawn and post-Survey Dawn coordinate
+        systems; row 2 -- "Dawn Update":
+
+        Sphere:
+
+           Rsp = 470 km       Equivalent spherical body radius
+
+        Spheroid:
+
+           Re  = 482 km       Average equatorial radius of the oblate spheroid
+           Rp  = 446 km       Polar radius
+
+        References:
+ 
+        "Shape model and rotational state of dwarf planet Ceres from 
+        Dawn FC stereo images", Frank Preusker, et al., Euro. Plan. 
+        Sci. Congress, Oct. 2015   
+        ..."
+
+     \begindata
+ 
+        BODY2000001_RADII      = ( 482     482     446    )
+ 
+     \begintext
+
+
+GM for asteroid Ceres
+--------------------------------------------------------
+
+
+Value in the Versions 0.0 and 0.1
+
+      No Ceres GM was provided in the PCK version 0.0 and 0.1.
+
+
+Value in the Versions 0.2, 0.3, and 0.4
+
+     In the PCK versions 0.2, 0.3, and 0.4 the Ceres GM was set to the
+     following value from [4]:
+
+        6.2 Ceres Gravity Model
+
+        GM Ceres = 62.68 km3/s2 Gravitational Parameter [29]
+
+        ...
+
+        9 References
+
+        29. "Ceres Parameters from OD", Brian Kennedy, JPL internal 
+            E-mail, Feb. 26, 2015
+
+     The corresponding keyword was set as follows:
+
+        body2000001_gm         = (  62.68  )
+
+
+Value in the Current Version 0.5
+
+     In the PCK version 0.5 the Ceres GM is set to the following value 
+     from [7]:
+
+        GM Ceres = 62.6325 km3/s2
+
+     \begindata
+
+        BODY2000001_GM         = ( 62.6325 )
+ 
+     \begintext
+
+
+End of PCK file.
