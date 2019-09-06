@@ -231,7 +231,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
         Returns the name of the platform containing the sensor. This is usually
         the spacecraft name.
 
-        Messenger MDIS ISIS labels use upper camel case so this converts it to\
+        Messenger MDIS ISIS labels use upper camel case so this converts it to
         all upper case.
 
         Returns

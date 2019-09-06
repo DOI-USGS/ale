@@ -4,7 +4,7 @@ import numpy as np
 import spiceypy as spice
 from importlib import reload
 import json
-
+import unittest
 from unittest.mock import patch
 
 from conftest import get_image_label, get_image_kernels, convert_kernels, compare_dicts
@@ -12,23 +12,13 @@ import ale
 from ale.drivers.mes_drivers import MessengerMdisPds3NaifSpiceDriver
 from ale.drivers.mes_drivers import MessengerMdisIsisLabelNaifSpiceDriver
 
-@pytest.fixture()
-def test_kernels(scope='module'):
+@pytest.fixture(scope='module')
+def test_kernels():
     kernels = get_image_kernels('EN1072174528M')
     updated_kernels, binary_kernels = convert_kernels(kernels)
     yield updated_kernels
     for kern in binary_kernels:
         os.remove(kern)
-
-@pytest.fixture(params=["Pds3NaifDriver", "IsisNaifDriver"])
-def driver(request):
-    if request.param == "IsisNaifDriver":
-        label = get_image_label("EN1072174528M", "isis3")
-        return MessengerMdisIsisLabelNaifSpiceDriver(label)
-
-    else:
-        label = get_image_label("EN1072174528M", "pds3")
-        return MessengerMdisPds3NaifSpiceDriver(label)
 
 @pytest.fixture()
 def usgscsm_compare_dict():
@@ -73,9 +63,6 @@ def usgscsm_compare_dict():
     'name_model': 'USGS_ASTRO_FRAME_SENSOR_MODEL',
     'center_ephemeris_time': 483122606.85252464}
 
-def test_short_mission_name(driver):
-    assert driver.short_mission_name=='mes'
-
 @pytest.mark.parametrize("label_type", ["pds3", "isis3"])
 def test_load(test_kernels, usgscsm_compare_dict, label_type):
     label_file = get_image_label('EN1072174528M', label_type)
@@ -85,39 +72,138 @@ def test_load(test_kernels, usgscsm_compare_dict, label_type):
 
     assert compare_dicts(usgscsm_isd_obj, usgscsm_compare_dict) == []
 
-def test_spacecraft_name(driver):
-    assert driver.spacecraft_name == 'MESSENGER'
+# ========= Test Pds3 Label and NAIF Spice driver =========
+class test_pds3_naif(unittest.TestCase):
 
-def test_instrument_id(driver):
-    assert driver.instrument_id == 'MSGR_MDIS_NAC'
+    def setUp(self):
+        label = get_image_label("EN1072174528M", "pds3")
+        self.driver = MessengerMdisPds3NaifSpiceDriver(label)
 
-def test_sampling_factor(driver):
-    assert driver.sampling_factor == 2
+    def test_short_mission_name(self):
+        assert self.driver.short_mission_name=='mes'
 
-def test_focal_length(driver):
-    with patch('ale.drivers.mes_drivers.spice.gdpool', return_value=[pow(4.07, -x) for x in np.arange(6)]) as gdpool, \
-         patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-         assert driver.focal_length == pytest.approx(6.0)
-         gdpool.assert_called_with('INS-12345_FL_TEMP_COEFFS', 0, 6)
+    def test_spacecraft_name(self):
+        assert self.driver.spacecraft_name == 'MESSENGER'
 
-def test_detector_start_sample(driver):
-    with patch('ale.drivers.mes_drivers.spice.gdpool', return_value=[10.0]) as gdpool, \
-         patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-         assert driver.detector_start_sample == 10.0
-         gdpool.assert_called_with('INS-12345_FPUBIN_START_SAMPLE', 0, 1)
+    def test_fikid(self):
+        with patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.spacecraft_name == 'MESSENGER'
 
-def test_detector_start_line(driver):
-    with patch('ale.drivers.mes_drivers.spice.gdpool', return_value=[10.0]) as gdpool, \
-         patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-         assert driver.detector_start_line == 10.0
-         gdpool.assert_called_with('INS-12345_FPUBIN_START_LINE', 0, 1)
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == 'MSGR_MDIS_NAC'
 
-def test_detector_center_sample(driver):
-    with patch('ale.drivers.mes_drivers.spice.gdpool', return_value=[512.5, 512.5, 1]) as gdpool, \
-         patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-         assert driver.detector_center_sample == 512
+    def test_sampling_factor(self):
+        assert self.driver.sampling_factor == 2
 
-def test_detector_center_line(driver):
-    with patch('ale.drivers.mes_drivers.spice.gdpool', return_value=[512.5, 512.5, 1]) as gdpool, \
-         patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-        assert driver.detector_center_line == 512
+    def test_focal_length(self):
+        with patch('ale.drivers.mes_drivers.spice.gdpool', return_value=np.array([pow(4.07, -x) for x in np.arange(6)])) as gdpool, \
+             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.focal_length == pytest.approx(6.0)
+            gdpool.assert_called_with('INS-12345_FL_TEMP_COEFFS', 0, 6)
+
+    def test_detector_start_sample(self):
+        with patch('ale.drivers.mes_drivers.spice.gdpool', return_value=np.array([10.0])) as gdpool, \
+             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.detector_start_sample == 10.0
+            gdpool.assert_called_with('INS-12345_FPUBIN_START_SAMPLE', 0, 1)
+
+    def test_detector_start_line(self):
+        with patch('ale.drivers.mes_drivers.spice.gdpool', return_value=np.array([10.0])) as gdpool, \
+             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.detector_start_line == 10.0
+            gdpool.assert_called_with('INS-12345_FPUBIN_START_LINE', 0, 1)
+
+    def test_detector_center_sample(self):
+        assert self.driver.detector_center_sample == 512
+
+    def test_detector_center_line(self):
+        assert self.driver.detector_center_line == 512
+
+    def test_sensor_model_version(self):
+        assert self.driver.sensor_model_version == 2
+
+    def test_usgscsm_distortion_model(self):
+        with patch('ale.drivers.mes_drivers.spice.gdpool', side_effect=[np.array([1, 2, 3, 4, 5]), np.array([-1, -2, -3, -4, -5])]) as gdpool, \
+             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.usgscsm_distortion_model == {"transverse" : {
+                                                                "x" : [1, 2, 3, 4, 5],
+                                                                "y" : [-1, -2, -3, -4, -5]}}
+
+
+
+    def test_pixel_size(self):
+        with patch('ale.drivers.mes_drivers.spice.gdpool', return_value=np.array([0.1])) as gdpool, \
+             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.pixel_size == 0.1
+            gdpool.assert_called_with('INS-12345_PIXEL_PITCH', 0, 1)
+
+# ========= Test ISIS3 Label and NAIF Spice driver =========
+class test_isis3_naif(unittest.TestCase):
+
+    def setUp(self):
+        label = get_image_label("EN1072174528M", "isis3")
+        self.driver = MessengerMdisIsisLabelNaifSpiceDriver(label)
+
+    def test_short_mission_name(self):
+        assert self.driver.short_mission_name=='mes'
+
+    def test_platform_name(self):
+        assert self.driver.platform_name == 'MESSENGER'
+
+    def test_fikid(self):
+        with patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.spacecraft_name == 'MESSENGER'
+
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == 'MSGR_MDIS_NAC'
+
+    def test_sampling_factor(self):
+        assert self.driver.sampling_factor == 2
+
+    def test_focal_length(self):
+        with patch('ale.drivers.mes_drivers.spice.gdpool', return_value=np.array([pow(4.07, -x) for x in np.arange(6)])) as gdpool, \
+             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.focal_length == pytest.approx(6.0)
+            gdpool.assert_called_with('INS-12345_FL_TEMP_COEFFS', 0, 6)
+
+    def test_detector_start_sample(self):
+        with patch('ale.drivers.mes_drivers.spice.gdpool', return_value=np.array([10.0])) as gdpool, \
+             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.detector_start_sample == 10.0
+            gdpool.assert_called_with('INS-12345_FPUBIN_START_SAMPLE', 0, 1)
+
+    def test_detector_start_line(self):
+        with patch('ale.drivers.mes_drivers.spice.gdpool', return_value=np.array([10.0])) as gdpool, \
+             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.detector_start_line == 10.0
+            gdpool.assert_called_with('INS-12345_FPUBIN_START_LINE', 0, 1)
+
+    def test_detector_center_sample(self):
+        with patch('ale.drivers.mes_drivers.spice.gdpool', return_value=np.array([512.5, 512.5, 1])) as gdpool, \
+             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.detector_center_sample == 512
+            gdpool.assert_called_with('INS-12345_CCD_CENTER', 0, 3)
+
+    def test_detector_center_line(self):
+        with patch('ale.drivers.mes_drivers.spice.gdpool', return_value=np.array([512.5, 512.5, 1])) as gdpool, \
+             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.detector_center_line == 512
+            gdpool.assert_called_with('INS-12345_CCD_CENTER', 0, 3)
+
+    def test_sensor_model_version(self):
+        assert self.driver.sensor_model_version == 2
+
+    def test_usgscsm_distortion_model(self):
+        with patch('ale.drivers.mes_drivers.spice.gdpool', side_effect=[np.array([1, 2, 3, 4, 5]), np.array([-1, -2, -3, -4, -5])]) as gdpool, \
+             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.usgscsm_distortion_model == {"transverse" : {
+                                                                "x" : [1, 2, 3, 4, 5],
+                                                                "y" : [-1, -2, -3, -4, -5]}}
+
+
+
+    def test_pixel_size(self):
+        with patch('ale.drivers.mes_drivers.spice.gdpool', return_value=np.array([0.1])) as gdpool, \
+             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.pixel_size == 0.1
+            gdpool.assert_called_with('INS-12345_PIXEL_PITCH', 0, 1)
