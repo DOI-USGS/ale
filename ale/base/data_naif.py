@@ -322,17 +322,26 @@ class NaifSpice():
                 # spkezr returns a vector from the observer's location to the aberration-corrected
                 # location of the target. For more information, see:
                 # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
-                state, _ = spice.spkezr(self.target_name,
-                                       time,
-                                       self.reference_frame,
-                                       self.light_time_correction,
-                                       self.spacecraft_name,)
-                pos.append(state[:3])
-                vel.append(state[3:])
-            # By default, spice works in km, and the vector returned by spkezr points the opposite
-            # direction to what ALE needs, so it must be multiplied by (-1)
-            self._position = [p * -1000 for p in pos]
-            self._velocity = [v * -1000 for v in vel]
+                if self.swap_observer_target:
+                    state, _ = spice.spkezr(self.target_name,
+                                           time,
+                                           self.reference_frame,
+                                           self.light_time_correction,
+                                           self.spacecraft_name,)
+                    pos.append(-state[:3])
+                    vel.append(-state[3:])
+                else:
+                    state, _ = spice.spkezr(self.spacecraft_name,
+                                           time,
+                                           self.reference_frame,
+                                           self.light_time_correction,
+                                           self.target_name,)
+                    pos.append(state[:3])
+                    vel.append(state[3:])
+
+            # By default, SPICE works in km, so convert to m
+            self._position = [p * 1000 for p in pos]
+            self._velocity = [v * 1000 for v in vel]
         return self._position, self._velocity, self.ephemeris_time
 
     @property
@@ -425,6 +434,23 @@ class NaifSpice():
           Detector line of the principal point
         """
         return float(spice.gdpool('INS{}_BORESIGHT_LINE'.format(self.ikid), 0, 1)[0])
+
+    @property
+    def swap_observer_target(self):
+        """
+        Returns if the observer and target should be swapped when determining the
+        sensor state relative to the target. This is defined by a keyword in
+        ISIS IAKs. If the keyword is not defined in any loaded kernels then False
+        is returned.
+
+        Expects ikid to be defined. This should be an integer containing the
+        Naif Id code of the instrument.
+        """
+        try:
+            swap = spice.gcpool('INS{}_SWAP_OBSERVER_TARGET'.format(self.ikid), 0, 1)[0]
+            return swap.upper() == "TRUE"
+        except:
+            return False
 
     @property
     def isis_naif_keywords(self):

@@ -39,35 +39,35 @@ def isis_compare_dict():
             'TimeDependentFrames' : [-130000, 1],
             'ConstantFrames' : [-130102, -130101, -130000],
             'ConstantRotation' : [0.0066354810266741, 0.99997566485661, 0.0021540859158883, 0.99997683210906, -0.0066321870038765, -0.0015327559101681, -0.0015184323097167, 0.0021642065830212, -0.99999650528049],
-            'CkTableStartTime' : 180253725.05295,
-            'CkTableEndTime' : 180253725.05295,
+            'CkTableStartTime' : 180253725.05294585,
+            'CkTableEndTime' : 180253725.05294585,
             'CkTableOriginalSize' : 1,
-            'EphemerisTimes' : [180253725.05295],
+            'EphemerisTimes' : [180253725.05294585],
             'Quaternions' : [[0.5186992276393, 0.32271900198042, -0.67445755556568, 0.41462098686333]],
             'AngularVelocities' : [[9.19333484928951e-06, -1.48663583741119e-08, 3.96617090702544e-07]]
         },
         'BodyRotation': {
             'TimeDependentFrames' : [2025143, 1],
-            'CkTableStartTime' : 180253725.05295,
-            'CkTableEndTime' : 180253725.05295,
+            'CkTableStartTime' : 180253725.05294585,
+            'CkTableEndTime' : 180253725.05294585,
             'CkTableOriginalSize' : 1,
-            'EphemerisTimes' : [180253725.05295],
+            'EphemerisTimes' : [180253725.05294585],
             'Quaternions' : [[0.18323548096392, 0.90154842733457, 0.38412889618291, 0.077975526954163]],
             'AngularVelocities' : [[-2.51258934025691e-08, 5.61469404198439e-05, -1.32447670672467e-04]]
         },
         'InstrumentPosition': {
-            'SpkTableStartTime' : 180253725.05295,
-            'SpkTableEndTime' : 180253725.05295,
+            'SpkTableStartTime' : 180253725.05294585,
+            'SpkTableEndTime' : 180253725.05294585,
             'SpkTableOriginalSize' : 1.0,
-            'EphemerisTimes' : [180253725.05295],
+            'EphemerisTimes' : [180253725.05294585],
             'Positions' : [[15.911753685839,-3.6852792012552,-1.9322090453018]],
             'Velocities' : [[-1.34953737533863e-05,4.0428000235232e-06,1.28119025613885e-06]]
         },
         'SunPosition': {
-            'SpkTableStartTime' : 180253725.05295,
-            'SpkTableEndTime' : 180253725.05295,
+            'SpkTableStartTime' : 180253725.05294585,
+            'SpkTableEndTime' : 180253725.05294585,
             'SpkTableOriginalSize' : 1.0,
-            'EphemerisTimes' : [180253725.05295],
+            'EphemerisTimes' : [180253725.05294585],
             'Positions' : [[156625746.33017,-58109191.847413,-30430544.244924]],
             'Velocities' : [[4.4546441114475,27.037662550967,11.919266278546]]
         }
@@ -83,7 +83,7 @@ def test_kernels():
 
 @pytest.mark.parametrize("label_type", ['isis3'])
 @pytest.mark.parametrize("formatter", ['isis'])
-def test_load(test_kernels, label_type, formatter, isis_compare_dict):
+def test_hayabusa_amica_load(test_kernels, label_type, formatter, isis_compare_dict):
     label_file = get_image_label('st_2385617364_x', label_type)
     isd_str = ale.loads(label_file, props={'kernels': test_kernels}, formatter=formatter)
     isd_obj = json.loads(isd_str)
