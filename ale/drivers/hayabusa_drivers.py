@@ -37,6 +37,7 @@ class HayabusaAmicaIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Radial
             'BODY_CODE' : self.target_id,
             'BODY_FRAME_CODE' : self.target_frame_id,
             f'BODY{self.target_id}_RADII' : self.target_body_radii,
+            f'INS{self.ikid}_SWAP_OBSERVER_TARGET' : str(self.swap_observer_target).upper(),
             f'INS{self.ikid}_FOCAL_LENGTH' : self.focal_length,
             f'INS{self.ikid}_PIXEL_PITCH' : self.pixel_size,
             f'INS{self.ikid}_TRANSX' : self.pixel2focal_x,
