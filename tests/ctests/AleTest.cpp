@@ -298,7 +298,7 @@ TEST(RotationInterpTest, GetRotationDifferentCounts) {
 }
 
 TEST(PyInterfaceTest, LoadInvalidLabel) {
-  std::string label = "Not a Real Label";
+  std::string label = "Not = a-Real-Label";
   EXPECT_THROW(ale::load(label), invalid_argument);
 }
 

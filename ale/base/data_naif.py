@@ -46,11 +46,12 @@ class NaifSpice():
     def light_time_correction(self):
         """
         Returns the type of light time correciton and abberation correction to
-        use in NAIF calls.
+        use in NAIF calls. Expects ikid to be defined. This must be the integer
+        Naif id code of the instrument.
 
-        This defaults to light time correction and abberation correction (LT+S),
-        concrete drivers should override this if they need to either not use
-        light time correction or use a different type of light time correction.
+        This searches for the value of the NAIF keyword INS<ikid>_LIGHTTIME_CORRECTION.
+        If the keyword is not defined, then this defaults to light time
+        correction and abberation correction (LT+S).
 
         Returns
         -------
@@ -59,7 +60,10 @@ class NaifSpice():
           See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/abcorr.html
           for the different options available.
         """
-        return 'LT+S'
+        try:
+            return spice.gcpool('INS{}_LIGHTTIME_CORRECTION'.format(self.ikid), 0, 1)[0]
+        except:
+            return 'LT+S'
 
     @property
     def odtx(self):
