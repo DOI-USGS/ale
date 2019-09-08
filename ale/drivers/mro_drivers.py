@@ -171,25 +171,6 @@ class MroCtxIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDi
         """
         return 1
 
-    @property
-    def swap_observer_target(self):
-        """
-        Returns if the observer and target should be swapped when determining the
-        sensor state relative to the target. This is defined by a keyword in
-        ISIS IAKs. If the keyword is not defined in any loaded kernels then True
-        is returned.
-
-        This is overriden to default to True if kernels are not loaded
-
-        Expects ikid to be defined. This should be an integer containing the
-        Naif Id code of the instrument.
-        """
-        try:
-            swap = spice.gcpool('INS{}_SWAP_OBSERVER_TARGET'.format(self.ikid), 0, 1)[0]
-            return swap.upper() == "TRUE"
-        except:
-            return True
-
 class MroCtxPds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistortion, Driver):
     """
     Driver for reading CTX PDS3 labels. Requires a Spice mixin to acquire addtional
@@ -279,22 +260,3 @@ class MroCtxPds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDi
           platform name
         """
         return self.label['SPACECRAFT_NAME']
-
-    @property
-    def swap_observer_target(self):
-        """
-        Returns if the observer and target should be swapped when determining the
-        sensor state relative to the target. This is defined by a keyword in
-        ISIS IAKs. If the keyword is not defined in any loaded kernels then True
-        is returned.
-
-        This is overriden to default to True if kernels are not loaded
-
-        Expects ikid to be defined. This should be an integer containing the
-        Naif Id code of the instrument.
-        """
-        try:
-            swap = spice.gcpool('INS{}_SWAP_OBSERVER_TARGET'.format(self.ikid), 0, 1)[0]
-            return swap.upper() == "TRUE"
-        except:
-            return True
