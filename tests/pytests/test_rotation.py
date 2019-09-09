@@ -16,51 +16,57 @@ def test_constant_constant_composition():
 def test_constant_time_dependent_composition():
     quats = [[1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)],[1, 0, 0, 0]]
     times = [0, 1]
-    rot1_2 = TimeDependentRotation(quats, times, 1, 2, av=[[-np.pi/2, 0, 0], [-np.pi/2, 0, 0]])
+    av = [[np.pi/2, 0, 0], [np.pi/2, 0, 0]]
+    rot1_2 = TimeDependentRotation(quats, times, 1, 2, av=av)
     rot2_3 = ConstantRotation([0, 1.0/np.sqrt(2), 0, 1.0/np.sqrt(2)], 2, 3)
     rot1_3 = rot2_3*rot1_2
     assert isinstance(rot1_3, TimeDependentRotation)
     assert rot1_3.source == 1
     assert rot1_3.dest == 3
     expected_quats = [[0.5, 0.5, -0.5, 0.5],[1.0/np.sqrt(2), 0, -1.0/np.sqrt(2), 0]]
+    expected_av = [[0, 0, -np.pi/2], [0, 0, -np.pi/2]]
     np.testing.assert_equal(rot1_3.times, times)
-    np.testing.assert_almost_equal(rot1_3.av, [[0, 0, np.pi/2], [0, 0, np.pi/2]])
     np.testing.assert_almost_equal(rot1_3.quats, expected_quats)
+    np.testing.assert_almost_equal(rot1_3.av, expected_av)
 
 def test_time_dependent_constant_composition():
     rot1_2 = ConstantRotation([1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)], 1, 2)
     quats = [[1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)],[1, 0, 0, 0]]
     times = [0, 1]
-    rot2_3 = TimeDependentRotation(quats, times, 2, 3)
-    # compose to get a 180 degree rotation about the X-axis to a 270 degree rotation about the X-axis
+    av = [[np.pi/2, 0, 0], [np.pi/2, 0, 0]]
+    rot2_3 = TimeDependentRotation(quats, times, 2, 3, av=av)
     rot1_3 = rot2_3*rot1_2
     assert isinstance(rot1_3, TimeDependentRotation)
     assert rot1_3.source == 1
     assert rot1_3.dest == 3
-    expected_quats = np.array([[1, 0, 0, 0],[1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)]])
-    np.testing.assert_equal(rot1_3.times, np.array(times))
+    expected_quats = [[1, 0, 0, 0],[1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)]]
+    np.testing.assert_equal(rot1_3.times, times)
     np.testing.assert_almost_equal(rot1_3.quats, expected_quats)
+    np.testing.assert_almost_equal(rot1_3.av, av)
 
 def test_time_dependent_time_dependent_composition():
     # 90 degree rotation about the X-axis to a 180 degree rotation about the X-axis
     quats1_2 = [[1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)],[1, 0, 0, 0]]
     times1_2 = [0, 1]
+    av1_2 = [[np.pi/2, 0, 0], [np.pi/2, 0, 0]]
     rot1_2 = TimeDependentRotation(quats1_2, times1_2, 1, 2)
     # -90 degree rotation about the X-axis to a 90 degree rotation about the X-axis
     quats2_3 = [[1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)],[1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)]]
     times2_3 = [0, 2]
+    av2_3 = [[np.pi/2, 0, 0], [np.pi/2, 0, 0]]
     rot2_3 = TimeDependentRotation(quats2_3, times2_3, 2, 3)
-
 
     # compose to get no rotation to a 180 degree rotation about the X-axis to no rotation
     rot1_3 = rot2_3*rot1_2
     assert isinstance(rot1_3, TimeDependentRotation)
     assert rot1_3.source == 1
     assert rot1_3.dest == 3
-    expected_times = np.array([0, 1, 2])
-    expected_quats = np.array([[0, 0, 0, -1], [-1, 0, 0, 0], [0, 0, 0, 1]])
+    expected_times = [0, 1, 2]
+    expected_quats = [[0, 0, 0, -1], [-1, 0, 0, 0], [0, 0, 0, 1]]
+    expected_av = [[np.pi, 0, 0], [np.pi, 0, 0], [np.pi, 0, 0]]
     np.testing.assert_equal(rot1_3.times, expected_times)
     np.testing.assert_almost_equal(rot1_3.quats, expected_quats)
+    np.testing.assert_almost_equal(rot1_3.av, expected_av)
 
 def test_constant_inverse():
     rot1_2 = ConstantRotation([1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)], 1, 2)
@@ -73,13 +79,16 @@ def test_constant_inverse():
 def test_time_dependent_inverse():
     quats1_2 = [[1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)],[1, 0, 0, 0]]
     times1_2 = [0, 1]
+    av1_2 = [[np.pi/2, 0, 0], [np.pi/2, 0, 0]]
     rot1_2 = TimeDependentRotation(quats1_2, times1_2, 1, 2)
     rot2_1 = rot1_2.inverse()
     assert rot2_1.source == 2
     assert rot2_1.dest == 1
-    expected_quats = np.array([[1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)],[1, 0, 0, 0]])
-    np.testing.assert_equal(rot2_1.times, np.array(times1_2))
+    expected_quats = [[1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)],[1, 0, 0, 0]]
+    expected_av = [[-np.pi/2, 0, 0], [-np.pi/2, 0, 0]]
+    np.testing.assert_equal(rot2_1.times, times1_2)
     np.testing.assert_almost_equal(rot2_1.quats, expected_quats)
+    np.testing.assert_almost_equal(rot2_1.av, expected_av)
 
 def test_rotation_matrix():
     rot = ConstantRotation([0, 0, 0, 1], 1, 2)
