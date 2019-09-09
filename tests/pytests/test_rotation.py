@@ -5,36 +5,30 @@ from scipy.spatial.transform import Rotation
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
 def test_constant_constant_composition():
-    # Two 90 degree rotation about the X-axis
     rot1_2 = ConstantRotation([1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)], 1, 2)
-    rot2_3 = ConstantRotation([1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)], 2, 3)
-    # compose to get a 180 degree rotation about the X-axis
+    rot2_3 = ConstantRotation([0, 1.0/np.sqrt(2), 0, 1.0/np.sqrt(2)], 2, 3)
     rot1_3 = rot2_3*rot1_2
     assert isinstance(rot1_3, ConstantRotation)
     assert rot1_3.source == 1
     assert rot1_3.dest == 3
-    np.testing.assert_equal(rot1_3.quat, np.array([1, 0, 0, 0]))
+    np.testing.assert_equal(rot1_3.quat, [0.5, 0.5, -0.5, 0.5])
 
 def test_constant_time_dependent_composition():
-    # 90 degree rotation about the X-axis to a 180 degree rotation about the X-axis
     quats = [[1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)],[1, 0, 0, 0]]
     times = [0, 1]
-    rot1_2 = TimeDependentRotation(quats, times, 1, 2)
-    # 90 degree rotation about the X-axis
-    rot2_3 = ConstantRotation([1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)], 2, 3)
-    # compose to get a 180 degree rotation about the X-axis to a 270 degree rotation about the X-axis
+    rot1_2 = TimeDependentRotation(quats, times, 1, 2, av=[[-np.pi/2, 0, 0], [-np.pi/2, 0, 0]])
+    rot2_3 = ConstantRotation([0, 1.0/np.sqrt(2), 0, 1.0/np.sqrt(2)], 2, 3)
     rot1_3 = rot2_3*rot1_2
     assert isinstance(rot1_3, TimeDependentRotation)
     assert rot1_3.source == 1
     assert rot1_3.dest == 3
-    expected_quats = np.array([[1, 0, 0, 0],[1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)]])
-    np.testing.assert_equal(rot1_3.times, np.array(times))
+    expected_quats = [[0.5, 0.5, -0.5, 0.5],[1.0/np.sqrt(2), 0, -1.0/np.sqrt(2), 0]]
+    np.testing.assert_equal(rot1_3.times, times)
+    np.testing.assert_almost_equal(rot1_3.av, [[0, 0, np.pi/2], [0, 0, np.pi/2]])
     np.testing.assert_almost_equal(rot1_3.quats, expected_quats)
 
 def test_time_dependent_constant_composition():
-    # 90 degree rotation about the X-axis
     rot1_2 = ConstantRotation([1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)], 1, 2)
-    # 90 degree rotation about the X-axis to a 180 degree rotation about the X-axis
     quats = [[1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)],[1, 0, 0, 0]]
     times = [0, 1]
     rot2_3 = TimeDependentRotation(quats, times, 2, 3)

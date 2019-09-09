@@ -110,7 +110,7 @@ class ConstantRotation:
             new_rot = self._rot * other._rot
             return ConstantRotation(new_rot.as_quat(), other.source, self.dest)
         elif isinstance(other, TimeDependentRotation):
-            return TimeDependentRotation((self._rot * other._rots).as_quat(), other.times, other.source, self.dest, av=other.av)
+            return TimeDependentRotation((self._rot * other._rots).as_quat(), other.times, other.source, self.dest, av=self._rot.apply(other.av))
         else:
             raise TypeError("Rotations can only be composed with other rotations.")
 
