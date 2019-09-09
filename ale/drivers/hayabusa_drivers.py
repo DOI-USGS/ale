@@ -40,7 +40,7 @@ class HayabusaAmicaIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Radial
             f'BODY{self.target_id}_RADII' : self.target_body_radii,
             f'INS{self.ikid}_SWAP_OBSERVER_TARGET' : str(self.swap_observer_target).upper(),
             f'INS{self.ikid}_LIGHTTIME_CORRECTION' : str(self.light_time_correction).upper(),
-            f'INS{self.ikid}_LT_SURFACE_CORRECT' : str(False).upper(),
+            f'INS{self.ikid}_LT_SURFACE_CORRECT' : str(self.correct_lt_to_surface).upper(),
             f'INS{self.ikid}_FOCAL_LENGTH' : self.focal_length,
             f'INS{self.ikid}_PIXEL_PITCH' : self.pixel_size,
             f'CLOCK_ET_{self.spacecraft_id}_{self.spacecraft_clock_start_count}_COMPUTED' : struct.pack('d', self.ephemeris_start_time).hex(),

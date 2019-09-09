@@ -457,6 +457,22 @@ class NaifSpice():
             return False
 
     @property
+    def correct_lt_to_surface(self):
+        """
+        Returns if light time correction should be made to the surface instead of
+        to the center of the body. This is defined by a keyword in ISIS IAKs.
+        If the keyword is not defined in any loaded kernels then False is returned.
+
+        Expects ikid to be defined. This should be an integer containing the
+        Naif Id code of the instrument.
+        """
+        try:
+            swap = spice.gcpool('INS{}_LT_SURFACE_CORRECT'.format(self.ikid), 0, 1)[0]
+            return swap.upper() == "TRUE"
+        except:
+            return False
+
+    @property
     def isis_naif_keywords(self):
         """
         Returns
