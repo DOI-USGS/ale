@@ -467,8 +467,8 @@ class NaifSpice():
         Naif Id code of the instrument.
         """
         try:
-            swap = spice.gcpool('INS{}_LT_SURFACE_CORRECT'.format(self.ikid), 0, 1)[0]
-            return swap.upper() == "TRUE"
+            surface_correct = spice.gcpool('INS{}_LT_SURFACE_CORRECT'.format(self.ikid), 0, 1)[0]
+            return surface_correct.upper() == "TRUE"
         except:
             return False
 
