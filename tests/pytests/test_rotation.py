@@ -73,7 +73,7 @@ def test_constant_inverse():
     rot2_1 = rot1_2.inverse()
     assert rot2_1.source == 2
     assert rot2_1.dest == 1
-    expected_quats = np.array([1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)])
+    expected_quats = [1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)]
     np.testing.assert_almost_equal(rot2_1.quat, expected_quats)
 
 def test_time_dependent_inverse():
@@ -102,9 +102,11 @@ def test_from_euler():
     times = [0, 1]
     seq = 'XYZ'
     rot = TimeDependentRotation.from_euler(seq, angles, times, 0, 1)
-    expected_quats = np.asarray([[0.5, 0.5, 0.5, 0.5], [-0.5, -0.5, 0.5, 0.5]])
+    expected_quats = [[0.5, 0.5, 0.5, 0.5], [-0.5, -0.5, 0.5, 0.5]]
+    expected_av = [[0.0, np.pi, 0.0], [0.0, np.pi, 0.0]]
     np.testing.assert_almost_equal(rot.quats, expected_quats)
-    np.testing.assert_equal(rot.times, np.asarray(times))
+    np.testing.assert_almost_equal(rot.av, expected_av)
+    np.testing.assert_equal(rot.times, times)
     assert rot.source == 0
     assert rot.dest == 1
 
@@ -116,6 +118,7 @@ def test_from_euler_degrees():
     rad_rot = TimeDependentRotation.from_euler('XYZ', rad_angles, [0, 1], 0, 1)
     degree_rot = TimeDependentRotation.from_euler('XYZ', degree_angles, [0, 1], 0, 1, degrees=True)
     np.testing.assert_almost_equal(rad_rot.quats, degree_rot.quats)
+    np.testing.assert_almost_equal(rad_rot.av, degree_rot.av)
 
 def test_from_matrix():
     mat = [[0, 0, 1],
@@ -139,13 +142,23 @@ def test_slerp():
     np.testing.assert_almost_equal(np.degrees(new_avs),
                                    np.repeat([[90, 0, 0]], 8, 0))
 
-def test_slerp_single_time():
+def test_slerp_constant_rotation():
     rot = TimeDependentRotation([[0, 0, 0, 1]], [0], 1, 2)
     new_rot, new_avs = rot._slerp([-1, 3])
     np.testing.assert_equal(new_rot.as_quat(),
                             [[0, 0, 0, 1], [0, 0, 0, 1]])
     np.testing.assert_equal(new_avs,
                             [[0, 0, 0], [0, 0, 0]])
+
+def test_slerp_single_time():
+    rot = TimeDependentRotation([[0, 0, 0, 1]], [0], 1, 2, av=[[np.pi/2, 0, 0]])
+    new_rot, new_avs = rot._slerp([-1, 3])
+    expected_quats = [[-1/np.sqrt(2), 0, 0, 1/np.sqrt(2)], [1/np.sqrt(2), 0, 0, -1/np.sqrt(2)]]
+    expected_av = [[np.pi/2, 0, 0], [np.pi/2, 0, 0]]
+    np.testing.assert_almost_equal(new_rot.as_quat(),
+                                   expected_quats)
+    np.testing.assert_equal(new_avs,
+                            expected_av)
 
 def test_slerp_variable_velocity():
     test_quats = Rotation.from_euler('xyz',
