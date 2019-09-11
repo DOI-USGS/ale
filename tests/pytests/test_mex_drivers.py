@@ -238,7 +238,6 @@ def test_mex_load(usgscsm_compare_dict):
         usgscsm_isd = to_usgscsm(driver)
         assert compare_dicts(usgscsm_isd, usgscsm_compare_dict) == []
 
-
 # ========= Test mex pds3label and naifspice driver =========
 class test_mex_pds3_naif(unittest.TestCase):
 

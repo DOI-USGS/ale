@@ -442,6 +442,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         self._binary_ephemeris_times = times
 
 
+
     @property
     def center_ephemeris_time(self):
         """
@@ -475,7 +476,6 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         if not hasattr(self, '_ephemeris_stop_time'):
             self._ephemeris_stop_time = self.binary_ephemeris_times[-1] + self.binary_exposure_durations[-1]
         return self._ephemeris_stop_time
-
 
 
     # TODO We need to confirm that returning nothing here does not affect
