@@ -3,6 +3,7 @@ from os import path
 
 from glob import glob
 from itertools import filterfalse, groupby
+import warnings
 
 import pvl
 
@@ -14,6 +15,8 @@ import subprocess
 import re
 import networkx as nx
 from networkx.algorithms.shortest_paths.generic import shortest_path
+
+import spiceypy as spice
 
 from ale import spice_root
 
@@ -423,3 +426,65 @@ def write_metakernel_from_kernel_list(kernels):
         ])
 
     return body
+
+
+
+def duckpool(naifvar, start=0, length=10, default=None):
+    """
+    Duck typing friendly version of spiceypy kernel pool functions.
+
+    Parameters
+    ----------
+    naifvar : str
+              naif var string to query pool for
+
+    start : int
+            Index of first value
+
+    length : int
+             max number of values returned
+
+    default : obj
+              Default value to return if key is not found in kernel pool
+
+    Returns
+    -------
+    : obj
+      Spice value returned from spiceypy if found, default value otherwise
+
+    """
+    var_exists = spice.expool(naifvar)
+    if var_exists:
+        for f in [spice.gdpool, spice.gcpool, spice.gipool]:
+            try:
+                return f(naifvar, start, length)
+            except:
+                continue
+    return default
+
+
+def duckpond(matchstr="*"):
+    """
+    Collect multiple keywords from the naif kernel pool based on a
+    template string
+
+    Parameters
+    ----------
+    matchstr : str
+               matchi_c formatted str
+
+    Returns
+    -------
+    : dict
+      python dictionary of naif keywords in {keyword:value} format.
+    """
+
+    try:
+        svars = spice.gnpool(matchstr, 0, 100)
+    except Exception as e:
+        warnings.warn(f"kernel search for {matchstr} failed with {e}")
+        svars = []
+
+    svals = [duckpool(v) for v in svars]
+    return dict(zip(svars, svals))
+
