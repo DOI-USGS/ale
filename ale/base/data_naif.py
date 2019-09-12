@@ -441,5 +441,5 @@ class NaifSpice():
         naif_keywords['BODY_FRAME_CODE'] = self.target_frame_id
         naif_keywords['BODY_CODE'] = self.target_id
 
-        naif_keywords = {**naif_keywords, **util.duckpond(f"*{self.ikid}*")}
+        naif_keywords = {**naif_keywords, **util.query_kernel_pool(f"*{self.ikid}*")}
         return naif_keywords
