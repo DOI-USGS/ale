@@ -133,9 +133,9 @@ def test_sensor_position(driver):
     """
     position, velocity, time = driver.sensor_position
     image_et = spice.scs2e(-236, '2/0072174528:989000') + 0.0005
-    expected_state, _ = spice.spkez(199, image_et, 'IAU_MERCURY', 'LT+S', -236)
-    expected_position = -1000 * np.asarray(expected_state[:3])
-    expected_velocity = -1000 * np.asarray(expected_state[3:])
+    expected_state, _ = spice.spkezr('Messenger', image_et, 'IAU_MERCURY', 'LT+S', 'Mercury')
+    expected_position = 1000 * np.asarray(expected_state[:3])
+    expected_velocity = 1000 * np.asarray(expected_state[3:])
     np.testing.assert_allclose(position,
                                [expected_position],
                                rtol=1e-8)
@@ -159,7 +159,7 @@ def test_frame_chain(driver):
     sensor_to_j2000_mat = spice.pxform('MSGR_MDIS_NAC', 'J2000', image_et)
     sensor_to_j2000_quats = spice.m2q(sensor_to_j2000_mat)
     np.testing.assert_almost_equal(sensor_to_j2000.quats,
-                                   [-np.roll(sensor_to_j2000_quats, -1)])
+                                   [np.roll(sensor_to_j2000_quats, -1)])
 
 def test_sun_position(driver):
     position, velocity, time = driver.sun_position

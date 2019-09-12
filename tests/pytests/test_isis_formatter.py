@@ -162,9 +162,10 @@ def test_camera_version(driver):
 def test_instrument_pointing(driver):
     meta_data = isis_formatter.to_isis(driver)
     pointing = meta_data['InstrumentPointing']
+    print(pointing)
     assert pointing['TimeDependentFrames'] == [1000, 1]
     assert pointing['ConstantFrames'] == [1010, 1000]
-    np.testing.assert_equal(pointing['ConstantRotation'], np.array([[1, 0 ,0], [0, 1, 0], [0, 0, 1]]))
+    np.testing.assert_equal(pointing['ConstantRotation'], np.array([1., 0., 0., 0., 1., 0., 0., 0., 1.]))
     assert pointing['CkTableStartTime'] == 0
     assert pointing['CkTableEndTime'] == 1
     assert pointing['CkTableOriginalSize'] == 2

@@ -322,23 +322,92 @@ class NaifSpice():
                 # spkezr returns a vector from the observer's location to the aberration-corrected
                 # location of the target. For more information, see:
                 # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
-                state, _ = spice.spkezr(self.target_name,
+                state, _ = spice.spkezr(self.spacecraft_name,
                                        time,
                                        self.reference_frame,
                                        self.light_time_correction,
-                                       self.spacecraft_name,)
+                                       self.target_name,)
                 pos.append(state[:3])
                 vel.append(state[3:])
             # By default, spice works in km, and the vector returned by spkezr points the opposite
             # direction to what ALE needs, so it must be multiplied by (-1)
-            self._position = [p * -1000 for p in pos]
-            self._velocity = [v * -1000 for v in vel]
+            self._position = [p * 1000 for p in pos]
+            self._velocity = [v * 1000 for v in vel]
         return self._position, self._velocity, self.ephemeris_time
+
+    @property
+    def frame_trace(self):
+        frame_codes = [self.sensor_frame_id]
+        _, frame_type, _ = spice.frinfo(frame_codes[-1])
+        frame_types = [frame_type]
+
+        while(frame_codes[-1] != 1):
+            try:
+                center, frame_type, frame_type_id = spice.frinfo(frame_codes[-1])
+            except Exception as e:
+                print(e)
+                break
+
+            if frame_type is 1 or frame_type is 2:
+                frame_code = 1
+
+            elif frame_type is 3:
+                matrix, frame_code, found = spice.ckfrot(frame_type_id, self.center_ephemeris_time)
+                if not found:
+                    raise Exception(f"The ck rotation from frame {frame_codes[-1]} can not \
+                                      be found due to no pointing available at requested time \
+                                      or a problem with the frame")
+            elif frame_type is 4:
+                matrix, frame_code, found = spice.tkfram(frame_type_id)
+                if not found:
+                    raise Exception(f"The tk rotation from frame {frame_codes[-1]} can not \
+                                      be found")
+            elif frame_type is 5:
+                matrix, frame_code = spice.zzdynrot(frame_type_id, center, self.center_ephemeris_time)
+
+            else:
+                raise Exception(f"The frame {frame_codes[-1]} has a type {frame_type_id} \
+                                  not supported by your version of Naif Spicelib. \
+                                  You need to update.")
+
+            frame_codes.append(frame_code)
+            frame_types.append(frame_type)
+        constant_frames = [frame_codes[i] for i, frame_type in enumerate(frame_types) if frame_type == 4]
+
+        time_dependent_frames = []
+        if len(constant_frames) != 0:
+            time_dependent_frames.append(constant_frames[-1])
+
+        for i, frame_type in enumerate(frame_types):
+            if frame_type != 4:
+                time_dependent_frames.append(frame_codes[i])
+
+        return time_dependent_frames, constant_frames
 
     @property
     def frame_chain(self):
         if not hasattr(self, '_frame_chain'):
-            self._frame_chain = FrameChain.from_spice(frame_changes = [(1, self.sensor_frame_id), (1, self.target_frame_id)], ephemeris_time=self.ephemeris_time)
+            time_dependent_frames, constant_frames = self.frame_trace
+            print(time_dependent_frames, constant_frames)
+
+            frames = constant_frames.copy()
+            if not frames:
+                frames.extend(time_dependent_frames)
+            else:
+                frames.extend(time_dependent_frames[1:])
+            frame_changes = [(frames[i], frames[i+1]) for i in range(len(frames) - 1)]
+            frame_changes.append((1, self.target_frame_id))
+
+            frame_type = []
+            if len(constant_frames) > 0:
+                frame_type.extend(list(np.full(len(constant_frames) - 1, 'c')))
+            if len(time_dependent_frames) > 0:
+                frame_type.extend(np.full(len(time_dependent_frames) - 1, 't'))
+            frame_type.append('t')
+
+            self._frame_chain = FrameChain.from_spice(frame_changes = frame_changes,
+                                                      frame_types = frame_type,
+                                                      ephemeris_time=self.ephemeris_time)
         return self._frame_chain
 
     @property
