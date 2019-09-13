@@ -387,9 +387,9 @@ namespace ale {
      Py_DECREF(pStringFileName);
      Py_DECREF(pStringProps);
      Py_DECREF(pStringFormatter);
-
+     
      if(!pResult) {
-        throw invalid_argument(getPyTraceback());
+        throw invalid_argument("No Valid instrument found for label.");
      }
 
      PyObject *pResultStr = PyObject_Str(pResult);

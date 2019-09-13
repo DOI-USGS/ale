@@ -189,19 +189,20 @@ def test_isis_naif_keywords(driver):
     expected_keywords = {
         'BODY199_RADII' : driver.target_body_radii,
         'BODY_FRAME_CODE' : 10011,
-        'INS-236820_PIXEL_SIZE' : 0.014,
+        'INS-236820_PIXEL_PITCH' : 0.014,
         'INS-236820_ITRANSL' : [0.0, 0.0, 71.42857143],
         'INS-236820_ITRANSS' : [0.0, 71.42857143, 0.0],
-        'INS-236820_FOCAL_LENGTH' : 549.5535053027719,
+        'INS-236820_FOCAL_LENGTH' : 549.1178195372703,
         'INS-236820_BORESIGHT_SAMPLE' : 512.5,
         'INS-236820_BORESIGHT_LINE' : 512.5
     }
-    assert set(driver.isis_naif_keywords.keys()) == set(expected_keywords.keys())
-    for key, value in driver.isis_naif_keywords.items():
-        if isinstance(value, np.ndarray):
-            np.testing.assert_almost_equal(value, expected_keywords[key])
+    print(driver.isis_naif_keywords.keys())
+    assert set(expected_keywords.keys()).issubset(set(driver.isis_naif_keywords.keys()))
+    for key, value in expected_keywords.items():
+        if isinstance(value, np.ndarray) or isinstance(value, list):
+            np.testing.assert_almost_equal(value, driver.isis_naif_keywords[key])
         else:
-            assert value == expected_keywords[key]
+            assert value == driver.isis_naif_keywords[key]
 
 def test_sensor_model_version(driver):
     assert driver.sensor_model_version == 2

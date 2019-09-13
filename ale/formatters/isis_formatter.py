@@ -26,6 +26,7 @@ def to_isis(driver):
 
     frame_chain = driver.frame_chain
     sensor_frame = driver.sensor_frame_id
+    target_frame = driver.target_frame_id
 
     instrument_pointing = {}
     source_frame, destination_frame, time_dependent_sensor_frame = frame_chain.last_time_dependent_frame_between(1, sensor_frame)
@@ -61,6 +62,7 @@ def to_isis(driver):
         body_rotation['CkTableOriginalSize'] = len(time_dependent_rotation.times)
         body_rotation['EphemerisTimes'] = time_dependent_rotation.times
         body_rotation['Quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
+
     if source_frame != target_frame:
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
@@ -68,6 +70,8 @@ def to_isis(driver):
         constant_rotation = frame_chain.compute_rotation(source_frame, target_frame)
         body_rotation['ConstantRotation'] = constant_rotation.rotation_matrix().flatten()
     meta_data['BodyRotation'] = body_rotation
+
+    j2000_rotation = frame_chain.compute_rotation(target_frame, 1)
 
     instrument_position = {}
     positions, velocities, times = driver.sensor_position

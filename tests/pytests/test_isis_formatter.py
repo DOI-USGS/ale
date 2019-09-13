@@ -170,7 +170,7 @@ def test_instrument_pointing(driver):
     assert pointing['CkTableEndTime'] == 1
     assert pointing['CkTableOriginalSize'] == 2
     np.testing.assert_equal(pointing['EphemerisTimes'], np.array([0, 1]))
-    np.testing.assert_equal(pointing['Quaternions'], np.array([[0, 0, 0, -1], [0, 0, 0, -1]]))
+    np.testing.assert_equal(pointing['Quaternions'], np.array([[-1, 0, 0, 0], [-1, 0, 0, 0]]))
 
 def test_instrument_position(driver):
     meta_data = isis_formatter.to_isis(driver)
@@ -179,8 +179,8 @@ def test_instrument_position(driver):
     assert position['SpkTableEndTime'] == 900
     assert position['SpkTableOriginalSize'] == 2
     np.testing.assert_equal(position['EphemerisTimes'], np.array([800, 900]))
-    np.testing.assert_equal(position['Positions'], np.array([[0, 1, 2], [3, 4, 5]]))
-    np.testing.assert_equal(position['Velocities'], np.array([[0, -1, -2], [-3, -4, -5]]))
+    np.testing.assert_equal(position['Positions'], np.array([[0, 0.001, 0.002], [0.003, 0.004, 0.005]]))
+    np.testing.assert_equal(position['Velocities'], np.array([[0, -0.001, -0.002], [-0.003, -0.004, -0.005]]))
 
 def test_body_rotation(driver):
     meta_data = isis_formatter.to_isis(driver)
@@ -190,7 +190,7 @@ def test_body_rotation(driver):
     assert rotation['CkTableEndTime'] == 1
     assert rotation['CkTableOriginalSize'] == 2
     np.testing.assert_equal(rotation['EphemerisTimes'], np.array([0, 1]))
-    np.testing.assert_equal(rotation['Quaternions'], np.array([[0, 0, 0, -1], [0, 0, 0, -1]]))
+    np.testing.assert_equal(rotation['Quaternions'], np.array([[-1, 0, 0, 0], [-1, 0, 0, 0]]))
 
 def test_sun_position(driver):
     meta_data = isis_formatter.to_isis(driver)
@@ -199,8 +199,8 @@ def test_sun_position(driver):
     assert position['SpkTableEndTime'] == 700
     assert position['SpkTableOriginalSize'] == 2
     np.testing.assert_equal(position['EphemerisTimes'], np.array([600, 700]))
-    np.testing.assert_equal(position['Positions'], np.array([[0, 1, 2], [3, 4, 5]]))
-    np.testing.assert_equal(position['Velocities'], np.array([[0, -1, -2], [-3, -4, -5]]))
+    np.testing.assert_equal(position['Positions'], np.array([[0, 0.001, 0.002], [0.003, 0.004, 0.005]]))
+    np.testing.assert_equal(position['Velocities'], np.array([[0, -0.001, -0.002], [-0.003, -0.004, -0.005]]))
 
 def test_naif_keywords(driver):
     meta_data = isis_formatter.to_isis(driver)
