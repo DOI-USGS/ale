@@ -282,9 +282,9 @@ class TimeDependentRotation:
         # If actual angular velocities are available, linearly interpolate them
         if self.av is not None:
             av_diff = np.zeros((len(self.times), 3))
-            if len(self.times) > 2:
+            if len(self.times) > 1:
                 av_diff[:-1] = self.av[1:] - self.av[:-1]
-                av_diff[:-1] = av_diff[:-2]
+                av_diff[-1] = av_diff[-2]
             interp_av = self.av[rot_idx] + (av_diff[rot_idx] * time_diffs[:, None])
 
         return interp_rots, interp_av
