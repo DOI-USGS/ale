@@ -388,25 +388,10 @@ class NaifSpice():
     def frame_chain(self):
         if not hasattr(self, '_frame_chain'):
             time_dependent_frames, constant_frames = self.frame_trace
-            print(time_dependent_frames, constant_frames)
 
-            frames = constant_frames.copy()
-            if not frames:
-                frames.extend(time_dependent_frames)
-            else:
-                frames.extend(time_dependent_frames[1:])
-            frame_changes = [(frames[i], frames[i+1]) for i in range(len(frames) - 1)]
-            frame_changes.append((1, self.target_frame_id))
-
-            frame_type = []
-            if len(constant_frames) > 0:
-                frame_type.extend(list(np.full(len(constant_frames) - 1, 'c')))
-            if len(time_dependent_frames) > 0:
-                frame_type.extend(np.full(len(time_dependent_frames) - 1, 't'))
-            frame_type.append('t')
-
-            self._frame_chain = FrameChain.from_spice(frame_changes = frame_changes,
-                                                      frame_types = frame_type,
+            self._frame_chain = FrameChain.from_spice(time_dependent_frames = time_dependent_frames,
+                                                      constant_frames = constant_frames,
+                                                      target_frames = [1, self.target_frame_id],
                                                       ephemeris_time=self.ephemeris_time)
         return self._frame_chain
 
