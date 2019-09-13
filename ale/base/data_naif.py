@@ -426,6 +426,7 @@ class NaifSpice():
         """
         return float(spice.gdpool('INS{}_BORESIGHT_LINE'.format(self.ikid), 0, 1)[0])
 
+
     @property
     def isis_naif_keywords(self):
         """
@@ -438,11 +439,7 @@ class NaifSpice():
 
         naif_keywords['BODY{}_RADII'.format(self.target_id)] = self.target_body_radii
         naif_keywords['BODY_FRAME_CODE'] = self.target_frame_id
-        naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)] = self.pixel_size
-        naif_keywords['INS{}_ITRANSL'.format(self.ikid)] = self.focal2pixel_lines
-        naif_keywords['INS{}_ITRANSS'.format(self.ikid)] = self.focal2pixel_samples
-        naif_keywords['INS{}_FOCAL_LENGTH'.format(self.ikid)] = self.focal_length
-        naif_keywords['INS{}_BORESIGHT_SAMPLE'.format(self.ikid)] = self.detector_center_sample + 0.5
-        naif_keywords['INS{}_BORESIGHT_LINE'.format(self.ikid)] = self.detector_center_line + 0.5
+        naif_keywords['BODY_CODE'] = self.target_id
 
+        naif_keywords = {**naif_keywords, **util.query_kernel_pool(f"*{self.ikid}*")}
         return naif_keywords
