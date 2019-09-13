@@ -248,57 +248,46 @@ class TimeDependentRotation:
          : 2darray
            The angular velocity vectors
         """
+        # Convert non-vector input to vector and check input
         vec_times = np.atleast_1d(times)
         if vec_times.ndim > 1:
             raise ValueError('Input times must be either a float or a 1d iterable of floats')
 
-        if len(self.times) < 2:
-            return Rotation.from_quat(np.repeat(self.quats, len(vec_times), 0)), np.zeros((len(vec_times), 3))
+        # Compute constant angular velocity for interpolation intervals
+        avs = np.zeros((len(self.times) + 1, 3))
+        if len(self.times) > 1:
+            steps = self.times[1:] - self.times[:-1]
+            rotvecs = (self._rots[1:] * self._rots[:-1].inv()).as_rotvec()
+            avs[1:-1] = rotvecs / steps[:, None]
+
+        # If available use actual angular velocity for extrapolation
+        # Otherwise use the adjacent interpolation interval
+        if self.av is not None:
+            avs[0] = self.av[0]
+            avs[-1] = self.av[-1]
         else:
-            idx = np.searchsorted(self.times, vec_times) - 1
-            idx[idx >= len(self.times) - 1] = len(self.times) - 2
-            idx[idx < 0] = 0
-            steps = self.times[idx+1] - self.times[idx]
-            rotvecs = (self._rots[idx + 1] * self._rots[idx].inv()).as_rotvec()
-            alpha = (vec_times - self.times[idx]) / steps
-            interp_rots = Rotation.from_rotvec(rotvecs * alpha[:, None]) * self._rots[idx]
-            interp_av = rotvecs / steps[:, None]
-            return interp_rots, interp_av
+            avs[0] = avs[1]
+            avs[-1] = avs[-2]
 
-    def _spline():
-        """
-        Using a spline over the rotations, interpolate the
-        rotation and angular velocity at specific times.
+        # Determine interpolation intervals for input times
+        av_idx = np.searchsorted(self.times, vec_times)
+        rot_idx = av_idx - 1
+        rot_idx[rot_idx < 0] = 0
 
-        Parameters
-        ----------
-        times : 1darray or float
-                The new times to interpolate at.
+        # Interpolate/extrapolate rotations
+        time_diffs = vec_times - self.times[rot_idx]
+        interp_av = avs[av_idx]
+        interp_rots = Rotation.from_rotvec(interp_av * time_diffs[:, None]) * self._rots[rot_idx]
 
-        Returns
-        -------
-         : Rotation
-           The new rotations at the input times
-         : 2darray
-           The angular velocity vectors
-        """
-        vec_times = np.atleast_1d(times)
-        if vec_times.ndim > 1:
-            raise ValueError('Input times must be either a float or a 1d iterable of floats')
-        if self.av is None:
-            spline = RotationSpline(vec_times, self._rots)
-            return spline(vec_times), spline(vec_times, 1)
-        else:
-            quats = self.quats
-            av = self.av
-            x = self.quats[:][0]
-            y = self.quats[:][1]
-            z = self.quats[:][2]
-            w = self.quats[:][3]
-            dxdt = 0.5 * (av[:][0] * w + av[:][1] * z - av[:][2] * y)
-            dydt = 0.5 * (av[:][1] * w + av[:][2] * x - av[:][0] * z)
-            dzdt = 0.5 * (av[:][2] * w + av[:][0] * y - av[:][1] * x)
-            dwdt = 0.5 * (av[:][0] * x + av[:][1] * y + av[:][2] * z)
+        # If actual angular velocities are available, linearly interpolate them
+        if self.av is not None:
+            av_diff = np.zeros((len(self.times), 3))
+            if len(self.times) > 2:
+                av_diff[:-1] = self.av[1:] - self.av[:-1]
+                av_diff[:-1] = av_diff[:-2]
+            interp_av = self.av[rot_idx] + (av_diff[rot_idx] * time_diffs[:, None])
+
+        return interp_rots, interp_av
 
 
     def reinterpolate(self, times):

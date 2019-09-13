@@ -49,12 +49,12 @@ def test_time_dependent_time_dependent_composition():
     quats1_2 = [[1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)],[1, 0, 0, 0]]
     times1_2 = [0, 1]
     av1_2 = [[np.pi/2, 0, 0], [np.pi/2, 0, 0]]
-    rot1_2 = TimeDependentRotation(quats1_2, times1_2, 1, 2)
+    rot1_2 = TimeDependentRotation(quats1_2, times1_2, 1, 2, av=av1_2)
     # -90 degree rotation about the X-axis to a 90 degree rotation about the X-axis
     quats2_3 = [[1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)],[1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)]]
     times2_3 = [0, 2]
     av2_3 = [[np.pi/2, 0, 0], [np.pi/2, 0, 0]]
-    rot2_3 = TimeDependentRotation(quats2_3, times2_3, 2, 3)
+    rot2_3 = TimeDependentRotation(quats2_3, times2_3, 2, 3, av=av2_3)
 
     # compose to get no rotation to a 180 degree rotation about the X-axis to no rotation
     rot1_3 = rot2_3*rot1_2
@@ -80,7 +80,7 @@ def test_time_dependent_inverse():
     quats1_2 = [[1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)],[1, 0, 0, 0]]
     times1_2 = [0, 1]
     av1_2 = [[np.pi/2, 0, 0], [np.pi/2, 0, 0]]
-    rot1_2 = TimeDependentRotation(quats1_2, times1_2, 1, 2)
+    rot1_2 = TimeDependentRotation(quats1_2, times1_2, 1, 2, av=av1_2)
     rot2_1 = rot1_2.inverse()
     assert rot2_1.source == 2
     assert rot2_1.dest == 1
@@ -89,6 +89,18 @@ def test_time_dependent_inverse():
     np.testing.assert_equal(rot2_1.times, times1_2)
     np.testing.assert_almost_equal(rot2_1.quats, expected_quats)
     np.testing.assert_almost_equal(rot2_1.av, expected_av)
+
+def test_time_dependent_inverse_no_av():
+    quats1_2 = [[1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)],[1, 0, 0, 0]]
+    times1_2 = [0, 1]
+    rot1_2 = TimeDependentRotation(quats1_2, times1_2, 1, 2)
+    rot2_1 = rot1_2.inverse()
+    assert rot2_1.source == 2
+    assert rot2_1.dest == 1
+    expected_quats = [[1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)],[1, 0, 0, 0]]
+    np.testing.assert_equal(rot2_1.times, times1_2)
+    np.testing.assert_almost_equal(rot2_1.quats, expected_quats)
+    assert rot2_1.av is None
 
 def test_rotation_matrix():
     rot = ConstantRotation([0, 0, 0, 1], 1, 2)
@@ -103,9 +115,8 @@ def test_from_euler():
     seq = 'XYZ'
     rot = TimeDependentRotation.from_euler(seq, angles, times, 0, 1)
     expected_quats = [[0.5, 0.5, 0.5, 0.5], [-0.5, -0.5, 0.5, 0.5]]
-    expected_av = [[0.0, np.pi, 0.0], [0.0, np.pi, 0.0]]
     np.testing.assert_almost_equal(rot.quats, expected_quats)
-    np.testing.assert_almost_equal(rot.av, expected_av)
+    assert rot.av is None
     np.testing.assert_equal(rot.times, times)
     assert rot.source == 0
     assert rot.dest == 1
@@ -118,7 +129,7 @@ def test_from_euler_degrees():
     rad_rot = TimeDependentRotation.from_euler('XYZ', rad_angles, [0, 1], 0, 1)
     degree_rot = TimeDependentRotation.from_euler('XYZ', degree_angles, [0, 1], 0, 1, degrees=True)
     np.testing.assert_almost_equal(rad_rot.quats, degree_rot.quats)
-    np.testing.assert_almost_equal(rad_rot.av, degree_rot.av)
+    assert degree_rot.av is None
 
 def test_from_matrix():
     mat = [[0, 0, 1],
