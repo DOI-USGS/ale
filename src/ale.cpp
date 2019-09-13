@@ -388,10 +388,7 @@ namespace ale {
      Py_DECREF(pStringProps);
      Py_DECREF(pStringFormatter);
      
-     std::cout << pResult << std::endl;
-
      if(!pResult) {
-        std::cout << "THROWING" << std::endl;
         throw invalid_argument("No Valid instrument found for label.");
      }
 
