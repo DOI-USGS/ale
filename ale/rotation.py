@@ -1,5 +1,5 @@
-from scipy.interpolate import interp1d, BPoly
-from scipy.spatial.transform import Rotation, RotationSpline
+from scipy.interpolate import interp1d
+from scipy.spatial.transform import Rotation
 
 import numpy as np
 
@@ -229,12 +229,11 @@ class TimeDependentRotation:
         Using SLERP interpolate the rotation and angular velocity at
         specific times.
 
-        This uses the same code as scipy SLERP, except it extrapolates
-        assuming constant angular velocity before and after the first
-        and last intervals.
-
-        If the this rotation is only defined at one time, then the rotation is
-        assumed to be constant.
+        Times outside of the range covered by this rotation are extrapolated
+        assuming constant angular velocity. If the rotation has angular velocities
+        stored, then the first and last angular velocity are used for extrapolation.
+        Otherwise, the angular velocities from the first and last interpolation
+        interval are used for extrapolation.
 
         Parameters
         ----------
@@ -302,7 +301,7 @@ class TimeDependentRotation:
         Returns
         -------
          : TimeDependentRotation
-           The new rotation that the input times
+           The new rotation at the input times
         """
         new_rots, av = self._slerp(times)
         return TimeDependentRotation(new_rots.as_quat(), times, self.source, self.dest, av=av)
