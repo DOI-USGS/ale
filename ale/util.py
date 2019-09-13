@@ -453,17 +453,17 @@ def duckpool(naifvar, start=0, length=10, default=None):
       Spice value returned from spiceypy if found, default value otherwise
 
     """
-    var_exists = spice.expool(naifvar)
-    if var_exists:
-        for f in [spice.gdpool, spice.gcpool, spice.gipool]:
-            try:
-                return f(naifvar, start, length)
-            except:
-                continue
+    for f in [spice.gdpool, spice.gcpool, spice.gipool]:
+        try:
+            val = f(naifvar, start, length)
+            return val[0] if  len(val) == 1 else val
+
+        except:
+            continue
     return default
 
 
-def duckpond(matchstr="*"):
+def query_kernel_pool(matchstr="*"):
     """
     Collect multiple keywords from the naif kernel pool based on a
     template string
