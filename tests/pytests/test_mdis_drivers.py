@@ -133,9 +133,9 @@ def test_sensor_position(driver):
     """
     position, velocity, time = driver.sensor_position
     image_et = spice.scs2e(-236, '2/0072174528:989000') + 0.0005
-    expected_state, _ = spice.spkez(199, image_et, 'IAU_MERCURY', 'LT+S', -236)
-    expected_position = -1000 * np.asarray(expected_state[:3])
-    expected_velocity = -1000 * np.asarray(expected_state[3:])
+    expected_state, _ = spice.spkez(-236, image_et, 'IAU_MERCURY', 'LT+S', 199)
+    expected_position = 1000 * np.asarray(expected_state[:3])
+    expected_velocity = 1000 * np.asarray(expected_state[3:])
     np.testing.assert_allclose(position,
                                [expected_position],
                                rtol=1e-8)
