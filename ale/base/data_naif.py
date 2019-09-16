@@ -322,24 +322,26 @@ class NaifSpice():
             pos = []
             vel = []
 
+            target = self.spacecraft_name
+            observer = self.target_name
+            # Check for ISIS flag to fix target and observer swapping
+            if self.swap_observer_target:
+                target = self.target_name
+                observer = self.spacecraft_name
+
             for time in ephem:
                 # spkezr returns a vector from the observer's location to the aberration-corrected
                 # location of the target. For more information, see:
                 # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
+                state, _ = spice.spkezr(target,
+                                        time,
+                                        self.reference_frame,
+                                        self.light_time_correction,
+                                        observer)
                 if self.swap_observer_target:
-                    state, _ = spice.spkezr(self.target_name,
-                                           time,
-                                           self.reference_frame,
-                                           self.light_time_correction,
-                                           self.spacecraft_name,)
                     pos.append(-state[:3])
                     vel.append(-state[3:])
                 else:
-                    state, _ = spice.spkezr(self.spacecraft_name,
-                                           time,
-                                           self.reference_frame,
-                                           self.light_time_correction,
-                                           self.target_name,)
                     pos.append(state[:3])
                     vel.append(state[3:])
 
