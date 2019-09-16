@@ -26,6 +26,7 @@ def isis_compare_dict():
                      'INS-32101_BORESIGHT_LINE': 500},
     'InstrumentPointing': {'TimeDependentFrames': [-32100, 2, 1],
                            'ConstantFrames': [-32101, -32100],
+                           'ConstantRotation': (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0),
                            'CkTableStartTime': -646346832.89712,
                            'CkTableEndTime': -646346832.89712,
                            'CkTableOriginalSize': 1,

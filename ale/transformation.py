@@ -89,20 +89,41 @@ class FrameChain(nx.DiGraph):
                      of frame rotations in the frame chain
     """
     @classmethod
-    def from_spice(cls, *args, frame_changes=[], ephemeris_time=[], **kwargs):
+    def from_spice(cls, *args, time_dependent_frames=[], constant_frames=[], target_frames=[], ephemeris_time=[], **kwargs):
         frame_chain = cls()
 
         times = np.array(ephemeris_time)
+
+        time_dependent_frames = [(frame, time_dependent_frames[i+1]) for i, frame in enumerate(time_dependent_frames[:-1])]
+        constant_frames = [(frame, constant_frames[i+1]) for i, frame in enumerate(constant_frames[:-1])]
+        target_frames = [(frame, target_frames[i+1]) for i, frame in enumerate(target_frames[:-1])]
+
+        time_dependent_frames.extend(target_frames)
+
         quats = np.zeros((len(times), 4))
 
-        for s, d in frame_changes:
-            for i, time in enumerate(times):
+        for s, d in time_dependent_frames:
+            for j, time in enumerate(times):
                 rotation_matrix = spice.pxform(spice.frmnam(s), spice.frmnam(d), time)
                 quat_from_rotation = spice.m2q(rotation_matrix)
-                quats[i,:3] = quat_from_rotation[1:]
-                quats[i,3] = quat_from_rotation[0]
+                quats[j,:3] = quat_from_rotation[1:]
+                quats[j,3] = quat_from_rotation[0]
+
             rotation = TimeDependentRotation(quats, times, s, d)
             frame_chain.add_edge(s, d, rotation=rotation)
+
+        quats = np.zeros(4)
+
+        for s, d in constant_frames:
+            rotation_matrix = spice.pxform(spice.frmnam(s), spice.frmnam(d), times[0])
+            quat_from_rotation = spice.m2q(rotation_matrix)
+            quats[:3] = quat_from_rotation[1:]
+            quats[3] = quat_from_rotation[0]
+
+            rotation = ConstantRotation(quats, s, d)
+
+            frame_chain.add_edge(s, d, rotation=rotation)
+
         return frame_chain
 
     @classmethod

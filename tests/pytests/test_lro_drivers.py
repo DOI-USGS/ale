@@ -50,12 +50,12 @@ def usgscsm_comparison_isd():
             'velocities': np.array([[366615.76978428, -78679.46821947, -787.76505647]]),
             'unit': 'm'},
         'sensor_orientation': {
-            'quaternions': np.array([[ 0.83106252, -0.29729751,  0.44741172,  0.14412506],
-                                     [ 0.83104727, -0.29729165,  0.44744078,  0.14413484],
-                                     [ 0.83103181, -0.29728538,  0.44747013,  0.14414582],
-                                     [ 0.83101642, -0.29727968,  0.44749888,  0.14415708],
-                                     [ 0.83100113, -0.29727394,  0.44752759,  0.1441679 ],
-                                     [ 0.8309859 , -0.29726798,  0.44755647,  0.14417831]])},
+            'quaternions': np.array([[-0.83106252, 0.29729751, -0.44741172, -0.14412506],
+                                     [-0.83104727, 0.29729165, -0.44744078, -0.14413484],
+                                     [-0.83103181, 0.29728538, -0.44747013, -0.14414582],
+                                     [-0.83101642, 0.29727968, -0.44749888, -0.14415708],
+                                     [-0.83100113, 0.29727394, -0.44752759, -0.1441679 ],
+                                     [-0.8309859, 0.29726798, -0.44755647, -0.14417831]])},
         'detector_sample_summing': 1,
         'detector_line_summing': 1,
         'focal_length_model': {
@@ -138,4 +138,5 @@ def test_exposure_duration(driver):
 def test_load(test_kernels, usgscsm_comparison_isd):
     label_file = get_image_label('M103595705LE')
     usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter='usgscsm')
+    print(usgscsm_isd)
     assert compare_dicts(usgscsm_isd, usgscsm_comparison_isd) == []

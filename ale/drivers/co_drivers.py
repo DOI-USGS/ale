@@ -11,8 +11,6 @@ from ale.base.label_pds3 import Pds3Label
 from ale.base.type_distortion import RadialDistortion
 from ale.base.type_sensor import Framer
 
-from ale.util import find_latest_metakernel
-
 from ale.rotation import ConstantRotation
 from ale.transformation import FrameChain
 from scipy.spatial.transform import Rotation
@@ -213,17 +211,6 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
           ISIS sensor model version
         """
         return 1
-
-    @property
-    def frame_chain(self):
-        if not hasattr(self, '_frame_chain'):
-            if self.instrument_id == 'CASSINI_ISS_NAC':
-                self._frame_chain = FrameChain.from_spice(frame_changes = [(1, self._original_naif_sensor_frame_id), (1, self.target_frame_id)], ephemeris_time=self.ephemeris_time)
-                rot_180 = Rotation.from_euler('z', 180, degrees=True)
-                self._frame_chain.add_edge(self._original_naif_sensor_frame_id, self.sensor_frame_id, ConstantRotation(rot_180.as_quat(), self._original_naif_sensor_frame_id, self.sensor_frame_id))
-            elif self.instrument_id == "CASSINI_ISS_WAC":
-                self._frame_chain =  super(CassiniIssPds3LabelNaifSpiceDriver, self).frame_chain
-        return self._frame_chain
 
     @property
     def focal_length(self):
