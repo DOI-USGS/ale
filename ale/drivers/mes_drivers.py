@@ -223,7 +223,8 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
 class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver):
     """
     Driver for reading MDIS ISIS3 Labels. These are Labels that have been ingested
-    into ISIS from PDS EDR images but have not been spiceinit'd yet.
+    into ISIS from PDS EDR images. Any SPCIE data attached by the spiceinit application
+    will be ignored.
     """
     @property
     def platform_name(self):
