@@ -428,18 +428,21 @@ class NaifSpice():
 
 
     @property
-    def isis_naif_keywords(self):
+    def naif_keywords(self):
         """
         Returns
         -------
         : dict
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
-        naif_keywords = dict()
+        if not hasattr(self, "_naif_keywords"):
+            self._naif_keywords = dict()
 
-        naif_keywords['BODY{}_RADII'.format(self.target_id)] = self.target_body_radii
-        naif_keywords['BODY_FRAME_CODE'] = self.target_frame_id
-        naif_keywords['BODY_CODE'] = self.target_id
+            self._naif_keywords['BODY{}_RADII'.format(self.target_id)] = self.target_body_radii
+            self._naif_keywords['BODY_FRAME_CODE'] = self.target_frame_id
+            self._naif_keywords['BODY_CODE'] = self.target_id
 
-        naif_keywords = {**naif_keywords, **util.query_kernel_pool(f"*{self.ikid}*")}
-        return naif_keywords
+            self._naif_keywords = {**self._naif_keywords, **util.query_kernel_pool(f"*{self.ikid}*")}
+
+        return self._naif_keywords
+

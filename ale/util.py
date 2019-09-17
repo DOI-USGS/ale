@@ -457,7 +457,6 @@ def duckpool(naifvar, start=0, length=10, default=None):
         try:
             val = f(naifvar, start, length)
             return val[0] if  len(val) == 1 else val
-
         except:
             continue
     return default
