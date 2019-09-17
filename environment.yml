@@ -1,5 +1,6 @@
 name: ale
 channels:
+  - usgs-astrogeology
   - conda-forge
   - default
 
