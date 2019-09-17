@@ -1,8 +1,8 @@
 name: ale
 channels:
-  - usgs-astrogeology
   - conda-forge
   - default
+  - usgs-astrogeology
 
 dependencies:
   - cmake>=3.10
@@ -14,10 +14,10 @@ dependencies:
   - numpy
   - openblas>=0.3.0
   - pvl
-  - python=3.7.3
+  - python=3.7.1
   - python-dateutil
   - scipy
-  - spiceypy
+  - spiceypy=2.2.2
   - quaternion
   - pyyaml
   - networkx
