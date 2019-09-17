@@ -1,6 +1,5 @@
 name: ale
 channels:
-  - usgs-astrogeology
   - conda-forge
   - default
 
@@ -17,7 +16,6 @@ dependencies:
   - python=3.7.1
   - python-dateutil
   - scipy
-  - spiceypy
   - quaternion
   - pyyaml
   - networkx
