@@ -17,6 +17,7 @@ dependencies:
   - python=3.7.3
   - python-dateutil
   - scipy
+  - spiceypy
   - quaternion
   - pyyaml
   - networkx
