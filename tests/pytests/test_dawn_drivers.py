@@ -65,7 +65,6 @@ def test_kernels():
 def test_dawn_load(test_kernels, usgscsm_compare_dict):
     label_file = get_image_label('FC21A0038582_15170161546F6F')
     usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter='usgscsm')
-    print(usgscsm_isd)
     assert compare_dicts(usgscsm_isd, usgscsm_compare_dict) == []
 
 
