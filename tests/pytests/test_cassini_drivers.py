@@ -27,7 +27,7 @@ def usgscsm_compare_dict():
                'velocities': [np.array([-7.41107317e+07, 1.22577658e+07, 3.91731010e+03])],
                'unit': 'm'},
             'sensor_orientation':
-              {'quaternions': np.array([[ 0.21183452, 0.66567547, 0.69966839, -0.14988809]])},
+              {'quaternions': np.array([[-0.21183452, -0.66567547, -0.69966839,  0.14988809]])},
             'detector_sample_summing': 1,
             'detector_line_summing': 1,
             'focal_length_model': {'focal_length': 2003.09},

@@ -154,12 +154,12 @@ def test_frame_chain(driver):
     target_to_j2000_mat = spice.pxform('IAU_MERCURY', 'J2000', image_et)
     target_to_j2000_quats = spice.m2q(target_to_j2000_mat)
     np.testing.assert_almost_equal(target_to_j2000.quats,
-                                   [-np.roll(target_to_j2000_quats, -1)])
+                                   [np.roll(target_to_j2000_quats, -1)])
     sensor_to_j2000 = driver.frame_chain.compute_rotation(-236820, 1)
     sensor_to_j2000_mat = spice.pxform('MSGR_MDIS_NAC', 'J2000', image_et)
     sensor_to_j2000_quats = spice.m2q(sensor_to_j2000_mat)
     np.testing.assert_almost_equal(sensor_to_j2000.quats,
-                                   [np.roll(sensor_to_j2000_quats, -1)])
+                                   [-np.roll(sensor_to_j2000_quats, -1)])
 
 def test_sun_position(driver):
     position, velocity, time = driver.sun_position

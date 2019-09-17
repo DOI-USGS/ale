@@ -336,63 +336,12 @@ class NaifSpice():
         return self._position, self._velocity, self.ephemeris_time
 
     @property
-    def frame_trace(self):
-        frame_codes = [self.sensor_frame_id]
-        _, frame_type, _ = spice.frinfo(frame_codes[-1])
-        frame_types = [frame_type]
-
-        while(frame_codes[-1] != 1):
-            try:
-                center, frame_type, frame_type_id = spice.frinfo(frame_codes[-1])
-            except Exception as e:
-                print(e)
-                break
-
-            if frame_type is 1 or frame_type is 2:
-                frame_code = 1
-
-            elif frame_type is 3:
-                matrix, frame_code, found = spice.ckfrot(frame_type_id, self.center_ephemeris_time)
-                if not found:
-                    raise Exception(f"The ck rotation from frame {frame_codes[-1]} can not \
-                                      be found due to no pointing available at requested time \
-                                      or a problem with the frame")
-            elif frame_type is 4:
-                matrix, frame_code, found = spice.tkfram(frame_type_id)
-                if not found:
-                    raise Exception(f"The tk rotation from frame {frame_codes[-1]} can not \
-                                      be found")
-            elif frame_type is 5:
-                matrix, frame_code = spice.zzdynrot(frame_type_id, center, self.center_ephemeris_time)
-
-            else:
-                raise Exception(f"The frame {frame_codes[-1]} has a type {frame_type_id} \
-                                  not supported by your version of Naif Spicelib. \
-                                  You need to update.")
-
-            frame_codes.append(frame_code)
-            frame_types.append(frame_type)
-        constant_frames = [frame_codes[i] for i, frame_type in enumerate(frame_types) if frame_type == 4]
-
-        time_dependent_frames = []
-        if len(constant_frames) != 0:
-            time_dependent_frames.append(constant_frames[-1])
-
-        for i, frame_type in enumerate(frame_types):
-            if frame_type != 4:
-                time_dependent_frames.append(frame_codes[i])
-
-        return time_dependent_frames, constant_frames
-
-    @property
     def frame_chain(self):
         if not hasattr(self, '_frame_chain'):
-            time_dependent_frames, constant_frames = self.frame_trace
-
-            self._frame_chain = FrameChain.from_spice(time_dependent_frames = time_dependent_frames,
-                                                      constant_frames = constant_frames,
-                                                      target_frames = [1, self.target_frame_id],
-                                                      ephemeris_time=self.ephemeris_time)
+            self._frame_chain = FrameChain.from_spice(sensor_frame=self.sensor_frame_id,
+                                                      target_frame=self.target_frame_id,
+                                                      center_ephemeris_time=self.center_ephemeris_time,
+                                                      ephemeris_times=self.ephemeris_time)
         return self._frame_chain
 
     @property

@@ -82,7 +82,7 @@ class TestDriver(Driver):
             100,
             1
         )
-        frame_chain.add_edge(100, 1, rotation=body_rotation)
+        frame_chain.add_edge(rotation=body_rotation)
 
         spacecraft_rotation = TimeDependentRotation(
             np.array([[0, 0, 0, 1], [0, 0, 0, 1]]),
@@ -90,10 +90,10 @@ class TestDriver(Driver):
             1000,
             1
         )
-        frame_chain.add_edge(1000, 1, rotation=spacecraft_rotation)
+        frame_chain.add_edge(rotation=spacecraft_rotation)
 
         sensor_rotation = ConstantRotation(np.array([0, 0, 0, 1]), 1010, 1000)
-        frame_chain.add_edge(1010, 1000, rotation=sensor_rotation)
+        frame_chain.add_edge(rotation=sensor_rotation)
         return frame_chain
 
     @property
@@ -162,7 +162,6 @@ def test_camera_version(driver):
 def test_instrument_pointing(driver):
     meta_data = isis_formatter.to_isis(driver)
     pointing = meta_data['InstrumentPointing']
-    print(pointing)
     assert pointing['TimeDependentFrames'] == [1000, 1]
     assert pointing['ConstantFrames'] == [1010, 1000]
     np.testing.assert_equal(pointing['ConstantRotation'], np.array([1., 0., 0., 0., 1., 0., 0., 0., 1.]))

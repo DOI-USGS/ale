@@ -89,16 +89,21 @@ class FrameChain(nx.DiGraph):
                      of frame rotations in the frame chain
     """
     @classmethod
-    def from_spice(cls, *args, time_dependent_frames=[], constant_frames=[], target_frames=[], ephemeris_time=[], **kwargs):
+    def from_spice(cls, *args, sensor_frame, target_frame, center_ephemeris_time, ephemeris_times=[], **kwargs):
         frame_chain = cls()
 
-        times = np.array(ephemeris_time)
+        times = np.array(ephemeris_times)
 
-        time_dependent_frames = [(frame, time_dependent_frames[i+1]) for i, frame in enumerate(time_dependent_frames[:-1])]
-        constant_frames = [(frame, constant_frames[i+1]) for i, frame in enumerate(constant_frames[:-1])]
-        target_frames = [(frame, target_frames[i+1]) for i, frame in enumerate(target_frames[:-1])]
+        sensor_time_dependent_frames, sensor_constant_frames = cls.frame_trace(sensor_frame, center_ephemeris_time)
+        target_time_dependent_frames, target_constant_frames = cls.frame_trace(target_frame, center_ephemeris_time)
 
-        time_dependent_frames.extend(target_frames)
+        time_dependent_frames = list(zip(sensor_time_dependent_frames[:-1], sensor_time_dependent_frames[1:]))
+        constant_frames = list(zip(sensor_constant_frames[:-1], sensor_constant_frames[1:]))
+        target_time_dependent_frames = list(zip(target_time_dependent_frames[:-1], target_time_dependent_frames[1:]))
+        target_constant_frames = list(zip(target_constant_frames[:-1], target_constant_frames[1:]))
+
+        time_dependent_frames.extend(target_time_dependent_frames)
+        constant_frames.extend(target_constant_frames)
 
         quats = np.zeros((len(times), 4))
 
@@ -110,7 +115,7 @@ class FrameChain(nx.DiGraph):
                 quats[j,3] = quat_from_rotation[0]
 
             rotation = TimeDependentRotation(quats, times, s, d)
-            frame_chain.add_edge(s, d, rotation=rotation)
+            frame_chain.add_edge(rotation=rotation)
 
         quats = np.zeros(4)
 
@@ -122,28 +127,81 @@ class FrameChain(nx.DiGraph):
 
             rotation = ConstantRotation(quats, s, d)
 
-            frame_chain.add_edge(s, d, rotation=rotation)
+            frame_chain.add_edge(rotation=rotation)
 
         return frame_chain
+
+    @staticmethod
+    def frame_trace(reference_frame, ephemeris_time):
+        frame_codes = [reference_frame]
+        _, frame_type, _ = spice.frinfo(frame_codes[-1])
+        frame_types = [frame_type]
+
+        while(frame_codes[-1] != 1):
+            try:
+                center, frame_type, frame_type_id = spice.frinfo(frame_codes[-1])
+            except Exception as e:
+                print(e)
+                break
+
+            if frame_type is 1 or frame_type is 2:
+                frame_code = 1
+
+            elif frame_type is 3:
+                try:
+                    matrix, frame_code = spice.ckfrot(frame_type_id, ephemeris_time)
+                except:
+                    raise Exception(f"The ck rotation from frame {frame_codes[-1]} can not \
+                                      be found due to no pointing available at requested time \
+                                      or a problem with the frame")
+            elif frame_type is 4:
+                try:
+                    matrix, frame_code = spice.tkfram(frame_type_id)
+                except:
+                    raise Exception(f"The tk rotation from frame {frame_codes[-1]} can not \
+                                      be found")
+            elif frame_type is 5:
+                matrix, frame_code = spice.zzdynrot(frame_type_id, center, ephemeris_time)
+
+            else:
+                raise Exception(f"The frame {frame_codes[-1]} has a type {frame_type_id} \
+                                  not supported by your version of Naif Spicelib. \
+                                  You need to update.")
+
+            frame_codes.append(frame_code)
+            frame_types.append(frame_type)
+        constant_frames = []
+        while frame_codes:
+            if frame_types[0] == 4:
+                constant_frames.append(frame_codes.pop(0))
+                frame_types.pop(0)
+            else:
+                break
+
+        time_dependent_frames = []
+        if len(constant_frames) != 0:
+            time_dependent_frames.append(constant_frames[-1])
+
+        while frame_codes:
+            time_dependent_frames.append(frame_codes.pop(0))
+
+        return time_dependent_frames, constant_frames
 
     @classmethod
     def from_isis_tables(cls, *args, inst_pointing={}, body_orientation={}, **kwargs):
         frame_chain = cls()
 
         for rotation in create_rotations(inst_pointing):
-            frame_chain.add_edge(rotation.source,
-                                 rotation.dest,
-                                 rotation=rotation)
+            frame_chain.add_edge(rotation=rotation)
 
         for rotation in create_rotations(body_orientation):
-            frame_chain.add_edge(rotation.source,
-                                 rotation.dest,
-                                 rotation=rotation)
+            frame_chain.add_edge(rotation=rotation)
         return frame_chain
 
-    def add_edge(self, s, d, rotation, **kwargs):
-        super(FrameChain, self).add_edge(s, d, rotation=rotation, **kwargs)
-        super(FrameChain, self).add_edge(d, s, rotation=rotation.inverse(), **kwargs)
+    def add_edge(self, rotation, **kwargs):
+        super(FrameChain, self).add_edge(rotation.source, rotation.dest, rotation=rotation, **kwargs)
+        rotation = rotation.inverse()
+        super(FrameChain, self).add_edge(rotation.source, rotation.dest, rotation=rotation, **kwargs)
 
     def compute_rotation(self, source, destination):
         """
