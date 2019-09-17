@@ -331,8 +331,8 @@ class NaifSpice():
                 vel.append(state[3:])
             # By default, spice works in km, and the vector returned by spkezr points the opposite
             # direction to what ALE needs, so it must be multiplied by (-1)
-            self._position = [p * -1000 for p in pos]
-            self._velocity = [v * -1000 for v in vel]
+            self._position = np.asarray([p * -1000 for p in pos])
+            self._velocity = np.asarray([v * -1000 for v in vel])
         return self._position, self._velocity, self.ephemeris_time
 
     @property
