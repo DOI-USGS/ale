@@ -107,7 +107,7 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         : double
           focal length in meters
         """
-        coeffs = spice.gdpool('INS{}_FL_TEMP_COEFFS '.format(self.fikid), 0, 6)
+        coeffs = spice.gdpool('INS{}_FL_TEMP_COEFFS'.format(self.fikid), 0, 6)
 
         # reverse coeffs, MDIS coeffs are listed a_0, a_1, a_2 ... a_n where
         # numpy wants them a_n, a_n-1, a_n-2 ... a_0
@@ -223,8 +223,24 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
 class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver):
     """
     Driver for reading MDIS ISIS3 Labels. These are Labels that have been ingested
-    into ISIS from PDS EDR images but have not been spiceinit'd yet.
+    into ISIS from PDS EDR images. Any SPCIE data attached by the spiceinit application
+    will be ignored.
     """
+    @property
+    def platform_name(self):
+        """
+        Returns the name of the platform containing the sensor. This is usually
+        the spacecraft name.
+
+        Messenger MDIS ISIS labels use upper camel case so this converts it to
+        all upper case.
+
+        Returns
+        -------
+        : str
+          Spacecraft name
+        """
+        return super().platform_name.upper()
 
     @property
     def instrument_id(self):
@@ -315,7 +331,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
         : double
           focal length in meters
         """
-        coeffs = spice.gdpool('INS{}_FL_TEMP_COEFFS '.format(self.fikid), 0, 5)
+        coeffs = spice.gdpool('INS{}_FL_TEMP_COEFFS'.format(self.fikid), 0, 6)
         # reverse coeffs, MDIS coeffs are listed a_0, a_1, a_2 ... a_n where
         # numpy wants them a_n, a_n-1, a_n-2 ... a_0
         f_t = np.poly1d(coeffs[::-1])
