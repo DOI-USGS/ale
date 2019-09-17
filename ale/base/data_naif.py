@@ -322,23 +322,26 @@ class NaifSpice():
                 # spkezr returns a vector from the observer's location to the aberration-corrected
                 # location of the target. For more information, see:
                 # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
-                state, _ = spice.spkezr(self.target_name,
+                state, _ = spice.spkezr(self.spacecraft_name,
                                        time,
                                        self.reference_frame,
                                        self.light_time_correction,
-                                       self.spacecraft_name,)
+                                       self.target_name,)
                 pos.append(state[:3])
                 vel.append(state[3:])
             # By default, spice works in km, and the vector returned by spkezr points the opposite
             # direction to what ALE needs, so it must be multiplied by (-1)
-            self._position = [p * -1000 for p in pos]
-            self._velocity = [v * -1000 for v in vel]
+            self._position = [p * 1000 for p in pos]
+            self._velocity = [v * 1000 for v in vel]
         return self._position, self._velocity, self.ephemeris_time
 
     @property
     def frame_chain(self):
         if not hasattr(self, '_frame_chain'):
-            self._frame_chain = FrameChain.from_spice(frame_changes = [(1, self.sensor_frame_id), (1, self.target_frame_id)], ephemeris_time=self.ephemeris_time)
+            self._frame_chain = FrameChain.from_spice(sensor_frame=self.sensor_frame_id,
+                                                      target_frame=self.target_frame_id,
+                                                      center_ephemeris_time=self.center_ephemeris_time,
+                                                      ephemeris_times=self.ephemeris_time)
         return self._frame_chain
 
     @property
