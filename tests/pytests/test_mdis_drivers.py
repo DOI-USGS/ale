@@ -28,15 +28,15 @@ def usgscsm_compare_dict():
         'semiminor': 2439.4,
         'unit': 'km'},
     'sensor_position': {
-        'positions': np.array([[-629657.4559945846, -1583350.7374122413, 1784408.773440049]]),
-        'velocities': np.array([[1732.8734290653545, 2504.0213215928925, 2412.578186708735]]),
+        'positions': np.array([[-629496.4862139452, -1582946.0091313303, 1783952.6403104223]]),
+        'velocities': np.array([[1732.186663134826, 2502.768253236102, 2412.6523222267365]]),
         'unit': 'm'},
     'sun_position': {
         'positions': np.array([[-4.68946673e+10, -5.36158427e+08,  2.71167863e+07]]),
         'velocities': np.array([[-4629.73346128, 256.72086237, 10.63960444]]),
         'unit': 'm'},
     'sensor_orientation': {
-        'quaternions': np.array([[ 0.93418372,  0.00144773, -0.00449382, -0.35676112]])},
+        'quaternions': np.array([[-0.9341837162001089, -0.0014477307579469636, 0.0044938223368195815, 0.3567611161870253]])},
     'detector_sample_summing': 2,
     'detector_line_summing': 2,
     'focal_length_model': {
