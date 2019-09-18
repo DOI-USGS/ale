@@ -71,9 +71,9 @@ def frame_tree(request):
         ConstantRotation(np.array([1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)]), 3, 2),
         ConstantRotation(np.array([1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)]), 4, 1)
     ]
-    frame_chain.add_edge(2, 1, rotation = rotations[0])
-    frame_chain.add_edge(3, 2, rotation = rotations[1])
-    frame_chain.add_edge(4, 1, rotation = rotations[2])
+    frame_chain.add_edge(rotation = rotations[0])
+    frame_chain.add_edge(rotation = rotations[1])
+    frame_chain.add_edge(rotation = rotations[2])
 
     return frame_chain, rotations
 
@@ -156,10 +156,10 @@ def test_last_time_dependent_frame_between():
             np.array([1]), 4, 1),
         ConstantRotation(np.array([1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)]), 5, 4)
     ]
-    frame_chain.add_edge(2, 1, rotation = rotations[0])
-    frame_chain.add_edge(3, 2, rotation = rotations[1])
-    frame_chain.add_edge(4, 1, rotation = rotations[2])
-    frame_chain.add_edge(5, 4, rotation = rotations[3])
+    frame_chain.add_edge(rotation = rotations[0])
+    frame_chain.add_edge(rotation = rotations[1])
+    frame_chain.add_edge(rotation = rotations[2])
+    frame_chain.add_edge(rotation = rotations[3])
 
     # last frame from node 1 to node 3
     s31, d31, _ = frame_chain.last_time_dependent_frame_between(1, 3)

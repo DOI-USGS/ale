@@ -322,12 +322,12 @@ class NaifSpice():
             pos = []
             vel = []
 
-            target = self.target_name
-            observer = self.spacecraft_name
+            target = self.spacecraft_name
+            observer = self.target_name
             # Check for ISIS flag to fix target and observer swapping
             if self.swap_observer_target:
-                target = self.spacecraft_name
-                observer = self.target_name
+                target = self.target_name
+                observer = self.spacecraft_name
 
             for time in ephem:
                 # spkezr returns a vector from the observer's location to the aberration-corrected
@@ -339,11 +339,11 @@ class NaifSpice():
                                         self.light_time_correction,
                                         observer)
                 if self.swap_observer_target:
-                    pos.append(state[:3])
-                    vel.append(state[3:])
-                else:
                     pos.append(-state[:3])
                     vel.append(-state[3:])
+                else:
+                    pos.append(state[:3])
+                    vel.append(state[3:])
 
             # By default, SPICE works in km, so convert to m
             self._position = [p * 1000 for p in pos]
@@ -353,7 +353,10 @@ class NaifSpice():
     @property
     def frame_chain(self):
         if not hasattr(self, '_frame_chain'):
-            self._frame_chain = FrameChain.from_spice(frame_changes = [(1, self.sensor_frame_id), (1, self.target_frame_id)], ephemeris_time=self.ephemeris_time)
+            self._frame_chain = FrameChain.from_spice(sensor_frame=self.sensor_frame_id,
+                                                      target_frame=self.target_frame_id,
+                                                      center_ephemeris_time=self.center_ephemeris_time,
+                                                      ephemeris_times=self.ephemeris_time)
         return self._frame_chain
 
     @property
