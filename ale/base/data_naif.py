@@ -30,7 +30,10 @@ class NaifSpice():
     def kernels(self):
         if not hasattr(self, '_kernels'):
             if 'kernels' in self._props.keys():
-                self._kernels =  self._props['kernels']
+                try:
+                    self._kernels = util.get_kernels_from_isis_pvl(self._props['kernels'])
+                except Exception as e:
+                    self._kernels =  self._props['kernels']
             else:
                 if not ale.spice_root:
                     raise EnvironmentError(f'ale.spice_root is not set, cannot search for metakernels. ale.spice_root = "{ale.spice_root}"')
@@ -445,7 +448,7 @@ class NaifSpice():
             self._naif_keywords['BODY_FRAME_CODE'] = self.target_frame_id
             self._naif_keywords['BODY_CODE'] = self.target_id
 
-            self._naif_keywords = {**self._naif_keywords, **util.query_kernel_pool(f"*{self.ikid}*")}
+            self._naif_keywords = {**self._naif_keywords, **util.query_kernel_pool(f"*{self.ikid}*"), **util.query_kernel_pool(f"*{self.target_id}*")}
 
         return self._naif_keywords
 
