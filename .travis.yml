@@ -40,7 +40,8 @@ install:
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
   - conda config --set always_yes yes
-  - conda env create -f environment.yml -n ale
+  - conda env create -n ale python=3.7.3
+  - conda env update -f environment.yml -n ale
   - source activate ale
   - conda install pytest
 
