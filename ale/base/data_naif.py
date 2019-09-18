@@ -49,11 +49,12 @@ class NaifSpice():
     def light_time_correction(self):
         """
         Returns the type of light time correciton and abberation correction to
-        use in NAIF calls.
+        use in NAIF calls. Expects ikid to be defined. This must be the integer
+        Naif id code of the instrument.
 
-        This defaults to light time correction and abberation correction (LT+S),
-        concrete drivers should override this if they need to either not use
-        light time correction or use a different type of light time correction.
+        This searches for the value of the NAIF keyword INS<ikid>_LIGHTTIME_CORRECTION.
+        If the keyword is not defined, then this defaults to light time
+        correction and abberation correction (LT+S).
 
         Returns
         -------
@@ -62,7 +63,10 @@ class NaifSpice():
           See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/abcorr.html
           for the different options available.
         """
-        return 'LT+S'
+        try:
+            return spice.gcpool('INS{}_LIGHTTIME_CORRECTION'.format(self.ikid), 0, 1)[0]
+        except:
+            return 'LT+S'
 
     @property
     def odtx(self):
@@ -321,10 +325,18 @@ class NaifSpice():
             pos = []
             vel = []
 
+            target = self.spacecraft_name
+            observer = self.target_name
+            # Check for ISIS flag to fix target and observer swapping
+            if self.swap_observer_target:
+                target = self.target_name
+                observer = self.spacecraft_name
+
             for time in ephem:
                 # spkezr returns a vector from the observer's location to the aberration-corrected
                 # location of the target. For more information, see:
                 # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
+<<<<<<< HEAD
                 state, _ = spice.spkezr(self.spacecraft_name,
                                        time,
                                        self.reference_frame,
@@ -334,6 +346,21 @@ class NaifSpice():
                 vel.append(state[3:])
             # By default, spice works in km, and the vector returned by spkezr points the opposite
             # direction to what ALE needs, so it must be multiplied by (-1)
+=======
+                state, _ = spice.spkezr(target,
+                                        time,
+                                        self.reference_frame,
+                                        self.light_time_correction,
+                                        observer)
+                if self.swap_observer_target:
+                    pos.append(-state[:3])
+                    vel.append(-state[3:])
+                else:
+                    pos.append(state[:3])
+                    vel.append(state[3:])
+
+            # By default, SPICE works in km, so convert to m
+>>>>>>> 67e17d642f7dfa678b9f7fb51c581d503d1b8c24
             self._position = [p * 1000 for p in pos]
             self._velocity = [v * 1000 for v in vel]
         return self._position, self._velocity, self.ephemeris_time
@@ -432,6 +459,39 @@ class NaifSpice():
         """
         return float(spice.gdpool('INS{}_BORESIGHT_LINE'.format(self.ikid), 0, 1)[0])
 
+
+    @property
+    def swap_observer_target(self):
+        """
+        Returns if the observer and target should be swapped when determining the
+        sensor state relative to the target. This is defined by a keyword in
+        ISIS IAKs. If the keyword is not defined in any loaded kernels then False
+        is returned.
+
+        Expects ikid to be defined. This should be an integer containing the
+        Naif Id code of the instrument.
+        """
+        try:
+            swap = spice.gcpool('INS{}_SWAP_OBSERVER_TARGET'.format(self.ikid), 0, 1)[0]
+            return swap.upper() == "TRUE"
+        except:
+            return False
+
+    @property
+    def correct_lt_to_surface(self):
+        """
+        Returns if light time correction should be made to the surface instead of
+        to the center of the body. This is defined by a keyword in ISIS IAKs.
+        If the keyword is not defined in any loaded kernels then False is returned.
+
+        Expects ikid to be defined. This should be an integer containing the
+        Naif Id code of the instrument.
+        """
+        try:
+            surface_correct = spice.gcpool('INS{}_LT_SURFACE_CORRECT'.format(self.ikid), 0, 1)[0]
+            return surface_correct.upper() == "TRUE"
+        except:
+            return False
 
     @property
     def naif_keywords(self):

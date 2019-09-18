@@ -83,6 +83,15 @@ class test_data_naif(unittest.TestCase):
     def test_detector_center_line(self):
         assert self.driver.detector_center_line == 0.430442527
 
+    def test_swap_observer_target(self):
+        assert not self.driver.swap_observer_target
+
+    def test_light_time_correction(self):
+        assert self.driver.light_time_correction == "LT+S"
+
+    def test_correct_lt_to_surface(self):
+        assert not self.driver.correct_lt_to_surface
+
     def test_sun_position(self):
         sun_positions, sun_velocities, times = self.driver.sun_position
         assert len(sun_positions) == 1
@@ -91,3 +100,26 @@ class test_data_naif(unittest.TestCase):
         np.testing.assert_allclose(sun_velocities[0], [9883868.06162645, 8989183.29614645, 881.9339912834714])
         assert len(times) == 1
         np.testing.assert_allclose(times[0], 297088762.61698407)
+
+def test_light_time_correction_keyword():
+    with patch('ale.base.data_naif.spice.gcpool', return_value=['NONE']) as gcpool, \
+         patch('ale.base.data_naif.NaifSpice.ikid', new_callable=PropertyMock) as ikid:
+        ikid.return_value = -12345
+        assert NaifSpice().light_time_correction == 'NONE'
+        gcpool.assert_called_with('INS-12345_LIGHTTIME_CORRECTION', 0, 1)
+
+@pytest.mark.parametrize(("key_val, return_val"), [(['TRUE'], True), (['FALSE'], False)])
+def test_swap_observer_target_keyword(key_val, return_val):
+    with patch('ale.base.data_naif.spice.gcpool', return_value=key_val) as gcpool, \
+         patch('ale.base.data_naif.NaifSpice.ikid', new_callable=PropertyMock) as ikid:
+        ikid.return_value = -12345
+        assert NaifSpice().swap_observer_target == return_val
+        gcpool.assert_called_with('INS-12345_SWAP_OBSERVER_TARGET', 0, 1)
+
+@pytest.mark.parametrize(("key_val, return_val"), [(['TRUE'], True), (['FALSE'], False)])
+def test_correct_lt_to_surface_keyword(key_val, return_val):
+    with patch('ale.base.data_naif.spice.gcpool', return_value=key_val) as gcpool, \
+         patch('ale.base.data_naif.NaifSpice.ikid', new_callable=PropertyMock) as ikid:
+        ikid.return_value = -12345
+        assert NaifSpice().correct_lt_to_surface == return_val
+        gcpool.assert_called_with('INS-12345_LT_SURFACE_CORRECT', 0, 1)
