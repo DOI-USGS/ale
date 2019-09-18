@@ -138,4 +138,5 @@ def test_exposure_duration(driver):
 def test_load(test_kernels, usgscsm_comparison_isd):
     label_file = get_image_label('M103595705LE')
     usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter='usgscsm')
+    print(usgscsm_isd)
     assert compare_dicts(usgscsm_isd, usgscsm_comparison_isd) == []

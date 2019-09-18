@@ -165,5 +165,6 @@ def test_load(test_kernels):
                 new_callable=PropertyMock) as mock_reference_frame:
         mock_reference_frame.return_value = 'IAU_MOON'
         usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter='usgscsm')
+    print(usgscsm_isd)
 
     assert compare_dicts(usgscsm_isd, isd) == []

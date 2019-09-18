@@ -30,7 +30,7 @@ requirements:
   run:
   - eigen
   - gsl
-  - netowrkx
+  - networkx
   - numpy
   - openblas
   - python
