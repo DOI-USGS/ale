@@ -1,0 +1,48 @@
+KPL/IK
+
+
+Voyager 2 Imaging Subsytem Wide Angle camera (ISSWA)
+----------------------------------------------------------------
+
+   Version 1   by Jeff Bytof -- 27 November 2000.
+
+      First version of the instrument kernel for Voyager 2's
+      ISSWA instrument. 
+
+
+\begintext
+
+
+  Field of view description
+  -------------------------
+   
+    - FOV is square with its sides along X and Y 
+      axes of the instrument's frame;
+
+    - full FOV angular size in X and Y directions is 3.169 degrees; 
+
+    - boresight vector intersects FOV exactly in the center of 
+      the rectangle;
+
+
+\begindata
+
+
+   INS-32102_FOV_FRAME            = 'VG2_ISSWA'
+
+   INS-32102_FOV_SHAPE            = 'RECTANGLE'
+
+   INS-32102_BORESIGHT            = ( 0.0   0.0    1.0 )
+                                    
+
+   INS-32102_FOV_BOUNDARY_CORNERS = ( 
+
+                                .02765    .02765   1.0
+                               -.02765    .02765   1.0
+                               -.02765   -.02765   1.0
+                                .02765   -.02765   1.0
+
+                                    )
+   
+\begintext
+
