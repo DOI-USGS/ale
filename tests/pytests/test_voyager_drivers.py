@@ -83,7 +83,6 @@ def test_kernels():
 
 @pytest.mark.parametrize("label_type", ['isis3'])
 @pytest.mark.parametrize("formatter", ['isis'])
-# @pytest.mark.skip(reason="Fails due to angular velocity problems")
 def test_voyager_load(test_kernels, label_type, formatter, isis_compare_dict):
     label_file = get_image_label('c2065022', label_type)
 
