@@ -230,6 +230,6 @@ def test_rotate_velocity_at():
     input_times = [1, 2, 3]
     rot_vel = rot.rotate_velocity_at(input_pos, input_vel, input_times)
     np.testing.assert_almost_equal(rot_vel,
-                                   [[-1, -3 - np.pi, 2 - 3*np.pi/2],
-                                    [1 + 2*np.pi, -3, -2 + np.pi],
-                                    [3 + np.pi/2, 1 - 3*np.pi/2, -2]])
+                                   [[-1, -3 + np.pi, 2 + 3*np.pi/2],
+                                    [1 + 3*np.pi, -3 + np.pi, -2],
+                                    [3, 1 - np.pi, -2 - np.pi/2]])

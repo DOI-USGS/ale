@@ -366,7 +366,7 @@ class TimeDependentRotation:
             skew = np.array([[0, -avs[indx, 2], avs[indx, 1]],
                              [avs[indx, 2], 0, -avs[indx, 0]],
                              [-avs[indx, 1], avs[indx, 0], 0]])
-            rot_deriv = np.dot(skew, rots[indx].as_dcm())
+            rot_deriv = np.dot(skew, rots[indx].as_dcm().T).T
             rotated_vel[indx] = rots[indx].apply(vec_vel[indx])
             rotated_vel[indx] += np.dot(rot_deriv, vec_pos[indx])
 

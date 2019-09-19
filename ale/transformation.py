@@ -110,7 +110,7 @@ class FrameChain(nx.DiGraph):
             avs = np.zeros((len(times), 3))
             for j, time in enumerate(times):
                 state_matrix = spice.sxform(spice.frmnam(s), spice.frmnam(d), time)
-                rotation_matrix, avs[i] = spice.xf2rav(state_matrix)
+                rotation_matrix, avs[j] = spice.xf2rav(state_matrix)
                 quat_from_rotation = spice.m2q(rotation_matrix)
                 quats[j,:3] = quat_from_rotation[1:]
                 quats[j,3] = quat_from_rotation[0]

@@ -51,13 +51,15 @@ def isis_compare_dict():
                            'CkTableEndTime': -646346832.89712,
                            'CkTableOriginalSize': 1,
                            'EphemerisTimes': [-646346832.89712],
-                           'Quaternions': [[0.34057881936764,0.085849252725072,0.69748691965044,-0.62461825983655]]},
+                           'Quaternions': [[0.34057881936764,0.085849252725072,0.69748691965044,-0.62461825983655]],
+                           'AngularVelocity': [[0.0, 0.0, 0.0]]},
     'BodyRotation': {'TimeDependentFrames': [10024, 1],
                      'CkTableStartTime': -646346832.89712,
                      'CkTableEndTime': -646346832.89712,
                      'CkTableOriginalSize': 1,
                      'EphemerisTimes': [-646346832.89712],
-                     'Quaternions': [[-0.029536576144092695, 0.010097306192904288, 0.22183794661925513, -0.9745837883512549]]},
+                     'Quaternions': [[-0.029536576144092695, 0.010097306192904288, 0.22183794661925513, -0.9745837883512549]],
+                     'AngularVelocity': [[-6.713536787324419e-07, -8.842601122842458e-06, 1.845852958470088e-05]]},
     'InstrumentPosition': {'SpkTableStartTime': -646346832.89712,
                            'SpkTableEndTime': -646346832.89712,
                            'SpkTableOriginalSize': 1,
@@ -81,12 +83,11 @@ def test_kernels():
 
 @pytest.mark.parametrize("label_type", ['isis3'])
 @pytest.mark.parametrize("formatter", ['isis'])
-@pytest.mark.skip(reason="Fails due to angular velocity problems")
+# @pytest.mark.skip(reason="Fails due to angular velocity problems")
 def test_voyager_load(test_kernels, label_type, formatter, isis_compare_dict):
     label_file = get_image_label('c2065022', label_type)
 
     usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels}, formatter=formatter)
     usgscsm_isd_obj = json.loads(usgscsm_isd_str)
     print(usgscsm_isd_obj)
-
     assert compare_dicts(usgscsm_isd_obj, isis_compare_dict) == []
