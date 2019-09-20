@@ -53,8 +53,6 @@ def load(label, props={}, formatter='usgscsm', verbose=True):
     label : str
                String path to the given label file
     """
-    print(props)
-
     if isinstance(formatter, str):
         formatter = __formatters__[formatter]
 
