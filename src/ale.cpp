@@ -367,7 +367,7 @@ namespace ale {
      // Create a Python tuple to hold the arguments to the method.
      PyObject *pArgs = PyTuple_New(3);
      if(!pArgs) {
-       throw runtime_error("whoops");
+       throw runtime_error(getPyTraceback());
      }
 
      // Set the Python int as the first and second arguments to the method.
@@ -380,14 +380,9 @@ namespace ale {
      PyObject *pStringFormatter = PyUnicode_FromString(formatter.c_str());
      PyTuple_SetItem(pArgs, 2, pStringFormatter);
 
-
      // Call the function with the arguments.
-     PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
-     //Py_DECREF(pStringFileName);
-     //Py_DECREF(pStringProps);
-     //Py_DECREF(pStringFormatter);
-     //Py_DECREF(pArgs);
-     
+     PyObject* pResult = PyObject_CallObject(pFunc, pArgs); 
+
      if(!pResult) {
         throw invalid_argument("No Valid instrument found for label.");
      }
@@ -402,8 +397,11 @@ namespace ale {
      char *temp_str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
      cResult = temp_str; // copy into std::string
 
-     // Py_DECREF(pResultStr);
-      
+     Py_DECREF(pResultStr); 
+     Py_DECREF(pStringFileName);
+     Py_DECREF(pStringProps);
+     Py_DECREF(pStringFormatter); 
+
      return cResult;
  }
 
@@ -411,10 +409,4 @@ namespace ale {
    std::string jsonstr = loads(filename, props, formatter, verbose);
    return json::parse(jsonstr);
  }
-
-
-
-
-
-
 }

@@ -16,34 +16,43 @@ from conftest import get_image_kernels, convert_kernels, get_image_label, compar
 def isis_compare_dict():
     return {
     'CameraVersion': 1,
-    'NaifKeywords': {'BODY502_RADII': [1564.13, 1561.23, 1560.93],
-                     'BODY_FRAME_CODE': 10024,
-                     'BODY_CODE': 502,
-                     'FRAME_-32101_CLASS_ID': -32101.0,
-                     'TKFRAME_-32101_AXES': [1.0, 2.0, 3.0],
-                     'TKFRAME_-32101_SPEC': 'ANGLES',
-                     'INS-32101_CK_REFERENCE_ID': 2.0,
-                     'TKFRAME_-32101_ANGLES': [0.0, 0.0, 0.0],
-                     'FRAME_-32101_CENTER': -32.0,
-                     'INS-32101_PLATFORM_ID': -32001.0,
-                     'TKFRAME_-32101_RELATIVE': 'VG2_SCAN_PLATFORM',
-                     'INS-32101_FOCAL_LENGTH': 1503.49,
-                     'INS-32101_TRANSX': [0.0, 0.011789473651194, 0.0],
-                     'FRAME_-32101_CLASS': 4.0,
-                     'INS-32101_TRANSY': [0.0, 0.0, 0.011789473651194],
-                     'INS-32101_BORESIGHT': [0.0, 0.0, 1.0],
-                     'INS-32101_PIXEL_PITCH': 0.011789473651194,
-                     'INS-32101_FOV_SHAPE': 'RECTANGLE',
-                     'INS-32101_ITRANSL': [0.0, 0.0, 84.8214288089711],
-                     'INS-32101_ITRANSS': [0.0, 84.8214288089711, 0.0],
-                     'INS-32101_FOV_BOUNDARY_CORNERS': [0.003700098, 0.003700098, 1.0, -0.003700098, 0.003700098, 1.0, -0.003700098, -0.003700098, 1.0, 0.003700098],
-                     'INS-32101_CK_FRAME_ID': -32100.0,
-                     'TKFRAME_-32101_UNITS': 'DEGREES',
-                     'INS-32101_FOV_FRAME': 'VG2_ISSNA',
-                     'INS-32101_CK_TIME_TOLERANCE': 2000.0,
-                     'INS-32101_SPK_TIME_BIAS': 0.0,
-                     'INS-32101_CK_TIME_BIAS': 0.0,
-                     'FRAME_-32101_NAME': 'VG2_ISSNA'},
+    'NaifKeywords': {
+        "BODY502_RADII": [1564.13, 1561.23, 1560.93],
+        "BODY_FRAME_CODE": 10024,
+        "BODY_CODE": 502,
+        "FRAME_-32101_CLASS_ID": -32101.0,
+        "TKFRAME_-32101_AXES": [1.0,2.0,3.0],
+        "TKFRAME_-32101_SPEC": "ANGLES",
+        "INS-32101_CK_REFERENCE_ID": 2.0,
+        "TKFRAME_-32101_ANGLES": [0.0,0.0,0.0],
+        "FRAME_-32101_CENTER": -32.0,
+        "INS-32101_PLATFORM_ID": -32001.0,
+        "TKFRAME_-32101_RELATIVE": "VG2_SCAN_PLATFORM",
+        "INS-32101_FOCAL_LENGTH": 1503.49,
+        "INS-32101_TRANSX": [0.0,0.011789473651194,0.0],
+        "FRAME_-32101_CLASS": 4.0,
+        "INS-32101_TRANSY": [0.0,0.0,0.011789473651194],
+        "INS-32101_BORESIGHT": [0.0,0.0,1.0],
+        "INS-32101_PIXEL_PITCH": 0.011789473651194,
+        "INS-32101_FOV_SHAPE": "RECTANGLE",
+        "INS-32101_ITRANSL": [0.0,0.0,84.8214288089711],
+        "INS-32101_ITRANSS": [0.0,84.8214288089711,0.0],
+        "INS-32101_FOV_BOUNDARY_CORNERS": [0.003700098,0.003700098,1.0,-0.003700098,0.003700098,1.0,-0.003700098,-0.003700098,1.0,0.003700098],
+        "INS-32101_CK_FRAME_ID": -32100.0,
+        "TKFRAME_-32101_UNITS": "DEGREES",
+        "INS-32101_FOV_FRAME": "VG2_ISSNA",
+        "INS-32101_CK_TIME_TOLERANCE": 2000.0,
+        "INS-32101_SPK_TIME_BIAS": 0.0,
+        "INS-32101_CK_TIME_BIAS": 0.0,
+        "FRAME_-32101_NAME": "VG2_ISSNA",
+        "BODY502_POLE_RA": [268.08,-0.009,0.0],
+        "BODY502_NUT_PREC_DEC": [0.0,0.0,0.0,0.468,0.026,0.007,0.002],
+        "BODY502_POLE_DEC": [64.51,0.003,0.0],
+        "BODY502_NUT_PREC_PM": [0.0,0.0,0.0,-0.98,-0.054,-0.014,-0.008],
+        "BODY502_LONG_AXIS": 0.0,
+        "BODY502_PM": [36.022,101.3747235,0.0],
+        "BODY502_NUT_PREC_RA": [0.0,0.0,0.0,1.086,0.06,0.015,0.009]
+    },
     'InstrumentPointing': {'TimeDependentFrames': [-32100, 2, 1],
                            'ConstantFrames': [-32101, -32100],
                            'ConstantRotation': (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0),
@@ -51,13 +60,15 @@ def isis_compare_dict():
                            'CkTableEndTime': -646346832.89712,
                            'CkTableOriginalSize': 1,
                            'EphemerisTimes': [-646346832.89712],
-                           'Quaternions': [[0.34057881936764,0.085849252725072,0.69748691965044,-0.62461825983655]]},
+                           'Quaternions': [[0.34057881936764,0.085849252725072,0.69748691965044,-0.62461825983655]],
+                           'AngularVelocity': [[0.0, 0.0, 0.0]]},
     'BodyRotation': {'TimeDependentFrames': [10024, 1],
                      'CkTableStartTime': -646346832.89712,
                      'CkTableEndTime': -646346832.89712,
                      'CkTableOriginalSize': 1,
                      'EphemerisTimes': [-646346832.89712],
-                     'Quaternions': [[-0.029536576144092695, 0.010097306192904288, 0.22183794661925513, -0.9745837883512549]]},
+                     'Quaternions': [[-0.029536576144092695, 0.010097306192904288, 0.22183794661925513, -0.9745837883512549]],
+                     'AngularVelocity': [[-6.713536787324419e-07, -8.842601122842458e-06, 1.845852958470088e-05]]},
     'InstrumentPosition': {'SpkTableStartTime': -646346832.89712,
                            'SpkTableEndTime': -646346832.89712,
                            'SpkTableOriginalSize': 1,
@@ -81,12 +92,10 @@ def test_kernels():
 
 @pytest.mark.parametrize("label_type", ['isis3'])
 @pytest.mark.parametrize("formatter", ['isis'])
-@pytest.mark.skip(reason="Fails due to angular velocity problems")
 def test_voyager_load(test_kernels, label_type, formatter, isis_compare_dict):
     label_file = get_image_label('c2065022', label_type)
 
     usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels}, formatter=formatter)
     usgscsm_isd_obj = json.loads(usgscsm_isd_str)
-    print(usgscsm_isd_obj)
-
+    print(json.dumps(usgscsm_isd_obj, indent=2))
     assert compare_dicts(usgscsm_isd_obj, isis_compare_dict) == []

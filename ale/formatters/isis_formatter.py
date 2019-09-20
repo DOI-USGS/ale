@@ -40,6 +40,7 @@ def to_isis(driver):
     instrument_pointing['CkTableOriginalSize'] = len(time_dependent_rotation.times)
     instrument_pointing['EphemerisTimes'] = time_dependent_rotation.times
     instrument_pointing['Quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
+    instrument_pointing['AngularVelocity'] = time_dependent_rotation.av
 
     # Reverse the frame order because ISIS orders frames as
     # (destination, intermediate, ..., intermediate, source)
@@ -61,6 +62,7 @@ def to_isis(driver):
         body_rotation['CkTableOriginalSize'] = len(time_dependent_rotation.times)
         body_rotation['EphemerisTimes'] = time_dependent_rotation.times
         body_rotation['Quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
+        body_rotation['AngularVelocity'] = time_dependent_rotation.av
 
     if source_frame != target_frame:
         # Reverse the frame order because ISIS orders frames as

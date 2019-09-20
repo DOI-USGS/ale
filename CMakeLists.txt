@@ -53,7 +53,7 @@ if(BUILD_TESTS)
                         PRIVATE
                         GSL::gsl
                         GSL::gslcblas
-                        ${PYTHON_LIBRARY}
+                        Python::Python
                         PUBLIC
                         gtest ${CMAKE_THREAD_LIBS_INIT})
   enable_testing()

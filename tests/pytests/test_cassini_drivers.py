@@ -61,8 +61,7 @@ def test_kernels(scope="module", autouse=True):
 def test_cassini_load(test_kernels, usgscsm_compare_dict):
     label_file = get_image_label("N1702360370_1")
     usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter='usgscsm')
-    print(usgscsm_isd['sensor_position'])
-    print(usgscsm_isd['sensor_orientation'])
+    print(usgscsm_isd)
     assert compare_dicts(usgscsm_isd, usgscsm_compare_dict) == []
 
 # ========= Test cassini pds3label and naifspice driver =========

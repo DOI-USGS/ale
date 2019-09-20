@@ -121,7 +121,7 @@ namespace ale {
   double interpolate(std::vector<double> points, std::vector<double> times, double time, interpolation interp, int d);
   std::string loads(std::string filename, std::string props="", std::string formatter="usgscsm", bool verbose=true);
 
-json load(std::string filename, std::string props="", std::string formatter="usgscsm", bool verbose=true);
+  json load(std::string filename, std::string props="", std::string formatter="usgscsm", bool verbose=true);
 
 
 }
