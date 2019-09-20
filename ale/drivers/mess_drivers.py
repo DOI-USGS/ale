@@ -334,6 +334,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
             self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
         return self._starting_ephemeris_time
 
+    @property
     def usgscsm_distortion_model(self):
         """
         Returns a dictionary containing the distortion model.
