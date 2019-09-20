@@ -110,7 +110,7 @@ class ConstantRotation:
             new_rot = self._rot * other._rot
             return ConstantRotation(new_rot.as_quat(), other.source, self.dest)
         elif isinstance(other, TimeDependentRotation):
-            return TimeDependentRotation((self._rot * other._rots).as_quat(), other.times, other.source, self.dest)
+            return TimeDependentRotation((self._rot * other._rots).as_quat(), other.times, other.source, self.dest, av=self._rot.apply(other.av))
         else:
             raise TypeError("Rotations can only be composed with other rotations.")
 
@@ -155,7 +155,7 @@ class TimeDependentRotation:
         rot = Rotation.from_euler(sequence, np.asarray(euler), degrees=degrees)
         return TimeDependentRotation(rot.as_quat(), times, source, dest)
 
-    def __init__(self, quats, times, source, dest):
+    def __init__(self, quats, times, source, dest, av=None):
         """
         Construct a time dependent rotation
 
@@ -173,14 +173,22 @@ class TimeDependentRotation:
                  The NAIF ID code for the source frame
         dest : int
                The NAIF ID code for the destination frame
+        av : 2darray
+             The angular velocity of the rotation at each time as a 2d numpy array.
+             If not entered, then angular velocity will be computed by assuming constant
+             angular velocity between times.
         """
         self.source = source
         self.dest = dest
-        self.quats = np.asarray(quats)
-        self.times = np.asarray(times)
+        self.quats = quats
+        self.times = np.atleast_1d(times)
+        if av is not None:
+            self.av = np.asarray(av)
+        else:
+            self.av = av
 
     def __repr__(self):
-        return f'Time Dependent Rotation Source: {self.source}, Destination: {self.dest}, Quat: {self.quats}'
+        return f'Time Dependent Rotation Source: {self.source}, Destination: {self.dest}, Quats: {self.quats}, AV: {self.av}, Times: {self.times}'
 
     @property
     def quats(self):
@@ -202,25 +210,29 @@ class TimeDependentRotation:
                     The new quaternions as a 2d array. The quaternions must be
                     in scalar last format (x, y, z, w).
         """
-        self._rots = Rotation.from_quat(np.asarray(new_quats))
+        self._rots = Rotation.from_quat(new_quats)
 
     def inverse(self):
         """
         Get the inverse rotation, that is the rotation from the destination
         reference frame to the source reference frame.
         """
-        return TimeDependentRotation(self._rots.inv().as_quat(), self.times, self.dest, self.source)
+        if self.av is not None:
+            new_av = -self._rots.apply(self.av)
+        else:
+            new_av = None
+        return TimeDependentRotation(self._rots.inv().as_quat(), self.times, self.dest, self.source, av=new_av)
 
     def _slerp(self, times):
         """
-        Using SLERP interpolate the rotation and angular velocity at specific times
+        Using SLERP interpolate the rotation and angular velocity at
+        specific times.
 
-        This uses the same code as scipy SLERP, except it extrapolates
-        assuming constant angular velocity before and after the first
-        and last intervals.
-
-        If the this rotation is only defined at one time, then the rotation is
-        assumed to be constant.
+        Times outside of the range covered by this rotation are extrapolated
+        assuming constant angular velocity. If the rotation has angular velocities
+        stored, then the first and last angular velocity are used for extrapolation.
+        Otherwise, the angular velocities from the first and last interpolation
+        interval are used for extrapolation.
 
         Parameters
         ----------
@@ -234,23 +246,47 @@ class TimeDependentRotation:
          : 2darray
            The angular velocity vectors
         """
-        vec_times = np.asarray(times)
-        if vec_times.ndim < 1:
-            vec_times = np.asarray([times])
-        elif vec_times.ndim > 1:
+        # Convert non-vector input to vector and check input
+        vec_times = np.atleast_1d(times)
+        if vec_times.ndim > 1:
             raise ValueError('Input times must be either a float or a 1d iterable of floats')
-        if len(self.times) < 2:
-            return Rotation.from_quat(np.repeat(self.quats, len(vec_times), 0)), np.zeros((len(vec_times), 3))
+
+        # Compute constant angular velocity for interpolation intervals
+        avs = np.zeros((len(self.times) + 1, 3))
+        if len(self.times) > 1:
+            steps = self.times[1:] - self.times[:-1]
+            rotvecs = (self._rots[1:] * self._rots[:-1].inv()).as_rotvec()
+            avs[1:-1] = rotvecs / steps[:, None]
+
+        # If available use actual angular velocity for extrapolation
+        # Otherwise use the adjacent interpolation interval
+        if self.av is not None:
+            avs[0] = self.av[0]
+            avs[-1] = self.av[-1]
         else:
-            idx = np.searchsorted(self.times, vec_times) - 1
-            idx[idx >= len(self.times) - 1] = len(self.times) - 2
-            idx[idx < 0] = 0
-            steps = self.times[idx+1] - self.times[idx]
-            rotvecs = (self._rots[idx + 1] * self._rots[idx].inv()).as_rotvec()
-            alpha = (vec_times - self.times[idx]) / steps
-            interp_rots = Rotation.from_rotvec(rotvecs * alpha[:, None]) * self._rots[idx]
-            interp_av = rotvecs / steps[:, None]
-            return interp_rots, interp_av
+            avs[0] = avs[1]
+            avs[-1] = avs[-2]
+
+        # Determine interpolation intervals for input times
+        av_idx = np.searchsorted(self.times, vec_times)
+        rot_idx = av_idx - 1
+        rot_idx[rot_idx < 0] = 0
+
+        # Interpolate/extrapolate rotations
+        time_diffs = vec_times - self.times[rot_idx]
+        interp_av = avs[av_idx]
+        interp_rots = Rotation.from_rotvec(interp_av * time_diffs[:, None]) * self._rots[rot_idx]
+
+        # If actual angular velocities are available, linearly interpolate them
+        if self.av is not None:
+            av_diff = np.zeros((len(self.times), 3))
+            if len(self.times) > 1:
+                av_diff[:-1] = self.av[1:] - self.av[:-1]
+                av_diff[-1] = av_diff[-2]
+            interp_av = self.av[rot_idx] + (av_diff[rot_idx] * time_diffs[:, None])
+
+        return interp_rots, interp_av
+
 
     def reinterpolate(self, times):
         """
@@ -264,10 +300,10 @@ class TimeDependentRotation:
         Returns
         -------
          : TimeDependentRotation
-           The new rotation that the input times
+           The new rotation at the input times
         """
-        new_rots, _ = self._slerp(times)
-        return TimeDependentRotation(new_rots.as_quat(), times, self.source, self.dest)
+        new_rots, av = self._slerp(times)
+        return TimeDependentRotation(new_rots.as_quat(), times, self.source, self.dest, av=av)
 
     def __mul__(self, other):
         """
@@ -289,11 +325,14 @@ class TimeDependentRotation:
         if self.source != other.dest:
             raise ValueError("Destination frame of first rotation {} is not the same as source frame of second rotation {}.".format(other.dest, self.source))
         if isinstance(other, ConstantRotation):
-            return TimeDependentRotation((self._rots * other._rot).as_quat(), self.times, other.source, self.dest)
+            return TimeDependentRotation((self._rots * other._rot).as_quat(), self.times, other.source, self.dest, av=self.av)
         elif isinstance(other, TimeDependentRotation):
             merged_times = np.union1d(np.asarray(self.times), np.asarray(other.times))
-            new_quats = (self.reinterpolate(merged_times)._rots * other.reinterpolate(merged_times)._rots).as_quat()
-            return TimeDependentRotation(new_quats, merged_times, other.source, self.dest)
+            reinterp_self = self.reinterpolate(merged_times)
+            reinterp_other = other.reinterpolate(merged_times)
+            new_quats = (reinterp_self._rots * reinterp_other._rots).as_quat()
+            new_av = reinterp_self.av + reinterp_self._rots.apply(reinterp_other.av)
+            return TimeDependentRotation(new_quats, merged_times, other.source, self.dest, av=new_av)
         else:
             raise TypeError("Rotations can only be composed with other rotations.")
 
@@ -326,7 +365,7 @@ class TimeDependentRotation:
             skew = np.array([[0, -avs[indx, 2], avs[indx, 1]],
                              [avs[indx, 2], 0, -avs[indx, 0]],
                              [-avs[indx, 1], avs[indx, 0], 0]])
-            rot_deriv = np.dot(skew, rots[indx].as_dcm())
+            rot_deriv = np.dot(skew, rots[indx].as_dcm().T).T
             rotated_vel[indx] = rots[indx].apply(vec_vel[indx])
             rotated_vel[indx] += np.dot(rot_deriv, vec_pos[indx])
 

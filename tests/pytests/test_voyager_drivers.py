@@ -52,13 +52,15 @@ image_dict = {
                                    'CkTableEndTime': -646346832.89712,
                                    'CkTableOriginalSize': 1,
                                    'EphemerisTimes': [-646346832.89712],
-                                   'Quaternions': [[0.34057881936764,0.085849252725072,0.69748691965044,-0.62461825983655]]},
+                                   'Quaternions': [[0.34057881936764,0.085849252725072,0.69748691965044,-0.62461825983655]],
+                                   'AngularVelocity' : [[0, 0, 0]]},
             'BodyRotation': {'TimeDependentFrames': [10024, 1],
                              'CkTableStartTime': -646346832.89712,
                              'CkTableEndTime': -646346832.89712,
                              'CkTableOriginalSize': 1,
                              'EphemerisTimes': [-646346832.89712],
-                             'Quaternions': [[-0.029536576144092695, 0.010097306192904288, 0.22183794661925513, -0.9745837883512549]]},
+                             'Quaternions': [[-0.029536576144092695, 0.010097306192904288, 0.22183794661925513, -0.9745837883512549]],
+                             'AngularVelocity' : [[-1.3462902248136902e-07, -8.86702528492048e-06, 1.8458530884981245e-05]]},
             'InstrumentPosition': {'SpkTableStartTime': -646346832.89712,
                                    'SpkTableEndTime': -646346832.89712,
                                    'SpkTableOriginalSize': 1,
@@ -271,12 +273,11 @@ def test_kernels():
 @pytest.mark.parametrize("label_type", ['isis3'])
 @pytest.mark.parametrize("formatter", ['isis'])
 @pytest.mark.parametrize("image", image_dict.keys())
-# @pytest.mark.skip(reason="Fails due to angular velocity problems")
 def test_voyager_load(test_kernels, label_type, formatter, image):
     label_file = get_image_label(image, label_type)
 
     usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]}, formatter=formatter)
     usgscsm_isd_obj = json.loads(usgscsm_isd_str)
-    print(usgscsm_isd_obj)
+    print(json.dumps(usgscsm_isd_obj, indent=2))
 
     assert compare_dicts(usgscsm_isd_obj, image_dict[image][formatter]) == []

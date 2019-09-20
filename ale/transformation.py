@@ -105,21 +105,21 @@ class FrameChain(nx.DiGraph):
         time_dependent_frames.extend(target_time_dependent_frames)
         constant_frames.extend(target_constant_frames)
 
-        quats = np.zeros((len(times), 4))
-
         for s, d in time_dependent_frames:
+            quats = np.zeros((len(times), 4))
+            avs = np.zeros((len(times), 3))
             for j, time in enumerate(times):
-                rotation_matrix = spice.pxform(spice.frmnam(s), spice.frmnam(d), time)
+                state_matrix = spice.sxform(spice.frmnam(s), spice.frmnam(d), time)
+                rotation_matrix, avs[j] = spice.xf2rav(state_matrix)
                 quat_from_rotation = spice.m2q(rotation_matrix)
                 quats[j,:3] = quat_from_rotation[1:]
                 quats[j,3] = quat_from_rotation[0]
 
-            rotation = TimeDependentRotation(quats, times, s, d)
+            rotation = TimeDependentRotation(quats, times, s, d, av=avs)
             frame_chain.add_edge(rotation=rotation)
 
-        quats = np.zeros(4)
-
         for s, d in constant_frames:
+            quats = np.zeros(4)
             rotation_matrix = spice.pxform(spice.frmnam(s), spice.frmnam(d), times[0])
             quat_from_rotation = spice.m2q(rotation_matrix)
             quats[:3] = quat_from_rotation[1:]
