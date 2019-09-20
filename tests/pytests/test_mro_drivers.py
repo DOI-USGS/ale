@@ -66,48 +66,162 @@ def usgscsm_compare_dict():
 def isis_compare_dict():
     return {
     'CameraVersion': 1,
-    'NaifKeywords': {
-      'BODY499_RADII': [3396.19, 3396.19, 3376.2],
-      'BODY_FRAME_CODE': 10014,
-      'BODY_CODE': 499,
-      'INS-74021_FOV_ANGLE_UNITS': 'DEGREES',
-      'TKFRAME_-74021_UNITS': 'DEGREES',
-      'INS-74021_FOV_ANGULAR_SIZE': [5.73, 0.001146],
-      'INS-74021_PIXEL_LINES': 1.0,
-      'TKFRAME_-74021_ANGLES': [0.0, 0.0, 0.0],
-      'INS-74021_IFOV': [2e-05, 2e-05],
-      'FRAME_-74021_CENTER': -74.0,
-      'INS-74021_F/RATIO': 3.25,
-      'INS-74021_PLATFORM_ID': -74000.0,
-      'INS-74021_CCD_CENTER': [2500.5, 0.5],
-      'INS-74021_PIXEL_SAMPLES': 5000.0,
-      'INS-74021_FOCAL_LENGTH': 352.9271664,
-      'INS-74021_FOV_CROSS_ANGLE': 0.00057296,
-      'INS-74021_TRANSX': [0.0, 0.0, 0.007],
-      'INS-74021_FOV_CLASS_SPEC': 'ANGLES',
-      'INS-74021_TRANSY': [0.0, 0.007, 0.0],
-      'INS-74021_FOV_REF_VECTOR': [0.0, 1.0, 0.0],
-      'INS-74021_BORESIGHT': [0.0, 0.0, 1.0],
-      'FRAME_-74021_NAME': 'MRO_CTX',
-      'INS-74021_PIXEL_PITCH': 0.007,
-      'TKFRAME_-74021_AXES': [1.0, 2.0, 3.0],
-      'TKFRAME_-74021_SPEC': 'ANGLES',
-      'INS-74021_BORESIGHT_LINE': 0.430442527,
-      'INS-74021_FOV_SHAPE': 'RECTANGLE',
-      'INS-74021_BORESIGHT_SAMPLE': 2543.46099,
-      'FRAME_-74021_CLASS': 4.0,
-      'INS-74021_CK_FRAME_ID': -74000.0,
-      'INS-74021_ITRANSL': [0.0, 142.85714285714, 0.0],
-      'INS-74021_FOV_REF_ANGLE': 2.86478898,
-      'INS-74021_ITRANSS': [0.0, 0.0, 142.85714285714],
-      'FRAME_-74021_CLASS_ID': -74021.0,
-      'INS-74021_OD_K': [-0.0073433925920054505,
-       2.8375878636241697e-05,
-       1.2841989124027099e-08],
-      'INS-74021_FOV_FRAME': 'MRO_CTX',
-      'INS-74021_CK_REFERENCE_ID': -74900.0,
-      'TKFRAME_-74021_RELATIVE': 'MRO_CTX_BASE',
-      'INS-74021_PIXEL_SIZE': [0.007, 0.007]},
+"NaifKeywords": {
+        "BODY499_RADII": [
+            3396.19,
+            3396.19,
+            3376.2
+        ],
+        "BODY_FRAME_CODE": 10014,
+        "BODY_CODE": 499,
+        "INS-74021_FOV_ANGLE_UNITS": "DEGREES",
+        "TKFRAME_-74021_UNITS": "DEGREES",
+        "INS-74021_FOV_ANGULAR_SIZE": [
+            5.73,
+            0.001146
+        ],
+        "INS-74021_PIXEL_LINES": 1.0,
+        "TKFRAME_-74021_ANGLES": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "INS-74021_IFOV": [
+            2e-05,
+            2e-05
+        ],
+        "FRAME_-74021_CENTER": -74.0,
+        "INS-74021_F/RATIO": 3.25,
+        "INS-74021_PLATFORM_ID": -74000.0,
+        "INS-74021_CCD_CENTER": [
+            2500.5,
+            0.5
+        ],
+        "INS-74021_PIXEL_SAMPLES": 5000.0,
+        "INS-74021_FOCAL_LENGTH": 352.9271664,
+        "INS-74021_FOV_CROSS_ANGLE": 0.00057296,
+        "INS-74021_TRANSX": [
+            0.0,
+            0.0,
+            0.007
+        ],
+        "INS-74021_FOV_CLASS_SPEC": "ANGLES",
+        "INS-74021_TRANSY": [
+            0.0,
+            0.007,
+            0.0
+        ],
+        "INS-74021_FOV_REF_VECTOR": [
+            0.0,
+            1.0,
+            0.0
+        ],
+        "INS-74021_BORESIGHT": [
+            0.0,
+            0.0,
+            1.0
+        ],
+        "FRAME_-74021_NAME": "MRO_CTX",
+        "INS-74021_PIXEL_PITCH": 0.007,
+        "TKFRAME_-74021_AXES": [
+            1.0,
+            2.0,
+            3.0
+        ],
+        "TKFRAME_-74021_SPEC": "ANGLES",
+        "INS-74021_BORESIGHT_LINE": 0.430442527,
+        "INS-74021_FOV_SHAPE": "RECTANGLE",
+        "INS-74021_BORESIGHT_SAMPLE": 2543.46099,
+        "FRAME_-74021_CLASS": 4.0,
+        "INS-74021_CK_FRAME_ID": -74000.0,
+        "INS-74021_ITRANSL": [
+            0.0,
+            142.85714285714,
+            0.0
+        ],
+        "INS-74021_FOV_REF_ANGLE": 2.86478898,
+        "INS-74021_ITRANSS": [
+            0.0,
+            0.0,
+            142.85714285714
+        ],
+        "FRAME_-74021_CLASS_ID": -74021.0,
+        "INS-74021_OD_K": [
+            -0.0073433925920054505,
+            2.8375878636241697e-05,
+            1.2841989124027099e-08
+        ],
+        "INS-74021_FOV_FRAME": "MRO_CTX",
+        "INS-74021_CK_REFERENCE_ID": -74900.0,
+        "TKFRAME_-74021_RELATIVE": "MRO_CTX_BASE",
+        "INS-74021_PIXEL_SIZE": [
+            0.007,
+            0.007
+        ],
+        "SCLK_PARTITION_END_74999": [
+            52973626698957.0,
+            56987144678331.0,
+            58187590527162.99,
+            60316687182323.0,
+            60877152115000.0,
+            61228279788693.0,
+            61339176915162.99,
+            61899057915627.0,
+            63521451859691.0,
+            65622287643263.0
+        ],
+        "SCLK01_N_FIELDS_74999": 2.0,
+        "SCLK01_OUTPUT_DELIM_74999": 1.0,
+        "BODY499_POLE_DEC": [
+            52.8865,
+            -0.0609,
+            0.0
+        ],
+        "SCLK01_OFFSETS_74999": [
+            0.0,
+            0.0
+        ],
+        "SCLK_DATA_TYPE_74999": 1.0,
+        "SCLK01_COEFFICIENTS_74999": [
+            0.0,
+            -631195148.816,
+            1.0,
+            3097283854336.0,
+            -583934347.816,
+            1.0,
+            5164027215872.0,
+            -552398346.816,
+            1.0,
+            7230770577408.0
+        ],
+        "SCLK01_TIME_SYSTEM_74999": 2.0,
+        "SCLK_PARTITION_START_74999": [
+            0.0,
+            52973626982399.99,
+            56987144683520.0,
+            58187590533120.0,
+            60316687204352.01,
+            60877152124927.99,
+            61228279791616.0,
+            61339176927232.0,
+            61899057922048.0,
+            63521451868160.0
+        ],
+        "BODY499_POLE_RA": [
+            317.68143,
+            -0.1061,
+            0.0
+        ],
+        "BODY499_PM": [
+            176.63,
+            350.89198226,
+            0.0
+        ],
+        "SCLK01_MODULI_74999": [
+            4294967296.0,
+            65536.0
+        ]
+    },
     'InstrumentPointing': {'TimeDependentFrames': [-74000, -74900, 1],
                            'ConstantFrames': [-74021, -74020, -74699, -74690, -74000],
                            'ConstantRotation': [0.9999995608798441, -1.51960241928035e-05, 0.0009370214510594064, 1.5276552075356694e-05, 0.9999999961910578, -8.593317911879532e-05, -0.000937020141647677, 8.594745584079714e-05, 0.9999995573030465],
@@ -182,7 +296,8 @@ def test_mro_load(test_kernels, label_type, formatter, usgscsm_compare_dict, isi
 
     usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels}, formatter=formatter)
     usgscsm_isd_obj = json.loads(usgscsm_isd_str)
-    print(usgscsm_isd_obj)
+    print(json.dumps(usgscsm_isd_obj, indent=4))
+
 
     if formatter=='usgscsm':
         # Check to change the line based on ISIS vs PDS3

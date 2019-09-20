@@ -30,7 +30,10 @@ class NaifSpice():
     def kernels(self):
         if not hasattr(self, '_kernels'):
             if 'kernels' in self._props.keys():
-                self._kernels =  self._props['kernels']
+                try:
+                    self._kernels = util.get_kernels_from_isis_pvl(self._props['kernels'])
+                except Exception as e:
+                    self._kernels =  self._props['kernels']
             else:
                 if not ale.spice_root:
                     raise EnvironmentError(f'ale.spice_root is not set, cannot search for metakernels. ale.spice_root = "{ale.spice_root}"')
@@ -40,6 +43,7 @@ class NaifSpice():
                 if search_results['count'] == 0:
                     raise ValueError(f'Failed to find metakernels. mission: {self.short_mission_name}, year:{self.utc_start_time.year}, versions="latest" spice root = "{ale.spice_root}"')
                 self._kernels = [search_results['data'][0]['path']]
+
         return self._kernels
 
     @property
@@ -479,18 +483,21 @@ class NaifSpice():
             return False
 
     @property
-    def isis_naif_keywords(self):
+    def naif_keywords(self):
         """
         Returns
         -------
         : dict
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
-        naif_keywords = dict()
+        if not hasattr(self, "_naif_keywords"):
+            self._naif_keywords = dict()
 
-        naif_keywords['BODY{}_RADII'.format(self.target_id)] = self.target_body_radii
-        naif_keywords['BODY_FRAME_CODE'] = self.target_frame_id
-        naif_keywords['BODY_CODE'] = self.target_id
+            self._naif_keywords['BODY{}_RADII'.format(self.target_id)] = self.target_body_radii
+            self._naif_keywords['BODY_FRAME_CODE'] = self.target_frame_id
+            self._naif_keywords['BODY_CODE'] = self.target_id
 
-        naif_keywords = {**naif_keywords, **util.query_kernel_pool(f"*{self.ikid}*")}
-        return naif_keywords
+            self._naif_keywords = {**self._naif_keywords, **util.query_kernel_pool(f"*{self.ikid}*"),  **util.query_kernel_pool(f"*{self.target_id}*")}
+
+        return self._naif_keywords
+

@@ -337,7 +337,7 @@ namespace ale {
     return "";
  }
 
- std::string load(std::string filename, std::string props, std::string formatter) {
+ std::string loads(std::string filename, std::string props, std::string formatter, bool verbose) {
      static bool first_run = true;
      if(first_run) {
          // Initialize the Python interpreter but only once.
@@ -380,14 +380,9 @@ namespace ale {
      PyObject *pStringFormatter = PyUnicode_FromString(formatter.c_str());
      PyTuple_SetItem(pArgs, 2, pStringFormatter);
 
-
      // Call the function with the arguments.
-     PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
-     Py_DECREF(pArgs);
-     Py_DECREF(pStringFileName);
-     Py_DECREF(pStringProps);
-     Py_DECREF(pStringFormatter);
-     
+     PyObject* pResult = PyObject_CallObject(pFunc, pArgs); 
+
      if(!pResult) {
         throw invalid_argument("No Valid instrument found for label.");
      }
@@ -402,8 +397,16 @@ namespace ale {
      char *temp_str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
      cResult = temp_str; // copy into std::string
 
-     Py_DECREF(pResultStr);
+     Py_DECREF(pResultStr); 
+     Py_DECREF(pStringFileName);
+     Py_DECREF(pStringProps);
+     Py_DECREF(pStringFormatter); 
 
      return cResult;
+ }
+
+ json load(std::string filename, std::string props, std::string formatter, bool verbose) {
+   std::string jsonstr = loads(filename, props, formatter, verbose);
+   return json::parse(jsonstr);
  }
 }

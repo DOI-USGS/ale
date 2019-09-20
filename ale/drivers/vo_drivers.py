@@ -44,3 +44,4 @@ class Voyager2IssnacIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Drive
     @property
     def ephemeris_stop_time(self):
         return self.ephemeris_start_time + self.exposure_duration
+

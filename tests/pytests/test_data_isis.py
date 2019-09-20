@@ -553,7 +553,7 @@ def test_ephemeris_start_time(testdata):
    assert testdata.ephemeris_start_time == 2
 
 
-def test_isis_naif_keywords(testdata):
+def test_naif_keywords(testdata):
 
     naif_keywords =   pvl.loads("""Object = NaifKeywords
                         BODY499_RADII                            = (3396.19, 3396.19, 3376.2)
@@ -567,7 +567,7 @@ def test_isis_naif_keywords(testdata):
                         INS-74699_OD_K                           = (-0.0048509, 2.41312e-07, -1.62369e-13)
                         END_OBJECT
                         END""")['NaifKeywords']
-    assert testdata.isis_naif_keywords == naif_keywords
+    assert testdata.naif_keywords == naif_keywords
 
 
 def test_odtk(testdata):
