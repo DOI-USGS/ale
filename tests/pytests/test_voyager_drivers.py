@@ -8,7 +8,6 @@ import numpy as np
 import spiceypy as spice
 
 import ale
-from ale.drivers.mro_drivers import MroCtxPds3LabelNaifSpiceDriver, MroCtxIsisLabelNaifSpiceDriver, MroCtxIsisLabelIsisSpiceDriver
 
 from conftest import get_image_kernels, convert_kernels, get_image_label, compare_dicts
 
@@ -18,6 +17,13 @@ image_dict = {
         'isis': {
             'CameraVersion': 1,
             'NaifKeywords': {'BODY502_RADII': [1564.13, 1561.23, 1560.93],
+                             'BODY502_POLE_RA': [268.08,-0.009,0.0],
+                             'BODY502_NUT_PREC_DEC': [0.0,0.0,0.0,0.468,0.026,0.007,0.002],
+                             'BODY502_POLE_DEC': [64.51,0.003,0.0],
+                             'BODY502_NUT_PREC_PM': [0.0,0.0,0.0,-0.98,-0.054,-0.014,-0.008],
+                             'BODY502_LONG_AXIS': 0.0,
+                             'BODY502_PM': [36.022,101.3747235,0.0],
+                             'BODY502_NUT_PREC_RA': [0.0,0.0,0.0,1.086,0.06,0.015,0.009],
                              'BODY_FRAME_CODE': 10024,
                              'BODY_CODE': 502,
                              'FRAME_-32101_CLASS_ID': -32101.0,
@@ -78,6 +84,13 @@ image_dict = {
         'isis' : {
             'CameraVersion': 1,
             'NaifKeywords': {'BODY599_RADII': [71492.0, 71492.0, 66854.0],
+                             'BODY599_PM': [284.95, 870.536642, 0.0],
+                             'BODY599_LONG_AXIS' : 0.0,
+                             'BODY599_NUT_PREC_DEC' : [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+                             'BODY599_NUT_PREC_PM' : [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+                             'BODY599_POLE_RA' : [268.056595,-0.006499,0.0],
+                             'BODY599_POLE_DEC' : [64.495303,0.002413,0.0],
+                             'BODY599_NUT_PREC_RA': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
                              'BODY_FRAME_CODE': 10015,
                              'BODY_CODE': 599,
                              'INS-32102_FOV_SHAPE': 'RECTANGLE',
@@ -139,6 +152,13 @@ image_dict = {
             'CameraVersion': 1,
             'NaifKeywords': {
                 'BODY599_RADII': [71492.0, 71492.0, 66854.0],
+                'BODY599_PM': [284.95, 870.536642, 0.0],
+                'BODY599_LONG_AXIS' : 0.0,
+                'BODY599_NUT_PREC_DEC' : [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+                'BODY599_NUT_PREC_PM' : [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+                'BODY599_POLE_RA' : [268.056595,-0.006499,0.0],
+                'BODY599_POLE_DEC' : [64.495303,0.002413,0.0],
+                'BODY599_NUT_PREC_RA': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
                 'BODY_FRAME_CODE': 10015,
                 'BODY_CODE': 599,
                 'INS-31101_CK_REFERENCE_ID': 2.0,
@@ -201,6 +221,13 @@ image_dict = {
             'CameraVersion': 1,
             'NaifKeywords': {
                 'BODY599_RADII': [71492.0, 71492.0, 66854.0],
+                'BODY599_PM': [284.95, 870.536642, 0.0],
+                'BODY599_LONG_AXIS' : 0.0,
+                'BODY599_NUT_PREC_DEC' : [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+                'BODY599_NUT_PREC_PM' : [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+                'BODY599_POLE_RA' : [268.056595,-0.006499,0.0],
+                'BODY599_POLE_DEC' : [64.495303,0.002413,0.0],
+                'BODY599_NUT_PREC_RA': [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
                 'BODY_FRAME_CODE': 10015,
                 'BODY_CODE': 599,
                 'INS-31102_CK_REFERENCE_ID': 2.0,

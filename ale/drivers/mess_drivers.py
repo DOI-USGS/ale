@@ -10,11 +10,68 @@ from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
+from ale.base.data_isis import IsisSpice
 
 ID_LOOKUP = {
     'MDIS-WAC': 'MSGR_MDIS_WAC',
     'MDIS-NAC':'MSGR_MDIS_NAC',
 }
+
+
+class MessengerMdisIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, Driver):
+    @property
+    def spacecraft_name(self):
+        """
+        Spacecraft name used in various SPICE calls to acquire
+        ephemeris data. Messenger MDIS img PDS3 labels do not the have a SPACECRAFT_NAME keyword,
+        so we override it here to find INSTRUMENT_HOST_NAME in the label.
+
+        Returns
+        -------
+        : str
+          Spacecraft name
+        """
+        return self.instrument_host_name
+
+    @property
+    def fikid(self):
+        """
+        Naif ID code used in calculating focal length
+        Expects filter_number to be defined. This should be an integer containing
+        the filter number from the pds3 label.
+        Expects ikid to be defined. This should be the integer Naid ID code for
+        the instrument.
+
+        Returns
+        -------
+        : int
+          Naif ID code used in calculating focal length
+        """
+        if isinstance(self, Framer):
+            fn = super().filter_number
+            if fn == 'N/A':
+                fn = 0
+        else:
+            fn = 0
+        return self.ikid - int(fn)
+
+    @property
+    def instrument_id(self):
+        """
+        Returns an instrument id for unquely identifying the instrument, but often
+        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+        the same ID the Spice expects in bods2c calls.
+        Expects instrument_id to be defined in the Pds3Label mixin. This should
+        be a string of the form MDIS-WAC or MDIS-NAC.
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
+        return ID_LOOKUP[super().instrument_id]
+
+
 
 class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
     """
