@@ -217,12 +217,11 @@ class TimeDependentRotation:
         Get the inverse rotation, that is the rotation from the destination
         reference frame to the source reference frame.
         """
-        new_rots = self._rots.inv()
         if self.av is not None:
-            new_av = -new_rots.apply(self.av)
+            new_av = -self._rots.apply(self.av)
         else:
             new_av = None
-        return TimeDependentRotation(new_rots.as_quat(), self.times, self.dest, self.source, av=new_av)
+        return TimeDependentRotation(self._rots.inv().as_quat(), self.times, self.dest, self.source, av=new_av)
 
     def _slerp(self, times):
         """
