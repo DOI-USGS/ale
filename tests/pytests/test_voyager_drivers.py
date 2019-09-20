@@ -8,7 +8,6 @@ import numpy as np
 import spiceypy as spice
 
 import ale
-from ale.drivers.mro_drivers import MroCtxPds3LabelNaifSpiceDriver, MroCtxIsisLabelNaifSpiceDriver, MroCtxIsisLabelIsisSpiceDriver
 
 from conftest import get_image_kernels, convert_kernels, get_image_label, compare_dicts
 
