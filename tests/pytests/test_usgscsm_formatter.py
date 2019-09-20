@@ -106,7 +106,7 @@ class TestDriver(Driver, NaifSpice):
         return 100
 
     @property
-    def isis_naif_keywords(self):
+    def naif_keywords(self):
         return {
             'keyword_1' : 0,
             'keyword_2' : 'test'

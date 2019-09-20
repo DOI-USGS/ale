@@ -302,6 +302,11 @@ TEST(PyInterfaceTest, LoadInvalidLabel) {
   EXPECT_THROW(ale::load(label), invalid_argument);
 }
 
+TEST(PyInterfaceTest, LoadValidLabel) {
+  std::string label = "../pytests/data/EN1072174528M/EN1072174528M_spiceinit.lbl";
+  ale::load(label, "", "isis");
+}
+
 TEST(AngularVelocityInterpTest, ExampleGetRotation) {
   vector<double> times = {0,  1};
   vector<vector<double>> rots({{0,0}, {1,0}, {0,1}, {0,0}});

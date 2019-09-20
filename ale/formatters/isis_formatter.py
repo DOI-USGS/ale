@@ -22,7 +22,7 @@ def to_isis(driver):
 
     meta_data['CameraVersion'] = driver.sensor_model_version
 
-    meta_data['NaifKeywords'] = driver.isis_naif_keywords
+    meta_data['NaifKeywords'] = driver.naif_keywords
 
     frame_chain = driver.frame_chain
     sensor_frame = driver.sensor_frame_id

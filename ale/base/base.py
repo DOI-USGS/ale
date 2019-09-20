@@ -1,4 +1,5 @@
 import pvl
+import json
 
 class Driver():
     """
@@ -221,7 +222,7 @@ class Driver():
         raise NotImplementedError
 
     @property
-    def isis_naif_keywords(self):
+    def naif_keywords(self):
         """
           Returns
         -------
