@@ -337,7 +337,7 @@ namespace ale {
     return "";
  }
 
- std::string load(std::string filename, std::string props, std::string formatter) {
+ std::string loads(std::string filename, std::string props, std::string formatter, bool verbose) {
      static bool first_run = true;
      if(first_run) {
          // Initialize the Python interpreter but only once.
@@ -367,7 +367,7 @@ namespace ale {
      // Create a Python tuple to hold the arguments to the method.
      PyObject *pArgs = PyTuple_New(3);
      if(!pArgs) {
-       throw runtime_error(getPyTraceback());
+       throw runtime_error("whoops");
      }
 
      // Set the Python int as the first and second arguments to the method.
@@ -383,10 +383,10 @@ namespace ale {
 
      // Call the function with the arguments.
      PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
-     Py_DECREF(pArgs);
-     Py_DECREF(pStringFileName);
-     Py_DECREF(pStringProps);
-     Py_DECREF(pStringFormatter);
+     //Py_DECREF(pStringFileName);
+     //Py_DECREF(pStringProps);
+     //Py_DECREF(pStringFormatter);
+     //Py_DECREF(pArgs);
      
      if(!pResult) {
         throw invalid_argument("No Valid instrument found for label.");
@@ -402,8 +402,19 @@ namespace ale {
      char *temp_str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
      cResult = temp_str; // copy into std::string
 
-     Py_DECREF(pResultStr);
-
+     // Py_DECREF(pResultStr);
+      
      return cResult;
  }
+
+ json load(std::string filename, std::string props, std::string formatter, bool verbose) {
+   std::string jsonstr = loads(filename, props, formatter, verbose);
+   return json::parse(jsonstr);
+ }
+
+
+
+
+
+
 }

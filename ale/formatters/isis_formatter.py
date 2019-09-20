@@ -22,7 +22,7 @@ def to_isis(driver):
 
     meta_data['CameraVersion'] = driver.sensor_model_version
 
-    meta_data['NaifKeywords'] = driver.isis_naif_keywords
+    meta_data['NaifKeywords'] = driver.naif_keywords
 
     frame_chain = driver.frame_chain
     sensor_frame = driver.sensor_frame_id
@@ -51,23 +51,21 @@ def to_isis(driver):
     body_rotation = {}
     source_frame, destination_frame, time_dependent_target_frame = frame_chain.last_time_dependent_frame_between(target_frame, 1)
 
-    if source_frame != 1:
-        # Reverse the frame order because ISIS orders frames as
-        # (destination, intermediate, ..., intermediate, source)
-        body_rotation['TimeDependentFrames'] = shortest_path(frame_chain, source_frame, 1)
-        time_dependent_rotation = frame_chain.compute_rotation(1, source_frame)
-        body_rotation['CkTableStartTime'] = time_dependent_rotation.times[0]
-        body_rotation['CkTableEndTime'] = time_dependent_rotation.times[-1]
-        body_rotation['CkTableOriginalSize'] = len(time_dependent_rotation.times)
-        body_rotation['EphemerisTimes'] = time_dependent_rotation.times
-        body_rotation['Quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
+    # Reverse the frame order because ISIS orders frames as
+    # (destination, intermediate, ..., intermediate, source)
+    body_rotation['TimeDependentFrames'] = shortest_path(frame_chain, source_frame, 1)
+    time_dependent_rotation = frame_chain.compute_rotation(1, source_frame)
+    body_rotation['CkTableStartTime'] = time_dependent_rotation.times[0]
+    body_rotation['CkTableEndTime'] = time_dependent_rotation.times[-1]
+    body_rotation['CkTableOriginalSize'] = len(time_dependent_rotation.times)
+    body_rotation['EphemerisTimes'] = time_dependent_rotation.times
+    body_rotation['Quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
 
-    if source_frame != target_frame:
-        # Reverse the frame order because ISIS orders frames as
-        # (destination, intermediate, ..., intermediate, source)
-        body_rotation['ConstantFrames'] = shortest_path(frame_chain, target_frame, source_frame)
-        constant_rotation = frame_chain.compute_rotation(source_frame, target_frame)
-        body_rotation['ConstantRotation'] = constant_rotation.rotation_matrix().flatten()
+    # Reverse the frame order because ISIS orders frames as
+    # (destination, intermediate, ..., intermediate, source)
+    body_rotation['ConstantFrames'] = shortest_path(frame_chain, target_frame, source_frame)
+    constant_rotation = frame_chain.compute_rotation(source_frame, target_frame)
+    body_rotation['ConstantRotation'] = constant_rotation.rotation_matrix().flatten()
 
     meta_data['BodyRotation'] = body_rotation
 

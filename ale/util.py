@@ -66,8 +66,8 @@ def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=
 
     for md in mission_dirs:
         # Assuming spice root has the same name as the original on NAIF website"
-        mission = os.path.basename(md).split('-')[0]
-        if missions and (mission.lower() not in missions):
+        mission = os.path.basename(md).split('-')[0].split('_')[0]
+        if missions and all([m not in mission.lower() for m in missions]):
             continue
 
         metakernel_keys = ['mission', 'year', 'version', 'path']
@@ -75,11 +75,17 @@ def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=
         # recursive glob to make metakernel search more robust to subtle directory structure differences
         metakernel_paths = sorted(glob(os.path.join(md, '**','*.tm'), recursive=True))
 
-        metakernels = [dict(zip(metakernel_keys, [mission]+path.splitext(path.basename(k))[0].split('_')[1:3] + [k])) for k in metakernel_paths]
+        metakernels = []
+        for k in metakernel_paths:
+            components = path.splitext(path.basename(k))[0].split('_') + [k]
+            if len(components) == 3:
+                components.insert(1, 'N/A')
+
+            metakernels.append(dict(zip(metakernel_keys, components)))
 
         # naive filter, do we really need anything else?
         if years:
-            metakernels = list(filter(lambda x:x['year'] in years, metakernels))
+            metakernels = list(filter(lambda x:x['year'] in years or x['year'] == 'N/A', metakernels))
         if versions:
             if versions == 'latest':
                 latest = []
@@ -207,11 +213,26 @@ def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
     cubelabel = pvl.load(cube)
 
     try:
-        kernel_group = cubelabel['IsisCube']['Kernels']
+        kernel_group = cubelabel['IsisCube']
     except KeyError:
         raise KeyError(f'{cubelabel}, Could not find kernels group, input cube [{cube}] may not be spiceinited')
 
-    # Start loading. Stuff that might have multiple entries first
+    return get_kernels_from_isis_pvl(cube, exapnd, format_as)
+
+def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
+    # enforce key order
+    mk_paths = OrderedDict.fromkeys(
+        ['TargetPosition', 'InstrumentPosition',
+         'InstrumentPointing', 'Frame', 'TargetAttitudeShape',
+         'Instrument', 'InstrumentAddendum', 'LeapSecond',
+         'SpacecraftClock', 'Extra'])
+
+
+    if isinstance(kernel_group, str):
+        kernel_group = pvl.loads(kernel_group)
+
+    kernel_group = kernel_group["Kernels"]
+
     def load_table_data(key):
         mk_paths[key] = kernel_group.get(key, None)
         if isinstance(mk_paths[key], str):
@@ -222,7 +243,6 @@ def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
     load_table_data('InstrumentPosition')
     load_table_data('InstrumentPointing')
     load_table_data('TargetAttitudeShape')
-
     # the rest
     mk_paths['Frame'] = [kernel_group.get('Frame', None)]
     mk_paths['Instrument'] = [kernel_group.get('Instrument', None)]
@@ -250,7 +270,6 @@ def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
         return mk_paths
     else:
         raise Exception(f'{format_as} is not a valid return format')
-
 
 def write_metakernel_from_cube(cube, mkpath=None):
     # add ISISPREF paths as path_symbols and path_values to avoid custom expand logic

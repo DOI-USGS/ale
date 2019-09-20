@@ -116,7 +116,7 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
         : list<double>
           detector to focal plane x
        """
-        return self.isis_naif_keywords.get('IDEAL_TRANSX')
+        return self.naif_keywords.get('IDEAL_TRANSX')
 
 
     @property
@@ -129,7 +129,7 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
         : list<double>
           detector to focal plane y
        """
-        return self.isis_naif_keywords.get('IDEAL_TRANSY')
+        return self.naif_keywords.get('IDEAL_TRANSY')
 
 
     @property
@@ -143,7 +143,7 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
           focal plane to detector lines
        """
 
-        return self.isis_naif_keywords.get('IDEAL_TRANSL')
+        return self.naif_keywords.get('IDEAL_TRANSL')
 
 
     @property
@@ -156,13 +156,13 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
         : list<double>
           focal plane to detector samples
        """
-        return self.isis_naif_keywords.get('IDEAL_TRANSS')
+        return self.naif_keywords.get('IDEAL_TRANSS')
 
     @property
     def focal_length(self):
         """
         The focal length of the instrument
-        Expects isis_naif_keywords to be defined. This should be a dict containing
+        Expects naif_keywords to be defined. This should be a dict containing
         Naif keyworkds from the label.
 
         Returns
@@ -170,7 +170,7 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
         float :
             The focal length in millimeters
         """
-        return self.isis_naif_keywords.get('IDEAL_FOCAL_LENGTH', None)
+        return self.naif_keywords.get('IDEAL_FOCAL_LENGTH', None)
 
     @property
     def detector_center_sample(self):

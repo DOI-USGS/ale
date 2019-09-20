@@ -44,7 +44,7 @@ class AleJsonEncoder(json.JSONEncoder):
             return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
-def load(label, props={}, formatter='usgscsm', verbose=False):
+def load(label, props={}, formatter='usgscsm', verbose=True):
     """
     Attempt to load a given label from all possible drivers
 
@@ -53,6 +53,8 @@ def load(label, props={}, formatter='usgscsm', verbose=False):
     label : str
                String path to the given label file
     """
+    print(props)
+
     if isinstance(formatter, str):
         formatter = __formatters__[formatter]
 
@@ -75,6 +77,6 @@ def load(label, props={}, formatter='usgscsm', verbose=False):
                 traceback.print_exc()
     raise Exception('No Such Driver for Label')
 
-def loads(label, props='', formatter='usgscsm', verbose=False):
+def loads(label, props='', formatter='usgscsm', verbose=True):
     res = load(label, props, formatter, verbose=verbose)
     return json.dumps(res, cls=AleJsonEncoder)

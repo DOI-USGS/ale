@@ -43,6 +43,7 @@ class NaifSpice():
                 if search_results['count'] == 0:
                     raise ValueError(f'Failed to find metakernels. mission: {self.short_mission_name}, year:{self.utc_start_time.year}, versions="latest" spice root = "{ale.spice_root}"')
                 self._kernels = [search_results['data'][0]['path']]
+
         return self._kernels
 
     @property
@@ -336,17 +337,6 @@ class NaifSpice():
                 # spkezr returns a vector from the observer's location to the aberration-corrected
                 # location of the target. For more information, see:
                 # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
-<<<<<<< HEAD
-                state, _ = spice.spkezr(self.spacecraft_name,
-                                       time,
-                                       self.reference_frame,
-                                       self.light_time_correction,
-                                       self.target_name,)
-                pos.append(state[:3])
-                vel.append(state[3:])
-            # By default, spice works in km, and the vector returned by spkezr points the opposite
-            # direction to what ALE needs, so it must be multiplied by (-1)
-=======
                 state, _ = spice.spkezr(target,
                                         time,
                                         self.reference_frame,
@@ -360,7 +350,6 @@ class NaifSpice():
                     vel.append(state[3:])
 
             # By default, SPICE works in km, so convert to m
->>>>>>> 67e17d642f7dfa678b9f7fb51c581d503d1b8c24
             self._position = [p * 1000 for p in pos]
             self._velocity = [v * 1000 for v in vel]
         return self._position, self._velocity, self.ephemeris_time
@@ -508,7 +497,7 @@ class NaifSpice():
             self._naif_keywords['BODY_FRAME_CODE'] = self.target_frame_id
             self._naif_keywords['BODY_CODE'] = self.target_id
 
-            self._naif_keywords = {**self._naif_keywords, **util.query_kernel_pool(f"*{self.ikid}*"), **util.query_kernel_pool(f"*{self.target_id}*")}
+            self._naif_keywords = {**self._naif_keywords, **util.query_kernel_pool(f"*{self.ikid}*"), **util.query_kernel_pool(f"INS*"),  **util.query_kernel_pool(f"*{self.target_id}*")}
 
         return self._naif_keywords
 
