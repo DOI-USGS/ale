@@ -497,7 +497,7 @@ class NaifSpice():
             self._naif_keywords['BODY_FRAME_CODE'] = self.target_frame_id
             self._naif_keywords['BODY_CODE'] = self.target_id
 
-            self._naif_keywords = {**self._naif_keywords, **util.query_kernel_pool(f"*{self.ikid}*"), **util.query_kernel_pool(f"INS*"),  **util.query_kernel_pool(f"*{self.target_id}*")}
+            self._naif_keywords = {**self._naif_keywords, **util.query_kernel_pool(f"*{self.ikid}*"),  **util.query_kernel_pool(f"*{self.target_id}*")}
 
         return self._naif_keywords
 

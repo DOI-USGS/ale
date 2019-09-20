@@ -113,8 +113,7 @@ def test_load(test_kernels):
                                     [-1069.88881194, -1232.15316986,  -256.80391882],
                                     [-1069.97812106, -1232.24378854,  -256.01897702],
                                     [-1070.06718562, -1232.33412517,  -255.23397236],
-                                    [-1070.15600557, -1232.42417969,  -254.44890536]]),
-             'unit': 'm'},
+                                    [-1070.15600557, -1232.42417969,  -254.44890536]]),'unit': 'm'},
          'sun_position': {
             'positions': np.array([[9.50465237e+10, 1.15903815e+11, 3.78729685e+09]]),
             'velocities': np.array([[285707.13474515, -232731.15884149, 592.91742112]]),
@@ -165,6 +164,8 @@ def test_load(test_kernels):
                 new_callable=PropertyMock) as mock_reference_frame:
         mock_reference_frame.return_value = 'IAU_MOON'
         usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter='usgscsm')
-    print(usgscsm_isd)
 
-    assert compare_dicts(usgscsm_isd, isd) == []
+    diff = compare_dicts(usgscsm_isd, isd)
+    print(usgscsm_isd)
+    print(diff)
+    assert diff == []

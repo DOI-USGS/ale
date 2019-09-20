@@ -117,7 +117,7 @@ class TestDriver(Driver):
         return 1010
 
     @property
-    def isis_naif_keywords(self):
+    def naif_keywords(self):
         return {
             'keyword_1' : 0,
             'keyword_2' : 'test'

@@ -217,7 +217,7 @@ def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
     except KeyError:
         raise KeyError(f'{cubelabel}, Could not find kernels group, input cube [{cube}] may not be spiceinited')
 
-    return get_kernels_from_isis_pvl(cube, exapnd, format_as)
+    return get_kernels_from_isis_pvl(kernel_group, expand, format_as)
 
 def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
     # enforce key order

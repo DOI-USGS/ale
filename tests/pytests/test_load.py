@@ -60,8 +60,8 @@ def test_load_mes_from_metakernels(tmpdir, monkeypatch, mess_kernels):
 
     updated_kernels = mess_kernels
     label_file = get_image_label('EN1072174528M')
-    tmpdir.mkdir('mes')
-    with open(tmpdir.join('mes', 'mes_2015_v1.tm'), 'w+') as mk_file:
+    tmpdir.mkdir('mess')
+    with open(tmpdir.join('mess', 'mess_2015_v1.tm'), 'w+') as mk_file:
         mk_str = util.write_metakernel_from_kernel_list(updated_kernels)
         print(mk_str)
         mk_file.write(mk_str)
