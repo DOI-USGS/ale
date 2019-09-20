@@ -1,0 +1,50 @@
+KPL/IK
+
+Voyager 1 Imaging Subsytem Narrow Angle camera (ISSNA)
+----------------------------------------------------------------
+
+   Version 2   by Jeff Bytof -- 27 November 2000.
+
+       Changed shape from POLYGON to RECTANGLE.
+     
+
+   Version 1.0 by Jeff Bytof, NAIF/JPL, 31 March 2000.
+   
+       Provide the corner vector directions of the ISSNA 
+       field of view. 
+  
+\begintext
+   
+   Field of view description
+   -------------------------
+ 
+    - FOV is square with its sides along X and Y 
+      axes of the instrument's frame;
+
+    - full FOV angular size in X and Y directions is 0.424 degrees; 
+
+    - boresight vector intersects FOV exactly in the center of 
+      the square;
+
+
+\begindata
+
+
+   INS-31101_FOV_FRAME            = 'VG1_ISSNA'
+
+   INS-31101_FOV_SHAPE            = 'RECTANGLE'
+
+   INS-31101_BORESIGHT            = ( 0.0   0.0    1.0 )
+                                    
+
+   INS-31101_FOV_BOUNDARY_CORNERS = ( 
+
+                                .003700098    .003700098  1.0
+                               -.003700098    .003700098  1.0
+                               -.003700098   -.003700098  1.0
+                                .003700098   -.003700098  1.0
+
+                                    )
+   
+\begintext
+
