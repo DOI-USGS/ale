@@ -6,7 +6,19 @@ from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
 from ale.base.base import Driver
 
-class Voyager2IssnacIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
+class VoyagerCameraLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
+
+    @property
+    def instrument_id(self):
+        sc_lookup = {
+        "VOYAGER_1" : "VG1",
+        "VOYAGER_2" : "VG2"
+        }
+        sensor_lookup = {
+        "NARROW_ANGLE_CAMERA" : "ISSNA",
+        "WIDE_ANGLE_CAMERA" : "ISSWA"
+        }
+        return sc_lookup[super().spacecraft_name] + '_' + sensor_lookup[super().instrument_id]
 
     @property
     def sensor_model_version(self):
@@ -44,4 +56,3 @@ class Voyager2IssnacIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Drive
     @property
     def ephemeris_stop_time(self):
         return self.ephemeris_start_time + self.exposure_duration
-
