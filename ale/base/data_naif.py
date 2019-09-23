@@ -1,4 +1,5 @@
 import spiceypy as spice
+import scipy.constants
 import numpy as np
 
 import ale
@@ -337,11 +338,32 @@ class NaifSpice():
                 # spkezr returns a vector from the observer's location to the aberration-corrected
                 # location of the target. For more information, see:
                 # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
-                state, _ = spice.spkezr(target,
-                                        time,
-                                        self.reference_frame,
-                                        self.light_time_correction,
-                                        observer)
+                if self.correct_lt_to_surface and self.light_time_correction.upper() == 'LT+S':
+                    obs_tar_state, obs_tar_lt = spice.spkezr(target,
+                                                             time,
+                                                             self.reference_frame,
+                                                             self.light_time_correction,
+                                                             observer)
+                    ssb_obs_state, ssb_obs_lt = spice.spkezr(observer,
+                                                             time,
+                                                             self.reference_frame,
+                                                             'NONE',
+                                                             'SSB')
+                    radius_lt = (self.target_body_radii[2] + self.target_body_radii[0]) / 2 / scipy.constants.c
+                    adjusted_time = time - obs_tar_lt + radius_lt
+                    ssb_tar_state, ssb_tar_lt = spice.spkezr(target,
+                                                             adjusted_time,
+                                                             self.reference_frame,
+                                                             'NONE',
+                                                             'SSB')
+                    state = ssb_tar_state - ssb_obs_state
+                else:
+                    state, _ = spice.spkezr(target,
+                                            time,
+                                            self.reference_frame,
+                                            self.light_time_correction,
+                                            observer)
+
                 if self.swap_observer_target:
                     pos.append(-state[:3])
                     vel.append(-state[3:])
@@ -500,4 +522,3 @@ class NaifSpice():
             self._naif_keywords = {**self._naif_keywords, **util.query_kernel_pool(f"*{self.ikid}*"),  **util.query_kernel_pool(f"*{self.target_id}*")}
 
         return self._naif_keywords
-
