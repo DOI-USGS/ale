@@ -30,7 +30,9 @@ class VoyagerCameraLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
 
     @property
     def spacecraft_name(self):
-        return super().spacecraft_name.replace('_', ' ')
+        name = super().spacecraft_name.replace('_', ' ')
+        assert name.split(' ')[0] == "VOYAGER"
+        return name
 
     @property
     def pixel_size(self):
