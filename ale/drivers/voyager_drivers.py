@@ -31,7 +31,7 @@ class VoyagerCameraLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
     @property
     def spacecraft_name(self):
         name = super().spacecraft_name.replace('_', ' ')
-        if name.split(' ')[0] == "VOYAGER":
+        if name.split(' ')[0] != "VOYAGER":
             raise Exception("{name} for label is not a valid Voyager spacecraft name")
         return name
 
