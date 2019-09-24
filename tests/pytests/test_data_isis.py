@@ -706,11 +706,11 @@ def test_no_tables():
     test_mix_in = IsisSpice()
     test_mix_in._file = test_file
     test_mix_in.label = pvl.load(test_file)
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         test_mix_in.inst_pointing_table
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         test_mix_in.body_orientation_table
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         test_mix_in.inst_position_table
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         test_mix_in.sun_position_table
