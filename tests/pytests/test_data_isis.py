@@ -4,6 +4,7 @@ import pvl
 import numpy as np
 from ale.base.data_isis import IsisSpice
 
+from conftest import get_image_label
 
 testlabel = """
 Object = IsisCube
@@ -699,3 +700,17 @@ def test_inst_position_cache(testdata):
                                    [[-1000, -2000*np.pi*np.sqrt(3)/9, 2000*np.pi*np.sqrt(3)/9],
                                     [-2000*np.pi*np.sqrt(3)/9, 2000*np.pi*np.sqrt(3)/9, -1000]])
     np.testing.assert_equal(sensor_times, [0, 1])
+
+def test_no_tables():
+    test_file = get_image_label('B10_013341_1010_XN_79S172W')
+    test_mix_in = IsisSpice()
+    test_mix_in._file = test_file
+    test_mix_in.label = pvl.load(test_file)
+    with pytest.raises(ValueError):
+        test_mix_in.inst_pointing_table
+    with pytest.raises(ValueError):
+        test_mix_in.body_orientation_table
+    with pytest.raises(ValueError):
+        test_mix_in.inst_position_table
+    with pytest.raises(ValueError):
+        test_mix_in.sun_position_table
