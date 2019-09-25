@@ -20,10 +20,10 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
 
     @property
     def instrument_id(self):
-        instrument_id = super(self, IsisLabel).instrument_id
+        instrument_id = super().instrument_id
 
         if instrument_id != "IdealCamera":
-            raise Exception("Instrument ID is {self.instrument_id} when it should be \"IdealCamera\"")
+            raise Exception(f"Instrument ID is {instrument_id} when it should be \"IdealCamera\"")
 
         return instrument_id
 
