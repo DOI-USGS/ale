@@ -110,7 +110,7 @@ class ConstantRotation:
             new_rot = self._rot * other._rot
             return ConstantRotation(new_rot.as_quat(), other.source, self.dest)
         elif isinstance(other, TimeDependentRotation):
-            return TimeDependentRotation((self._rot * other._rots).as_quat(), other.times, other.source, self.dest, av=self._rot.apply(other.av))
+            return TimeDependentRotation((self._rot * other._rots).as_quat(), other.times, other.source, self.dest, av=other.av)
         else:
             raise TypeError("Rotations can only be composed with other rotations.")
 
@@ -325,13 +325,18 @@ class TimeDependentRotation:
         if self.source != other.dest:
             raise ValueError("Destination frame of first rotation {} is not the same as source frame of second rotation {}.".format(other.dest, self.source))
         if isinstance(other, ConstantRotation):
-            return TimeDependentRotation((self._rots * other._rot).as_quat(), self.times, other.source, self.dest, av=self.av)
+            if self.av is not None:
+                other_inverse = other._rot.inv()
+                new_av = np.asarray([other_inverse.apply(av) for av in self.av])
+            else:
+                new_av = None
+            return TimeDependentRotation((self._rots * other._rot).as_quat(), self.times, other.source, self.dest, av=new_av)
         elif isinstance(other, TimeDependentRotation):
             merged_times = np.union1d(np.asarray(self.times), np.asarray(other.times))
             reinterp_self = self.reinterpolate(merged_times)
             reinterp_other = other.reinterpolate(merged_times)
             new_quats = (reinterp_self._rots * reinterp_other._rots).as_quat()
-            new_av = reinterp_self.av + reinterp_self._rots.apply(reinterp_other.av)
+            new_av = reinterp_other._rots.inv().apply(reinterp_self.av) + reinterp_other.av
             return TimeDependentRotation(new_quats, merged_times, other.source, self.dest, av=new_av)
         else:
             raise TypeError("Rotations can only be composed with other rotations.")
