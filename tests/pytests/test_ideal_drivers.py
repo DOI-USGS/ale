@@ -8,9 +8,9 @@ def IdealDriver():
     return IdealLsIsisLabelIsisSpiceDriver("")
 
 
-@patch('ale.base.label_isis.IsisLabel.instrument_id', 1)
+@patch('ale.base.label_isis.IsisLabel.instrument_id', "IdealCamera")
 def test_sensor_name(IdealDriver):
-    assert IdealDriver.sensor_name == 1
+    assert IdealDriver.sensor_name == "IdealCamera"
 
 
 @patch('ale.drivers.isis_ideal_drivers.IdealLsIsisLabelIsisSpiceDriver.ephemeris_start_time', 451262458.99571)
