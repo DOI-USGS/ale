@@ -24,10 +24,9 @@ def test_constant_time_dependent_composition():
     assert rot1_3.source == 1
     assert rot1_3.dest == 3
     expected_quats = [[0.5, 0.5, -0.5, 0.5],[1.0/np.sqrt(2), 0, -1.0/np.sqrt(2), 0]]
-    expected_av = [[0, 0, -np.pi/2], [0, 0, -np.pi/2]]
     np.testing.assert_equal(rot1_3.times, times)
     np.testing.assert_almost_equal(rot1_3.quats, expected_quats)
-    np.testing.assert_almost_equal(rot1_3.av, expected_av)
+    np.testing.assert_almost_equal(rot1_3.av, av)
 
 def test_time_dependent_constant_composition():
     rot1_2 = ConstantRotation([1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)], 1, 2)
