@@ -18,6 +18,14 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
         """
         return self.instrument_id
 
+    @property
+    def instrument_id(self):
+        instrument_id = super().instrument_id
+
+        if instrument_id != "IdealCamera":
+            raise Exception(f"Instrument ID is {instrument_id} when it should be \"IdealCamera\"")
+
+        return instrument_id
 
     @property
     def ephemeris_start_time(self):
