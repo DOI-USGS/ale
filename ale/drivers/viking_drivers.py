@@ -45,7 +45,12 @@ class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
         : float
           ephemeris start time of the image
         """
-        ephemeris_start_time = spice.scs2e(-27999, str(self.spacecraft_clock_start_count))
+        if spacecraft_name == 'VIKING ORBITER 1':
+            ephemeris_start_time = spice.scs2e(-27999, str(self.spacecraft_clock_start_count))
+
+        # else use vo2 alt ID
+        else:
+            ephemeris_start_time = spice.scs2e(-30999, str(self.spacecraft_clock_start_count))
 
         if self.exposure_duration <= .420:
             offset1 = 7.0 / 8.0 * 4.48
