@@ -48,14 +48,6 @@ if(BUILD_TESTS)
     include(CTest)
 
     find_package (Threads)
-
-    target_link_libraries(ale
-                          PRIVATE
-                          GSL::gsl
-                          GSL::gslcblas
-                          Python::Python
-                          PUBLIC
-                          gtest)
     enable_testing()
     add_subdirectory(tests/ctests)
 
