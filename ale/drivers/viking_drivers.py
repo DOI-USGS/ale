@@ -45,7 +45,7 @@ class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
         : float
           ephemeris start time of the image
         """
-        if spacecraft_name == 'VIKING ORBITER 1':
+        if self.spacecraft_name == 'VIKING ORBITER 1':
             ephemeris_start_time = spice.scs2e(-27999, str(self.spacecraft_clock_start_count))
 
         # else use vo2 alt ID
