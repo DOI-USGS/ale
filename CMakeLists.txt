@@ -7,7 +7,7 @@
 # Specify the required version of CMake.
 # cmake 3.10 required for ctest/gtest integration
 cmake_minimum_required(VERSION 3.10)
-project(ale VERSION 0.3.0 DESCRIPTION "Abstraction Library for Ephemerides ")
+project(ale VERSION 0.5.0 DESCRIPTION "Abstraction Library for Ephemerides ")
 
 # include what we need
 include(GNUInstallDirs)
@@ -32,40 +32,40 @@ target_include_directories(ale
                            PUBLIC
                            ${ALE_INCLUDE_DIRS})
 
- target_link_libraries(ale
-                       PRIVATE
-                       GSL::gsl
-                       GSL::gslcblas
-                       Eigen3::Eigen
-                       Python::Python
-                       nlohmann_json::nlohmann_json)
+target_link_libraries(ale
+                      PRIVATE
+                      GSL::gsl
+                      GSL::gslcblas
+                      Eigen3::Eigen
+                      Python::Python
+                      nlohmann_json::nlohmann_json)
 
 # Optional build tests
 option (BUILD_TESTS "Build tests" ON)
 if(BUILD_TESTS)
-  include(cmake/gtest.cmake)
-  include(GoogleTest)
-  include(CTest)
+    include(cmake/gtest.cmake)
+    include(GoogleTest)
+    include(CTest)
 
-  find_package (Threads)
+    find_package (Threads)
 
-  target_link_libraries(ale
-                        PRIVATE
-                        GSL::gsl
-                        GSL::gslcblas
-                        Python::Python
-                        PUBLIC
-                        gtest ${CMAKE_THREAD_LIBS_INIT})
-  enable_testing()
-  add_subdirectory(tests/ctests)
+    target_link_libraries(ale
+                          PRIVATE
+                          GSL::gsl
+                          GSL::gslcblas
+                          Python::Python
+                          PUBLIC
+                          gtest)
+    enable_testing()
+    add_subdirectory(tests/ctests)
 
-  # Setup for code coverage
-  # default to off
-  set(COVERAGE OFF CACHE BOOL "Coverage")
-  if(COVERAGE)
-      target_compile_options(ale PRIVATE --coverage -O0)
-      target_link_libraries(ale PRIVATE --coverage -O0)
-  endif()
+    # Setup for code coverage
+    # default to off
+    set(COVERAGE OFF CACHE BOOL "Coverage")
+    if(COVERAGE)
+        target_compile_options(ale PRIVATE --coverage -O0)
+        target_link_libraries(ale PRIVATE --coverage -O0)
+    endif()
 endif()
 
 # Install commands
