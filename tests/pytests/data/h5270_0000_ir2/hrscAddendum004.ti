@@ -1,0 +1,233 @@
+HRSC Instrument Kernel
+=============================================================
+
+This instrument kernel (I-kernel) contains parameters that
+describe the Mars Express HRSC (High Resolution
+Stereographic Camera) instrument.
+
+Version and Date
+-------------------------------------------------------------
+Version 4.0 -- March 23, 2010 -- Debbie Cook, U.S. Geological Survey,
+    Flagstaff, AZ
+    Added new keywords CK_FRAME_ID and CK_REFERENCE_FRAME_ID needed for ckwriter..
+
+Version 3.0 -- June 05, 2009 -- Ken Edmundson, U.S. Geological Survey,
+    Flagstaff, AZ
+    Corrected additional errors in coefficients and updated documentation.
+
+Version 2.0 -- May 07, 2009 -- Ken Edmundson, U.S. Geological Survey,
+    Flagstaff, AZ
+    Modified focal lengths, "boresight" values, and forward/reverse affine
+    transformation coefficients. The focal lengths and boresight values
+    in Version 1.0 were specific to Socet Set instead of Isis. There were
+    also errors in the computation of the affine transformation
+    coefficients. The first indication that there was a problem with Version
+    1.0 was in the Isis Support Center post of 2008-11-11 by Angelo Pio
+    entitled "HRSC anaglyphs with isis3 from level1 data?"
+    (http://isis.astrogeology.usgs.gov/IsisSupport/viewtopic.php?t=1852&highlight=anaglyph)
+
+Version 1.0 -- July 28, 2008 -- Steven Lambright, U.S. Geological Survey,
+    Flagstaff, AZ
+    Initial version.
+
+-------------------------------------------------------------
+
+\begindata
+INS-41210_PLATFORM_ID = -41000
+
+INS-41210_SPK_TIME_BIAS = 0.0
+INS-41210_CK_TIME_BIAS = 0.0
+INS-41210_CK_TIME_TOLERANCE = 1
+
+\begintext
+The following is the focal length, which is expressed in MILLIMETERS.
+This value comes from Randy Kirk's file HRSC_cal_RLK.xls referenced
+in his May 23rd, 2008 email (no subject). 
+
+\begindata
+
+INS-41211_FOCAL_LENGTH = 174.80
+INS-41212_FOCAL_LENGTH = 174.61
+INS-41213_FOCAL_LENGTH = 174.74
+INS-41214_FOCAL_LENGTH = 175.01
+INS-41215_FOCAL_LENGTH = 175.01
+INS-41216_FOCAL_LENGTH = 175.23
+INS-41217_FOCAL_LENGTH = 174.80
+INS-41218_FOCAL_LENGTH = 174.82
+INS-41219_FOCAL_LENGTH = 174.87
+
+INS-41211_BORESIGHT_SAMPLE = 2592.5
+INS-41211_BORESIGHT_LINE   = 0.0
+INS-41212_BORESIGHT_SAMPLE = 2592.5
+INS-41212_BORESIGHT_LINE   = 0.0
+INS-41213_BORESIGHT_SAMPLE = 2592.5
+INS-41213_BORESIGHT_LINE   = 0.0
+INS-41214_BORESIGHT_SAMPLE = 2592.5
+INS-41214_BORESIGHT_LINE   = 0.0
+INS-41215_BORESIGHT_SAMPLE = 2592.5
+INS-41215_BORESIGHT_LINE   = 0.0
+INS-41216_BORESIGHT_SAMPLE = 2592.5
+INS-41216_BORESIGHT_LINE   = 0.0
+INS-41217_BORESIGHT_SAMPLE = 2592.5
+INS-41217_BORESIGHT_LINE   = 0.0
+INS-41218_BORESIGHT_SAMPLE = 2592.5
+INS-41218_BORESIGHT_LINE   = 0.0
+INS-41219_BORESIGHT_SAMPLE = 2592.5
+INS-41219_BORESIGHT_LINE   = 0.0
+
+\begintext
+The following is the pixel pitch, which is the distance between
+adjacent pixels on the CCD arrays.  This is expressed in
+MILLIMETERS per pixel.
+
+\begindata
+INS-41210_PIXEL_PITCH = 0.007
+INS-41210_OD_K = (0.0, 0.0, 0.0)
+
+\begintext
+The following affine transformation computes focal plane
+coordinates (x,y) from CCD coordinates (Line,Sample). The
+affine coefficients are given by transx[0,1,2] and transy[0,1,2]
+
+x = transx[0] + transx[1]*ccdSample_c + transx[2]*ccdLine_c
+y = transy[0] + transy[1]*ccdSample_c + transy[2]*ccdLine_c
+
+The affine coefficients are calculated as follows:
+
+TRANSX (0) =  (So-Smid) * cos(theta) * PixelPitch
+
+TRANSX (1) = -cos(theta) * PixelPitch
+
+TRANSX (2) =  sin(theta) * PixelPitch
+
+TRANSY (0) =  Y0 - (So-Smid) * sin(theta) * PixelPitch
+
+TRANSY (1) =  sin(theta) * PixelPitch
+
+TRANSY (2) =  cos(theta) * PixelPitch
+  
+where
+
+Smid = Boresight
+PixelPitch = 0.007mm
+Yo = offset of the line array along the Y axis (mm) from the xyz origin
+So = Sample number where the detector crosses the Y axis (at x = 0, y = Y0)
+
+Values for Yo, So, and theta are given in the table below.
+
+
+Instrument |       description        |theta radians (degrees) | So (sample) | Yo (mm)   |
+===========|==========================|========================|=============|===========|
+INS-41211  | MEX_HRSC_S2 (aft stereo) |     0.00011   (0.0063) |   2588.7635 | -59.9927  |
+-----------|--------------------------|------------------------|-------------|-----------|
+INS-41212  | MEX_HRSC_RED (red)       |    -0.00004 (-0.00229) |   2585.3891 | -49.7678  |
+-----------|--------------------------|------------------------|-------------|-----------|
+INS-41213  | MEX_HRSC_P2 (aft photo)  |    -0.00034 (-0.01948) |   2589.3140 | -39.5483  |
+-----------|--------------------------|------------------------|-------------|-----------|
+INS-41214  | MEX_HRSC_BLUE (blue)     |     0.00019  (0.01089) |   2602.0075 | -10.2417  |
+-----------|--------------------------|------------------------|-------------|-----------|
+INS-41215  | MEX_HRSC_NADIR (nadir)   |    -0.00006 (-0.00344) |   2597.3376 |  -0.0055  |
+-----------|--------------------------|------------------------|-------------|-----------|
+INS-41216  | MEX_HRSC_GREEN (green)   |     0.00095  (0.05443) |   2598.8432 |  10.2130  |
+-----------|--------------------------|------------------------|-------------|-----------|
+INS-41217  | MEX_HRSC_P1 (fwd photo)  |     0.00021  (0.01203) |   2597.1421 |  39.5531  |
+-----------|--------------------------|------------------------|-------------|-----------|
+INS-41218  | MEX_HRSC_IR (infra-red)  |     0.00044  (0.02521) |   2594.8517 |  49.7918  |
+-----------|--------------------------|------------------------|-------------|-----------|
+INS-41219  | MEX_HRSC_S1 (fwd stereo) |     0.00048  (0.02750) |   2595.9317 |  59.9869  |
+-----------|--------------------------|------------------------|-------------|-----------|
+
+
+
+\begindata
+ INS-41211_TRANSX=(-0.026155499841886, -0.006999999957684, 0.0000007696901985785)
+ INS-41211_TRANSY=(-59.9926971240526, 0.0000007696901985785, 0.006999999957684) 
+ INS-41212_TRANSX=(-0.049776299960244, -0.006999999994409, -0.0000002797762790202)
+ INS-41212_TRANSY=(-49.7678019894611, -0.0000002797762790202, 0.006999999994409) 
+ INS-41213_TRANSX=(-0.022301998711020, -0.006999999595423, -0.000002379930922169)
+ INS-41213_TRANSY=(-39.5483075824599, -0.000002379930922169, 0.006999999595423) 
+ INS-41214_TRANSX=(0.066552498797889, -0.006999999873562, 0.000001330464480785)
+ INS-41214_TRANSY=(-10.2417126493911, 0.000001330464480785, 0.006999999873562) 
+ INS-41215_TRANSX=(0.033863199938965, -0.006999999987383, -0.0000004202752836277)
+ INS-41215_TRANSY=(-0.005497966876288, -0.0000004202752836277, 0.006999999987383) 
+ INS-41216_TRANSX=(0.044402379964146, -0.006999996841365, 0.000006649877982807)
+ INS-41216_TRANSY=(10.212957818494, 0.000006649877982807, 0.006999996841365)
+ INS-41217_TRANSX=(0.032494699283744, -0.006999999845704, 0.000001469741752306)
+ INS-41217_TRANSY=(39.5530931773118, 0.000001469741752306, 0.006999999845704)
+ INS-41218_TRANSX=(0.016461898406507, -0.006999999322408, 0.000003079982431615)
+ INS-41218_TRANSY=(49.7917927568053, 0.000003079982431615, 0.006999999322408)
+ INS-41219_TRANSX=(0.024021897233075, -0.006999999193716, 0.000003359758681093)
+ INS-41219_TRANSY=(59.9868884703161, 0.000003359758681093, 0.006999999193716)
+
+\begintext
+The inverse transformation computes CCD coordinates (Line,Sample) given
+focal plane coordinates (x,y).
+
+The coefficients of the inverse transform are calculated as follows:
+
+
+TRANSS (0) =  (So-Smid) - Y0 * sin(theta) / PixelPitch
+
+TRANSS (1) = -cos(theta) / PixelPitch
+
+TRANSS (2) =  sin(theta) / PixelPitch
+
+TRANSL (0) =  -Y0 * cos(theta) / PixelPitch
+
+TRANSL (1) =  sin(theta) / PixelPitch
+
+TRANSL (2) =  cos(theta) / PixelPitch
+
+
+\begindata
+  INS-41211_ITRANSS = (-2.7941368739538, -142.857141993552, 0.015707963236297)
+  INS-41211_ITRANSL = (8570.3856624766, 0.015707963236297, 142.857141993552)
+  INS-41212_ITRANSS = (-7.39506020202098, -142.85714274304, -0.005709719980004)
+  INS-41212_ITRANSL = (7109.68570860705, -0.005709719980004, 142.85714274304)
+  INS-41213_ITRANSS = (-5.10686167529011, -142.857134600479, -0.048570018819771)
+  INS-41213_ITRANSL = (5649.75681632013, -0.048570018819771, 142.857134600479)
+  INS-41214_ITRANSS = (9.78558608311961, -142.85714027677, 0.027152336342545)
+  INS-41214_ITRANSL = (1463.0999735726, 0.027152336342545, 142.85714027677)
+  INS-41215_ITRANSS = (4.83755282624351, -142.857142599663, -0.008577046604648)
+  INS-41215_ITRANSL = (0.785714284298145, -0.008577046604648, 142.857142599663)
+  INS-41216_ITRANSS = (4.95717543186894, -142.857078395208, 0.135711795567498)
+  INS-41216_ITRANSL = (-1458.99934165026, 0.135711795567498, 142.857078395208)
+  INS-41217_ITRANSS = (3.45571545912004, -142.857139708249, 0.029994729638890)
+  INS-41217_ITRANSL = (-5650.44273259436, 0.029994729638890, 142.857139708249)
+  INS-41218_ITRANSS = (-0.778052433438109, -142.857129028729, 0.062856784318668)
+  INS-41218_ITRANSL = (-7113.11359717265, 0.062856784318668, 142.857129028729)
+  INS-41219_ITRANSS = (-0.681392000547864, -142.857126402363, 0.068566503695773)
+  INS-41219_ITRANSL = (-8569.5561557859, 0.068566503695773, 142.857126402363)
+
+\begintext
+These are the parameters required for writing c-kernels.  Isis will
+create ck with the same frame endpoints as the mission ck.  For 
+the Mars Express spacecraft the ck frame is MEX_SC_REF (-41001), and the
+ck reference frame is J2000 (1).
+
+\begindata
+INS-41211_CK_FRAME_ID=-41001
+INS-41211_CK_REFERENCE_ID=1
+INS-41212_CK_FRAME_ID=-41001
+INS-41212_CK_REFERENCE_ID=1
+INS-41213_CK_FRAME_ID=-41001
+INS-41213_CK_REFERENCE_ID=1
+INS-41214_CK_FRAME_ID=-41001
+INS-41214_CK_REFERENCE_ID=1
+INS-41215_CK_FRAME_ID=-41001
+INS-41215_CK_REFERENCE_ID=1
+INS-41216_CK_FRAME_ID=-41001
+INS-41216_CK_REFERENCE_ID=1
+INS-41217_CK_FRAME_ID=-41001
+INS-41217_CK_REFERENCE_ID=1
+INS-41218_CK_FRAME_ID=-41001
+INS-41218_CK_REFERENCE_ID=1
+INS-41219_CK_FRAME_ID=-41001
+INS-41219_CK_REFERENCE_ID=1
+
+  
+  
+  
+    
+
+  

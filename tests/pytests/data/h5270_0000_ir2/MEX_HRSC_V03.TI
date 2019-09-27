@@ -1,0 +1,806 @@
+KPL/IK
+
+HRSC Instrument kernel
+===========================================================================
+
+   This instrument kernel (I-kernel) contains Mars Express High
+   Resolution Stereo Camera (HRSC) main camera and Super Resolution
+   Channel (SRC) camera optics, detector, and field-of-view parameters.
+
+
+Version and Date
+---------------------------------------------------------------------------
+
+   Version 0.3 -- December 16, 2003 -- Boris Semenov, NAIF/JPL
+
+      Updated focal length for SRC (988.6 mm instead of 975.0 mm)
+
+      Corrected SRC size and central pixel location to be consistent 
+      with the values accepted by HRSC team.
+
+      Corrected SRC diagram showing its relationship to the frame 
+      (it is rotated extra 90 degrees) and the cross- and along-track
+      directions.
+
+   Version 0.2 -- May 19, 2003 -- Boris Semenov, NAIF/JPL
+
+      Cleaned up terminology and grammar.
+
+   Version 0.1 -- November 4, 2002 -- Boris Semenov, NAIF/JPL
+
+      Corrected error in HRSC/SRC FOV definition (replaced full angle,
+      0.54, degrees with half angle, 0.27 degrees, as GETFOV
+      specification requires.) Replaced INS######_CENTER keywords with
+      INS######_CCD_CENTER. Fixed acronym for the "RED" detector ("RD" was 
+      replaced with "RE".) Replaced SRC physical CCD sizes with active 
+      matrix sizes and added note clarifying the difference between them.
+
+   Version 0.0 -- May 21, 2002 -- Boris Semenov, NAIF/JPL
+
+      Initial release.
+
+
+References
+---------------------------------------------------------------------------
+
+   1. ``Kernel Pool Required Reading''
+
+   2. ``C-kernel Required Reading''
+
+   3. ``HRSC ICD'', MSP01-97-0008, June 10, 1999
+
+   4. Mars Express Frames Definition Kernel (FK), latest version.
+
+   5. ``HRSC Geometric Calibration Data'', set of 9 ASCII tables provided
+      by T. Roatsch/DLR, February 2002
+
+   6. ``HRSC On Mars Express'', presentation by R. Pischel, et al at HRSC
+      Science Team Meeting, May 9-11, 2001
+
+   7. N/A
+
+   8. Review comments from Thomas Roatsch, HRSC Team, May-Nov 2002.
+
+   9. E-mails from Thomas Roatsch, Sep 11 & Dec 15, 2003.
+ 
+
+Implementation Notes
+--------------------------------------------------------
+
+   Applications that need SPICE I-kernel data must ``load'' the I-kernel
+   file, normally during program initialization.
+
+   Loading the kernel using the SPICELIB routine FURNSH causes the data
+   items and their associated values present in the kernel to become
+   associated with a data structure called the ``kernel pool''. The
+   application program may then obtain the value(s) for any IK data
+   item using the SPICELIB routines GDPOOL, GIPOOL, GCPOOL. Routine
+   GETFOV may be used if the file contains instrument field-of-view
+   (FOV) specification. See [1] for details.
+
+   This file was created with, and can be updated with a text editor or
+   word processor.
+
+
+Conventions for Specifying Data
+--------------------------------------------------------
+
+   Data items are specified using ``keyword=value'' assignments [1].
+   All keywords referencing values in this I-kernel start with the
+   characters `INS' followed by the NAIF MEX instrument ID code,
+   constructed using the spacecraft ID number (-41) followed by the NAIF
+   three digit ID number for HRSC main camera head (210), individual
+   HRSC line arrays (211-219) or SRC (220). These IDs are defined in
+   [4] as follows:
+
+               Instrument name          ID
+               --------------------   ------
+               MEX_HRSC_HEAD          -41210
+
+               MEX_HRSC_S2            -41211
+               MEX_HRSC_RED           -41212
+               MEX_HRSC_P2            -41213
+               MEX_HRSC_BLUE          -41214
+               MEX_HRSC_NADIR         -41215
+               MEX_HRSC_GREEN         -41216
+               MEX_HRSC_P1            -41217
+               MEX_HRSC_IR            -41218
+               MEX_HRSC_S1            -41219
+
+               MEX_HRSC_SRC           -41220
+
+   The remainder of the keyword is an underscore character followed by the
+   unique name of the data item. For example, the focal length of the
+   main HRSC camera is specified by
+
+               INS-41210_FOCAL_LENGTH
+
+   The upper bound on the length of all keywords is 32 characters.
+
+   If a keyword is included in more then one file, or if the same
+   keyword appears more than once within a single file, the last
+   assignment supersedes any earlier assignments.
+
+
+Overview
+--------------------------------------------------------
+
+   From [TBD]:
+
+      "HRCS description. To be copied from TBD source provided by
+      the HRSC team."
+
+
+Mounting Alignment
+--------------------------------------------------------
+
+   Refer to the latest version of the Mars Express Frames Definition
+   Kernel (FK) [4] for the HRSC reference frame definitions and
+   mounting alignment information.
+
+
+Detector Layout
+--------------------------------------------------------
+
+   This section provides a set of diagrams illustrating the HRSC line
+   detector and SRC camera detector layout in the corresponding camera
+   reference frames.
+
+
+HRSC Camera 
+
+   The HRSC camera includes 9 line detectors, each 5184 pixels long:
+
+               Name             Acronym
+               --------------   ------- 
+               STEREO-1            S1
+               INFRARED            IR
+               PHOTOMETRIC-1       P1
+               GREEN               GR
+               NADIR               ND
+               BLUE                BL
+               PHOTOMETRIC-2       P2
+               RED                 RE
+               STEREO-2            S2                
+
+   The view directions of these detectors in the MEX_HRSC_HEAD frame are 
+   as follows:
+
+                                             ^ s/c velocity
+                                             |  along track
+                                             |
+                   View Direction
+               of the central pixel                         
+                  of the line S1                   
+                                     .'            
+                           `-.     .'.'       Yhrsc       
+                              `-..'.'.'      ^          
+                               .'`-.'        |       
+                          S1 .'.'.' `-.      |
+                          IR .'.'  .'.'`-.   |
+              Zhrsc       P1 .'  .'.'.'   `-.|
+       <---     <--------------.'.-----------o 
+       Nadir              GR .'.'.'  .'    .' Focal
+                          ND .'.'  .'.'  .'   Point
+                          BL .'  .'.'.' v   
+                               .'.'.'    Xhrsc
+                          P2 .'.'.'
+                          RE .'.'
+                          S2 .'
+
+                            .'
+                          v'  
+                            Cross-Track
+
+
+   As seen on the diagram the view direction of the central pixel of
+   the S1 (STEREO-1) line is in the (+Y,+Z) quadrant looking forward
+   with regard to the s/c motion, while the view direction of the
+   central pixel of the S2 line is in the (-Y,+Z) quadrant, looking
+   backwards. Other pixel view directions extend from the focal point
+   through the corresponding line point.
+ 
+   This diagram shows view direction and HRSC camera head axes projected 
+   onto the Mars surface:
+
+
+                                  ^ +Yhrsc -- s/c velocity/along track
+                                  |
+                                  |
+               Pixel 1            |
+                    """"""""""""""|"""""""""""""" S1
+                    """"""""""""""|"""""""""""""" IR
+                    """"""""""""""|"""""""""""""" P1
+                                  |         
+                                  |         
+                    """"""""""""""|"""""""""""""" GR
+               <------------------x """"""""""""" ND
+           +Xhrsc   """""""""" +Zhrsc """"""""""" BL
+         cross-track          boresight      
+                             (into page)     
+                    """"""""""""""""""""""""""""" P2
+                    """"""""""""""""""""""""""""" RE
+                    """"""""""""""""""""""""""""" S2
+                             5184 pixels
+
+
+SRC Camera
+
+   The SRC camera comprises a single square CCD detector. The view
+   directions of the corners and the axes of the MEX_HRSC_SRC frame
+   projected onto the Mars surface look like this:
+
+
+                                  ^ +Ysrc (cross-track)
+                                  |
+                      Pixel       |
+                      (1,1)-------|---------+
+                        |         |         |
+                        |         |         |
+                        |         |         |
+                        |         |         |
+                    <-------------x         |  1024      -------> 
+             +Xsrc      |       +Zsrc       | lines    direction of 
+         (along-track)  |     boresight     |            flight
+                        |    (into page)    |         (s/c +Y axis)
+                        |                   |
+                        +-------------------+
+                          1024 pixels/line
+
+
+Optical Parameters
+--------------------------------------------------------
+
+   The following HRSC and SRC camera first order optical parameters are
+   included in the data section below, taken from [6]:
+
+      -----------------------------------------------------------------
+             parameter                    HRSC                HRSC/SRC
+      -----------------------------------------------------------------
+      Focal Length, mm                    175.0               988.6  (4)
+      f/ratio                             f/5.6               f/9.2
+      IFOV, rad/pixel                     0.000040            0.0000092
+      Field of view (rad)
+          Cross-track                     0.200000 (1)        0.0094 (3)
+          Along-track                     0.659734 (2)        0.0094 (3)
+      -----------------------------------------------------------------
+
+   (1) The HRSC main camera cross-track FOV is nominally 11.9 degrees.
+
+   (2) The HRSC main camera combined along-track FOV size is assumed to be 
+       equal to the angular separation between the first and last line
+       detectors. It is nominally equal to 2 * 18.9 degrees = 37.8
+       degrees, where 18.9 degrees is the nominal stereo angle.
+
+   (3) The SRC along-track FOV is assumed to have the same size as the 
+       cross-track FOV -- nominally 0.54 degrees.
+
+   (4) Actual calibrated FL from [9]; nominal value is 975.0 mm.
+
+   Note that the value for HRSC cross-track FOV is not equal to the value
+   of IFOV multiplied by the the number of pixels in the line arrays. 
+   This is due to the fact that [6] provided nominal reference values.
+
+   This data section also provides nominal data for each of the HRSC main
+   camera line detectors. In these, the FOV_ANGULAR_SIZE keyword's along-
+   track FOV dimension is set to IFOV. 
+
+   Angular size values in the keywords are given radians, with the
+   cross-track size being the first value and the along-track size being
+   the second value in each pair.
+
+      \begindata
+
+         INS-41210_FOCAL_LENGTH       = ( 175.0              )
+         INS-41210_F/RATIO            = (   5.6              )
+         INS-41210_FOV_ANGULAR_SIZE   = (   0.200,  0.659734 )
+         INS-41210_IFOV               = (   0.000040         )
+
+
+         INS-41211_FOCAL_LENGTH       = ( 175.0              )
+         INS-41211_F/RATIO            = (   5.6              )
+         INS-41211_FOV_ANGULAR_SIZE   = (   0.200,  0.000040 )
+         INS-41211_IFOV               = (   0.000040         )
+
+         INS-41212_FOCAL_LENGTH       = ( 175.0              )
+         INS-41212_F/RATIO            = (   5.6              )
+         INS-41212_FOV_ANGULAR_SIZE   = (   0.200,  0.000040 )
+         INS-41212_IFOV               = (   0.000040         )
+
+         INS-41213_FOCAL_LENGTH       = ( 175.0              )
+         INS-41213_F/RATIO            = (   5.6              )
+         INS-41213_FOV_ANGULAR_SIZE   = (   0.200,  0.000040 )
+         INS-41213_IFOV               = (   0.000040         )
+
+         INS-41214_FOCAL_LENGTH       = ( 175.0              )
+         INS-41214_F/RATIO            = (   5.6              )
+         INS-41214_FOV_ANGULAR_SIZE   = (   0.200,  0.000040 )
+         INS-41214_IFOV               = (   0.000040         )
+
+         INS-41215_FOCAL_LENGTH       = ( 175.0              )
+         INS-41215_F/RATIO            = (   5.6              )
+         INS-41215_FOV_ANGULAR_SIZE   = (   0.200,  0.000040 )
+         INS-41215_IFOV               = (   0.000040         )
+
+         INS-41216_FOCAL_LENGTH       = ( 175.0              )
+         INS-41216_F/RATIO            = (   5.6              )
+         INS-41216_FOV_ANGULAR_SIZE   = (   0.200,  0.000040 )
+         INS-41216_IFOV               = (   0.000040         )
+
+         INS-41217_FOCAL_LENGTH       = ( 175.0              )
+         INS-41217_F/RATIO            = (   5.6              )
+         INS-41217_FOV_ANGULAR_SIZE   = (   0.200,  0.000040 )
+         INS-41217_IFOV               = (   0.000040         )
+
+         INS-41218_FOCAL_LENGTH       = ( 175.0              )
+         INS-41218_F/RATIO            = (   5.6              )
+         INS-41218_FOV_ANGULAR_SIZE   = (   0.200,  0.000040 )
+         INS-41218_IFOV               = (   0.000040         )
+
+         INS-41219_FOCAL_LENGTH       = ( 175.0              )
+         INS-41219_F/RATIO            = (   5.6              )
+         INS-41219_FOV_ANGULAR_SIZE   = (   0.200,  0.000040 )
+         INS-41219_IFOV               = (   0.000040         )
+
+
+         INS-41220_FOCAL_LENGTH       = ( 988.6              )
+         INS-41220_F/RATIO            = (   9.2              )
+         INS-41220_FOV_ANGULAR_SIZE   = (   0.0094, 0.0094   )
+         INS-41220_IFOV               = (   0.0000092        )
+
+      \begintext
+
+
+Detector CCD Parameters
+--------------------------------------------------------
+
+   The HRSC and SRC CCD detector geometry parameters are included in the
+   data section below, taken from [6]:
+
+      -----------------------------------------------------------------
+             parameter                     HRSC             SRC
+      -----------------------------------------------------------------
+      Pixel Size, microns
+          Cross-track                      7.0              9.0
+          Along-track                      7.0              9.0
+      Detector Array Size
+          Cross-track                      5184  (2)        1024 (3)
+          Along-track                      1     (1)        1024 (3)
+      Detector Array Center
+          Cross-track                      2592.5           512.5
+          Along-track                      0.5   (1)        512.5
+      -----------------------------------------------------------------
+
+   (1) This dimension is given for individual line detectors, each of which
+       is 1 pixel wide. No combined CCD dimensions are provided for the
+       HRSC main camera because they are not applicable.
+
+   (2) The HRSC sensor lines have 5272 "physical" pixels but only 5184 of 
+       them are active and used for image reconstruction and processing ([8]).
+
+   (3) The SRC has 1032 pixels and 1024 lines; only 1024 pixels are
+       transferred to the data processing unit; only 1016 samples are
+       transmitted to Earth; and only 1008 lines and 1008 pixels are 
+       available after calibration [8]. The 1024 by 1024 CCD and  
+       (512.5,512.5) for its center were chosen by the HRSC team as 
+       a reference for geometric calibration.
+
+   The values are given in microns for PIXEL_SIZE keywords and in counts
+   for PIXEL_SAMPLES, PIXEL_LINES, and CENTER keywords.
+
+      \begindata
+
+         INS-41211_PIXEL_SIZE         = ( 7, 7 )
+         INS-41211_PIXEL_SAMPLES      = ( 5184 )
+         INS-41211_PIXEL_LINES        = ( 1    )
+         INS-41211_CCD_CENTER         = ( 2592.5, 0.5 )
+
+         INS-41212_PIXEL_SIZE         = ( 7, 7 )
+         INS-41212_PIXEL_SAMPLES      = ( 5184 )
+         INS-41212_PIXEL_LINES        = ( 1    )
+         INS-41212_CCD_CENTER         = ( 2592.5, 0.5 )
+
+         INS-41213_PIXEL_SIZE         = ( 7, 7 )
+         INS-41213_PIXEL_SAMPLES      = ( 5184 )
+         INS-41213_PIXEL_LINES        = ( 1    )
+         INS-41213_CCD_CENTER         = ( 2592.5, 0.5 )
+
+         INS-41214_PIXEL_SIZE         = ( 7, 7 )
+         INS-41214_PIXEL_SAMPLES      = ( 5184 )
+         INS-41214_PIXEL_LINES        = ( 1    )
+         INS-41214_CCD_CENTER         = ( 2592.5, 0.5 )
+
+         INS-41215_PIXEL_SIZE         = ( 7, 7 )
+         INS-41215_PIXEL_SAMPLES      = ( 5184 )
+         INS-41215_PIXEL_LINES        = ( 1    )
+         INS-41215_CCD_CENTER         = ( 2592.5, 0.5 )
+
+         INS-41216_PIXEL_SIZE         = ( 7, 7 )
+         INS-41216_PIXEL_SAMPLES      = ( 5184 )
+         INS-41216_PIXEL_LINES        = ( 1    )
+         INS-41216_CCD_CENTER         = ( 2592.5, 0.5 )
+
+         INS-41217_PIXEL_SIZE         = ( 7, 7 )
+         INS-41217_PIXEL_SAMPLES      = ( 5184 )
+         INS-41217_PIXEL_LINES        = ( 1    )
+         INS-41217_CCD_CENTER         = ( 2592.5, 0.5 )
+
+         INS-41218_PIXEL_SIZE         = ( 7, 7 )
+         INS-41218_PIXEL_SAMPLES      = ( 5184 )
+         INS-41218_PIXEL_LINES        = ( 1    )
+         INS-41218_CCD_CENTER         = ( 2592.5, 0.5 )
+
+         INS-41219_PIXEL_SIZE         = ( 7, 7 )
+         INS-41219_PIXEL_SAMPLES      = ( 5184 )
+         INS-41219_PIXEL_LINES        = ( 1    )
+         INS-41219_CCD_CENTER         = ( 2592.5, 0.5 )
+
+         INS-41220_PIXEL_SIZE         = ( 9, 9 )
+         INS-41220_PIXEL_SAMPLES      = ( 1024 )
+         INS-41220_PIXEL_LINES        = ( 1024 )
+         INS-41220_CCD_CENTER         = ( 512.5, 512.5 )
+
+      \begintext
+
+
+Wavelength Ranges
+---------------------------------------------------------------------------
+
+   This section contains assignments specifying HRSC and SRC detector 
+   wavelength ranges.
+    
+
+HRSC Camera
+
+   The following line detector wavelength band center/width data are 
+   taken from [6]: 
+
+      -------------------------------------------
+         Detector     Band Center,   Bandwidth, 
+            #          nanometers    nanometers (1)
+      -------------------------------------------
+           S1            675          180
+           RED           750           40
+           P2            675          180
+           BLUE          440           90    
+           NADIR         675          180
+           GREEN         530           90
+           P1            675          180
+           IR            970           90
+           S1            675          180
+      -------------------------------------------
+
+   (1) in [6] the bandwidth was specified as 1/2 of the value provided 
+       in this table (i.e. +/- 90 for 180 bandwidth given above.)
+
+   The set of assignments below specifies wavelength center and bandwidth
+   for each detector, with units the same as in the table above.
+
+      \begindata
+
+         INS-41211_FILTER_BANDCENTER  = ( 675 )
+         INS-41211_FILTER_BANDWIDTH   = ( 180 )
+
+         INS-41212_FILTER_BANDCENTER  = ( 750 )
+         INS-41212_FILTER_BANDWIDTH   = (  40 )
+
+         INS-41213_FILTER_BANDCENTER  = ( 675 )
+         INS-41213_FILTER_BANDWIDTH   = ( 180 )
+
+         INS-41214_FILTER_BANDCENTER  = ( 440 )
+         INS-41214_FILTER_BANDWIDTH   = (  90 )
+
+         INS-41215_FILTER_BANDCENTER  = ( 675 )
+         INS-41215_FILTER_BANDWIDTH   = ( 180 )
+
+         INS-41216_FILTER_BANDCENTER  = ( 530 )
+         INS-41216_FILTER_BANDWIDTH   = (  90 )
+
+         INS-41217_FILTER_BANDCENTER  = ( 675 )
+         INS-41217_FILTER_BANDWIDTH   = ( 180 )
+
+         INS-41218_FILTER_BANDCENTER  = ( 970 )
+         INS-41218_FILTER_BANDWIDTH   = (  90 )
+
+         INS-41219_FILTER_BANDCENTER  = ( 675 )
+         INS-41219_FILTER_BANDWIDTH   = ( 180 )
+
+      \begintext
+
+
+SRC Camera
+
+   No wavelength data has been made available for this camera at the
+   time when this IK file was made.
+
+      begindata
+ 
+         INS-41220_FILTER_BANDCENTER  = ( '?' )
+         INS-41220_FILTER_BANDWIDTH   = ( '?' )
+
+      begintext
+
+
+FOV Definitions
+---------------------------------------------------------------------------
+
+   This section contains definitions for the HRSC main camera combined FOV, 
+   HRSC line detector individual FOVs, and SRC camera FOV. These definitions 
+   are provided in a format consistent required by the SPICE (CSPICE) 
+   function GETFOV (getfov_c).
+   
+
+HRSC Camera Individual Line Detector FOVs
+
+   The sets of keywords in the data section below define individual
+   HRSC line detector FOVs with respect to the MEX_HRSC_HEAD frame.
+
+   Each of these FOVS is a rectangle with the edges defined by the
+   outer corners of the first and last pixels of that line detector. The
+   boresight of each of these FOVs is defined such that it points along
+   the detector center's view direction (with the center being the point
+   between the two middle pixels.)
+
+   The data from which the view directions for the corner pixels
+   have been computed are provided in the camera geometric calibration
+   tables ([5]). This reference specifies coordinates for each pixel of
+   each line detector in the CCD plane -- the plane normal to the
+   camera boresight (+Z axis) and located at the focal length behind
+   the focal point. The view direction of each pixel can then be
+   determined as a vector pointing from that pixel's location on that
+   plane through the focal point, as illustrated by this diagram:
+
+                       Corner pixel
+                      view direction 
+                           ^
+         Center pixel       \             Y
+            view   <.        \           ^   CCD plane
+          direction  `-.      \          |
+                        `-.    \         |     .^ X
+                           `-.  \        |   .'
+                              `-.\    F  | .'
+                     <-----------`o.-----o'  Detector line in
+                   Z        Focal  \`-.  | .  the CCD plane
+                            point   \  `-*'
+                                     \ .'| Center pixel
+                                      *  |
+                                  Corner
+                                   pixel           
+
+   Assuming that the CCD plane coordinates of the first and last pixel
+   of the detector line N are (Xf,Yf) and (Xl,Yl) and the coordinates
+   of the two pixels on either side of the geometric middle point of the 
+   line are (Xm1,Ym1) and (Xm2,Ym2), the FOV definition for that line can 
+   be constructed as:
+
+         INS<INSTID>_FOV_FRAME            = 'MEX_HRSC_HEAD'
+         INS<INSTID>_FOV_SHAPE            = 'RECTANGLE'
+         INS<INSTID>_BORESIGHT            = (
+                                           -(Xm1+Xm2)/2, -(Ym1+Ym2)/2, FL 
+                                          )
+         INS<INSTID>_FOV_BOUNDARY_CORNERS = (
+                                           -(Xf-HP),     -(Yf-HP),     FL
+                                           -(Xf-HP),     -(Yf+HP),     FL
+                                           -(Xl+HP),     -(Yl+HP),     FL
+                                           -(Xl+HP),     -(Yl-HP),     FL
+                                          )
+
+   where HP is 1/2 of the pixel size, and FL is the focal length.
+ 
+   The boresight and corner vectors included in the frame definition
+   below have intentionally been left un-unitized to allow easier back
+   tracking to the original calibration data and focal length and pixel
+   size values defined earlier in this I-kernel.
+
+   Refer to [7] for definitions of the keywords used in these assignments.
+
+      \begindata
+
+
+         INS-41211_FOV_FRAME            = 'MEX_HRSC_HEAD'
+         INS-41211_FOV_SHAPE            = 'RECTANGLE'
+         INS-41211_BORESIGHT            = (
+                                           -0.028300   -60.035700   175.000000
+                                          )
+         INS-41211_FOV_BOUNDARY_CORNERS = (
+                                           18.128100   -60.032900   175.000000
+                                           18.128100   -60.039900   175.000000
+                                          -18.186200   -60.043500   175.000000
+                                          -18.186200   -60.036500   175.000000
+                                          )
+
+
+         INS-41212_FOV_FRAME            = 'MEX_HRSC_HEAD'
+         INS-41212_FOV_SHAPE            = 'RECTANGLE'
+         INS-41212_BORESIGHT            = (
+                                           -0.052100   -49.818000   175.000000
+                                          )
+         INS-41212_FOV_BOUNDARY_CORNERS = (
+                                           18.112200   -49.816100   175.000000
+                                           18.112200   -49.823100   175.000000
+                                          -18.217400   -49.821800   175.000000
+                                          -18.217400   -49.814800   175.000000
+                                          )
+
+
+         INS-41213_FOV_FRAME            = 'MEX_HRSC_HEAD'
+         INS-41213_FOV_SHAPE            = 'RECTANGLE'
+         INS-41213_BORESIGHT            = (
+                                           -0.023700   -39.592400   175.000000
+                                          )
+         INS-41213_FOV_BOUNDARY_CORNERS = (
+                                           18.145600   -39.597300   175.000000
+                                           18.145600   -39.604300   175.000000
+                                          -18.191600   -39.591500   175.000000
+                                          -18.191600   -39.584500   175.000000
+                                          )
+
+
+         INS-41214_FOV_FRAME            = 'MEX_HRSC_HEAD'
+         INS-41214_FOV_SHAPE            = 'RECTANGLE'
+         INS-41214_BORESIGHT            = (
+                                            0.064300   -10.229000   175.000000
+                                          )
+         INS-41214_FOV_BOUNDARY_CORNERS = (
+                                           18.184500   -10.219900   175.000000
+                                           18.184500   -10.226900   175.000000
+                                          -18.053200   -10.233100   175.000000
+                                          -18.053200   -10.226100   175.000000
+                                          )
+
+
+         INS-41215_FOV_FRAME            = 'MEX_HRSC_HEAD'
+         INS-41215_FOV_SHAPE            = 'RECTANGLE'
+         INS-41215_BORESIGHT            = (
+                                            0.032200    -0.005800   175.000000
+                                          )
+         INS-41215_FOV_BOUNDARY_CORNERS = (
+                                           18.174900    -0.002900   175.000000
+                                           18.174900    -0.009900   175.000000
+                                          -18.110800    -0.007700   175.000000
+                                          -18.110800    -0.000700   175.000000
+                                          )
+
+
+         INS-41216_FOV_FRAME            = 'MEX_HRSC_HEAD'
+         INS-41216_FOV_SHAPE            = 'RECTANGLE'
+         INS-41216_BORESIGHT            = (
+                                            0.042600    10.213000   175.000000
+                                          )
+         INS-41216_FOV_BOUNDARY_CORNERS = (
+                                           18.186200    10.232000   175.000000
+                                           18.186200    10.225000   175.000000
+                                          -18.100700    10.191500   175.000000
+                                          -18.100700    10.198500   175.000000
+                                          )
+
+
+         INS-41217_FOV_FRAME            = 'MEX_HRSC_HEAD'
+         INS-41217_FOV_SHAPE            = 'RECTANGLE'
+         INS-41217_BORESIGHT            = (
+                                            0.031600    39.612600   175.000000
+                                          )
+         INS-41217_FOV_BOUNDARY_CORNERS = (
+                                           18.202500    39.617200   175.000000
+                                           18.202500    39.610200   175.000000
+                                          -18.138900    39.603100   175.000000
+                                          -18.138900    39.610100   175.000000
+                                          )
+
+
+         INS-41218_FOV_FRAME            = 'MEX_HRSC_HEAD'
+         INS-41218_FOV_SHAPE            = 'RECTANGLE'
+         INS-41218_BORESIGHT            = (
+                                            0.015100    49.903900   175.000000
+                                          )
+         INS-41218_FOV_BOUNDARY_CORNERS = (
+                                           18.198200    49.912100   175.000000
+                                           18.198200    49.905100   175.000000
+                                          -18.169300    49.890100   175.000000
+                                          -18.169300    49.897100   175.000000
+                                          )
+
+
+         INS-41219_FOV_FRAME            = 'MEX_HRSC_HEAD'
+         INS-41219_FOV_SHAPE            = 'RECTANGLE'
+         INS-41219_BORESIGHT            = (
+                                            0.021500    60.057200   175.000000
+                                          )
+         INS-41219_FOV_BOUNDARY_CORNERS = (
+                                           18.187000    60.064100   175.000000
+                                           18.187000    60.057100   175.000000
+                                          -18.142000    60.040600   175.000000
+                                          -18.142000    60.047600   175.000000
+                                          )
+
+      \begintext
+
+
+HRSC Camera Combined FOV
+
+   The set of assignments in the data section below defines the combined HRSC
+   main camera FOV with respect to the MEX_HRSC_HEAD frame to be a
+   rectangle with the edges defined by the outer corners of the first
+   and last pixels of the S1 and S2 detectors and the boresight along the +Z
+   axis of the MEX_HRSC_HEAD frame. The corner view direction are taken
+   from the corresponding individual detector FOV defined in the
+   previous section.
+
+      \begindata
+
+         INS-41210_FOV_FRAME            = 'MEX_HRSC_HEAD'
+         INS-41210_FOV_SHAPE            = 'RECTANGLE'
+         INS-41210_BORESIGHT            = (
+                                            0.000000     0.000000   175.000000
+                                          )
+         INS-41210_FOV_BOUNDARY_CORNERS = (
+                                           18.187000    60.064100   175.000000
+                                           18.128100   -60.039900   175.000000
+                                          -18.186200   -60.043500   175.000000
+                                          -18.142000    60.047600   175.000000
+                                          )
+
+      \begintext
+
+
+SRC Camera FOV
+
+   The set of assignments in the data section below defines the SRC FOV
+   with respect to the MEX_HRSC_SRC frame to be a rectangle with the
+   corners defined by the first and last pixels of the first and last
+   lines of the CCD and the boresight along the +Z axis of the MEX_HRSC_SRC
+   frame. This FOV definition uses angular extent style specification
+   with the cross and along track angular sizes taken from the ``Optics
+   Parameters'' section above.
+
+      \begindata
+
+         INS-41220_FOV_FRAME                 = 'MEX_HRSC_SRC'
+         INS-41220_FOV_SHAPE                 = 'RECTANGLE'
+         INS-41220_BORESIGHT                 = (
+                                            0.000000     0.000000   988.600000
+                                               )
+         INS-41220_FOV_CLASS_SPEC            = 'ANGLES'
+         INS-41220_FOV_REF_VECTOR            = (
+                                            1.000000     0.000000     0.000000
+                                               )
+         INS-41220_FOV_REF_ANGLE             = ( 0.27 )
+         INS-41220_FOV_CROSS_ANGLE           = ( 0.27 )
+         INS-41220_FOV_ANGLE_UNITS           = 'DEGREES'
+
+      \begintext
+
+
+Optical Distortion
+--------------------------------------------------------
+
+   This section provides optical distortion and geometric calibration
+   data for HRSC and SRC cameras.
+
+
+HRSC Camera 
+
+   The optical distortion for the HRSC provided in [5] has not been included 
+   in this version of the I-kernel.
+
+
+SRC Camera
+
+   The optical distortion for the SRC camera was not available at the time
+   when this version of the IK was released.
+
+
+Platform ID
+---------------------------------------------------------------------------
+
+   This number is the NAIF instrument ID of the platform on which the
+   cameras are mounted. For both cameras this platform is the
+   spacecraft.
+
+      \begindata
+
+      INS-41210_PLATFORM_ID  = ( -41000 )
+      INS-41220_PLATFORM_ID  = ( -41000 )
+
+      \begintext
+
