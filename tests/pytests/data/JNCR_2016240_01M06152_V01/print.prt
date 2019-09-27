@@ -1,0 +1,112 @@
+Object = spiceinit
+  IsisVersion       = "3.8.1  | 2019-08-16"
+  ProgramVersion    = 2018-01-11
+  ProgramPath       = /usgs/cpkgs/anaconda3_linux/envs/isis3.8.1/bin
+  ExecutionDateTime = 2019-09-27T12:04:31
+  HostName          = Unknown
+  UserName          = acpaquette
+  Description       = "Update SPICE data (kernels, pointing, and position) for
+                       a camera cube"
+
+  Group = UserParameters
+    FROM         = JNCR_2016240_01M06152_V01_METHANE_0008_isis.spice.lbl
+    WEB          = false
+    ATTACH       = TRUE
+    CKSMITHED    = FALSE
+    CKRECON      = TRUE
+    CKPREDICTED  = FALSE
+    CKNADIR      = FALSE
+    SPKSMITHED   = FALSE
+    SPKRECON     = TRUE
+    SPKPREDICTED = FALSE
+    SHAPE        = SYSTEM
+    STARTPAD     = 0.0
+    ENDPAD       = 0.0
+    URL          = https://services.isis.astrogeology.usgs.gov/cgi-bin/spicei-
+                   nit.cgi
+    PORT         = 443
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -61500
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = $juno/kernels/pck/pck00010.tpc
+    TargetPosition            = ($juno/kernels/tspk/jup310.bsp,
+                                 $juno/kernels/tspk/de438s.bsp,
+                                 $juno/kernels/tspk/juno_struct_v04.bsp)
+    InstrumentPointing        = ($juno/kernels/ck/juno_sc_rec_160821_160827_v-
+                                 01.bc, $juno/kernels/fk/juno_v12.tf)
+    Instrument                = $juno/kernels/ik/juno_junocam_v03.ti
+    SpacecraftClock           = $juno/kernels/sclk/jno_sclkscet_00090.tsc
+    InstrumentPosition        = $juno/kernels/spk/juno_rec_160729_160923_1610-
+                                27.bsp
+    InstrumentAddendum        = $juno/kernels/iak/junoAddendum005.ti
+    ShapeModel                = Null
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
+  End_Group
+
+  Group = Accounting
+    ConnectTime = 00:00:00.5
+    CpuTime     = 00:00:00.7
+  End_Group
+End_Object
+
+
+Object = spiceinit
+  IsisVersion       = "3.8.1  | 2019-08-16"
+  ProgramVersion    = 2018-01-11
+  ProgramPath       = /usgs/cpkgs/anaconda3_linux/envs/isis3.8.1/bin
+  ExecutionDateTime = 2019-09-27T13:59:30
+  HostName          = Unknown
+  UserName          = acpaquette
+  Description       = "Update SPICE data (kernels, pointing, and position) for
+                       a camera cube"
+
+  Group = UserParameters
+    FROM         = JNCR_2016240_01M06152_V01_METHANE_0008_isis.spice.lbl
+    WEB          = false
+    ATTACH       = TRUE
+    CKSMITHED    = FALSE
+    CKRECON      = TRUE
+    CKPREDICTED  = FALSE
+    CKNADIR      = FALSE
+    SPKSMITHED   = FALSE
+    SPKRECON     = TRUE
+    SPKPREDICTED = FALSE
+    SHAPE        = SYSTEM
+    STARTPAD     = 0.0
+    ENDPAD       = 0.0
+    URL          = https://services.isis.astrogeology.usgs.gov/cgi-bin/spicei-
+                   nit.cgi
+    PORT         = 443
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -61500
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = $juno/kernels/pck/pck00010.tpc
+    TargetPosition            = ($juno/kernels/tspk/jup310.bsp,
+                                 $juno/kernels/tspk/de438s.bsp,
+                                 $juno/kernels/tspk/juno_struct_v04.bsp)
+    InstrumentPointing        = ($juno/kernels/ck/juno_sc_rec_160821_160827_v-
+                                 01.bc, $juno/kernels/fk/juno_v12.tf)
+    Instrument                = $juno/kernels/ik/juno_junocam_v03.ti
+    SpacecraftClock           = $juno/kernels/sclk/jno_sclkscet_00090.tsc
+    InstrumentPosition        = $juno/kernels/spk/juno_rec_160729_160923_1610-
+                                27.bsp
+    InstrumentAddendum        = $juno/kernels/iak/junoAddendum005.ti
+    ShapeModel                = Null
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
+  End_Group
+
+  Group = Accounting
+    ConnectTime = 00:00:00.4
+    CpuTime     = 00:00:00.3
+  End_Group
+End_Object
+
+
