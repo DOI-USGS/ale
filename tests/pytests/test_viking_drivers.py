@@ -81,10 +81,8 @@ def test_kernels():
 
 @pytest.mark.parametrize("label_type", ['isis3'])
 @pytest.mark.parametrize("formatter", ['isis'])
-# @pytest.mark.skip(reason="Fails due to angular velocity problems")
 def test_viking_load(test_kernels, label_type, formatter, isis_compare_dict):
-    # label_file = get_image_label('f735a00')
-    label_file = '/home/pgiroux/repos/ale/tests/pytests/data/f735a00/f735a00_isis.lbl'
+    label_file = get_image_label('f735a00', label_type)
     isis_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter='isis')
     print(isis_isd)
     assert compare_dicts(isis_isd, isis_compare_dict) == []
@@ -93,7 +91,7 @@ def test_viking_load(test_kernels, label_type, formatter, isis_compare_dict):
 class test_isis_naif(unittest.TestCase):
 
     def setUp(self):
-        label = get_image_label("f735a00", "isis")
+        label = get_image_label("f735a00", "isis3")
         self.driver = VikingIsisLabelNaifSpiceDriver(label)
 
     def test_short_mission_name(self):
