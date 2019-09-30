@@ -6,14 +6,7 @@ from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
 from ale.base.base import Driver
 
-ALT_ID_LOOKUP = {
-    'VIKING ORBITER 1': -27999,
-    'VIKING ORBITER 2':-30999
-}
-
 class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
-
-
 
     @property
     def spacecraft_name(self):
@@ -25,7 +18,12 @@ class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
         : str
           Name of the spacecraft.
         """
-        return super().spacecraft_name.replace('_', ' ')
+        name_lookup = {
+            'VIKING_ORBITER_1': 'VIKING ORBITER 1',
+            'VIKING_ORBITER_2': 'VIKING ORBITER 2'
+        }
+
+        return name_lookup[super().spacecraft_name]
 
     @property
     def alt_ikid(self):
@@ -40,7 +38,13 @@ class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
         : integer
         Alternate Naif Integer ID code for the instrument
         """
-        return ALT_ID_LOOKUP[self.spacecraft_name]
+
+        alt_id_lookup = {
+            'VIKING ORBITER 1': -27999,
+            'VIKING ORBITER 2':-30999
+        }
+
+        return alt_id_lookup[self.spacecraft_name]
 
     @property
     def ikid(self):

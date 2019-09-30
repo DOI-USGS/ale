@@ -11,7 +11,6 @@ from conftest import get_image_label, get_image_kernels, convert_kernels, compar
 
 import ale
 from ale.drivers.viking_drivers import VikingIsisLabelNaifSpiceDriver
-from ale.formatters.isis_formatter import to_isis
 
 image_dict = {
     # Viking Orbiter 1 VISCA
@@ -251,7 +250,7 @@ image_dict = {
                     'Velocities': [[-10.327617595005,18.315940117221,8.6804664968805]]}}}
     }
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope="module")
 def test_kernels():
     updated_kernels = {}
     binary_kernels = {}
@@ -294,4 +293,10 @@ class test_isis_naif(unittest.TestCase):
     def test_ephemeris_start_time(self):
         with patch('ale.drivers.viking_drivers.spice.scs2e', return_value=54321) as scs2e:
              assert self.driver.ephemeris_start_time == 54324.99
+             scs2e.assert_called_with(-27999, '40031801')
+
+    @patch('ale.base.label_isis.IsisLabel.exposure_duration', 0.43)
+    def test_ephemeris_start_time_different_exposure(self):
+        with patch('ale.drivers.viking_drivers.spice.scs2e', return_value=54321) as scs2e:
+             assert self.driver.ephemeris_start_time == 54322.75
              scs2e.assert_called_with(-27999, '40031801')
