@@ -1,0 +1,237 @@
+KPL/SCLK
+
+\beginlabel
+PDS_VERSION_ID               = PDS3
+RECORD_TYPE                  = STREAM
+RECORD_BYTES                 = "N/A"
+^SPICE_KERNEL                = "VO1_FSC.TSC"
+MISSION_NAME                 = VIKING
+SPACECRAFT_NAME              = "VIKING ORBITER 1"
+DATA_SET_ID                  = "VO1/VO2-M-SPICE-6-V1.0"
+KERNEL_TYPE_ID               = SCLK
+PRODUCT_ID                   = "VO1_FSC.TSC"
+PRODUCT_CREATION_TIME        = 2000-04-21T10:53:21
+PRODUCER_ID                  = "NAIF/JPL"
+MISSION_PHASE_NAME           = {
+                               PRIMARY_MISSION,
+                               EXTENDED_MISSION,
+                               CONTINUATION_MISSION,
+                               SURVEY_MISSION
+                               }
+PRODUCT_VERSION_TYPE         = ACTUAL
+PLATFORM_OR_MOUNTING_NAME    = "N/A"
+START_TIME                   = "N/A"
+STOP_TIME                    = "N/A"
+SPACECRAFT_CLOCK_START_COUNT = "N/A"
+SPACECRAFT_CLOCK_STOP_COUNT  = "N/A"
+TARGET_NAME                  = MARS
+INSTRUMENT_NAME              = "N/A"
+NAIF_INSTRUMENT_ID           = "N/A"
+SOURCE_PRODUCT_ID            = "N/A"
+NOTE                         = "See comments in the file for details"
+OBJECT                       = SPICE_KERNEL
+  INTERCHANGE_FORMAT         = ASCII
+  KERNEL_TYPE                = CLOCK_COEFFICIENTS
+  DESCRIPTION                = "SCLK file containing linear piecewise
+function representing VO1 FSC on-board clock. This function was generated as
+the result of VO1 image time tags restoration. "
+END_OBJECT                   = SPICE_KERNEL
+\endlabel
+
+
+Viking Orbiter 1 Reconstructed Frame Start Count (FSC) SCLK file
+--------------------------------------------------------
+
+   This file contain data necessary to convert a Viking Orbiter 1
+   FSC count to the ET time corresponding to it. These data are
+   based on the results of VO1 image times reconstruction done at
+   NAIF/JPL. The process of this reconstruction is described in
+   detail in the "VO Image Time Reconstruction" document.
+
+   Note that the main purpose of this file is to store the
+   reconstructed FSC counter; the on-board clock defined by the
+   function in this file was not used to time tag any of the
+   orientation data in CK files.
+
+   To avoid confusion with the other VO1 clock used for time tagging,
+   the FSC on-board clock in this file was assigned the NAIF ID
+   code -27999.
+   
+
+Version
+--------------------------------------------------------
+ 
+   Version 1.0.1 -- April 20, 2000
+   
+      Comments in the file were slightly reformatted and augmented.
+ 
+   Version 1.0.0 -- July 22, 1996
+        
+
+Implementation notes
+--------------------------------------------------------
+ 
+   This SPICE SCLK file is constructed so that valid SCLK strings
+   are the eight digit VO1 FSC count associated with each VO1 image.
+   Note that the actual "image time" (the time of the beginning,
+   middle or the end of exposure) has a significant offset from
+   the FSC tick start time. This offset depends on the exposure
+   duration and is described in the "VO Image Time Reconstruction"
+   document.
+
+   You must load this file into the kernel pool before using any
+   of the SPICELIB SCLK routines. The code fragment
+
+      CALL LDPOOL ( < name of this file > )
+ 
+   performs this task. To convert between ET and UTC, you will also
+   need to load a leapseconds kernel. The additional call to LDPOOL,
+
+      CALL LDPOOL ( < name of your leapsecond file > )
+ 
+   will accomplish this. Note that you must supply the actual names
+   of the files used on your system as arguments to LDPOOL. Because
+   the file names are system dependent, we do not list them here.
+
+   For more information, consult your SPICELIB required reading
+   files. The following areas are covered:
+
+      SCLK system                     SCLK required reading
+      Time systems and conversion     TIME required reading
+      Kernel pool                     KERNEL required reading
+
+
+Kernel data
+--------------------------------------------------------
+
+\begindata
+
+ SCLK_KERNEL_ID           = ( @22-JUL-1996 )
+
+ SCLK_DATA_TYPE_27999        = ( 1 )
+ SCLK01_TIME_SYSTEM_27999    = ( 2 )
+ SCLK01_N_FIELDS_27999       = ( 1 )
+ SCLK01_MODULI_27999         = ( 60000000 )
+ SCLK01_OFFSETS_27999        = ( 25837050 )
+ SCLK01_OUTPUT_DELIM_27999   = ( 1 )
+
+ SCLK_PARTITION_START_27999  = ( 
+                                0
+                                231791
+                                644942
+                                1569121
+                                3367553
+                                5555717
+                                6396566
+                                7572950
+                                8087730
+                                9835672
+                                10866610
+                                11503583
+                                12217716
+                                13159619
+                                13679685
+                                14664700
+                                15449939
+                                16432925
+                                17479492
+                                17896518
+                                18344818
+                                20321730
+                                23280832
+                                24166658
+                                24262845
+                                24359029
+                                24609280
+                                25992950
+                                26522392
+                                27368930
+                                27915783
+                                            )
+
+ SCLK_PARTITION_END_27999    = ( 
+                                231791
+                                644942
+                                1569121
+                                3367553
+                                5555717
+                                6396566
+                                7572950
+                                8087730
+                                9835672
+                                10866610
+                                11503583
+                                12217716
+                                13159619
+                                13679685
+                                14664700
+                                15449939
+                                16432925
+                                17479492
+                                17896518
+                                18344818
+                                20321730
+                                23280832
+                                24166658
+                                24262845
+                                24359029
+                                24609280
+                                25992950
+                                26522392
+                                27368930
+                                27915783
+                                59999999
+                                            )
+
+ SCLK01_COEFFICIENTS_27999   = ( 
+
+               0 -742936101.084011  4.480002320
+          231791 -741897676.845143  4.480001506
+          644942 -740046759.578601  4.480001685
+         1569121 -735906436.111559  4.480001416
+         3367553 -727849458.210550  4.480001972
+         5555717 -718046479.059529  4.480002284
+         6396566 -714279473.752967  4.480001816
+         7572950 -709009271.245943  4.480001816
+         8087730 -706703055.797485  4.480001869
+         9835672 -698872272.708142  4.480001557
+        10866610 -694253669.451953  4.480001151
+        11503583 -691400029.539901  4.480000884
+        12217716 -688200712.915836  4.480000934
+        13159619 -683980986.490315  4.480000934
+        13679685 -681651090.175512  4.480000934
+        14664700 -677238222.129167  4.480000778
+        15449939 -673720350.640383  4.480000830
+        16432925 -669316572.195161  4.480000882
+        17479492 -664627950.891482  4.480000922
+        17896518 -662759673.743136  4.480000929
+        18344818 -660751289.419364  4.480000581
+        20321730 -651894716.843243  4.480001297
+        23280832 -638637935.825957  4.480001191
+        24166658 -634669434.296886  4.480000989
+        24262845 -634238516.448398  4.480001715
+        24359029 -633807611.943517  4.480001275
+        24609280 -632686487.136533  4.480001142
+        25992950 -626487643.963656  4.480001192
+        26522392 -624115743.164982  4.480000986
+        27368930 -620323251.820923  4.480001408
+        27915783 -617873349.601991  4.480001089
+
+                                            )
+
+\begintext
+
+
+Contact Information
+--------------------------------------------------------
+
+   Contact NAIF node of the Planetary Data System if you have any
+   questions regarding this SCLK file.
+
+      Charles H. Acton, Jr
+      (818)-354-3869 
+      chuck.acton@jpl.nasa.gov
+      
+      Boris V. Semenov
+      (818)-354-8136 
+      boris.semenov@jpl.nasa.gov
