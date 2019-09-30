@@ -17,6 +17,23 @@ class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Dri
     ingested into ISIS from PDS EDR images but have not been spiceinit'd yet.
     """
     @property
+    def instrument_id():
+        """
+        Returns an instrument id for uniquely identifying the instrument, but often
+        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+        the same ID the Spice expects in bods2c calls.
+        Returns
+        -------
+        : str
+          instrument id
+        """
+        id_lookup = {
+        "LORRI" : "NH_LORRI"
+        }
+        return id_lookup[super().instrument_id]
+
+
+    @property
     def ikid(self):
         """
         Overridden to grab the ikid from the Isis Cube since there is no way to
@@ -24,7 +41,8 @@ class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Dri
         ingestion, based on the original fits file. 
 
         For LORRI, there are two options associated with different binning modes: 
-
+        1x1 binning: -98301 
+        4x4 binning: -98302
 
 
         Returns
