@@ -1,0 +1,23 @@
+\begindata
+INS-27001_TRANSX = ( 0.0, 0.0117647058823529, 0.0)
+INS-27001_TRANSY = ( 0.0, 0.0, 0.0117647058823529)
+INS-27001_ITRANSS = ( 0.0, 85.0, 0.0)
+INS-27001_ITRANSL = ( 0.0, 0.0, 85.0)
+
+INS-27002_TRANSX = ( 0.0, 0.0117647058823529, 0.0)
+INS-27002_TRANSY = ( 0.0, 0.0, 0.0117647058823529)
+INS-27002_ITRANSS = ( 0.0, 85.0, 0.0)
+INS-27002_ITRANSL = ( 0.0, 0.0, 85.0)
+
+\begintext
+These are the parameters for writing c-kernels.  Isis will create ck
+with the same frame endpoints as the mission ck. For Viking1 the ck
+instrument frame is VO1_PLATFORM (-27000) and the ck reference frame
+is B1950 (2) or J2000 (1), depending on the ck used.  The mdim2.0_rand
+ck is in J2000.
+
+\begindata
+INS-27001_CK_FRAME_ID=-27000
+INS-27001_CK_REFERENCE_ID=2
+INS-27002_CK_FRAME_ID=-27000
+INS-27002_CK_REFERENCE_ID=2

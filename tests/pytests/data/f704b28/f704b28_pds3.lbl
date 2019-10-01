@@ -1,0 +1,1632 @@
+CCSD3ZF0000100000001NJPL3IF0PDS200000001 = SFDU_LABEL
+/*          FILE FORMAT AND LENGTH */
+RECORD_TYPE                      = VARIABLE_LENGTH
+RECORD_BYTES                     = 1204
+FILE_RECORDS                     = 2176
+LABEL_RECORDS                    = 60
+/*          POINTERS TO START RECORDS OF MAJOR OBJECTS IN FILE */
+^IMAGE_HISTOGRAM                 = 61
+^ENCODING_HISTOGRAM              = 62
+^ENGINEERING_TABLE               = 64
+^LINE_HEADER_TABLE               = 65
+^IMAGE                           = 1121
+/*          IMAGE DESCRIPTION */
+DATA_SET_ID                      = 'VO1/VO2-M-VIS-2-EDR-V2.0'
+SPACECRAFT_NAME                  = VIKING_ORBITER_2
+MISSION_PHASE_NAME               = CONTINUATION_MISSION
+TARGET_NAME                      = MARS
+IMAGE_ID                         = '704B28'
+IMAGE_NUMBER                     = 60266453
+IMAGE_TIME                       = 1978-07-23T05:01:26Z
+EARTH_RECEIVED_TIME              = 1978-07-23T06:18:16Z
+ORBIT_NUMBER                     = 704
+INSTRUMENT_NAME                  = VISUAL_IMAGING_SUBSYSTEM_CAMERA_B
+GAIN_MODE_ID                     = LOW
+FLOOD_MODE_ID                    = ON
+OFFSET_MODE_ID                   = ON
+FILTER_NAME                      = MINUS_BLUE
+EXPOSURE_DURATION                = 0.067880 <SECONDS>
+NOTE                             = "MEDIUM RESOLUTION MAPPING SEQUENCE"
+/*          DESCRIPTION OF THE OBJECTS CONTAINED IN FILE */
+OBJECT                           = IMAGE_HISTOGRAM
+ ITEMS                           = 256
+ ITEM_TYPE                       = VAX_INTEGER
+ ITEM_BITS                       = 32
+END_OBJECT
+OBJECT                           = ENCODING_HISTOGRAM
+ ITEMS                           = 511
+ ITEM_TYPE                       = VAX_INTEGER
+ ITEM_BITS                       = 32
+END_OBJECT
+OBJECT                           = ENGINEERING_TABLE
+ ROWS                            = 1
+ ROW_BYTES                       = 152
+CCSD3ZF0000100000001NJPL3IF0PDS200000001 = SFDU_LABEL
+
+OBJECT                         = ENGINEERING_TABLE_STRUCTURE
+  INTERCHANGE_FORMAT           = BINARY
+  BYTES                        = 152
+  NOTE                         = "This structure describes the format of
+        the engineering record that is included in each image file.
+        This record contains the first 152 bytes of data extracted from
+        the Mission and Test Imaging System (MTIS) header record on each
+        file of an imaging EDR tape."
+
+  OBJECT                       = COLUMN
+    NAME                       = MTIS_RECORD_ID
+    DATA_TYPE                  = UNSIGNED_INTEGER
+    START_BYTE                 = 1
+    BYTES                      = 2
+    DESCRIPTION                = "Mission and Test Imaging System record
+        ID."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = PHYSICAL_SEQUENCE_NUMBER
+    DATA_TYPE                  = VAX_UNSIGNED_INTEGER
+    START_BYTE                 = 3
+    BYTES                      = 2
+    DESCRIPTION                = "Physical sequence number on Experiment
+        Data Record tape.  Not used."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = LOGICAL_SEQUENCE_NUMBER
+    DATA_TYPE                  = VAX_UNSIGNED_INTEGER
+    START_BYTE                 = 5
+    BYTES                      = 2
+    DESCRIPTION                = "Logical sequence number on Experiment
+        Data Record tape.  Not used."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = FIRST_ERT
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 7
+    BYTES                      = 2
+    DESCRIPTION                = "Earth Received Time year and day
+        value.  Time of first line segment in the file containing valid
+        data.  This field is NOT stored in VAX least significant byte
+        first format."
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = FIRST_ERT_YEAR
+      DATA_TYPE                = UNSIGNED_INTEGER
+      START_BIT                = 1
+      BITS                     = 7
+      DESCRIPTION              = "Earth Received Time year of century
+        (1900).  Time of first line record in the file containing valid
+        data.  This field is often incorrect."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = FIRST_ERT_DAY
+      DATA_TYPE                = UNSIGNED_INTEGER
+      START_BIT                = 7
+      BITS                     = 9
+      DESCRIPTION              = "Earth Received Time day of year."
+    END_OBJECT                 = BIT_COLUMN
+
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = FIRST_ERT_MINUTE
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 9
+    BYTES                      = 2
+    DESCRIPTION                = "Earth Received Time minute of day."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = FIRST_ERT_MILLISECOND
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 11
+    BYTES                      = 2
+    DESCRIPTION                = "Earth Received Time millisecond of
+        minute."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = LAST_ERT
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 13
+    BYTES                      = 2
+    DESCRIPTION                = "Earth Received Time year and day
+        value.  Time of last line segment of the file containing valid
+        data."
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = LAST_ERT_YEAR
+      DATA_TYPE                = UNSIGNED_INTEGER
+      START_BIT                = 1
+      BITS                     = 7
+      DESCRIPTION              = "Earth Received Time year of century
+        (1900).  This field is often incorrect."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = LAST_ERT_DAY
+      DATA_TYPE                = UNSIGNED_INTEGER
+      START_BIT                = 8
+      BITS                     = 9
+      DESCRIPTION              = "Earth Received Time day of year."
+    END_OBJECT                 = BIT_COLUMN
+
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = LAST_ERT_MINUTE
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 15
+    BYTES                      = 2
+    DESCRIPTION                = "Earth Received Time minute of day."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = LAST_ERT_MILLISECOND
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 17
+    BYTES                      = 2
+    DESCRIPTION                = "Earth Received Time millisecond of
+        minute."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = FIRST_FDS_NUMBER
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 19
+    BYTES                      = 4
+    DESCRIPTION                = "Flight Data Subsystem count for the
+        first line segment of the file containing valid data.  Note that
+        this may not correspond to the FDS count for line 1, segment 1."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = LAST_FDS_NUMBER
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 23
+    BYTES                      = 4
+    DESCRIPTION                = "Flight Data Subsystem count for the
+        last line segment of the file containing valid data.  Note that
+        this may not correspond to the FDS count for segment 7 of line
+        1056."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = EDR_ID
+    DATA_TYPE                  = CHARACTER
+    START_BYTE                 = 27
+    BYTES                      = 6
+    DESCRIPTION                = "Tape reel identifier of the original
+        EDR tape for this image."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = EDR_FILE_NUMBER
+    DATA_TYPE                  = UNSIGNED_INTEGER
+    START_BYTE                 = 33
+    BYTES                      = 2
+    DESCRIPTION                = "File number of image on original EDR
+        tape."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = FILL_IN
+    DATA_TYPE                  = UNSIGNED_INTEGER
+    START_BYTE                 = 34
+    BYTES                      = 1
+    DESCRIPTION                = "Value used to fill in missing samples
+        (always zero)."
+  END_OBJECT                   = COLUMN
+  OBJECT                       = COLUMN
+    NAME                       = TRACK_PRESENCE_MASK
+    DATA_TYPE                  = UNSIGNED_INTEGER
+    START_BYTE                 = 36
+    BYTES                      = 1
+    DESCRIPTION                = "Mask indicating which tracks are
+        present in the image.  The nominal value is HEX 7F, indicating
+        that all seven tracks are present."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = AVERAGE_PIXEL
+    DATA_TYPE                  = UNSIGNED_INTEGER
+    START_BYTE                 = 37
+    BYTES                      = 2
+    DESCRIPTION                = "Average pixel value for image."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = UNUSED_1
+    DATA_TYPE                  = CHARACTER
+    START_BYTE                 = 39
+    BYTES                      = 4
+    DESCRIPTION                = "Unused."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = MINIMUM_SNR
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 43
+    BYTES                      = 2
+    FACTOR                     = 0.03125
+    DESCRIPTION                = "Minimum signal to noise ratio.  The
+        minimum noise level found for the scan lines.  Divide by 32 to
+        get the actual value."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = MAXIMUM_SNR
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 45
+    BYTES                      = 2
+    FACTOR                     = 0.03125
+    DESCRIPTION                = "Maximum signal to noise ratio.  The
+        maximum noise level found for the scan lines.  Divide by 32 to
+        get the actual value."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = UNUSED_2
+    DATA_TYPE                  = CHARACTER
+    START_BYTE                 = 47
+    BYTES                      = 2
+    DESCRIPTION                = "Unused."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = MINIMUM_AGC
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 49
+    BYTES                      = 2
+    FACTOR                     = 0.0625
+    DESCRIPTION                = "Automatic gain control minimum.
+        Divide by 16 to get actual value."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = MAXIMUM_AGC
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 51
+    BYTES                      = 2
+    FACTOR                     = 0.0625
+    DESCRIPTION                = "Automatic gain control maximum.
+        Divide by 16 to get actual value."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = UNUSED_3
+    DATA_TYPE                  = CHARACTER
+    START_BYTE                 = 53
+    BYTES                      = 2
+    DESCRIPTION                = "Unused."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = SEGMENTS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 55
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of line segments in the
+        file that contain some valid data (maximum is 7 x 1056)."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = FULLY_SYNCHED_SEGMENTS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 57
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of line segments in the
+        file that were fully synchronized (maximum is 7 x 1056)."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = PARTLY_SYNCHED_SEGMENTS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 59
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of line segments in the
+        file that were partly synchronized (maximum is 7 x 1056)."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DQI0_SEGMENTS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 61
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of line segments in the
+        file with a data quality indicator of 0 (maximum is 7 x 1056).
+        DQI0 indicates bad data."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DQI1_SEGMENTS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 63
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of line segments in the
+        file with a data quality indicator of 1 (maximum is 7 x 1056).
+        DQI1 means SNR low, GCF block bad."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DQI2_SEGMENTS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 65
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of line segments in the
+        file with a data quality indicator of 2 (maximum is 7 x 1056).
+        DQI2 means SNR good, GCF block bad."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DQI3_SEGMENTS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 67
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of line segments in the
+        file with a data quality indicator of 3 (maximum is 7 x 1056).
+        DQI3 means SNR low, GCF block good."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DQI4_SEGMENTS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 69
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of line segments in the
+        file with a data quality indicator of 4 (maximum is 7 x 1056).
+        DQI4 means SNR good, GCF block good."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = FDS_CORRECTIONS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 71
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of line segments in the
+        file with corrected FDS counts."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = PNERROR_CORRECTIONS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 73
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of line segments in the
+        file with corrected pseudonoise codes."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = ADJUSTED_PNERROR_CORRECTIONS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 75
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of line segments in the
+        file with corrected pseudonoise codes adjusted based on the
+        number of line segments processed versus the total in a full
+        image (7 x 1056)."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = UNREADABLE_RECORDS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 77
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of line segments in the
+        file that could not be read from the Master Data Record tape."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = LOGICAL_SEQUENCE_BREAKS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 79
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of breaks in logical
+        sequence number in reading the System/Master Data Record tape."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DATA_BREAKS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 81
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of breaks in data
+        sequence in reading the System/Master Data Record tape."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = UNUSED_4
+    DATA_TYPE                  = CHARACTER
+    START_BYTE                 = 83
+    BYTES                      = 2
+    DESCRIPTION                = "Unused."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = LINES
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 85
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of lines in the file that
+        contain some valid data (nominal is 1056)."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = FULL_LINES
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 87
+    BYTES                      = 2
+    DESCRIPTION                = "Number of lines in the file that are
+        composed of seven line segments."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = PARTIAL_LINES
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 89
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of line records in the
+        file that contain some valid data but are not composed of seven
+        line segments."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = FIRST_LINE_NUMBER
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 91
+    BYTES                      = 2
+    DESCRIPTION                = "First line in image containing valid
+        data."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = LAST_LINE_NUMBER
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 93
+    BYTES                      = 2
+    DESCRIPTION                = "Last line in image containing valid
+        data."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = UNUSED_5
+    DATA_TYPE                  = CHARACTER
+    START_BYTE                 = 95
+    BYTES                      = 2
+    DESCRIPTION                = "Unused."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = IMAGE_ID
+    DATA_TYPE                  = CHARACTER
+    START_BYTE                 = 97
+    BYTES                      = 6
+    DESCRIPTION                = "Image identifier (PICNO) for this
+        image, formatted OOOSNN, where OOO is orbit number, S is
+        spacecraft identifier (A for Viking Orbiter 1 prime and extended
+        missions; B for Viking Orbiter 2; and S for Viking Orbiter 1
+        Survey mission)."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = VRP_RUN_NUMBER
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 103
+    BYTES                      = 2
+    DESCRIPTION                = "Viking Reconstruction Processing run
+        number."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DISK_ID
+    DATA_TYPE                  = CHARACTER
+    START_BYTE                 = 105
+    BYTES                      = 6
+    DESCRIPTION                = "MTIS disk identifier of the original
+        EDR file for this image."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = UNUSED_6
+    DATA_TYPE                  = CHARACTER
+    START_BYTE                 = 111
+    BYTES                      = 2
+    DESCRIPTION                = "Unused."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = TRANSMITTED_CODE_WORD1
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 113
+    BYTES                      = 2
+    DESCRIPTION                = "Transmitted command code word for the
+        image."
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DATA_ABSENCE_FLAG
+      START_BIT                = 1
+      BITS                     = 1
+      DATA_TYPE                = UNSIGNED_INTEGER
+      DESCRIPTION              = "Set to 1 if data not present for the
+        following measurements."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DQI
+      START_BIT                = 3
+      BITS                     = 3
+      DATA_TYPE                = UNSIGNED_INTEGER
+      DESCRIPTION              = "Data quality indicator associated with
+        code word values.  Where: 0 is bad data; 1 is SNR low, GCF block
+        error; 2 is SNR good, GCF block bad; 3 is SNR low, GCF block
+        good; 4 is SNR good, GCF block good."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = CATHODE_CURRENT_FLAG
+      START_BIT                = 7
+      BITS                     = 1
+      DATA_TYPE                = UNSIGNED_INTEGER
+      DESCRIPTION              = "Cathode current off (0) or on (1)."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = GAIN_FLAG
+      START_BIT                = 8
+      BITS                     = 1
+      DATA_TYPE                = UNSIGNED_INTEGER
+      DESCRIPTION              = "Gain mode low (0) or high (1)."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = LIGHT_FLOOD_FLAG
+      START_BIT                = 9
+      BITS                     = 1
+      DATA_TYPE                = UNSIGNED_INTEGER
+      DESCRIPTION              = "Light flood off (0) or on (1)."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = FILTER_STEP
+      START_BIT                = 10
+      BITS                     = 2
+      DATA_TYPE                = UNSIGNED_INTEGER
+      DESCRIPTION              = "Filter step indicator."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = EXPOSURE_CODE
+      START_BIT                = 12
+      BITS                     = 5
+      DATA_TYPE                = UNSIGNED_INTEGER
+      DESCRIPTION              = "Exposure interval code."
+    END_OBJECT                 = BIT_COLUMN
+
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = TRANSMITTED_CODE_WORD2
+    DATA_TYPE                  = INTEGER
+    START_BYTE                 = 115
+    BYTES                      = 2
+    DESCRIPTION                = "Transmitted command code word 2 for
+        this image."
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DATA_ABSENCE_FLAG
+      START_BIT                = 1
+      BITS                     = 1
+      DATA_TYPE                = UNSIGNED_INTEGER
+      DESCRIPTION              = "Set to 1 if data not present for the
+        following measurements."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DQI
+      START_BIT                = 3
+      BITS                     = 3
+      DATA_TYPE                = UNSIGNED_INTEGER
+      DESCRIPTION              = "Data quality indicator associated with
+        code word values.  where: 0 is bad data; 1 is SNR low, GCF block
+        error; 2 is SNR good, GCF block bad; 3 is SNR low, GCF block
+        good; 4 is SNR good, GCF block good."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = FILTER_NUMBER
+      START_BIT                = 10
+      BITS                     = 3
+      DATA_TYPE                = UNSIGNED_INTEGER
+      DESCRIPTION              = "Filter number:  where 1 is blue; 2 is
+        minus blue; 3 is violet; 4 is clear; 5 is green; and 6 is red."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = CAMERA_SERIAL_NUMBER
+      START_BIT                = 13
+      BITS                     = 4
+      DATA_TYPE                = UNSIGNED_INTEGER
+      DESCRIPTION              = "Visual Imaging Subsystem camera serial
+        number."
+    END_OBJECT                 = BIT_COLUMN
+
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = RECEIVED_CODE_WORD1
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 117
+    BYTES                      = 2
+    DESCRIPTION                = "Received command code word for the
+        image."
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DATA_ABSENCE_FLAG
+      START_BIT                = 1
+      BITS                     = 1
+      DATA_TYPE                = UNSIGNED_INTEGER
+      DESCRIPTION              = "Set to 1 if data not present for the
+        following measurements."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DQI
+      START_BIT                = 3
+      BITS                     = 3
+      DATA_TYPE                = UNSIGNED_INTEGER
+      DESCRIPTION              = "Data quality indicator associated with
+        code word values.  where: 0 is bad data; 1 is SNR low, GCF block
+        error; 2 is SNR good, GCF block bad; 3 is SNR low, GCF block
+        good; 4 is SNR good, GCF block good."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = CATHODE_CURRENT_FLAG
+      START_BIT                = 7
+      BITS                     = 1
+      DATA_TYPE                = UNSIGNED_INTEGER
+      DESCRIPTION              = "Cathode current (beam) off (0) or on
+        (1)."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = GAIN_FLAG
+      START_BIT                = 8
+      BITS                     = 1
+      DATA_TYPE                = UNSIGNED_INTEGER
+      DESCRIPTION              = "Gain mode low (0) or high (1)."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = LIGHT_FLOOD_FLAG
+      START_BIT                = 9
+      BITS                     = 1
+      DATA_TYPE                = UNSIGNED_INTEGER
+      DESCRIPTION              = "Light flood off (0) or on (1)."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = FILTER_STEP
+      START_BIT                = 10
+      BITS                     = 2
+      DATA_TYPE                = UNSIGNED_INTEGER
+      DESCRIPTION              = "Filter step."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = EXPOSURE_CODE
+      START_BIT                = 12
+      BITS                     = 5
+      DATA_TYPE                = UNSIGNED_INTEGER
+      DESCRIPTION              = "Exposure interval code."
+    END_OBJECT                 = BIT_COLUMN
+
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = VIS_PLUS50_VDC
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 121
+    BYTES                      = 2
+    DESCRIPTION                = "Plus 50 volts dc."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = VIS_PLUS15_VDC
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 123
+    BYTES                      = 2
+    DESCRIPTION                = "Plus 15 volts dc."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = VIS_PLUS12_VDC
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 125
+    BYTES                      = 2
+    DESCRIPTION                = "Plus 12 volts dc."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = VIS_PLUS5_VDC
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 127
+    BYTES                      = 2
+    DESCRIPTION                = "Plus 5 volts dc."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = VIS_MINUS15_VDC
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 129
+    BYTES                      = 2
+    DESCRIPTION                = "Minus 15 volts dc."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = VIS_MINUS23_VDC
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 131
+    BYTES                      = 2
+    DESCRIPTION                = "Minus 23 volts dc."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = VIS_AVERAGE_VIDEO
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 133
+    BYTES                      = 2
+    DESCRIPTION                = "Average video."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = POWER_CONVERTER_INPUT_CURRENT
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 135
+    BYTES                      = 2
+    DESCRIPTION                = "Power converter input current."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = CATHODE_CURRENT
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 137
+    BYTES                      = 2
+    DESCRIPTION                = "Cathode current."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = CATHODE_VOLTAGE
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 139
+    BYTES                      = 2
+    DESCRIPTION                = "Cathode voltage."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = FILAMENT_CURRENT
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 141
+    BYTES                      = 2
+    DESCRIPTION                = "Filament current."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = FRAME_SWEEP_CURRENT
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 143
+    BYTES                      = 2
+    DESCRIPTION                = "Frame sweep current."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = LINE_SWEEP_CURRENT
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 145
+    BYTES                      = 2
+    DESCRIPTION                = "Line sweep current."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = GRID3_VOLTAGE
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 147
+    BYTES                      = 2
+    DESCRIPTION                = "Grid 3 voltage."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = FOCUS_CURRENT
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 149
+    BYTES                      = 2
+    DESCRIPTION                = "Focus current."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DIGITAL_LADDER
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 151
+    BYTES                      = 2
+    DESCRIPTION                = "Digital ladder."
+  END_OBJECT                   = COLUMN
+
+END_OBJECT                     = ENGINEERING_TABLE_STRUCTURE
+
+END
+END_OBJECT
+OBJECT                           = LINE_HEADER_TABLE
+ ROWS                            = 1056
+ ROW_BYTES                       = 62
+CCSD3ZF0000100000001NJPL3IF0PDS200000001 = SFDU_LABEL
+
+OBJECT                         = LINE_HEADER_TABLE_STRUCTURE
+  INTERCHANGE_FORMAT           = BINARY
+  BYTES                        = 62
+  NOTE                         = "Viking Orbiter Image Line-header
+        Structure.  This label describes the structure of the 62-bytes
+        extracted from the end of each image line."
+
+  OBJECT                       = COLUMN
+    NAME                       = FDS_NUMBER
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 1
+    BYTES                      = 4
+    DESCRIPTION                = "Flight Data Subsystem (FDS) clock
+        count."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = LINE_NUMBER
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 5
+    BYTES                      = 2
+    DESCRIPTION                = "Flight Data Subsystem line number,
+        extracted from the telemetry record header information."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = FILL_IN
+    DATA_TYPE                  = UNSIGNED_INTEGER
+    START_BYTE                 = 7
+    BYTES                      = 1
+    DESCRIPTION                = "Value used to fill in missing samples
+        (always zero)."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = TRACK_PRESENCE_MASK
+    DATA_TYPE                  = UNSIGNED_INTEGER
+    START_BYTE                 = 8
+    BYTES                      = 1
+    DESCRIPTION                = "Mask indicating which tracks are
+        present in this line.  The nominal value is HEX 7F, indicating
+        that all seven tracks are present."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = AVERAGE_PIXEL
+    DATA_TYPE                  = UNSIGNED_INTEGER
+    START_BYTE                 = 9
+    BYTES                      = 2
+    DESCRIPTION                = "Average pixel value for this line."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = SEGMENTS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 11
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of line segments in the
+        line that contain some valid data (maximum is 7)."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = FULLY_SYNCHED_SEGMENTS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 13
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of segments in the line
+        that were fully synchronized (maximum is 7)."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = PARTLY_SYNCHED_SEGMENTS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 15
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of segments in the line
+        that were partly synchronized (maximum is 7)."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DQI0_SEGMENTS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 17
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of segments in the line
+        with a data quality indicator of 0 (maximum is 7), indicating
+        bad data."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DQI1_SEGMENTS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 19
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of segments in the line
+        with a data quality indicator of 1 (maximum is 7), indicating
+        SNR low, GCF block bad."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DQI2_SEGMENTS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 21
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of segments in the line
+        with a data quality indicator of 2 (maximum is 7), indicating
+        SNR good, GCF block bad."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DQI3_SEGMENTS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 23
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of segments in the line
+        with a data quality indicator of 3 (maximum is 7), indicating
+        SNR low, GCF block good."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DQI4_SEGMENTS
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 25
+    BYTES                      = 2
+    DESCRIPTION                = "Total number of segments in the line
+        with a data quality indicator of 4 (maximum is 7), indicating
+        SNR good, GCF block good."
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DQI_RATE_ORBIT1
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 27
+    BYTES                      = 2
+    DESCRIPTION                = "Bit string containing data quality
+        indicator, telemetry rate code and orbit number."
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DQI
+      DATA_TYPE                = INTEGER
+      START_BIT                = 1
+      BITS                     = 3
+      DESCRIPTION              = "Data quality indicator for this line
+        segment, where: 0 is bad data; 1 is SNR low, GCF block error; 2
+        is SNR good, GCF block bad; 3 is SNR low, GCF block good; 4 is
+        SNR good, GCF block good."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = TELEMETRY_RATE_CODE
+      DATA_TYPE                = INTEGER
+      START_BIT                = 4
+      BITS                     = 3
+      DESCRIPTION              = "Telemetry rate code, where:  1 for
+        16K; 2 for 8K; 3 for 4K; 4 for 2K; 5 for 1K."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = ORBIT_NUMBER
+      DATA_TYPE                = INTEGER
+      START_BIT                = 7
+      BITS                     = 10
+      DESCRIPTION              = "Orbit number taken from expected
+        picture list.  For Viking Orbiter 1 Survey mission images this
+        is ORBIT_NUMBER - 1000."
+    END_OBJECT                 = BIT_COLUMN
+
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = LINE_TRACK1
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 29
+    BYTES                      = 2
+    DESCRIPTION                = "Bit string containing track and line
+        number."
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = PLAYBACK_REVERSED_FLAG
+      DATA_TYPE                = INTEGER
+      START_BIT                = 1
+      BITS                     = 1
+      DESCRIPTION              = "Set to 1 if playback is in reverse
+        order for this segment.  Track 1, 3, 5 and 7 are played-back
+        forward, 2, 4 and 6 are played-back reversed."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DATA_ABSENCE_FLAG
+      DATA_TYPE                = INTEGER
+      START_BIT                = 2
+      BITS                     = 1
+      DESCRIPTION              = "Set to 1 if data is not present for
+        this segment."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = TRACK_CODE
+      DATA_TYPE                = INTEGER
+      START_BIT                = 3
+      BITS                     = 3
+      DESCRIPTION              = "Track code, where:  0 is Track 7; 1 is
+        Track 3; 2 is Track 2; 3 is error; 4 is Track 6; 5 is Track 1; 6
+        is Track 5; 7 is Track 4."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = SEGMENT_LINE_NUMBER
+      DATA_TYPE                = INTEGER
+      START_BIT                = 6
+      BITS                     = 11
+      DESCRIPTION              = "Line number extracted from segment
+        header."
+    END_OBJECT                 = BIT_COLUMN
+
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DQI_RATE_ORBIT2
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 31
+    BYTES                      = 2
+    DESCRIPTION                = "Bit string containing data quality
+        indicator, telemetry rate code and orbit number."
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DQI
+      DATA_TYPE                = INTEGER
+      START_BIT                = 1
+      BITS                     = 3
+      DESCRIPTION              = "Data quality indicator for this line
+        segment, where: 0 is bad data; 1 is SNR low, GCF block error; 2
+        is SNR good, GCF block bad; 3 is SNR low, GCF block good; 4 is
+        SNR good, GCF block good."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = TELEMETRY_RATE_CODE
+      DATA_TYPE                = INTEGER
+      START_BIT                = 4
+      BITS                     = 3
+      DESCRIPTION              = "Telemetry rate code, where:  1 for
+        16K; 2 for 8K; 3 for 4K; 4 for 2K; 5 for 1K."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = ORBIT_NUMBER
+      DATA_TYPE                = INTEGER
+      START_BIT                = 7
+      BITS                     = 10
+      DESCRIPTION              = "Orbit number taken from expected
+        picture list.  For Viking Orbiter 1 Survey mission images this
+        is ORBIT_NUMBER - 1000."
+    END_OBJECT                 = BIT_COLUMN
+
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = LINE_TRACK2
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 33
+    BYTES                      = 2
+    DESCRIPTION                = "Bit string containing track and line
+        number."
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = PLAYBACK_REVERSED_FLAG
+      DATA_TYPE                = INTEGER
+      START_BIT                = 1
+      BITS                     = 1
+      DESCRIPTION              = "Set to 1 if playback is in reverse
+        order for this segment.  Track 1, 3, 5 and 7 are played-back
+        forward, 2, 4 and 6 are played-back reversed."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DATA_ABSENCE_FLAG
+      DATA_TYPE                = INTEGER
+      START_BIT                = 2
+      BITS                     = 1
+      DESCRIPTION              = "Set to 1 if data is not present for
+        this segment."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = TRACK_CODE
+      DATA_TYPE                = INTEGER
+      START_BIT                = 3
+      BITS                     = 3
+      DESCRIPTION              = "Track code, where:  0 is Track 7; 1 is
+        Track 3; 2 is Track 2; 3 is error; 4 is Track 6; 5 is Track 1; 6
+        is Track 5; 7 is Track 4."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = SEGMENT_LINE_NUMBER
+      DATA_TYPE                = INTEGER
+      START_BIT                = 6
+      BITS                     = 11
+      DESCRIPTION              = "Line number extracted from segment
+        header."
+    END_OBJECT                 = BIT_COLUMN
+
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DQI_RATE_ORBIT3
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 35
+    BYTES                      = 2
+    DESCRIPTION                = "Bit string containing data quality
+        indicator, telemetry rate code and orbit number."
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DQI
+      DATA_TYPE                = INTEGER
+      START_BIT                = 1
+      BITS                     = 3
+      DESCRIPTION              = "Data quality indicator for this line
+        segment, where: 0 is bad data; 1 is SNR low, GCF block error; 2
+        is SNR good, GCF block bad; 3 is SNR low, GCF block good; 4 is
+        SNR good, GCF block good."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = TELEMETRY_RATE_CODE
+      DATA_TYPE                = INTEGER
+      START_BIT                = 4
+      BITS                     = 3
+      DESCRIPTION              = "Telemetry rate code, where:  1 for
+        16K; 2 for 8K; 3 for 4K; 4 for 2K; 5 for 1K."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = ORBIT_NUMBER
+      DATA_TYPE                = INTEGER
+      START_BIT                = 7
+      BITS                     = 10
+      DESCRIPTION              = "Orbit number taken from expected
+        picture list.  For Viking Orbiter 1 Survey mission images this
+        is ORBIT_NUMBER - 1000."
+    END_OBJECT                 = BIT_COLUMN
+
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = LINE_TRACK3
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 37
+    BYTES                      = 2
+    DESCRIPTION                = "Bit string containing track and line
+        number."
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = PLAYBACK_REVERSED_FLAG
+      DATA_TYPE                = INTEGER
+      START_BIT                = 1
+      BITS                     = 1
+      DESCRIPTION              = "Set to 1 if playback is in reverse
+        order for this segment.  Track 1, 3, 5 and 7 are played-back
+        forward, 2, 4 and 6 are played-back reversed."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DATA_ABSENCE_FLAG
+      DATA_TYPE                = INTEGER
+      START_BIT                = 2
+      BITS                     = 1
+      DESCRIPTION              = "Set to 1 if data is not present for
+        this segment."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = TRACK_CODE
+      DATA_TYPE                = INTEGER
+      START_BIT                = 3
+      BITS                     = 3
+      DESCRIPTION              = "Track code, where:  0 is Track 7; 1 is
+        Track 3; 2 is Track 2; 3 is error; 4 is Track 6; 5 is Track 1; 6
+        is Track 5; 7 is Track 4."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = SEGMENT_LINE_NUMBER
+      DATA_TYPE                = INTEGER
+        START_BIT              = 6
+      BITS                     = 11
+      DESCRIPTION              = "Line number extracted from segment
+        header."
+    END_OBJECT                 = BIT_COLUMN
+
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DQI_RATE_ORBIT4
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 39
+    BYTES                      = 2
+    DESCRIPTION                = "Bit string containing data quality
+        indicator, telemetry rate code and orbit number."
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DQI
+      DATA_TYPE                = INTEGER
+      START_BIT                = 1
+      BITS                     = 3
+      DESCRIPTION              = "Data quality indicator for this line
+        segment, where: 0 is bad data; 1 is SNR low, GCF block error; 2
+        is SNR good, GCF block bad; 3 is SNR low, GCF block good; 4 is
+        SNR good, GCF block good."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = TELEMETRY_RATE_CODE
+      DATA_TYPE                = INTEGER
+      START_BIT                = 4
+      BITS                     = 3
+      DESCRIPTION              = "Telemetry rate code, where:  1 for
+        16K; 2 for 8K; 3 for 4K; 4 for 2K; 5 for 1K."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = ORBIT_NUMBER
+      DATA_TYPE                = INTEGER
+      START_BIT                = 7
+      BITS                     = 10
+      DESCRIPTION              = "Orbit number taken from expected
+        picture list.  For Viking Orbiter 1 Survey mission images this
+        is ORBIT_NUMBER - 1000."
+    END_OBJECT                 = BIT_COLUMN
+
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = LINE_TRACK4
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 41
+    BYTES                      = 2
+    DESCRIPTION                = "Bit string containing track and line
+        number."
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = PLAYBACK_REVERSED_FLAG
+      DATA_TYPE                = INTEGER
+      START_BIT                = 1
+      BITS                     = 1
+      DESCRIPTION              = "Set to 1 if playback is in reverse
+        order for this segment.  Track 1, 3, 5 and 7 are played-back
+        forward, 2, 4 and 6 are played-back reversed."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DATA_ABSENCE_FLAG
+      DATA_TYPE                = INTEGER
+      START_BIT                = 2
+      BITS                     = 1
+      DESCRIPTION              = "Set to 1 if data is not present for
+        this segment."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = TRACK_CODE
+      DATA_TYPE                = INTEGER
+      START_BIT                = 3
+      BITS                     = 3
+      DESCRIPTION              = "Track code, where:  0 is Track 7; 1 is
+        Track 3; 2 is Track 2; 3 is error; 4 is Track 6; 5 is Track 1; 6
+        is Track 5; 7 is Track 4."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = SEGMENT_LINE_NUMBER
+      DATA_TYPE                = INTEGER
+      START_BIT                = 6
+      BITS                     = 11
+      DESCRIPTION              = "Line number extracted from segment
+        header."
+    END_OBJECT                 = BIT_COLUMN
+
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DQI_RATE_ORBIT5
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 43
+    BYTES                      = 2
+    DESCRIPTION                = "Bit string containing data quality
+        indicator, telemetry rate code and orbit number."
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DQI
+      DATA_TYPE                = INTEGER
+      START_BIT                = 1
+      BITS                     = 3
+      DESCRIPTION              = "Data quality indicator for this line
+        segment, where: 0 is bad data; 1 is SNR low, GCF block error; 2
+        is SNR good, GCF block bad; 3 is SNR low, GCF block good; 4 is
+        SNR good, GCF block good."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = TELEMETRY_RATE_CODE
+      DATA_TYPE                = INTEGER
+      START_BIT                = 4
+      BITS                     = 3
+      DESCRIPTION              = "Telemetry rate code, where:  1 for
+        16K; 2 for 8K; 3 for 4K; 4 for 2K; 5 for 1K."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = ORBIT_NUMBER
+      DATA_TYPE                = INTEGER
+      START_BIT                = 7
+      BITS                     = 10
+      DESCRIPTION              = "Orbit number taken from expected
+        picture list.  For Viking Orbiter 1 Survey mission images this
+        is ORBIT_NUMBER - 1000."
+    END_OBJECT                 = BIT_COLUMN
+
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = LINE_TRACK5
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 45
+    BYTES                      = 2
+    DESCRIPTION                = "Bit string containing track and line
+        number."
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = PLAYBACK_REVERSED_FLAG
+      DATA_TYPE                = INTEGER
+      START_BIT                = 1
+      BITS                     = 1
+      DESCRIPTION              = "Set to 1 if playback is in reverse
+        order for this segment.  Track 1, 3, 5 and 7 are played-back
+        forward, 2, 4 and 6 are played-back reversed."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DATA_ABSENCE_FLAG
+      DATA_TYPE                = INTEGER
+      START_BIT                = 2
+      BITS                     = 1
+      DESCRIPTION              = "Set to 1 if data is not present for
+        this segment."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = TRACK_CODE
+      DATA_TYPE                = INTEGER
+      START_BIT                = 3
+      BITS                     = 3
+      DESCRIPTION              = "Track code, where:  0 is Track 7; 1 is
+        Track 3; 2 is Track 2; 3 is error; 4 is Track 6; 5 is Track 1; 6
+        is Track 5; 7 is Track 4."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = SEGMENT_LINE_NUMBER
+      DATA_TYPE                = INTEGER
+      START_BIT                = 6
+      BITS                     = 11
+      DESCRIPTION              = "Line number extracted from segment
+        header."
+    END_OBJECT                 = BIT_COLUMN
+
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DQI_RATE_ORBIT6
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 47
+    BYTES                      = 2
+    DESCRIPTION                = "Bit string containing data quality
+        indicator, telemetry rate code and orbit number."
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DQI
+      DATA_TYPE                = INTEGER
+      START_BIT                = 1
+      BITS                     = 3
+      DESCRIPTION              = "Data quality indicator for this line
+        segment, where: 0 is bad data; 1 is SNR low, GCF block error; 2
+        is SNR good, GCF block bad; 3 is SNR low, GCF block good; 4 is
+        SNR good, GCF block good."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = TELEMETRY_RATE_CODE
+      DATA_TYPE                = INTEGER
+      START_BIT                = 4
+      BITS                     = 3
+      DESCRIPTION              = "Telemetry rate code, where:  1 for
+        16K; 2 for 8K; 3 for 4K; 4 for 2K; 5 for 1K."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = ORBIT_NUMBER
+      DATA_TYPE                = INTEGER
+      START_BIT                = 7
+      BITS                     = 10
+      DESCRIPTION              = "Orbit number taken from expected
+        picture list.  For Viking Orbiter 1 Survey mission images this
+        is ORBIT_NUMBER - 1000."
+    END_OBJECT                 = BIT_COLUMN
+
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = LINE_TRACK6
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 49
+    BYTES                      = 2
+    DESCRIPTION                = "Bit string containing track and line
+        number."
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = PLAYBACK_REVERSED_FLAG
+      DATA_TYPE                = INTEGER
+      START_BIT                = 1
+      BITS                     = 1
+      DESCRIPTION              = "Set to 1 if playback is in reverse
+        order for this segment.  Track 1, 3, 5 and 7 are played-back
+        forward, 2, 4 and 6 are played-back reversed."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DATA_ABSENCE_FLAG
+      DATA_TYPE                = INTEGER
+      START_BIT                = 2
+      BITS                     = 1
+      DESCRIPTION              = "Set to 1 if data is not present for
+        this segment."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = TRACK_CODE
+      DATA_TYPE                = INTEGER
+      START_BIT                = 3
+      BITS                     = 3
+      DESCRIPTION              = "Track code, where:  0 is Track 7; 1 is
+        Track 3; 2 is Track 2; 3 is error; 4 is Track 6; 5 is Track 1; 6
+        is Track 5; 7 is Track 4."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = SEGMENT_LINE_NUMBER
+      DATA_TYPE                = INTEGER
+      START_BIT                = 6
+      BITS                     = 11
+      DESCRIPTION              = "Line number extracted from segment
+        header."
+    END_OBJECT                 = BIT_COLUMN
+
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = DQI_RATE_ORBIT7
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 51
+    BYTES                      = 2
+    DESCRIPTION                = "Bit string containing data quality
+        indicator, telemetry rate code and orbit number."
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DQI
+      DATA_TYPE                = INTEGER
+      START_BIT                = 1
+      BITS                     = 3
+      DESCRIPTION              = "Data quality indicator for this line
+        segment, where: 0 is bad data; 1 is SNR low, GCF block error; 2
+        is SNR good, GCF block bad; 3 is SNR low, GCF block good; 4 is
+        SNR good, GCF block good."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = TELEMETRY_RATE_CODE
+      DATA_TYPE                = INTEGER
+      START_BIT                = 4
+      BITS                     = 3
+      DESCRIPTION              = "Telemetry rate code, where:  1 for
+        16K; 2 for 8K; 3 for 4K; 4 for 2K; 5 for 1K."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = ORBIT_NUMBER
+      DATA_TYPE                = INTEGER
+      START_BIT                = 7
+      BITS                     = 10
+      DESCRIPTION              = "Orbit number taken from expected
+        picture list.  For Viking Orbiter 1 Survey mission images this
+        is ORBIT_NUMBER - 1000."
+    END_OBJECT                 = BIT_COLUMN
+
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = LINE_TRACK7
+    DATA_TYPE                  = VAX_INTEGER
+    START_BYTE                 = 53
+    BYTES                      = 2
+    DESCRIPTION                = "Bit string containing track and line
+        number."
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = PLAYBACK_REVERSED_FLAG
+      DATA_TYPE                = INTEGER
+      START_BIT                = 1
+      BITS                     = 1
+      DESCRIPTION              = "Set to 1 if playback is in reverse
+        order for this segment.  Track 1, 3, 5 and 7 are played-back
+        forward, 2, 4 and 6 are played-back reversed."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = DATA_ABSENCE_FLAG
+      DATA_TYPE                = INTEGER
+      START_BIT                = 2
+      BITS                     = 1
+      DESCRIPTION              = "Set to 1 if data is not present for
+        this segment."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = TRACK_CODE
+      DATA_TYPE                = INTEGER
+      START_BIT                = 3
+      BITS                     = 3
+      DESCRIPTION              = "Track code, where:  0 is Track 7; 1 is
+        Track 3; 2 is Track 2; 3 is error; 4 is Track 6; 5 is Track 1; 6
+        is Track 5; 7 is Track 4."
+    END_OBJECT                 = BIT_COLUMN
+
+    OBJECT                     = BIT_COLUMN
+      NAME                     = SEGMENT_LINE_NUMBER
+      DATA_TYPE                = INTEGER
+      START_BIT                = 6
+      BITS                     = 11
+      DESCRIPTION              = "Line number extracted from segment
+        header."
+    END_OBJECT                 = BIT_COLUMN
+
+  END_OBJECT                   = COLUMN
+
+  OBJECT                       = COLUMN
+    NAME                       = EMBEDDED_SCIENCE_DATA
+    ITEMS                      = 7
+    DATA_TYPE                  = INTEGER
+    START_BYTE                 = 55
+    ITEM_BYTES                 = 1
+    DESCRIPTION                = "Embedded low rate science data from
+        seven segments."
+  END_OBJECT                   = COLUMN
+
+END_OBJECT                     = LINE_HEADER_TABLE_STRUCTURE
+
+END
+END_OBJECT
+OBJECT                           = IMAGE
+ ENCODING_TYPE                   = HUFFMAN_FIRST_DIFFERENCE
+ LINES                           = 1056
+ LINE_SAMPLES                    = 1204
+ SAMPLE_TYPE                     = UNSIGNED_INTEGER
+ SAMPLE_BITS                     = 8
+ SAMPLE_BIT_MASK                 = 2#11111110#
+ CHECKSUM                        = 157067616
+END_OBJECT
+END
