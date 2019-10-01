@@ -110,8 +110,8 @@ def isis_compare_dict():
                     'SpkTableEndTime': 525560475.0262545,
                     'SpkTableOriginalSize': 1,
                     'EphemerisTimes': np.array([5.25560475e+08]),
-                    'Positions': np.array([[ 8.14823026e+08,  2.20464215e+07, -1.03927531e+07]]),
-                    'Velocities': np.array([[-0.10113375, 11.44908315,  4.9098488 ]])}}
+                    'Positions': np.array([[814823700.57661,22018509.45354,-10399060.67075]]),
+                    'Velocities': np.array([[-0.10070347311145,11.449085311077,4.9098525890309]])}}
 
 @pytest.fixture(scope='module')
 def test_kernels():
