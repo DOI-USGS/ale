@@ -8,7 +8,6 @@ import json
 
 import ale
 from ale import util
-from ale.drivers import lro_drivers
 from ale.drivers.ody_drivers import OdyThemisVisIsisLabelNaifSpiceDriver, OdyThemisIrIsisLabelNaifSpiceDriver
 
 from conftest import get_image_label, get_image_kernels, convert_kernels, compare_dicts

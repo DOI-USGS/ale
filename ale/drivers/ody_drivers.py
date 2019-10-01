@@ -9,7 +9,9 @@ from ale.base.base import Driver
 import pvl
 
 class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver):
-
+    """
+    Driver for Themis IR ISIS cube
+    """
     @property
     def instrument_id(self):
         inst_id = super().instrument_id
@@ -36,6 +38,11 @@ class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Dri
 
     @property
     def line_exposure_duration(self):
+        """
+        returns line exposure duration
+
+        Taken from ISIS ThemisIr Camera Model
+        """
         return (33.2871/1000 * self.line_summing)
 
     @property
@@ -54,8 +61,8 @@ class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Dri
 
 
 class OdyThemisVisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver):
-    """
-
+    """"
+    Driver for Themis VIS ISIS cube
     """
 
     @property
