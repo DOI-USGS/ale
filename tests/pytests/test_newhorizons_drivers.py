@@ -228,32 +228,7 @@ def test_kernels(scope="module"):
         os.remove(kern)
 
 def test_newhorizons_load(test_kernels, isis_compare_dict):
-    class AleJsonEncoder(json.JSONEncoder):
-        def default(self, obj):
-            if isinstance(obj, set):
-                return list(obj)
-            if isinstance(obj, np.integer):
-                return int(obj)
-            elif isinstance(obj, np.floating):
-                return float(obj)
-            elif isinstance(obj, np.ndarray):
-                return obj.tolist()
-            elif isinstance(obj, datetime.date):
-                return obj.isoformat()
-            return json.JSONEncoder.default(self, obj)
-
     label_file = get_image_label("lor_0034974380_0x630_sci_1", "isis")
-    with NewHorizonsLorriIsisLabelNaifSpiceDriver(label_file, props={'kernels': test_kernels}) as driver: 
-        isd_str = json.dumps(to_isis(driver), cls=AleJsonEncoder)
-    isis_obj = json.loads(isd_str)
-
-    assert compare_dicts(isis_obj, isis_compare_dict) == []
-
-# ========= Test LORRI ISIS label and naifspice driver =========
-class test_newhorizons_isis_naif(unittest.TestCase):
-    
-    def setUp(self):
-      label = get_image_label("lor_0034974380_0x630_sci_1", "isis")
-      self.driver = NewHorizonsLorriIsisLabelNaifSpiceDriver(label)
-
+    isis_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter="isis")
+    assert compare_dicts(isis_isd, isis_compare_dict) == []
 

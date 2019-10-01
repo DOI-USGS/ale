@@ -17,7 +17,7 @@ class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Dri
     ingested into ISIS from PDS EDR images but have not been spiceinit'd yet.
     """
     @property
-    def instrument_id():
+    def instrument_id(self):
         """
         Returns an instrument id for uniquely identifying the instrument, but often
         also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
@@ -28,7 +28,7 @@ class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Dri
           instrument id
         """
         id_lookup = {
-        "LORRI" : "NH_LORRI"
+            "LORRI" : "NH_LORRI"
         }
         return id_lookup[super().instrument_id]
 
