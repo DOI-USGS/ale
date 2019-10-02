@@ -17,7 +17,7 @@ class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Dri
         inst_id = super().instrument_id
 
         if inst_id not in ["THEMIS_IR"]:
-            raise Exception(f"{inst_id} is not a valid THEMIS instrument name. Expecting THEMIS_IR")
+            raise Exception(f"{inst_id} is not a valid THEMIS IR instrument name. Expecting THEMIS_IR")
 
         return inst_id
 
@@ -70,7 +70,7 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Dr
         inst_id = super().instrument_id
 
         if inst_id not in ["THEMIS_VIS"]:
-            raise Exception(f"{inst_id} is not a valid THEMIS instrument name. Expecting THEMIS_VIS")
+            raise Exception(f"{inst_id} is not a valid THEMIS VIS instrument name. Expecting \"THEMIS_VIS\"")
 
         return inst_id
 
@@ -91,8 +91,16 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Dr
 
     @property
     def ephemeris_start_time(self):
-        # inst["SpacecraftClockOffset"]
-        # et + offset - ((p_exposureDur / 1000.0) / 2.0);
+        """
+        The starting ephemeris time, in seconds
+
+        Formula derived from ISIS3's ThemisVis Camera model
+
+        Returns
+        -------
+        : double
+          Starting ephemeris time in seconds
+        """
         og_start_time = super().ephemeris_start_time
 
         offset = self.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"]

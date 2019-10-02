@@ -1,4 +1,0 @@
-This CK is for testing with the image: /tmp/themisvis/V46475015EDR.cub
-
-This CK was generated using the following command: {}
-/Users/kelvin/Downloads/ckslicer -LSK /usgs/cpkgs/isis3/data/base/kernels/lsk/naif0012.tls -SCLK /usgs/cpkgs/isis3/data/odyssey/kernels/sclk/ORB1_SCLKSCET.00247.tsc -INPUTCK /usgs/cpkgs/isis3/data/odyssey/kernels/ck/m01_sc_ext31.bc -OUTPUTCK /tmp/themisvis/m01_sc_ext31_1_sliced_-53000.bc -ID -53000 -TIMETYPE SCLK -START 2/1023406782.023 -STOP 2/1023406963.133
