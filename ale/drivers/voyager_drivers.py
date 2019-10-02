@@ -6,7 +6,7 @@ from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
 from ale.base.base import Driver
 
-class VoyagerCameraLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
+class VoyagerCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
 
     @property
     def instrument_id(self):
