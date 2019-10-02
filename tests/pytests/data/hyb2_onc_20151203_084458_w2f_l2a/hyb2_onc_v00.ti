@@ -1,0 +1,315 @@
+KPL/IK
+
+Hayabusa2 ONC Instrument kernel  
+================================================================================
+
+  This instrument kernel (I-kernel) contains the frames and FOV
+  definitions for Hayabusa2 Optical Navigation Camera (ONC).
+
+
+Version and Date
+================================================================================
+  Version 0.0     -- Jan 16, 2017 -- Hayabusa2 SPICE Team
+        Renamed for the public release
+
+  Version beta-01 -- Dec 21, 2016 -- Manabu YAMADA, PERC/Chitech
+        Fixed typo and values.
+
+  Version beta-00 -- Nov 18, 2014 -- Manabu YAMADA, PERC/Chitech
+        Preliminary Version. Based on AKATSUKI/UVI I-Kernel Version 4.0
+
+References
+
+
+   1.  ``Kernel Pool Required Reading'', NAIF Document No.____
+                http://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/kernel.html
+
+   2. ``C-kernel Required Reading'', NAIF Document No.____
+                http://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/ck.html
+
+   [3. ``'ONC Payload Interface Document '  not published :TBD]
+    ** îÚ„ƒé¿å±åvâÊèëÇéQè∆ÇµÇΩ
+
+   4. HAYABUSA2 Frames Definition Kernel (FK), latest version.
+
+Contact Infromation
+================================================================================
+
+  Manabu YAMADA, PERC/Chitech, manabu@perc.it-chiba.ac.jp
+
+
+Implementation Notes
+================================================================================
+
+  Applications that need SPICE I-kernel data must ``load'' the I-kernel
+  file, normally during program initialization.
+
+  Loading the kernel using the SPICELIB routine FURNSH causes the data
+  items and their associated values present in the kernel to become
+  associated with a data structure called the ``kernel pool''. The
+  application program may then obtain the value(s) for any IK data
+  item using the SPICELIB routines GDPOOL, GIPOOL, GCPOOL. Routine
+  GETFOV may be used if the file contains instrument field-of-view
+  (FOV) specification. See [1] for details.
+
+  This file was created with, and can be updated with a text editor or
+  word processor.
+
+
+Conventions for Specifying Data
+================================================================================
+
+  Data items are specified using ``keyword=value'' assignments [1].
+  All keywords referencing values in this I-kernel start with the
+  characters `INS' followed by the NAIF Hayabusa2 instrument ID 
+  code, constructed using the spacecraft ID number (-37) followed by the NAIF
+  three digit ID number for three ONC camera head (ONC-T, ONC-W1, ONC-W2).
+  These IDs are defined in [4] as follows:
+
+               Instrument name           ID
+               --------------------   -------
+               HAYABUSA2_ONC-T        -37100 [T.B.D.]
+               HAYABUSA2_ONC-W1       -37110 [T.B.D.]
+               HAYABUSA2_ONC-W2       -37120 [T.B.D.]
+
+
+  The remainder of the keyword is an underscore character followed by the
+  unique name of the data item. For example, the focal length of the ONC-T 
+  is specified by
+
+               INS-37100_FOCAL_LENGTH
+
+  The upper bound on the length of all keywords is 32 characters.
+
+  If a keyword is included in more then one file, or if the same
+  keyword appears more than once within a single file, the last
+  assignment supersedes any earlier assignments.
+
+
+Overview
+================================================================================
+
+  From [TBD]:
+
+    "ONC description. To be copied from [TBD] source provided by
+     the ONC team."
+
+
+Optical Parameters
+================================================================================
+
+  The following UVI first order optical parameters are included
+  in the data section below, taken from [3]:
+
+      -------------------------------------------------------
+             parameter        ONC-T      ONC-W1      ONC-W2  
+      -------------------------------------------------------
+      Focal Length, mm        121.1      10.35       10.44   
+      f/ratio                 f/8.0     f/9.6       f/9.6  
+      IFOV, mrad         (1)    0.107     1.26        1.25   
+      -------------------------------------------------------
+
+
+  (1) IFOV is computed as the arcus tangens of the pixel size divided by 
+      the nominal focal length:
+
+                             Pixel size     
+              IFOV = ATAN( -------------- ) 
+                            Focal length
+
+                            0.013 mm
+                   = ATAN( ---------- ) = 0.107 mrad
+                            121.1 mm
+
+  Angular size values in the keywords are given in radians. Only one
+  value is provided since the shape of the different filters' Field of
+  View is rectangler.
+
+
+  \begindata
+
+    INS-37100_FOCAL_LENGTH      = ( 121.1          )
+    INS-37100_F/RATIO           = (   8.0          )
+    INS-37100_IFOV              = (   0.000107349  )
+
+    INS-37110_FOCAL_LENGTH      = (  10.35         )
+    INS-37110_F/RATIO           = (   9.6          )
+    INS-37110_IFOV              = (   0.001256038  )
+
+    INS-37120_FOCAL_LENGTH      = (  10.44         )
+    INS-37120_F/RATIO           = (   9.6          )
+    INS-37120_IFOV              = (   0.00124521   )
+
+  \begintext
+
+
+Detector CCD Parameters
+================================================================================
+
+  The UVI detector parameters are included in the data section below,
+  taken from [3]:
+
+  -------------------------------------------------------
+         parameter          ONC-T      ONC-W1      ONC-W2
+  -------------------------------------------------------
+  Pixel Size, microns
+      Cross-track [mm]      0.013      0.013       0.013 
+      Along-track [mm]      0.013      0.013       0.013 
+  Detector Array Size
+      Cross-track            1024       1024        1024 
+      Along-track            1024       1024        1024 
+  Detector Array Center
+      Cross-track           512.5      512.5       512.5 
+      Along-track           512.5      512.5       512.5 
+  -------------------------------------------------------
+
+  The values are given in mm for PIXEL_SIZE keywords and in counts
+  for PIXEL_SAMPLES, PIXEL_LINES, and CENTER keywords.
+
+  The values of PIXEL_SAMPLES and  PIXEL_LINES are equal to the diameter of
+  each camera head, in counts.
+
+  \begindata
+
+    INS-37100_PIXEL_SIZE         = ( 0.013, 0.013 )
+    INS-37100_PIXEL_SAMPLES      = ( 1024 )
+    INS-37100_PIXEL_LINES        = ( 1024 )
+    INS-37100_CCD_CENTER         = ( 512.5, 512.5 )
+
+    INS-37110_PIXEL_SIZE         = ( 0.013, 0.013 )
+    INS-37110_PIXEL_SAMPLES      = ( 1024 )
+    INS-37110_PIXEL_LINES        = ( 1024 )
+    INS-37110_CCD_CENTER         = ( 512.5, 512.5 )
+
+    INS-37120_PIXEL_SIZE         = ( 0.013, 0.013 )
+    INS-37120_PIXEL_SAMPLES      = ( 1024 )
+    INS-37120_PIXEL_LINES        = ( 1024 )
+    INS-37120_CCD_CENTER         = ( 512.5, 512.5 )
+
+  \begintext
+
+
+Wavelength Ranges and Filter Parameters
+================================================================================
+
+  This section contains assignments specifying 
+  wavelength range and other filter parameters of ONC optics and filters.
+    
+  The following filter data are taken from [3]:
+
+     ---------------------------------------------------------------------------
+        Camera     Band Center,  Bandwidth,        Quantum    Trans-
+        Head       nanometers   nanometers (1)  Efficiency   mittance (2)
+     ---------------------------------------------------------------------------
+        ONC-T      700           800                0.70       0.25*[TBD]
+        ONC-W1     570           170                0.70       0.05*[TBD]
+        ONC-W2     570           170                0.70       0.25*[TBD]
+     ---------------------------------------------------------------------------
+
+     ---------------------------------------------------------------------------
+        ONC-T      Band Center,  Bandwidth,        Band      Trans-
+        Filter No. nanometers   nanometers (1)     Name     mittance
+     ---------------------------------------------------------------------------
+        1          390            40               ul          0.40
+        2          775           850               Wide        0.60
+        3          550            30               v           0.60
+        4          700            30               w           0.70
+        5          860            40               x           0.70
+        6          589.5          10               Na          0.70
+        7          950            60               p           0.70
+        8          480            30               b           0.50
+     ---------------------------------------------------------------------------
+
+  (1) The bandwidth is defined in terms of Full Width at Half Peak (FWHP)
+      values, as described in [3].
+
+  (2) The transmittance values account for both the optics and ND filter.
+
+  The set of assignments below specifies wavelength center and bandwidth
+  for each filter, with units the same as in the table above.
+
+
+  \begindata
+
+    INS-37100_FILTER_BANDCENTER    = (  700     )
+    INS-37100_FILTER_BANDWIDTH     = (  800     )
+    INS-37100_FILTER_QE            = (    0.70  )
+    INS-37100_FILTER_TRANSMITTANCE = (    0.25  )
+
+    INS-37110_FILTER_BANDCENTER    = (  570     )
+    INS-37110_FILTER_BANDWIDTH     = (  170     )
+    INS-37110_FILTER_QE            = (    0.70  )
+    INS-37110_FILTER_TRANSMITTANCE = (    0.05 )
+
+    INS-37120_FILTER_BANDCENTER    = (  570     )
+    INS-37120_FILTER_BANDWIDTH     = (  170     )
+    INS-37120_FILTER_QE            = (    0.70  )
+    INS-37120_FILTER_TRANSMITTANCE = (    0.25 )
+
+  \begintext
+
+
+FOV Definitions
+================================================================================
+
+  This section contains definitions for each of ONC camera heads.
+  These definitions are provided in a format consistent required by the
+  SPICE (CSPICE) function GETFOV (getfov_c).
+
+
+  Each of ONC camera heads has a square FOV:
+
+     ---------------------------
+        Camera     FOV
+        Head       (degrees)
+     ---------------------------
+        ONC-T       6.35 x  6.35
+        ONC-W1     65.24 x 65.24
+        ONC-W2     65.24 x 65.24
+     ---------------------------
+
+  For each of the frames, the boresight vector, along the +Z axis of 
+  instrument frame, was scaled to be equal to the focal length. 
+  The reference vector is a unit vector along the +Y axis of the frame.
+
+  \begindata
+    INS-37100_FOV_FRAME            = 'HAYABUSA2_ONC-T'
+    INS-37100_FOV_SHAPE            = 'RECTANGLE'
+    INS-37100_BORESIGHT            = ( 0.0     0.0    121.1 )
+    INS-37100_FOV_CLASS_SPEC       = 'ANGLES'
+    INS-37100_FOV_REF_VECTOR       = ( 0.0     1.0     0.0 )
+    INS-37100_FOV_REF_ANGLE        = ( 3.175 )
+    INS-37100_FOV_CROSS_ANGLE      = ( 3.175 )
+    INS-37100_FOV_ANGLE_UNITS      = 'DEGREES'
+
+    INS-37110_FOV_FRAME            = 'HAYABUSA2_ONC-W1'
+    INS-37110_FOV_SHAPE            = 'RECTANGLE'
+    INS-37110_BORESIGHT            = ( 0.0     0.0    10.35 )
+    INS-37110_FOV_CLASS_SPEC       = 'ANGLES'
+    INS-37110_FOV_REF_VECTOR       = ( 0.0     1.0     0.0 )
+    INS-37110_FOV_REF_ANGLE        = ( 32.62 )
+    INS-37110_FOV_CROSS_ANGLE      = ( 32.62 )
+    INS-37110_FOV_ANGLE_UNITS      = 'DEGREES'
+
+    INS-37120_FOV_FRAME            = 'HAYABUSA2_ONC-W2'
+    INS-37120_FOV_SHAPE            = 'RECTANGLE'
+    INS-37120_BORESIGHT            = ( 0.0     0.0    10.44 )
+    INS-37120_FOV_CLASS_SPEC       = 'ANGLES'
+    INS-37120_FOV_REF_VECTOR       = ( 0.0     1.0     0.0 )
+    INS-37120_FOV_REF_ANGLE        = ( 32.62 )
+    INS-37120_FOV_CROSS_ANGLE      = ( 32.62 )
+    INS-37120_FOV_ANGLE_UNITS      = 'DEGREES'
+
+  \begintext
+
+Optical Distortion
+===========================================================================
+
+  This section provides optical distortion and geometric calibration
+  data for the UVI.
+
+  The optical distortion for the ONC camera was not available at the time
+  when this version of the IK was released.
+
+
+End of IK file.
