@@ -1,0 +1,136 @@
+KPL/SCLK
+
+\beginlabel
+PDS_VERSION_ID               = PDS3
+RECORD_TYPE                  = STREAM
+RECORD_BYTES                 = "N/A"
+^SPICE_KERNEL                = "VO1_FICT.TSC"
+MISSION_NAME                 = VIKING
+SPACECRAFT_NAME              = "VIKING ORBITER 1"
+DATA_SET_ID                  = "VO1/VO2-M-SPICE-6-V1.0"
+KERNEL_TYPE_ID               = SCLK
+PRODUCT_ID                   = "VO1_FICT.TSC"
+PRODUCT_CREATION_TIME        = 2000-04-21T10:53:20
+PRODUCER_ID                  = "NAIF/JPL"
+MISSION_PHASE_NAME           = {
+                               PRIMARY_MISSION,
+                               EXTENDED_MISSION,
+                               CONTINUATION_MISSION,
+                               SURVEY_MISSION
+                               }
+PRODUCT_VERSION_TYPE         = ACTUAL
+PLATFORM_OR_MOUNTING_NAME    = "N/A"
+START_TIME                   = "N/A"
+STOP_TIME                    = "N/A"
+SPACECRAFT_CLOCK_START_COUNT = "N/A"
+SPACECRAFT_CLOCK_STOP_COUNT  = "N/A"
+TARGET_NAME                  = MARS
+INSTRUMENT_NAME              = "N/A"
+NAIF_INSTRUMENT_ID           = "N/A"
+SOURCE_PRODUCT_ID            = "N/A"
+NOTE                         = "See comments in the file for details"
+OBJECT                       = SPICE_KERNEL
+  INTERCHANGE_FORMAT         = ASCII
+  KERNEL_TYPE                = CLOCK_COEFFICIENTS
+  DESCRIPTION                = "SCLK file implementing fictitious clock
+used to tag orientation data in the VO1 CK files. This SCLK file does NOT
+represent real Viking Orbiter 1 on-board clock but rather is a simple
+counter of milliseconds since 1 Jan 1976 00:00:00. "
+END_OBJECT                   = SPICE_KERNEL
+\endlabel
+
+
+Viking Orbiter 1 "fictitious" SCLK Kernel
+--------------------------------------------------------
+ 
+   This file contains the data necessary to convert between the
+   'fictitious' Viking Orbiter 1 on-board clock times used as tags
+   for pointing instances in Viking Orbiter 1 CK files and ephemeris
+   time.
+
+   NAIF suggests that you do not modify this file. If you do modify
+   it, be sure to indicate this in the `Version' section below.
+
+ 
+Version
+--------------------------------------------------------
+ 
+   Version 1.0.1 -- April 20, 2000
+   
+      Comments in the file were slightly reformatted and augmented.
+ 
+   Version 1.0.0 -- July 22, 1996
+ 
+ 
+Implementation notes
+--------------------------------------------------------
+ 
+   This SPICE SCLK file is constructed so that valid SCLK strings
+   are simply the number of seconds that have passed since the UTC
+   epoch 1 Jan 1976 00:00:00. Thus 288929292.827 simply represents
+   the epoch that occurs 288929292.827 seconds past the UTC epoch
+   1 Jan 1976.
+
+   For all time, the clock runs at the same rate as Terrestrial
+   Dynamical Time (TDT). There is only one partition for this clock.
+
+   You must load this file into the kernel pool before using any
+   of the SPICELIB SCLK routines. The code fragment
+ 
+      CALL LDPOOL ( < name of this file > )
+ 
+   performs this task. To convert between ET and UTC, you will
+   also need to load a leapseconds kernel. The additional call
+   to LDPOOL,
+ 
+      CALL LDPOOL ( < name of your leapsecond file > )
+ 
+   will accomplish this. Note that you must supply the actual names
+   of the files used on your system as arguments to LDPOOL. Because
+   the file names are system dependent, we do not list them here.
+
+   For more information, consult your SPICELIB required reading
+   files. The following areas are covered:
+
+      SCLK system                     SCLK required reading
+      Time systems and conversion     TIME required reading
+      Kernel pool                     KERNEL required reading
+ 
+ 
+Kernel data
+--------------------------------------------------------
+ 
+   \begindata
+   
+      SCLK_KERNEL_ID                = (  @22-JUL-1996     )
+         
+      SCLK_DATA_TYPE_27             = (                 1 )
+         
+      SCLK01_TIME_SYSTEM_27         = (                 2 )
+      SCLK01_N_FIELDS_27            = (                 2 )
+      SCLK01_MODULI_27              = ( 10000000000  1000 )
+      SCLK01_OFFSETS_27             = (           0     0 )
+      SCLK01_OUTPUT_DELIM_27        = (                 1 )
+         
+      SCLK_PARTITION_START_27       = ( 0.0000000000000E+00 )
+      SCLK_PARTITION_END_27         = ( 1.00000000E+14      )
+      SCLK01_COEFFICIENTS_27        = ( 0.00000000E+00     
+                                        @01-JAN-1976-00:00:47.184 
+                                        1  )
+      
+   \begintext
+
+
+Contact Information
+--------------------------------------------------------
+
+   Contact NAIF node of the Planetary Data System if you have any
+   questions regarding this SCLK file.
+
+      Charles H. Acton, Jr
+      (818)-354-3869 
+      chuck.acton@jpl.nasa.gov
+      
+      Boris V. Semenov
+      (818)-354-8136 
+      boris.semenov@jpl.nasa.gov
