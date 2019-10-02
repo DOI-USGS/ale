@@ -4,7 +4,6 @@ import os
 import subprocess
 import numpy as np
 import spiceypy as spice
-from importlib import reload
 import json
 from unittest.mock import patch, PropertyMock
 import unittest 
@@ -211,13 +210,11 @@ def usgscsm_compare_dict():
           "t0_quaternion": -101.83713859319687,
           "dt_quaternion": 40.734855437278746}
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope="module")
 def test_kernels():
     kernels = get_image_kernels('h5270_0000_ir2')
     updated_kernels, binary_kernels = convert_kernels(kernels)
-    spice.furnsh(updated_kernels)
     yield updated_kernels
-    spice.unload(updated_kernels)
     for kern in binary_kernels:
         os.remove(kern)
 
@@ -234,8 +231,7 @@ def test_mex_load(usgscsm_compare_dict):
         binary_exposure_durations.return_value = [0.012800790786743165, 0.012800790786743165, 0.013227428436279297]
         binary_lines.return_value = [0.5, 1.5, 15086.5]
 
-        driver = MexHrscPds3NaifSpiceDriver(label_file)
-        usgscsm_isd = to_usgscsm(driver)
+        usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter='usgscsm', verbose='true')
         assert compare_dicts(usgscsm_isd, usgscsm_compare_dict) == []
 
 # ========= Test mex pds3label and naifspice driver =========

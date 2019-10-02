@@ -331,12 +331,8 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         : list
           Line scan rates
         """
-        if not hasattr(self, '_line_scan_rate'):
-            times = [time - self.center_ephemeris_time for time in self.binary_ephemeris_times]
-            self._line_scan_rate = (self.binary_lines, 
-                                    times, 
-                                    self.binary_exposure_durations)
-        return self._line_scan_rate
+        times = [time - self.center_ephemeris_time for time in self.binary_ephemeris_times]
+        return (self.binary_lines, times, self.binary_exposure_durations)
 
 
     @property
@@ -426,17 +422,11 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
                 record_bytes = image_file.read(bytes_per_record)
                 eph_time = struct.unpack('<d', record_bytes[:8])[0]
                 exp_dur = struct.unpack('<f', record_bytes[8:12])[0] / 1000
-                #if record == 0:
                 # Offset for zero-based corrections, and then offest for ISIS pixel definition
                 lines.append(record+1-0.5)
                 times.append(eph_time)
                 durations.append(exp_dur)
-            # Only add records if exposure duration has changed since the line before
-                    #elif exp_dur != durations[-1]:
-                    #    # Offset for zero-based corrections, and then offest for ISIS pixel definition
-                    #    lines.append(record+1-0.5)
-                    #    times.append(eph_time)
-                    #    durations.append(exp_dur)
+
         self._binary_exposure_durations = durations
         self._binary_lines = lines
         self._binary_ephemeris_times = times
@@ -456,9 +446,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         : float
           Center ephemeris time
         """
-        if not hasattr(self, '_center_ephemeris_time'):
-            self._center_ephemeris_time = (self.ephemeris_stop_time + self.ephemeris_start_time) / 2
-        return self._center_ephemeris_time
+        return self._center_ephemeris_time = (self.ephemeris_stop_time + self.ephemeris_start_time) / 2
 
 
     @property
@@ -473,9 +461,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         : float
           Ephemeris stop time
         """
-        if not hasattr(self, '_ephemeris_stop_time'):
-            self._ephemeris_stop_time = self.binary_ephemeris_times[-1] + self.binary_exposure_durations[-1]
-        return self._ephemeris_stop_time
+        return self._ephemeris_stop_time = self.binary_ephemeris_times[-1] + self.binary_exposure_durations[-1]
 
 
     # TODO We need to confirm that returning nothing here does not affect
