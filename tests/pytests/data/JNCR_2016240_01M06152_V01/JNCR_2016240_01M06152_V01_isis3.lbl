@@ -1,0 +1,76 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 824
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 1648
+      Lines   = 128
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = SignedWord
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName            = JUNO
+    InstrumentHostId          = UNKNOWN
+    InstrumentName            = "JUNO EPO CAMERA"
+    InstrumentId              = JNC
+    TargetName                = JUPITER
+
+    # Start time for the entire observation, i.e. start time for FrameNumber 1.
+    StartTime                 = 2016-08-27T09:00:04.129
+
+    # Start count for the entire observation, i.e. start count for FrameNumber 1.
+    SpacecraftClockStartCount = 525560580:87
+    ExposureDuration          = 204.800000 <ms>
+    InterFrameDelay           = 0.378 <s>
+    SummingMode               = 1
+    NumberFramelets           = 12
+    FrameNumber               = 8
+  End_Group
+
+  Group = Archive
+    MissionPhase          = "SCIENCE ORBITS"
+    OrbitNumber           = 1
+    FocalPlaneTemperature = 273.0 <K>
+    TDICount              = 64
+    CompressionType       = "INTEGER COSINE TRANSFORM"
+    YearDoy               = 2016240
+    SourceProductId       = JNCR_2016240_01M06152_V01
+  End_Group
+
+  Group = BandBin
+    FilterName = METHANE
+    NaifIkCode = -61504
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode = -61500
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 487425
+  Bytes     = 533
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 487958
+  Bytes     = 17903
+End_Object
+End
