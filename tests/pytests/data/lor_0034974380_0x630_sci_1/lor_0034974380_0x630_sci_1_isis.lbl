@@ -1,0 +1,369 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 512
+    TileLines   = 512
+
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 1024
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName            = "NEW HORIZONS"
+    InstrumentId              = LORRI
+    TargetName                = IO
+    StartTime                 = 2007-02-28T13:14:22.331 <Cal d>
+    SpacecraftClockStartCount = 1/0034974379:47125
+    ExposureDuration          = 0.075
+  End_Group
+
+  Group = Archive
+    HighSpeedCompressionMode    = LOSSLESS
+    ObservationCompletionStatus = COMPLETE
+    SequenceDescription         = "Jupiter shine"
+  End_Group
+
+  Group = BandBin
+    Name   = None
+    Center = 600
+    Width  = 500
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -98301
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = ($newhorizons/kernels/pck/pck00010.tpc,
+                                 $newhorizons/kernels/pck/nh_stars_kbo_centaur-
+                                 _v002.tpc)
+    TargetPosition            = (Table, $newhorizons/kernels/tspk/de413.bsp,
+                                 $newhorizons/kernels/tspk/jup260.bsp)
+    InstrumentPointing        = (Table,
+                                 $newhorizons/kernels/ck/merged_nhpc_2007_v006-
+                                 .bc, $newhorizons/kernels/fk/nh_v220.tf,
+                                 $newhorizons/kernels/fk/nh_soc_misc_v002.tf)
+    Instrument                = $newhorizons/kernels/ik/nh_lorri_v201.ti
+    SpacecraftClock           = $newhorizons/kernels/sclk/new_horizons_1454.t-
+                                sc
+    InstrumentPosition        = (Table,
+                                 $newhorizons/kernels/spk/nh_recon_e2j_v1.bsp)
+    InstrumentAddendum        = $newhorizons/kernels/iak/nh_lorriAddendum_v00-
+                                4.ti
+    ShapeModel                = Null
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 2
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 4284335
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-98000, 1)
+  ConstantFrames      = (-98301, -98300, -98000)
+  ConstantRotation    = (-0.005452680629036, -0.99996036726125,
+                         0.007037910250677, 0.002999533810427,
+                         -0.0070543385533461, -0.99997061912063,
+                         0.99998063534794, -0.0054314099747325,
+                         0.0030378799858676)
+  CkTableStartTime    = 225940527.51628
+  CkTableEndTime      = 225940527.51628
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = ($newhorizons/kernels/ck/merged_nhpc_2007_v006.bc,
+                         $newhorizons/kernels/fk/nh_v220.tf,
+                         $newhorizons/kernels/fk/nh_soc_misc_v002.tf)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 4284399
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 225940527.51628
+  SpkTableEndTime      = 225940527.51628
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = $newhorizons/kernels/spk/nh_recon_e2j_v1.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 4284455
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (10023, 1)
+  CkTableStartTime    = 225940527.51628
+  CkTableEndTime      = 225940527.51628
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 2
+  PoleRa              = (268.05, -0.009, 0.0)
+  PoleDec             = (64.5, 0.003, 0.0)
+  PrimeMeridian       = (200.39, 203.4889538, 0.0)
+  PoleRaNutPrec       = (0.0, 0.0, 0.094, 0.024, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                         0.0, 0.0, 0.0, 0.0, 0.0)
+  PoleDecNutPrec      = (0.0, 0.0, 0.04, 0.011, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                         0.0, 0.0, 0.0, 0.0, 0.0)
+  PmNutPrec           = (0.0, 0.0, -0.085, -0.022, 0.0, 0.0, 0.0, 0.0, 0.0,
+                         0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+  SysNutPrec0         = (73.32, 24.62, 283.9, 355.8, 119.9, 229.8, 352.25,
+                         113.35, 146.64, 49.24, 99.360714, 175.895369,
+                         300.323162, 114.012305, 49.511251)
+  SysNutPrec1         = (91472.9, 45137.2, 4850.7, 1191.3, 262.1, 64.3,
+                         2382.6, 6070.0, 182945.8, 90274.4, 4850.4046,
+                         1191.9605, 262.5475, 6070.2476, 64.3)
+  Description         = "Created by spiceinit"
+  Kernels             = ($newhorizons/kernels/tspk/de413.bsp,
+                         $newhorizons/kernels/tspk/jup260.bsp,
+                         $newhorizons/kernels/pck/pck00010.tpc,
+                         $newhorizons/kernels/pck/nh_stars_kbo_centaur_v002.tp-
+                         c)
+  SolarLongitude      = 324.3350636269
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 4284519
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 225940527.51628
+  SpkTableEndTime      = 225940527.51628
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = ($newhorizons/kernels/tspk/de413.bsp,
+                          $newhorizons/kernels/tspk/jup260.bsp)
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 4284575
+  Bytes     = 1387
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 4260317
+  Bytes     = 24018
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE                                = 501
+  BODY501_RADII                            = (1829.4, 1819.4, 1815.7)
+  BODY_FRAME_CODE                          = 10023
+  INS-98301_FOCAL_LENGTH_UNITS             = mm
+  INS-98301_FOCAL_LENGTH                   = 2618.4775964615
+  INS-98301_PIXEL_SIZE                     = 12.997
+  INS-98301_TRANSX                         = (0.0, 0.013, 0.0)
+  INS-98301_TRANSY                         = (0.0, 0.0, 0.013)
+  INS-98301_ITRANSS                        = (0.0, 76.923076923077, 0.0)
+  INS-98301_ITRANSL                        = (0.0, 0.0, 76.923076923077)
+  INS-98301_CCD_CENTER                     = (511.5, 511.5)
+  INS-98301_OOC_EM                         = (2.71725397251225e-05,
+                                              -1.90343925521274e-05,
+                                              -2.8806647687928e-05)
+  CLOCK_ET_-98_1/0034974379:47125_COMPUTED = c755085f28efaa41
+End_Object
+End
