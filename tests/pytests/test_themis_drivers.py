@@ -306,6 +306,7 @@ class test_themisir_isis_naif(unittest.TestCase):
         with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=0) as scs2e:
             self.driver.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"] = 10
             assert self.driver.ephemeris_start_time == 10
+            scs2e.assert_called_with(-53, '1220641481.102')
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
@@ -329,6 +330,7 @@ class test_themisvis_isis_naif(unittest.TestCase):
         with patch('ale.drivers.mro_drivers.spice.scs2e', return_value=0) as scs2e:
             self.driver.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"] = 10
             assert self.driver.ephemeris_start_time == (10 - self.driver.line_exposure_duration/2)
+            scs2e.assert_called_with(-53, '1023406812.23')
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
