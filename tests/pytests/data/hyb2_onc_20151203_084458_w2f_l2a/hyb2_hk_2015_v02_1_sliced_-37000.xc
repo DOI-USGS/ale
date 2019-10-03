@@ -1,0 +1,40 @@
+DAFETF NAIF DAF ENCODED TRANSFER FILE
+'DAF/CK  '
+'2'
+'6'
+'Hayabusa2 CK data type 3                                    '
+BEGIN_ARRAY 1 19
+'ISAS/JAXA HAYABUSA2 project             '
+'3C3AB63A^8'
+'3C3AB77A^8'
+'-9088'
+'1'
+'3'
+'1'
+19
+'80597948A2F94^0'
+'-D50001E371076^0'
+'-CAC0114F1E256^-1'
+'3B6FFF356289FA^0'
+'-1658020DB3587E^-3'
+'1CC94AD707858E^-3'
+'-56761289A98D9^-4'
+'80597948A2F94^0'
+'-D50001E371076^0'
+'-CAC0114F1E256^-1'
+'3B6FFF356289FA^0'
+'-300B0CE35DED54^-3'
+'28756F295F5D34^-3'
+'BA9DFCC3CAA118^-4'
+'3C3AB63A^8'
+'3C3AB77A^8'
+'3C3AB63A^8'
+'1^1'
+'2^1'
+END_ARRAY 1 19
+TOTAL_ARRAYS 1
+ ~NAIF/SPC BEGIN COMMENTS~
+This CK is for testing with the image: /home/tthatcher/Desktop/data/hybusa/hyb2.cub
+
+This CK was generated using the following command: {}
+ ~NAIF/SPC END COMMENTS~
