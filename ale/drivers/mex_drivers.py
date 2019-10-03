@@ -446,7 +446,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         : float
           Center ephemeris time
         """
-        return self._center_ephemeris_time = (self.ephemeris_stop_time + self.ephemeris_start_time) / 2
+        return (self.ephemeris_stop_time + self.ephemeris_start_time) / 2
 
 
     @property
@@ -461,7 +461,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         : float
           Ephemeris stop time
         """
-        return self._ephemeris_stop_time = self.binary_ephemeris_times[-1] + self.binary_exposure_durations[-1]
+        return self.binary_ephemeris_times[-1] + self.binary_exposure_durations[-1]
 
 
     # TODO We need to confirm that returning nothing here does not affect

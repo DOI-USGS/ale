@@ -218,7 +218,7 @@ def test_kernels():
     for kern in binary_kernels:
         os.remove(kern)
 
-def test_mex_load(usgscsm_compare_dict):
+def test_mex_load(test_kernels, usgscsm_compare_dict):
     label_file = get_image_label('h5270_0000_ir2')
 
     with patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_ephemeris_times', \
@@ -313,9 +313,12 @@ class test_mex_pds3_naif(unittest.TestCase):
         with patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_ephemeris_times', \
                    new_callable=PropertyMock) as binary_ephemeris_times, \
             patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_exposure_durations', \
-                   new_callable=PropertyMock) as binary_exposure_durations :
+                   new_callable=PropertyMock) as binary_exposure_durations, \
+            patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.ephemeris_start_time', 
+                   new_callable=PropertyMock) as ephemeris_start_time:
             binary_ephemeris_times.return_value = [255744795.73322123]
             binary_exposure_durations.return_value = [0.013227428436279297]
+            ephemeris_start_time.return_value = 255744592.07217148
             assert self.driver.center_ephemeris_time == 255744693.90931007
 
     def test_ephemeris_stop_time(self):
@@ -333,11 +336,16 @@ class test_mex_pds3_naif(unittest.TestCase):
             patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_exposure_durations', \
                    new_callable=PropertyMock) as binary_exposure_durations, \
             patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_lines', \
-                   new_callable=PropertyMock) as binary_lines:
+                   new_callable=PropertyMock) as binary_lines, \
+            patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.ephemeris_start_time', 
+                   new_callable=PropertyMock) as ephemeris_start_time:
             binary_ephemeris_times.return_value = [255744599.02748165, 255744599.04028246]
             binary_exposure_durations.return_value = [0.012800790786743165, 0.012800790786743165]
             binary_lines.return_value = [0.5, 1.5]
-            assert self.driver.line_scan_rate == ([0.5, 1.5], [3.464854270219803, 3.4776550829410553], [0.012800790786743165, 0.012800790786743165])
+            ephemeris_start_time.return_value = 255744592.07217148
+            assert self.driver.line_scan_rate == ([0.5, 1.5], 
+                                                  [3.464854270219803, 3.4776550829410553], 
+                                                  [0.012800790786743165, 0.012800790786743165])
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
