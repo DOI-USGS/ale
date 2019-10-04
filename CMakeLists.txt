@@ -72,13 +72,13 @@ configure_file(cmake/config.cmake.in
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
               DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 
-# Export the target
-export(TARGETS ale
-       NAMESPACE ale::
-       FILE ${CMAKE_CURRENT_BINARY_DIR}/ale.cmake)
-
 # Install the library
 install(TARGETS ale
-        EXPORT ale
+        EXPORT aleTargets
         LIBRARY       DESTINATION ${CMAKE_INSTALL_LIBDIR}
         PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+# Install the target
+install(EXPORT aleTargets
+        NAMESPACE ale::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
