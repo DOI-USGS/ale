@@ -1,7 +1,5 @@
 import pytest
-import pvl
 import os
-import subprocess
 import numpy as np
 import spiceypy as spice
 import json
