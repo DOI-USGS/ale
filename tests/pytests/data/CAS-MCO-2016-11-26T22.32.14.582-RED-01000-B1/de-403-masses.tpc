@@ -1,0 +1,65 @@
+This file was produced by Bill Taber on October 3, 1997.  
+
+The values in this file are taken from the JPL Interoffice Memorandum
+(IOM 314.10-127 May 22, 1995) "JPL Planetary and Lunar Ephemerides,
+DE403/LE403" by Myles Standish, et al.
+
+
+The masses for the sun and planetary barycenters given in this file are
+derived from the masses used for the integration of the planetary
+ephemeris DE-403.  In the ephemeris the values of the masses are given
+as ratios to of Solar GM to barycenter GM.  These values are given here.
+
+	BODY1_GMSUN/GM  =   6023600.0
+	BODY2_GMSUN/GM  =    408523.71
+	BODY3_GMSUN/GM  =    332946.048134
+	BODY4_GMSUN/GM  =   3098708.0
+	BODY5_GMSUN/GM  =      1047.3486
+	BODY6_GMSUN/GM  =      3497.898
+	BODY7_GMSUN/GM  =     22902.98
+	BODY8_GMSUN/GM  =     19412.24
+	BODY9_GMSUN/GM  = 135200000.0
+
+These values are used by other products that use DE-403 to provide
+gravitational force models for integration of trajectories.  
+
+Given the mass ratios and the mass of the sun, you can compute the mass
+of any barycenter.  These values are supplied in the text data given
+below.  Note that the values provided are rounded to three decimal
+places.
+
+
+
+\begindata
+
+AU         =      149597870.691 
+
+BODY1_GM   =          22032.080
+BODY2_GM   =         324858.599
+BODY3_GM   =         403503.235
+BODY4_GM   =          42828.314
+BODY5_GM   =      126712767.863
+BODY6_GM   =       37940626.063
+BODY7_GM   =        5794549.007
+BODY8_GM   =        6836534.064
+BODY9_GM   =            981.601
+BODY10_GM  =   132712440023.310
+
+\begintext
+
+The masses of bodies other than the earth and moon are simply taken to
+be the masses of the barycenters given above.  The masses of the earth
+and moon are taken from the referenced IOM.
+
+\begindata
+
+BODY199_GM   =          22032.080 
+BODY299_GM   =         324858.599
+BODY301_GM   =           4902.799
+BODY399_GM   =         398600.436
+BODY499_GM   =          42828.314
+BODY599_GM   =      126712767.863
+BODY699_GM   =       37940626.063
+BODY799_GM   =        5794549.007
+BODY899_GM   =        6836534.064
+BODY999_GM   =            981.601
