@@ -15,17 +15,17 @@ include(GNUInstallDirs)
 set(CMAKE_CXX_STANDARD 11)
 
 # Third Party Dependencies
-find_package(GSL    REQUIRED)
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
-find_package(Python REQUIRED COMPONENTS Development)
+find_package(GSL           REQUIRED)
+find_package(Eigen3 3.3    REQUIRED NO_MODULE)
+find_package(Python        REQUIRED COMPONENTS Development)
 find_package(nlohmann_json REQUIRED)
 
 # Library setup
 add_library(ale SHARED
             ${CMAKE_CURRENT_SOURCE_DIR}/src/ale.cpp)
 set_target_properties(ale PROPERTIES
-    VERSION ${PROJECT_VERSION}
-    SOVERSION 1)
+                      VERSION ${PROJECT_VERSION}
+                      SOVERSION 1)
 set(ALE_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 
 target_include_directories(ale
@@ -61,5 +61,6 @@ if(BUILD_TESTS)
 endif()
 
 # Install commands
-install(TARGETS ale LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install(DIRECTORY ${ALE_INCLUDE_DIRS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(TARGETS ale
+        LIBRARY       DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
