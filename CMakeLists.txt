@@ -25,7 +25,7 @@ add_library(ale SHARED
             ${CMAKE_CURRENT_SOURCE_DIR}/src/ale.cpp)
 set_target_properties(ale PROPERTIES
                       VERSION ${PROJECT_VERSION}
-                      SOVERSION 1)
+                      SOVERSION 0)
 set(ALE_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 
 target_include_directories(ale
