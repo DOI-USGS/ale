@@ -402,9 +402,8 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         For each line/record of the binary data, the first 8 bytes make up the
         double presicion value of the ephemeris time, with the next 4 bytes
         making up the float value of the line exposure duration for the
-        associated line. NOTE: The image label specifies MSB_INTEGER as the byte
-        order, however, to match ISIS values, we used python struct's little
-        endian functionality.
+        associated line. NOTE: The prefix data is always LSB, regardless
+        of the overall file format.
         """
         lines = []
         times = []
