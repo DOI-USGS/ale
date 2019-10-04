@@ -341,7 +341,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         Returns the exposure durations taken from the binary image data.
 
         For HRSC, the exposure durations are imbedded in the binary data of the image.
-        The expsoure durations start at the 9th byte of the line/record and are 4 bytes.
+        The expsoure durations start at the 9th byte of the line/record and are 4 bytes long.
 
         Returns
         -------
@@ -359,7 +359,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         Returns the ephemeris times taken from the binary image data.
 
         For HRSC, the ephemeris times are imbedded in the binary data of the image.
-        The ephemeris times start at the first bye of the line/records and are 8 bytes.
+        The ephemeris times start at the first byte of the line/records and are 8 bytes long.
 
         Returns
         -------
