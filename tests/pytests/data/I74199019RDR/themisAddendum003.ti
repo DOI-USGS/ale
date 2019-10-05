@@ -1,0 +1,32 @@
+\begindata
+INS-53031_SPK_TIME_BIAS     = 0.0
+INS-53031_CK_TIME_BIAS      = 0.0 
+INS-53031_CK_TIME_TOLERANCE = 1
+INS-53031_PLATFORM_ID = -53000
+
+INS-53032_SPK_TIME_BIAS     = 0.0
+INS-53032_CK_TIME_BIAS      = 0.0
+INS-53032_CK_TIME_TOLERANCE = 1
+INS-53032_PLATFORM_ID = -53000
+
+INS-53031_TRANSX = ( 0.0, 0.05, 0.0)
+INS-53031_TRANSY = ( 0.0, 0.0, 0.05)
+INS-53031_ITRANSS = ( 0.0, 20.0, 0.0)
+INS-53031_ITRANSL = ( 0.0, 0.0, 20.0)
+
+INS-53032_TRANSX = ( 0.0, 0.009, 0.0)
+INS-53032_TRANSY = ( 0.0, 0.0, -0.009)
+INS-53032_ITRANSS = ( 0.0, 111.11111111, 0.0)
+INS-53032_ITRANSL = ( 0.0, 0.0, -111.11111111)
+
+\begintext
+These are the parameters for writing c-kernels.  Isis will create ck
+with the same frame endpoints as the mission ck. For Odyssey the ck
+instrument frame is  MO1_SPACECRAFT (-53000) and the ck reference frame
+is MARSIAU (16).
+
+\begindata
+INS-53031_CK_FRAME_ID=-53000
+INS-53031_CK_REFERENCE_ID=16
+INS-53032_CK_FRAME_ID=-53000
+INS-53032_CK_REFERENCE_ID=16

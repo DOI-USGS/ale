@@ -1,0 +1,78 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 512
+    TileLines   = 456
+
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 400
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName        = MARS_ODYSSEY
+    InstrumentId          = THEMIS_VIS
+    TargetName            = MARS
+    MissionPhaseName      = EXTENDED-4
+    StartTime             = 2012-06-05T23:30:30.245
+    StopTime              = 2012-06-05T23:30:47.343
+    SpacecraftClockCount  = 1023406812.230
+    ExposureDuration      = 4.800
+    InterframeDelay       = 0.900
+    SpatialSumming        = 1
+    SpacecraftClockOffset = 0.0 <seconds>
+    NumFramelets          = 19
+    Framelets             = Even
+  End_Group
+
+  Group = Archive
+    DataSetId               = ODY-M-THM-2-VISEDR-V1.0
+    ProducerId              = ODY_THM_TEAM
+    ProductId               = V46475015EDR
+    ProductCreationTime     = 2012-06-07T16:05:29
+    ProductVersionId        = 1.0
+    OrbitNumber             = 46475
+    FlightSoftwareVersionId = 1.00
+    CommandSequenceNumber   = 46475
+    Description             = "No Description Given"
+  End_Group
+
+  Group = BandBin
+    OriginalBand = 1
+    Center       = 0.654
+    Width        = 0.053
+    FilterNumber = 3
+    BandNumber   = 3
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode = -53032
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 15007745
+  Bytes     = 492
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 15008237
+  Bytes     = 5983
+End_Object
+End
