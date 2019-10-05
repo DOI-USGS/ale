@@ -1,0 +1,109 @@
+PDS_VERSION_ID = PDS3
+/* File Identification and Structure */
+RECORD_TYPE = "FIXED_LENGTH"
+RECORD_BYTES = 1024
+FILE_RECORDS = 3652
+LABEL_RECORDS = 3
+
+/* Pointers to Data Objects */
+^HISTORY = 4
+^SPECTRAL_QUBE = 5
+
+/* Identification Data Elements */
+MISSION_NAME = "2001 MARS ODYSSEY"
+INSTRUMENT_HOST_NAME = "2001 MARS ODYSSEY"
+INSTRUMENT_NAME = "THERMAL EMISSION IMAGING SYSTEM"
+INSTRUMENT_ID = "THEMIS"
+DETECTOR_ID = "VIS"
+MISSION_PHASE_NAME = "EXTENDED-4"
+SPACECRAFT_ORIENTATION_DESC = (PITCH,ROLL,YAW)
+SPACECRAFT_ORIENTATION = (0,0,0)
+SPACECRAFT_POINTING_MODE = "NADIR"
+^SPACECRAFT_POINTING_MODE_DESC = "ODY_ORIENT_POINT.TXT"
+TARGET_NAME = "MARS"
+PRODUCT_ID = "V46475015EDR"
+PRODUCER_ID = "ODY_THM_TEAM"
+DATA_SET_ID = "ODY-M-THM-2-VISEDR-V1.0"
+PRODUCT_CREATION_TIME = 2012-06-07T16:05:29
+PRODUCT_VERSION_ID = "1.0"
+RELEASE_ID = "0042"
+START_TIME = 2012-06-05T23:30:30.245
+STOP_TIME = 2012-06-05T23:30:47.343
+SPACECRAFT_CLOCK_START_COUNT = "1023406812.230"
+SPACECRAFT_CLOCK_STOP_COUNT = "1023406829.255"
+START_TIME_ET = 392211096.430
+STOP_TIME_ET = 392211113.528
+ORBIT_NUMBER = 46475
+
+/*History Object Structure*/
+OBJECT = HISTORY
+    BYTES = 1024
+    HISTORY_TYPE = CUSTOM
+    INTERCHANGE_FORMAT = ASCII
+END_OBJECT = HISTORY
+
+
+OBJECT = SPECTRAL_QUBE
+    
+    /* QUBE Structure */
+    AXES = 3
+    AXIS_NAME = (SAMPLE,LINE,BAND)
+    
+    /* Core Description */
+    CORE_ITEMS = (1024,400,1)
+    CORE_NAME = "RAW_DATA_NUMBER"
+    CORE_ITEM_BYTES = 1
+    CORE_ITEM_TYPE = MSB_UNSIGNED_INTEGER
+    CORE_BASE = 0.0
+    CORE_MULTIPLIER = 1.0
+    CORE_UNIT = "DIMENSIONLESS"
+    CORE_NULL = 0
+    
+    /* Observation Parameters */
+    FLIGHT_SOFTWARE_VERSION_ID = "1.00"
+    COMMAND_SEQUENCE_NUMBER = 46475
+    IMAGE_ID = 15
+    DESCRIPTION = "No Description Given"
+    INST_CMPRS_RATIO = 1.95
+    UNCORRECTED_SCLK_START_COUNT = "1023406814.179"
+    IMAGE_DURATION = 17.100
+    INST_CMPRS_NAME = "PREDICTIVE"
+    FOCAL_PLANE_TEMPERATURE = -3.10
+    EXPOSURE_DURATION = 4.800
+    INTERFRAME_DELAY = 0.900
+    SPATIAL_SUMMING = 1
+    MD5_CHECKSUM = "c0dcd705fced5e0542751f66de9b4985"
+    
+    /* Band Bins */
+    GROUP = BAND_BIN
+        BAND_BIN_FILTER_NUMBER = (3)
+        BAND_BIN_BAND_NUMBER = (3)
+        BAND_BIN_CENTER = (0.654)
+        BAND_BIN_WIDTH = (0.053)
+        BAND_BIN_UNIT = "MICROMETER"
+    END_GROUP = BAND_BIN
+END_OBJECT = SPECTRAL_QUBE
+
+END
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+GROUP = SFDU2CUBE
+DATE_TIME = 2012-06-07T16:05:29
+SOFTWARE_DESC = "Translation of data format from SFDU into raw
+        image qube(THM-EDR).  Removes SFDU headers and unpackages
+        data; returns an individual spectral image QUBE (THM-EDR)
+        containing raw DN, with missing data CORE_NULL filled and
+        an attched PDS label"
+VERSION_ID = 1.68
+USER_NAME = "murray@olympus"
+USER_NOTE = ""
+GROUP = PARAMETERS
+START_SFDU_ID = "1023483943"
+STOP_SFDU_ID = "1023484023"
+ERT_START_TIME = "2012-158 // 21:09:10"
+ERT_STOP_TIME = "2012-158 // 21:11:34"
+MISSING_PACKETS = 0
+FOUND_PACKETS = 878
+END_GROUP = PARAMETERS
+END_GROUP = SFDU2CUBE
+END

@@ -71,7 +71,7 @@ def load(label, props={}, formatter='usgscsm', verbose=False):
                 isd = formatter(driver)
                 if verbose:
                     print("Success with: ", driver)
-                    print("ISD:\n", isd)
+                    print("ISD:\n", json.dumps(isd, indent=2, cls=AleJsonEncoder))
                 return isd
         except Exception as e:
             if verbose:
