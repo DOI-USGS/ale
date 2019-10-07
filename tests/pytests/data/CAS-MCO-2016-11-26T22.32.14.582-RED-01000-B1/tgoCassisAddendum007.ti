@@ -1,0 +1,194 @@
+\begintext 
+The instrument addendum kernel for TGO CaSSIS camera.
+
+history 2017-01-13 Jeannie Backer - Original version.
+history 2017-02-03 Kris Becker - Added light time correction flags
+                       and filter offsets from beginning of CCD.
+history 2017-09-05 Stuart Sides - Added distortion coefficients (no longer appearing in IK).
+history 2017-09-13 Jeannie Backer - Updated distortion coefficients provided by S.Tulyakov (EPFL)
+                       and added documentation.
+history 2017-09-20 Kristin Berry - Moved unneeded filter offsets to text area and cleaned up file. 
+history 2018-03-13 Jeannie Backer - Updated focal length from 880.0 to 876, as
+                       recommended by S.Tulyakov (EPFL). Also updated filter boresight line/samp.
+history 2018-07-01 Kristin Berry - Updated focal length from 876 to 874.9 mm, as
+                       recommended by S.Tulyakov (EPFL). Also updated filter offset. 
+
+\begintext
+Values below come from the camera kernel.
+ 
+\begindata
+ INS-143400_PIXEL_PITCH      = 0.010
+ INS-143400_FOCAL_LENGTH     = 874.9
+ INS-143400_BORESIGHT_SAMPLE = 1024.5
+ INS-143400_BORESIGHT_LINE   = 1024.5
+ INS-143400_FILTER_LINES     = 2048
+ INS-143400_FILTER_SAMPLES   = 2048
+
+ INS-143421_FOCAL_LENGTH     = 874.9
+ INS-143421_BORESIGHT_SAMPLE = 1024.5
+ INS-143421_BORESIGHT_LINE   = 493.5
+ INS-143421_FILTER_LINES     = 280
+ INS-143421_FILTER_SAMPLES   = 2048
+
+ INS-143422_FOCAL_LENGTH     = 874.9
+ INS-143422_BORESIGHT_SAMPLE = 1024.5
+ INS-143422_BORESIGHT_LINE   = 839.5
+ INS-143422_FILTER_LINES     = 256
+ INS-143422_FILTER_SAMPLES   = 2048
+
+ INS-143423_FOCAL_LENGTH     = 874.9
+ INS-143423_BORESIGHT_SAMPLE = 1024.5
+ INS-143423_BORESIGHT_LINE   = 1175.5
+ INS-143423_FILTER_LINES     = 256
+ INS-143423_FILTER_SAMPLES   = 2048
+
+ INS-143424_FOCAL_LENGTH     = 874.9
+ INS-143424_BORESIGHT_SAMPLE = 1024.5
+ INS-143424_BORESIGHT_LINE   = 1516.5
+ INS-143424_FILTER_LINES     = 256
+ INS-143424_FILTER_SAMPLES   = 2048
+
+\begintext
+Filter Offsets, for reference. (No longer required by ISIS3.)
+
+ INS-143421_FILTER_OFFSET    = 354.0
+ INS-143422_FILTER_OFFSET    = 712.0
+ INS-143423_FILTER_OFFSET    = 1048.0
+ INS-143424_FILTER_OFFSET    = 1389.0
+
+\begintext
+Calculated using pixel pitch and 1/pixel pitch
+
+\begindata
+ INS-143400_TRANSX = ( 0.0, 0.010, 0.0 )
+ INS-143400_TRANSY  = ( 0.0, 0.0, 0.010 )
+ INS-143400_ITRANSS = ( 0.0, 100.0, 0.0 ) 
+ INS-143400_ITRANSL = ( 0.0, 0.0, 100.0 )
+
+\begintext
+
+ CASSIS OBSERVER/TARGET SWAPPING, STELLAR ABERRATION & LIGHT TIME CORRECTION:
+------------------------------------------------------------------------------
+
+The following table lists the TGO/CASSIS NAIF Ids that need to have parameters
+set that will provide the settings for handling light time/stellar aberration
+corrections as well as swap observer/target to set the correct order for NAIF
+calls to get s/c and target postion and attitude data.
+
+      Name                         NAIF ID
+     ---------------------        ---------
+      TGO_CASSIS                   -143400
+      TGO_CASSIS_PAN               -143421
+      TGO_CASSIS_RED               -143422
+      TGO_CASSIS_NIR               -143423
+      TGO_CASSIS_BLU               -143424
+
+
+\begindata
+
+  INS-143400_SWAP_OBSERVER_TARGET = 'TRUE'
+  INS-143400_LIGHTTIME_CORRECTION = 'LT+S'
+  INS-143400_LT_SURFACE_CORRECT   = 'TRUE'
+
+  INS-143421_SWAP_OBSERVER_TARGET = 'TRUE'
+  INS-143421_LIGHTTIME_CORRECTION = 'LT+S'
+  INS-143421_LT_SURFACE_CORRECT   = 'TRUE'
+
+  INS-143422_SWAP_OBSERVER_TARGET = 'TRUE'
+  INS-143422_LIGHTTIME_CORRECTION = 'LT+S'
+  INS-143422_LT_SURFACE_CORRECT   = 'TRUE'
+
+  INS-143423_SWAP_OBSERVER_TARGET = 'TRUE'
+  INS-143423_LIGHTTIME_CORRECTION = 'LT+S'
+  INS-143423_LT_SURFACE_CORRECT   = 'TRUE'
+
+  INS-143424_SWAP_OBSERVER_TARGET = 'TRUE'
+  INS-143424_LIGHTTIME_CORRECTION = 'LT+S'
+  INS-143424_LT_SURFACE_CORRECT   = 'TRUE'
+
+
+\begintext
+
+Optical Distortion -   Correcting distorted coordinates
+--------------------------------------------------------
+ Converting from distorted (i,j) to ideal (x,y).
+
+Rational correction model is described by following equation
+
+ chi = [ i^2, i*j, j^2, i, j, 1]
+
+          A_corr_1 * chi'
+ x =  ----------------------
+          A_corr_3 * chi'
+
+          A_corr_2 * chi'
+ y =  ----------------------
+          A_corr_3 * chi'
+
+ where (i, j) are distorted focal plane coordinates in millimeters
+       (x, y) are ideal focal plane coordinates in millimeters
+       A_corr_1, A_corr_2, A_corr_3 are 1x6 vectors, parameters of the rational correction model
+
+\begindata
+
+         INS-143400_OD_A1_CORR = (  0.00376130530948266,
+                                   -0.0134154156065812,
+                                   -1.86749521007237e-05,
+                                    1.00021352681836,
+                                   -0.000432362371703953,
+                                   -0.000948065735350123 )
+         INS-143400_OD_A2_CORR = (  9.9842559363676e-05,
+                                    0.00373543707958162,
+                                   -0.0133299918873929,
+                                   -0.000215311328389359,
+                                    0.995296015537294,
+                                   -0.0183542717710778 )
+         INS-143400_OD_A3_CORR = ( -3.13320167004204e-05,
+                                   -7.35655125749807e-06,
+                                   -1.57664245066771e-05,
+                                    0.00373549465439151,
+                                   -0.0141671946930935,
+                                    1.0 )
+\begintext
+
+Optical Distortion - Distorting ideal coordinates
+--------------------------------------------------------
+ Converting from ideal (x,y) to distorted (i,j).
+
+ Rational distortion model is described by following equation
+
+ chi = [ x^2, x*y, y^2, x, y, 1]
+
+          A_dist_1 * chi'
+ i =  ----------------------
+          A_dist_3 * chi'
+
+          A_dist_2 * chi'
+ j =  ----------------------
+          A_dist_3 * chi'
+
+ where (i, j) are distorted focal plane coordinates in millimeters
+       (x, y) are ideal focal plane coordinates in millimeters
+       A_dist_1, A_dist_2, A_dist_3 are 1x6 vectors, parameters of the rational distortion model
+
+\begindata
+
+         INS-143400_OD_A1_DIST = (  0.00213658795560622,
+                                   -0.00711785765064197,
+                                    1.10355974742147e-05,
+                                    0.573607182625377,
+                                    0.000250884350194894,
+                                    0.000550623913037132 )
+         INS-143400_OD_A2_DIST = ( -5.69725741015406e-05,
+                                    0.00215155905679149,
+                                   -0.00716392991767185,
+                                    0.000124152787728634,
+                                    0.576459544392426,
+                                    0.010576940564854 )
+         INS-143400_OD_A3_DIST = (  1.78250771483506e-05,
+                                    4.24592743471094e-06,
+                                    9.51220699036653e-06,
+                                    0.00215158425420738,
+                                   -0.0066835595774833,
+                                    0.573741540971609 )
+
