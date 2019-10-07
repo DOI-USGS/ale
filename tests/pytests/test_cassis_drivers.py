@@ -2,13 +2,11 @@ import pytest
 import ale
 import os
 import json
-import pvl
 
 import numpy as np
-from ale.drivers import co_drivers
 from ale.formatters.isis_formatter import to_isis
 from ale.base.data_isis import IsisSpice
-import unittest 
+import unittest
 from unittest.mock import patch
 
 from conftest import get_image_label, get_image_kernels, convert_kernels, compare_dicts
@@ -26,34 +24,34 @@ def isis_compare_dict():
     "BODY_CODE": 499,
     "INS-143400_FOV_ANGLE_UNITS": "DEGREES",
     "INS-143400_OD_A3_DIST": [
-      1.52240896709669e-05,
-      2.4045252496397297e-06,
-      1.5382711014407e-05,
-      0.00310362726634607,
-      0.00238330278037335,
-      0.575374652906421
+      1.78250771483506e-05,
+      4.24592743471094e-06,
+      9.51220699036653e-06,
+      0.00215158425420738,
+      -0.0066835595774833,
+      0.573741540971609
     ],
     "TKFRAME_-143400_ANGLES": [0.021, 0.12, -179.881],
     "FRAME_-143400_CENTER": -143.0,
     "INS-143400_FOV_CLASS_SPEC": "ANGLES",
     "INS-143400_OD_A3_CORR": [
-      -2.66362211929368e-05,
-      -4.18111444381442e-06,
-      -2.6043401940728897e-05,
-      0.00542860345347002,
-      0.00164668822925175,
+      -3.13320167004204e-05,
+      -7.35655125749807e-06,
+      -1.57664245066771e-05,
+      0.00373549465439151,
+      -0.0141671946930935,
       1.0
     ],
     "INS-143400_FOV_REF_VECTOR": [1.0, 0.0, 0.0],
     "TKFRAME_-143400_AXES": [1.0, 2.0, 3.0],
     "TKFRAME_-143400_SPEC": "ANGLES",
     "INS-143400_OD_A2_DIST": [
-      -5.61600987759384e-05,
-      0.0031016957502373998,
-      0.00190053792058327,
-      0.000208146838499972,
-      0.576977522640326,
-      0.010177651661487
+      -5.69725741015406e-05,
+      0.00215155905679149,
+      -0.00716392991767185,
+      0.000124152787728634,
+      0.576459544392426,
+      0.010576940564854
     ],
     "FRAME_-143400_NAME": "TGO_CASSIS_CRU",
     "INS-143400_BORESIGHT": [0.0, 0.0, 1.0],
@@ -63,12 +61,12 @@ def isis_compare_dict():
     "INS-143400_FOV_CROSS_ANGLE": 0.67057,
     "INS-143400_BORESIGHT_LINE": 1024.5,
     "INS-143400_OD_A2_CORR": [
-      9.807709057550299e-05,
-      0.00543196976741689,
-      0.00248552506455258,
-      -0.00036068968926879805,
-      0.997230456361333,
-      -0.01765423906529
+      9.9842559363676e-05,
+      0.00373543707958162,
+      -0.0133299918873929,
+      -0.000215311328389359,
+      0.995296015537294,
+      -0.0183542717710778
     ],
     "INS-143400_SWAP_OBSERVER_TARGET": "TRUE",
     "FRAME_-143400_CLASS_ID": -143400.0,
@@ -78,22 +76,22 @@ def isis_compare_dict():
     "INS-143400_FOV_REF_ANGLE": 0.67057,
     "INS-143400_FOV_SHAPE": "RECTANGLE",
     "INS-143400_OD_A1_DIST": [
-      0.0030962215897376,
-      0.0019365954357096601,
-      1.43799661742481e-05,
-      0.575732495892843,
-      7.45445812599102e-05,
-      -0.000924338558685123
+      0.00213658795560622,
+      -0.00711785765064197,
+      1.10355974742147e-05,
+      0.573607182625377,
+      0.000250884350194894,
+      0.000550623913037132
     ],
     "INS-143400_FILTER_SAMPLES": 2048.0,
     "INS-143400_FILTER_LINES": 2048.0,
     "INS-143400_OD_A1_CORR": [
-      0.00544124551618559,
-      0.00242058700718023,
-      -2.48577907043558e-05,
-      0.999359573639265,
-      -0.000130945991526083,
-      0.00161016464782889
+      0.00376130530948266,
+      -0.0134154156065812,
+      -1.86749521007237e-05,
+      1.00021352681836,
+      -0.000432362371703953,
+      -0.000948065735350123
     ],
     "INS-143400_FOV_FRAME": "TGO_CASSIS_FSA",
     "INS-143400_LT_SURFACE_CORRECT": "TRUE",
@@ -194,14 +192,14 @@ def isis_compare_dict():
       ]
     ],
     "ConstantRotation": [
-        0.0021039880161896, 
+        0.0021039880161896,
         -5.08910327554815e-04,
-        0.99999765711961, 
-        0.98482103650022, 
+        0.99999765711961,
+        0.98482103650022,
         0.17356149021485,
-        -0.0019837290716917, 
+        -0.0019837290716917,
         -0.17356007404082,
-        0.98482290292452, 
+        0.98482290292452,
         8.66356891752243e-04
     ]
   },
@@ -279,14 +277,18 @@ def test_cassis_load(test_kernels, isis_compare_dict):
 
 # ========= Test cassis ISIS label and naifspice driver =========
 class test_cassis_isis_naif(unittest.TestCase):
-    
+
     def setUp(self):
       label = get_image_label("CAS-MCO-2016-11-26T22.32.14.582-RED-01000-B1", "isis")
       self.driver = TGOCassisIsisLabelNaifSpiceDriver(label)
-    
+
     def test_short_mission_name(self):
       assert self.driver.short_mission_name == "tgo"
-    
-    def test_exposure_duration(self):
-      assert self.driver.exposure_duration == 1.920e-003
 
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == "TGO_CASSIS"
+
+    def test_ephemeris_start_time(self):
+        with patch("ale.drivers.viking_drivers.spice.utc2et", return_value=12345) as utc2et:
+            assert self.driver.ephemeris_start_time == 12345
+            utc2et.assert_called_with("2016-11-26 22:32:14.582000")

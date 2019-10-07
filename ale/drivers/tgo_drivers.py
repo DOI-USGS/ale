@@ -30,7 +30,10 @@ class TGOCassisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
         : str
           instrument id
         """
-        return "TGO_CASSIS"
+        id_lookup = {
+            'CaSSIS': 'TGO_CASSIS',
+        }
+        return id_lookup[super().instrument_id]
 
     @property
     def ephemeris_start_time(self):
@@ -61,5 +64,3 @@ class TGOCassisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
           ISIS sensor model version
         """
         return 1
-
-
