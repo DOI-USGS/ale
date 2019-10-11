@@ -419,4 +419,4 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
         name_lookup = {
             "MOON": "MOON_ME"
         }
-        return spice.gdpool('FRAME_{}'.format(name_lookup[self.target_name]),0,1)
+        return int(spice.gdpool('FRAME_{}'.format(name_lookup[self.target_name]),0,1)[0])
