@@ -1,0 +1,110 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 512
+    TileLines   = 512
+
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 1024
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName                  = HAYABUSA-2
+    InstrumentId                    = ONC-W2
+    InstrumentName                  = "Optical Navigation Camera"
+    OriginalTargetName              = Earth
+    TargetName                      = Earth
+    StartTime                       = 2015-12-03T08:44:58.177
+    StopTime                        = 2015-12-03T08:44:58.179
+    ExposureDuration                = 0.00272 <seconds>
+    SpacecraftClockStartCount       = 1/1010480858
+    SpacecraftClockStartCount       = 1/1010480858
+    RawSpacecraftClockCount         = 0x3C3AB6DA <1/32 sec>
+    OnboardDataRecordedTime         = 3C3AB701
+    Binning                         = 1
+    SelectedImageAreaX1             = 1
+    SelectedImageAreaY1             = 1
+    SelectedImageAreaX2             = 1024
+    SelectedImageAreaY2             = 1
+    SelectedImageAreaX3             = 1
+    SelectedImageAreaY3             = 1024
+    SelectedImageAreaX4             = 1024
+    SelectedImageAreaY4             = 1024
+    SmearCorrection                 = NON
+    OffsetCorrection                = N/A
+    FlatCorrection                  = NON
+    RadianceConversion              = NON
+    PhotometricCorrection           = NON
+    BandRegistration                = NON
+    L2BFlatFileName                 = N/A
+    L2BSystemEfficiencyFileName     = N/A
+    L2CShapeModelFileName           = N/A
+    L2DPhaseFunctionFileName        = N/A
+    L2DShapeModelFileName           = N/A
+    ImageID                         = 01026
+    SubImageCount                   = 1
+    BusLineVoltage                  = 49.28 <V>
+    ONCCurrent                      = 0.52 <V>
+    FLACCurrent                     = 0.00 <V>
+    ONCAETemperature                = 1.53 <degC>
+    ONCTOpticsTemperature           = 19.26 <degC>
+    ONCTCCDTemperature              = -29.47 <degC>
+    ONCTElectricCircuitTemperature  = -11.88 <degC>
+    ONCW1OpticsTemperature          = 1.36 <degC>
+    ONCW1CCDTemperature             = -25.02 <degC>
+    ONCW1ElectricCircuitTemperature = -10.90 <degC>
+    ONCW2OpticsTemperature          = 1.27 <degC>
+    ONCW2CCDTemperature             = -24.66 <degC>
+    ONCW2ElectricCircuitTemperature = -4.12 <degC>
+    FLACTemperature                 = -15.27 <degC>
+    Compression                     = LOSSY
+  End_Group
+
+  Group = Archive
+    ProducerId        = ISAS/JAXA
+    L0FileName        = 01026_20151203084459_00003C3AB701.img
+    FormatType        = "HAYABUSA2 IMAGE ONC L2a"
+    FormatTypeVersion = 20161019
+    ContentType       = "ONC-W2 NON SMEARCORRECTED"
+    ContentVersion    = 20161019
+    ImageType         = SCIENCE
+    SourceProductId   = hyb2_onc_20151203_084458_w2f_l2a
+    YearDoy           = 2015337
+  End_Group
+
+  Group = BandBin
+    FilterName = None
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode = -37120
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 4259841
+  Bytes     = 574
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 4260415
+  Bytes     = 11769
+End_Object
+End

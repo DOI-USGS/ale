@@ -1,0 +1,473 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 512
+    TileLines   = 256
+
+    Group = Dimensions
+      Samples = 2048
+      Lines   = 256
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName            = "TRACE GAS ORBITER"
+    InstrumentId              = CaSSIS
+    TargetName                = Mars
+    StartTime                 = 2016-11-26T22:32:14.582
+    SpacecraftClockStartCount = 2f01543131b1aa13
+    ExposureDuration          = 1.920e-003 <seconds>
+    Filter                    = RED
+    Expanded                  = 1
+    SummingMode               = 0
+  End_Group
+
+  Group = Archive
+    DataSetId                    = TBD
+    ProductVersionId             = UNK
+    ProducerId                   = UBE
+    ProducerName                 = "Nicolas Thomas"
+    ProductCreationTime          = 2017-10-03T10:49:49
+    FileName                     = CAS-MCO-2016-11-26T22.32.14.582-RED-01000--
+                                   B1
+    ScalingFactor                = 1.00
+    Offset                       = 0.00
+    PredictMaximumExposureTime   = 1.5274 <ms>
+    CassisOffNadirAngle          = 50.470 <deg>
+    PredictedRepetitionFrequency = 351.9 <ms>
+    GroundTrackVelocity          = 3.2356 <km/s>
+    ForwardRotationAngle         = 68.821 <deg>
+    SpiceMisalignment            = 8.487 <deg>
+    FocalLength                  = 0.8770 <m>
+    FNumber                      = 6.50
+    ExposureTimeCommand          = 200
+    FrameletNumber               = 0
+    NumberOfFramelets            = 40
+    ImageFrequency               = 1000000 <ms>
+    NumberOfWindows              = 6
+    UniqueIdentifier             = 100797368
+    UID                          = 100797368
+    ExposureTimestamp            = 2f01543131b1aa13
+    ExposureTimePEHK             = 1.920e-003 <ms>
+    PixelsPossiblySaturated      = 0.39
+    IFOV                         = 1.140e-005
+    IFOVUnit                     = rad/px
+    FiltersAvailable             = "BLU RED NIR PAN"
+    FocalLengthUnit              = M
+    TelescopeType                = "Three-mirror anastigmat with powered fold
+                                    mirror"
+    DetectorDescription          = "2D Array"
+    PixelHeight                  = 10.0
+    PixelHeightUnit              = MICRON
+    PixelWidth                   = 10.0
+    PixelWidthUnit               = MICRON
+    DetectorType                 = "SI CMOS HYBRID (OSPREY 2K)"
+    ReadNoise                    = 61.0
+    ReadNoiseUnit                = ELECTRON
+    MissionPhase                 = MCO
+    SubInstrumentIdentifier      = 61.0
+    WindowCount                  = 1
+    Window1Binning               = 0
+    Window1StartSample           = 0
+    Window1EndSample             = 2047
+    Window1StartLine             = 354
+    Window1EndLine               = 632
+    Window2Binning               = 0
+    Window2StartSample           = 0
+    Window2EndSample             = 2047
+    Window2StartLine             = 712
+    Window2EndLine               = 967
+    Window3Binning               = 0
+    Window3StartSample           = 0
+    Window3EndSample             = 2047
+    Window3StartLine             = 1048
+    Window3EndLine               = 1302
+    Window4Binning               = 0
+    Window4StartSample           = 0
+    Window4EndSample             = 2047
+    Window4StartLine             = 1409
+    Window4EndLine               = 1662
+    Window5Binning               = 0
+    Window5StartSample           = 640
+    Window5EndSample             = 767
+    Window5StartLine             = 200
+    Window5EndLine               = 208
+    Window6Binning               = 0
+    Window6StartSample           = 1280
+    Window6EndSample             = 1407
+    Window6StartLine             = 1850
+    Window6EndLine               = 1858
+    YearDoy                      = 2016331
+    ObservationId                = CRUS_049217_238_0
+  End_Group
+
+  Group = BandBin
+    FilterName = RED
+    Center     = 840 <nm>
+    Width      = 100 <nm>
+    NaifIkCode = -143422
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -143400
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = ($tgo/kernels/pck/pck00010.tpc,
+                                 $tgo/kernels/pck/de-403-masses.tpc)
+    TargetPosition            = (Table, $tgo/kernels/tspk/de432s.bsp,
+                                 $tgo/kernels/tspk/mar097.bsp)
+    InstrumentPointing        = (Table,
+                                 $tgo/kernels/ck/em16_tgo_sc_spm_20161101_2017-
+                                 0301_s20190703_v01.bc,
+                                 $tgo/kernels/ck/cassis_ck_p_160312_191231_190-
+                                 601.bc, $tgo/kernels/fk/em16_tgo_v18.tf,
+                                 $tgo/kernels/fk/em16_tgo_ops_v02.tf,
+                                 $tgo/kernels/fk/rssd0002.tf)
+    Instrument                = $tgo/kernels/ik/em16_tgo_cassis_v07.ti
+    SpacecraftClock           = $tgo/kernels/sclk/em16_tgo_step_20190823.tsc
+    InstrumentPosition        = (Table,
+                                 $tgo/kernels/spk/em16_tgo_fsp_048_01_20160314-
+                                 _20181231_v02.bsp)
+    InstrumentAddendum        = $tgo/kernels/iak/tgoCassisAddendum007.ti
+    ShapeModel                = $base/dems/molaMarsPlanetaryRadius0005.cub
+    InstrumentPositionQuality = Predicted
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
+  End_Group
+
+  Group = AlphaCube
+    AlphaSamples        = 2048
+    AlphaLines          = 2048
+    AlphaStartingSample = 0.5
+    AlphaStartingLine   = 712.5
+    AlphaEndingSample   = 2048.5
+    AlphaEndingLine     = 968.5
+    BetaSamples         = 2048
+    BetaLines           = 256
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 2176659
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-143410, -143400, -143000, 1)
+  ConstantFrames      = (-143420, -143410)
+  ConstantRotation    = (0.0021039880161896, -5.08910327554815e-04,
+                         0.99999765711961, 0.98482103650022, 0.17356149021485,
+                         -0.0019837290716917, -0.17356007404082,
+                         0.98482290292452, 8.66356891752243e-04)
+  CkTableStartTime    = 533471602.76595
+  CkTableEndTime      = 533471602.76595
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = ($tgo/kernels/ck/em16_tgo_sc_spm_20161101_20170301_s2-
+                         0190703_v01.bc,
+                         $tgo/kernels/ck/cassis_ck_p_160312_191231_190601.bc,
+                         $tgo/kernels/fk/em16_tgo_v18.tf,
+                         $tgo/kernels/fk/em16_tgo_ops_v02.tf,
+                         $tgo/kernels/fk/rssd0002.tf)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 2176723
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 533471602.76595
+  SpkTableEndTime      = 533471602.76595
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = $tgo/kernels/spk/em16_tgo_fsp_048_01_20160314_201812-
+                         31_v02.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 2176779
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (10014, 1)
+  CkTableStartTime    = 533471602.76595
+  CkTableEndTime      = 533471602.76595
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 2
+  PoleRa              = (317.68143, -0.1061, 0.0)
+  PoleDec             = (52.8865, -0.0609, 0.0)
+  PrimeMeridian       = (176.63, 350.89198226, 0.0)
+  Description         = "Created by spiceinit"
+  Kernels             = ($tgo/kernels/tspk/de432s.bsp,
+                         $tgo/kernels/tspk/mar097.bsp,
+                         $tgo/kernels/pck/pck00010.tpc,
+                         $tgo/kernels/pck/de-403-masses.tpc)
+  SolarLongitude      = 269.12863680949
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 2176843
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 533471602.76595
+  SpkTableEndTime      = 533471602.76595
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = ($tgo/kernels/tspk/de432s.bsp,
+                          $tgo/kernels/tspk/mar097.bsp)
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 2176899
+  Bytes     = 1487
+End_Object
+
+Object = OriginalXmlLabel
+  Name      = IsisCube
+  StartByte = 2163248
+  Bytes     = 13411
+  ByteOrder = Lsb
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE                       = 499
+  BODY499_RADII                   = (3396.19, 3396.19, 3376.2)
+  BODY_FRAME_CODE                 = 10014
+  INS-143400_SWAP_OBSERVER_TARGET = TRUE
+  INS-143400_LIGHTTIME_CORRECTION = LT+S
+  INS-143400_LT_SURFACE_CORRECT   = TRUE
+  INS-143400_FOCAL_LENGTH         = 874.9
+  INS-143400_PIXEL_PITCH          = 0.01
+  INS-143400_TRANSX               = (0.0, 0.01, 0.0)
+  INS-143400_TRANSY               = (0.0, 0.0, 0.01)
+  INS-143400_ITRANSS              = (0.0, 100.0, 0.0)
+  INS-143400_ITRANSL              = (0.0, 0.0, 100.0)
+  INS-143400_BORESIGHT_SAMPLE     = 1024.5
+  INS-143400_BORESIGHT_LINE       = 1024.5
+  INS-143400_OD_A1_CORR           = (0.0037613053094827, -0.013415415606581,
+                                     -1.86749521007237e-05, 1.0002135268184,
+                                     -4.32362371703953e-04,
+                                     -9.48065735350123e-04)
+  INS-143400_OD_A2_CORR           = (9.9842559363676e-05, 0.0037354370795816,
+                                     -0.013329991887393, -2.15311328389359e-04,
+                                     0.99529601553729, -0.018354271771078)
+  INS-143400_OD_A3_CORR           = (-3.13320167004204e-05,
+                                     -7.35655125749807e-06,
+                                     -1.57664245066771e-05, 0.0037354946543915,
+                                     -0.014167194693093, 1.0)
+  INS-143400_OD_A1_DIST           = (0.0021365879556062, -0.007117857650642,
+                                     1.10355974742147e-05, 0.57360718262538,
+                                     2.50884350194894e-04,
+                                     5.50623913037132e-04)
+  INS-143400_OD_A2_DIST           = (-5.69725741015406e-05,
+                                     0.0021515590567915, -0.0071639299176719,
+                                     1.24152787728634e-04, 0.57645954439243,
+                                     0.010576940564854)
+  INS-143400_OD_A3_DIST           = (1.78250771483506e-05,
+                                     4.24592743471094e-06,
+                                     9.51220699036653e-06, 0.0021515842542074,
+                                     -0.0066835595774833, 0.57374154097161)
+  INS-143400_FILTER_SAMPLES       = 2048.0
+  INS-143400_FILTER_LINES         = 2048.0
+End_Object
+End

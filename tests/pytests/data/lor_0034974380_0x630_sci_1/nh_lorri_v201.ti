@@ -1,0 +1,1284 @@
+KPL/IK
+
+\beginlabel
+PDS_VERSION_ID               = PDS3
+RECORD_TYPE                  = STREAM
+RECORD_BYTES                 = "N/A"
+^SPICE_KERNEL                = "nh_lorri_v201.ti"
+MISSION_NAME                 = "NEW HORIZONS"
+SPACECRAFT_NAME              = "NEW HORIZONS"
+DATA_SET_ID                  = "NH-J/P/SS-SPICE-6-V1.0"
+KERNEL_TYPE_ID               = IK
+PRODUCT_ID                   = "nh_lorri_v201.ti"
+PRODUCT_CREATION_TIME        = 2016-04-30T00:00:00
+PRODUCER_ID                  = "APL"
+MISSION_PHASE_NAME           = "N/A"
+PRODUCT_VERSION_TYPE         = ACTUAL
+PLATFORM_OR_MOUNTING_NAME    = "NEW HORIZONS"
+START_TIME                   = "N/A"
+STOP_TIME                    = "N/A"
+SPACECRAFT_CLOCK_START_COUNT = "N/A"
+SPACECRAFT_CLOCK_STOP_COUNT  = "N/A"
+TARGET_NAME                  = {
+                               JUPITER,
+                               PLUTO,
+                               "SOLAR SYSTEM"
+                               }
+INSTRUMENT_NAME              = "LONG RANGE RECONNAISSANCE IMAGER"
+NAIF_INSTRUMENT_ID           = { -98302, -98301, -98300 }
+SOURCE_PRODUCT_ID            = "N/A"
+NOTE                         = "See comments in the file for details"
+OBJECT                       = SPICE_KERNEL
+  INTERCHANGE_FORMAT         = ASCII
+  KERNEL_TYPE                = INSTRUMENT
+  DESCRIPTION                = "NH LORRI instrument kernel"
+END_OBJECT                   = SPICE_KERNEL
+\endlabel
+
+KPL/IK
+
+
+LORRI Instrument Kernel
+==============================================================================
+
+   This instrument kernel (I-kernel) contains references to the mounting
+   alignment, internal and FOV geometry for the New Horizons LOng Range
+   Reconnaissance Imager (LORRI).
+
+
+Version and Date
+----------------------------------------------------------
+
+   The TEXT_KERNEL_ID stores version information of loaded project text
+   kernels. Each entry associated with the keyword is a string that consists
+   of four parts: the kernel name, version, entry date, and type. For example,
+   the LORRI I-kernel might have an entry as follows:
+
+         TEXT_KERNEL_ID += 'NEWHORIZONS_LORRI V2.0.1 01-MAR-2016 IK'
+                                    |           |         |       |
+                                    |           |         |       |
+                KERNEL NAME <-------+           |         |       |
+                                                |         |       V
+                                VERSION <-------+         |      KERNEL TYPE
+                                                          |
+                                                          V
+                                                     ENTRY DATE
+
+   LORRI I-Kernel Version:
+
+           \begindata
+
+           TEXT_KERNEL_ID += 'NEWHORIZONS_LORRI V2.0.1 01-MAR-2016 IK'
+
+           NAIF_BODY_NAME += ( 'NH_LORRI' )
+           NAIF_BODY_CODE += ( -98300 )
+
+           NAIF_BODY_NAME += ( 'NH_LORRI_1X1' )
+           NAIF_BODY_CODE += ( -98301 )
+
+           NAIF_BODY_NAME += ( 'NH_LORRI_4X4' )
+           NAIF_BODY_CODE += ( -98302 )
+
+           \begintext
+
+   Version 2.0.1 -- March 1, 2016 -- Howard Taylor, JHU/APL
+
+            --   Added discussion on adapting coefficients of the OOC
+                 distortion model (Ky and EM5) to comply with the LORRI
+                 instrument frame.
+            --   Changed the pixel size to the measured value rather
+                 than the assumed value. This affected values for the
+                 focal length, f-number, and coefficients in both the
+                 OOC and SIP distortion models [15].
+            --   Changed the sense of the sign of two coefficients
+                 ( Ky, EM5) in the Owen and O'Connell distortion model
+                 due to differences in the direction of the +Y-axis used
+                 in the published model compared to the LORRI instrument
+                 frame.
+            --   Fixed values for INS-9830X_OOC_EM_SIGMA.  The exponent
+                 had been omitted unintentionally.
+            --   Added keywords INS-9830X_APERTURE_DIAM_UNITS
+            --   changed the reference for the INS*_OOC_CCD_CENTER keywords
+                 from unit reference to zero reference pixel values.
+            --   Text updated in Optical Distortion model section that
+                 incorrectly described the detector size to include the
+                 dark columns.
+            --   Removed references to pixel pitch for consistency,
+                 replacing with equivalent term:  pixel size.
+            --   Clarified representation of mathematical equations
+                 in the SIP distortion section.
+            --   Added section relating Owen & O'Connell model to the
+                 SIP reverse transform.
+            --   Updated plate scale (IFOV) values based on updated
+                 estimate for focal length.
+
+   Version 2.0.0 -- August 18, 2015 -- Howard Taylor, JHU/APL
+
+            --   Redefined the units of two keywords to maintain
+                 internal consistency and to make them consistent with
+                 the Owen and O'Connell distortion model.  The units on
+                 the FOCAL_LENGTH keyword were changed from m to mm. The
+                 units of the APERTURE_DIAMETER keyword were changed
+                 from cm to mm.
+            --   Added distortion model coefficients for OOC and SIP
+                 distortion models.
+            --   Fixed begin data and begin text tags in platform id section.
+
+   Version 1.0.0 -- February 21, 2007 -- Lillian Nguyen, JHU/APL
+
+            --   Updated the diagrams to match those in the frames kernel,
+                 nh.tf.
+            --   Promoting to version 1.0.0 denoting approval of kernel set
+                 by instrument teams.
+
+   Version 0.0.3 -- January 4, 2007 -- Lillian Nguyen, JHU/APL
+
+            --   Added field of view information for the 1x1 and 4x4 binning
+                 modes.
+            --   Added optical and CCD geometry parameters, and reference
+                 vector.
+
+   Version 0.0.2 -- October 4, 2006 -- Lillian Nguyen, JHU/APL
+
+            --   Removed the 3-letter frame NH_LOR.
+
+   Version 0.0.1 -- January 25, 2006 -- Lillian Nguyen
+
+            --   Frame definition and frame diagram modified after
+                 review by instrument team.
+
+   Version 0.0.0 -- January 5, 2006 -- Lillian Nguyen
+
+            --   Draft Version. NOT YET APPROVED BY INSTRUMENT TEAM.
+
+
+References
+----------------------------------------------------------
+
+            1.   LOng-Range Reconnaissance Imager (LORRI) Specification
+                 Document, 7400-9000 Rev A.
+
+            2. ``Kernel Pool Required Reading''
+
+            3.   Spacecraft to LORRI Interface Control Document (ICD),
+                 7399-9048, Rev B.
+
+            4.   APL New Horizons web site,
+                 http://pluto.jhuapl.edu/spacecraft/overview.html.
+
+            5.   New Horizons Spacecraft Frames Kernel.
+
+            6.   New Horizons Mission Science Definitions (MSD),
+                 NH7399-9000v1.6.
+
+            7.   LOng-Range Reconnaissance Imager (LORRI) User's Manual,
+                 7400-9601, dated Jan. 10, 2006.
+
+            8.   LORRI_orientation_1-9-06, received on 1/23/2006 by e-mail
+                 from Hal Weaver along with a description of the LORRI frame
+                 relative to the spacecraft frame. Also a phone conversation
+                 with Hal clarifying the diagrams in the document.
+
+            9.   Discussions with Howard Taylor regarding LORRI instrument
+                 frame definition and LORRI keywords, 12/21/2006.
+
+           10.   Response to LORRI OpNav action items, forwarded in an e-mail
+                 from Howard Taylor on 12/21/2006.
+
+           11.   Owen, Jr., W. M. and O'Connell, D., "New Horizons LORRI
+                 Geometric Calibration of August 2006", JPL Interoffice
+                 Memorandum 343L-11-002, 06/08/2011
+
+           12.   Email exchange between Bill Owen and Hal Weaver containing
+                 updated distortion coefficients of [11] using ACO-7 Wishing
+                 Well data, 04/16/2015.
+
+           13.   Shupe, David L, et. al. "The SIP Convention for Representing
+                 Distortion in FITS Image Headers", Astronomical Data Analysis
+                 Software and Systems XIV, ASP Conference, Vol 347, 2005,
+                 P. L. Shopbell, M. C. Britton, and R. Ebert, eds.
+
+           14.   Analysis results from Brian Carcich for Hal Weaver, which
+                 derived SIP coefficients from Bill Owen's latest model
+                 coefficients on 04/16/2015 at
+                 https://www.spaceops.swri.org/~brian/for_hal/sip
+
+           15.   Email exchange between Bill Owen and Hal Weaver detailing
+                 how to scale his published coefficients for the updated
+                 pixel size. 01/27/2016
+
+Contact Information
+----------------------------------------------------------
+
+   Lillian Nguyen, JHU/APL, (443)-778-5477, Lillian.Nguyen@jhuapl.edu
+   Howard Taylor, JHU/APL, (443)-778-5682, Howard.Taylor@jhuapl.edu
+   Brian Carcich, Latchmoor Services LLC, Williamsburg, VA, USA
+
+
+Implementation Notes
+----------------------------------------------------------
+
+   This file is used by the SPICE system as follows: programs that make use of
+   this instrument kernel must ``load'' the kernel, normally during program
+   initialization. Loading the kernel associates data items with their names
+   in a data structure called the ``kernel pool''. The SPICELIB routine FURNSH,
+   CSPICE routine furnsh_c, and IDL routine cspice_furnsh load SPICE kernels
+   as shown below:
+
+   FORTRAN (SPICELIB)
+
+           CALL FURNSH ( 'kernel_name' )
+
+   C (CSPICE)
+
+           furnsh_c ( "kernel_name" )
+
+   ICY (IDL)
+
+           cspice_furnsh, 'kernel_name'
+
+   In order for a program or subroutine to extract data from the pool, the
+   SPICELIB routines GDPOOL, GCPOOL, and GIPOOL are used. See [2] for details.
+
+   This file was created and may be updated with a text editor or word
+   processor.
+
+
+Naming Conventions
+----------------------------------------------------------
+
+   All names referencing values in this I-kernel start with the characters
+   `INS' followed by the NAIF New Horizons spacecraft ID number (-98)
+   followed by a NAIF three digit ID code for the LORRI instrument.
+
+   The remainder of the name is an underscore character followed by the unique
+   name of the data item. For example, the LORRI boresight direction in the
+   LORRI frame (``NH_LORRI'' -- see [5] ) is specified by:
+
+           INS-98300_BORESIGHT
+
+   The upper bound on the length of the name of any data item is 32
+   characters.
+
+   If the same item is included in more than one file, or if the same item
+   appears more than once within a single file, the latest value supersedes
+   any earlier values.
+
+
+LORRI description
+----------------------------------------------------------
+
+   From [4]:
+
+   ``The instrument that provides the highest spatial resolution on New
+   Horizons is LORRI - short for Long Range Reconnaissance Imager - which
+   consists of a telescope with a 8.2-inch (20.8-centimeter) aperture that
+   focuses visible light onto a charge coupled device (CCD). LORRI has a
+   very simple design; there are no filters or moving parts. Near the time
+   of closest approach, LORRI will take images of Pluto's surface at
+   football-field sized resolution, resolving features approximately 100
+   yards or 100 meters across.''
+
+   From [1]:
+
+   ``The Long Range Reconnaissance Imager, LORRI, is a modest aperture
+   (200 mm), narrow-angle camera capable of producing high-resolution
+   imagery.  The LORRI will provide imagery of Pluto-Charon, beginning 90
+   days prior to encounter. From 75 days regarding before closest approach,
+   LORRI will provide resolution of Pluto beyond that achievable using HST.
+     .
+     .
+     .
+   LORRI imager consists of a 208 mm aperture Ritchey-Chretien telescope
+   made of silicon carbide.  The telescope is f/12.75, and feeds an
+   unfiltered, 1024 x 1024 frame transfer CCD.  The effective band-pass is
+   primarily limited by the CCD response to 350 to 850 nm.  There is a long
+   composite baffle running the length of the instrument, and smaller
+   baffles at the outside of the secondary and inside of the primary.  The
+   assembly is mounted to the spacecraft via 3 titanium legs.
+     .
+     .
+     .
+   LORRI operations consist of imaging at Jupiter, Pluto/Charon, and one to
+   three Kuiper Belt Objects.  Additionally, various calibration images and
+   functional tests will be performed.''
+
+   From [3]:
+
+   ``The LOng Range Reconnaissance Imager (LORRI) is intended to complement
+   the PERSI/MVIC wide angle, medium resolution imagers.  LORRI is
+   controlled independently of PERSI/MVIC. It will provide higher resolution
+   imagery with a much narrower field-of-view and contributes a measure of
+   redundancy to the mission.  Its boresight is aligned to within 0.1 deg of
+   PERSI/MVIC to support coordinated operations when operated in their
+   "framing mode".  The long-range capability of LORRI will permit the
+   receipt of high-resolution observations of Pluto-Charon at least 75 days
+   before their encounter and of the Kuiper-Belt Objects (KBOs).
+     .
+     .
+     .
+   LORRI is a panchromatic visible imager with an angular resolution of 5
+   microrad/pixel and a field-of-view (FOV) of 0.2912 deg x 0.2912 deg.  It
+   consists of a 20-cm aperture, f/13 telescope imaging onto a CCD focal
+   plane. The combined mass of the telescope structure, mirrors, supporting
+   electronics, and aperture door is 8.593 Kg.  To reduce unwanted stray
+   light, the telescope is heavily baffled.  LORRI is fixed mounted inside
+   the spacecraft structure within a baffle tube protruding through the
+   spacecraft structure.  An aperture door provides contamination protection
+   during ground operation, launch, and early cruise.''
+
+
+LORRI Frame
+----------------------------------------------------------
+
+   The following diagrams are reproduced from [8] and [9].
+
+   When viewed by an observer looking out LORRI's boresight, the spacecraft
+   axes on the sky will look like:
+
+   Diagram 1
+   ---------
+                  Sky View Looking out from LORRI
+                 _________________________________
+                |                                 |
+                |                                 |
+                |                ^ +Y             |
+                |                |   sc           |
+                |                |                |
+                |                |                |
+                |                |                |
+                |       <--------o                |
+                |     +Z           +X  (out)      |
+                |       sc           sc           |
+                |                                 |
+                |                                 |
+                |                                 |
+                |                                 |
+                |_________________________________|
+
+
+   The LORRI optics inverts images in both the Y and Z directions, so that the
+   projection of these spacecraft axes onto the LORRI CCD will look like the
+   following: (Note that we are looking INTO the LORRI telescope in the
+   diagram below, whereas above we were looking outwards, hence the position
+   of the +Z axis does not appear to have changed when in fact it has flipped).
+
+   Diagram 2
+   ---------
+                   Looking in at the LORRI CCD
+                 _________________________________
+                |                                 |       Spacecraft Axes
+                |                                 |
+                |                                 |              ^ +Y
+                |                                 |              |   sc
+  increasing  ^ |                                 |              |
+   columns    | |                   p             |              x-----> +Z
+              | |    p            +X  (in)        |        +X (in)         sc
+              | |  +Z  <---------x  sc            |          sc
+              | |    sc          |                |
+              | |                |                |
+              | |                |                |
+              | |                |    p           |
+              | |                V  +Y            |
+              | |                     sc          |
+                O_________________________________|
+                 ------------------------>
+          [0,0]=[column, row]            increasing rows
+
+                                                 p       p
+   Note that in Diagram 2, the axes are labeled Z   and Y   to clarify
+                                                 sc      sc
+   that although these are still spacecraft coordinates, they are the
+   projections of the spacecraft axes from Diagram 1 onto the LORRI CCD, not
+   the actual spacecraft axes. The actual spacecraft axes are depicted to the
+   right of Diagram 2. The origin in the CCD view is at the bottom left, and
+   the CCD storage area and serial register are to the left.
+
+   The LORRI IDL display further inverts the image in Diagram 2 about the
+   diagonal originating at [0,0]:
+
+   Diagram 3
+   ---------
+                        LORRI IDL Display
+                 _________________________________
+                |                                 |       Spacecraft Axes
+                |                                 |
+                |                                 |              ^ +Z
+                |                                 |              |   sc
+  increasing  ^ |                                 |              |
+        rows  | |                    p            |              o-----> +Y
+              | |    p             +X  (out)      |        +X (out)        sc
+              | |  +Y  <---------x   sc           |          sc
+              | |    sc          |                |
+              | |                |                |
+              | |                |                |
+              | |                |    p           |
+              | |                V  +Z            |
+              | |                     sc          |
+                O_________________________________|
+                 ------------------------>
+          [0,0]=[column, row]            increasing columns
+
+
+
+   Also provided here are the same set of three diagrams using the LORRI
+   instrument axes, X , Y , Z , rather than the spacecraft axes.
+                     L   L   L
+
+   Diagram 1a
+   ----------
+                  Sky View Looking out from LORRI
+                 _________________________________
+                |                                 |
+                |                                 |      Spacecraft Axes
+                |                                 |
+                |                                 |             ^ +Y
+                |                                 |             |   sc
+                |                                 |             |
+                |                                 |       <-----o
+                |                o--------->      |      +Z      +X  (out)
+                |                |          Y     |        sc      sc
+                |                |           L    |
+                |                |                |
+                |                |                |
+                |                V X              |
+                |                   L             |
+                |_________________________________|
+
+
+   Diagram 2a
+   ----------
+                   Looking in at the LORRI CCD
+                 _________________________________
+                |                                 |
+                |                   p             |
+                |                ^ X              |
+                |                |  L             |
+  increasing  ^ |                |                |
+   columns    | |                |                |
+              | |                |                |
+              | |                x---------> p    |
+              | |                           Y     |
+              | |                            L    |
+              | |                                 |
+              | |                                 |
+              | |                                 |
+              | |                                 |
+                O_________________________________|
+                 ------------------------>
+          [0,0]=[column, row]            increasing rows
+
+   As in Diagram 2, the axes in Diagram 2a are the projections of the LORRI
+   instrument axes through the optics onto the LORRI CCD.
+
+   Diagram 3a
+   ---------
+                        LORRI IDL Display
+                 _________________________________
+                |                                 |
+                |                   p             |
+                |                ^ Y              |
+                |                |  L             |
+  increasing  ^ |                |                |
+        rows  | |                |                |
+              | |                |                |
+              | |            p   o---------> p    |
+              | |           Z (out)         X     |
+              | |            L               L    |
+              | |                                 |
+              | |                                 |
+              | |                                 |
+              | |                                 |
+                O_________________________________|
+                 ------------------------>
+          [0,0]=[column, row]            increasing columns
+
+
+   Taken from [9], we have the following coordinate system definition for the
+   LORRI frame:
+
+   The -Z axis in instrument coordinates is defined to be the boresight and
+   is approximately aligned with the spacecraft -X axis. The Y axis in
+   instrument coordinates is approximately aligned with the spacecraft -Z axis
+   and is in the direction of increasing rows. The X axis in instrument
+   coordinates is approximately aligned with the spacecraft -Y axis and is in
+   the direction of increasing columns.
+
+
+LORRI Field of View Parameters
+----------------------------------------------------------
+
+   From [10] and updated in [12], the LORRI FOV is 0.29121706 deg square.
+
+   Since LORRI's angular separation in Y is 0.29121706 deg, looking up the +Y
+   axis in the instrument frame we have: (Note we are arbitrarily choosing
+   vectors that terminate in the Z=-1 plane.)
+
+                             X    ^
+                              inst|
+                                  |
+                                  |
+                                  |        _.-|
+                                  |    _.-'   |    o
+                                  |_.-'  0.14560853
+                                  x-------------->
+                            Y (in) `~._       |   -Z
+                             inst      `~._   |     inst
+                                           `~.|
+
+                                  |--- 1.0 ---|
+                                                    Plane X = 0
+
+   Since LORRI's field of view is square, a similar computation yields the
+   Y component.
+
+   These FOV values for LORRI are given in the keywords below:
+
+           \begindata
+
+           INS-98300_FOV_FRAME                 = 'NH_LORRI'
+           INS-98300_FOV_SHAPE                 = 'RECTANGLE'
+           INS-98300_BORESIGHT                 = ( 0.0, 0.0, -1.0 )
+           INS-98300_FOV_CLASS_SPEC            = 'ANGLES'
+           INS-98300_FOV_REF_VECTOR            = ( 1.0, 0.0, 0.0 )
+           INS-98300_FOV_REF_ANGLE             = ( 0.14560853 )
+           INS-98300_FOV_CROSS_ANGLE           = ( 0.14560853 )
+           INS-98300_FOV_ANGLE_UNITS           = 'DEGREES'
+
+           \begintext
+
+   And are duplicated for the 1x1 and 4x4 binning mode frames:
+
+           \begindata
+
+           INS-98301_FOV_FRAME                 = 'NH_LORRI_1X1'
+           INS-98301_FOV_SHAPE                 = 'RECTANGLE'
+           INS-98301_BORESIGHT                 = ( 0.0, 0.0, -1.0 )
+           INS-98301_FOV_CLASS_SPEC            = 'ANGLES'
+           INS-98301_FOV_REF_VECTOR            = ( 1.0, 0.0, 0.0 )
+           INS-98301_FOV_REF_ANGLE             = ( 0.14560853 )
+           INS-98301_FOV_CROSS_ANGLE           = ( 0.14560853 )
+           INS-98301_FOV_ANGLE_UNITS           = 'DEGREES'
+
+           INS-98302_FOV_FRAME                 = 'NH_LORRI_4X4'
+           INS-98302_FOV_SHAPE                 = 'RECTANGLE'
+           INS-98302_BORESIGHT                 = ( 0.0, 0.0, -1.0 )
+           INS-98302_FOV_CLASS_SPEC            = 'ANGLES'
+           INS-98302_FOV_REF_VECTOR            = ( 1.0, 0.0, 0.0 )
+           INS-98302_FOV_REF_ANGLE             = ( 0.14560853 )
+           INS-98302_FOV_CROSS_ANGLE           = ( 0.14560853 )
+           INS-98302_FOV_ANGLE_UNITS           = 'DEGREES'
+
+           \begintext
+
+LORRI Optics Parameters
+----------------------------------------------------------
+
+   From [10] and updated in [12] and [15], LORRI has the following optics
+   parameters:
+
+      -----------------------------------------------------------------
+      parameter                 1x1 binning mode      4x4 binning mode
+      -----------------------------------------------------------------
+      Focal length (mm)       2618.4775964615382691   2618.4775964615382691
+      f-number                  12.59                   12.59
+      IFOV (microrad/pixel)      4.963571               19.854284
+      Aperture diameter (mm)   208                     208
+      -----------------------------------------------------------------
+
+   The focal length indicated in the table above is the result of a
+   transformation of the updated parameters by way of a scaling
+   operation.  It is given to full precision to preserve the
+   relationship to the published values.  Check the Owen and O'Connell
+   distortion section below for more details.
+
+   These parameters are captured in the following keywords in the same units
+   as in the table.
+
+           \begindata
+
+           INS-98301_FOCAL_LENGTH       = ( 2618.4775964615382691 )
+           INS-98301_FOCAL_LENGTH_UNITS = 'mm'
+           INS-98301_F/NUMBER            = ( 12.59 )
+           INS-98301_IFOV                = ( 4.963571 )
+           INS-98301_APERTURE_DIAMETER   = ( 208 )
+           INS-98301_APERTURE_DIAM_UNITS = ( 'mm' )
+
+           INS-98302_FOCAL_LENGTH       = ( 2618.4775964615382691 )
+           INS-98302_FOCAL_LENGTH_UNITS = 'mm'
+           INS-98302_F/NUMBER            = ( 12.59 )
+           INS-98302_IFOV                = ( 19.854284 )
+           INS-98302_APERTURE_DIAMETER   = ( 208  )
+           INS-98302_APERTURE_DIAM_UNITS = ( 'mm' )
+
+           \begintext
+
+LORRI Optical Distortion Specifications
+----------------------------------------------------------
+
+   This section provides parameters for two sets of optical distortion
+   models for both formats (1x1 and 4x4) of the LORRI camera.  The first
+   model has been used by the New Horizons (NH) Optical Navigation (OPNAV) 
+   teams during the NH mission (based on [11] and personal
+   communication with Bill Owen; there are two OPNAV teams on NH: 
+   "PNAV", led by KinetX, is the "Primary" OPNAV team on NH, and "INAV", 
+   led by JPL, is the "Independent" OPNAV team on NH).
+   This is the same camera model used by the Deep Impact camera and
+   Cassini OPNAV.  The second model is used by the LORRI team and is
+   commonly used within the astronomical community (based on [13]).
+   The parameters for the SIP model have been derived by Brian
+   Carcich using parameters from the Owen & O'Connell model.
+   
+   
+   Owen & O'Connell Distortion Model
+   ----------------------------------
+   
+   The following distortion model has been used by the NH OPNAV team
+   for this camera during the mission (based on [11]; according to Bill
+   Owen, NH INAV and PNAV used the same camera model as for Deep Impact
+   and Cassini OPNAV).
+   
+   In the following discussion, the terms 'sample' and 'line' are used
+   by the author and retained for ease of comparison to the published
+   work.  In all cases in this document, sample is equivalent to column
+   and line is equivalent to row.
+
+      A 3d vector (P) in the camera frame is mapped into sample and 
+      line (S,L) coordinates by:
+
+          ( X )    FL    ( P(1) )
+          (   ) = ------ (      )
+          ( Y )   P(3)   ( P(2) )
+  
+              2    2    2
+             R  = X  + Y
+          
+         ( dX )   ( X*R*R  X*Y X*X ) ( EM2 )
+         (    ) = (                ) ( EM5 ) 
+         ( dY )   ( Y*R*R  Y*Y X*Y ) ( EM6 )
+
+          ( S )   ( Kx   Kxy ) ( X + dX )   ( S0 )
+          (   ) = (          ) (        ) + (    )
+          ( L )   ( Kyx  Ky  ) ( Y + dY )   ( L0 )
+
+      where FL is the camera focal length in mm; EM(i) are coefficients
+      of the cubic radial distortion and detector misalignment; the
+      matrix K provides a mapping from millimeters to pixels in the
+      focal plane; and (S0,L0) are the focal plane coordinates as sample
+      and line of the optical axis.
+
+      The values of X and Y are computed from vector P by way of the
+      gnomonic projection.  These values represent the non-distorted
+      location in instrument coordinates measured in millimeters.  The
+      values for dX and dY indicate the amount of the distortion introduced
+      by the optics and electromagnetic configuration of the detector.
+
+      The values of S and L represent the pixel location associated with
+      point P as affected by the distortion as would be observed in an
+      image.
+
+      The undistorted pixel location associated with X and Y can be
+      computed by setting the distortion parameters, EM(i), to 0.
+
+    Adapting Owen and O'Connell Model Parameters To LORRI Instrument Frame
+    ----------------------------------------------------------------------
+      
+      The +Y axis defined in OOC model is opposite to the direction of
+      the +Y axis defined in the LORRI instrument kernel.  To make use
+      of the OOC model equations without modification and remain
+      consistent with the LORRI instrument frame, the parameters Ky and
+      EM5 must be negated.
+
+      The need to change the sign on Ky is apparent by inspection when
+      pushing the four corners of the detector through the OOC model.
+      The need to negate EM5 is not as obvious. The derivation below
+      supports work by Brian Carcich, who originally identified the need
+      to negate EM5, as well as Ky.
+      
+      Starting from the distortion portion of the OOC model: 
+
+        (  dX  )     (   X*R^2    X*Y   X^2  )    (  EM2 )
+        (      )  =  (                       )    (  EM5 )
+        (  dY  )     (   Y*R^2    Y^2   X*Y  )    (  EM6 )
+
+      The +Y axis in the OOC model (Y) is opposite the +Y axis in the
+      LORRI Instrument frame (Y_L), while the +X axes agree in
+      direction. So a change in Y in the OOC model (dY) will be a
+      negative change in Y in the LORRI frame (dY_L). 
+
+         Y =  -Y_L
+        dY = -dY_L
+
+      Substituting these into the previous equation: 
+
+        (  dX   )     (   X*R^2     -X*Y_L     X^2   )  (  EM2 )
+        (       )  =  (                              )  (  EM5 )
+        ( -dY_L )     (  -Y_L*R^2   (Y_L)^2   -X*Y_L )  (  EM6 )
+
+      Then rewrite this equation in terms of distortion changes in dX
+      and dYL by distributing the negative sign from the left to the
+      right side: 
+
+        (  dX  )     (   X*R^2       -X*Y_L      X^2      )  (  EM2 )
+        (      )  =  (                                    )  (  EM5 )
+        ( dY_L )     ( (-)-Y_L*R^2  (-)(Y_L)^2  (-)-X*Y_L )  (  EM6 )
+
+      And simplifying:
+
+        (  dX  )     (   X*R^2    -X*Y_L        X^2  )  (  EM2 )
+        (      )  =  (                               )  (  EM5 )
+        ( dY_L )     (  Y_L*R^2   -(Y_L)^2    X*Y_L  )  (  EM6 )
+
+      The structure of this equation is very similar to the OOC model
+      but with the Y component of the left-hand matrix negated. By
+      absorbing  the negative sign into EM5, the equation will look
+      exactly like the OOC model but in terms of the LORRI frame:
+
+        (  dX  )     (   X*R^2      X*Y_L      X^2   )  (  EM2 )
+        (      )  =  (                               )  ( -EM5 )
+        ( dY_L )     (   Y_L*R^2    (Y_L)^2    X*Y_L )  (  EM6 )
+
+      So by changing the sign on EM5 and Ky, code for the OOC model
+      can be reused for to get distortion deltas in the LORRI frame.
+      Based on this relationship, the sign of two coefficients (Ky, EM5)
+      in this model have been changed from the published material[11] to
+      remain consistent with the LORRI instrument frame.
+
+    Initial results (2006)
+    ----------------------
+      
+      The following NH LORRI optical distortion parameters for this
+      model were derived using data collected in 2006 and were provided
+      by Bill Owen, NH INAV (from [11]) assuming a pixel scale of 13um.
+
+      *** Values for Focal Length, EM2, EM5, EM6, KMAT(1,1) and ***
+      *** KMAT(2,2) in the following table below are now        ***
+      *** obsolete. See below for updated results.              ***
+
+        Description         Value       Sigma       Units
+      -------------------  -----------  --------    --------
+      Focal Length         2619.008      0.021       mm
+      EM2                  2.696E-05     0.016E-05   mm^{-2}
+      EM5                 -1.988E-05     0.091E-05   mm^{-1}    **
+      EM6                 -2.864E-05     0.099E-05   mm^{-1}
+
+      other parameters computed analytically assuming a pixel scale
+      of 13um:
+
+      KMAT(1,1) =  76.9231
+      KMAT(1,2) =   0.0
+      KMAT(2,1) =   0.0
+      KMAT(2,2) =  76.9231   // sign differs from published material **
+      S0        = 511.5      // zero reference
+      L0        = 511.5      // zero reference
+
+      ** The sign of two coefficients (Ky, EM5) in this model have been
+      changed from the published material[11] due to the difference in
+      the definition of the LORRI +Y axis for the model compared to the
+      LORRI instrument frame. All references to these two coefficients
+      in this document have had their sign flipped to remain consistent
+      with the LORRI instrument frame.
+
+      The values for S0 and L0 are referenced to the center of the first
+      pixel of the first line as 0, rather than 1 as is used in the Owen
+      and O'Connell literature. This was done to remain consistent with
+      the LORRI coordinate system.
+
+    Updated results (2013)
+    ----------------------
+
+      Some of the coefficients for this model were updated [12] using
+      the image data from the Wishing Well star cluster collected
+      during Annual Check Out 7 (ACO-7), which executed between May and
+      August 2013.  These results were derived assuming a pixel size
+      of 13um.
+
+        Description         Value       Sigma       Units
+      -------------------  -----------  --------    --------
+      Focal Length         2619.082      0.020       mm
+      EM2                  2.716E-05     0.016E-05   mm^{-2}
+      EM5                 -1.903E-05     0.083E-05   mm^{-1}     **
+      EM6                 -2.880E-05     0.080E-05   mm^{-1}
+
+    Results used by the LORRI Team in this kernel
+    ---------------------------------------------
+
+      After consulting with the CCD manufacturer, E2V Technologies,
+      the pixel size was determined to be 12.997 +/- 0.003 um rather
+      than the assumed size of 13 um.  To account for the change in
+      pixel size, the coefficients published in [12] were scaled
+      appropriately [16].  The scale factor is defined as
+
+        T = 12.997 um / 13.000 um
+
+      the scaled coefficients are calculated as:
+
+      scaled Focal Length = original focal length * T
+      scaled KMAT(1,1)    = original KMAT[1,1] / T
+      scaled KMAT(2,2)    = original KMAT[2,2] / T
+      scaled EM2          = original EM2 / T ^ 2
+      scaled EM5          = original EM5 / T
+      scaled EM6          = original EM6 / T
+
+      The table below captures the scaled coefficients to full precision
+      to preserve the relationship to the published values in [12].
+      
+        Description         Value
+      -------------------  -----------
+      Focal Length         2618.4775964615382691
+      KMAT(1,1)              76.9408555820574094
+      KMAT(2,2)              76.9408555820574094        // sign change **
+      EM2                     2.7172539725122498E-05
+      EM5                    -1.9034392552127415E-05    // sign change **
+      EM6                    -2.8806647687927984E-05
+
+   Notice that there are several differences in convention in this
+   distortion model when compared to what is adopted in the other 
+   portions of this document:
+   
+      - the keywords in the next section include "_OOC_" for Owen and
+        O'Connell to distinguish these distortion parameters from the
+        "_SIP_" distortion keywords in the next section.
+   
+      - the units for INS*_OOC_FOCAL_LENGTH keyword are always
+        expressed in millimeters.  The units for focal length were
+        previously expressed in meters.  These units have been adjusted
+        to millimeters to remain consistent throughout the document.
+
+      - the INS*_OOC_CCD_CENTER keywords listed below follow the LORRI
+        pixel naming scheme which labels the center of the first
+        pixel of the first row as pixel (0,0). This differs from the
+        convention indicated in [11], which labels the center of the
+        first pixel of the first row as pixel (1,1).
+
+   The FOCAL_LENGTH keyword is defined below.  It is also presented
+   with the _OOC_ term in the keyword to indicate that it is associated
+   with the Owen and O'Connell distortion model.  Also note that there
+   is no focal length associated with the SIP distortion model.
+
+   The updated values for this data is provided in the keywords below:
+
+      \begindata
+
+         INS-98301_OOC_FOCAL_LENGTH       = 2618.4775964615382691
+         INS-98301_OOC_FOCAL_LENGTH_SIGMA = 0.020
+
+         INS-98301_OOC_KMAT         = ( 
+                                        76.9408555820574094,
+                                        0.0,
+                                        0.0,
+                                        76.9408555820574094
+                                      )
+
+         INS-98301_OOC_EM           = ( 
+                                        2.7172539725122498E-05,
+                                       -1.9034392552127415E-05,
+                                       -2.8806647687927984E-05
+                                      )
+         INS-98301_OOC_EM_SIGMA     = ( 
+                                        0.016E-05, 
+                                        0.083E-05, 
+                                        0.080E-05 
+                                      )
+
+         INS-98301_OOC_CCD_CENTER   = ( 511.5, 511.5 )
+
+      \begintext  
+
+   The equivalent coefficients for 4x4 mode can be derived from the 1x1
+   mode coefficients.  The only coefficients affected by the effectively
+   larger pixel area are given in the last equation from the model:
+
+          ( S )   ( Kx   Kxy ) ( X + dX )   ( S0 )
+          (   ) = (          ) (        ) + (    )
+          ( L )   ( Kyx  Ky  ) ( Y + dY )   ( L0 )
+
+    The parameters S, L, S0 and L0 are all given in pixel coordinates and
+    are thus affected.  Specifically, 4x4 mode has 256 columns and 256
+    rows rather than the 1024 columns and 1024 rows for 1x1 mode.
+    Because of this, the values for S0 and L0 must be updated to reflect
+    the new pixel dimensions.  The parameters in the K matrix also needs
+    to be adjusted to account for the effectively larger pixel size
+    since they convert from mm to pixel space.
+
+    The 4x4 binning mode combines 4 pixels in each of the X and Y
+    directions.  This has the effect of creating a pixel that is four
+    times the size in both directions, yielding an effective pixel size
+    of 4 * 12.997 um = 51.998 um.  From [11], the Kx and Ky elements of the
+    K matrix are computed as the inverse of the pixel size in units of
+    mm^{-1}.  The updated values for 4x4 mode are listed in the table below:
+    
+      KMAT(1,1) =  19.2352138955143523
+      KMAT(1,2) =   0.0
+      KMAT(2,1) =   0.0
+      KMAT(2,2) =  19.2352138955143523 // sign change **
+      S0        = 127.5                // zero reference
+      L0        = 127.5                // zero reference
+
+    ** The sign of two coefficients (Ky, EM5) in this model have been
+    changed from the published material[11] due to the difference in
+    the definition of the LORRI +Y axis for the model compared to the
+    LORRI instrument frame. All references to these two coefficients
+    in this document have had their sign flipped to remain consistent
+    with the LORRI instrument frame.
+
+    The values for S0 and L0 are referenced to the center of the first
+    pixel of the first line as 0, rather than 1 as is used in the Owen
+    and O'Connell literature. This was done to remain consistent with
+    the LORRI coordinate system.
+
+      \begindata
+
+         INS-98302_OOC_FOCAL_LENGTH       = 2618.4775964615382691
+         INS-98302_OOC_FOCAL_LENGTH_SIGMA = 0.020
+
+         INS-98302_OOC_KMAT         = ( 
+                                        19.2352138955143523,
+                                        0.0,  
+                                        0.0,
+                                        19.2352138955143523
+                                      )
+
+         INS-98302_OOC_EM           = ( 
+                                        2.7172539725122498E-05,
+                                       -1.9034392552127415E-05,
+                                       -2.8806647687927984E-05
+                                      )
+         INS-98302_OOC_EM_SIGMA     = ( 
+                                        0.016E-05, 
+                                        0.083E-05, 
+                                        0.080E-05 
+                                      )
+
+         INS-98302_OOC_CCD_CENTER   = ( 127.5, 127.5 )
+
+      \begintext  
+
+    This small fragment of SPICE-based FORTRAN code illustrates how
+    these parameters can be loaded into an application and used to
+    compute sample and line for a 3d vector defined in the camera frame,
+    NH_LORRI_1X1:
+
+      C
+      C     Retrieve loaded camera distortion parameters.
+      C
+            CALL GDPOOL ( 'INS-98301_OOC_FOCAL_LENGTH', 1, 1, N, FL,   FND1 )
+            CALL GDPOOL ( 'INS-98301_OOC_KMAT',         1, 4, N, KMAT, FND2 )
+            CALL GDPOOL ( 'INS-98301_OOC_EM',           1, 3, N, EM,   FND3 )
+            CALL GDPOOL ( 'INS-98301_OOC_CCD_CENTER',   1, 2, N, CNTR, FND4 )
+      C
+      C     Given 3d vector VECTOR in the camera frame, 'NH_LORRI_1X1',
+      C     compute ideal X and Y in sample/line space.
+      C
+            CALL VSCLG ( FL / VECTOR(3), VECTOR, 2, XYIDL )
+      C
+      C     Construct XYR2 matrix.
+      C
+            R2 = XYIDL(1)**2 + XYIDL(2)**2
+
+            XYRMAT(1,1) = XYIDL(1) * R2
+            XYRMAT(2,1) = XYIDL(2) * R2
+            XYRMAT(1,2) = XYIDL(1) * XYIDL(2)
+            XYRMAT(2,2) = XYIDL(2) * XYIDL(2)
+            XYRMAT(1,3) = XYIDL(1) * XYIDL(1)
+            XYRMAT(2,3) = XYIDL(1) * XYIDL(2)
+     C
+     C      Compute delta X and Y.
+     C
+            CALL MXVG ( XYRMAT, EM, 2, 3, XYDLT ) 
+     C
+     C      Compute line sample, SL (sample is the first element,
+     C      line is the second element.)
+     C
+            CALL VADDG( XYIDL, XYDLT, 2, XY )
+            CALL MXVG ( KMAT, XY, 2, 2, SLREL )
+            CALL VADDG( SLREL, CNTR, 2, SL )
+
+
+   Simple Imaging Polynomial (SIP) Distortion Model
+   ------------------------------------------------
+   
+   The use of the Simple Imaging Polynomial distortion model is
+   prevalent in the astronomy community and is supported by a large
+   number of freely available software packages.  It extends the World
+   Coordinate System standard for FITS images to provide non-linear
+   geometric distortion using polynomials in FITS headers and is
+   described in [13]:
+
+        Values u and v are the distorted locations in relative pixel
+        coordinates with origin at CRPIX1, CRPIX2, which are the center
+        pixel sample and line locations.  Values x and y are
+        "intermediate world coordinates" in degrees with origin at
+        CRVAL1, CRVAL2, which are Right Ascension and Declination in the
+        case of LORRI images. Then f(u,v) and g(u,v) are the quadratic
+        and higher order terms of the distortion polynomial:
+
+          ( x ) = ( CD1_1  CD1_2 ) ( u + f(u,v) ) 
+          ( y )   ( CD2_1  CD2_2 ) ( v + g(u,v) )
+  
+        A_p_q an B_p_q are defined as the polynomial coefficients for
+        polynomial terms u^p * v^q, respectively.  From this:
+
+                      ----
+                      \
+            f(u, v) = /    A_p_q * u^p * v^q,   p + q <= A_ORDER
+                      ----
+                      p,q
+
+                      ----
+                      \
+            g(u, v) = /    B_p_q * u^p * v^q,   p + q <= B_ORDER
+                      ----
+                      p,q
+
+        For example, for a third order polynomial:
+        f(u,v) = A_2_0 * u^2 + A_0_2 * v^2 + A_1_1 * u * v + 
+                 A_2_1 * u^2 * v + A_1_2 * u * v^2 + A_3_0 * u^3 +
+                 A_0_3 * v^3
+
+        The values for u and v represent the distorted pixel location
+        resulting from the effects caused by the optics, measured
+        relative to the center of the detector.
+
+        The CDi_j keywords encode skew as well as rotation and scaling.
+        The CD matrix values together with the higher-order distortion
+        polynomials define a unique transformation from pixel
+        coordinates to the plane-of-projection.
+
+        The polynomials for the reverse transformation are also provided
+        for fast inversion.  Pixel coordinates U,V are the location if
+        the optics didn't cause any distortion and can be found from:
+                    
+          ( U ) =     -1  ( x ) 
+          ( V )     CD    ( y )
+
+        then the distorted pixel coordinates (u,v) can be computed from
+        the undistorted pixel coordinates (U,V) by:
+
+                               ----
+                               \
+         u = U + F(U,V) = U +  /    AP_p_q * U^p * V^q,  p + q <= AP_ORDER
+                               ----
+                               p,q
+
+                               ----
+                               \
+         v = V + G(U,V) = V +  /    BP_p_q * U^p * V^q,  p + q <= BP_ORDER
+                               ----
+                               p,q
+
+   Relating the Owen & O'Connell Distortion Model to the SIP Model
+   ---------------------------------------------------------------
+
+   With some substitution, the Owen & O'Connell distortion model
+   equations can be rewritten in the form of the SIP reverse
+   transformation.  To do so requires recognizing that the values of U
+   and V in the SIP model represent the undistorted pixel location as
+   computed using the gnomonic projection, meaning that the distortion
+   produced from the optics are not present.  The SIP values of U and V
+   are in units of pixels and can be related to the values X and Y, in
+   units of millimeters, from the Owen & O'Connell model by multiplying
+   by the effective scale factor
+
+        U = Kx * X              V = Ky * Y
+        X = U / Kx              Y = V / Ky
+
+   The following derivation is provided for the sample (ie: column) component
+   of the Owen & O'Connell model.  The derivation for the line (ie: row)
+   component follows directly.  From the Owen and O'Connell model:
+
+        dX = X * R ^ 2 * EM2 + X * Y * EM5 + X * X * EM6
+
+    Substituting for R ^ 2:
+
+        dX = X * ( X ^ 2 + Y ^ 2 ) * EM2 + X * Y * EM5 + X * X * EM6
+
+    simplifying:
+
+        dX = X ^ 3 * EM2 + X * Y ^ 2 * EM2 + X * Y * EM5 + X * X * EM6
+
+    From the Owen & O'Connell model:
+
+        S = Kx * ( X + dX ) + Kxy ( Y + dY ) + S0
+
+    Rearranging, simplifying and recalling that for LORRI, Kxy = 0:
+
+        S - S0 = Kx * ( X + dX )
+
+    Recall that the S - S0 represents the distorted, relative pixel
+    location, which is equivalent to the parameter u in the SIP model.
+     
+        u = Kx * ( X + X ^ 3 * EM2 + X * Y ^ 2 * EM2 + 
+                                     X * Y * EM5 + X * X * EM6 )
+
+    Substituting for X = U / Kx   and  Y = V / Ky
+
+        u = U + EM2 / Kx ^ 2 * U ^ 3 + EM2 / Ky ^ 2 * U * V ^ 2 +
+                EM5 / Ky * U * V + EM6 / Kx * U ^ 2
+
+    This equation is now in the form of the SIP reverse transform:
+
+        u = U + F ( U, V )
+
+    The components of F( U, V) are available by inspection:
+
+        AP_3_0 = EM2 / ( Kx ^ 2 )
+        AP_1_2 = EM2 / ( Ky ^ 2 )
+        AP_1_1 = EM5 / Ky
+        AP_2_0 = EM6 / Kx
+
+    Following similar methods, the derivation for the line (ie: row)
+    component follows:
+
+        dY = Y * ( X ^ 2 + Y ^ 2 ) * EM2 + Y * Y * EM5 + X * Y * EM6
+        dY = X ^ 2 * Y * EM2 + Y ^ 3 * EM2 + Y * Y * EM5 + X * Y * EM6
+        L = Kyx * ( X + dX ) + Ky ( Y + dY ) + L0       (recall: Kyx = 0)
+        L - L0 = Ky * ( Y + dY )
+        v = Ky * ( Y + X ^ 2 * Y * EM2 + Y ^ 3 * EM2 + 
+                                     Y * Y * EM5 + X * Y * EM6 )
+        v = V + EM2 / Kx ^ 2 * U ^ 2 * V + EM2 / Ky ^ 2 * V ^ 3 +
+                EM5 / Ky * V ^ 2 + EM6 / Kx * U * V
+
+    This equation is now in the form of the SIP reverse transform:
+
+        v = V + G ( U, V )
+
+    The components of G( U, V) are available by inspection:
+
+        BP_2_1 = EM2 / ( Kx ^ 2 )
+        BP_0_3 = EM2 / ( Ky ^ 2 )
+        BP_0_2 = EM5 / Ky
+        BP_1_1 = EM6 / Kx
+
+
+   Definition of SIP Distortion Model Coefficients:
+   ------------------------------------------------
+   
+   The parameters listed below were derived by Brian Carcich starting
+   from the parameters listed in the Owen & O'Connell distortion model.
+   In the list of keywords below, all unmentioned polynomial coefficients
+   are assumed to be 0.
+
+   The SIP coefficients for 1x1 mode are captured in variables below:
+
+           \begindata
+
+            INS-98301_SIP_A_ORDER  =                    3
+            INS-98301_SIP_A_3_0    = -4.5683524653106E-09
+            INS-98301_SIP_A_2_1    =  3.6773993329229E-13
+            INS-98301_SIP_A_1_2    = -4.5506608174421E-09
+            INS-98301_SIP_A_0_3    = -4.8263827227450E-16
+            INS-98301_SIP_A_2_0    =  3.7132883452972E-07
+            INS-98301_SIP_A_1_1    =  2.4489911491959E-07
+            INS-98301_SIP_A_0_2    = -3.8995992016687E-10
+            INS-98301_SIP_B_ORDER  =                    3
+            INS-98301_SIP_B_3_0    = -4.8263374371619E-16
+            INS-98301_SIP_B_2_1    = -4.5505047160943E-09
+            INS-98301_SIP_B_1_2    =  3.6773991492864E-13
+            INS-98301_SIP_B_0_3    = -4.5685088916275E-09
+            INS-98301_SIP_B_2_0    = -2.5764535470748E-10
+            INS-98301_SIP_B_1_1    =  3.7063022991452E-07
+            INS-98301_SIP_B_0_2    =  2.4536068067188E-07
+            INS-98301_SIP_AP_ORDER =                    3
+            INS-98301_SIP_AP_3_0   =  4.5900372459772E-09
+            INS-98301_SIP_AP_1_2   =  4.5900372459772E-09
+            INS-98301_SIP_AP_1_1   = -2.4738992578302E-07
+            INS-98301_SIP_AP_2_0   = -3.7439988768003E-07
+            INS-98301_SIP_BP_ORDER =                    3
+            INS-98301_SIP_BP_2_1   =  4.5900372459772E-09
+            INS-98301_SIP_BP_0_3   =  4.5900372459772E-09
+            INS-98301_SIP_BP_0_2   = -2.4738992578302E-07
+            INS-98301_SIP_BP_1_1   = -3.7439988768003E-07
+
+           \begintext
+
+    The equivalent set of distortion parameters for LORRI in 4x4 mode
+    were computed from the 1x1 set of parameters listed above:
+
+           \begindata
+
+            INS-98302_SIP_A_ORDER  =                    3
+            INS-98302_SIP_A_3_0    = -7.3093639444970E-08
+            INS-98302_SIP_A_2_1    =  5.8838389330992E-12
+            INS-98302_SIP_A_1_2    = -7.2810573079073E-08
+            INS-98302_SIP_A_0_3    = -7.7222124763245E-15
+            INS-98302_SIP_A_2_0    =  1.4853153381189E-06
+            INS-98302_SIP_A_1_1    =  9.7959645967839E-07
+            INS-98302_SIP_A_0_2    = -1.5598396806578E-09
+            INS-98302_SIP_B_ORDER  =                    3
+            INS-98302_SIP_B_3_0    = -7.7221397202775E-15
+            INS-98302_SIP_B_2_1    = -7.2808075457509E-08
+            INS-98302_SIP_B_1_2    =  5.8838386384176E-12
+            INS-98302_SIP_B_0_3    = -7.3096142266041E-08
+            INS-98302_SIP_B_2_0    = -1.0305814188049E-09
+            INS-98302_SIP_B_1_1    =  1.4825209196581E-06
+            INS-98302_SIP_B_0_2    =  9.8144272268748E-07
+            INS-98302_SIP_AP_ORDER =                    3
+            INS-98302_SIP_AP_3_0   =  7.3440595935636E-08
+            INS-98302_SIP_AP_1_2   =  7.3440595935636E-08
+            INS-98302_SIP_AP_1_1   = -9.8955970313209E-07
+            INS-98302_SIP_AP_2_0   = -1.4975995507201E-06
+            INS-98302_SIP_BP_ORDER =                    3
+            INS-98302_SIP_BP_2_1   =  7.3440595935636E-08
+            INS-98302_SIP_BP_0_3   =  7.3440595935636E-08
+            INS-98302_SIP_BP_0_2   = -9.8955970313209E-07
+            INS-98302_SIP_BP_1_1   = -1.4975995507201E-06
+           
+           \begintext
+
+LORRI CCD Detector Parameters
+----------------------------------------------------------
+
+   From [9] and [10], LORRI has the following CCD parameters:
+
+      -----------------------------------------------------------------
+      parameter                 1x1 binning mode      4x4 binning mode
+      -----------------------------------------------------------------
+      Detector array size         1024 x 1024            256 x 256
+      Pixel size (microns)      12.997 x 12.997       51.988 x 51.988
+      CCD center                ( 511.5, 511.5)       ( 127.5, 127.5 )
+      -----------------------------------------------------------------
+
+   These parameters are captured in the following keywords in the same units
+   as in the table:
+
+           \begindata
+
+           INS-98301_PIXEL_SAMPLES     = ( 1024 )
+           INS-98301_PIXEL_LINES       = ( 1024 )
+           INS-98301_PIXEL_SIZE        = (  12.997  )
+           INS-98301_CCD_CENTER        = ( 511.5, 511.5 )
+
+           INS-98302_PIXEL_SAMPLES     = ( 256 )
+           INS-98302_PIXEL_LINES       = ( 256 )
+           INS-98302_PIXEL_SIZE        = ( 51.988 )
+           INS-98302_CCD_CENTER        = ( 127.5, 127.5 )
+
+           \begintext
+
+   Also defined here is the celestial position angle reference vector. This
+   vector defines the position angle, or angle from celestial north (and
+   passing through celestial east) to the reference vector.
+
+           \begindata
+
+           INS-98300_REFERENCE_VECTOR  = ( 1.0, 0.0, 0.0 )
+           INS-98301_REFERENCE_VECTOR  = ( 1.0, 0.0, 0.0 )
+           INS-98302_REFERENCE_VECTOR  = ( 1.0, 0.0, 0.0 )
+
+           \begintext
+
+
+Platform ID
+--------------------------------------------------------
+
+   This number is the NAIF instrument ID of the platform on which the
+   instrument is mounted.
+
+           \begindata
+
+           INS-98300_PLATFORM_ID  = ( -98000 )
+           INS-98301_PLATFORM_ID  = ( -98000 )
+           INS-98302_PLATFORM_ID  = ( -98000 )
+
+           \begintext
