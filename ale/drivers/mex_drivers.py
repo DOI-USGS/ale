@@ -9,8 +9,11 @@ import spiceypy as spice
 import warnings
 
 from ale.base import Driver
+from ale.base.data_isis import read_table_data
+from ale.base.data_isis import parse_table
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
+from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import LineScanner
 from ale.base.type_distortion import RadialDistortion
 from ale.util import find_latest_metakernel
@@ -322,9 +325,9 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
     def line_scan_rate(self):
         """
         Returns a 2D array of line scan rates.
-    
-        For HRSC, the ephemeris times and exposure durations are 
-        stored in the image data. 
+
+        For HRSC, the ephemeris times and exposure durations are
+        stored in the image data.
 
         Returns
         -------
@@ -374,7 +377,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
     @property
     def binary_lines(self):
         """
-        Returns the lines of the binary image data. 
+        Returns the lines of the binary image data.
 
         For example, the first entry would be the first line of the image.
 
@@ -385,18 +388,18 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         """
         if not hasattr(self, '_binary_lines'):
             self.read_image_data()
-        return self._binary_lines   
-    
+        return self._binary_lines
+
 
     def read_image_data(self):
         """
         Reads data off of image and stores in binary_exposure_durations, binary_lines,
         and binary_ephemeris_times.
 
-        For HRSC, the exposure durations and ephemeris times are imbedded in the binary 
-        data of the image itself. Each line is stored in what is referred to as a 
-        "record" within the image. The label will have the size of each record, 
-        the number of records, and the number of records in the label, so the 
+        For HRSC, the exposure durations and ephemeris times are imbedded in the binary
+        data of the image itself. Each line is stored in what is referred to as a
+        "record" within the image. The label will have the size of each record,
+        the number of records, and the number of records in the label, so the
         beginning of binary data can be calculated.
 
         For each line/record of the binary data, the first 8 bytes make up the
@@ -492,3 +495,85 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
           ISIS sensor model version
         """
         return 1
+
+class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDistortion, Driver):
+
+        @property
+        def instrument_id(self):
+            if(super().instrument_id != "HRSC"):
+                raise Exception ("Instrument ID is wrong.")
+
+            return super().instrument_id
+
+        @property
+        def sensor_model_version(self):
+            return 1
+
+        @property
+        def line_scan_rate(self):
+            isis_bytes = read_table_data(self.label['Table'], self._file)
+            times_table = parse_table(self.label['Table'], isis_bytes)
+            start_time = times_table['EphemerisTime'][0]
+            return times_table['LineStart'], times_table['EphemerisTime'], times_table['ExposureTime']
+
+        @property
+        def ephemeris_start_time(self):
+            isis_bytes = read_table_data(self.label['Table'], self._file)
+            times_table = parse_table(self.label['Table'], isis_bytes)
+            start_time = times_table['EphemerisTime'][0]
+            return start_time
+
+        @property
+        def ephemeris_stop_time(self):
+            isis_bytes = read_table_data(self.label['Table'], self._file)
+            times_table = parse_table(self.label['Table'], isis_bytes)
+            last_line = times_table['LineStart'][-1]
+            stop_time = times_table['EphemerisTime'][-1] + ((self.image_lines - last_line + 1) * times_table['ExposureTime'][-1])
+            return stop_time
+
+        @property
+        def ikid(self):
+            """
+            Returns the Naif ID code for the HRSC head instrument
+
+            This would be the Naif ID code for the base (or "head") instrument.
+
+            Returns
+            -------
+            : int
+              Naif ID used to for indentifying the instrument in Spice kernels
+            """
+            return spice.bods2c("MEX_HRSC_HEAD")
+
+        @property
+        def center_ephemeris_time(self):
+            """
+            Returns the center ephemeris time.
+
+            For HRSC, the center ephemeris time is calculated with the ephemeris stop time,
+            which is calculated from the binary image data.
+
+            Returns
+            -------
+            : float
+              Center ephemeris time
+            """
+            return (self.ephemeris_stop_time + self.ephemeris_start_time) / 2
+
+
+        @property
+        def fikid(self):
+            """
+            Naif ID code of the filter dependent instrument codes.
+
+            Expects filter_number to be defined. This should be an integer containing
+            the filter number from the pds3 label.
+            Expects ikid to be defined. This should be the integer Naid ID code for
+            the instrument.
+
+            Returns
+            -------
+            : int
+              Naif ID code used in calculating focal length
+            """
+            return spice.bods2c(self.instrument_id)
