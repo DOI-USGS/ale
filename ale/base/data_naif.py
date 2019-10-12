@@ -295,14 +295,20 @@ class NaifSpice():
         : (sun_positions, sun_velocities)
           a tuple containing a list of sun positions, a list of sun velocities
         """
-        sun_state, _ = spice.spkezr("SUN",
-                                     self.center_ephemeris_time,
-                                     self.reference_frame,
-                                     'LT+S',
-                                     self.target_name)
-        positions = 1000 * np.asarray([sun_state[:3]])
-        velocities = 1000 * np.asarray([sun_state[3:6]])
-        times = np.asarray([self.center_ephemeris_time])
+        times = [self.center_ephemeris_time]
+        positions = []
+        velocities = []
+
+        for time in times:
+            sun_state, _ = spice.spkezr("SUN",
+                                         time,
+                                         self.reference_frame,
+                                         'LT+S',
+                                         self.target_name)
+            positions.append(sun_state[:3])
+            velocities.append(sun_state[3:6])
+        positions = 1000 * np.asarray(positions)
+        velocities = 1000 * np.asarray(velocities)
 
         return positions, velocities, times
 
@@ -367,7 +373,7 @@ class NaifSpice():
                                             self.reference_frame,
                                             self.light_time_correction,
                                             observer)
-       
+
                 if self.swap_observer_target:
                     pos.append(-state[:3])
                     vel.append(-state[3:])
@@ -526,4 +532,3 @@ class NaifSpice():
             self._naif_keywords = {**self._naif_keywords, **util.query_kernel_pool(f"*{self.ikid}*"),  **util.query_kernel_pool(f"*{self.target_id}*")}
 
         return self._naif_keywords
-

@@ -10,6 +10,11 @@ from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.type_sensor import Framer
 
+ID_LOOKUP = {
+    "FC1" : "DAWN_FC1",
+    "FC2" : "DAWN_FC2"
+}
+
 class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
     """
     Dawn driver for generating an ISD from a Dawn PDS3 image.
@@ -32,7 +37,7 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         instrument_id = super().instrument_id
         filter_number = self.filter_number
 
-        return "DAWN_{}_FILTER_{}".format(instrument_id, filter_number)
+        return "{}_FILTER_{}".format(ID_LOOKUP[instrument_id], filter_number)
 
     @property
     def label(self):
