@@ -22,7 +22,7 @@ def mess_kernels():
 def test_priority(tmpdir, monkeypatch):
     drivers = [type('FooNaifSpice', (NaifSpice,), {}), type('BarIsisSpice', (IsisSpice,), {}), type('BazNaifSpice', (NaifSpice,), {}), type('FubarIsisSpice', (IsisSpice,), {})]
     sorted_drivers = sort_drivers(drivers)
-    assert all([IsisSpice in klass.__bases__ for klass in sorted_drivers[:2]])
+    assert all([IsisSpice in klass.__bases__ for klass in sorted_drivers[2:]])
 
 def test_mess_load(mess_kernels):
     updated_kernels = mess_kernels
