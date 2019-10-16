@@ -8,7 +8,6 @@ import json
 
 import ale
 from ale import util
-# from ale.drivers import lro_drivers
 from ale.drivers.lro_drivers import LroLrocPds3LabelNaifSpiceDriver
 from ale.drivers.lro_drivers import LroLrocIsisLabelNaifSpiceDriver
 
@@ -321,13 +320,6 @@ def test_exposure_duration(driver):
                new_callable=PropertyMock) as exposure_duration:
         exposure_duration.return_value = 1
         assert driver.exposure_duration == 1.0045
-
-# usgscsm isd
-# def test_load_usgs(test_kernels, usgscsm_comparison_isd):
-#     label_file = get_image_label('M103595705LE', 'pds3')
-#     usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter='usgscsm')
-#     print(usgscsm_isd)
-#     assert compare_dicts(usgscsm_isd, usgscsm_comparison_isd) == []
 
 @pytest.mark.parametrize("label_type", ['isis3'])
 @pytest.mark.parametrize("formatter", ['isis'])
