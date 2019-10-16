@@ -525,9 +525,6 @@ def test_mex_load(test_kernels, formatter, usgscsm_compare_dict):
     if formatter=="usgscsm":
         label_file = get_image_label('h5270_0000_ir2', "pds3")
 
-        # Check to change the line based on ISIS vs PDS3
-        # This is due to a processing step in mroctx2isis that removes samples
-        # based on some flags on the label
         with patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_ephemeris_times', \
                    new_callable=PropertyMock) as binary_ephemeris_times, \
             patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_exposure_durations', \

@@ -167,8 +167,13 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         : str
           Short name of the instrument
         """
-        return self.label['DETECTOR_ID']
+        instrument_id = self.label['DETECTOR_ID']
+        if(super().instrument_id != "HRSC"):
+          raise Exception ("Instrument ID is wrong.")
 
+        return super().instrument_id
+        return self.label['DETECTOR_ID']
+#FIXME
 
     @property
     def spacecraft_name(self):
@@ -434,23 +439,6 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         self._binary_ephemeris_times = times
 
 
-
-    @property
-    def center_ephemeris_time(self):
-        """
-        Returns the center ephemeris time.
-
-        For HRSC, the center ephemeris time is calculated with the ephemeris stop time,
-        which is calculated from the binary image data.
-
-        Returns
-        -------
-        : float
-          Center ephemeris time
-        """
-        return (self.ephemeris_stop_time + self.ephemeris_start_time) / 2
-
-
     @property
     def ephemeris_stop_time(self):
         """
@@ -513,7 +501,6 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
         def line_scan_rate(self):
             isis_bytes = read_table_data(self.label['Table'], self._file)
             times_table = parse_table(self.label['Table'], isis_bytes)
-            start_time = times_table['EphemerisTime'][0]
             return times_table['LineStart'], times_table['EphemerisTime'], times_table['ExposureTime']
 
         @property
@@ -544,21 +531,6 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
               Naif ID used to for indentifying the instrument in Spice kernels
             """
             return spice.bods2c("MEX_HRSC_HEAD")
-
-        @property
-        def center_ephemeris_time(self):
-            """
-            Returns the center ephemeris time.
-
-            For HRSC, the center ephemeris time is calculated with the ephemeris stop time,
-            which is calculated from the binary image data.
-
-            Returns
-            -------
-            : float
-              Center ephemeris time
-            """
-            return (self.ephemeris_stop_time + self.ephemeris_start_time) / 2
 
 
         @property
