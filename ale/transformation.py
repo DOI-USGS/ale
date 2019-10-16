@@ -35,10 +35,17 @@ def create_rotations(rotation_table):
                           rotation_table['J2000Q2'],
                           rotation_table['J2000Q3'],
                           rotation_table['J2000Q0']]).T
+        if 'AV1' in rotation_table:
+            av = np.array([rotation_table['AV1'],
+                           rotation_table['AV2'],
+                           rotation_table['AV3']]).T
+        else:
+            av = None
         time_dep_rot = TimeDependentRotation(quats,
                                              rotation_table['ET'],
                                              root_frame,
-                                             last_time_dep_frame)
+                                             last_time_dep_frame,
+                                             av=av)
         rotations.append(time_dep_rot)
     # Case 2: It's a table of Euler angle coefficients
     elif 'J2000Ang1' in rotation_table:
