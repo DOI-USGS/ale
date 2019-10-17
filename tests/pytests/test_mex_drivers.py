@@ -478,39 +478,6 @@ def usgscsm_compare_dict():
 }
 }}
 
-#def isis_compare_dict():
-#    return {'CameraVersion': 1,
-#    'NaifKeywords':
-#    {'BODY499_RADII': array([3396.19, 3396.19, 3376.2 ]),
-#    'BODY_FRAME_CODE': 10014,
-#    'BODY_CODE': 499,
-#    'INS-41210_FOV_FRAME': 'MEX_HRSC_HEAD',
-#    'FRAME_-41210_NAME': 'MEX_HRSC_HEAD',
-#    'INS-41210_CK_TIME_TOLERANCE': 1.0,
-#    'TKFRAME_-41210_AXES': array([1., 2., 3.]),
-#    'TKFRAME_-41210_SPEC': 'ANGLES',
-#    'FRAME_-41210_CLASS': 4.0,
-#    'INS-41210_FOV_ANGULAR_SIZE': array([0.2 , 0.659734]),
-#    'INS-41210_OD_K': array([0., 0., 0.]),
-#    'INS-41210_F/RATIO': 5.6,
-#    'INS-41210_PLATFORM_ID': -41000.0,
-#    'TKFRAME_-41210_ANGLES': array([-0.334 ,  0.0101,  0.    ]),
-#    'INS-41210_SPK_TIME_BIAS': 0.0,
-#    'FRAME_-41210_CENTER': -41.0,
-#    'TKFRAME_-41210_UNITS': 'DEGREES',
-#    'INS-41210_BORESIGHT': array([  0.,   0., 175.]),
-#    'INS-41210_CK_TIME_BIAS': 0.0,
-#    'FRAME_-41210_CLASS_ID': -41210.0,
-#    'INS-41210_IFOV': 4e-05,
-#    'INS-41210_FOV_BOUNDARY_CORNERS': array([ 18.187 ,  60.0641, 175. ,  18.1281, -60.0399, 175. , -18.1862, -60.0435, 175. , -18.142 ]),
-#    'INS-41210_FOV_SHAPE': 'RECTANGLE',
-#    'TKFRAME_-41210_RELATIVE': 'MEX_HRSC_BASE',
-#    'INS-41210_PIXEL_PITCH': 0.007,
-#    'INS-41210_FOCAL_LENGTH': 175.0,
-#    'BODY499_POLE_DEC': array([52.8865, -0.0609,  0.    ]),
-#    'BODY499_POLE_RA': array([ 3.1768143e+02, -1.0610000e-01,  0.0000000e+00]),
-#    'BODY499_PM': array([176.63      , 350.89198226,   0.        ])}}
-
 @pytest.fixture(scope="module")
 def test_kernels():
     kernels = get_image_kernels('h5270_0000_ir2')

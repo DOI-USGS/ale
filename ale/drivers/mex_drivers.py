@@ -167,13 +167,8 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         : str
           Short name of the instrument
         """
-#        instrument_id = self.label['DETECTOR_ID']
-#        if(super().instrument_id != "HRSC"):
-#          raise Exception ("Instrument ID is wrong.")
-
-#        return super().instrument_id
         return self.label['DETECTOR_ID']
-#FIXME
+
 
     @property
     def spacecraft_name(self):
@@ -488,6 +483,14 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
 
         @property
         def instrument_id(self):
+            """
+            Returns the name of the instrument
+
+            Returns
+            -------
+            : str
+              Name of the instrument
+            """
             if(super().instrument_id != "HRSC"):
                 raise Exception ("Instrument ID is wrong.")
 
@@ -495,26 +498,57 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
 
         @property
         def sensor_model_version(self):
+            """
+            Returns
+            -------
+            : int
+              ISIS sensor model version
+            """
             return 1
 
         @property
-        def isis_bytes(self):
-            return read_table_data(self.label['Table'], self._file)
-
-        @property
         def times_table(self):
-            return parse_table(self.label['Table'], self.isis_bytes)
+            """
+            Returns EphermisTime, ExposureTime, and LinesStart informtation which was stored as 
+            binary information in the ISIS cube.
+
+            Returns
+            -------
+            : dict
+              Dictionary with EphemerisTime, ExposureTime, and LineStart.
+            """
+            isis_bytes = read_table_data(self.label['Table'], self._file)
+            return parse_table(self.label['Table'], isis_bytes)
 
         @property
         def line_scan_rate(self):
+            """
+            Returns
+            -------
+            : tuple
+              list of lines, list of ephemeris times, and list of exposure
+              times
+            """
             return self.times_table['LineStart'], self.times_table['EphemerisTime'], self.times_table['ExposureTime']
 
         @property
         def ephemeris_start_time(self):
+            """
+            Returns
+            -------
+            : float
+              starting ephemeris time
+            """
             return self.times_table['EphemerisTime'][0]
 
         @property
         def ephemeris_stop_time(self):
+            """
+            Returns
+            -------
+            : float
+              ephemeris stop time
+            """
             last_line = self.times_table['LineStart'][-1]
             return self.times_table['EphemerisTime'][-1] + ((self.image_lines - last_line + 1) * self.times_table['ExposureTime'][-1])
 
