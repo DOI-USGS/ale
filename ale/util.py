@@ -600,7 +600,7 @@ def JBFPvlParser(lines):
 
     imeta = 0
     while imeta < len(metadata):
-        element_start_line, element_type = mmetadata[imeta]
+        element_start_line, element_type = metadata[imeta]
 
         if element_type == "keyword":
             next_element_start = metadata[imeta+1][0] if imeta+1<len(metadata) else len(lines)+1
@@ -705,6 +705,10 @@ def search_isis_db(dbobj, labelobj, isis3_data="/usgs/cpkgs/isis3/data/"):
                     f = os.path.join(*f)
 
                 full_path = os.path.join(isis3_data, f).replace("$", "")
+                if "{" in full_path:
+                    start = full_path.find("{")
+                    stop = full_path.find("}")
+                    full_path[start:stop+1] = "?"*stop-start
                 if '?' in full_path:
                     full_path = sorted(glob(full_path))[-1]
                 files[i] = full_path
