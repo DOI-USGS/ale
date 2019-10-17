@@ -1,0 +1,101 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 422
+    TileLines   = 512
+
+    Group = Dimensions
+      Samples = 5064
+      Lines   = 400
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName              = "LUNAR RECONNAISSANCE ORBITER"
+    InstrumentHostName          = "LUNAR RECONNAISSANCE ORBITER"
+    InstrumentHostId            = LRO
+    InstrumentName              = "LUNAR RECONNAISSANCE ORBITER NARROW ANGLE
+                                   CAMERA LEFT"
+    InstrumentId                = NACL
+    FrameId                     = LEFT
+    TargetName                  = MOON
+    MissionPhaseName            = COMMISSIONING
+    PrerollTime                 = 2009-07-30T12:20:37.127
+    StartTime                   = 2009-07-30T12:20:38.185
+    StopTime                    = 2009-07-30T12:21:32.155
+    SpacecraftClockPrerollCount = 1/270649237:07208
+    SpacecraftClockStartCount   = 1/270649238:11024
+    SpacecraftClockStopCount    = 1/270649292:09046
+    LineExposureDuration        = 1.028800 <ms>
+    TemperatureSCS              = 2.49 <degC>
+    TemperatureFPA              = 16.89 <degC>
+    TemperatureFPGA             = -14.08 <degC>
+    TemperatureTelescope        = 12.38 <degC>
+    SpatialSumming              = 1
+    SampleFirstPixel            = 0
+    TemperatureSCSRaw           = 2833
+    TemperatureFPARaw           = 2155
+    TemperatureFPGARaw          = 3476
+    TemperatureTelescopeRaw     = 2370
+  End_Group
+
+  Group = Archive
+    DataSetId               = LRO-L-LROC-2-EDR-V1.0
+    OriginalProductId       = nacl00002965
+    ProductId               = M103595705LE
+    ProducerId              = LRO_LROC_TEAM
+    ProducerInstitutionName = "ARIZONA STATE UNIVERSITY"
+    ProductVersionId        = v1.8
+    UploadId                = SC_2009211_0000_B_V01.txt
+    OrbitNumber             = 433
+    RationaleDescription    = "TARGET OF OPPORTUNITY"
+    DataQualityId           = 0
+    LineExposureCode        = 81
+    DACResetLevel           = 198
+    ChannelAOffset          = 40
+    ChannelBOffset          = 104
+    CompandCode             = 0
+    LineCode                = 51
+    BTerms                  = (0, 8, 25, 59, 128)
+    MTerms                  = (0.5, 0.25, 0.125, 0.0625, 0.03125)
+    XTerms                  = (0, 32, 136, 543, 2207)
+    CompressionFlag         = 1
+    Mode                    = 7
+  End_Group
+
+  Group = BandBin
+    FilterName = BroadBand
+    Center     = 600 <nm>
+    Width      = 300 <nm>
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode = -85600
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 1057914881
+  Bytes     = 428
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 1057915309
+  Bytes     = 4411
+End_Object
+End

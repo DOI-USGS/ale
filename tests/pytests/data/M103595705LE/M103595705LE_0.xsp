@@ -6,7 +6,7 @@ DAFETF NAIF DAF ENCODED TRANSFER FILE
 BEGIN_ARRAY 1 44
 'SPK_STATES_13                           '
 '1203A21863267E^8'
-'1203A2253DC63C^8'
+'1203A2253D432A^8'
 '-55'
 '12D'
 '1'
@@ -60,7 +60,7 @@ END_ARRAY 1 44
 BEGIN_ARRAY 2 45
 'DE-0421LE-0421                          '
 '1203A21863267E^8'
-'1203A2253DC63C^8'
+'1203A2253D432A^8'
 '12D'
 '3'
 '1'
@@ -115,7 +115,7 @@ END_ARRAY 2 45
 BEGIN_ARRAY 3 39
 'DE-0421LE-0421                          '
 '1203A21863267E^8'
-'1203A2253DC63C^8'
+'1203A2253D432A^8'
 'A'
 '0'
 '1'
@@ -164,7 +164,7 @@ END_ARRAY 3 39
 BEGIN_ARRAY 4 45
 'DE-0421LE-0421                          '
 '1203A21863267E^8'
-'1203A2253DC63C^8'
+'1203A2253D432A^8'
 '3'
 '0'
 '1'
@@ -218,25 +218,25 @@ BEGIN_ARRAY 4 45
 END_ARRAY 4 45
 TOTAL_ARRAYS 4
  ~NAIF/SPC BEGIN COMMENTS~
-; /Users/jmapel/ale/nb_test/M103595705LE_0.bsp LOG FILE
+; /home/pgiroux/Desktop/lro_slices/M103595705LE_0.bsp LOG FILE
 
-; Created 2019-09-04/12:46:24.00.
+; Created 2019-10-11/11:26:30.00.
 ;
 ; BEGIN SPKMERGE COMMANDS
 
 LEAPSECONDS_KERNEL   = /usgs/cpkgs/isis3/data/base/kernels/lsk/naif0012.tls
 
-SPK_KERNEL           = /Users/jmapel/ale/nb_test/M103595705LE_0.bsp
+SPK_KERNEL           = /home/pgiroux/Desktop/lro_slices/M103595705LE_0.bsp
 SOURCE_SPK_KERNEL = /usgs/cpkgs/isis3/data/lro/kernels/spk/fdf29r_2009182_2009213_v01.bsp
     INCLUDE_COMMENTS = NO
     BODIES           = -85
     BEGIN_TIME       = 2009 JUL 30 12:12:06.204
-    END_TIME         = 2009 JUL 30 12:12:19.058
+    END_TIME         = 2009 JUL 30 12:12:19.056
   SOURCE_SPK_KERNEL  = /usgs/cpkgs/isis3/data/lro/kernels/tspk/de421.bsp
     INCLUDE_COMMENTS = NO
     BODIES           = 3, 10, 301
     BEGIN_TIME       = 2009 JUL 30 12:12:06.204
-    END_TIME         = 2009 JUL 30 12:12:19.058
+    END_TIME         = 2009 JUL 30 12:12:19.056
 
 ; END SPKMERGE COMMANDS
  ~NAIF/SPC END COMMENTS~
