@@ -167,6 +167,8 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         : str
           Short name of the instrument
         """
+        if(super().instrument_id != "HRSC"):
+            raise Exception ("Instrument ID is wrong.")
         return self.label['DETECTOR_ID']
 
 
