@@ -1,0 +1,48 @@
+\begintext
+
+  This kernel is used by the ISIS software to supply required keywords for
+  the ISIS camera models. This kernel is furnished to the NAIF SPICE pool as 
+  one of the very last kernels. This allows it to overide keywords from other
+  kernels.
+
+  History:
+  
+  2014-05-13 Stuart Sides - Original version. Some information sourced from:
+      "JET PROPULSION LABORATORY, INTEROFFICE MEMORANDUM 343L-11-002, 8 June 2011"
+
+  2015-05-07 Stuart Sides - Updated LORRI focal length and distortion
+      parameters with information from Bill Owen, as per email from Harold 
+      Weaver dated 2015-05-06. Some formatting of comments. Added 98302 focal
+      length.
+
+  2015-08-27 Stuart Sides - The newest focal length and the distortion model
+      coefficients are in the IK as of V200, so removed them from here.
+
+
+-------------------------------------------------------------------------------
+The coefficients below are for transforming focal plane X,Y (mm) to/from Line,
+Sample. The numbers are from the CCD pixel pitch and the axes diagrams in the 
+instrument kernel (nh_lorri_v100.ti).
+
+  +XL ~= -YSC, +XL increasing columns
+  +YL ~= -ZSC, +YL increasing rows
+  +ZL = borsite , -ZL ~= -XSC, i.e., +ZL is oriented out the back of the 
+        instrumnet, going aways from an observed target. 
+      
+The following TRANS values are for ISIS cubes ingested with no flipping.
+First pixel in the input file is line 1 sample 1, second pixel in the input file
+is line 1 sample 2.
+
+\begindata
+
+INS-98301_TRANSX=(0.0,0.013,0.0)
+INS-98301_TRANSY=(0.0,0.0,0.013)
+INS-98301_ITRANSS=(0.0,76.923076923077,0.0)
+INS-98301_ITRANSL=(0.0,0.0,76.923076923077)
+
+INS-98302_TRANSX=(0.0,0.052,0.0)
+INS-98302_TRANSY=(0.0,0.0,0.052)
+INS-98302_ITRANSS=(0.0,19.230769230769,0.0)
+INS-98302_ITRANSL=(0.0,0.0,19.230769230769)
+
+

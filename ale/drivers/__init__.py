@@ -28,7 +28,7 @@ __formatters__ = {'usgscsm': to_usgscsm,
                   'isis': to_isis}
 
 def sort_drivers(drivers=[]):
-    return list(sorted(drivers, key=lambda x:IsisSpice in x.__bases__, reverse=True))
+    return list(sorted(drivers, key=lambda x:IsisSpice in x.__bases__, reverse=False))
 
 class AleJsonEncoder(json.JSONEncoder):
     def default(self, obj):

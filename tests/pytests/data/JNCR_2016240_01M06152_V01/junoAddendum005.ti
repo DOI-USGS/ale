@@ -1,0 +1,71 @@
+\begintext 
+The instrument addendum kernel for JUNO's JNC camera (JunoCam).
+
+history 2017-08-01 Jeannie Backer - Original version.
+        2017-08-10 Kris Becker - Updated parameters per an email from M. Caplinger
+                                 received on June 20, 2017
+        2017-08-15 Jesse Mapel - Removed duplicated keywords from juno_v12.tf and
+                                 juno_junocam_v02.ti
+        2018-05-14 Jesse Mapel - Changed filter offsets to match code from M Caplinger.
+
+negate k value (per gerard post)
+\begindata
+ INS-61500_PIXEL_PITCH      = 0.0074
+ INS-61500_FOCAL_LENGTH     = 10.95637
+ INS-61500_BORESIGHT_LINE   = 600
+ INS-61500_BORESIGHT_SAMPLE = 814.21
+ INS-61500_FILTER_OFFSET    = 1
+ INS-61500_FILTER_LINES     = 1200
+ INS-61500_FILTER_SAMPLES   = 1648
+ INS-61500_FILTER_NAME      = 'FULLCCD'
+
+\begintext
+
+Ensure this section provides all the necessary parameters
+for the PushFrameCameraCcdLayout class to provide framelet
+parameters for full ccd mapping.
+
+The order of the filters on the CCD, from top to bottom is 
+METHANE (-61504), BLUE (-61501), GREEN (-61502), RED (-61503)
+
+\begindata
+
+ INS-61504_FILTER_NAME      = 'METHANE'
+ INS-61504_FILTER_OFFSET    = 284.52
+ INS-61504_FILTER_LINES     = 128
+ INS-61504_FILTER_SAMPLES   = 1648
+
+ INS-61501_FILTER_NAME      = 'BLUE'
+ INS-61501_FILTER_OFFSET    = 441.52
+ INS-61501_FILTER_LINES     = 128
+ INS-61501_FILTER_SAMPLES   = 1648
+
+ INS-61502_FILTER_NAME      = 'GREEN'
+ INS-61502_FILTER_OFFSET    = 596.52
+ INS-61502_FILTER_LINES     = 128
+ INS-61502_FILTER_SAMPLES   = 1648
+
+ INS-61503_FILTER_NAME      = 'RED'
+ INS-61503_FILTER_OFFSET    = 751.52
+ INS-61503_FILTER_LINES     = 128
+ INS-61503_FILTER_SAMPLES   = 1648
+
+\begintext
+Calculated transformation and inverse transfromation vectors using pixel pitch and 1/pixel pitch
+
+\begindata
+ INS-61500_TRANSX  = (0.0000,   0.0074,   0.0000)
+ INS-61500_TRANSY  = (0.0000,   0.0000,   0.0074)
+ INS-61500_ITRANSS = (0.0000, 135.1351,   0.0000)
+ INS-61500_ITRANSL = (0.0000,   0.0000, 135.1351)
+
+\begintext
+ 
+ Turn off surface correction adjustment for now (KJB - 2017-08-10)
+
+\begindata
+
+  INS-61500_SWAP_OBSERVER_TARGET = 'TRUE'
+  INS-61500_LIGHTTIME_CORRECTION = 'NONE'
+  INS-61500_LT_SURFACE_CORRECT   = 'FALSE'
+

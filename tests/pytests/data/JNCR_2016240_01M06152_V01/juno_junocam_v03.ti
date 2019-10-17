@@ -1,0 +1,482 @@
+KPL/IK
+
+\beginlabel
+PDS_VERSION_ID               = PDS3
+RECORD_TYPE                  = STREAM
+RECORD_BYTES                 = "N/A"
+^SPICE_KERNEL                = "juno_junocam_v03.ti"
+MISSION_NAME                 = JUNO
+SPACECRAFT_NAME              = JUNO
+DATA_SET_ID                  = "JNO-J/E/SS-SPICE-6-V1.0"
+KERNEL_TYPE_ID               = IK
+PRODUCT_ID                   = "juno_junocam_v03.ti"
+PRODUCT_CREATION_TIME        = 2019-09-04T10:44:03
+PRODUCER_ID                  = "NAIF/JPL"
+MISSION_PHASE_NAME           = "N/A"
+PRODUCT_VERSION_TYPE         = ACTUAL
+PLATFORM_OR_MOUNTING_NAME    = "JUNO SPACECRAFT"
+START_TIME                   = "N/A"
+STOP_TIME                    = "N/A"
+SPACECRAFT_CLOCK_START_COUNT = "N/A"
+SPACECRAFT_CLOCK_STOP_COUNT  = "N/A"
+TARGET_NAME                  = JUPITER
+INSTRUMENT_NAME              = "JUNO EPO CAMERA"
+NAIF_INSTRUMENT_ID           = {
+                               -61504,
+                               -61503,
+                               -61502,
+                               -61501,
+                               -61500
+                               }
+SOURCE_PRODUCT_ID            = "N/A"
+NOTE                         = "See comments in the file for details"
+OBJECT                       = SPICE_KERNEL
+  INTERCHANGE_FORMAT         = ASCII
+  KERNEL_TYPE                = INSTRUMENT
+  DESCRIPTION                = "SPICE IK file providing FOV definitions and
+other instrument parameters for the JUNO EPO Camera (JUNOCAM) instrument,
+created by NAIF, JPL. "
+END_OBJECT                   = SPICE_KERNEL
+\endlabel
+
+
+Juno JUNOCAM Instrument Kernel
+===============================================================================
+
+   This Instrument Kernel (IK) file contains optics and detector
+   parameters and FOV definitions for the JUNO Camera (JUNOCAM)
+   instrument.
+
+
+Version and Date
+-------------------------------------------------------------------------------
+
+   Version 0.3 -- August 7, 2019 -- Boris Semenov, NAIF
+
+      Updated FOVs to use vectors computed using distortion models.
+
+   Version 0.2 -- August 3, 2017 -- Boris Semenov, NAIF
+
+      Updated most sections based on [8].
+
+   Version 0.1 -- September 29, 2016 -- Boris Semenov, NAIF
+
+      Updated based on [5].
+
+   Version 0.0 -- June 9, 2009 -- Boris Semenov, NAIF
+
+      Initial Release.
+
+
+References
+-------------------------------------------------------------------------------
+
+   1. Kernel Pool Required Reading
+
+   2. GETFOV, getfoc_c, cspice_getfov headers
+
+   3. JUNO FK file, latest version
+
+   4. JUNOCAM CDR Presentations
+
+   5. E-mail from Mike Caplinger, MSSS re actual JUNOCAM parameters,
+      09/19/16.
+
+   6. C.J. Hansen, et al, "Junocam: Juno~s Outreach Camera", Space Sci Rev,
+      DOI 10.1007/s11214-014-0079-x
+
+   7. http://www.msss.com/all_projects/junocam.php, accessed 09/29/16
+
+   8. E-mail from Mike Caplinger, MSSS re updated Junocam camera model,
+      06/20/17
+
+
+Contact Information
+-------------------------------------------------------------------------------
+
+   Boris V. Semenov, NAIF/JPL, (818)-354-8136, Boris.Semenov@jpl.nasa.gov
+
+
+Implementation Notes
+-------------------------------------------------------------------------------
+
+   This file is used by the SPICE system as follows: programs that make
+   use of this kernel must ``load'' the kernel, normally during program
+   initialization. The SPICE routine FURNSH loads a kernel file into
+   the pool as shown below.
+
+      CALL FURNSH ( 'frame_kernel_name; )    -- FORTRAN
+      furnsh_c ( "frame_kernel_name" );      -- C
+      cspice_furnsh, frame_kernel_name       -- IDL
+      cspice_furnsh( 'frame_kernel_name' )   -- MATLAB
+
+   Once the file has been loaded, the SPICE routine GETFOV (getfov_c in
+   C, cspice_getfov in IDL and MATLAB) can be used to retrieve FOV
+   parameters for a given instrument or structure.
+
+   This file was created and may be updated with a text editor or word
+   processor.
+
+
+Naming Conventions
+----------------------------------------------------------
+
+   All names referencing values in this IK file start with the
+   characters `INS' followed by the NAIF JUNO spacecraft ID number
+   (-61) followed by a NAIF three digit ID code for the camera or one
+   of its spectral bands. This is the full list of names and IDs for
+   the camera and spectral bands described by this IK file:
+
+      JUNO_JUNOCAM_METHANE           -61504
+      JUNO_JUNOCAM_BLUE              -61501
+      JUNO_JUNOCAM                   -61500
+      JUNO_JUNOCAM_GREEN             -61502
+      JUNO_JUNOCAM_RED               -61503
+
+   The remainder of the keyword name is an underscore character
+   followed by the unique name of the data item. For example, the
+   JUNOCAM "blue" band boresight direction in the JUNO_JUNOCAM frame is
+   specified by:
+
+           INS-61501_BORESIGHT
+
+   The upper bound on the length of the name of any data item is 32
+   characters.
+
+   If the same item is included in more than one file, or if the same
+   item appears more than once within a single file, the latest value
+   supersedes any earlier values.
+
+
+Instrument Description
+---------------------------------------------------------
+
+   From [7]:
+
+      Junocam will acquire 3-color (red, green, blue) images of Jupiter
+      during Juno's first seven orbits around the giant planet. The
+      data will be processed and studied by students as part of the
+      Juno Education and Public Outreach effort.
+
+      The camera, derived from the MSL MARDI instrument, is designed to
+      acquire red-, green- and blue-wavelength images of Jupiter's
+      polar regions and lower-latitude cloud tops during Juno's first
+      seven orbits around the planet. These images, of approximately 15
+      kilometers (9.3 miles) per pixel resolution, will be used by
+      students to create the first color images of the jovian poles, as
+      well as high resolution views of lower-latitude cloud belts.
+      After the required, seven orbit design life, Junocam will
+      continue to operate as long as possible in the harsh jovian
+      radiation environment.
+
+   For a detailed description see [6]
+
+
+Mounting Alignment
+--------------------------------------------------------
+
+   Refer to the latest version of the Juno Frames Definition Kernel
+   (FK) [3] for the JUNOCAM frame definitions and mounting alignment
+   information.
+
+
+Apparent FOV Layout
+--------------------------------------------------------
+
+   The diagram below illustrates the nominal JUNOCAM camera FOV/CCD
+   layout:
+
+
+      --- 0,0--------------------------------------------.
+     5 deg | METHANE 128 pix      *                      |     --------
+      ---  `-----------------------------------------1648,128   | 245 pixels
+                                                                |
+      --- 0,0--------------------------------------------.      |
+     5 deg | BLUE    128 pix      *                      |      |  ---
+      ---  `-----------------------------------------1648,128   |   |80 pixels
+                             +Zjc x-------------> +Xjc         --- ---
+      --- 0,0---------------------|----------------------.      |   |75 pixels
+     5 deg | GREEN   128 pix      *                      |      |  ---
+      ---  `----------------------|------------------1648,128   |
+                                  |                             |
+      --- 0,0---------------------|----------------------.      | 230 pixels
+     5 deg | RED     128 pix      *                      |     --------
+      ---  `----------------------|------------------1648,128
+                                  |
+                                  V +Yjc
+
+           |                     58 deg                  |      Boresight
+           |---------------------------------------------|    (+Zjc axis)
+           |                                             |      is into
+                                                                the page
+
+
+   Note 1: In addition to photoactive pixels the sensor has dark and
+   overscan columns that are present in all 1648 pixels wide Junocam
+   images. There are 23 dark pixels at the start of each line,
+   followed by 1608 photoactive pixels and additional dark, isolation,
+   and overscan/dummy pixels for a total of 1648 pixels per line.
+
+   Note 2: the angular dimensions above are nominal. The actual extents
+   of the photoactive pixel areas vary due to optical distortion and,
+   depending on a band, are between ~4.90 and ~5.05 deg in the YZ
+   direction and between ~57.5 and ~58.5 deg in the XZ direction.
+
+
+Optical and Detector Parameters
+--------------------------------------------------------
+
+   This section provides two parameters that, in combination with the
+   optical distortion and filter parameters, are needed to compute the
+   view directions of the individual CCD pixels. These parameters are
+   the focal length and pixel size, both given in millimeters.
+
+      \begindata
+
+         INS-61504_FOCAL_LENGTH           = ( 10.95637 )
+         INS-61504_PIXEL_SIZE             = (  0.0074  )
+
+         INS-61501_FOCAL_LENGTH           = ( 10.95637 )
+         INS-61501_PIXEL_SIZE             = (  0.0074  )
+
+         INS-61500_FOCAL_LENGTH           = ( 10.95637 )
+         INS-61500_PIXEL_SIZE             = (  0.0074  )
+
+         INS-61502_FOCAL_LENGTH           = ( 10.95637 )
+         INS-61502_PIXEL_SIZE             = (  0.0074  )
+
+         INS-61503_FOCAL_LENGTH           = ( 10.95637 )
+         INS-61503_PIXEL_SIZE             = (  0.0074  )
+
+      \begintext
+
+
+FOV Definition
+--------------------------------------------------------
+
+   This section contains definitions of the JUNOCAM band and total
+   FOVs.
+
+   All FOVs are defined as (nearly) rectangular pyramids using boundary
+   vectors computed using the distortion model in the "Optical
+   Distortion" section below for pixels (23.5,0.5), (23.5,127.5),
+   (1630.5,127.5), and (1630.5,0.5) and using the boresight computed
+   for the pixel (827.0,64.0). They are provided for visualization
+   purposes, do not represent the geometry of the actual FOV sides, and
+   are not intended for quantitative analysis.
+
+   The total FOV (ID -61500), spanning from the METHANE top edge to the
+   RED bottom edge through all band boundary vectors, with the
+   boresight set to be exactly along the the JUNO_JUNOCAM frame +Z
+   axis, is defined as a polygon and provided solely for convenience.
+
+      \begindata
+
+         INS-61504_FOV_FRAME              = 'JUNO_JUNOCAM'
+         INS-61504_FOV_SHAPE              = 'RECTANGLE'
+         INS-61504_BORESIGHT              = (
+                                   0.00854687, -0.16805056, 0.98574133
+                                            )
+         INS-61504_FOV_BOUNDARY_CORNERS   = (
+                                  -0.47351727, -0.18862601, 0.86034971
+                                  -0.47852984, -0.11376363, 0.87067045
+                                   0.49067337, -0.11299511, 0.86398596
+                                   0.48553839, -0.18735362, 0.85390345
+                                            )
+
+         INS-61501_FOV_FRAME              = 'JUNO_JUNOCAM'
+         INS-61501_FOV_SHAPE              = 'RECTANGLE'
+         INS-61501_BORESIGHT              = (
+                                   0.00862523, -0.06371477, 0.99793088
+                                            )
+         INS-61501_FOV_BOUNDARY_CORNERS   = (
+                                  -0.47934991, -0.09577177, 0.87238262
+                                  -0.48125208, -0.01885545, 0.87637943
+                                   0.49346247, -0.01872799, 0.86956544
+                                   0.49151356, -0.09512467, 0.86565912
+                                            )
+
+         INS-61500_FOV_FRAME              = 'JUNO_JUNOCAM'
+         INS-61500_FOV_SHAPE              = 'POLYGON'
+         INS-61500_BORESIGHT              = (
+                                   0.00000000,  0.00000000, 1.00000000
+                                            )
+         INS-61500_FOV_BOUNDARY_CORNERS   = (
+                                  -0.47351727, -0.18862601, 0.86034971
+                                  -0.47852984, -0.11376363, 0.87067045
+                                  -0.47934991, -0.09577177, 0.87238262
+                                  -0.48125208, -0.01885545, 0.87637943
+                                  -0.48132762, -0.00181401, 0.87653889
+                                  -0.48010800,  0.07530320, 0.87397125
+                                  -0.47949606,  0.09218676, 0.87268845
+                                  -0.47518685,  0.16768048, 0.86375964
+                                   0.48724863,  0.16654879, 0.85723408
+                                   0.49166330,  0.09156385, 0.86595800
+                                   0.49229026,  0.07479430, 0.86721169
+                                   0.49353987, -0.00180175, 0.86972131
+                                   0.49346247, -0.01872799, 0.86956544
+                                   0.49151356, -0.09512467, 0.86565912
+                                   0.49067337, -0.11299511, 0.86398596
+                                   0.48553839, -0.18735362, 0.85390345
+                                            )
+
+         INS-61502_FOV_FRAME              = 'JUNO_JUNOCAM'
+         INS-61502_FOV_SHAPE              = 'RECTANGLE'
+         INS-61502_BORESIGHT              = (
+                                   0.00863288,  0.04084925, 0.99912803
+                                            )
+         INS-61502_FOV_BOUNDARY_CORNERS   = (
+                                  -0.48132762, -0.00181401, 0.87653889
+                                  -0.48010800,  0.07530320, 0.87397125
+                                   0.49229026,  0.07479430, 0.86721169
+                                   0.49353987, -0.00180175, 0.86972131
+                                            )
+
+         INS-61503_FOV_FRAME              = 'JUNO_JUNOCAM'
+         INS-61503_FOV_SHAPE              = 'RECTANGLE'
+         INS-61503_BORESIGHT              = (
+                                   0.00857099,  0.14442688, 0.98947835
+                                            )
+         INS-61503_FOV_BOUNDARY_CORNERS   = (
+                                  -0.47949606,  0.09218676, 0.87268845
+                                  -0.47518685,  0.16768048, 0.86375964
+                                   0.48724863,  0.16654879, 0.85723408
+                                   0.49166330,  0.09156385, 0.86595800
+                                            )
+
+      \begintext
+
+
+Optical Distortion
+--------------------------------------------------------
+
+   This code recipe with fragments in Python, based on [8], maps to and
+   from pixel coordinates (for full images with 1648 samples per line)
+   and vectors in the JUNO_JUNOCAM reference frame.
+
+   The distortion parameters are set from these IK keywords assigned in
+   the data block below the recipe (# is 4 for METHANE, 1 for BLUE, 2
+   for GREEN, and 3 for RED):
+
+      cx = INS-6150#_DISTORTION_X
+      cy = INS-6150#_DISTORTION_Y
+      k1 = INS-6150#_DISTORTION_K1
+      k2 = INS-6150#_DISTORTION_K2
+      fl = INS-6150#_FOCAL_LENGTH/INS-6150#_PIXEL_SIZE
+
+   Using these "distort" and "undistort" functions:
+
+      def undistort(c):
+        xd, yd = c[0], c[1]
+        for i in range(5): # fixed number of iterations for simplicity
+          r2 = (xd**2+yd**2)
+          dr = 1+k1*r2+k2*r2*r2
+          xd = c[0]/dr
+          yd = c[1]/dr
+        return [xd, yd]
+
+      def distort(c):
+        xd, yd = c[0], c[1]
+        r2 = (xd**2+yd**2)
+        dr = 1+k1*r2+k2*r2*r2
+        xd *= dr
+        yd *= dr
+        return [xd, yd]
+
+   given a vector v in the JUNO_JUNOCAM reference frame, the following
+   computes an XY coordinate in Junocam framelet coordinates with 0,0
+   in the upper left:
+
+      alpha = v[2]/fl
+      cam = [v[0]/alpha, v[1]/alpha]
+      cam = distort(cam)
+      x = cam[0]+cx
+      y = cam[1]+cy
+
+   and the following takes an XY coordinate in Junocam framelet
+   coordinates and produces a vector in the JUNO_JUNOCAM reference
+   frame (of arbitrary length).
+
+      cam[0] = x-cx
+      cam[1] = y-cy
+      cam = undistort(cam)
+      v = [cam[0], cam[1], fl]
+
+   The K1, K2, CX, and CY values are provided in the keyword below.
+
+      \begindata
+
+         INS-61504_DISTORTION_K1          =   -5.9624209455667325e-08
+         INS-61504_DISTORTION_K2          =    2.7381910042256151e-14
+         INS-61504_DISTORTION_X           =  814.21
+         INS-61504_DISTORTION_Y           =  315.48
+
+         INS-61501_DISTORTION_K1          =   -5.9624209455667325e-08
+         INS-61501_DISTORTION_K2          =    2.7381910042256151e-14
+         INS-61501_DISTORTION_X           =  814.21
+         INS-61501_DISTORTION_Y           =  158.48
+
+         INS-61500_DISTORTION_K1          =   -5.9624209455667325e-08
+         INS-61500_DISTORTION_K2          =    2.7381910042256151e-14
+         INS-61500_DISTORTION_X           =  814.21
+         INS-61500_DISTORTION_Y           =   78.48
+
+         INS-61502_DISTORTION_K1          =   -5.9624209455667325e-08
+         INS-61502_DISTORTION_K2          =    2.7381910042256151e-14
+         INS-61502_DISTORTION_X           =  814.21
+         INS-61502_DISTORTION_Y           =    3.48
+
+         INS-61503_DISTORTION_K1          =   -5.9624209455667325e-08
+         INS-61503_DISTORTION_K2          =    2.7381910042256151e-14
+         INS-61503_DISTORTION_X           =  814.21
+         INS-61503_DISTORTION_Y           = -151.52
+
+      \begintext
+
+
+Timing
+--------------------------------------------------------
+
+   From [8]:
+
+      Each Junocam image consists of multiple frames, each a readout of
+      a portion of the CCD containing one or more filter strips
+      ("framelets") as described in the I kernel.  The timing of each
+      frame is set by a base time (the "START_TIME" keyword in the PDS
+      label of each Junocam product) and an interframe delay
+      ("INTERFRAME_DELAY").  We have found that there is a fixed bias
+      of 61.88 msec in the start time with a possible jitter of order
+      20 msec relative to the reported value (that is, you should add
+      61.88 msec to the value of START_TIME.)  You should also add 1
+      msec to the value of INTERFRAME_DELAY.
+
+   The start time bias and additional interfame delay delta are
+   provided in the keywords below in seconds.
+
+      \begindata
+
+         INS-61504_START_TIME_BIAS        = 0.06188
+         INS-61504_INTERFRAME_DELTA       = 0.001
+
+         INS-61501_START_TIME_BIAS        = 0.06188
+         INS-61501_INTERFRAME_DELTA       = 0.001
+
+         INS-61500_START_TIME_BIAS        = 0.06188
+         INS-61500_INTERFRAME_DELTA       = 0.001
+
+         INS-61502_START_TIME_BIAS        = 0.06188
+         INS-61502_INTERFRAME_DELTA       = 0.001
+
+         INS-61503_START_TIME_BIAS        = 0.06188
+         INS-61503_INTERFRAME_DELTA       = 0.001
+
+      \begintext
+
+
+Filters
+--------------------------------------------------------
+
+   TBD; may be based on MRO/MARCI
+
+
+End of the IK file.

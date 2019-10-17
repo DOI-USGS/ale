@@ -16,8 +16,27 @@ def test_create_quaternion_rotations():
     assert len(rotations) == 1
     assert rotations[0].source == 1
     assert rotations[0].dest == -1000
-    np.testing.assert_equal(rotations[0].times, np.array([0, 1]))
-    np.testing.assert_almost_equal(rotations[0].quats, np.array([[0, 0, 0, 1], [0.5, 0.5, 0.5, 0.5]]))
+    np.testing.assert_equal(rotations[0].times, [0, 1])
+    np.testing.assert_almost_equal(rotations[0].quats, [[0, 0, 0, 1], [0.5, 0.5, 0.5, 0.5]])
+
+def test_create_quaternion_av_rotations():
+    test_table = {
+        'J2000Q0' : [1, 0.5],
+        'J2000Q1' : [0, 0.5],
+        'J2000Q2' : [0, 0.5],
+        'J2000Q3' : [0, 0.5],
+        'AV1' : [0, 1],
+        'AV2' : [2, 3],
+        'AV3' :[4, 5],
+        'ET' : [0, 1],
+        'TimeDependentFrames' : [-1000, -100, 1]}
+    rotations = create_rotations(test_table)
+    assert len(rotations) == 1
+    assert rotations[0].source == 1
+    assert rotations[0].dest == -1000
+    np.testing.assert_equal(rotations[0].times, [0, 1])
+    np.testing.assert_almost_equal(rotations[0].quats, [[0, 0, 0, 1], [0.5, 0.5, 0.5, 0.5]])
+    np.testing.assert_almost_equal(rotations[0].av, [[0, 2, 4], [1, 3, 5]])
 
 def test_create_two_rotations():
     test_table = {
