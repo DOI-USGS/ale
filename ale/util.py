@@ -573,7 +573,8 @@ def JBFPvlParser(lines):
         value = lines[0].split("=")[1]+"".join(l.strip() for l in lines[1:])
 
         if "(" in value and ")" in value:
-            value = eval(value)
+            value = value.replace("(", "").replace(")", "").split(",")
+            value = tuple([v.replace("\"", "") for v in value])
         else:
             value = value.strip()
 
@@ -660,6 +661,8 @@ def search_isis_db(dbobj, labelobj, isis3_data="/usgs/cpkgs/isis3/data/"):
     if not dbobj:
         return
 
+    quality = dict(e[::-1] for e  in enumerate(["predicted", "nadir", "reconstructed", "smithed"]))
+
     utc_start_time = labelobj["IsisCube"]["Instrument"]["StartTime"]
     utc_stop_time = labelobj["IsisCube"]["Instrument"]["StopTime"]
 
@@ -690,45 +693,59 @@ def search_isis_db(dbobj, labelobj, isis3_data="/usgs/cpkgs/isis3/data/"):
 
         for i,time in enumerate(times):
             isis_time_format = '%Y %b %d %H:%M:%S.%f TDB'
-            time = (datetime.strptime(time[0], isis_time_format),
-                               datetime.strptime(time[1], isis_time_format))
+            other_isis_time_format =  '"%Y %b %d %H:%M:%S.%f TDB"'
+
+            try:
+                time = (datetime.strptime(time[0].strip(), isis_time_format),
+                                   datetime.strptime(time[1].strip(), isis_time_format))
+            except:
+                time = (datetime.strptime(time[0].strip(), other_isis_time_format),
+                                   datetime.strptime(time[1].strip(), other_isis_time_format))
+
             start_time_in_range = utc_start_time >= time[0] and utc_start_time <= time[1]
             stop_time_in_range = utc_stop_time >= time[0] and utc_stop_time <= time[1]
             times[i] = stop_time_in_range, stop_time_in_range
 
         for i,match in enumerate(matches):
-            matches[i] = labelobj["IsisCube"][match[0]][match[1]].lower() == match[2].lower()
+            matches[i] = labelobj["IsisCube"][match[0].strip()][match[1].strip()].lower().strip() == match[2].lower().strip()
 
         if any(matches if matches else [True]):
             for i,f in enumerate(files):
                 if isinstance(f, tuple):
-                    f = os.path.join(*f)
+                    f = os.path.join(*[e.strip() for e in f])
 
-                full_path = os.path.join(isis3_data, f).replace("$", "")
+                full_path = os.path.join(isis3_data, f).replace("$", "").replace("\"", "")
                 if "{" in full_path:
                     start = full_path.find("{")
                     stop = full_path.find("}")
-                    full_path[start:stop+1] = "?"*stop-start
+                    full_path = full_path[:start] + "?"*(stop-start-1) + full_path[stop+1:]
                 if '?' in full_path:
                     full_path = sorted(glob(full_path))[-1]
                 files[i] = full_path
 
             if times:
                 have_start_match, have_stop_match = list(map(list, zip(*times)))
+                typ = selection.get("Type", None)
+                typ = typ.lower().strip() if typ else None
+
+                current_quality = max([quality[t.lower().strip()] for t in types if t]) if any(types) else 0
+
                 if any(have_start_match) and any(have_stop_match):
                     # best case, the image is fully encapsulated in the kernel
                     full_match = True
-                    kernels.extend(files)
-                    types.append(selection.get("Type", None))
+                    if quality[typ] >= current_quality:
+                        kernels = files
+                        types = [selection.get("Type", None)]
                 elif any(have_start_match):
                     kernels.extend(files)
                     types.append(selection.get("Type", None))
                     partial_match = True
                 elif any(have_stop_match):
                     if partial_match:
-                        kernels.extend(files)
-                        types.append(selection.get("Type", None))
-                        full_match = True
+                        if quality[typ] >= current_quality:
+                            kernels.extend(files)
+                            types.append(selection.get("Type", None))
+                            full_match = True
             else:
                 full_match = True
                 kernels = files
@@ -766,6 +783,19 @@ def find_kernels(cube, isis3_data="/usgs/cpkgs/isis3/data/", format_as=dict):
     : obj
       Container with kernels
     """
+    def remove_dups(listofElements):
+        # Create an empty list to store unique elements
+        uniqueList = []
+
+        # Iterate over the original list and for each element
+        # add it to uniqueList, if its not already there.
+        for elem in listofElements:
+            if elem not in uniqueList:
+                uniqueList.append(elem)
+
+        # Return the list of unique elements
+        return uniqueList
+
     cube_label = pvl.load(cube)
     mission_lookup_table = get_isis_mission_translations(isis3_data)
 
@@ -797,22 +827,31 @@ def find_kernels(cube, isis3_data="/usgs/cpkgs/isis3/data/", format_as=dict):
         typ = f[0][0]
         kernel_search_results = search_isis_db(f[0][1], cube_label)
 
-        try:
-            kernels[typ]["kernels"].extend(kernel_search_results["kernels"])
-            if any(kernel_search_results.get("types", [None])):
-                kernels[typ]["types"].extend(kernel_search_results["types"])
-        except:
-            kernels[typ] = {}
-            kernels[typ]["kernels"] = kernel_search_results["kernels"]
-            if any(kernel_search_results.get("types", [None])):
-                kernels[typ]["types"] = kernel_search_results["types"]
+        if not kernel_search_results:
+            kernels[typ] = None
+        else:
+            try:
+                kernels[typ]["kernels"].extend(kernel_search_results["kernels"])
+                if any(kernel_search_results.get("types", [None])):
+                    kernels[typ]["types"].extend(kernel_search_results["types"])
+            except:
+                kernels[typ] = {}
+                kernels[typ]["kernels"] = kernel_search_results["kernels"]
+                if any(kernel_search_results.get("types", [None])):
+                    kernels[typ]["types"] = kernel_search_results["types"]
+
+    for k,v in kernels.items():
+        if v:
+            print(remove_dups(v["kernels"]))
+            kernels[k]["kernels"] = remove_dups(v["kernels"])
 
     if format_as == dict:
         return kernels
     elif format_as == list:
         kernel_list = []
         for _,kernels in kernels.items():
-            kernel_list.extend(kernels["kernels"])
+            if kernels:
+                kernel_list.extend(kernels["kernels"])
         return kernel_list
     else:
         warnings.warn(f"{format_as} is not a valid format, returning as dict")
