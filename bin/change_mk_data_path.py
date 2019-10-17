@@ -10,7 +10,7 @@ parser.add_argument('mk_path', action='store', help='Path containing metakernel 
 parser.add_argument('new_data_path', action='store', help='new data path containing kernel, this path will overwrite the current data path in the metakernels')
 args = parser.parse_args()
 
-mks = glob(path.join(args.mk_path,'*.tm'))
+mks = glob(path.join(args.mk_path,'*.[Tt][Mm]'))
 
 for mk in mks:
     with open(mk, 'r') as f:
