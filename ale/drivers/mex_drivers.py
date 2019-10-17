@@ -9,8 +9,11 @@ import spiceypy as spice
 import warnings
 
 from ale.base import Driver
+from ale.base.data_isis import read_table_data
+from ale.base.data_isis import parse_table
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
+from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import LineScanner
 from ale.base.type_distortion import RadialDistortion
 from ale.util import find_latest_metakernel
@@ -130,7 +133,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         : int
           Naif ID code used in calculating focal length
         """
-        return spice.bods2c(self.label['DETECTOR_ID'])
+        return spice.bods2c(self.instrument_id)
 
 
     # TODO Since HRSC has different frames based on filters, need to check that
@@ -164,6 +167,8 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         : str
           Short name of the instrument
         """
+        if(super().instrument_id != "HRSC"):
+            raise Exception ("Instrument ID is wrong.")
         return self.label['DETECTOR_ID']
 
 
@@ -323,75 +328,128 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         """
         Returns a 2D array of line scan rates.
 
-        For HRSC, this data is actually imbedded in the binary data of the image
-        itself. Each line is stored in what is referred to as a "record" within
-        the image. The label will have the size of each record, the number of
-        records, and the number of records in the label, so the beginning of
-        binary data can be calculated.
-
-        For each line/record of the binary data, the first 8 bytes make up the
-        double presicion value of the ephemeris time, with the next 4 bytes
-        making up the float value of the line exposure duration for the
-        associated line. NOTE: The image label specifies MSB_INTEGER as the byte
-        order, however, to match ISIS values, we used python struct's little
-        endian functionality.
+        For HRSC, the ephemeris times and exposure durations are
+        stored in the image data.
 
         Returns
         -------
         : list
-          Start lines
-        : list
-          Line times
+          Line scan rates
+        """
+        times = [time - self.center_ephemeris_time for time in self.binary_ephemeris_times]
+        return (self.binary_lines, times, self.binary_exposure_durations)
+
+
+    @property
+    def binary_exposure_durations(self):
+        """
+        Returns the exposure durations taken from the binary image data.
+
+        For HRSC, the exposure durations are imbedded in the binary data of the image.
+        The expsoure durations start at the 9th byte of the line/record and are 4 bytes long.
+
+        Returns
+        -------
         : list
           Exposure durations
         """
-        if not hasattr(self, '_line_scan_rate'):
-            self._line_scan_rate = None
-            lines = []
-            times = []
-            durations = []
+        if not hasattr(self, '_binary_exposure_durations'):
+            self.read_image_data()
+        return self._binary_exposure_durations
 
-            with open(self._file, 'rb') as image_file:
-                bytes_per_record = self.label['RECORD_BYTES']
-                num_records = self.label['FILE_RECORDS']
-                img_start_record = self.label['^IMAGE']
-                img_start_byte = bytes_per_record * (img_start_record - 1) # Offset by one for zero-based records
-                num_img_records = num_records - img_start_record
-                image_file.seek(img_start_byte)
 
-                for record in range(num_img_records):
-                    record_bytes = image_file.read(bytes_per_record)
-                    eph_time = struct.unpack('<d', record_bytes[:8])[0]
-                    exp_dur = struct.unpack('<f', record_bytes[8:12])[0] / 1000
-                    #if record == 0:
-                    # Offset for zero-based corrections, and then offest for ISIS pixel definition
-                    lines.append(record+1-0.5)
-                    times.append(eph_time)
-                    durations.append(exp_dur)
-                # Only add records if exposure duration has changed since the line before
-                    #elif exp_dur != durations[-1]:
-                    #    # Offset for zero-based corrections, and then offest for ISIS pixel definition
-                    #    lines.append(record+1-0.5)
-                    #    times.append(eph_time)
-                    #    durations.append(exp_dur)
-            self._ephemeris_stop_time = times[-1] + durations[-1]
-            self._center_ephemeris_time = (self.ephemeris_stop_time + self.ephemeris_start_time) / 2
-            times = [time - self.center_ephemeris_time for time in times]
-            # print(self.ephemeris_stop_time, self.center_ephemeris_time)
-
-            self._line_scan_rate = (lines, times, durations)
-        return self._line_scan_rate
     @property
-    def center_ephemeris_time(self):
-        if not hasattr(self, '_center_ephemeris_time'):
-            self._center_ephemeris_time = (self.ephemeris_stop_time - self._ephemeris_start_time) / 2
-        return self._center_ephemeris_time
+    def binary_ephemeris_times(self):
+        """
+        Returns the ephemeris times taken from the binary image data.
+
+        For HRSC, the ephemeris times are imbedded in the binary data of the image.
+        The ephemeris times start at the first byte of the line/records and are 8 bytes long.
+
+        Returns
+        -------
+        : list
+          Ephemeris times
+        """
+        if not hasattr(self, '_binary_ephemeris_times'):
+            self.read_image_data()
+        return self._binary_ephemeris_times
+
+
+    @property
+    def binary_lines(self):
+        """
+        Returns the lines of the binary image data.
+
+        For example, the first entry would be the first line of the image.
+
+        Returns
+        -------
+        : list
+          Image lines
+        """
+        if not hasattr(self, '_binary_lines'):
+            self.read_image_data()
+        return self._binary_lines
+
+
+    def read_image_data(self):
+        """
+        Reads data off of image and stores in binary_exposure_durations, binary_lines,
+        and binary_ephemeris_times.
+
+        For HRSC, the exposure durations and ephemeris times are imbedded in the binary
+        data of the image itself. Each line is stored in what is referred to as a
+        "record" within the image. The label will have the size of each record,
+        the number of records, and the number of records in the label, so the
+        beginning of binary data can be calculated.
+
+        For each line/record of the binary data, the first 8 bytes make up the
+        double presicion value of the ephemeris time, with the next 4 bytes
+        making up the float value of the line exposure duration for the
+        associated line. NOTE: The prefix data is always LSB, regardless
+        of the overall file format.
+        """
+        lines = []
+        times = []
+        durations = []
+
+        with open(self._file, 'rb') as image_file:
+            bytes_per_record = self.label['RECORD_BYTES']
+            num_records = self.label['FILE_RECORDS']
+            img_start_record = self.label['^IMAGE']
+            img_start_byte = bytes_per_record * (img_start_record - 1) # Offset by one for zero-based records
+            num_img_records = num_records - img_start_record
+            image_file.seek(img_start_byte)
+
+            for record in range(num_img_records):
+                record_bytes = image_file.read(bytes_per_record)
+                eph_time = struct.unpack('<d', record_bytes[:8])[0]
+                exp_dur = struct.unpack('<f', record_bytes[8:12])[0] / 1000
+                # Offset for zero-based corrections, and then offest for ISIS pixel definition
+                lines.append(record+1-0.5)
+                times.append(eph_time)
+                durations.append(exp_dur)
+
+        self._binary_exposure_durations = durations
+        self._binary_lines = lines
+        self._binary_ephemeris_times = times
+
 
     @property
     def ephemeris_stop_time(self):
-        if not hasattr(self, '_ephemeris_stop_time'):
-            _, _, _ = self.line_scan_rate
-        return self._ephemeris_stop_time
+        """
+        Returns the ephemeris stop time.
+
+        For HRSC, the ephemeris stop time is calculated from the binary image data.
+
+        Returns
+        -------
+        : float
+          Ephemeris stop time
+        """
+        return self.binary_ephemeris_times[-1] + self.binary_exposure_durations[-1]
+
 
     # TODO We need to confirm that returning nothing here does not affect
     # calculations elsewhere in code. Or is there possibly just a better way of
@@ -422,3 +480,108 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
           ISIS sensor model version
         """
         return 1
+
+class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDistortion, Driver):
+
+        @property
+        def instrument_id(self):
+            """
+            Returns the name of the instrument
+
+            Returns
+            -------
+            : str
+              Name of the instrument
+            """
+            if(super().instrument_id != "HRSC"):
+                raise Exception ("Instrument ID is wrong.")
+
+            return super().instrument_id
+
+        @property
+        def sensor_model_version(self):
+            """
+            Returns
+            -------
+            : int
+              ISIS sensor model version
+            """
+            return 1
+
+        @property
+        def times_table(self):
+            """
+            Returns EphermisTime, ExposureTime, and LinesStart informtation which was stored as 
+            binary information in the ISIS cube.
+
+            Returns
+            -------
+            : dict
+              Dictionary with EphemerisTime, ExposureTime, and LineStart.
+            """
+            isis_bytes = read_table_data(self.label['Table'], self._file)
+            return parse_table(self.label['Table'], isis_bytes)
+
+        @property
+        def line_scan_rate(self):
+            """
+            Returns
+            -------
+            : tuple
+              list of lines, list of ephemeris times, and list of exposure
+              times
+            """
+            return self.times_table['LineStart'], self.times_table['EphemerisTime'], self.times_table['ExposureTime']
+
+        @property
+        def ephemeris_start_time(self):
+            """
+            Returns
+            -------
+            : float
+              starting ephemeris time
+            """
+            return self.times_table['EphemerisTime'][0]
+
+        @property
+        def ephemeris_stop_time(self):
+            """
+            Returns
+            -------
+            : float
+              ephemeris stop time
+            """
+            last_line = self.times_table['LineStart'][-1]
+            return self.times_table['EphemerisTime'][-1] + ((self.image_lines - last_line + 1) * self.times_table['ExposureTime'][-1])
+
+        @property
+        def ikid(self):
+            """
+            Returns the Naif ID code for the HRSC head instrument
+
+            This would be the Naif ID code for the base (or "head") instrument.
+
+            Returns
+            -------
+            : int
+              Naif ID used to for indentifying the instrument in Spice kernels
+            """
+            return spice.bods2c("MEX_HRSC_HEAD")
+
+
+        @property
+        def fikid(self):
+            """
+            Naif ID code of the filter dependent instrument codes.
+
+            Expects filter_number to be defined. This should be an integer containing
+            the filter number from the pds3 label.
+            Expects ikid to be defined. This should be the integer Naid ID code for
+            the instrument.
+
+            Returns
+            -------
+            : int
+              Naif ID code used in calculating focal length
+            """
+            return spice.bods2c(self.instrument_id)
