@@ -222,6 +222,32 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
         """
         return self.crosstrack_summing
 
+    @property
+    def target_frame_id(self):
+        """
+        Returns the Naif ID code for the target body frame
+        Expects target_name to be defined. This must be a string containig the name
+        of the target body.
+
+        Returns
+        -------
+        : int
+          Naif ID code for the target body
+        """
+        return spice.cidfrm(spice.bodn2c(self.target_name))[0]
+
+    @property
+    def reference_frame(self):
+        """
+        Returns a string containing the name of the target reference frame
+
+        Returns
+        -------
+        : str
+        String name of the target reference frame
+        """
+        return spice.cidfrm(spice.bodn2c(self.target_name))[1]
+
 class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver):
     @property
     def instrument_id(self):
@@ -420,3 +446,15 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
             "MOON": "MOON_ME"
         }
         return int(spice.gdpool('FRAME_{}'.format(name_lookup[self.target_name]),0,1))
+
+    @property
+    def reference_frame(self):
+        """
+        Returns a string containing the name of the target reference frame
+
+        Returns
+        -------
+        : str
+        String name of the target reference frame
+        """
+        return spice.frmnam(self.target_frame_id)
