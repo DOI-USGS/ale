@@ -14,7 +14,7 @@ from ale.formatters.usgscsm_formatter import to_usgscsm
 def usgscsm_compare_dict():
     return {
     "h5270_0000_ir2" : {
-        "pds" : {
+        "usgscsm" : {
           "radii": {
             "semimajor": 3396.19,
             "semiminor": 3376.2,
@@ -210,7 +210,7 @@ def usgscsm_compare_dict():
               "dt_quaternion": 40.734855437278746
               },
 
-        "isis3" :
+        "isis" :
           {
   "CameraVersion": 1,
   "NaifKeywords": {
@@ -478,38 +478,38 @@ def usgscsm_compare_dict():
 }
 }}
 
-def isis_compare_dict():
-    return {'CameraVersion': 1,
-    'NaifKeywords':
-    {'BODY499_RADII': array([3396.19, 3396.19, 3376.2 ]),
-    'BODY_FRAME_CODE': 10014,
-    'BODY_CODE': 499,
-    'INS-41210_FOV_FRAME': 'MEX_HRSC_HEAD',
-    'FRAME_-41210_NAME': 'MEX_HRSC_HEAD',
-    'INS-41210_CK_TIME_TOLERANCE': 1.0,
-    'TKFRAME_-41210_AXES': array([1., 2., 3.]),
-    'TKFRAME_-41210_SPEC': 'ANGLES',
-    'FRAME_-41210_CLASS': 4.0,
-    'INS-41210_FOV_ANGULAR_SIZE': array([0.2 , 0.659734]),
-    'INS-41210_OD_K': array([0., 0., 0.]),
-    'INS-41210_F/RATIO': 5.6,
-    'INS-41210_PLATFORM_ID': -41000.0,
-    'TKFRAME_-41210_ANGLES': array([-0.334 ,  0.0101,  0.    ]),
-    'INS-41210_SPK_TIME_BIAS': 0.0,
-    'FRAME_-41210_CENTER': -41.0,
-    'TKFRAME_-41210_UNITS': 'DEGREES',
-    'INS-41210_BORESIGHT': array([  0.,   0., 175.]),
-    'INS-41210_CK_TIME_BIAS': 0.0,
-    'FRAME_-41210_CLASS_ID': -41210.0,
-    'INS-41210_IFOV': 4e-05,
-    'INS-41210_FOV_BOUNDARY_CORNERS': array([ 18.187 ,  60.0641, 175. ,  18.1281, -60.0399, 175. , -18.1862, -60.0435, 175. , -18.142 ]),
-    'INS-41210_FOV_SHAPE': 'RECTANGLE',
-    'TKFRAME_-41210_RELATIVE': 'MEX_HRSC_BASE',
-    'INS-41210_PIXEL_PITCH': 0.007,
-    'INS-41210_FOCAL_LENGTH': 175.0,
-    'BODY499_POLE_DEC': array([52.8865, -0.0609,  0.    ]),
-    'BODY499_POLE_RA': array([ 3.1768143e+02, -1.0610000e-01,  0.0000000e+00]),
-    'BODY499_PM': array([176.63      , 350.89198226,   0.        ])}}
+#def isis_compare_dict():
+#    return {'CameraVersion': 1,
+#    'NaifKeywords':
+#    {'BODY499_RADII': array([3396.19, 3396.19, 3376.2 ]),
+#    'BODY_FRAME_CODE': 10014,
+#    'BODY_CODE': 499,
+#    'INS-41210_FOV_FRAME': 'MEX_HRSC_HEAD',
+#    'FRAME_-41210_NAME': 'MEX_HRSC_HEAD',
+#    'INS-41210_CK_TIME_TOLERANCE': 1.0,
+#    'TKFRAME_-41210_AXES': array([1., 2., 3.]),
+#    'TKFRAME_-41210_SPEC': 'ANGLES',
+#    'FRAME_-41210_CLASS': 4.0,
+#    'INS-41210_FOV_ANGULAR_SIZE': array([0.2 , 0.659734]),
+#    'INS-41210_OD_K': array([0., 0., 0.]),
+#    'INS-41210_F/RATIO': 5.6,
+#    'INS-41210_PLATFORM_ID': -41000.0,
+#    'TKFRAME_-41210_ANGLES': array([-0.334 ,  0.0101,  0.    ]),
+#    'INS-41210_SPK_TIME_BIAS': 0.0,
+#    'FRAME_-41210_CENTER': -41.0,
+#    'TKFRAME_-41210_UNITS': 'DEGREES',
+#    'INS-41210_BORESIGHT': array([  0.,   0., 175.]),
+#    'INS-41210_CK_TIME_BIAS': 0.0,
+#    'FRAME_-41210_CLASS_ID': -41210.0,
+#    'INS-41210_IFOV': 4e-05,
+#    'INS-41210_FOV_BOUNDARY_CORNERS': array([ 18.187 ,  60.0641, 175. ,  18.1281, -60.0399, 175. , -18.1862, -60.0435, 175. , -18.142 ]),
+#    'INS-41210_FOV_SHAPE': 'RECTANGLE',
+#    'TKFRAME_-41210_RELATIVE': 'MEX_HRSC_BASE',
+#    'INS-41210_PIXEL_PITCH': 0.007,
+#    'INS-41210_FOCAL_LENGTH': 175.0,
+#    'BODY499_POLE_DEC': array([52.8865, -0.0609,  0.    ]),
+#    'BODY499_POLE_RA': array([ 3.1768143e+02, -1.0610000e-01,  0.0000000e+00]),
+#    'BODY499_PM': array([176.63      , 350.89198226,   0.        ])}}
 
 @pytest.fixture(scope="module")
 def test_kernels():
@@ -519,39 +519,34 @@ def test_kernels():
     for kern in binary_kernels:
         os.remove(kern)
 
-@pytest.mark.parametrize("formatter", ['isis', 'usgscsm'])
-def test_mex_load(test_kernels, formatter, usgscsm_compare_dict):
+# Eventually all label/formatter combinations should be tested. For now, isis3/usgscsm and
+# pds3/isis will fail. 
+@pytest.mark.parametrize("label,formatter", [('isis3','isis'), ('pds3', 'usgscsm'), 
+                                              pytest.param('isis3','usgscsm', marks=pytest.mark.xfail),
+                                              pytest.param('pds3','isis', marks=pytest.mark.xfail),])
+def test_mex_load(test_kernels, formatter, usgscsm_compare_dict, label):
+    label_file = get_image_label('h5270_0000_ir2', label)
 
-    if formatter=="usgscsm":
-        label_file = get_image_label('h5270_0000_ir2', "pds3")
-
-        with patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_ephemeris_times', \
-                   new_callable=PropertyMock) as binary_ephemeris_times, \
-            patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_exposure_durations', \
-                   new_callable=PropertyMock) as binary_exposure_durations, \
-            patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_lines', \
-                   new_callable=PropertyMock) as binary_lines:
-            binary_ephemeris_times.return_value = [255744599.02748165, 255744599.04028246, 255744795.73322123]
-            binary_exposure_durations.return_value = [0.012800790786743165, 0.012800790786743165, 0.013227428436279297]
-            binary_lines.return_value = [0.5, 1.5, 15086.5]
-
-            usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter='usgscsm', verbose='true')
-            assert compare_dicts(usgscsm_isd, usgscsm_compare_dict['h5270_0000_ir2']['pds']) == []
-
-    else:
-        label_file = get_image_label('h5270_0000_ir2', "isis3")
-
-        with patch('ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.ephemeris_time', \
-                   new_callable=PropertyMock) as ephemeris_time, \
-             patch('ale.drivers.mex_drivers.read_table_data', return_value=12345) as read_table_data, \
-             patch('ale.drivers.mex_drivers.parse_table', return_value={'EphemerisTime': [255744599.02748165, 255744684.33197814, 255744684.34504557], \
+    with patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_ephemeris_times', \
+               new_callable=PropertyMock) as binary_ephemeris_times, \
+        patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_exposure_durations', \
+               new_callable=PropertyMock) as binary_exposure_durations, \
+        patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_lines', \
+               new_callable=PropertyMock) as binary_lines, \
+        patch('ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.ephemeris_time', \
+               new_callable=PropertyMock) as ephemeris_time, \
+        patch('ale.drivers.mex_drivers.read_table_data', return_value=12345) as read_table_data, \
+        patch('ale.drivers.mex_drivers.parse_table', return_value={'EphemerisTime': [255744599.02748165, 255744684.33197814, 255744684.34504557], \
                                                                    'ExposureTime': [0.012800790786743165, 0.012907449722290038, 0.013227428436279297], \
                                                                    'LineStart': [1, 6665, 6666]}) as parse_table:
 
-            ephemeris_time.return_value = [255744599.02748, 255744623.61901, 255744635.91477]
+        ephemeris_time.return_value = [255744599.02748, 255744623.61901, 255744635.91477]
+        binary_ephemeris_times.return_value = [255744599.02748165, 255744599.04028246, 255744795.73322123]
+        binary_exposure_durations.return_value = [0.012800790786743165, 0.012800790786743165, 0.013227428436279297]
+        binary_lines.return_value = [0.5, 1.5, 15086.5]
 
-            usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter='isis', verbose='true')
-            assert compare_dicts(usgscsm_isd, usgscsm_compare_dict['h5270_0000_ir2']['isis3']) == []
+        usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter=formatter, verbose='true')
+        assert compare_dicts(usgscsm_isd, usgscsm_compare_dict['h5270_0000_ir2'][formatter]) == []
 
 # ========= Test mex pds3label and naifspice driver =========
 class test_mex_pds3_naif(unittest.TestCase):

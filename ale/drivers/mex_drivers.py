@@ -167,11 +167,11 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         : str
           Short name of the instrument
         """
-        instrument_id = self.label['DETECTOR_ID']
-        if(super().instrument_id != "HRSC"):
-          raise Exception ("Instrument ID is wrong.")
+#        instrument_id = self.label['DETECTOR_ID']
+#        if(super().instrument_id != "HRSC"):
+#          raise Exception ("Instrument ID is wrong.")
 
-        return super().instrument_id
+#        return super().instrument_id
         return self.label['DETECTOR_ID']
 #FIXME
 
@@ -498,25 +498,25 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
             return 1
 
         @property
+        def isis_bytes(self):
+            return read_table_data(self.label['Table'], self._file)
+
+        @property
+        def times_table(self):
+            return parse_table(self.label['Table'], self.isis_bytes)
+
+        @property
         def line_scan_rate(self):
-            isis_bytes = read_table_data(self.label['Table'], self._file)
-            times_table = parse_table(self.label['Table'], isis_bytes)
-            return times_table['LineStart'], times_table['EphemerisTime'], times_table['ExposureTime']
+            return self.times_table['LineStart'], self.times_table['EphemerisTime'], self.times_table['ExposureTime']
 
         @property
         def ephemeris_start_time(self):
-            isis_bytes = read_table_data(self.label['Table'], self._file)
-            times_table = parse_table(self.label['Table'], isis_bytes)
-            start_time = times_table['EphemerisTime'][0]
-            return start_time
+            return self.times_table['EphemerisTime'][0]
 
         @property
         def ephemeris_stop_time(self):
-            isis_bytes = read_table_data(self.label['Table'], self._file)
-            times_table = parse_table(self.label['Table'], isis_bytes)
-            last_line = times_table['LineStart'][-1]
-            stop_time = times_table['EphemerisTime'][-1] + ((self.image_lines - last_line + 1) * times_table['ExposureTime'][-1])
-            return stop_time
+            last_line = self.times_table['LineStart'][-1]
+            return self.times_table['EphemerisTime'][-1] + ((self.image_lines - last_line + 1) * self.times_table['ExposureTime'][-1])
 
         @property
         def ikid(self):
