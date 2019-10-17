@@ -570,7 +570,6 @@ def JBFPvlParser(lines):
     """
     def JBFKeywordParser(lines):
         keyword = lines[0].split("=")[0]
-        value = lines[0].split("=")[1].strip()
         value = lines[0].split("=")[1]+"".join(l.strip() for l in lines[1:])
 
         if "(" in value and ")" in value:
@@ -601,8 +600,7 @@ def JBFPvlParser(lines):
 
     imeta = 0
     while imeta < len(metadata):
-        m = metadata[imeta]
-        element_start_line, element_type = m
+        element_start_line, element_type = mmetadata[imeta]
 
         if element_type == "keyword":
             next_element_start = metadata[imeta+1][0] if imeta+1<len(metadata) else len(lines)+1
@@ -671,9 +669,11 @@ def search_isis_db(dbobj, labelobj, isis3_data="/usgs/cpkgs/isis3/data/"):
     typ = None
     types = []
 
-    # flag is set when a kernel is found matching the start time but not stop time,
-    # this may
+    # flag is set when a kernel is found matching the start time but not stop time
+    # and therefore a second pair needs to be found
     partial_match = False
+
+    # Flag is set when kernels encapsulating the entire image time is found
     full_match = False
 
     for selection in dbobj.getlist("Selection"):
@@ -709,19 +709,17 @@ def search_isis_db(dbobj, labelobj, isis3_data="/usgs/cpkgs/isis3/data/"):
                     full_path = sorted(glob(full_path))[-1]
                 files[i] = full_path
 
-
             if times:
                 have_start_match, have_stop_match = list(map(list, zip(*times)))
                 if any(have_start_match) and any(have_stop_match):
                     # best case, the image is fully encapsulated in the kernel
                     full_match = True
-                    kernels = files
-                    types = [selection.get("Type", None)]
-
-                elif any(have_start_match):
-                    kernels = files
+                    kernels.extend(files)
                     types.append(selection.get("Type", None))
-                    looking_for_end = True
+                elif any(have_start_match):
+                    kernels.extend(files)
+                    types.append(selection.get("Type", None))
+                    partial_match = True
                 elif any(have_stop_match):
                     if partial_match:
                         kernels.extend(files)
@@ -779,25 +777,39 @@ def find_kernels(cube, isis3_data="/usgs/cpkgs/isis3/data/", format_as=dict):
 
     db_files = []
     for typ in kernel_types:
-        files = glob(path.join(kernel_dir, typ, "*.db"))
-        base_files = glob(path.join(base_kernel_dir, typ, "*.db"))
+        files = sorted(glob(path.join(kernel_dir, typ, "*.db")))
+        base_files = sorted(glob(path.join(base_kernel_dir, typ, "*.db")))
+        files = [list(it) for k,it in groupby(files, key=lambda f:os.path.basename(f).split(".")[0])]
+        base_files = [list(it) for k,it in groupby(base_files, key=lambda f:os.path.basename(f).split(".")[0])]
 
-        if files:
-            db_files.append(read_pvl(sorted(files)[-1], True))
-        if base_files:
-            db_files.append(read_pvl(sorted(base_files)[-1], True))
+        for instrument_dbs in files:
+            db_files.append(read_pvl(sorted(instrument_dbs)[-1], True))
+        for base_dbs in base_files:
+            db_files.append(read_pvl(sorted(base_dbs)[-1], True))
 
-    db_files = {k: v for d in db_files for k, v in d.items()}
 
     kernels = {}
-    kernels['Frame'] = search_isis_db(db_files["Frame"], cube_label)
-    kernels['Instrument'] = search_isis_db(db_files["Instrument"], cube_label)
-    kernels['SpacecraftClock'] = search_isis_db(db_files['SpacecraftClock'], cube_label)
-    kernels['InstrumentAddendum'] = search_isis_db(db_files['InstrumentAddendum'], cube_label)
-    kernels['SpacecraftPointing'] = search_isis_db(db_files['SpacecraftPointing'], cube_label)
-    kernels['SpacecraftPosition'] = search_isis_db(db_files['SpacecraftPosition'], cube_label)
-    kernels['LeapSecond'] = search_isis_db(db_files['LeapSecond'], cube_label)
-    kernels['TargetAttitudeShape'] = search_isis_db(db_files['TargetAttitudeShape'], cube_label)
-    kernels['TargetPosition'] = search_isis_db(db_files['TargetPosition'], cube_label)
-    return kernels
+    for f in db_files:
+        typ = f[0][0]
+        kernel_search_results = search_isis_db(f[0][1], cube_label)
 
+        try:
+            kernels[typ]["kernels"].extend(kernel_search_results["kernels"])
+            if any(kernel_search_results.get("types", [None])):
+                kernels[typ]["types"].extend(kernel_search_results["types"])
+        except:
+            kernels[typ] = {}
+            kernels[typ]["kernels"] = kernel_search_results["kernels"]
+            if any(kernel_search_results.get("types", [None])):
+                kernels[typ]["types"] = kernel_search_results["types"]
+
+    if format_as == dict:
+        return kernels
+    elif format_as == list:
+        kernel_list = []
+        for _,kernels in kernels.items():
+            kernel_list.extend(kernels["kernels"])
+        return kernel_list
+    else:
+        warnings.warn(f"{format_as} is not a valid format, returning as dict")
+        return kernels
