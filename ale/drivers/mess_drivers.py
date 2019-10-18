@@ -174,34 +174,6 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         return f_t(self.label['FOCAL_PLANE_TEMPERATURE'].value)
 
     @property
-    def detector_start_sample(self):
-        """
-        Returns starting detector sample quired from Spice Kernels.
-        Expects ikid to be defined. This should be the integer Naid ID code for
-        the instrument.
-
-        Returns
-        -------
-        : int
-          starting detector sample
-        """
-        return int(spice.gdpool('INS{}_FPUBIN_START_SAMPLE'.format(self.ikid), 0, 1)[0])
-
-    @property
-    def detector_start_line(self):
-        """
-        Returns starting detector line acquired from Spice Kernels.
-        Expects ikid to be defined. This should be the integer Naid ID code for
-        the instrument.
-
-        Returns
-        -------
-        : int
-          starting detector line
-        """
-        return int(spice.gdpool('INS{}_FPUBIN_START_LINE'.format(self.ikid), 0, 1)[0])
-
-    @property
     def detector_center_sample(self):
         """
         Returns center detector sample acquired from Spice Kernels.
@@ -395,34 +367,6 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver
 
         # eval at the focal_plane_temperature
         return f_t(self.label['IsisCube']['Instrument']['FocalPlaneTemperature'].value)
-
-    @property
-    def detector_start_sample(self):
-        """
-        Returns starting detector sample quired from Spice Kernels.
-        Expects ikid to be defined. This should be the integer Naid ID code for
-        the instrument.
-
-        Returns
-        -------
-        : int
-          starting detector sample
-        """
-        return int(spice.gdpool('INS{}_FPUBIN_START_SAMPLE'.format(self.ikid), 0, 1)[0])
-
-    @property
-    def detector_start_line(self):
-        """
-        Returns starting detector line acquired from Spice Kernels.
-        Expects ikid to be defined. This should be the integer Naid ID code for
-        the instrument.
-
-        Returns
-        -------
-        : int
-          detector start line
-        """
-        return int(spice.gdpool('INS{}_FPUBIN_START_LINE'.format(self.ikid), 0, 1)[0])
 
     @property
     def detector_center_sample(self):
