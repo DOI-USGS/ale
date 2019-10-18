@@ -157,8 +157,7 @@ class FrameChain(nx.DiGraph):
             elif frame_type is 3:
                 try:
                     matrix, frame_code = spice.ckfrot(frame_type_id, ephemeris_time)
-                except Exception as e:
-                    print(e)
+                except:
                     raise Exception(f"The ck rotation from frame {frame_codes[-1]} can not \
                                       be found due to no pointing available at requested time \
                                       or a problem with the frame")
