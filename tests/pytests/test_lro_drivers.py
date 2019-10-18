@@ -323,8 +323,3 @@ class test_isis_naif(unittest.TestCase):
 
     def test_sampling_factor(self):
         assert self.driver.sampling_factor == 1
-
-    def test_target_frame_id(self):
-        with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=-12345) as gdpool:
-            assert self.driver.target_frame_id == -12345
-            gdpool.assert_called_with('FRAME_MOON_ME',0,1)
