@@ -278,7 +278,10 @@ class NaifSpice():
         : str
         String name of the target reference frame
         """
-        return 'IAU_{}'.format(self.target_name)
+        try:
+            return spice.cidfrm(spice.bodn2c(self.target_name))[1]
+        except:
+            return 'IAU_{}'.format(self.target_name)
 
     @property
     def sun_position(self):

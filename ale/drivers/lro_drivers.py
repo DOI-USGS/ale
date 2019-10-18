@@ -222,6 +222,7 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
         """
         return self.crosstrack_summing
 
+
 class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver):
     @property
     def instrument_id(self):
@@ -403,20 +404,3 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
           Number of samples and lines combined from the original data to produce a single pixel in this image
         """
         return self.label['IsisCube']['Instrument']['SpatialSumming']
-
-    @property
-    def target_frame_id(self):
-        """
-        Returns the Naif ID code for the target body
-        Expects target_name to be defined. This must be a string containig the name
-        of the target body.
-
-        Returns
-        -------
-        : int
-          Naif ID code for the target body
-        """
-        name_lookup = {
-            "MOON": "MOON_ME"
-        }
-        return int(spice.gdpool('FRAME_{}'.format(name_lookup[self.target_name]),0,1))
