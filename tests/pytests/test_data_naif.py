@@ -69,7 +69,7 @@ class test_data_naif(unittest.TestCase):
         np.testing.assert_array_equal(self.driver.target_body_radii, [3396.19, 3396.19, 3376.2 ])
 
     def test_reference_frame(self):
-        assert self.driver.reference_frame == 'IAU_Mars'
+        assert self.driver.reference_frame.upper() == 'IAU_MARS'
 
     def test_ephemeris_start_time(self):
         assert self.driver.ephemeris_start_time == -631195148.8160816
