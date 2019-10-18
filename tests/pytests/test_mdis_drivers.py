@@ -149,8 +149,8 @@ image_dict = {
             'detector_center': {
                 'line': 512,
                 'sample': 512},
-            'starting_detector_line': 1,
-            'starting_detector_sample': 9,
+            'starting_detector_line': 0,
+            'starting_detector_sample': 0,
             'focal2pixel_lines': [0.0, 0.0, 71.42857143],
             'focal2pixel_samples': [0.0, 71.42857143, 0.0],
             'optical_distortion': {
@@ -209,18 +209,6 @@ class test_pds3_naif(unittest.TestCase):
             assert self.driver.focal_length == pytest.approx(6.0)
             gdpool.assert_called_with('INS-12345_FL_TEMP_COEFFS', 0, 6)
 
-    def test_detector_start_sample(self):
-        with patch('ale.drivers.mess_drivers.spice.gdpool', return_value=np.array([10.0])) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-            assert self.driver.detector_start_sample == 10.0
-            gdpool.assert_called_with('INS-12345_FPUBIN_START_SAMPLE', 0, 1)
-
-    def test_detector_start_line(self):
-        with patch('ale.drivers.mess_drivers.spice.gdpool', return_value=np.array([10.0])) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-            assert self.driver.detector_start_line == 10.0
-            gdpool.assert_called_with('INS-12345_FPUBIN_START_LINE', 0, 1)
-
     def test_detector_center_sample(self):
         assert self.driver.detector_center_sample == 512
 
@@ -273,18 +261,6 @@ class test_isis3_naif(unittest.TestCase):
              patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
             assert self.driver.focal_length == pytest.approx(6.0)
             gdpool.assert_called_with('INS-12345_FL_TEMP_COEFFS', 0, 6)
-
-    def test_detector_start_sample(self):
-        with patch('ale.drivers.mess_drivers.spice.gdpool', return_value=np.array([10.0])) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-            assert self.driver.detector_start_sample == 10.0
-            gdpool.assert_called_with('INS-12345_FPUBIN_START_SAMPLE', 0, 1)
-
-    def test_detector_start_line(self):
-        with patch('ale.drivers.mess_drivers.spice.gdpool', return_value=np.array([10.0])) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-            assert self.driver.detector_start_line == 10.0
-            gdpool.assert_called_with('INS-12345_FPUBIN_START_LINE', 0, 1)
 
     def test_detector_center_sample(self):
         with patch('ale.drivers.mess_drivers.spice.gdpool', return_value=np.array([512.5, 512.5, 1])) as gdpool, \
