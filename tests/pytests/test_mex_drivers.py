@@ -154,7 +154,7 @@ def usgscsm_compare_dict():
                 "sample": 2592.0
               },
               "starting_detector_line": 1,
-              "starting_detector_sample": 80,
+              "starting_detector_sample": 0,
               "focal2pixel_lines": [
                 -7113.11359717265,
                 0.062856784318668,
@@ -189,11 +189,6 @@ def usgscsm_compare_dict():
                 [
                   0.5,
                   -94.88182842731476,
-                  0.012800790786743165
-                ],
-                [
-                  1.5,
-                  -94.8690276145935,
                   0.012800790786743165
                 ],
                 [
@@ -487,8 +482,8 @@ def test_kernels():
         os.remove(kern)
 
 # Eventually all label/formatter combinations should be tested. For now, isis3/usgscsm and
-# pds3/isis will fail. 
-@pytest.mark.parametrize("label,formatter", [('isis3','isis'), ('pds3', 'usgscsm'), 
+# pds3/isis will fail.
+@pytest.mark.parametrize("label,formatter", [('isis3','isis'), ('pds3', 'usgscsm'),
                                               pytest.param('isis3','usgscsm', marks=pytest.mark.xfail),
                                               pytest.param('pds3','isis', marks=pytest.mark.xfail),])
 def test_mex_load(test_kernels, formatter, usgscsm_compare_dict, label):
@@ -581,9 +576,6 @@ class test_mex_pds3_naif(unittest.TestCase):
     def test_detector_start_line(self):
         assert self.driver.detector_start_line == 1
 
-    def test_detector_start_sample(self):
-        assert self.driver.detector_start_sample == 80
-
     def test_detector_center_line(self):
         assert self.driver.detector_center_line == 0.0
 
@@ -620,13 +612,13 @@ class test_mex_pds3_naif(unittest.TestCase):
                    new_callable=PropertyMock) as binary_lines, \
             patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.ephemeris_start_time',
                    new_callable=PropertyMock) as ephemeris_start_time:
-            binary_ephemeris_times.return_value = [255744599.02748165, 255744599.04028246]
-            binary_exposure_durations.return_value = [0.012800790786743165, 0.012800790786743165]
-            binary_lines.return_value = [0.5, 1.5]
-            ephemeris_start_time.return_value = 255744592.07217148
-            assert self.driver.line_scan_rate == ([0.5, 1.5],
-                                                  [3.464854270219803, 3.4776550829410553],
-                                                  [0.012800790786743165, 0.012800790786743165])
+            binary_ephemeris_times.return_value =    [0, 1, 2, 3, 5, 7, 9]
+            binary_exposure_durations.return_value = [1, 1, 1, 2, 2, 2, 2]
+            binary_lines.return_value = [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5]
+            ephemeris_start_time.return_value = 0
+            assert self.driver.line_scan_rate == ([0.5, 3.5],
+                                                  [-5.5, -2.5],
+                                                  [1, 2])
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
