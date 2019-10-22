@@ -19,6 +19,13 @@ from ale import util
 def cube_kernels():
    return """
     Object = IsisCube
+    Group = Instrument
+      StartTime = 2016-332T05:40:45.020
+      StopTime  = 2016-332T05:40:46.820
+      InstrumentId = fake
+      SpacecraftName = fake
+    End_Group
+
     Group = Kernels
       TargetAttitudeShape = $base/attitudeshape
       TargetPosition = ($messenger/targetposition0, $messenger/targetposition1)
@@ -32,6 +39,7 @@ def cube_kernels():
     End_Object
     End
     """
+
 
 @pytest.fixture
 def pvl_one_group():
@@ -84,6 +92,67 @@ def pvl_four_group():
       Messenger    = $ISIS3DATA/messenger
     EndGroup
     """
+
+def test_pvl_parser(pvl_three_group):
+    obj = util.JBFPvlParser(pvl_three_group)
+    assert obj["Data"]["a"] == "a3"
+    assert obj["Test"]["t"] == "t3"
+    assert obj["Settings"]["delsystem32"] == "yes"
+
+
+def test_find_kernels(cube_kernels, tmpdir):
+    ck_db = """
+    Object = Pointing
+    Group = Selection
+        Time = ( "2016 JAN 01 00:00:00.000000 TDB", "2016 DEC 31 00:00:00.000000 TDB" )
+        Type = Reconstructed
+        File = $MRO/fake
+    End_Group
+    End_Object
+    """
+
+    ik_db = """
+    Object = instrument
+    Group = Selection
+        Match = ("Instrument", "InstrumentId", "fake")
+        File = ("fake", "not/a/real/file")
+    End_Group
+    End_Object
+    """
+    translation = """
+    Group = MissionName
+      InputKey      = SpacecraftName
+      InputGroup    = "IsisCube,Instrument"
+      InputPosition = (IsisCube, Instrument)
+      Translation   = (fake, "fake")
+    End_Group
+    """
+
+    tmpdir.mkdir("fake").mkdir("kernels").mkdir("ik")
+    tmpdir.mkdir("base").mkdir("kernels").mkdir("ck")
+    tmpdir.mkdir("base", "translations")
+
+    ck_db_file = tmpdir.join("base", "kernels", "ck", "kernel.01.db")
+    ik_db_file = tmpdir.join("fake", "kernels", "ik", "kernel.01.db")
+    translation_file = tmpdir.join("base", "translations", "MissionName2DataDir.trn")
+    cube_file = tmpdir.join("test.cub")
+
+    with open(translation_file, "w") as f:
+        f.write(translation)
+
+    with open(ck_db_file, "w") as f:
+        f.write(ck_db)
+
+    with open(ik_db_file, "w") as f:
+        f.write(ik_db)
+
+    with open(cube_file, "w") as cube:
+        cube.write(cube_kernels)
+
+    print(pvl.load(str(cube_file)))
+    kernels = util.find_kernels(str(cube_file), str(tmpdir))
+    assert kernels == {'Pointing': {'kernels': ['/usgs/cpkgs/isis3/data/MRO/fake'], 'types': ['Reconstructed']}, 'instrument': {'kernels': ['/usgs/cpkgs/isis3/data/fake/not/a/real/file']}}
+
 
 def test_kernel_from_cube_list(cube_kernels):
     with tempfile.NamedTemporaryFile('r+') as cube:

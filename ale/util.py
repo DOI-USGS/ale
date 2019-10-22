@@ -687,7 +687,7 @@ def search_isis_db(dbobj, labelobj, isis3_data="/usgs/cpkgs/isis3/data/"):
         times = selection.getlist("Time")
 
         if not files:
-            raise Exception(f"No File found in {pvlobj}")
+            raise Exception(f"No File found in {selection}")
 
         files = [path.join(*file) if isinstance(file, list) else file  for file in files]
 
@@ -824,6 +824,7 @@ def find_kernels(cube, isis3_data="/usgs/cpkgs/isis3/data/", format_as=dict):
 
     kernels = {}
     for f in db_files:
+        #TODO: Error checking
         typ = f[0][0]
         kernel_search_results = search_isis_db(f[0][1], cube_label)
 
@@ -842,7 +843,6 @@ def find_kernels(cube, isis3_data="/usgs/cpkgs/isis3/data/", format_as=dict):
 
     for k,v in kernels.items():
         if v:
-            print(remove_dups(v["kernels"]))
             kernels[k]["kernels"] = remove_dups(v["kernels"])
 
     if format_as == dict:
