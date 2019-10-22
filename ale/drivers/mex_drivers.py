@@ -323,8 +323,8 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
 
         In the image, every line has an entry. This method goes through
         and removes conescutive lines with the same exposure duration.
-        There are also potentially missing lines in the image which have
-        to be accounted for.
+        There are also potentially missing lines in the image which this
+        method accounts for.
 
         Returns
         -------
@@ -336,9 +336,14 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         start_times = [relative_times[0]]
         exposure_durations = [self.binary_exposure_durations[0]]
         for line, start_time, exposure_duration in zip(self.binary_lines, relative_times, self.binary_exposure_durations):
-            # Check for lines missing from the PDS image.
-            # If line are missing, add an extra entry for the line immediately following them
-            skipped_lines = int( (start_time - start_times[-1]) / exposure_durations[-1] - (line - start_lines[-1]) + 0.5 )
+            # Check for lines missing from the PDS image
+            #
+            # If more exposures fit into the time since the last entry than
+            # there are lines since the last entry, then there are missing lines.
+            #
+            # If line are missing, add an extra entry for the line immediately
+            # following them.
+            skipped_lines = int( (start_time - start_times[-1]) / exposure_durations[-1] - (line - start_lines[-1]) + 0.5 ) # add 0.5 to round up
             if exposure_duration != exposure_durations[-1] or skipped_lines > 0:
                 start_lines.append(line)
                 start_times.append(start_time)
