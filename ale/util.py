@@ -10,6 +10,7 @@ import pvl
 import collections
 from collections import OrderedDict
 from itertools import chain
+from datetime import datetime
 
 import subprocess
 import re
@@ -133,28 +134,22 @@ def get_isis_preferences(isis_preferences=None):
     """
     Returns ISIS Preference file as a pvl object
     """
-    def read_pref(path):
-        with open(path) as f:
-            preftext = f.read().replace('EndGroup', 'End_Group')
-            pvlprefs = pvl.loads(preftext)
-        return pvlprefs
-
     argprefs = {}
     if isis_preferences:
         if isinstance(isis_preferences, dict):
             argprefs = isis_preferences
         else:
-            argprefs = read_pref(isis_preferences)
+            argprefs = read_pvl(isis_preferences)
 
     try:
-        homeprefs = read_pref(os.path.join(os.path.expanduser("~"), '.Isis', 'IsisPreferences'))
+        homeprefs = read_pvl(os.path.join(os.path.expanduser("~"), '.Isis', 'IsisPreferences'))
     except FileNotFoundError as e:
         homeprefs = {}
 
     try:
         isisrootprefs_path = os.path.join(os.environ["ISISROOT"], 'IsisPreferences')
         isisroot = os.environ['ISISROOT']
-        isisrootprefs = read_pref(isisrootprefs_path)
+        isisrootprefs = read_pvl(isisrootprefs_path)
     except (FileNotFoundError, KeyError) as e:
         isisrootprefs = {}
 
@@ -506,3 +501,358 @@ def query_kernel_pool(matchstr="*"):
     svals = [duckpool(v) for v in svars]
     return dict(zip(svars, svals))
 
+
+def read_pvl(path, use_jank=False):
+    """
+    Syntax sugar, used to load a pvl object file from path
+
+    Parameters
+    ----------
+
+    path : str
+           Path to Pvl file
+
+    use_jank : bool
+               If true, uses faster but less reliable JBFPvlParser, else uses standard PVL parser.
+
+    """
+    with open(path) as f:
+        preftext = f.read().replace('EndGroup', 'End_Group').replace("EndObject", "End_Object")
+        if use_jank:
+            pvlprefs = JBFPvlParser(open(path).read())
+        else:
+            pvlprefs = pvl.loads(preftext)
+
+    return pvlprefs
+
+
+def get_isis_mission_translations(isis3_data):
+    """
+    Use ISIS translation files and return a lookup table.
+
+    Parameters
+    ----------
+
+    isis3_data : str
+                 path to $ISIS3DATA
+
+    Returns
+    -------
+
+    : dict
+      Dictionary mapping label mission strings to ISIS3 mission strings
+
+    """
+    mission_translation_file = read_pvl(os.path.join(isis3_data, "base", "translations", "MissionName2DataDir.trn"))
+    # For some reason this file takes the form [value, key] for mission name -> data dir
+    lookup = [l[::-1] for l in mission_translation_file["MissionName"].getlist("Translation")]
+    return dict(lookup)
+
+
+def JBFPvlParser(lines):
+    """
+    Janky But Faster PVL Parser(TM)
+
+    Only really supports ISIS's Kernel DB files. This is because KernelDB files are sometimes very large for smithed kernels.
+    This should bring the parsing time for those DB files from minutes to seconds.
+    Still needs nested object/group support and it should be able to read most PVL files.
+
+    Parameters
+    ----------
+
+    lines : str
+          string body of PVL file.
+
+    Returns : PVLModule
+              object representing the parsed PVL
+
+
+    """
+    def JBFKeywordParser(lines):
+        keyword = lines[0].split("=")[0]
+        value = lines[0].split("=")[1]+"".join(l.strip() for l in lines[1:])
+
+        if "(" in value and ")" in value:
+            value = value.replace("(", "").replace(")", "").split(",")
+            value = tuple([v.replace("\"", "") for v in value])
+        else:
+            value = value.strip()
+
+        return keyword.strip(), value
+
+
+    if isinstance(lines, str):
+        lines = lines.split("\n")
+
+    items = []
+    lines = [l.strip() for l in lines if l.strip()]
+    metadata = []
+    for i,l in enumerate(lines):
+        if "group = " in l.lower():
+            metadata.append([i, "group_start"])
+        elif "object = " in l.lower():
+            metadata.append([i, "object_start"])
+        elif "=" in l:
+            metadata.append([i, "keyword"])
+        elif "end_group" in l.lower() or "endgroup" in l.lower():
+            metadata.append([i, "group_end"])
+        elif "end_object" in l.lower() or "endobject" in l.lower():
+            metadata.append([i, "object_end"])
+
+    imeta = 0
+    while imeta < len(metadata):
+        element_start_line, element_type = metadata[imeta]
+
+        if element_type == "keyword":
+            next_element_start = metadata[imeta+1][0] if imeta+1<len(metadata) else len(lines)+1
+            element_lines = lines[element_start_line:next_element_start]
+            items.append(JBFKeywordParser(element_lines))
+            imeta+=1
+        elif element_type == "group_start":
+            group_name = lines[element_start_line].split('=')[1].strip()
+
+            next_meta = [(i,m) for i,m in enumerate(metadata[imeta:]) if m[1] == "group_end"][0]
+            next_group_start = next_meta[1][0]
+
+            group_lines = lines[element_start_line+1:next_group_start]
+            items.append((group_name, JBFPvlParser(group_lines)))
+            imeta += next_meta[0]
+        elif element_type == "object_start":
+            # duplicate code but whatever
+            group_name = lines[element_start_line].split('=')[1].strip()
+
+            next_meta = [(i,m) for i,m in enumerate(metadata[imeta:]) if m[1] == "object_end"][0]
+            next_group_start = next_meta[1][0]
+
+            group_lines = lines[element_start_line+1:next_group_start]
+            items.append((group_name, JBFPvlParser(group_lines)))
+            imeta += next_meta[0]
+        elif element_type == "object_end" or element_type == "group_end":
+            imeta+=1
+
+    return pvl.PVLModule(items)
+
+
+def search_isis_db(dbobj, labelobj, isis3_data="/usgs/cpkgs/isis3/data/"):
+    """
+    Given an PVL obj of a KernelDB file and an Isis Label for a cube, find the best kernel
+    to attach to the cube.
+
+    The Logic here is a bit gross, but it matches ISIS's implementation very closely.
+
+
+    Parameters
+    ----------
+    dbobj : PVLModule
+            ISIS3 KernelDB file as a loaded PVLModule
+
+    labelobj : PVLModule
+               Cube label as loaded PVLModule
+
+    isis3_data : str
+                 path to $ISIS3DATA
+
+    Returns
+    -------
+    : dict
+      dictionary containing kernel list and optionally the kernel type if relevant.
+
+    """
+    if not dbobj:
+        return
+
+    quality = dict(e[::-1] for e  in enumerate(["predicted", "nadir", "reconstructed", "smithed"]))
+
+    utc_start_time = labelobj["IsisCube"]["Instrument"]["StartTime"]
+    utc_stop_time = labelobj["IsisCube"]["Instrument"]["StopTime"]
+
+    run_time = None
+    dependencies = None
+    kernels = []
+    typ = None
+    types = []
+
+    # flag is set when a kernel is found matching the start time but not stop time
+    # and therefore a second pair needs to be found
+    partial_match = False
+
+    # Flag is set when kernels encapsulating the entire image time is found
+    full_match = False
+
+    for selection in dbobj.getlist("Selection"):
+        files = selection.getlist("File")
+
+        # selection criteria
+        matches = selection.getlist("Match")
+        times = selection.getlist("Time")
+
+        if not files:
+            raise Exception(f"No File found in {selection}")
+
+        files = [path.join(*file) if isinstance(file, list) else file  for file in files]
+
+        for i,time in enumerate(times):
+            isis_time_format = '%Y %b %d %H:%M:%S.%f TDB'
+            other_isis_time_format =  '"%Y %b %d %H:%M:%S.%f TDB"'
+
+            try:
+                time = (datetime.strptime(time[0].strip(), isis_time_format),
+                                   datetime.strptime(time[1].strip(), isis_time_format))
+            except:
+                time = (datetime.strptime(time[0].strip(), other_isis_time_format),
+                                   datetime.strptime(time[1].strip(), other_isis_time_format))
+
+            start_time_in_range = utc_start_time >= time[0] and utc_start_time <= time[1]
+            stop_time_in_range = utc_stop_time >= time[0] and utc_stop_time <= time[1]
+            times[i] = stop_time_in_range, stop_time_in_range
+
+        for i,match in enumerate(matches):
+            matches[i] = labelobj["IsisCube"][match[0].strip()][match[1].strip()].lower().strip() == match[2].lower().strip()
+
+        if any(matches if matches else [True]):
+            for i,f in enumerate(files):
+                if isinstance(f, tuple):
+                    f = os.path.join(*[e.strip() for e in f])
+
+                full_path = os.path.join(isis3_data, f).replace("$", "").replace("\"", "")
+                if "{" in full_path:
+                    start = full_path.find("{")
+                    stop = full_path.find("}")
+                    full_path = full_path[:start] + "?"*(stop-start-1) + full_path[stop+1:]
+                if '?' in full_path:
+                    full_path = sorted(glob(full_path))[-1]
+                files[i] = full_path
+
+            if times:
+                have_start_match, have_stop_match = list(map(list, zip(*times)))
+                typ = selection.get("Type", None)
+                typ = typ.lower().strip() if typ else None
+
+                current_quality = max([quality[t.lower().strip()] for t in types if t]) if any(types) else 0
+
+                if any(have_start_match) and any(have_stop_match):
+                    # best case, the image is fully encapsulated in the kernel
+                    full_match = True
+                    if quality[typ] >= current_quality:
+                        kernels = files
+                        types = [selection.get("Type", None)]
+                elif any(have_start_match):
+                    kernels.extend(files)
+                    types.append(selection.get("Type", None))
+                    partial_match = True
+                elif any(have_stop_match):
+                    if partial_match:
+                        if quality[typ] >= current_quality:
+                            kernels.extend(files)
+                            types.append(selection.get("Type", None))
+                            full_match = True
+            else:
+                full_match = True
+                kernels = files
+                types = [selection.get("Type", None)]
+
+    if partial_match:
+        # this can only be true if a kernel matching start time was founf
+        # but not the end time
+        raise Exception("Could not find kernels encapsulating the full image time")
+
+    kernels = {"kernels" : kernels}
+    if any(types):
+        kernels["types"] = types
+    return kernels
+
+
+def find_kernels(cube, isis3_data="/usgs/cpkgs/isis3/data/", format_as=dict):
+    """
+    Find all kernels for a cube and return a json object with categorized kernels.
+
+    Parameters
+    ----------
+
+    cube : str
+           Path to an ISIS cube
+
+    isis3_data : str
+                path to $ISIS3DATA
+
+    format_as : obj
+                What type to return the kernels as, ISIS3-like dict/PVL or flat list
+
+    Returns
+    -------
+    : obj
+      Container with kernels
+    """
+    def remove_dups(listofElements):
+        # Create an empty list to store unique elements
+        uniqueList = []
+
+        # Iterate over the original list and for each element
+        # add it to uniqueList, if its not already there.
+        for elem in listofElements:
+            if elem not in uniqueList:
+                uniqueList.append(elem)
+
+        # Return the list of unique elements
+        return uniqueList
+
+    cube_label = pvl.load(cube)
+    mission_lookup_table = get_isis_mission_translations(isis3_data)
+
+    mission_dir = mission_lookup_table[cube_label["IsisCube"]["Instrument"]["SpacecraftName"]]
+    mission_dir = path.join(isis3_data, mission_dir.lower())
+
+    kernel_dir = path.join(mission_dir, "kernels")
+    base_kernel_dir = path.join(isis3_data, "base", "kernels")
+
+    kernel_types = [ name for name in os.listdir(kernel_dir) if os.path.isdir(os.path.join(kernel_dir, name)) ]
+    kernel_types.extend(name for name in os.listdir(base_kernel_dir) if os.path.isdir(os.path.join(base_kernel_dir, name)))
+    kernel_types = set(kernel_types)
+
+    db_files = []
+    for typ in kernel_types:
+        files = sorted(glob(path.join(kernel_dir, typ, "*.db")))
+        base_files = sorted(glob(path.join(base_kernel_dir, typ, "*.db")))
+        files = [list(it) for k,it in groupby(files, key=lambda f:os.path.basename(f).split(".")[0])]
+        base_files = [list(it) for k,it in groupby(base_files, key=lambda f:os.path.basename(f).split(".")[0])]
+
+        for instrument_dbs in files:
+            db_files.append(read_pvl(sorted(instrument_dbs)[-1], True))
+        for base_dbs in base_files:
+            db_files.append(read_pvl(sorted(base_dbs)[-1], True))
+
+
+    kernels = {}
+    for f in db_files:
+        #TODO: Error checking
+        typ = f[0][0]
+        kernel_search_results = search_isis_db(f[0][1], cube_label)
+
+        if not kernel_search_results:
+            kernels[typ] = None
+        else:
+            try:
+                kernels[typ]["kernels"].extend(kernel_search_results["kernels"])
+                if any(kernel_search_results.get("types", [None])):
+                    kernels[typ]["types"].extend(kernel_search_results["types"])
+            except:
+                kernels[typ] = {}
+                kernels[typ]["kernels"] = kernel_search_results["kernels"]
+                if any(kernel_search_results.get("types", [None])):
+                    kernels[typ]["types"] = kernel_search_results["types"]
+
+    for k,v in kernels.items():
+        if v:
+            kernels[k]["kernels"] = remove_dups(v["kernels"])
+
+    if format_as == dict:
+        return kernels
+    elif format_as == list:
+        kernel_list = []
+        for _,kernels in kernels.items():
+            if kernels:
+                kernel_list.extend(kernels["kernels"])
+        return kernel_list
+    else:
+        warnings.warn(f"{format_as} is not a valid format, returning as dict")
+        return kernels
