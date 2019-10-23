@@ -216,27 +216,6 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         """
         return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[0] - 0.5
 
-
-    @property
-    def reference_frame(self):
-        """
-        Kaguya uses a slightly more accurate "mean Earth" reference frame for
-        moon obvervations. see https://darts.isas.jaxa.jp/pub/spice/SELENE/kernels/fk/moon_assoc_me.tf
-
-        Expects target_name to be defined. This should be a string containing the
-        name of the target body.
-
-        Returns
-        -------
-        : str
-          Reference frame
-        """
-        if self.target_name.lower() == "moon":
-            return "MOON_ME"
-        else:
-            # TODO: How do we handle no target?
-            return "NO TARGET"
-
     @property
     def focal2pixel_samples(self):
         """
@@ -435,3 +414,318 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
           ISIS sensor model version
         """
         return 1
+
+
+class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
+    """
+    Driver for a PDS3 Kaguya Multiband Imager (Mi) images. Specifically level2b2 Vis and Nir images.
+
+    NOTES
+    -----
+
+    * Kaguaya has adjusted values for some of its keys, usually suffixed with `CORRECTED_`.
+      These corrected values should always be preffered over the original values.
+    """
+
+
+    @property
+    def utc_start_time(self):
+        """
+        Returns corrected utc start time.
+
+        If no corrected form is found, defaults to the form specified in parent class.
+
+        Returns
+        -------
+        : str
+          Start time of the image in UTC YYYY-MM-DDThh:mm:ss[.fff]
+        """
+        return self.label.get('CORRECTED_START_TIME', super().utc_start_time)
+
+    @property
+    def utc_stop_time(self):
+        """
+        Returns corrected utc start time.
+
+        If no corrected form is found, defaults to the form specified in parent class.
+
+        Returns
+        -------
+        : str
+          Stop time of the image in UTC YYYY-MM-DDThh:mm:ss[.fff]
+
+        """
+
+        return self.label.get('CORRECTED_STOP_TIME', super().utc_stop_time)
+
+    @property
+    def base_band(self):
+        """
+        Which band the bands are registered to.
+        """
+        band_map = {
+            "MV1" : "MI-VIS1",
+            "MV2" : "MI-VIS2",
+            "MV3" : "MI-VIS3",
+            "MV4" : "MI-VIS4",
+            "MV5" : "MI-VIS5",
+            "MN1" : "MI-NIR1",
+            "MN2" : "MI-NIR2",
+            "MN3" : "MI-NIR3",
+            "MN4" : "MI-NIR4"
+        }
+        base_band = band_map[self.label.get("BASE_BAND")]
+        return base_band
+
+    @property
+    def instrument_id(self):
+        """
+        Id takes the form of LISM_<BASE_BAND> where <BASE_BAND> is which band
+        the bands were registered to.
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
+
+        id = f"LISM_{self.base_band}"
+        return id
+
+    @property
+    def sensor_frame_id(self):
+        """
+        Returns the sensor frame id.  Depends on the instrument that was used to
+        capture the image.
+
+        Returns
+        -------
+        : int
+          Sensor frame id
+        """
+        spectra = self.base_band[3]
+        return spice.namfrm(f"LISM_MI_{spectra}_HEAD")
+
+    @property
+    def spacecraft_name(self):
+        """
+        Returns "MISSION_NAME" as a proxy for spacecraft_name.
+
+        No NAIF code exists for the spacecraft name 'SELENE-M.'  The NAIF code
+        exists only for 'SELENE' or 'KAGUYA' -- 'SELENE' is captured as
+        'MISSION_NAME'
+
+        Returns
+        -------
+        : str
+          mission name
+        """
+        return self.label.get('MISSION_NAME')
+
+
+    @property
+    def spacecraft_clock_stop_count(self):
+        """
+        The original SC_CLOCK_STOP_COUNT key is often incorrect and cannot be trusted.
+        Therefore we get this information from CORRECTED_SC_CLOCK_STOP_COUNT
+
+        Returns
+        -------
+        : float
+          spacecraft clock stop count in seconds
+        """
+        return self.label.get('CORRECTED_SC_CLOCK_STOP_COUNT').value
+
+    @property
+    def spacecraft_clock_start_count(self):
+        """
+        The original SC_CLOCK_START_COUNT key is often incorrect and cannot be trusted.
+        Therefore we get this information from CORRECTED_SC_CLOCK_START_COUNT
+
+        Returns
+        -------
+        : float
+          spacecraft clock start count in seconds
+        """
+        return self.label.get('CORRECTED_SC_CLOCK_START_COUNT').value
+
+    @property
+    def ephemeris_start_time(self):
+        """
+        Returns the ephemeris start time of the image. Expects spacecraft_id to
+        be defined. This should be the integer naif ID code of the spacecraft.
+
+        Returns
+        -------
+        : float
+          ephemeris start time of the image
+        """
+        return spice.sct2e(self.spacecraft_id, self.spacecraft_clock_start_count)
+
+    @property
+    def detector_center_line(self):
+        """
+        Returns the center detector line of the detector. Expects tc_id to be
+        defined. This should be a string of the form LISM_TC1 or LISM_TC2.
+
+        We subtract 0.5 from the center line because as per the IK:
+        Center of the first pixel is defined as "1.0".
+
+        Returns
+        -------
+        : int
+          The detector line of the principle point
+        """
+        return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[1] - 0.5
+
+    @property
+    def detector_center_sample(self):
+        """
+        Returns the center detector sample of the detector. Expects tc_id to be
+        defined. This should be a string of the form LISM_TC1 or LISM_TC2.
+
+        We subtract 0.5 from the center sample because as per the IK:
+        Center of the first pixel is defined as "1.0".
+
+        Returns
+        -------
+        : int
+          The detector sample of the principle point
+        """
+        return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[0] - 0.5
+
+    @property
+    def focal2pixel_samples(self):
+        """
+        Calculated using 1/pixel pitch
+        Expects tc_id to be defined. This should be a string of the form
+        LISM_TC1 or LISM_TC2.
+
+        Returns
+        -------
+        : list
+          focal plane to detector samples
+        """
+        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0]
+        return [0, 0, -1/pixel_size]
+
+
+    @property
+    def focal2pixel_lines(self):
+        """
+        Calculated using 1/pixel pitch
+        Expects tc_id to be defined. This should be a string of the form
+        LISM_TC1 or LISM_TC2.
+
+        Returns
+        -------
+        : list
+          focal plane to detector lines
+        """
+        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0]
+        return [0, 1/pixel_size, 0]
+
+
+    @property
+    def _odkx(self):
+        """
+        Returns the x coefficients of the optical distortion model.
+        Expects tc_id to be defined. This should be a string of the form
+        LISM_TC1 or LISM_TC2.
+
+        Returns
+        -------
+        : list
+          Optical distortion x coefficients
+        """
+        return spice.gdpool('INS{}_DISTORTION_COEF_X'.format(self.ikid),0, 4).tolist()
+
+
+    @property
+    def _odky(self):
+        """
+        Returns the y coefficients of the optical distortion model.
+        Expects tc_id to be defined. This should be a string of the form
+        LISM_TC1 or LISM_TC2.
+
+        Returns
+        -------
+        : list
+          Optical distortion y coefficients
+        """
+        return spice.gdpool('INS{}_DISTORTION_COEF_Y'.format(self.ikid), 0, 4).tolist()
+
+    @property
+    def line_exposure_duration(self):
+        """
+        Returns Line Exposure Duration
+
+        Kaguya has an unintuitive key for this called CORRECTED_SAMPLING_INTERVAL.
+        The original LINE_EXPOSURE_DURATION PDS3 keys is often incorrect and cannot
+        be trusted.
+
+        Returns
+        -------
+        : float
+          Line exposure duration
+        """
+        # It's a list, but only sometimes.
+        # seems to depend on whether you are using the original zipped archives or
+        # if its downloaded from Jaxa's image search:
+        # (https://darts.isas.jaxa.jp/planet/pdap/selene/product_search.html#)
+        try:
+            return self.label['CORRECTED_SAMPLING_INTERVAL'][0].value * 0.001 # Scale to seconds
+        except:
+            return self.label['CORRECTED_SAMPLING_INTERVAL'].value * 0.001  # Scale to seconds
+
+
+    @property
+    def focal_length(self):
+        """
+        Returns camera focal length
+        Expects ikid to be defined. This should be the NAIF ID for the base band.
+
+        Returns
+        -------
+        : float
+          Camera focal length
+        """
+        return float(spice.gdpool('INS{}_FOCAL_LENGTH'.format(self.ikid), 0, 1)[0])
+
+    @property
+    def usgscsm_distortion_model(self):
+        """
+        Kaguya uses a unique radial distortion model so we need to overwrite the
+        method packing the distortion model into the ISD.
+
+        from the IK:
+
+        Line-of-sight vector of pixel no. n can be expressed as below.
+
+        Distortion coefficients information:
+        INS<INSTID>_DISTORTION_COEF_X  = ( a0, a1, a2, a3)
+        INS<INSTID>_DISTORTION_COEF_Y  = ( b0, b1, b2, b3),
+
+        Distance r from the center:
+        r = - (n - INS<INSTID>_CENTER) * INS<INSTID>_PIXEL_SIZE.
+
+        Line-of-sight vector v is calculated as
+        v[X] = INS<INSTID>BORESIGHT[X] + a0 + a1*r + a2*r^2 + a3*r^3 ,
+        v[Y] = INS<INSTID>BORESIGHT[Y] + r+a0 + a1*r +a2*r^2 + a3*r^3 ,
+        v[Z] = INS<INSTID>BORESIGHT[Z]
+
+        Expects odkx and odky to be defined. These should be a list of optical
+        distortion x and y coefficients respectively.
+
+        Returns
+        -------
+        : dict
+          radial distortion model
+
+        """
+        return {
+            "kaguyatc": {
+                "x" : self._odkx,
+                "y" : self._odky
+            }
+        }
