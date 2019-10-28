@@ -424,7 +424,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
     -----
 
     * Kaguaya has adjusted values for some of its keys, usually suffixed with `CORRECTED_`.
-      These corrected values should always be preffered over the original values.
+      These corrected values should always be preferred over the original values.
     """
 
 
@@ -565,8 +565,8 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
     @property
     def detector_center_line(self):
         """
-        Returns the center detector line of the detector. Expects tc_id to be
-        defined. This should be a string of the form LISM_TC1 or LISM_TC2.
+        Returns the center detector line of the detector. Expects ikid to be
+        defined. This should be the NAIF integer ID code for the sensor.
 
         We subtract 0.5 from the center line because as per the IK:
         Center of the first pixel is defined as "1.0".
@@ -581,8 +581,8 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
     @property
     def detector_center_sample(self):
         """
-        Returns the center detector sample of the detector. Expects tc_id to be
-        defined. This should be a string of the form LISM_TC1 or LISM_TC2.
+        Returns the center detector sample of the detector. Expects ikid to be
+        defined. This should be the NAIF integer ID code for the sensor.
 
         We subtract 0.5 from the center sample because as per the IK:
         Center of the first pixel is defined as "1.0".
@@ -598,8 +598,8 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
     def focal2pixel_samples(self):
         """
         Calculated using 1/pixel pitch
-        Expects tc_id to be defined. This should be a string of the form
-        LISM_TC1 or LISM_TC2.
+        Expects ikid to be defined. This should be the NAIF integer ID code
+        for the sensor.
 
         Returns
         -------
@@ -614,8 +614,8 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
     def focal2pixel_lines(self):
         """
         Calculated using 1/pixel pitch
-        Expects tc_id to be defined. This should be a string of the form
-        LISM_TC1 or LISM_TC2.
+        Expects ikid to be defined. This should be the NAIF integer ID code
+        for the sensor.
 
         Returns
         -------
@@ -630,8 +630,8 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
     def _odkx(self):
         """
         Returns the x coefficients of the optical distortion model.
-        Expects tc_id to be defined. This should be a string of the form
-        LISM_TC1 or LISM_TC2.
+        Expects ikid to be defined. This should be the NAIF integer ID code
+        for the sensor.
 
         Returns
         -------
