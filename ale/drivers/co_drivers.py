@@ -206,30 +206,28 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
     # number, so the order doesn't matter
     def detector_center_line(self):
         """
-        Expects ikid to be defined. This should be an integer containing the Naif
-        ID code of the instrument
+        Dectector center based on ISIS's corrected values.
 
         Returns
         -------
         : int
           The detector line of the principle point
         """
-        return float(spice.gdpool('INS{}_FOV_CENTER_PIXEL'.format(self.ikid), 0, 2)[1])+.5
+        return 512
 
     @property
     # FOV_CENTER_PIXEL doesn't specify which coordinate is sample or line, but they are the same
     # number, so the order doesn't matter
     def detector_center_sample(self):
         """
-        Expects ikid to be defined. This should be an integer containing the Naif
-        ID code of the instrument
+        Dectector center based on ISIS's corrected values.
 
         Returns
         -------
         : int
           The detector sample of the principle point
         """
-        return float(spice.gdpool('INS{}_FOV_CENTER_PIXEL'.format(self.ikid), 0, 2)[0])+.5
+        return 512
 
     @property
     def sensor_model_version(self):
