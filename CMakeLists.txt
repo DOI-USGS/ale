@@ -15,22 +15,25 @@ include(GNUInstallDirs)
 set(CMAKE_CXX_STANDARD 11)
 
 # Third Party Dependencies
-find_package(GSL    REQUIRED)
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
-find_package(Python REQUIRED COMPONENTS Development)
+find_package(GSL           REQUIRED)
+find_package(Eigen3 3.3    REQUIRED NO_MODULE)
+find_package(Python        REQUIRED COMPONENTS Development)
 find_package(nlohmann_json REQUIRED)
 
 # Library setup
 add_library(ale SHARED
             ${CMAKE_CURRENT_SOURCE_DIR}/src/ale.cpp)
+# Alias a scoped target for safer linking in downstream projects
+set(ALE_HEADERS "include/ale.h")
 set_target_properties(ale PROPERTIES
-    VERSION ${PROJECT_VERSION}
-    SOVERSION 1)
-set(ALE_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include/")
-
+                      VERSION       ${PROJECT_VERSION}
+                      SOVERSION     0
+                      PUBLIC_HEADER ${ALE_HEADERS})
+# Use generator expressions so that downstream projects can use this target
 target_include_directories(ale
                            PUBLIC
-                           ${ALE_INCLUDE_DIRS})
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                           $<INSTALL_INTERFACE:include>)
 
 target_link_libraries(ale
                       PRIVATE
@@ -60,6 +63,22 @@ if(BUILD_TESTS)
     endif()
 endif()
 
-# Install commands
-install(TARGETS ale LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install(DIRECTORY ${ALE_INCLUDE_DIRS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+# Generate the package config
+configure_file(cmake/config.cmake.in
+               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
+               @ONLY)
+
+# Install the package config
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
+              DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
+
+# Install the library
+install(TARGETS ale
+        EXPORT aleTargets
+        LIBRARY       DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+# Install the target
+install(EXPORT aleTargets
+        NAMESPACE ale::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
