@@ -90,7 +90,7 @@ class test_cassini_pds3_naif(unittest.TestCase):
              gdpool.assert_called_with('INS-12345_PIXEL_SIZE', 0, 1)
 
     def test_odtk(self):
-        assert self.driver.odtk == [-8e-06, 0, 0]
+        assert self.driver.odtk == [0, -8e-06, 0]
 
     def test_instrument_id(self):
         assert self.driver.instrument_id == "CASSINI_ISS_NAC"
@@ -111,13 +111,13 @@ class test_cassini_pds3_naif(unittest.TestCase):
     def test_detector_center_sample(self):
         with patch('ale.drivers.co_drivers.spice.gdpool', return_value=[511.5, 511.5]) as gdpool, \
              patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-             assert self.driver.detector_center_sample == 511.5
+             assert self.driver.detector_center_sample == 512
              gdpool.assert_called_with('INS-12345_FOV_CENTER_PIXEL', 0, 2)
 
     def test_detector_center_line(self):
         with patch('ale.drivers.co_drivers.spice.gdpool', return_value=[511.5, 511.5]) as gdpool, \
              patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-             assert self.driver.detector_center_sample == 511.5
+             assert self.driver.detector_center_sample == 512
              gdpool.assert_called_with('INS-12345_FOV_CENTER_PIXEL', 0, 2)
 
     def test_sensor_model_version(self):
