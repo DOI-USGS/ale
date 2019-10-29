@@ -31,14 +31,14 @@ def usgscsm_compare_dict():
             'detector_sample_summing': 1,
             'detector_line_summing': 1,
             'focal_length_model': {'focal_length': 2003.09},
-            'detector_center': {'line': 511.5, 'sample': 511.5},
+            'detector_center': {'line': 512, 'sample': 512},
             'starting_detector_line': 0,
             'starting_detector_sample': 0,
             'focal2pixel_lines': [0.0, 0.0, 83.33333333333333],
             'focal2pixel_samples': [0.0, 83.33333333333333, 0.0],
             'optical_distortion':
               {'radial':
-                {'coefficients': [-8e-06, 0, 0]}},
+                {'coefficients': [0, -8e-06, 0]}},
             'image_lines': 1024,
             'image_samples': 1024,
             'name_platform': 'CASSINI ORBITER',
