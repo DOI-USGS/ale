@@ -34,6 +34,7 @@ class NaifSpice():
                 try:
                     self._kernels = util.get_kernels_from_isis_pvl(self._props['kernels'])
                 except Exception as e:
+                    print("setting from list")
                     self._kernels =  self._props['kernels']
             else:
                 if not ale.spice_root:
