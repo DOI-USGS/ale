@@ -31,14 +31,14 @@ def usgscsm_compare_dict():
             'detector_sample_summing': 1,
             'detector_line_summing': 1,
             'focal_length_model': {'focal_length': 2003.09},
-            'detector_center': {'line': 511.5, 'sample': 511.5},
+            'detector_center': {'line': 512, 'sample': 512},
             'starting_detector_line': 0,
             'starting_detector_sample': 0,
             'focal2pixel_lines': [0.0, 0.0, 83.33333333333333],
             'focal2pixel_samples': [0.0, 83.33333333333333, 0.0],
             'optical_distortion':
               {'radial':
-                {'coefficients': [-8e-06, 0, 0]}},
+                {'coefficients': [0, -8e-06, 0]}},
             'image_lines': 1024,
             'image_samples': 1024,
             'name_platform': 'CASSINI ORBITER',
@@ -90,7 +90,7 @@ class test_cassini_pds3_naif(unittest.TestCase):
              gdpool.assert_called_with('INS-12345_PIXEL_SIZE', 0, 1)
 
     def test_odtk(self):
-        assert self.driver.odtk == [-8e-06, 0, 0]
+        assert self.driver.odtk == [0, -8e-06, 0]
 
     def test_instrument_id(self):
         assert self.driver.instrument_id == "CASSINI_ISS_NAC"
@@ -111,14 +111,12 @@ class test_cassini_pds3_naif(unittest.TestCase):
     def test_detector_center_sample(self):
         with patch('ale.drivers.co_drivers.spice.gdpool', return_value=[511.5, 511.5]) as gdpool, \
              patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-             assert self.driver.detector_center_sample == 511.5
-             gdpool.assert_called_with('INS-12345_FOV_CENTER_PIXEL', 0, 2)
+             assert self.driver.detector_center_sample == 512
 
     def test_detector_center_line(self):
         with patch('ale.drivers.co_drivers.spice.gdpool', return_value=[511.5, 511.5]) as gdpool, \
              patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-             assert self.driver.detector_center_sample == 511.5
-             gdpool.assert_called_with('INS-12345_FOV_CENTER_PIXEL', 0, 2)
+             assert self.driver.detector_center_sample == 512
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
