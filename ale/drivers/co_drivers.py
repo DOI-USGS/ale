@@ -77,6 +77,38 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         ("P120","UV3"):2002.71
     }
 
+
+    wac_filter_to_focal_length = {
+        ("B2","CL2"):200.85,
+        ("B2","IRP90"):200.83,
+        ("B2","IRP0"):200.82,
+        ("B3","CL2"):201.22,
+        ("B3","IRP90"):201.12,
+        ("B3","IRP0"):201.11,
+        ("L1","BL1"):200.86,
+        ("L1","CL2"):200.77,
+        ("L1","GRN"):200.71,
+        ("L1","HAL"):200.74,
+        ("L1","IR1"):200.80,
+        ("L1","RED"):200.74,
+        ("L1","VIO"):201.09,
+        ("R2","CL2"):200.97,
+        ("R2","IR"):200.95,
+        ("R2","IRP90"):200.95,
+        ("R3","CL2"):201.04,
+        ("R3","IRP90"):201.03,
+        ("R3","IRP0"):201.04,
+        ("R4","CL2"):201.22,
+        ("R4","IRP90"):201.16,
+        ("R4","IRP0"):201.15,
+        ("T2","CL2"):200.82,
+        ("T2","IRP0"):200.81,
+        ("T2","IRP90"):200.82,
+        ("T3","CL2"):201.04,
+        ("T3","IRP0"):201.06,
+        ("T3","IRP90"):201.07
+    }
+
     @property
     def instrument_id(self):
         """
@@ -157,7 +189,6 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         Expects instrument_id to be defined. This should be a string containing either
         CASSINI_ISS_WAC or CASSINI_ISIS_NAC
 
-
         Returns
         -------
         : list<float>
@@ -165,40 +196,38 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         """
         if self.instrument_id == 'CASSINI_ISS_WAC':
             # WAC
-            return [float('-6.2e-5'), 0, 0]
+            return [0, float('-6.2e-5'), 0]
         elif self.instrument_id == 'CASSINI_ISS_NAC':
             # NAC
-            return [float('-8e-6'), 0, 0]
+            return [0, float('-8e-6'), 0]
 
     @property
     # FOV_CENTER_PIXEL doesn't specify which coordinate is sample or line, but they are the same
     # number, so the order doesn't matter
     def detector_center_line(self):
         """
-        Expects ikid to be defined. This should be an integer containing the Naif
-        ID code of the instrument
+        Dectector center based on ISIS's corrected values.
 
         Returns
         -------
         : int
           The detector line of the principle point
         """
-        return float(spice.gdpool('INS{}_FOV_CENTER_PIXEL'.format(self.ikid), 0, 2)[1])
+        return 512
 
     @property
     # FOV_CENTER_PIXEL doesn't specify which coordinate is sample or line, but they are the same
     # number, so the order doesn't matter
     def detector_center_sample(self):
         """
-        Expects ikid to be defined. This should be an integer containing the Naif
-        ID code of the instrument
+        Dectector center based on ISIS's corrected values.
 
         Returns
         -------
         : int
           The detector sample of the principle point
         """
-        return float(spice.gdpool('INS{}_FOV_CENTER_PIXEL'.format(self.ikid), 0, 2)[0])
+        return 512
 
     @property
     def sensor_model_version(self):
@@ -221,14 +250,18 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
 
         """
         # default focal defined by IK kernel
-        default_focal_len = super(CassiniIssPds3LabelNaifSpiceDriver, self).focal_length
+        try:
+            default_focal_len = super(CassiniIssPds3LabelNaifSpiceDriver, self).focal_length
+        except:
+            default_focal_len = float(spice.gdpool('INS{}_FOV_CENTER_PIXEL'.format(self.ikid), 0, 2)[0])
+
+        filters = tuple(self.label['FILTER_NAME'])
 
         if self.instrument_id == "CASSINI_ISS_NAC":
-          filters = tuple(self.label['FILTER_NAME'])
           return self.nac_filter_to_focal_length.get(filters, default_focal_len)
 
         elif self.instrument_id == "CASSINI_ISS_WAC":
-          return default_focal_len
+          return self.wac_filter_to_focal_length.get(filters, default_focal_len)
 
     @property
     def _original_naif_sensor_frame_id(self):
@@ -252,7 +285,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         mounting point with a 180 degree rotation. ID was taken from ISIS's IAK
         kernel for Cassini. This is because NAC requires an extra rotation not
         in NAIF's Cassini kernels. Wac does not require an extra rotation so
-        se simply return original sensor frame id for Wac.
+        we simply return original sensor frame id for Wac.
 
         Returns
         -------
@@ -263,4 +296,6 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         if self.instrument_id == "CASSINI_ISS_NAC":
           return 14082360
         elif self.instrument_id == "CASSINI_ISS_WAC":
-          return self._original_naif_sensor_frame_id
+          return 14082361
+
+

@@ -278,6 +278,34 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         return spice.gdpool('INS{}_DISTORTION_COEF_Y'.format(self.ikid), 0, 4).tolist()
 
     @property
+    def boresight_x(self):
+        """
+        Returns the x focal plane coordinate of the boresight.
+        Expects ikid to be defined. This should be the NAIF integer ID for the
+        sensor.
+
+        Returns
+        -------
+        : float
+          Boresight focal plane x coordinate
+        """
+        return spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 1)[0]
+
+    @property
+    def boresight_y(self):
+        """
+        Returns the y focal plane coordinate of the boresight.
+        Expects ikid to be defined. This should be the NAIF integer ID for the
+        sensor.
+
+        Returns
+        -------
+        : float
+          Boresight focal plane x coordinate
+        """
+        return spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 1, 1)[0]
+
+    @property
     def line_exposure_duration(self):
         """
         Returns Line Exposure Duration
@@ -347,9 +375,11 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
 
         """
         return {
-            "kaguyatc": {
+            "kaguyalism": {
                 "x" : self._odkx,
-                "y" : self._odky
+                "y" : self._odky,
+                "boresight_x" : self.boresight_x,
+                "boresight_y" : self.boresight_y
             }
         }
 
@@ -656,6 +686,34 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         return spice.gdpool('INS{}_DISTORTION_COEF_Y'.format(self.ikid), 0, 4).tolist()
 
     @property
+    def boresight_x(self):
+        """
+        Returns the x focal plane coordinate of the boresight.
+        Expects ikid to be defined. This should be the NAIF integer ID for the
+        sensor.
+
+        Returns
+        -------
+        : float
+          Boresight focal plane x coordinate
+        """
+        return spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 1)[0]
+
+    @property
+    def boresight_y(self):
+        """
+        Returns the y focal plane coordinate of the boresight.
+        Expects ikid to be defined. This should be the NAIF integer ID for the
+        sensor.
+
+        Returns
+        -------
+        : float
+          Boresight focal plane x coordinate
+        """
+        return spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 1, 1)[0]
+
+    @property
     def line_exposure_duration(self):
         """
         Returns Line Exposure Duration
@@ -724,8 +782,10 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
 
         """
         return {
-            "kaguyatc": {
+            "kaguyalism": {
                 "x" : self._odkx,
-                "y" : self._odky
+                "y" : self._odky,
+                "boresight_x" : self.boresight_x,
+                "boresight_y" : self.boresight_y
             }
         }

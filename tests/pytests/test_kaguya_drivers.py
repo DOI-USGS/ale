@@ -59,9 +59,11 @@ image_dict = {
             'focal2pixel_lines': [0, -142.85714285714286, 0],
             'focal2pixel_samples': [0, 0, -142.85714285714286],
             'optical_distortion': {
-                'kaguyatc': {
+                'kaguyalism': {
                     'x': [-0.0009649900000000001, 0.00098441, 8.5773e-06, -3.7438e-06],
-                    'y': [-0.0013796, 1.3502e-05, 2.7251e-06, -6.193800000000001e-06]}},
+                    'y': [-0.0013796, 1.3502e-05, 2.7251e-06, -6.193800000000001e-06],
+                    'boresight_x' : -0.0725,
+                    'boresight_y' : 0.0214}},
             'image_lines': 400,
             'image_samples': 3208,
             'name_platform': 'SELENE-M',
@@ -160,9 +162,11 @@ image_dict = {
             "focal2pixel_lines": [0, 76.92307692307692, 0],
             "focal2pixel_samples": [0, 0, -76.92307692307692],
             "optical_distortion": {
-                "kaguyatc": {
+                "kaguyalism": {
                     "x": [2.8912e-19, 0.00020899000000000002, 4.7727000000000006e-05],
-                    "y": [-1.0119e-18, 0.0034982, 1.9597e-05]
+                    "y": [-1.0119e-18, 0.0034982, 1.9597e-05],
+                    "boresight_x": -6.2723,
+                    "boresight_y": -0.0170
                 }
             },
             "image_lines": 960,
