@@ -1,0 +1,142 @@
+PDS_VERSION_ID                       = "PDS3"
+
+/*** FILE FORMAT ***/
+RECORD_TYPE                          = "UNDEFINED"
+FILE_NAME                            = "MVA_2B2_01_02329N002E0302.img"
+
+/*** POINTERS TO START BYTE OFFSET OF OBJECTS IN FILE ***/
+^IMAGE                               = ("MVA_2B2_01_02329N002E0302.img", 1 <BYTES>)
+
+/*** BASIC INFORMATION ***/
+MISSION_NAME                         = "SELENE"
+DATA_SET_ID                          = "SLN-L-MI-3-VIS-LEVEL2B2-V1.0"
+DATA_SET_NAME                        = "SELENE MOON MI 3 VIS LEVEL2B2 V1.0"
+L2DB_ORIGINAL_ID                     = "MI-VIS_Level2B2"
+PRODUCT_ID                           = "MVA_2B2_01_02329N002E0302"
+INSTRUMENT_TYPE                      = "IMAGER"
+INSTRUMENT_ID                        = "MI-VIS"
+INSTRUMENT_NAME                      = "MULTIBAND IMAGER VISIBLE"
+INSTRUMENT_HOST_NAME                 = "SELENE MAIN ORBITER"
+TARGET_TYPE                          = "SATELLITE"
+TARGET_NAME                          = "MOON"
+START_TIME                           = 2008-04-17T00:34:47.373598
+STOP_TIME                            = 2008-04-17T00:34:59.841598
+
+/*** GENERAL DATA DESCRIPTION PARAMETERS ***/
+SOFTWARE_NAME                        = "RGC_TC_MI"
+SOFTWARE_VERSION                     = "2.6.0"
+PROCESS_VERSION_ID                   = "L2B"
+PRODUCT_CREATION_TIME                = 2009-11-14T19:30:51
+PROGRAM_START_TIME                   = 2009-11-14T15:30:23
+PRODUCER_ID                          = "LISM"
+PRODUCT_SET_ID                       = "MI-VIS_Level2B2"
+PRODUCT_VERSION_ID                   = "01"
+REGISTERED_PRODUCT                   = "Y"
+LEVEL2A_FILE_NAME                    = "MV52A0_02NS02329_003_0066.img"
+SPICE_METAKERNEL_FILE_NAME           = "RGC_INF_TCv301IK_MIv104IK_SPv104IK_RISE100g_de421_091007.mk"
+
+/*** SCENE RELATED PARAMETERS ***/
+MISSION_PHASE_NAME                   = "Nominal"
+REVOLUTION_NUMBER                    = 2329
+STRIP_SEQUENCE_NUMBER                = 3
+SCENE_SEQUENCE_NUMBER                = 66
+UPPER_LEFT_DAYTIME_FLAG              = "Day"
+UPPER_RIGHT_DAYTIME_FLAG             = "Day"
+LOWER_LEFT_DAYTIME_FLAG              = "Day"
+LOWER_RIGHT_DAYTIME_FLAG             = "Day"
+OBSERVATION_MODE_ID                  = "NORMAL"
+SENSOR_DESCRIPTION                   = "MI is a multiband push-broom imaging camera consisting of VIS(V) and NIR(N) sensors (each has nadir-directed optics of f number 65 mm and F ratio 3.7). Detector pixel sizes in micron are 13(V) and 40(N)."
+SENSOR_DESCRIPTION2                  = "Physical band arrangement [from satellite -x to +x] are VIS1>VIS2>VIS5>VIS4>VIS3 and NIR3>NIR4>NIR1>NIR2. Parallax between nearest band sets [degree] are 2.7 for VIS and 2.6 for NIR. Sampling time [msec] are 13 for VIS and 39 for NIR."
+DETECTOR_STATUS                      = ("TC1:OFF","TC2:OFF","MV:ON","MN:ON","SP:ON")
+EXPOSURE_MODE_ID                     = "SHORT"
+LINE_EXPOSURE_DURATION               = (1.329700 <ms>)
+SPACECRAFT_CLOCK_START_COUNT         =  "892427681.9160 <s>"
+SPACECRAFT_CLOCK_STOP_COUNT          =  "892427694.3840 <s>"
+CORRECTED_SC_CLOCK_START_COUNT       =  892427681.910768 <s>
+CORRECTED_SC_CLOCK_STOP_COUNT        =  892427694.377744 <s>
+CORRECTED_START_TIME                 = 2008-04-17T00:34:47.368366
+CORRECTED_STOP_TIME                  = 2008-04-17T00:34:59.835341
+LINE_SAMPLING_INTERVAL               =  13.000000 <ms>
+CORRECTED_SAMPLING_INTERVAL          = (12.999974 <ms>)
+UPPER_LEFT_LATITUDE                  =   0.570818 <deg>
+UPPER_LEFT_LONGITUDE                 =  29.865282 <deg>
+UPPER_RIGHT_LATITUDE                 =   0.567533 <deg>
+UPPER_RIGHT_LONGITUDE                =  30.446215 <deg>
+LOWER_LEFT_LATITUDE                  =  -0.069627 <deg>
+LOWER_LEFT_LONGITUDE                 =  29.858614 <deg>
+LOWER_RIGHT_LATITUDE                 =  -0.072846 <deg>
+LOWER_RIGHT_LONGITUDE                =  30.439950 <deg>
+LOCATION_FLAG                        = "D"
+ROLL_CANT                            = "NO"
+SCENE_CENTER_LATITUDE                =   0.248754 <deg>
+SCENE_CENTER_LONGITUDE               =  30.152558 <deg>
+INCIDENCE_ANGLE                      =  13.790 <deg>
+EMISSION_ANGLE                       =   0.463 <deg>
+PHASE_ANGLE                          =  13.893 <deg>
+SOLAR_AZIMUTH_ANGLE                  =  85.141 <deg>
+FOCAL_PLANE_TEMPERATURE              = (21.78 <degC>)
+TELESCOPE_TEMPERATURE                = (18.77 <degC>)
+SATELLITE_MOVING_DIRECTION           = +1
+FIRST_SAMPLED_LINE_POSITION          = "UPPERMOST"
+FIRST_DETECTOR_ELEM_POSITION         = "LEFT"
+A_AXIS_RADIUS                        = 1737.400 <km>
+B_AXIS_RADIUS                        = 1737.400 <km>
+C_AXIS_RADIUS                        = 1737.400 <km>
+DEFECT_PIXEL_POSITION                = ("N/A", "N/A", "N/A", "N/A", "N/A")
+
+/*** CAMERA RELATED PARAMETERS ***/
+FILTER_NAME                          = ("MV1", "MV2", "MV3", "MV4", "MV5")
+CENTER_FILTER_WAVELENGTH             = (414.0 <nm>, 749.0 <nm>, 901.0 <nm>, 950.0 <nm>, 1001.0 <nm>)
+BANDWIDTH                            = (20.0 <nm>, 12.0 <nm>, 21.0 <nm>, 30.0 <nm>, 42.0 <nm>)
+BASE_BAND                            = "MV5"
+SPACECRAFT_ALTITUDE                  =   91.868 <km>
+SPACECRAFT_GROUND_SPEED              =  1.559 <km/s>
+
+/*** DESCRIPTION OF OBJECTS CONTAINED IN THE FILE ***/
+
+OBJECT                               = IMAGE
+    NOMINAL_LINE_NUMBER              = 864
+    NOMINAL_OVERLAP_LINE_NUMBER      = 96
+    OVERLAP_LINE_NUMBER              = 96
+    BANDS                            = 5
+    BAND_STORAGE_TYPE                = "BAND_SEQUENTIAL"
+    LINES                            = 960
+    LINE_SAMPLES                     = 962
+    SAMPLE_TYPE                      = MSB_INTEGER
+    SAMPLE_BITS                      = 16
+    IMAGE_VALUE_TYPE                 = "RADIANCE"
+    UNIT                             = "W/m**2/micron/sr"
+    SCALING_FACTOR                   = 1.30000e-02
+    OFFSET                           = 0.00000e+00
+    MIN_FOR_STATISTICAL_EVALUATION   = (0, 0, 0, 0, 0)
+    MAX_FOR_STATISTICAL_EVALUATION   = (32767, 32767, 32767, 32767, 32767)
+    SCENE_MAXIMUM_DN                 = (5698, 7175, 5113, 4541, 4230)
+    SCENE_MINIMUM_DN                 = (1213, 1959, 1481, 1421, 1297)
+    SCENE_AVERAGE_DN                 = (1535.2, 2426.1, 1800.0, 1715.8, 1622.5)
+    SCENE_STDEV_DN                   = (181.0, 272.4, 185.3, 171.2, 164.9)
+    SCENE_MODE_DN                    = (1396, 2241, 1793, 1613, 1500)
+    SHADOWED_AREA_MINIMUM            = (0, 0, 0, 0, 0)
+    SHADOWED_AREA_MAXIMUM            = (327, 327, 327, 327, 327)
+    SHADOWED_AREA_PERCENTAGE         = (0, 0, 0, 0, 0)
+    INVALID_TYPE                     = ("SATURATION" , "MINUS" , "DUMMY_DEFECT" , "OTHER")
+    INVALID_VALUE                    = (-20000 , -21000 , -22000 , -23000)
+    INVALID_PIXELS                   = ((0 , 0 , 0 , 0), (0 , 0 , 0 , 0), (0 , 0 , 0 , 0), (0 , 0 , 0 , 0), (0 , 0 , 0 , 0))
+    OUT_OF_IMAGE_BOUNDS_VALUE        = -30000
+    OUT_OF_IMAGE_BOUNDS_PIXELS       = (3844, 3259, 3493, 2841, 0)
+END_OBJECT                           = IMAGE
+
+OBJECT                               = PROCESSING_PARAMETERS
+    DARK_FILE_NAME                   = "MIV_DRK_02269_02609_S___002.csv"
+    FT_FILE_NAME                     = "MIV_FTF_PRFLT_N___v01.csv"
+    FLAT_FILE_NAME                   = "MIV_FLT_02269_02609_N___002.csv"
+    EFFIC_FILE_NAME                  = "MIV_EFF_PRFLT_N___v01.csv"
+    NONLIN_FILE_NAME                 = "MIV_NLT_PRFLT_N___v01.csv"
+    RAD_CNV_COEF                     = (1.470593 <W/m**2/micron/sr>, 2.204781 <W/m**2/micron/sr>, 2.244315 <W/m**2/micron/sr>, 2.734361 <W/m**2/micron/sr>, 1.885889 <W/m**2/micron/sr>)
+    RESAMPLING_METHOD                = "Bi-Linear"
+    L2A_DEAD_PIXEL_THRESHOLD         = (35, 35, 35, 35, 35)
+    L2A_SATURATION_THRESHOLD         = (1023, 1023, 1023, 1023, 1023)
+    DARK_VALID_MINIMUM               = (-3, -3, -3, -3, -3)
+    FT_VALID_MINIMUM                 = -2
+    RADIANCE_SATURATION_THRESHOLD    = 425.971000 <W/m**2/micron/sr>
+END_OBJECT                           = PROCESSING_PARAMETERS
+END
