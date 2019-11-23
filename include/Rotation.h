@@ -34,8 +34,7 @@ namespace ale {
       std::pair<std::vector<double>, double> toAxisAngle() const;
 
       // Generic rotation operations
-      std::vector<double> operator()(const std::vector<double>& vector) const;
-      std::vector<double> operator()(const std::vector<double>& vector, const std::vector<double>& av) const;
+      std::vector<double> operator()(const std::vector<double>& vector, const std::vector<double>& av = {0.0, 0.0, 0.0}) const;
       Rotation inverse() const;
       Rotation operator*(const Rotation& rightRotation) const;
       Rotation interpolate(const Rotation& nextRotation, double t, RotationInterpolation interpType) const;

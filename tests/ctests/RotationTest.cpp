@@ -3,6 +3,7 @@
 #include "Rotation.h"
 
 #include <cmath>
+#include <exception>
 
 using namespace std;
 using namespace ale;
@@ -40,6 +41,14 @@ TEST(RotationTest, MatrixConstructor) {
   EXPECT_NEAR(quat[3],  0.5, 1e-10);
 }
 
+TEST(RotationTest, BadMatrixConstructor) {
+  ASSERT_THROW(Rotation({0.0, 0.0, 1.0,
+                         1.0, 0.0, 0.0,
+                         0.0, 1.0, 0.0,
+                         1.0, 0.0, 2.0}),
+               std::invalid_argument);
+}
+
 TEST(RotationTest, SingleAngleConstructor) {
   std::vector<double> angles;
   angles.push_back(M_PI);
@@ -64,6 +73,21 @@ TEST(RotationTest, MultiAngleConstructor) {
   EXPECT_NEAR(quat[3],  0.5, 1e-10);
 }
 
+TEST(RotationTest, DifferentAxisAngleCount) {
+  std::vector<double> angles;
+  angles.push_back(M_PI);
+  std::vector<int> axes = {0, 1, 2};
+  ASSERT_THROW(Rotation(angles, axes), std::invalid_argument);
+}
+
+TEST(RotationTest, BadAxisNumber) {
+  std::vector<double> angles;
+  angles.push_back(M_PI);
+  std::vector<int> axes;
+  axes.push_back(4);
+  ASSERT_THROW(Rotation(angles, axes), std::invalid_argument);
+}
+
 TEST(RotationTest, AxisAngleConstructor) {
   Rotation rotation({1.0, 1.0, 1.0}, 2.0 / 3.0 * M_PI);
   vector<double> quat = rotation.toQuaternion();
@@ -72,6 +96,10 @@ TEST(RotationTest, AxisAngleConstructor) {
   EXPECT_NEAR(quat[1], 0.5, 1e-10);
   EXPECT_NEAR(quat[2], 0.5, 1e-10);
   EXPECT_NEAR(quat[3], 0.5, 1e-10);
+}
+
+TEST(RotationTest, BadAxisAngleConstructor) {
+  ASSERT_THROW(Rotation({1.0, 1.0, 1.0, 1.0}, 2.0 / 3.0 * M_PI), std::invalid_argument);
 }
 
 TEST(RotationTest, ToRotationMatrix) {
@@ -107,6 +135,16 @@ TEST(RotationTest, ToEulerZYX) {
   EXPECT_NEAR(angles[2], M_PI/2, 1e-10);
 }
 
+TEST(RotationTest, ToEulerWrongNumberOfAxes) {
+  Rotation rotation;
+  ASSERT_ANY_THROW(rotation.toEuler({1, 0}));
+}
+
+TEST(RotationTest, ToEulerBadAxisNumber) {
+  Rotation rotation;
+  ASSERT_THROW(rotation.toEuler({4, 1, 0}), std::invalid_argument);
+}
+
 TEST(RotationTest, ToAxisAngle) {
   Rotation rotation(0.5, 0.5, 0.5, 0.5);
   std::pair<std::vector<double>, double> axisAngle = rotation.toAxisAngle();
@@ -137,6 +175,134 @@ TEST(RotationTest, RotateVector) {
   EXPECT_NEAR(rotatedZ[0], 1.0, 1e-10);
   EXPECT_NEAR(rotatedZ[1], 0.0, 1e-10);
   EXPECT_NEAR(rotatedZ[2], 0.0, 1e-10);
+}
+
+TEST(RotationTest, RotateState) {
+  Rotation rotation(0.5, 0.5, 0.5, 0.5);
+  std::vector<double> av = {2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI};
+  vector<double> unitX =  {1.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  vector<double> unitY =  {0.0, 1.0, 0.0, 0.0, 0.0, 0.0};
+  vector<double> unitZ =  {0.0, 0.0, 1.0, 0.0, 0.0, 0.0};
+  vector<double> unitVX = {0.0, 0.0, 0.0, 1.0, 0.0, 0.0};
+  vector<double> unitVY = {0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
+  vector<double> unitVZ = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
+  vector<double> rotatedX = rotation(unitX, av);
+  vector<double> rotatedY = rotation(unitY, av);
+  vector<double> rotatedZ = rotation(unitZ, av);
+  vector<double> rotatedVX = rotation(unitVX, av);
+  vector<double> rotatedVY = rotation(unitVY, av);
+  vector<double> rotatedVZ = rotation(unitVZ, av);
+  ASSERT_EQ(rotatedX.size(), 6);
+  EXPECT_NEAR(rotatedX[0], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedX[1], 1.0, 1e-10);
+  EXPECT_NEAR(rotatedX[2], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedX[3], 2.0 / 3.0 * M_PI, 1e-10);
+  EXPECT_NEAR(rotatedX[4], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedX[5], -2.0 / 3.0 * M_PI, 1e-10);
+  ASSERT_EQ(rotatedY.size(), 6);
+  EXPECT_NEAR(rotatedY[0], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedY[1], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedY[2], 1.0, 1e-10);
+  EXPECT_NEAR(rotatedY[3], -2.0 / 3.0 * M_PI, 1e-10);
+  EXPECT_NEAR(rotatedY[4], 2.0 / 3.0 * M_PI, 1e-10);
+  EXPECT_NEAR(rotatedY[5], 0.0, 1e-10);
+  ASSERT_EQ(rotatedZ.size(), 6);
+  EXPECT_NEAR(rotatedZ[0], 1.0, 1e-10);
+  EXPECT_NEAR(rotatedZ[1], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedZ[2], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedZ[3], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedZ[4], -2.0 / 3.0 * M_PI, 1e-10);
+  EXPECT_NEAR(rotatedZ[5], 2.0 / 3.0 * M_PI, 1e-10);
+  ASSERT_EQ(rotatedVX.size(), 6);
+  EXPECT_NEAR(rotatedVX[0], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVX[1], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVX[2], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVX[3], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVX[4], 1.0, 1e-10);
+  EXPECT_NEAR(rotatedVX[5], 0.0, 1e-10);
+  ASSERT_EQ(rotatedVY.size(), 6);
+  EXPECT_NEAR(rotatedVY[0], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVY[1], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVY[2], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVY[3], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVY[4], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVY[5], 1.0, 1e-10);
+  ASSERT_EQ(rotatedVZ.size(), 6);
+  EXPECT_NEAR(rotatedVZ[0], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVZ[1], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVZ[2], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVZ[3], 1.0, 1e-10);
+  EXPECT_NEAR(rotatedVZ[4], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVZ[5], 0.0, 1e-10);
+}
+
+TEST(RotationTest, RotateStateNoAv) {
+  Rotation rotation(0.5, 0.5, 0.5, 0.5);
+  vector<double> unitX =  {1.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  vector<double> unitY =  {0.0, 1.0, 0.0, 0.0, 0.0, 0.0};
+  vector<double> unitZ =  {0.0, 0.0, 1.0, 0.0, 0.0, 0.0};
+  vector<double> unitVX = {0.0, 0.0, 0.0, 1.0, 0.0, 0.0};
+  vector<double> unitVY = {0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
+  vector<double> unitVZ = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
+  vector<double> rotatedX = rotation(unitX);
+  vector<double> rotatedY = rotation(unitY);
+  vector<double> rotatedZ = rotation(unitZ);
+  vector<double> rotatedVX = rotation(unitVX);
+  vector<double> rotatedVY = rotation(unitVY);
+  vector<double> rotatedVZ = rotation(unitVZ);
+  ASSERT_EQ(rotatedX.size(), 6);
+  EXPECT_NEAR(rotatedX[0], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedX[1], 1.0, 1e-10);
+  EXPECT_NEAR(rotatedX[2], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedX[3], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedX[4], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedX[5], 0.0, 1e-10);
+  ASSERT_EQ(rotatedY.size(), 6);
+  EXPECT_NEAR(rotatedY[0], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedY[1], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedY[2], 1.0, 1e-10);
+  EXPECT_NEAR(rotatedY[3], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedY[4], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedY[5], 0.0, 1e-10);
+  ASSERT_EQ(rotatedZ.size(), 6);
+  EXPECT_NEAR(rotatedZ[0], 1.0, 1e-10);
+  EXPECT_NEAR(rotatedZ[1], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedZ[2], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedZ[3], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedZ[4], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedZ[5], 0.0, 1e-10);
+  ASSERT_EQ(rotatedVX.size(), 6);
+  EXPECT_NEAR(rotatedVX[0], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVX[1], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVX[2], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVX[3], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVX[4], 1.0, 1e-10);
+  EXPECT_NEAR(rotatedVX[5], 0.0, 1e-10);
+  ASSERT_EQ(rotatedVY.size(), 6);
+  EXPECT_NEAR(rotatedVY[0], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVY[1], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVY[2], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVY[3], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVY[4], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVY[5], 1.0, 1e-10);
+  ASSERT_EQ(rotatedVZ.size(), 6);
+  EXPECT_NEAR(rotatedVZ[0], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVZ[1], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVZ[2], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVZ[3], 1.0, 1e-10);
+  EXPECT_NEAR(rotatedVZ[4], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedVZ[5], 0.0, 1e-10);
+}
+
+TEST(RotationTest, RotateWrongSizeAV) {
+  Rotation rotation;
+  ASSERT_NO_THROW(rotation({1.0, 1.0, 1.0}));
+  ASSERT_NO_THROW(rotation({1.0, 1.0, 1.0}, {1.0, 1.0}));
+}
+
+TEST(RotationTest, RotateWrongSizeVector) {
+  Rotation rotation;
+  ASSERT_THROW(rotation({1.0, 1.0, 1.0, 1.0}), std::invalid_argument);
 }
 
 TEST(RotationTest, Inverse) {
@@ -173,6 +339,18 @@ TEST(RotationTest, Slerp) {
   EXPECT_NEAR(quat[3], sin(M_PI * 3.0/8.0) * 1/sqrt(3.0), 1e-10);
 }
 
+TEST(RotationTest, SlerpExtrapolate) {
+  Rotation rotationOne(0.5, 0.5, 0.5, 0.5);
+  Rotation rotationTwo(-0.5, 0.5, 0.5, 0.5);
+  Rotation interpRotation = rotationOne.interpolate(rotationTwo, 1.125, ale::slerp);
+  vector<double> quat = interpRotation.toQuaternion();
+  ASSERT_EQ(quat.size(), 4);
+  EXPECT_NEAR(quat[0], cos(M_PI * 17.0/24.0), 1e-10);
+  EXPECT_NEAR(quat[1], sin(M_PI * 17.0/24.0) * 1/sqrt(3.0), 1e-10);
+  EXPECT_NEAR(quat[2], sin(M_PI * 17.0/24.0) * 1/sqrt(3.0), 1e-10);
+  EXPECT_NEAR(quat[3], sin(M_PI * 17.0/24.0) * 1/sqrt(3.0), 1e-10);
+}
+
 TEST(RotationTest, Nlerp) {
   Rotation rotationOne(0.5, 0.5, 0.5, 0.5);
   Rotation rotationTwo(-0.5, 0.5, 0.5, 0.5);
@@ -181,6 +359,19 @@ TEST(RotationTest, Nlerp) {
   vector<double> quat = interpRotation.toQuaternion();
   ASSERT_EQ(quat.size(), 4);
   EXPECT_NEAR(quat[0], 3.0 / 8.0 * scaling, 1e-10);
+  EXPECT_NEAR(quat[1], 1.0 / 2.0 * scaling, 1e-10);
+  EXPECT_NEAR(quat[2], 1.0 / 2.0 * scaling, 1e-10);
+  EXPECT_NEAR(quat[3], 1.0 / 2.0 * scaling, 1e-10);
+}
+
+TEST(RotationTest, NlerpExtrapolate) {
+  Rotation rotationOne(0.5, 0.5, 0.5, 0.5);
+  Rotation rotationTwo(-0.5, 0.5, 0.5, 0.5);
+  Rotation interpRotation = rotationOne.interpolate(rotationTwo, 1.125, ale::nlerp);
+  double scaling = 8.0 / sqrt(73.0);
+  vector<double> quat = interpRotation.toQuaternion();
+  ASSERT_EQ(quat.size(), 4);
+  EXPECT_NEAR(quat[0], -5.0 / 8.0 * scaling, 1e-10);
   EXPECT_NEAR(quat[1], 1.0 / 2.0 * scaling, 1e-10);
   EXPECT_NEAR(quat[2], 1.0 / 2.0 * scaling, 1e-10);
   EXPECT_NEAR(quat[3], 1.0 / 2.0 * scaling, 1e-10);

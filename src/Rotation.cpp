@@ -34,6 +34,9 @@ namespace ale {
   Eigen::Quaterniond::Matrix3 avSkewMatrix(
         const std::vector<double>& av
   ) {
+    if (av.size() != 3) {
+      throw std::invalid_argument("Angular velocity vector to rotate is the wrong size.");
+    }
     Eigen::Quaterniond::Matrix3 avMat;
     avMat <<  0.0,    av[2], -av[1],
              -av[2],  0.0,    av[0],
@@ -150,6 +153,11 @@ namespace ale {
     if (axes.size() != 3) {
       throw std::invalid_argument("Must have 3 axes to convert to Euler angles.");
     }
+    if (axes[0] < 0 || axes[0] > 2 ||
+        axes[1] < 0 || axes[1] > 2 ||
+        axes[2] < 0 || axes[2] > 2) {
+      throw std::invalid_argument("Invalid axis number.");
+    }
     Eigen::Vector3d angles = m_impl->quat.toRotationMatrix().eulerAngles(
           axes[0],
           axes[1],
@@ -170,26 +178,29 @@ namespace ale {
   }
 
 
-  std::vector<double> Rotation::operator()(const std::vector<double>& vector) const {
-    Eigen::Map<Eigen::Vector3d> eigenVector((double *)vector.data());
-    Eigen::Vector3d rotatedVector = m_impl->quat._transformVector(eigenVector);
-    return std::vector<double>(rotatedVector.data(), rotatedVector.data() + rotatedVector.size());
-  }
-
-
   std::vector<double> Rotation::operator()(
         const std::vector<double>& vector,
         const std::vector<double>& av
   ) const {
-    Eigen::Map<Eigen::Vector3d> positionVector((double *)vector.data());
-    Eigen::Map<Eigen::Vector3d> velocityVector((double *)vector.data() + 3);
-    Eigen::Quaterniond::Matrix3 rotMat = m_impl->quat.toRotationMatrix();
-    Eigen::Quaterniond::Matrix3 avMat = avSkewMatrix(av);
-    Eigen::Quaterniond::Matrix3 rotationDerivative = rotMat * avMat;
-    Eigen::Vector3d rotatedPosition = rotMat * positionVector;
-    Eigen::Vector3d rotatedVelocity = rotMat * velocityVector + rotationDerivative * positionVector;
-    return {rotatedPosition(0), rotatedPosition(1), rotatedPosition(2),
-            rotatedVelocity(0), rotatedVelocity(1), rotatedVelocity(2)};
+    if (vector.size() == 3) {
+      Eigen::Map<Eigen::Vector3d> eigenVector((double *)vector.data());
+      Eigen::Vector3d rotatedVector = m_impl->quat._transformVector(eigenVector);
+      return std::vector<double>(rotatedVector.data(), rotatedVector.data() + rotatedVector.size());
+    }
+    else if (vector.size() == 6) {
+      Eigen::Map<Eigen::Vector3d> positionVector((double *)vector.data());
+      Eigen::Map<Eigen::Vector3d> velocityVector((double *)vector.data() + 3);
+      Eigen::Quaterniond::Matrix3 rotMat = m_impl->quat.toRotationMatrix();
+      Eigen::Quaterniond::Matrix3 avMat = avSkewMatrix(av);
+      Eigen::Quaterniond::Matrix3 rotationDerivative = rotMat * avMat;
+      Eigen::Vector3d rotatedPosition = rotMat * positionVector;
+      Eigen::Vector3d rotatedVelocity = rotMat * velocityVector + rotationDerivative * positionVector;
+      return {rotatedPosition(0), rotatedPosition(1), rotatedPosition(2),
+              rotatedVelocity(0), rotatedVelocity(1), rotatedVelocity(2)};
+    }
+    else {
+      throw std::invalid_argument("Vector to rotate is the wrong size.");
+    }
   }
 
 
