@@ -10,13 +10,6 @@ enum interpolation {
   spline
 };
 
-// Add more as needed?
-// Assume Velocity units are PositionUnits/s
-enum PositionUnits {
-  Meters, // set to 0
-  Kilometers // set to 3
-};
-
 // Consider converting to a class if useful or adding units and/or ref frame
 /** A 3D cartesian vector */
 struct Vec3d {
@@ -31,16 +24,12 @@ struct Vec3d {
 // Consider converting to a class if useful or adding units and/or ref frame
 /** A state vector with position and velocity*/
 struct State {
-  double x;
-  double y;
-  double z;
-  double vx; //! The x-component of the velocity
-  double vy; //! The y-component of the velocity
-  double vz; //! The z-component of the velocity
+  Vec3d position;
+  Vec3d velocity;
 
   State(double x, double y, double z, double vx, double vy, double vz) : x(x), y(y), z(z), 
       vx(vx), vy(vy), vz(vz) {};
-  State(ale::Vec3d position, ale::Vec3d velocity); 
+  State(ale::Vec3d position, ale::Vec3d velocity) : position(position), velocity(velocity); 
   State() : x(0.0), y(0.0), z(0.0), vx(0.0), vy(0.0), vz(0.0) {};
 }
 
@@ -48,22 +37,18 @@ class States {
     public:
       // Constructors
       States();
+      States(std::vector<double> ephemTimes, std::vector<ale::Vec3d> positions, int refFrame=1);
       States(std::vector<double> ephemTimes, std::vector<ale::Vec3d> positions, 
-                 PositionUnits units=PositionUnits::Meters, int refFrame=1);
-      States(std::vector<double> ephemTimes, std::vector<ale::Vec3d> positions, 
-                 std::vector<ale::Vec3d> velocities, PositionUnits units=PositionUnits::Meters, 
-                 int refFrame=1);
-      States(std::vector<double> ephemTimes, std::vector<ale::State> states,
-                 PositionUnits units=PositionUnits::Meters, int refFrame=1); 
+             std::vector<ale::Vec3d> velocities, int refFrame=1);
+      States(std::vector<double> ephemTimes, std::vector<ale::State> states, int refFrame=1); 
 
       ~States();
 
       // Getters
-      std::vector<ale:State> getStates() const; //! Returns state vectors (6-element positions&velocities) 
-      std::vector<ale:Vec3d> getPositions() const; 
-      std::vector<ale:Vec3d> getVelocities() const;
+      std::vector<ale::State> getStates() const; //! Returns state vectors (6-element positions&velocities) 
+      std::vector<ale::Vec3d> getPositions() const; 
+      std::vector<ale::Vec3d> getVelocities() const;
       std::vector<double> getTimes() const;
-      ale::PositionUnits getUnits() const; 
       int getReferenceFrame() const; //! Returns reference frame as NAIF ID
 
       // Interpolate state, position, velocity 
@@ -82,7 +67,6 @@ class States {
     private:
       std::vector<ale::State> states; //! Represent at states internally to keep pos, vel together
       std::vector<double> ephemTimes; //! Time in seconds (since _____ ) 
-      PositionUnits units; //! Units for the distance. Velocity is assumed to be this-per-second
       int refFrame;  //! Naif IDs for reference frames 
   };
 
