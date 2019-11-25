@@ -30,6 +30,7 @@ namespace ale {
       // Type specific accessors
       std::vector<double> toQuaternion() const;
       std::vector<double> toRotationMatrix() const;
+      std::vector<double> toStateRotationMatrix(const std::vector<double> &av) const;
       std::vector<double> toEuler(const std::vector<int>& axes) const;
       std::pair<std::vector<double>, double> toAxisAngle() const;
 
@@ -44,38 +45,6 @@ namespace ale {
       class Impl;
       std::unique_ptr<Impl> m_impl;
   };
-
-  std::vector<double> rotateAt(
-    double interpTime, // time to interpolate rotation at
-    const std::vector<double>& vector, // state vector to rotate, could be 3 or 6 elements
-    const std::vector<double>& times, // rotation times
-    const std::vector<Rotation>& rotations, // rotations
-    const std::vector<std::vector<double>>& avs = std::vector<std::vector<double>>(), // rotation angular velocities
-    RotationInterpolation interpType = slerp, // rotation interpolation type
-    bool invert = false // if the rotation direction should be inverted
-  );
-
-  Rotation interpolateRotation(
-    double interpTime, // time to interpolate rotation at
-    const std::vector<double>& times, // rotation times
-    const std::vector<Rotation>& rotations, // rotations
-    RotationInterpolation interpType = slerp // rotation interpolation type
-  );
-
-  std::vector<double> stateRotation(
-    const Rotation &rotation,
-    const std::vector<double> &av
-  );
-
-  int interpolationIndex(double interpTime, std::vector<double> times);
-
-  double linearInterpolate(double x, double y, double t);
-
-  std::vector<double> linearInterpolate(
-        const std::vector<double>& x,
-        const std::vector<double>& y,
-        double t
-  );
 }
 
 #endif

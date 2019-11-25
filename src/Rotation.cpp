@@ -11,6 +11,10 @@ namespace ale {
 // Helper Functions
 ///////////////////////////////////////////////////////////////////////////////
 
+  double linearInterpolate(double x, double y, double t) {
+    return x + t * (y - x);
+  }
+
   Eigen::Vector3d axis(int axisIndex) {
     switch (axisIndex) {
       case 0:
@@ -149,6 +153,19 @@ namespace ale {
   }
 
 
+  std::vector<double> Rotation::toStateRotationMatrix(const std::vector<double> &av) const {
+    Eigen::Quaterniond::Matrix3 rotMat = m_impl->quat.toRotationMatrix();
+    Eigen::Quaterniond::Matrix3 avMat = avSkewMatrix(av);
+    Eigen::Quaterniond::Matrix3 dtMat = rotMat * avMat;
+    return {rotMat(0,0), rotMat(0,1), rotMat(0,2), 0.0,         0.0,         0.0,
+            rotMat(1,0), rotMat(1,1), rotMat(1,2), 0.0,         0.0,         0.0,
+            rotMat(2,0), rotMat(2,1), rotMat(2,2), 0.0,         0.0,         0.0,
+            dtMat(0,0),  dtMat(0,1),  dtMat(0,2),  rotMat(0,0), rotMat(0,1), rotMat(0,2),
+            dtMat(1,0),  dtMat(1,1),  dtMat(1,2),  rotMat(1,0), rotMat(1,1), rotMat(1,2),
+            dtMat(2,0),  dtMat(2,1),  dtMat(2,2),  rotMat(2,0), rotMat(2,1), rotMat(2,2)};
+  }
+
+
   std::vector<double> Rotation::toEuler(const std::vector<int>& axes) const {
     if (axes.size() != 3) {
       throw std::invalid_argument("Must have 3 axes to convert to Euler angles.");
@@ -240,109 +257,6 @@ namespace ale {
         break;
     }
     return Rotation(interpQuat.w(), interpQuat.x(), interpQuat.y(), interpQuat.z());
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////
-  // Rotation Interpolation Functions
-  ///////////////////////////////////////////////////////////////////////////////
-
-  std::vector<double> rotateAt(
-        double interpTime, // time to interpolate rotation at
-        const std::vector<double>& vector, // state vector to rotate, could be 3 or 6 elements
-        const std::vector<double>& times, // rotation times
-        const std::vector<Rotation>& rotations, // rotations
-        const std::vector<std::vector<double>>& avs, // rotation angular velocities
-        RotationInterpolation interpType, // rotation interpolation type
-        bool invert
-  ) {
-    int prevTimeIndex = interpolationIndex(interpTime, times);
-    double t = (interpTime - times[prevTimeIndex]) / (times[prevTimeIndex + 1] - times[prevTimeIndex]);
-    Rotation interpRotation = rotations[prevTimeIndex].interpolate(rotations[prevTimeIndex+1], t, interpType);
-    if (invert) {
-      interpRotation = interpRotation.inverse();
-    }
-    if (vector.size() == 3) {
-      return interpRotation(vector);
-    }
-    else if (vector.size() == 6) {
-      std::vector<double> interpAv;
-      if (avs.empty()) {
-        interpAv.resize(3, 0.0);
-      }
-      else {
-        interpAv = linearInterpolate(avs[prevTimeIndex], avs[prevTimeIndex+1], t);
-      }
-      return interpRotation(vector, interpAv);
-    }
-    else {
-      throw std::invalid_argument("Vector to rotate must be 3 or 6 elements.");
-    }
-  }
-
-
-  Rotation interpolateRotation(
-    double interpTime, // time to interpolate rotation at
-    const std::vector<double>& times, // rotation times
-    const std::vector<Rotation>& rotations, // rotations
-    RotationInterpolation interpType // rotation interpolation type
-  ) {
-    int prevTimeIndex = interpolationIndex(interpTime, times);
-    double t = (interpTime - times[prevTimeIndex]) / (times[prevTimeIndex + 1] - times[prevTimeIndex]);
-    return rotations[prevTimeIndex].interpolate(rotations[prevTimeIndex+1], t, interpType);
-  }
-
-
-  std::vector<double> stateRotation(
-    const Rotation &rotation,
-    const std::vector<double> &av
-  ) {
-    std::vector<double> vecRotMat = rotation.toRotationMatrix();
-    Eigen::Map<Eigen::Quaterniond::Matrix3> rotMat((double*)vecRotMat.data());
-    Eigen::Quaterniond::Matrix3 avMat = avSkewMatrix(av);
-    Eigen::Quaterniond::Matrix3 dtMat = rotMat * avMat;
-    return {rotMat(0,0), rotMat(0,1), rotMat(0,2), 0.0,         0.0,         0.0,
-            rotMat(1,0), rotMat(1,1), rotMat(1,2), 0.0,         0.0,         0.0,
-            rotMat(2,0), rotMat(2,1), rotMat(2,2), 0.0,         0.0,         0.0,
-            dtMat(0,0),  dtMat(0,1),  dtMat(0,2),  rotMat(0,0), rotMat(0,1), rotMat(0,2),
-            dtMat(1,0),  dtMat(1,1),  dtMat(1,2),  rotMat(1,0), rotMat(1,1), rotMat(1,2),
-            dtMat(2,0),  dtMat(2,1),  dtMat(2,2),  rotMat(2,0), rotMat(2,1), rotMat(2,2)};
-  }
-
-
-  int interpolationIndex(double interpTime, std::vector<double> times) {
-    // Find the next time
-    auto nextTimeIt = std::upper_bound(times.begin(), times.end(), interpTime);
-    if (nextTimeIt == times.begin()) {
-      ++nextTimeIt;
-    }
-    else if (nextTimeIt == times.end()) {
-      --nextTimeIt;
-    }
-    return std::distance(times.begin(), nextTimeIt);
-  }
-
-
-  double linearInterpolate(double x, double y, double t) {
-    return x + t * (y - x);
-  }
-
-
-  std::vector<double> linearInterpolate(
-        const std::vector<double>& x,
-        const std::vector<double>& y,
-        double t
-  ) {
-    if (x.empty() || y.empty()) {
-      throw std::invalid_argument("Vectors to interpolate must be non-empty.");
-    }
-    if (x.size() != y.size()) {
-      throw std::invalid_argument("Vectors to interpolate must have the same size.");
-    }
-    std::vector<double> interpVector(x.size());
-    for (size_t i = 0; i < interpVector.size(); i++) {
-      interpVector[i] = linearInterpolate(x[i], y[i], t);
-    }
-    return interpVector;
   }
 
 }

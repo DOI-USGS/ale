@@ -80,6 +80,12 @@ TEST(RotationTest, DifferentAxisAngleCount) {
   ASSERT_THROW(Rotation(angles, axes), std::invalid_argument);
 }
 
+TEST(RotationTest, EmptyAxisAngle) {
+  std::vector<double> angles;
+  std::vector<int> axes = {0, 1, 2};
+  ASSERT_THROW(Rotation(angles, axes), std::invalid_argument);
+}
+
 TEST(RotationTest, BadAxisNumber) {
   std::vector<double> angles;
   angles.push_back(M_PI);
@@ -115,6 +121,54 @@ TEST(RotationTest, ToRotationMatrix) {
   EXPECT_NEAR(mat[6], 0.0, 1e-10);
   EXPECT_NEAR(mat[7], 1.0, 1e-10);
   EXPECT_NEAR(mat[8], 0.0, 1e-10);
+}
+
+TEST(RotationTest, ToStateRotationMatrix) {
+  Rotation rotation(0.5, 0.5, 0.5, 0.5);
+  std::vector<double> av = {2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI};
+  vector<double> mat = rotation.toStateRotationMatrix(av);
+  ASSERT_EQ(mat.size(), 36);
+  EXPECT_NEAR(mat[0], 0.0, 1e-10);
+  EXPECT_NEAR(mat[1], 0.0, 1e-10);
+  EXPECT_NEAR(mat[2], 1.0, 1e-10);
+  EXPECT_NEAR(mat[3], 0.0, 1e-10);
+  EXPECT_NEAR(mat[4], 0.0, 1e-10);
+  EXPECT_NEAR(mat[5], 0.0, 1e-10);
+
+  EXPECT_NEAR(mat[6], 1.0, 1e-10);
+  EXPECT_NEAR(mat[7], 0.0, 1e-10);
+  EXPECT_NEAR(mat[8], 0.0, 1e-10);
+  EXPECT_NEAR(mat[9], 0.0, 1e-10);
+  EXPECT_NEAR(mat[10], 0.0, 1e-10);
+  EXPECT_NEAR(mat[11], 0.0, 1e-10);
+
+  EXPECT_NEAR(mat[12], 0.0, 1e-10);
+  EXPECT_NEAR(mat[13], 1.0, 1e-10);
+  EXPECT_NEAR(mat[14], 0.0, 1e-10);
+  EXPECT_NEAR(mat[15], 0.0, 1e-10);
+  EXPECT_NEAR(mat[16], 0.0, 1e-10);
+  EXPECT_NEAR(mat[17], 0.0, 1e-10);
+
+  EXPECT_NEAR(mat[18], 2.0 / 3.0 * M_PI, 1e-10);
+  EXPECT_NEAR(mat[19], -2.0 / 3.0 * M_PI, 1e-10);
+  EXPECT_NEAR(mat[20], 0.0, 1e-10);
+  EXPECT_NEAR(mat[21], 0.0, 1e-10);
+  EXPECT_NEAR(mat[22], 0.0, 1e-10);
+  EXPECT_NEAR(mat[23], 1.0, 1e-10);
+
+  EXPECT_NEAR(mat[24], 0.0, 1e-10);
+  EXPECT_NEAR(mat[25], 2.0 / 3.0 * M_PI, 1e-10);
+  EXPECT_NEAR(mat[26], -2.0 / 3.0 * M_PI, 1e-10);
+  EXPECT_NEAR(mat[27], 1.0, 1e-10);
+  EXPECT_NEAR(mat[28], 0.0, 1e-10);
+  EXPECT_NEAR(mat[29], 0.0, 1e-10);
+
+  EXPECT_NEAR(mat[30], -2.0 / 3.0 * M_PI, 1e-10);
+  EXPECT_NEAR(mat[31], 0.0, 1e-10);
+  EXPECT_NEAR(mat[32], 2.0 / 3.0 * M_PI, 1e-10);
+  EXPECT_NEAR(mat[33], 0.0, 1e-10);
+  EXPECT_NEAR(mat[34], 1.0, 1e-10);
+  EXPECT_NEAR(mat[35], 0.0, 1e-10);
 }
 
 TEST(RotationTest, ToEulerXYZ) {
