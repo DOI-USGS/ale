@@ -6,7 +6,7 @@
 #include <vector>
 
 #include <gsl/gsl_interp.h>
- 
+
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
@@ -19,6 +19,7 @@ namespace ale {
     /// Interpolate using spline interpolation
     spline
   };
+
 
   /**
    *@brief Get the position of the spacecraft at a given time based on a set of coordinates, and their associated times

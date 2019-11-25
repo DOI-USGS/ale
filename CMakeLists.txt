@@ -23,9 +23,10 @@ find_package(nlohmann_json REQUIRED)
 # Library setup
 add_library(ale SHARED
             ${CMAKE_CURRENT_SOURCE_DIR}/src/ale.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/Rotation.cpp)
-# Alias a scoped target for safer linking in downstream projects
-set(ALE_HEADERS "include/ale.h, include/Rotation.h")
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/InterpUtils.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Rotation.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Orientations.cpp)
+set(ALE_HEADERS "include/ale.h, include/Rotation.h, include/Orientations.h, include/InterpUtils.h")
 set_target_properties(ale PROPERTIES
                       VERSION       ${PROJECT_VERSION}
                       SOVERSION     0
