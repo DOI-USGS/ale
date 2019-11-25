@@ -11,10 +11,13 @@ namespace ale {
 // Helper Functions
 ///////////////////////////////////////////////////////////////////////////////
 
+  // Linearly interpolate between two values
   double linearInterpolate(double x, double y, double t) {
     return x + t * (y - x);
   }
 
+
+  // Helper function to convert an axis number into a unit Eigen vector down that axis.
   Eigen::Vector3d axis(int axisIndex) {
     switch (axisIndex) {
       case 0:
@@ -32,9 +35,14 @@ namespace ale {
   }
 
 
-  // This is actually the transpose of the skew AV matrix because we define AV
-  // as the AV from the destination to the source. This matches how NAIF
-  // defines AV.
+  /**
+   * Create the skew symmetric matrix used when computing the derivative of a
+   * rotation matrix.
+   *
+   * This is actually the transpose of the skew AV matrix because we define AV
+   * as the AV from the destination to the source. This matches how NAIF
+   * defines AV.
+   */
   Eigen::Quaterniond::Matrix3 avSkewMatrix(
         const std::vector<double>& av
   ) {
@@ -52,6 +60,7 @@ namespace ale {
   // Rotation Impl class
   ///////////////////////////////////////////////////////////////////////////////
 
+  // Internal representation of the rotation as an Eigen Double Quaternion
   class Rotation::Impl {
     public:
       Impl() : quat(Eigen::Quaterniond::Identity()) { }
