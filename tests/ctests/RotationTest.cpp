@@ -171,6 +171,12 @@ TEST(RotationTest, ToStateRotationMatrix) {
   EXPECT_NEAR(mat[35], 0.0, 1e-10);
 }
 
+TEST(RotationTest, BadAvVectorSize) {
+  Rotation rotation(0.5, 0.5, 0.5, 0.5);
+  std::vector<double> av = {2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI};
+  ASSERT_THROW(rotation.toStateRotationMatrix(av), std::invalid_argument);
+}
+
 TEST(RotationTest, ToEulerXYZ) {
   Rotation rotation(0.5, 0.5, 0.5, 0.5);
   vector<double> angles = rotation.toEuler({0, 1, 2});
