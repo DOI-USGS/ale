@@ -6,6 +6,7 @@
 
 #include "ale.h"
 #include "isd.h"
+#include "util.h"
 
 void ASSERT_DOUBLE_VECTOR_EQ(std::vector<double> v1, std::vector<double> v2) {
   if (v1.size() != v2.size()) {
@@ -73,12 +74,421 @@ TEST(Isd, Constructor) {
   ASSERT_DOUBLE_EQ(isd.max_reference_height, 1000);
   ASSERT_DOUBLE_EQ(isd.min_reference_height, -1000);
 
-  ASSERT_DOUBLE_EQ(isd.max_reference_height, 1000);
-  ASSERT_DOUBLE_EQ(isd.max_reference_height, 1000);
-
   ASSERT_DOUBLE_2D_VECTOR_EQ(isd.line_scan_rate, std::vector<std::vector<double>>({std::vector<double>({0.5, -0.37540000677108765, 0.001877})}));
 
   ASSERT_DOUBLE_EQ(isd.starting_ephemeris_time, 297088762.24158406);
   ASSERT_DOUBLE_EQ(isd.center_ephemeris_time, 297088762.61698407);
-
 }
+
+TEST(Isd, BadNameModel) {
+  std::string bad_json_str("{}");
+  try {
+    ale::getSensorModelName(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the sensor model name.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the sensor model name.\"";
+  }
+}
+
+TEST(Isd, BadNamePlatform) {
+  std::string bad_json_str("{}");
+  try {
+    ale::getPlatformName(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    ASSERT_EQ(std::string(e.what()), "Could not parse the platform name.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the platform name.\"";
+  }
+}
+
+TEST(Isd, BadImageID) {
+  std::string bad_json_str("{}");
+  try {
+    ale::getImageId(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    ASSERT_EQ(std::string(e.what()), "Could not parse the image identifier.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the image identifier.\"";
+  }
+}
+
+TEST(Isd, BadSensorName) {
+  std::string bad_json_str("{}");
+  try {
+    ale::getSensorName(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    ASSERT_EQ(std::string(e.what()), "Could not parse the sensor name.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the sensor name.\"";
+  }
+}
+
+TEST(Isd, BadRadii) {
+  std::string bad_json_str("{}");
+  try {
+    ale::getSemiMajorRadius(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the reference ellipsoid semimajor radius.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the reference ellipsoid semimajor radius.\"";
+  }
+
+  try {
+    ale::getSemiMinorRadius(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the reference ellipsoid semiminor radius.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the reference ellipsoid semiminor radius.\"";
+  }
+}
+
+TEST(Isd, BadSumming) {
+  std::string bad_json_str("{}");
+  try {
+    ale::getSampleSumming(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the sample direction detector pixel summing.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the sample direction detector pixel summing.\"";
+  }
+
+  try {
+    ale::getLineSumming(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the line direction detector pixel summing.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the line direction detector pixel summing.\"";
+  }
+}
+
+TEST(Isd, BadFocalLength) {
+  std::string bad_json_str("{}");
+  try {
+    ale::getFocalLength(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the focal length.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the focal length.\"";
+  }
+
+  try {
+    ale::getFocalLengthUncertainty(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the focal length uncertainty.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the focal length uncertainty.\"";
+  }
+}
+
+TEST(Isd, BadDetectorCenter) {
+  std::string bad_json_str("{}");
+  try {
+    ale::getDetectorCenterSample(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the detector center sample.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the detector center sample.\"";
+  }
+
+  try {
+    ale::getDetectorCenterLine(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the detector center line.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the detector center line.\"";
+  }
+}
+
+TEST(Isd, BadStartingDetector) {
+  std::string bad_json_str("{}");
+  try {
+    ale::getDetectorStartingSample(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the detector starting sample.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the detector starting sample.\"";
+  }
+
+  try {
+    ale::getDetectorStartingLine(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the detector starting line.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the detector starting line.\"";
+  }
+}
+
+TEST(Isd, BadFocal2Pixel) {
+  std::string bad_json_str("{}");
+  try {
+    ale::getFocal2PixelSamples(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the focal plane coordinate to "
+                                     "detector samples transformation.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the focal plane coordinate to "
+                                                    "detector samples transformation.\"";
+  }
+
+  try {
+    ale::getFocal2PixelLines(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the focal plane coordinate to "
+                                     "detector lines transformation.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the focal plane coordinate to "
+                                                     "detector lines transformation.\"";
+  }
+}
+
+// TEST(Isd, BadDistortionModel) {
+//   std::string bad_json_str("{}");
+//   try {
+//     ale::getDistortionModel(bad_json_str);
+//     // Code that should throw an IException
+//     FAIL() << "Expected an exception to be thrown";
+//   }
+//   catch(std::exception &e) {
+//     EXPECT_EQ(std::string(e.what()), "Could not parse the distortion model.");
+//   }
+//   catch(...) {
+//     FAIL() << "Expected an Excpetion with message: \"Could not parse the distortion model.\"";
+//   }
+// }
+
+// TEST(Isd, BadDistortionTransverse) {
+//   std::string bad_json_str("{\"optical_distortion\":{\"transverse\"}}");
+//   try {
+//     ale::getDistortionCoeffs(bad_json_str);
+//     // Code that should throw an IException
+//     FAIL() << "Expected an exception to be thrown";
+//   }
+//   catch(std::exception &e) {
+//     EXPECT_EQ(std::string(e.what()), "Could not parse a set of transverse distortion model coefficients.");
+//   }
+//   catch(...) {
+//     FAIL() << "Expected an Excpetion with message: \"Could not parse a set of transverse distortion model coefficients.\"";
+//   }
+// }
+
+// TEST(Isd, BadDistortionRadial) {
+//   std::string bad_json_str("{\"optical_distortion\":{\"radial\"}}");
+//   try {
+//     ale::getDistortionCoeffs(bad_json_str);
+//     // Code that should throw an IException
+//     FAIL() << "Expected an exception to be thrown";
+//   }
+//   catch(std::exception &e) {
+//     EXPECT_EQ(std::string(e.what()), "Could not parse the radial distortion model coefficients.");
+//   }
+//   catch(...) {
+//     FAIL() << "Expected an Excpetion with message: \"Could not parse the radial distortion model coefficients.\"";
+//   }
+// }
+
+// TEST(Isd, BadDistortionKaguyalism) {
+//   std::string bad_json_str("{\"optical_distortion\":{\"dawnfc\"}}");
+//   try {
+//     ale::getDistortionCoeffs(bad_json_str);
+//     // Code that should throw an IException
+//     FAIL() << "Expected an exception to be thrown";
+//   }
+//   catch(std::exception &e) {
+//     EXPECT_EQ(std::string(e.what()), "Could not parse the dawn radial distortion model coefficients.");
+//   }
+//   catch(...) {
+//     FAIL() << "Expected an Excpetion with message: \"Could not parse the dawn radial distortion model coefficients.\"";
+//   }
+// }
+
+// TEST(Isd, BadDistortionDawnFC) {
+//   std::string bad_json_str("{\"optical_distortion\":{\"radial\"}}");
+//   try {
+//     ale::getDistortionCoeffs(bad_json_str);
+//     // Code that should throw an IException
+//     FAIL() << "Expected an exception to be thrown";
+//   }
+//   catch(std::exception &e) {
+//     EXPECT_EQ(std::string(e.what()), "Could not parse a set of Kaguya LISM distortion model coefficients.");
+//   }
+//   catch(...) {
+//     FAIL() << "Expected an Excpetion with message: \"Could not parse a set of Kaguya LISM distortion model coefficients.\"";
+//   }
+// }
+
+// TEST(Isd, BadDistortionLroLrocNac) {
+//   std::string bad_json_str("{\"optical_distortion\":{\"lrolrocnac\"}}");
+//   try {
+//     ale::getDistortionCoeffs(bad_json_str);
+//     // Code that should throw an IException
+//     FAIL() << "Expected an exception to be thrown";
+//   }
+//   catch(std::exception &e) {
+//     EXPECT_EQ(std::string(e.what()), "Could not parse the lrolrocnac distortion model coefficients.");
+//   }
+//   catch(...) {
+//     FAIL() << "Expected an Excpetion with message: \"Could not parse the lrolrocnac distortion model coefficients.\"";
+//   }
+// }
+
+TEST(Isd, BadImageSize) {
+  std::string bad_json_str("{}");
+  try {
+    ale::getTotalSamples(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the number of samples in the image.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the number of samples in the image.\"";
+  }
+
+  try {
+    ale::getTotalLines(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the number of lines in the image.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the number of lines in the image.\"";
+  }
+}
+
+TEST(Isd, BadReferenceHeight) {
+  std::string bad_json_str("{}");
+  try {
+    ale::getMinHeight(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the minimum height above the reference ellipsoid.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the minimum height above the reference ellipsoid.\"";
+  }
+
+  try {
+    ale::getMaxHeight(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the maximum height above the reference ellipsoid.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the maximum height above the reference ellipsoid.\"";
+  }
+}
+
+TEST(Isd, BadLineScanRate) {
+  std::string bad_json_str("{}");
+  try {
+    ale::getLineScanRate(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    ASSERT_EQ(std::string(e.what()), "Could not parse the integration start lines in the integration time table.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the integration start lines in the integration time table.\"";
+  }
+}
+
+TEST(Isd, BadEphemerisTimes) {
+  std::string bad_json_str("{}");
+  try {
+    ale::getStartingTime(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the image start time.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the image start time.\"";
+  }
+
+  try {
+    ale::getCenterTime(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the center image time.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the center image time.\"";
+  }
+}
+
