@@ -20,12 +20,14 @@ find_package(Eigen3 3.3    REQUIRED NO_MODULE)
 find_package(Python        REQUIRED COMPONENTS Development)
 find_package(nlohmann_json REQUIRED)
 
-
 set(ALE_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/")
-file(GLOB ALE_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 # Library setup
-add_library(ale SHARED ${ALE_SOURCE})
+add_library(ale SHARED
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/ale.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/rotation.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/isd.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/util.cpp)
 
 # Alias a scoped target for safer linking in downstream projects
 
