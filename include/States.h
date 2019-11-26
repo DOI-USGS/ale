@@ -1,6 +1,9 @@
 #ifndef ALE_STATES_H
 #define ALE_STATES_H
 
+#include<vector>
+#include <gsl/gsl_interp.h>
+ 
 namespace ale {
 
 enum interpolation {
@@ -27,11 +30,11 @@ struct State {
   Vec3d position;
   Vec3d velocity;
 
-  State(double x, double y, double z, double vx, double vy, double vz) : x(x), y(y), z(z), 
-      vx(vx), vy(vy), vz(vz) {};
-  State(ale::Vec3d position, ale::Vec3d velocity) : position(position), velocity(velocity); 
-  State() : x(0.0), y(0.0), z(0.0), vx(0.0), vy(0.0), vz(0.0) {};
-}
+  //State(double x, double y, double z, double vx, double vy, double vz) : x(x), y(y), z(z), 
+  //    vx(vx), vy(vy), vz(vz) {};
+  State(ale::Vec3d position, ale::Vec3d velocity) : position(position), velocity(velocity) {}; 
+  State() {};
+};
 
 class States {
     public:
@@ -48,6 +51,7 @@ class States {
       std::vector<ale::State> getStates() const; //! Returns state vectors (6-element positions&velocities) 
       std::vector<ale::Vec3d> getPositions() const; 
       std::vector<ale::Vec3d> getVelocities() const;
+      // getOriginalVelocities / positions or state? pre-reduction? 
       std::vector<double> getTimes() const;
       int getReferenceFrame() const; //! Returns reference frame as NAIF ID
 

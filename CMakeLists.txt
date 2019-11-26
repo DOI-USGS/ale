@@ -22,9 +22,10 @@ find_package(nlohmann_json REQUIRED)
 
 # Library setup
 add_library(ale SHARED
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/ale.cpp)
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/ale.cpp
+	    ${CMAKE_CURRENT_SOURCE_DIR}/src/States.cpp)
 # Alias a scoped target for safer linking in downstream projects
-set(ALE_HEADERS "include/ale.h")
+set(ALE_HEADERS "include/ale.h", "include/States.h")
 set_target_properties(ale PROPERTIES
                       VERSION       ${PROJECT_VERSION}
                       SOVERSION     0
