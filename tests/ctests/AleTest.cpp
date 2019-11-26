@@ -13,37 +13,6 @@
 
 using namespace std;
 
-void ASSERT_DOUBLE_VECTOR_EQ(std::vector<double> v1, std::vector<double> v2) {
-  if (v1.size() != v2.size()) {
-    EXPECT_TRUE(::testing::AssertionFailure() << "The two input vectors are different in size");
-  }
-
-  for(size_t i = 0; i < v1.size(); i++) {
-    if(v1[i] != v2[i]) {
-      EXPECT_TRUE(::testing::AssertionFailure() << "Arrays at " << i << " are not equal.");
-    }
-  }
-}
-
-
-void ASSERT_DOUBLE_2D_VECTOR_EQ(std::vector<std::vector<double>> v1, std::vector<std::vector<double>> v2) {
-  if (v1.size() != v2.size()) {
-    EXPECT_TRUE(::testing::AssertionFailure() << "The two input vectors are different in size");
-  }
-
-  for(size_t i = 0; i < v1.size(); i++) {
-    if (v1[i].size() != v2[i].size()){
-      EXPECT_TRUE(::testing::AssertionFailure() << "The two input vectors at " << i << "are different in size");
-    }
-
-    for(size_t j = 0; j < v1[i].size(); j++) {
-      if(v1[i][j] != v2[i][j]) {
-        EXPECT_TRUE(::testing::AssertionFailure() << "Arrays at " << i << ", " << j <<  " are not equal.");
-      }
-    }
-  }
-}
-
 
 TEST(PositionInterpTest, LinearInterp) {
   vector<double> times = { -3, -2, -1,  0,  1,  2};
