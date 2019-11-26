@@ -6,11 +6,11 @@ channels:
 
 dependencies:
   - cmake>=3.10
+  - pytest
   - eigen
   - gsl
   - jupyter
   - nlohmann_json
-  - numba
   - numpy
   - openblas>=0.3.0
   - pvl
@@ -18,6 +18,5 @@ dependencies:
   - python-dateutil
   - scipy
   - spiceypy=2.2.2
-  - quaternion
   - pyyaml
   - networkx
