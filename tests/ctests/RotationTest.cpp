@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "Rotation.h"
+#include "rotation.h"
 
 #include <cmath>
 #include <exception>
