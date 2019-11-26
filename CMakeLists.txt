@@ -31,8 +31,6 @@ add_library(ale SHARED
 
 # Alias a scoped target for safer linking in downstream projects
 
-message(STATUS ${ALE_HEADERS})
-
 set_target_properties(ale PROPERTIES
                       VERSION       ${PROJECT_VERSION}
                       SOVERSION     0
