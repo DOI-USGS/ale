@@ -212,3 +212,54 @@ TEST_F(TestState, getStopTime) {
 }
 
 //minimizeCache
+//one test where the cache can be minimized
+//one test where the test cannot be minimized
+TEST(StatesTest, minimizeCache_true) {
+  //create information that can be reduced
+  std::vector<double> ephemTimes = {0.0, 1.0, 2.0, 3.0, 4.0};
+  ale::Vec3d position1 = {5.0, 3.0, 0.0};
+  ale::Vec3d position2 = {5.6, 5.1875, 0.3};
+  ale::Vec3d position3 = {7.0, 6.0, 1.0};
+  ale::Vec3d position4 = {10.025, 5.5625, 2.5125};
+  ale::Vec3d position5 = {15.0, 4.0, 5.0};
+  //place into single vector
+  std::vector<ale::Vec3d> positions;
+  positions.push_back(position1);
+  positions.push_back(position2);
+  positions.push_back(position3);
+  positions.push_back(position4);
+  positions.push_back(position5);
+  //create states with no velocity information
+  States noVelocityState(ephemTimes, positions, 1);
+
+  vector<ale::State> states = noVelocityState.getStates();
+  EXPECT_EQ(states.size(), 5);
+  noVelocityState.minimizeCache();
+  vector<ale::State> states_min = noVelocityState.getStates();
+  EXPECT_EQ(states_min.size(), 3);
+}
+
+TEST(StatesTest, minimizeCache_false) {
+  //create information that cannot be reduced
+  std::vector<double> ephemTimes = {0.0, 1.0, 2.0, 3.0, 4.0};
+  ale::Vec3d position1 = {5.0, 3.0, 0.0};
+  ale::Vec3d position2 = {6.5, 4.0, 1.0};
+  ale::Vec3d position3 = {7.0, 6.0, 1.0};
+  ale::Vec3d position4 = {8.7, 3.0, 3.0};
+  ale::Vec3d position5 = {15.0, 4.0, 5.0};
+  //place into single vector
+  std::vector<ale::Vec3d> positions;
+  positions.push_back(position1);
+  positions.push_back(position2);
+  positions.push_back(position3);
+  positions.push_back(position4);
+  positions.push_back(position5);
+  //create states with no velocity information
+  States noVelocityState(ephemTimes, positions, 1);
+
+  vector<ale::State> states = noVelocityState.getStates();
+  EXPECT_EQ(states.size(), 5);
+  noVelocityState.minimizeCache();
+  vector<ale::State> states_min = noVelocityState.getStates();
+  EXPECT_EQ(states_min.size(), 5);
+}
