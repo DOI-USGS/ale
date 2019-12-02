@@ -21,7 +21,7 @@ namespace ale {
   std::vector<double> linearInterpolate(const std::vector<double> &x, const std::vector<double> &y, double t);
 
   /**
-   * Compute the index of the time to use when interpolating at a given time.
+   * Compute the index of the first time to use when interpolating at a given time.
    * @param times The ordered vector of times to search. Must have at least 2 times.
    * @param interpTime The time to search for the interpolation index of.
    * @return int The index of the time that comes before interpTime. If there is

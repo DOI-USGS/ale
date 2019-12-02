@@ -23,10 +23,10 @@ namespace ale {
       throw std::invalid_argument("There must be at least two times.");
     }
     auto nextTimeIt = std::upper_bound(times.begin(), times.end(), interpTime);
-    if (nextTimeIt == times.begin()) {
-      ++nextTimeIt;
+    if (nextTimeIt == times.end()) {
+      --nextTimeIt;
     }
-    else if (nextTimeIt == times.end()) {
+    if (nextTimeIt != times.begin()) {
       --nextTimeIt;
     }
     return std::distance(times.begin(), nextTimeIt);
