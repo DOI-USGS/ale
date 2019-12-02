@@ -8,6 +8,7 @@
 namespace ale {
   class Orientations {
   public:
+    Orientations() {};
     Orientations(
       const std::vector<Rotation> &rotations,
       const std::vector<double> &times,
@@ -15,6 +16,7 @@ namespace ale {
       int destination,
       const std::vector<std::vector<double>> &avs = std::vector<std::vector<double>>()
     );
+    ~Orientations() {};
 
     std::vector<Rotation> rotations() const;
     std::vector<std::vector<double>> angularVelocities() const;
