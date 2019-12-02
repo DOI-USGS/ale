@@ -67,11 +67,13 @@ class States {
       // Cache reduction
       // alternative names reduceLookup, reduceTable, reduceLookupTable, reduceState, reduceStateCache
       void minimizeCache(double tolerance=0.1); // default tolerance? 
-
+      std::vector<int> HermiteIndices(double tolerance, std::vector <int> indexList, 
+                                                 double baseTime, double timeScale);
     private:
       std::vector<ale::State> states; //! Represent at states internally to keep pos, vel together
       std::vector<double> ephemTimes; //! Time in seconds (since _____ ) 
       int refFrame;  //! Naif IDs for reference frames 
+      bool minimizedCache; 
   };
 
 }
