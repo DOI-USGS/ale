@@ -25,14 +25,14 @@ class OrientationTest : public ::testing::Test {
 
     vector<Rotation> rotations;
     vector<double> times;
-    std::vector<std::vector<double>> avs;
+    vector<vector<double>> avs;
     Orientations orientations;
 };
 
 TEST_F(OrientationTest, ConstructorAccessors) {
   vector<Rotation> outputRotations = orientations.rotations();
   vector<double> outputTimes = orientations.times();
-  std::vector<std::vector<double>> outputAvs = orientations.angularVelocities();
+  vector<vector<double>> outputAvs = orientations.angularVelocities();
   ASSERT_EQ(outputRotations.size(), rotations.size());
   for (size_t i = 0; i < outputRotations.size(); i++) {
     vector<double> quats = rotations[i].toQuaternion();
@@ -52,4 +52,50 @@ TEST_F(OrientationTest, ConstructorAccessors) {
     EXPECT_EQ(outputAvs[i][1], avs[i][1]);
     EXPECT_EQ(outputAvs[i][2], avs[i][2]);
   }
+}
+
+TEST_F(OrientationTest, Interpolate) {
+  Rotation interpRotation = orientations.interpolate(0.25);
+  vector<double> quat = interpRotation.toQuaternion();
+  ASSERT_EQ(quat.size(), 4);
+  EXPECT_NEAR(quat[0], cos(M_PI * 3.0/8.0), 1e-10);
+  EXPECT_NEAR(quat[1], sin(M_PI * 3.0/8.0) * 1/sqrt(3.0), 1e-10);
+  EXPECT_NEAR(quat[2], sin(M_PI * 3.0/8.0) * 1/sqrt(3.0), 1e-10);
+  EXPECT_NEAR(quat[3], sin(M_PI * 3.0/8.0) * 1/sqrt(3.0), 1e-10);
+}
+
+TEST_F(OrientationTest, InterpolateAtRotation) {
+  Rotation interpRotation = orientations.interpolate(0.0);
+  vector<double> quat = interpRotation.toQuaternion();
+  ASSERT_EQ(quat.size(), 4);
+  EXPECT_NEAR(quat[0], 0.5, 1e-10);
+  EXPECT_NEAR(quat[1], 0.5, 1e-10);
+  EXPECT_NEAR(quat[2], 0.5, 1e-10);
+  EXPECT_NEAR(quat[3], 0.5, 1e-10);
+}
+
+TEST_F(OrientationTest, InterpolateAv) {
+  vector<double> interpAv = orientations.interpolateAV(0.25);
+  ASSERT_EQ(interpAv.size(), 3);
+  EXPECT_NEAR(interpAv[0], 2.0 / 3.0 * M_PI, 1e-10);
+  EXPECT_NEAR(interpAv[1], 2.0 / 3.0 * M_PI, 1e-10);
+  EXPECT_NEAR(interpAv[2], 2.0 / 3.0 * M_PI, 1e-10);
+}
+
+TEST_F(OrientationTest, RotateAt) {
+  vector<double> rotatedX = orientations.rotateAt(0.0, {1.0, 0.0, 0.0});
+  ASSERT_EQ(rotatedX.size(), 3);
+  EXPECT_NEAR(rotatedX[0], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedX[1], 1.0, 1e-10);
+  EXPECT_NEAR(rotatedX[2], 0.0, 1e-10);
+  vector<double> rotatedY = orientations.rotateAt(0.0, {0.0, 1.0, 0.0});
+  ASSERT_EQ(rotatedY.size(), 3);
+  EXPECT_NEAR(rotatedY[0], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedY[1], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedY[2], 1.0, 1e-10);
+  vector<double> rotatedZ = orientations.rotateAt(0.0, {0.0, 0.0, 1.0});
+  ASSERT_EQ(rotatedZ.size(), 3);
+  EXPECT_NEAR(rotatedZ[0], 1.0, 1e-10);
+  EXPECT_NEAR(rotatedZ[1], 0.0, 1e-10);
+  EXPECT_NEAR(rotatedZ[2], 0.0, 1e-10);
 }
