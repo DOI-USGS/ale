@@ -191,7 +191,7 @@ TEST_F(TestState, getStopTime) {
 TEST_F(TestState, getTimes) {
   std::vector<double> time = states->getTimes();
   EXPECT_NEAR(time[0], 0.0, 1e-10);
-  EXPECT_NEAR(time[2], 3.0, 1e-10);
+  EXPECT_NEAR(time[3], 3.0, 1e-10);
 }
 
 TEST_F(TestState, getReferenceFrame) {
@@ -201,8 +201,6 @@ TEST_F(TestState, getReferenceFrame) {
 
 TEST_F(TestState, getPositions) {
   std::vector<ale::Vec3d> positions = states->getPositions();
-  ale::Vec3d(4.0, 1.0, 4.0),
-  ale::Vec3d (7.0, 4.0, 1.0)};
   EXPECT_EQ(positions.size(), 4); 
   EXPECT_NEAR(positions[0].x, 4.0, 1e-10);
   EXPECT_NEAR(positions[0].y, 1.0, 1e-10);
