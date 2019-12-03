@@ -22,15 +22,11 @@ TEST(StatesTest, DefaultConstructor) {
 
 TEST(StatesTest, ConstructorPositionNoVelocity) {
   std::vector<double> ephemTimes = {0.0, 1.0, 2.0, 3.0};
-  ale::Vec3d position = {4.0, 1.0, 4.0};
-  ale::Vec3d position2 = {5.0, 2.0, 3.0};
-  ale::Vec3d position3 = {6.0, 3.0, 2.0};
-  ale::Vec3d position4 = {7.0, 4.0, 1.0};
-  std::vector<ale::Vec3d> positions;
-  positions.push_back(position);
-  positions.push_back(position2);
-  positions.push_back(position3);
-  positions.push_back(position4);
+  std::vector<ale::Vec3d> positions = {
+    ale::Vec3d(4.0, 1.0, 4.0),
+    ale::Vec3d (5.0, 2.0, 3.0),
+    ale::Vec3d (6.0, 3.0, 2.0),
+    ale::Vec3d (7.0, 4.0, 1.0)};
 
   States noVelocityState(ephemTimes, positions, 1);
   vector<ale::State> states = noVelocityState.getStates();
@@ -49,28 +45,19 @@ TEST(StatesTest, ConstructorPositionNoVelocity) {
   EXPECT_NEAR(states[3].velocity.z, 0.0, 1e-10);
 }
 
-
 TEST(StatesTest, ConstructorPositionAndVelocity) {
   std::vector<double> ephemTimes = {0.0, 1.0, 2.0, 3.0};
-  ale::Vec3d position = {4.0, 1.0, 4.0};
-  ale::Vec3d position2 = {5.0, 2.0, 3.0};
-  ale::Vec3d position3 = {6.0, 3.0, 2.0};
-  ale::Vec3d position4 = {7.0, 4.0, 1.0};
-  std::vector<ale::Vec3d> positions;
-  positions.push_back(position);
-  positions.push_back(position2);
-  positions.push_back(position3);
-  positions.push_back(position4);
+  std::vector<ale::Vec3d> positions = {
+    ale::Vec3d(4.0, 1.0, 4.0),
+    ale::Vec3d (5.0, 2.0, 3.0),
+    ale::Vec3d (6.0, 3.0, 2.0),
+    ale::Vec3d (7.0, 4.0, 1.0)};
 
-  ale::Vec3d velocity =  {-4.0, -1.0, -4.0};
-  ale::Vec3d velocity2 = {-5.0, -2.0, -3.0};
-  ale::Vec3d velocity3 = {-6.0, -3.0, -2.0};
-  ale::Vec3d velocity4 = {-7.0, -4.0, -1.0};
-  std::vector<ale::Vec3d> velocities;
-  velocities.push_back(velocity);
-  velocities.push_back(velocity2);
-  velocities.push_back(velocity3);
-  velocities.push_back(velocity4);
+  std::vector<ale::Vec3d> velocities = {
+    ale::Vec3d(-4.0, -1.0, -4.0),
+    ale::Vec3d(-5.0, -2.0, -3.0),
+    ale::Vec3d(-6.0, -3.0, -2.0),
+    ale::Vec3d(-7.0, -4.0, -1.0)};
 
   States positionVelocityState(ephemTimes, positions, velocities,1);
   vector<ale::State> states = positionVelocityState.getStates();
@@ -91,26 +78,22 @@ TEST(StatesTest, ConstructorPositionAndVelocity) {
 
 TEST(StatesTest, ConstructorStates) {
   std::vector<double> ephemTimes = {0.0, 1.0, 2.0, 3.0};
-  ale::Vec3d position = {4.0, 1.0, 4.0};
-  ale::Vec3d position2 = {5.0, 2.0, 3.0};
-  ale::Vec3d position3 = {6.0, 3.0, 2.0};
-  ale::Vec3d position4 = {7.0, 4.0, 1.0};
+  std::vector<ale::Vec3d> positions = {
+    ale::Vec3d(4.0, 1.0, 4.0),
+    ale::Vec3d (5.0, 2.0, 3.0),
+    ale::Vec3d (6.0, 3.0, 2.0),
+    ale::Vec3d (7.0, 4.0, 1.0)};
 
-  ale::Vec3d velocity =  {-4.0, -1.0, -4.0};
-  ale::Vec3d velocity2 = {-5.0, -2.0, -3.0};
-  ale::Vec3d velocity3 = {-6.0, -3.0, -2.0};
-  ale::Vec3d velocity4 = {-7.0, -4.0, -1.0};
+  std::vector<ale::Vec3d> velocities = {
+    ale::Vec3d(-4.0, -1.0, -4.0),
+    ale::Vec3d(-5.0, -2.0, -3.0),
+    ale::Vec3d(-6.0, -3.0, -2.0),
+    ale::Vec3d(-7.0, -4.0, -1.0)};
 
   std::vector<ale::State> stateVector;
-  ale::State state(position, velocity);
-  ale::State state2(position2, velocity2);
-  ale::State state3(position3, velocity3);
-  ale::State state4(position4, velocity4);
-
-  stateVector.push_back(state);
-  stateVector.push_back(state2);
-  stateVector.push_back(state3);
-  stateVector.push_back(state4);
+  for (int i=0; i < positions.size(); i++) {
+    stateVector.push_back(ale::State(positions[i], velocities[i])); 
+  }
 
   States statesState(ephemTimes, stateVector, 1);
   vector<ale::State> states = statesState.getStates();
@@ -139,30 +122,25 @@ protected:
 
     //define test data values
     std::vector<double> ephemTimes = {0.0, 1.0, 2.0, 3.0};
-    ale::Vec3d position1 = {4.0, 1.0, 4.0};
-    ale::Vec3d position2 = {5.0, 3.0, 3.5};
-    ale::Vec3d position3 = {4.0, 3.5, 2.5};
-    ale::Vec3d position4 = {7.0, 4.0, 1.0};
 
-    ale::Vec3d velocity1 = {-4.0, -1.0, -4.0};
-    ale::Vec3d velocity2 = {-5.0, -3.0, -3.5};
-    ale::Vec3d velocity3 = {-4.0, -3.5, -2.5};
-    ale::Vec3d velocity4 = {-7.0, -4.0, -1.0};
+    std::vector<ale::Vec3d> positions = {
+      ale::Vec3d(4.0, 1.0, 4.0),
+      ale::Vec3d (5.0, 2.0, 3.0),
+      ale::Vec3d (6.0, 3.0, 2.0),
+      ale::Vec3d (7.0, 4.0, 1.0)};
 
-    //create State object
-    ale::State state1(position1, velocity1);
-    ale::State state2(position2, velocity2);
-    ale::State state3(position3, velocity3);
-    ale::State state4(position4, velocity4);
+    std::vector<ale::Vec3d> velocities = {
+      ale::Vec3d(-4.0, -1.0, -4.0),
+      ale::Vec3d(-5.0, -2.0, -3.0),
+      ale::Vec3d(-6.0, -3.0, -2.0),
+      ale::Vec3d(-7.0, -4.0, -1.0)};
 
-    // consolidate into States object
     std::vector<ale::State> stateVector;
-    stateVector.push_back(state1);
-    stateVector.push_back(state2);
-    stateVector.push_back(state3);
-    stateVector.push_back(state4);
-    states = new ale::States(ephemTimes, stateVector);
+    for (int i=0; i < positions.size(); i++) {
+      stateVector.push_back(ale::State(positions[i], velocities[i])); 
+    }
 
+    states = new ale::States(ephemTimes, stateVector);
   }
 
   void TearDown() override {
@@ -170,7 +148,6 @@ protected:
       delete states;
       states = NULL;
     }
-
   }
 };
 
@@ -211,57 +188,55 @@ TEST_F(TestState, getStopTime) {
   EXPECT_NEAR(time, 3.0, 1e-10);
 }
 
-//minimizeCache
-//one test where the cache can be minimized
-//one test where the test cannot be minimized
+// minimizeCache
+// one test where the cache can be minimized
+// one test where the test cannot be minimized
 TEST(StatesTest, minimizeCache_true) {
   //create information that can be reduced
   std::vector<double> ephemTimes = {0.0, 1.0, 2.0, 3.0, 4.0};
-  ale::Vec3d position1 = {5.0, 3.0, 0.0};
-  ale::Vec3d position2 = {5.6, 5.1875, 0.3};
-  ale::Vec3d position3 = {7.0, 6.0, 1.0};
-  ale::Vec3d position4 = {10.025, 5.5625, 2.5125};
-  ale::Vec3d position5 = {15.0, 4.0, 5.0};
-  //place into single vector
-  std::vector<ale::Vec3d> positions;
-  positions.push_back(position1);
-  positions.push_back(position2);
-  positions.push_back(position3);
-  positions.push_back(position4);
-  positions.push_back(position5);
-  //create states with no velocity information
-  States noVelocityState(ephemTimes, positions, 1);
+  std::vector<ale::Vec3d> positions = {
+    ale::Vec3d(5.0, 3.0, 0.0),
+    ale::Vec3d(5.6, 5.1875, 0.3),
+    ale::Vec3d(7.0, 6.0, 1.0),
+    ale::Vec3d(10.025, 5.5625, 2.5125),
+    ale::Vec3d(15.0, 4.0, 5.0)}; 
 
-  vector<ale::State> states = noVelocityState.getStates();
+  States withVelocityState(ephemTimes, positions, positions, 1);
+
+  vector<ale::State> states = withVelocityState.getStates();
   EXPECT_EQ(states.size(), 5);
-  noVelocityState.minimizeCache(1);
-  vector<ale::State> states_min = noVelocityState.getStates();
-  EXPECT_EQ(states_min.size(), 3);
+  withVelocityState.minimizeCache(1);
+  vector<ale::State> states_min = withVelocityState.getStates();
+  EXPECT_EQ(states_min.size(), 4);
 }
 
 // Creates a setup in which the cache cannot be minimized
 TEST(StatesTest, minimizeCache_false) {
   //create information that cannot be reduced
   std::vector<double> ephemTimes = {0.0, 1.0, 2.0, 3.0, 4.0};
-  ale::Vec3d position1 = {5.0, 3.0, 0.0};
-  ale::Vec3d position2 = {6.5, 4.0, 1.0};
-  ale::Vec3d position3 = {7.0, 6.0, 1.0};
-  ale::Vec3d position4 = {8.7, 3.0, 3.0};
-  ale::Vec3d position5 = {15.0, 4.0, 5.0};
-  //place into single vector
-  std::vector<ale::Vec3d> positions;
-  positions.push_back(position1);
-  positions.push_back(position2);
-  positions.push_back(position3);
-  positions.push_back(position4);
-  positions.push_back(position5);
+  std::vector<ale::Vec3d> positions = {
+    ale::Vec3d(5.0, 3.0, 0.0),
+    ale::Vec3d(6.5, 4.0, 1.0),
+    ale::Vec3d(7.0, 6.0, 1.0),
+    ale::Vec3d(8.7, 3.0, 3.0),
+    ale::Vec3d(15.0, 4.0, 5.0)};
+
   //create states with no velocity information
   States noVelocityState(ephemTimes, positions, 1);
-
   vector<ale::State> states = noVelocityState.getStates();
   EXPECT_EQ(states.size(), 5);
-  noVelocityState.minimizeCache();
-  vector<ale::State> states_min = noVelocityState.getStates();
+
+  ASSERT_THROW(noVelocityState.minimizeCache(), std::invalid_argument);
+
+  std::vector<ale::Vec3d> velocities = {
+    ale::Vec3d(5.0, 3.0, 0.0),
+    ale::Vec3d(6.5, 4.0, 1.0),
+    ale::Vec3d(7.0, 6.0, 1.0),
+    ale::Vec3d(8.7, 3.0, 3.0),
+    ale::Vec3d(15.0, 4.0, 5.0)};
+
+  States withVelocityState(ephemTimes, positions, velocities, 1);
+  vector<ale::State> states_min = withVelocityState.getStates();
   EXPECT_EQ(states_min.size(), 5);
 }
 
