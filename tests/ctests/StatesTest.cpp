@@ -404,8 +404,6 @@ ale::Vec3d(-0.015370186159624, -0.0967922883337961, -0.0284606798137744)
 States testState(ephemTimes, positions, velocities);
 testState.minimizeCache();
 
-
-
 // Test the ability to recover the original coordinates and velocity within the tolerance 
 // from the reduced cache. (Aribtrarily selected the 15th index.) 
 ale::State result = testState.getState(362681869.7384);

@@ -11,11 +11,11 @@
 
 namespace ale {
   
-  // The following helper functions are used to calculate the reduced m_states cache and cubic hermite 
-  // to interpolate over it. They were migrated (with minor modifications from 
-  // Isis::NumericalApproximation
+  /** The following helper functions are used to calculate the reduced states cache and cubic hermite 
+  to interpolate over it. They were migrated, with minor modifications, from 
+  Isis::NumericalApproximation **/
   
-  // Checks to see if an individual value, a, is within the doman specified by x
+  /** Checks to see if an individual value, a, is within the doman specified by x **/
   bool InsideDomain(const double a, std::vector<double> x) {
     if(a + DBL_EPSILON < *min_element(x.begin(), x.end())) {
       return false;
@@ -26,11 +26,11 @@ namespace ale {
     return true;
   }
 
-  /* Find the index of the x-value in the data set that is just
+  /** Find the index of the x-value in the data set that is just
    * below the input value, a. If a is below the domain minimum,
    * the method returns 0 as the lower index.  If a is above the
    * domain maximum, it returns the second to last index of the
-   * data set, Size()-2, as the lower index.*/
+   * data set, Size()-2, as the lower index. **/
   int FindIntervalLowerIndex(const double a, std::vector<double> x) {
     // find the interval in which "a" exists
     if(ale::InsideDomain(a, x)) {
@@ -54,12 +54,10 @@ namespace ale {
     }
   }
 
-  // Evaluates a cubic hermite at time, a, between two points in x. 
+  /** Evaluates a cubic hermite at time, a, between the appropriate two points in x. **/
   double EvaluateCubicHermite(const double a, std::vector<double> derivs, std::vector<double> x, std::vector<double> y) {
     if( (derivs.size() != x.size()) || (derivs.size() != y.size()) ) {
-//      ReportException(IException::User, "EvaluateCubicHermite()",
-//                      "Invalid arguments. The size of the first derivative vector does not match the number of (x,y) data points.",
-//                      _FILEINFO_);
+       throw std::invalid_argument("EvaluateCubicHermite - The size of the first derivative vector does not match the number of (x,y) data points.");
     }
 
     // Find the interval in which "a" exists
@@ -91,13 +89,12 @@ namespace ale {
     return (2 * t * t * t - 3 * t * t + 1) * y0 + (t * t * t - 2 * t * t + t) * h * m0 + (-2 * t * t * t + 3 * t * t) * y1 + (t * t * t - t * t) * h * m1;
   }
 
-  // Evaluate velocities using a Cubic Hermite Spline at a time a, within some interval in x, 
+  /** Evaluate velocities using a Cubic Hermite Spline at a time a, within some interval in x, **/
  double EvaluateCubicHermiteFirstDeriv(const double a, std::vector<double> deriv, std::vector<double> x, std::vector<double> y) {
     if(deriv.size() != x.size()) {
-//      ReportException(IException::User, "EvaluateCubicHermiteFirstDeriv()",
-//                      "Invalid arguments. The size of the first derivative vector does not match the number of (x,y) data points.",
-//                      _FILEINFO_);
+       throw std::invalid_argument("EvaluateCubicHermiteFirstDeriv - The size of the first derivative vector does not match the number of (x,y) data points.");
     }
+
     // find the interval in which "a" exists
     int lowerIndex = ale::FindIntervalLowerIndex(a, x);
 
@@ -195,9 +192,12 @@ namespace ale {
   m_ephemTimes(ephemTimes), m_refFrame(refFrame) {
     // Construct State vector from position and velocity vectors
 
-    // if time isn't the same length, also error out
+    if (positions.size() != ephemTimes.size()) {
+      throw std::invalid_argument("Length of times must match number of positions"); 
+    }
+
     ale::Vec3d velocities = {0.0, 0.0, 0.0};
-    for (ale::Vec3d position : positions) { // if sizes aren't equal, error out.
+    for (ale::Vec3d position : positions) {
       m_states.push_back(ale::State(position, velocities)); 
     }
     m_minimizedCache=false;
@@ -207,8 +207,12 @@ namespace ale {
   States::States(std::vector<double> ephemTimes, std::vector<ale::Vec3d> positions, 
                    std::vector<ale::Vec3d> velocities, int refFrame) : 
   m_ephemTimes(ephemTimes), m_refFrame(refFrame) {
-    // if time isn't the same length, also error out
-    for (int i=0; i < positions.size() ;i++) { // if sizes aren't equal, error out.
+
+    if ((positions.size() != ephemTimes.size())||(ephemTimes.size() != velocities.size())) {
+      throw std::invalid_argument("Length of times must match number of positions and velocities."); 
+    }
+
+    for (int i=0; i < positions.size() ;i++) {
       m_states.push_back(ale::State(positions[i], velocities[i])); 
     }
     m_minimizedCache=false;
@@ -258,28 +262,32 @@ namespace ale {
     return m_ephemTimes; 
   }
 
+
   //! Returns reference frame as NAIF ID
   int States::getReferenceFrame() const {
     return m_refFrame; 
   }
+
 
   //! Returns true if cache has been minimized
   bool States::hasMinimizedCache() const {
     return m_minimizedCache;
   }
 
+
   //! Returns true if velocities have been set
   bool States::hasVelocity() const {
     std::vector<ale::Vec3d> velocities = getVelocities(); 
-    bool allZero = std::all_of(velocities.begin(), velocities.end(), [](ale::Vec3d vec) { return vec.x==0.0 && vec.y==0.0 && vec.z==0.0; });
-    return true;
+    bool allZero = std::all_of(velocities.begin(), velocities.end(), [](ale::Vec3d vec) 
+                               { return vec.x==0.0 && vec.y==0.0 && vec.z==0.0; });
+    return !allZero;
   }
 
 
-  //! Returns a single state by interpolating state, position, velocity.
-  //! If the Cache has been minimized, a cubic hermite is used to interpolate the 
-  //! position and velocity over the reduced cache. 
-  //! If not, a standard gsl interpolation will be odne.
+  /** Returns a single state by interpolating state, position, velocity.
+   If the Cache has been minimized, a cubic hermite is used to interpolate the 
+   position and velocity over the reduced cache. 
+   If not, a standard gsl interpolation will be done. **/
   ale::State States::getState(double time, ale::interpolation interp) const {
     std::vector<double> xs, ys, zs, vxs, vys, vzs; 
     for (ale::State state : m_states) {
@@ -315,59 +323,62 @@ namespace ale {
       double baseTime = (m_ephemTimes.at(0) + m_ephemTimes.at(m_ephemTimes.size() - 1)) / 2.;
       double timeScale = 1.0;
 
-      std::vector<double> scaledm_ephemTimes; 
+      std::vector<double> scaledEphemTimes; 
       for(unsigned int i = 0; i < m_ephemTimes.size(); i++) {
-        scaledm_ephemTimes.push_back((m_ephemTimes[i] - baseTime) / timeScale);
+        scaledEphemTimes.push_back((m_ephemTimes[i] - baseTime) / timeScale);
       }
 
       double sTime = (time - baseTime) / timeScale;
-      position.x = ale::EvaluateCubicHermite(sTime, vxs, scaledm_ephemTimes, xs);
-      position.y = ale::EvaluateCubicHermite(sTime, vys, scaledm_ephemTimes, ys);
-      position.z = ale::EvaluateCubicHermite(sTime, vzs, scaledm_ephemTimes, zs);
+      position.x = ale::EvaluateCubicHermite(sTime, vxs, scaledEphemTimes, xs);
+      position.y = ale::EvaluateCubicHermite(sTime, vys, scaledEphemTimes, ys);
+      position.z = ale::EvaluateCubicHermite(sTime, vzs, scaledEphemTimes, zs);
 
-      velocity.x = ale::EvaluateCubicHermiteFirstDeriv(sTime, vxs, scaledm_ephemTimes, xs);
-      velocity.y = ale::EvaluateCubicHermiteFirstDeriv(sTime, vys, scaledm_ephemTimes, ys);
-      velocity.z = ale::EvaluateCubicHermiteFirstDeriv(sTime, vzs, scaledm_ephemTimes, zs);
+      velocity.x = ale::EvaluateCubicHermiteFirstDeriv(sTime, vxs, scaledEphemTimes, xs);
+      velocity.y = ale::EvaluateCubicHermiteFirstDeriv(sTime, vys, scaledEphemTimes, ys);
+      velocity.z = ale::EvaluateCubicHermiteFirstDeriv(sTime, vzs, scaledEphemTimes, zs);
     }
     return ale::State(position, velocity);
   }
 
-  // Gets a position at a single time. Operates the same way as getState()
+  /** Gets a position at a single time. Operates the same way as getState() **/
   ale::Vec3d States::getPosition(double time, ale::interpolation interp) const {
     ale::State interpState = getState(time, interp); 
     return interpState.position;
   }
 
-  // Gets a velocity at a single time. Operates the same way as getState()
+  /** Gets a velocity at a single time. Operates the same way as getState() **/
   ale::Vec3d States::getVelocity(double time, ale::interpolation interp) const {
     ale::State interpState = getState(time, interp); 
     return interpState.velocity;
   }
 
 
-  // Returns the first ephemeris time
+  /** Returns the first ephemeris time **/
   double States::getStartTime() {
     return m_ephemTimes[0];
   }
 
 
-  // Returns the last ephemeris time
+  /** Returns the last ephemeris time **/
   double States::getStopTime() {
     int len = m_ephemTimes.size(); 
-    return m_ephemTimes[len -1];
+    return m_ephemTimes[len - 1];
   }
       
-  // Perform a cache reduction. 
-  // After running this, getm_states(), getPositions(), and getVelocities() will return
-  // caches of reduced size, and getState(), getPosition(), and getVelocity() will
-  // returns values interpolated over the reduced cache using a cubic hermite spline
-  void States::minimizeCache(double tolerance) { // default tolerance? 
+  /** Perform a cache reduction. 
+  After running this, getm_states(), getPositions(), and getVelocities() will return
+  caches of reduced size, and getState(), getPosition(), and getVelocity() will
+  returns values interpolated over the reduced cache using a cubic hermite spline 
+   
+  Adapted from Isis::SpicePosition::reduceCache().  
+  */ 
+  void States::minimizeCache(double tolerance) {
     if (m_states.size() == 1) {
-//      print("error: cache size is only 1, no need to minimize");
+      throw std::invalid_argument("Cache size is 1, cannot minimize");
       return;
     }
     if (!hasVelocity()) {
-//      print("error: can only minimize cache if velocities are provided");
+      throw std::invalid_argument("The cache can only be minimized if velocity is provided.");
       return; 
     }
 
@@ -398,8 +409,11 @@ namespace ale {
    }
 
   
-  // Calculates the points (indicies) which need to be kept for the hermite spline to interpolate
-  // between to mantain a maximum error of tolerance.
+  /** Calculates the points (indicies) which need to be kept for the hermite spline to interpolate
+  between to mantain a maximum error of tolerance. 
+   
+  Adapted from Isis::SpicePosition::HermiteIndices. 
+  **/
   std::vector<int> States::HermiteIndices(double tolerance, std::vector <int> indexList, 
                                                  double baseTime, double timeScale) {
     unsigned int n = indexList.size();
@@ -431,7 +445,6 @@ namespace ale {
         yerror = fabs(ale::EvaluateCubicHermite(sTime, vy, scaledEphemTimes, y) - m_states[line].position.y);
         zerror = fabs(ale::EvaluateCubicHermite(sTime, vz, scaledEphemTimes, z) - m_states[line].position.z);
         
-//        std::cout << "xerror: " << xerror << std::endl;
         if(xerror > tolerance || yerror > tolerance || zerror > tolerance) {
           // if any error is greater than tolerance, no need to continue looking, break
           break;
