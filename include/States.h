@@ -13,7 +13,6 @@ enum interpolation {
   spline
 };
 
-// Consider converting to a class if useful or adding units and/or ref frame
 /** A 3D cartesian vector */
 struct Vec3d {
   double x;
@@ -24,14 +23,11 @@ struct Vec3d {
   Vec3d() : x(0.0), y(0.0), z(0.0) {};
 };
 
-// Consider converting to a class if useful or adding units and/or ref frame
 /** A state vector with position and velocity*/
 struct State {
   Vec3d position;
   Vec3d velocity;
 
-  //State(double x, double y, double z, double vx, double vy, double vz) : x(x), y(y), z(z), 
-  //    vx(vx), vy(vy), vz(vz) {};
   State(ale::Vec3d position, ale::Vec3d velocity) : position(position), velocity(velocity) {}; 
   State() {};
 };
@@ -51,31 +47,30 @@ class States {
       std::vector<ale::State> getStates() const; //! Returns state vectors (6-element positions&velocities) 
       std::vector<ale::Vec3d> getPositions() const; 
       std::vector<ale::Vec3d> getVelocities() const;
-      // getOriginalVelocities / positions or state? pre-reduction? 
       std::vector<double> getTimes() const;
       int getReferenceFrame() const; //! Returns reference frame as NAIF ID
+      bool hasMinimizedCache() const; //! Returns true if the cache has been minimized
+      bool hasVelocity() const; //! Returns true if any velocities have been provided
 
       // Interpolate state, position, velocity 
       ale::State getState(double time, ale::interpolation interp=linear) const;
       ale::Vec3d getPosition(double time, ale::interpolation interp=linear) const;
-      ale::Vec3d getVelocity(double time, ale::interpolation interp=linear) const; // needed? 
+      ale::Vec3d getVelocity(double time, ale::interpolation interp=linear) const;
 
       // Get start and stop time of cache 
       double getStartTime(); 
       double getStopTime(); 
       
       // Cache reduction
-      // alternative names reduceLookup, reduceTable, reduceLookupTable, reduceState, reduceStateCache
-      void minimizeCache(double tolerance=0.1); // default tolerance? 
+      void minimizeCache(double tolerance=0.01);
       std::vector<int> HermiteIndices(double tolerance, std::vector <int> indexList, 
                                                  double baseTime, double timeScale);
     private:
-      std::vector<ale::State> states; //! Represent at states internally to keep pos, vel together
-      std::vector<double> ephemTimes; //! Time in seconds (since _____ ) 
-      int refFrame;  //! Naif IDs for reference frames 
-      bool minimizedCache; 
+      std::vector<ale::State> m_states; //! Represent at states internally to keep pos, vel together
+      std::vector<double> m_ephemTimes; //! Time in seconds
+      int m_refFrame;  //! Naif IDs for reference frames 
+      bool m_minimizedCache; 
   };
-
 }
 
 #endif
