@@ -125,14 +125,14 @@ protected:
 
     std::vector<ale::Vec3d> positions = {
       ale::Vec3d(4.0, 1.0, 4.0),
-      ale::Vec3d (5.0, 2.0, 3.0),
-      ale::Vec3d (6.0, 3.0, 2.0),
+      ale::Vec3d (5.0, 3.0, 3.5),
+      ale::Vec3d (4.0, 3.5, 2.5),
       ale::Vec3d (7.0, 4.0, 1.0)};
 
     std::vector<ale::Vec3d> velocities = {
       ale::Vec3d(-4.0, -1.0, -4.0),
-      ale::Vec3d(-5.0, -2.0, -3.0),
-      ale::Vec3d(-6.0, -3.0, -2.0),
+      ale::Vec3d(-5.0, -3.0, -3.5),
+      ale::Vec3d(-4.0, -3.5, -2.5),
       ale::Vec3d(-7.0, -4.0, -1.0)};
 
     std::vector<ale::State> stateVector;
