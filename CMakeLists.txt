@@ -25,13 +25,13 @@ set(ALE_BUILD_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 set(ALE_INSTALL_INCLUDE_DIR "include/ale")
 add_library(ale SHARED
             ${CMAKE_CURRENT_SOURCE_DIR}/src/ale.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/rotation.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/isd.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/util.cpp)
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Rotation.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Isd.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Util.cpp)
 set(ALE_HEADERS "${ALE_BUILD_INCLUDE_DIR}/ale.h"
-                "${ALE_BUILD_INCLUDE_DIR}/rotation.h"
-                "${ALE_BUILD_INCLUDE_DIR}/isd.h"
-                "${ALE_BUILD_INCLUDE_DIR}/util.h")
+                "${ALE_BUILD_INCLUDE_DIR}/Rotation.h"
+                "${ALE_BUILD_INCLUDE_DIR}/Isd.h"
+                "${ALE_BUILD_INCLUDE_DIR}/Util.h")
 set_target_properties(ale PROPERTIES
                       VERSION   ${PROJECT_VERSION}
                       SOVERSION 0)
