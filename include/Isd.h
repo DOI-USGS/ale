@@ -5,8 +5,8 @@
 #include <vector>
 #include <map>
 
-#include "util.h"
-#include "distortion.h"
+#include "Util.h"
+#include "Distortion.h"
 
 //#include "Rotation.h"
 //#include "State.h"

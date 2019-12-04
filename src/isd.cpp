@@ -1,5 +1,5 @@
-#include "isd.h"
-#include "util.h"
+#include "Isd.h"
+#include "Util.h"
 
 
 ale::Isd::Isd(std::string isd_file) {

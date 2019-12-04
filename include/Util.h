@@ -4,8 +4,8 @@
 #include <string>
 #include <nlohmann/json.hpp>
 
-#include "isd.h"
-#include "distortion.h"
+#include "Isd.h"
+#include "Distortion.h"
 
 namespace ale {
   using json = nlohmann::json;

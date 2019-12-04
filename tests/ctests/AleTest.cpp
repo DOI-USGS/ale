@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "ale.h"
-#include "isd.h"
+#include "Isd.h"
 
 #include <stdexcept>
 #include <cmath>

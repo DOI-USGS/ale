@@ -5,8 +5,8 @@
 #include "gtest/gtest.h"
 
 #include "ale.h"
-#include "isd.h"
-#include "util.h"
+#include "Isd.h"
+#include "Util.h"
 
 void ASSERT_DOUBLE_VECTOR_EQ(std::vector<double> v1, std::vector<double> v2) {
   if (v1.size() != v2.size()) {
