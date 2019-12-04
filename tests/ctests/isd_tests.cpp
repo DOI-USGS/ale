@@ -80,6 +80,182 @@ TEST(Isd, Constructor) {
   ASSERT_DOUBLE_EQ(isd.center_ephemeris_time, 297088762.61698407);
 }
 
+TEST(Isd, LogFile) {
+  ale::json j;
+  j["log_file"] = "fake/path";
+  EXPECT_STREQ(ale::getLogFile(j).c_str(), "fake/path");
+}
+
+TEST(Isd, TransverseDistortion) {
+  ale::json trans;
+  trans["optical_distortion"]["transverse"]["x"] = {1};
+  trans["optical_distortion"]["transverse"]["y"] = {2};
+
+  std::vector<double> coeffs = ale::getDistortionCoeffs(trans);
+  EXPECT_EQ(ale::getDistortionModel(trans), ale::DistortionType::TRANSVERSE);
+  EXPECT_DOUBLE_EQ(coeffs[0], 1);
+  EXPECT_DOUBLE_EQ(coeffs[10], 2);
+}
+
+TEST(Isd, RadialDistortion) {
+  ale::json radial;
+  radial["optical_distortion"]["radial"]["coefficients"] = {1, 2};
+
+  std::vector<double> coeffs = ale::getDistortionCoeffs(radial);
+  EXPECT_EQ(ale::getDistortionModel(radial), ale::DistortionType::RADIAL);
+  EXPECT_DOUBLE_EQ(coeffs[0], 1);
+  EXPECT_DOUBLE_EQ(coeffs[1], 2);
+}
+
+TEST(Isd, KaguyaLISMDistortion) {
+  ale::json kaguya;
+  kaguya["optical_distortion"]["kaguyalism"]["x"] = {1};
+  kaguya["optical_distortion"]["kaguyalism"]["y"] = {2};
+  kaguya["optical_distortion"]["kaguyalism"]["boresight_x"] = 1;
+  kaguya["optical_distortion"]["kaguyalism"]["boresight_y"] = 2;
+
+  std::vector<double> coeffs = ale::getDistortionCoeffs(kaguya);
+  EXPECT_EQ(ale::getDistortionModel(kaguya), ale::DistortionType::KAGUYALISM);
+  EXPECT_DOUBLE_EQ(coeffs[0], 1);
+  EXPECT_DOUBLE_EQ(coeffs[1], 1);
+  EXPECT_DOUBLE_EQ(coeffs[5], 2);
+  EXPECT_DOUBLE_EQ(coeffs[6], 2);
+}
+
+TEST(Isd, DawnFCDistortion) {
+  ale::json dawn;
+  dawn["optical_distortion"]["dawnfc"]["coefficients"] = {1, 2};
+  std::vector<double> coeffs = ale::getDistortionCoeffs(dawn);
+  EXPECT_EQ(ale::getDistortionModel(dawn), ale::DistortionType::DAWNFC);
+  EXPECT_DOUBLE_EQ(coeffs[0], 1);
+  EXPECT_DOUBLE_EQ(coeffs[1], 2);
+}
+
+TEST(Isd, LroLrocNACDistortion) {
+  ale::json lro;
+  lro["optical_distortion"]["lrolrocnac"]["coefficients"] = {1, 2};
+  std::vector<double> coeffs = ale::getDistortionCoeffs(lro);
+  EXPECT_EQ(ale::getDistortionModel(lro), ale::DistortionType::LROLROCNAC);
+  EXPECT_DOUBLE_EQ(coeffs[0], 1);
+  EXPECT_DOUBLE_EQ(coeffs[1], 2);
+}
+
+TEST(Isd, UnrecognizedDistortion) {
+  ale::json j;
+  j["optical_distortion"]["foo"]["x"] = {1};
+
+  EXPECT_EQ(ale::getDistortionModel(j), ale::DistortionType::TRANSVERSE);
+}
+
+TEST(Isd, BadLogFile) {
+  ale::json j;
+  EXPECT_THROW(ale::getLogFile(j), std::runtime_error);
+}
+
+TEST(Isd, GetSunPositions) {
+  ale::json j;
+  j["sun_position"]["positions"] = {{1, 2, 3}, {4, 5, 6}};
+  std::vector<double> positions = ale::getSunPositions(j);
+  EXPECT_DOUBLE_EQ(positions[0], 1);
+  EXPECT_DOUBLE_EQ(positions[1], 2);
+  EXPECT_DOUBLE_EQ(positions[2], 3);
+  EXPECT_DOUBLE_EQ(positions[3], 4);
+  EXPECT_DOUBLE_EQ(positions[4], 5);
+  EXPECT_DOUBLE_EQ(positions[5], 6);
+}
+
+TEST(Isd, NoSunPositions) {
+  ale::json j;
+  try {
+    ale::getSunPositions(j);
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the sun positions.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the sun positions.\"";
+  }
+}
+
+TEST(Isd, GetSensorPositions) {
+  ale::json j;
+  j["sensor_position"]["positions"] = {{1, 2, 3}, {4, 5, 6}};
+  std::vector<double> positions = ale::getSensorPositions(j);
+  EXPECT_DOUBLE_EQ(positions[0], 1);
+  EXPECT_DOUBLE_EQ(positions[1], 2);
+  EXPECT_DOUBLE_EQ(positions[2], 3);
+  EXPECT_DOUBLE_EQ(positions[3], 4);
+  EXPECT_DOUBLE_EQ(positions[4], 5);
+  EXPECT_DOUBLE_EQ(positions[5], 6);
+}
+
+TEST(Isd, NoSensorPositions) {
+  ale::json j;
+  try {
+    ale::getSensorPositions(j);
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the sensor positions.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the sensor positions.\"";
+  }
+}
+
+TEST(Isd, GetSensorVelocities)
+{
+  ale::json j;
+  j["sensor_position"]["velocities"] = {{1, 2, 3}, {4, 5, 6}};
+  std::vector<double> velocities = ale::getSensorVelocities(j);
+  EXPECT_DOUBLE_EQ(velocities[0], 1);
+  EXPECT_DOUBLE_EQ(velocities[1], 2);
+  EXPECT_DOUBLE_EQ(velocities[2], 3);
+  EXPECT_DOUBLE_EQ(velocities[3], 4);
+  EXPECT_DOUBLE_EQ(velocities[4], 5);
+  EXPECT_DOUBLE_EQ(velocities[5], 6);
+}
+
+TEST(Isd, NoSensorVelocities) {
+  ale::json j;
+  try {
+    ale::getSensorVelocities(j);
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the sensor velocities.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the sensor velocities.\"";
+  }
+}
+
+TEST(Isd, GetSensorOrientations)
+{
+  ale::json j;
+  j["sensor_orientation"]["quaternions"] = {{1, 2, 3, 4}};
+  std::vector<double> quats = ale::getSensorOrientations(j);
+  EXPECT_DOUBLE_EQ(quats[0], 1);
+  EXPECT_DOUBLE_EQ(quats[1], 2);
+  EXPECT_DOUBLE_EQ(quats[2], 3);
+  EXPECT_DOUBLE_EQ(quats[3], 4);
+}
+
+TEST(Isd, NoSensorOrientations) {
+  ale::json j;
+  try {
+    ale::getSensorOrientations(j);
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the sensor orientations.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the sensor orientations.\"";
+  }
+}
+
 TEST(Isd, BadNameModel) {
   std::string bad_json_str("{}");
   try {
@@ -306,95 +482,105 @@ TEST(Isd, BadFocal2Pixel) {
   }
 }
 
-// TEST(Isd, BadDistortionModel) {
-//   std::string bad_json_str("{}");
-//   try {
-//     ale::getDistortionModel(bad_json_str);
-//     // Code that should throw an IException
-//     FAIL() << "Expected an exception to be thrown";
-//   }
-//   catch(std::exception &e) {
-//     EXPECT_EQ(std::string(e.what()), "Could not parse the distortion model.");
-//   }
-//   catch(...) {
-//     FAIL() << "Expected an Excpetion with message: \"Could not parse the distortion model.\"";
-//   }
-// }
+TEST(Isd, BadDistortionModel) {
+  std::string bad_json_str("{}");
+  try {
+    ale::getDistortionModel(bad_json_str);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the distortion model.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the distortion model.\"";
+  }
+}
 
-// TEST(Isd, BadDistortionTransverse) {
-//   std::string bad_json_str("{\"optical_distortion\":{\"transverse\"}}");
-//   try {
-//     ale::getDistortionCoeffs(bad_json_str);
-//     // Code that should throw an IException
-//     FAIL() << "Expected an exception to be thrown";
-//   }
-//   catch(std::exception &e) {
-//     EXPECT_EQ(std::string(e.what()), "Could not parse a set of transverse distortion model coefficients.");
-//   }
-//   catch(...) {
-//     FAIL() << "Expected an Excpetion with message: \"Could not parse a set of transverse distortion model coefficients.\"";
-//   }
-// }
+TEST(Isd, BadDistortionTransverse) {
+  ale::json bad_json;
+  bad_json["optical_distortion"]["transverse"]["x"] = {"NaN"};
+  bad_json["optical_distortion"]["transverse"]["y"] = {"NaN"};
 
-// TEST(Isd, BadDistortionRadial) {
-//   std::string bad_json_str("{\"optical_distortion\":{\"radial\"}}");
-//   try {
-//     ale::getDistortionCoeffs(bad_json_str);
-//     // Code that should throw an IException
-//     FAIL() << "Expected an exception to be thrown";
-//   }
-//   catch(std::exception &e) {
-//     EXPECT_EQ(std::string(e.what()), "Could not parse the radial distortion model coefficients.");
-//   }
-//   catch(...) {
-//     FAIL() << "Expected an Excpetion with message: \"Could not parse the radial distortion model coefficients.\"";
-//   }
-// }
+  try {
+    ale::getDistortionCoeffs(bad_json);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse a set of transverse distortion model coefficients.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse a set of transverse distortion model coefficients.\"";
+  }
+}
 
-// TEST(Isd, BadDistortionKaguyalism) {
-//   std::string bad_json_str("{\"optical_distortion\":{\"dawnfc\"}}");
-//   try {
-//     ale::getDistortionCoeffs(bad_json_str);
-//     // Code that should throw an IException
-//     FAIL() << "Expected an exception to be thrown";
-//   }
-//   catch(std::exception &e) {
-//     EXPECT_EQ(std::string(e.what()), "Could not parse the dawn radial distortion model coefficients.");
-//   }
-//   catch(...) {
-//     FAIL() << "Expected an Excpetion with message: \"Could not parse the dawn radial distortion model coefficients.\"";
-//   }
-// }
+TEST(Isd, BadDistortionRadial) {
+  ale::json bad_json;
+  bad_json["optical_distortion"]["radial"]["coefficients"] = {"NaN"};
 
-// TEST(Isd, BadDistortionDawnFC) {
-//   std::string bad_json_str("{\"optical_distortion\":{\"radial\"}}");
-//   try {
-//     ale::getDistortionCoeffs(bad_json_str);
-//     // Code that should throw an IException
-//     FAIL() << "Expected an exception to be thrown";
-//   }
-//   catch(std::exception &e) {
-//     EXPECT_EQ(std::string(e.what()), "Could not parse a set of Kaguya LISM distortion model coefficients.");
-//   }
-//   catch(...) {
-//     FAIL() << "Expected an Excpetion with message: \"Could not parse a set of Kaguya LISM distortion model coefficients.\"";
-//   }
-// }
+  try {
+    ale::getDistortionCoeffs(bad_json);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the radial distortion model coefficients.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the radial distortion model coefficients.\"";
+  }
+}
 
-// TEST(Isd, BadDistortionLroLrocNac) {
-//   std::string bad_json_str("{\"optical_distortion\":{\"lrolrocnac\"}}");
-//   try {
-//     ale::getDistortionCoeffs(bad_json_str);
-//     // Code that should throw an IException
-//     FAIL() << "Expected an exception to be thrown";
-//   }
-//   catch(std::exception &e) {
-//     EXPECT_EQ(std::string(e.what()), "Could not parse the lrolrocnac distortion model coefficients.");
-//   }
-//   catch(...) {
-//     FAIL() << "Expected an Excpetion with message: \"Could not parse the lrolrocnac distortion model coefficients.\"";
-//   }
-// }
+TEST(Isd, BadDistortionDawnFC) {
+  ale::json bad_json;
+  bad_json["optical_distortion"]["dawnfc"]["coefficients"] = {"NaN"};
+
+  try {
+    ale::getDistortionCoeffs(bad_json);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the dawn radial distortion model coefficients.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the dawn radial distortion model coefficients.\"";
+  }
+}
+
+TEST(Isd, BadDistortionKaguyaLISM) {
+  ale::json bad_json;
+  bad_json["optical_distortion"]["kaguyalism"]["x"] = {"NaN"};
+  bad_json["optical_distortion"]["kaguyalism"]["y"] = {"NaN"};
+  try {
+    ale::getDistortionCoeffs(bad_json);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse a set of Kaguya LISM distortion model coefficients.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse a set of Kaguya LISM distortion model coefficients.\"";
+  }
+}
+
+TEST(Isd, BadDistortionLroLrocNac) {
+  ale::json bad_json;
+  bad_json["optical_distortion"]["lrolrocnac"]["coefficients"] = {"NaN"};
+  try {
+    ale::getDistortionCoeffs(bad_json);
+    // Code that should throw an IException
+    FAIL() << "Expected an exception to be thrown";
+  }
+  catch(std::exception &e) {
+    EXPECT_EQ(std::string(e.what()), "Could not parse the lrolrocnac distortion model coefficients.");
+  }
+  catch(...) {
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the lrolrocnac distortion model coefficients.\"";
+  }
+}
 
 TEST(Isd, BadImageSize) {
   std::string bad_json_str("{}");
@@ -491,4 +677,3 @@ TEST(Isd, BadEphemerisTimes) {
     FAIL() << "Expected an Excpetion with message: \"Could not parse the center image time.\"";
   }
 }
-
