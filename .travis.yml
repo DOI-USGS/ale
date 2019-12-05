@@ -47,8 +47,9 @@ install:
 script:
   - PYTHONPATH=. pytest tests/pytests -vv
   - python setup.py install # install to use python lib in c code
-  - echo $TRAVIS_COMMIT_RANGE
-  - git clang-format $TRAVIS_COMMIT_RANGE --diff
+  - PR_COMMIT_HASH=$(git rev-parse HEAD)
+  - MERGE_COMMIT_HASH=$(git rev-parse master)
+  - git clang-format $MERGE_COMMIT_HASH $PR_COMMIT_HASH --diff
   - mkdir -p build
   - cd build
   - cmake -DCOVERAGE=ON ..
