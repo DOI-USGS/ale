@@ -51,7 +51,7 @@ script:
   - mkdir -p build
   - cd build
   - cmake -DCOVERAGE=ON ..
-  - cmake --build VERBOSE=1 .
+  - cmake --build --verbose .
   - ctest -VV
 
 after_success:
