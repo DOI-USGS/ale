@@ -703,7 +703,7 @@ class test_mex_isis3_naif(unittest.TestCase):
     def test_fikid(self):
         with patch('ale.drivers.mex_drivers.spice.bods2c', return_value=12345) as bods2c:
             assert self.driver.fikid == 12345
-            bods2c.assert_called_with('HRSC')
+            bods2c.assert_called_with('MEX_HRSC_IR')
 
     def test_ephemeris_start_time(self):
         with patch('ale.drivers.mex_drivers.read_table_data', return_value=12345) as read_table_data, \
