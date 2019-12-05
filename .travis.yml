@@ -12,6 +12,7 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-4.0
           packages:
             - g++-7
       env:
@@ -48,6 +49,10 @@ install:
 script:
   - PYTHONPATH=. pytest tests/pytests -vv
   - python setup.py install # install to use python lib in c code
+  - |
+    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+      run-clang-tidy.py
+    fi
   - mkdir -p build
   - cd build
   - cmake -DCOVERAGE=ON ..
