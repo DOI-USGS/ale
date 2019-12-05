@@ -693,7 +693,7 @@ class test_mex_isis3_naif(unittest.TestCase):
         self.driver =  MexHrscIsisLabelNaifSpiceDriver(label)
 
     def test_instrument_id(self):
-        assert self.driver.instrument_id == 'HRSC'
+        assert self.driver.instrument_id == 'MEX_HRSC_IR'
 
     def test_ikid(self):
         with patch('ale.drivers.mex_drivers.spice.bods2c', return_value=12345) as bods2c:
