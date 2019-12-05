@@ -43,7 +43,6 @@ install:
   - conda env create -n ale python=3.7.3
   - conda env update -f environment.yml -n ale
   - source activate ale
-  - conda install pytest
 
 script:
   - PYTHONPATH=. pytest tests/pytests -vv
