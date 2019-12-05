@@ -14,9 +14,9 @@ namespace ale {
   /// Interpolation enum for defining different methods of interpolation
   enum interpolation {
     /// Interpolate using linear interpolation
-    linear,
+    LINEAR,
     /// Interpolate using spline interpolation
-    spline
+    SPLINE
   };
 
   /**
