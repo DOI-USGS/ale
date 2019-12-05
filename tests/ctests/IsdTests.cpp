@@ -9,32 +9,22 @@
 #include "Util.h"
 
 void ASSERT_DOUBLE_VECTOR_EQ(std::vector<double> v1, std::vector<double> v2) {
-  if (v1.size() != v2.size()) {
-    EXPECT_TRUE(::testing::AssertionFailure() << "The two input vectors are different in size");
-  }
+  ASSERT_EQ(v1.size(), v2.size()) << "The two input vectors are different in size";
 
   for(size_t i = 0; i < v1.size(); i++) {
-    if(v1[i] != v2[i]) {
-      EXPECT_TRUE(::testing::AssertionFailure() << "Arrays at " << i << " are not equal.");
-    }
+    EXPECT_DOUBLE_EQ(v1[i], v2[i]) << "Arrays at " << i << " are not equal.";
   }
 }
 
 
 void ASSERT_DOUBLE_2D_VECTOR_EQ(std::vector<std::vector<double>> v1, std::vector<std::vector<double>> v2) {
-  if (v1.size() != v2.size()) {
-    EXPECT_TRUE(::testing::AssertionFailure() << "The two input vectors are different in size");
-  }
+  ASSERT_EQ(v1.size(), v2.size()) << "The two input vectors are different in size";
 
   for(size_t i = 0; i < v1.size(); i++) {
-    if (v1[i].size() != v2[i].size()){
-      EXPECT_TRUE(::testing::AssertionFailure() << "The two input vectors at " << i << "are different in size");
-    }
+    ASSERT_EQ(v1[i].size(), v2[i].size()) << "The two input vectors at " << i << "are different in size";
 
     for(size_t j = 0; j < v1[i].size(); j++) {
-      if(v1[i][j] != v2[i][j]) {
-        EXPECT_TRUE(::testing::AssertionFailure() << "Arrays at " << i << ", " << j <<  " are not equal.");
-      }
+      EXPECT_DOUBLE_EQ(v1[i][j], v2[i][j]) << "Arrays at " << i << ", " << j <<  " are not equal.";
     }
   }
 }
@@ -93,6 +83,7 @@ TEST(Isd, TransverseDistortion) {
 
   std::vector<double> coeffs = ale::getDistortionCoeffs(trans);
   EXPECT_EQ(ale::getDistortionModel(trans), ale::DistortionType::TRANSVERSE);
+  ASSERT_EQ(coeffs.size(), 20);
   EXPECT_DOUBLE_EQ(coeffs[0], 1);
   EXPECT_DOUBLE_EQ(coeffs[10], 2);
 }
@@ -103,6 +94,7 @@ TEST(Isd, RadialDistortion) {
 
   std::vector<double> coeffs = ale::getDistortionCoeffs(radial);
   EXPECT_EQ(ale::getDistortionModel(radial), ale::DistortionType::RADIAL);
+  ASSERT_EQ(coeffs.size(), 2);
   EXPECT_DOUBLE_EQ(coeffs[0], 1);
   EXPECT_DOUBLE_EQ(coeffs[1], 2);
 }
@@ -111,14 +103,15 @@ TEST(Isd, KaguyaLISMDistortion) {
   ale::json kaguya;
   kaguya["optical_distortion"]["kaguyalism"]["x"] = {1};
   kaguya["optical_distortion"]["kaguyalism"]["y"] = {2};
-  kaguya["optical_distortion"]["kaguyalism"]["boresight_x"] = 1;
-  kaguya["optical_distortion"]["kaguyalism"]["boresight_y"] = 2;
+  kaguya["optical_distortion"]["kaguyalism"]["boresight_x"] = 3;
+  kaguya["optical_distortion"]["kaguyalism"]["boresight_y"] = 4;
 
   std::vector<double> coeffs = ale::getDistortionCoeffs(kaguya);
   EXPECT_EQ(ale::getDistortionModel(kaguya), ale::DistortionType::KAGUYALISM);
-  EXPECT_DOUBLE_EQ(coeffs[0], 1);
+  ASSERT_EQ(coeffs.size(), 10);
+  EXPECT_DOUBLE_EQ(coeffs[0], 3);
   EXPECT_DOUBLE_EQ(coeffs[1], 1);
-  EXPECT_DOUBLE_EQ(coeffs[5], 2);
+  EXPECT_DOUBLE_EQ(coeffs[5], 4);
   EXPECT_DOUBLE_EQ(coeffs[6], 2);
 }
 
@@ -127,6 +120,7 @@ TEST(Isd, DawnFCDistortion) {
   dawn["optical_distortion"]["dawnfc"]["coefficients"] = {1, 2};
   std::vector<double> coeffs = ale::getDistortionCoeffs(dawn);
   EXPECT_EQ(ale::getDistortionModel(dawn), ale::DistortionType::DAWNFC);
+  ASSERT_EQ(coeffs.size(), 2);
   EXPECT_DOUBLE_EQ(coeffs[0], 1);
   EXPECT_DOUBLE_EQ(coeffs[1], 2);
 }
@@ -136,6 +130,7 @@ TEST(Isd, LroLrocNACDistortion) {
   lro["optical_distortion"]["lrolrocnac"]["coefficients"] = {1, 2};
   std::vector<double> coeffs = ale::getDistortionCoeffs(lro);
   EXPECT_EQ(ale::getDistortionModel(lro), ale::DistortionType::LROLROCNAC);
+  ASSERT_EQ(coeffs.size(), 2);
   EXPECT_DOUBLE_EQ(coeffs[0], 1);
   EXPECT_DOUBLE_EQ(coeffs[1], 2);
 }
