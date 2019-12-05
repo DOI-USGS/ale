@@ -51,7 +51,7 @@ script:
   - python setup.py install # install to use python lib in c code
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      run-clang-tidy.py
+      python ci_support/run-clang-tidy.py
     fi
   - mkdir -p build
   - cd build
