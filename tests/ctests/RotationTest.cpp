@@ -205,7 +205,7 @@ TEST(RotationTest, ToEulerBadAxisNumber) {
   ASSERT_THROW(rotation.toEuler({4, 1, 0}), std::invalid_argument);
 }
 
-TEST(RotationTest, ToAxisAngle){
+TEST(RotationTest, ToAxisAngle) {
   Rotation rotation(0.5, 0.5, 0.5, 0.5);
   std::pair<std::vector<double>, double> axisAngle = rotation.toAxisAngle();
   ASSERT_EQ(axisAngle.first.size(), 3);

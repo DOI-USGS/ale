@@ -51,7 +51,7 @@ script:
     PR_COMMIT_HASH=$(git rev-parse HEAD)
     MERGE_COMMIT_HASH=$(git rev-parse master)
     FORMATTING_ERRORS=$(git clang-format ${MERGE_COMMIT_HASH} ${PR_COMMIT_HASH} --diff)
-    if [ -z "${FORMATTING_ERRORS}"]; then
+    if [ -z "${FORMATTING_ERRORS}" ]; then
       echo "All modified source code properly formatted!"
       exit 0
     else
