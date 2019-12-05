@@ -48,7 +48,7 @@ install:
 script:
   - PYTHONPATH=. pytest tests/pytests -vv
   - python setup.py install # install to use python lib in c code
-  - git clang-format $TRAVIS_COMMIT_RANGE
+  - git clang-format $TRAVIS_COMMIT_RANGE --diff
   - mkdir -p build
   - cd build
   - cmake -DCOVERAGE=ON ..
