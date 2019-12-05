@@ -390,7 +390,7 @@ TEST(RotationTest, MultiplyRotation) {
 TEST(RotationTest, Slerp) {
   Rotation rotationOne(0.5, 0.5, 0.5, 0.5);
   Rotation rotationTwo(-0.5, 0.5, 0.5, 0.5);
-  Rotation interpRotation = rotationOne.interpolate(rotationTwo, 0.125, ale::slerp);
+  Rotation interpRotation = rotationOne.interpolate(rotationTwo, 0.125, ale::SLERP);
   vector<double> quat = interpRotation.toQuaternion();
   ASSERT_EQ(quat.size(), 4);
   EXPECT_NEAR(quat[0], cos(M_PI * 3.0/8.0), 1e-10);
@@ -402,7 +402,7 @@ TEST(RotationTest, Slerp) {
 TEST(RotationTest, SlerpExtrapolate) {
   Rotation rotationOne(0.5, 0.5, 0.5, 0.5);
   Rotation rotationTwo(-0.5, 0.5, 0.5, 0.5);
-  Rotation interpRotation = rotationOne.interpolate(rotationTwo, 1.125, ale::slerp);
+  Rotation interpRotation = rotationOne.interpolate(rotationTwo, 1.125, ale::SLERP);
   vector<double> quat = interpRotation.toQuaternion();
   ASSERT_EQ(quat.size(), 4);
   EXPECT_NEAR(quat[0], cos(M_PI * 17.0/24.0), 1e-10);
@@ -414,7 +414,7 @@ TEST(RotationTest, SlerpExtrapolate) {
 TEST(RotationTest, Nlerp) {
   Rotation rotationOne(0.5, 0.5, 0.5, 0.5);
   Rotation rotationTwo(-0.5, 0.5, 0.5, 0.5);
-  Rotation interpRotation = rotationOne.interpolate(rotationTwo, 0.125, ale::nlerp);
+  Rotation interpRotation = rotationOne.interpolate(rotationTwo, 0.125, ale::NLERP);
   double scaling = 8.0 / sqrt(57.0);
   vector<double> quat = interpRotation.toQuaternion();
   ASSERT_EQ(quat.size(), 4);
@@ -427,7 +427,7 @@ TEST(RotationTest, Nlerp) {
 TEST(RotationTest, NlerpExtrapolate) {
   Rotation rotationOne(0.5, 0.5, 0.5, 0.5);
   Rotation rotationTwo(-0.5, 0.5, 0.5, 0.5);
-  Rotation interpRotation = rotationOne.interpolate(rotationTwo, 1.125, ale::nlerp);
+  Rotation interpRotation = rotationOne.interpolate(rotationTwo, 1.125, ale::NLERP);
   double scaling = 8.0 / sqrt(73.0);
   vector<double> quat = interpRotation.toQuaternion();
   ASSERT_EQ(quat.size(), 4);
