@@ -540,6 +540,7 @@ def test_kernels():
     kernels = get_image_kernels('h5270_0000_ir2')
     updated_kernels, binary_kernels = convert_kernels(kernels)
     yield updated_kernels
+    print(updated_kernels)
     for kern in binary_kernels:
         os.remove(kern)
 
@@ -571,6 +572,7 @@ def test_mex_load(test_kernels, formatter, usgscsm_compare_dict, label):
 
         usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter=formatter, verbose='true')
         assert compare_dicts(usgscsm_isd, usgscsm_compare_dict['h5270_0000_ir2'][formatter]) == []
+        assert False
 
 # ========= Test mex pds3label and naifspice driver =========
 class test_mex_pds3_naif(unittest.TestCase):
