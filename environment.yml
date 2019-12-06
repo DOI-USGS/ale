@@ -5,7 +5,6 @@ channels:
   - usgs-astrogeology
 
 dependencies:
-  - clang-tools
   - cmake>=3.10
   - pytest
   - eigen
