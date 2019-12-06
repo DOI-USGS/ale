@@ -151,6 +151,7 @@ TEST(Isd, GetSunPositions) {
   ale::json j;
   j["sun_position"]["positions"] = {{1, 2, 3}, {4, 5, 6}};
   std::vector<double> positions = ale::getSunPositions(j);
+  ASSERT_EQ(positions.size(), 6);
   EXPECT_DOUBLE_EQ(positions[0], 1);
   EXPECT_DOUBLE_EQ(positions[1], 2);
   EXPECT_DOUBLE_EQ(positions[2], 3);
@@ -177,6 +178,7 @@ TEST(Isd, GetSensorPositions) {
   ale::json j;
   j["sensor_position"]["positions"] = {{1, 2, 3}, {4, 5, 6}};
   std::vector<double> positions = ale::getSensorPositions(j);
+  ASSERT_EQ(positions.size(), 6);
   EXPECT_DOUBLE_EQ(positions[0], 1);
   EXPECT_DOUBLE_EQ(positions[1], 2);
   EXPECT_DOUBLE_EQ(positions[2], 3);
@@ -204,6 +206,7 @@ TEST(Isd, GetSensorVelocities)
   ale::json j;
   j["sensor_position"]["velocities"] = {{1, 2, 3}, {4, 5, 6}};
   std::vector<double> velocities = ale::getSensorVelocities(j);
+  ASSERT_EQ(velocities.size(), 6);
   EXPECT_DOUBLE_EQ(velocities[0], 1);
   EXPECT_DOUBLE_EQ(velocities[1], 2);
   EXPECT_DOUBLE_EQ(velocities[2], 3);
@@ -231,6 +234,7 @@ TEST(Isd, GetSensorOrientations)
   ale::json j;
   j["sensor_orientation"]["quaternions"] = {{1, 2, 3, 4}};
   std::vector<double> quats = ale::getSensorOrientations(j);
+  ASSERT_EQ(quats.size(), 4);
   EXPECT_DOUBLE_EQ(quats[0], 1);
   EXPECT_DOUBLE_EQ(quats[1], 2);
   EXPECT_DOUBLE_EQ(quats[2], 3);
