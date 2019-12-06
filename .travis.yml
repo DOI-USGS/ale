@@ -12,6 +12,7 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise
           packages:
             - g++-7
       env:
@@ -47,7 +48,6 @@ install:
 script:
   - PYTHONPATH=. pytest tests/pytests -vv
   - python setup.py install # install to use python lib in c code
-  - bash ci_support/check-formatting.sh
   - mkdir -p build
   - cd build
   - cmake -DCOVERAGE=ON ..
@@ -58,4 +58,5 @@ after_success:
   - |
     if [ "$TRAVIS_OS_NAME" == linux ]; then
       coveralls --root $(dirname $PWD) -i src/ --verbose;
+      bash ci_support/check-formatting.sh
     fi
