@@ -1,7 +1,6 @@
 #include "States.h"
 
 #include <iostream>
-#include <stdexcept>
 #include <algorithm>
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_spline.h>
@@ -63,15 +62,6 @@ namespace ale {
     // Find the interval in which "a" exists
     int lowerIndex = ale::FindIntervalLowerIndex(a, x);
 
-    // If the time is exactly equal to either endpoint of the interval,
-    // return the value at the appropriate endpoint
-    if(a == x[lowerIndex]) {
-      return y[lowerIndex];
-    }
-    if(a == x[lowerIndex+1]) {
-      return y[lowerIndex+1];
-    }
-
     double x0, x1, y0, y1, m0, m1;
     // a is contained within the interval (x0,x1)
     x0 = x[lowerIndex];
@@ -98,15 +88,6 @@ namespace ale {
     // find the interval in which "a" exists
     int lowerIndex = ale::FindIntervalLowerIndex(a, x);
 
-    // if a is exactly equal to the time at either endpoint, return the 
-    // value at the appropriate endpoint
-    if(a == x[lowerIndex]) {
-      return deriv[lowerIndex];
-    }
-    if(a == x[lowerIndex+1]) {
-      return deriv[lowerIndex+1];
-    }
-
     double x0, x1, y0, y1, m0, m1;
 
     // a is contained within the interval (x0,x1)
@@ -128,11 +109,13 @@ namespace ale {
       return ((6 * t * t - 6 * t) * y0 + (3 * t * t - 4 * t + 1) * h * m0 + (-6 * t * t + 6 * t) * y1 + (3 * t * t - 2 * t) * h * m1) / h;
     }
     else {
-      return 0;  // Should never happen
+      throw std::invalid_argument("Error in evaluating cubic hermite velocities, values at"
+                                  "lower and upper indicies are exactly equal.");
     }
   }
   
   // Stadard default gsl interpolation to use if we haven't yet reduced the cache.
+  // Times must be sorted in order of least to greatest
    double interpolateState(std::vector<double> points, std::vector<double> times, double time, interpolation interp, int d) {
    size_t numPoints = points.size();
    if (numPoints < 2) {
@@ -140,9 +123,6 @@ namespace ale {
    }
    if (points.size() != times.size()) {
      throw std::invalid_argument("Invalid gsl_interp_type data, must have the same number of points as times.");
-   }
-   if (time < times.front() || time > times.back()) {
-     throw std::invalid_argument("Invalid gsl_interp_type time, outside of input times.");
    }
 
    // convert our interp enum into a GSL one,
@@ -177,25 +157,27 @@ namespace ale {
    return result;
  }
 
+  // States Class
+  
   // Empty constructor
-   States::States() : m_refFrame(0) {
+   States::States() : m_refFrame(0), m_minimizedCache(false) {
     ale::Vec3d position = {0.0, 0.0, 0.0};
     ale::Vec3d velocity = {0.0, 0.0, 0.0};
     m_states.push_back(ale::State(position, velocity)); 
     
     std::vector<double> ephems = {0.0};
     m_ephemTimes = ephems; 
-    m_minimizedCache = false;
   }
 
-  States::States(std::vector<double> ephemTimes, std::vector<ale::Vec3d> positions, int refFrame) :
-  m_ephemTimes(ephemTimes), m_refFrame(refFrame) {
-    // Construct State vector from position and velocity vectors
 
+  States::States(std::vector<double> ephemTimes, std::vector<ale::Vec3d> positions, int refFrame) :
+    m_ephemTimes(ephemTimes), m_refFrame(refFrame) {
+    // Construct State vector from position and velocity vectors
+    
     if (positions.size() != ephemTimes.size()) {
       throw std::invalid_argument("Length of times must match number of positions"); 
     }
-
+    
     ale::Vec3d velocities = {0.0, 0.0, 0.0};
     for (ale::Vec3d position : positions) {
       m_states.push_back(ale::State(position, velocities)); 
@@ -205,21 +187,26 @@ namespace ale {
 
 
   States::States(std::vector<double> ephemTimes, std::vector<ale::Vec3d> positions, 
-                   std::vector<ale::Vec3d> velocities, int refFrame) : 
-  m_ephemTimes(ephemTimes), m_refFrame(refFrame) {
-
+                 std::vector<ale::Vec3d> velocities, int refFrame) : 
+    m_ephemTimes(ephemTimes), m_refFrame(refFrame) {
+    
     if ((positions.size() != ephemTimes.size())||(ephemTimes.size() != velocities.size())) {
       throw std::invalid_argument("Length of times must match number of positions and velocities."); 
     }
-
+    
     for (int i=0; i < positions.size() ;i++) {
       m_states.push_back(ale::State(positions[i], velocities[i])); 
     }
     m_minimizedCache=false;
   }
 
+
   States::States(std::vector<double> ephemTimes, std::vector<ale::State> states, int refFrame) :
-  m_ephemTimes(ephemTimes), m_states(states), m_refFrame(refFrame), m_minimizedCache(false) {}
+  m_ephemTimes(ephemTimes), m_states(states), m_refFrame(refFrame), m_minimizedCache(false) {
+    if (states.size() != ephemTimes.size()) {
+      throw std::invalid_argument("Length of times must match number of states."); 
+    }
+  }
 
   // Default Destructor 
   States::~States() {}
@@ -237,8 +224,7 @@ namespace ale {
     std::vector<ale::Vec3d> positions; 
     
     for(ale::State state : m_states) {
-        ale::Vec3d position = state.position;
-        positions.push_back(position);
+        positions.push_back(state.position);
     }
     return positions; 
   }
@@ -250,8 +236,7 @@ namespace ale {
     std::vector<ale::Vec3d> velocities; 
     
     for(ale::State state : m_states) {
-        ale::Vec3d velocity = state.velocity;
-        velocities.push_back(velocity);
+        velocities.push_back(state.velocity);
     }
     return velocities; 
   }
@@ -362,7 +347,7 @@ namespace ale {
   /** Returns the last ephemeris time **/
   double States::getStopTime() {
     int len = m_ephemTimes.size(); 
-    return m_ephemTimes[len - 1];
+    return m_ephemTimes.back();
   }
       
   /** Perform a cache reduction. 
@@ -383,7 +368,7 @@ namespace ale {
     }
 
     // Compute scaled time to use for fitting. 
-    double baseTime = (m_ephemTimes.at(0) + m_ephemTimes.at(m_ephemTimes.size() - 1)) / 2.0;
+    double baseTime = (m_ephemTimes.at(0) + m_ephemTimes.back())/ 2.0;
     double timeScale = 1.0;
 
     // Find current size of m_states
@@ -399,6 +384,8 @@ namespace ale {
     std::vector <int> indexList = HermiteIndices(tolerance, inputIndices, baseTime, timeScale);
 
     // Remove all lines from cache vectors that are not in the index list
+    // Note the delibrately reversed order so that the length of the vectors can be changed 
+    // without messing up the indexing
     for(int i = currentSize; i >= 0; i--) {
       if(!std::binary_search(indexList.begin(), indexList.end(), i)) {
         m_states.erase(m_states.begin() + i);
