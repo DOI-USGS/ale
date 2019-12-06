@@ -6,10 +6,10 @@
 
 namespace ale {
 
-enum RotationInterpolation {
-  slerp,  // Spherical interpolation
-  nlerp   // Normalized linear interpolation
-};
+  enum RotationInterpolation {
+    SLERP, // Spherical interpolation
+    NLERP // Normalized linear interpolation
+  };
 
 /**
  * A generic 3D rotation.
