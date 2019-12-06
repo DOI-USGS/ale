@@ -32,7 +32,7 @@ of a cloned fork of the repository, follow these steps:
 
 ```bash
 python setup.py install
-mkdir build && cd build
+cd build
 cmake ..
 make
 ```
@@ -43,3 +43,12 @@ running the following command will retrieve the gtest submodule manually:
 ```bash
 git submodule update --init --recursive
 ```
+
+## Running Tests
+
+To run ctests to test c++ part of ale, run:
+
+```
+ctest
+```
+from the build directory. 
