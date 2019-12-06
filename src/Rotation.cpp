@@ -213,33 +213,30 @@ Rotation Rotation::operator*(const Rotation& rightRotation) const {
                   combinedQuat.z());
 }
 
-  Rotation Rotation::interpolate(
-        const Rotation& nextRotation,
-        double t,
-        RotationInterpolation interpType
-  ) const {
-    Eigen::Quaterniond interpQuat;
-    switch (interpType) {
-      case SLERP:
-        interpQuat = m_impl->quat.slerp(t, nextRotation.m_impl->quat);
-        break;
-      case NLERP:
-        interpQuat = Eigen::Quaterniond(
-              linearInterpolate(m_impl->quat.w(), nextRotation.m_impl->quat.w(), t),
-              linearInterpolate(m_impl->quat.x(), nextRotation.m_impl->quat.x(), t),
-              linearInterpolate(m_impl->quat.y(), nextRotation.m_impl->quat.y(), t),
-              linearInterpolate(m_impl->quat.z(), nextRotation.m_impl->quat.z(), t)
-        );
-        interpQuat.normalize();
-        break;
-      default:
-        throw std::invalid_argument("Unsupported rotation interpolation type.");
-        break;
-    }
-    return Rotation(interpQuat.w(), interpQuat.x(), interpQuat.y(), interpQuat.z());
+Rotation Rotation::interpolate(
+      const Rotation& nextRotation,
+      double t,
+      RotationInterpolation interpType
+) const {
+  Eigen::Quaterniond interpQuat;
+  switch (interpType) {
+    case SLERP:
+      interpQuat = m_impl->quat.slerp(t, nextRotation.m_impl->quat);
+      break;
+    case NLERP:
+      interpQuat = Eigen::Quaterniond(
+            linearInterpolate(m_impl->quat.w(), nextRotation.m_impl->quat.w(), t),
+            linearInterpolate(m_impl->quat.x(), nextRotation.m_impl->quat.x(), t),
+            linearInterpolate(m_impl->quat.y(), nextRotation.m_impl->quat.y(), t),
+            linearInterpolate(m_impl->quat.z(), nextRotation.m_impl->quat.z(), t)
+      );
+      interpQuat.normalize();
+      break;
+    default:
+      throw std::invalid_argument("Unsupported rotation interpolation type.");
+      break;
   }
-  return Rotation(interpQuat.w(), interpQuat.x(), interpQuat.y(),
-                  interpQuat.z());
+  return Rotation(interpQuat.w(), interpQuat.x(), interpQuat.y(), interpQuat.z());
 }
 
 }  // namespace ale
