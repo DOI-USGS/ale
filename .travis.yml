@@ -47,6 +47,10 @@ install:
   - source activate ale
 
 script:
+  - |
+    if [ "$TRAVIS_OS_NAME" == linux ]; then
+      bash ci_support/check-formatting.sh
+    fi
   - PYTHONPATH=. pytest tests/pytests -vv
   - python setup.py install # install to use python lib in c code
   - mkdir -p build
