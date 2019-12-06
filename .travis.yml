@@ -15,7 +15,7 @@ matrix:
             - llvm-toolchain-precise
           packages:
             - g++-7
-            - clang-format-9.0
+            - clang-format-8.0
       env:
         - MATRIX_EVAL="CXX=g++-7 && CC=gcc-7"
     - os: osx
