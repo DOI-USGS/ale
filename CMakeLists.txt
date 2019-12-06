@@ -21,16 +21,20 @@ find_package(Python        REQUIRED COMPONENTS Development)
 find_package(nlohmann_json REQUIRED)
 
 # Library setup
+set(ALE_BUILD_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/")
+set(ALE_INSTALL_INCLUDE_DIR "include/ale")
 add_library(ale SHARED
             ${CMAKE_CURRENT_SOURCE_DIR}/src/ale.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/Rotation.cpp)
-set(ALE_BUILD_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/")
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Rotation.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Isd.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Util.cpp)
 set(ALE_HEADERS "${ALE_BUILD_INCLUDE_DIR}/ale.h"
-                "${ALE_BUILD_INCLUDE_DIR}/Rotation.h")
-set(ALE_INSTALL_INCLUDE_DIR "include/ale")
+                "${ALE_BUILD_INCLUDE_DIR}/Rotation.h"
+                "${ALE_BUILD_INCLUDE_DIR}/Isd.h"
+                "${ALE_BUILD_INCLUDE_DIR}/Util.h")
 set_target_properties(ale PROPERTIES
-                      VERSION             ${PROJECT_VERSION}
-                      SOVERSION           0)
+                      VERSION   ${PROJECT_VERSION}
+                      SOVERSION 0)
 # Use generator expressions so that downstream projects can use this target
 target_include_directories(ale
                            PUBLIC
