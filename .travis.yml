@@ -12,10 +12,8 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise
           packages:
             - g++-7
-            - clang-format-5.0
       env:
         - MATRIX_EVAL="CXX=g++-7 && CC=gcc-7"
     - os: osx
@@ -49,6 +47,7 @@ install:
 script:
   - |
     if [ "$TRAVIS_OS_NAME" == linux ]; then
+      conda install -c conda-forge clang-tools
       bash ci_support/check-formatting.sh
     fi
   - PYTHONPATH=. pytest tests/pytests -vv
