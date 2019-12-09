@@ -121,6 +121,7 @@ def test_kernels():
     for kern in binary_kernels:
         os.remove(kern)
 
+@pytest.mark.xfail
 @pytest.mark.parametrize("label_type", ['isis3'])
 @pytest.mark.parametrize("formatter", ['isis'])
 def test_mro_load(test_kernels, label_type, formatter, isis_compare_dict):
