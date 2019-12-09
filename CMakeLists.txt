@@ -20,12 +20,6 @@ find_package(Eigen3 3.3    REQUIRED NO_MODULE)
 find_package(Python        REQUIRED COMPONENTS Development)
 find_package(nlohmann_json REQUIRED)
 
-# if cmake install prefix is not set, and conda env is activated, use the
-# conda env as the install directory
-if(DEFINED ENV{CONDA_PREFIX} AND CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
- set(CMAKE_INSTALL_PREFIX $ENV{CONDA_PREFIX})
-endif()
-
 # Library setup
 add_library(ale SHARED
             ${CMAKE_CURRENT_SOURCE_DIR}/src/ale.cpp
@@ -33,7 +27,7 @@ add_library(ale SHARED
 set(ALE_BUILD_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 set(ALE_HEADERS "${ALE_BUILD_INCLUDE_DIR}/ale.h"
                 "${ALE_BUILD_INCLUDE_DIR}/Rotation.h")
-set(ALE_INSTALL_INCLUDE_DIR "include/")
+set(ALE_INSTALL_INCLUDE_DIR "include/ale/")
 set_target_properties(ale PROPERTIES
                       VERSION             ${PROJECT_VERSION}
                       SOVERSION           0)
