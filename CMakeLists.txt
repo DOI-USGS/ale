@@ -17,8 +17,15 @@ set(CMAKE_CXX_STANDARD 11)
 # Third Party Dependencies
 find_package(GSL           REQUIRED)
 find_package(Eigen3 3.3    REQUIRED NO_MODULE)
-find_package(Python        REQUIRED COMPONENTS Development)
 find_package(nlohmann_json REQUIRED)
+
+# If there is an Anaconda environment activated, search that for Python first
+if(EXISTS $ENV{CONDA_PREFIX})
+  message("Searching $ENV{CONDA_PREFIX} for Python libraries")
+  set(Python_ROOT_DIR $ENV{CONDA_PREFIX})
+  set(Python_FIND_STRATEGY LOCATION)
+endif()
+find_package(Python        REQUIRED COMPONENTS Development)
 
 # Library setup
 set(ALE_BUILD_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/")
