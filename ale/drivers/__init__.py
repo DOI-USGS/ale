@@ -52,7 +52,7 @@ class AleJsonEncoder(json.JSONEncoder):
             return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
-def load(label, props={}, formatter='usgscsm', verbose=True):
+def load(label, props={}, formatter='usgscsm', verbose=False):
     """
     Attempt to load a given label from all possible drivers
 
@@ -66,7 +66,6 @@ def load(label, props={}, formatter='usgscsm', verbose=True):
 
     drivers = chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.isclass(x) and "_driver" in x.__module__) for dmod in __driver_modules__)
     drivers = sort_drivers([d[1] for d in drivers])
-    print(drivers)
 
     for driver in drivers:
         if verbose:
@@ -88,6 +87,6 @@ def load(label, props={}, formatter='usgscsm', verbose=True):
                 traceback.print_exc()
     raise Exception('No Such Driver for Label')
 
-def loads(label, props='', formatter='usgscsm', verbose=True):
+def loads(label, props='', formatter='usgscsm', verbose=False):
     res = load(label, props, formatter, verbose=verbose)
     return json.dumps(res, cls=AleJsonEncoder)
