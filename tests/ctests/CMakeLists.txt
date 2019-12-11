@@ -12,6 +12,8 @@ target_link_libraries(runAleTests
                       GSL::gslcblas
                       Eigen3::Eigen
                       gtest
-                      Threads::Threads)
+                      Threads::Threads
+                      nlohmann_json::nlohmann_json
+                      )
 
 gtest_discover_tests(runAleTests WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/tests/ctests)

@@ -206,7 +206,7 @@ def usgscsm_compare_dict():
               },
 
         "isis" :
-          {
+        {
   "CameraVersion": 1,
   "NaifKeywords": {
     "BODY499_RADII": [
@@ -283,7 +283,69 @@ def usgscsm_compare_dict():
       176.63,
       350.89198226,
       0.0
-    ]
+    ],
+    "INS-41218_ITRANSL": [
+      -7113.11359717265,
+      0.062856784318668,
+      142.857129028729
+    ],
+    "INS-41218_ITRANSS": [
+      -0.778052433438109,
+      -142.857129028729,
+      0.062856784318668
+    ],
+    "INS-41218_FOV_SHAPE": "RECTANGLE",
+    "INS-41218_PIXEL_SIZE": [
+      7.0,
+      7.0
+    ],
+    "INS-41218_CK_REFERENCE_ID": 1.0,
+    "INS-41218_FOV_FRAME": "MEX_HRSC_HEAD",
+    "INS-41218_CCD_CENTER": [
+      2592.5,
+      0.5
+    ],
+    "INS-41218_CK_FRAME_ID": -41001.0,
+    "INS-41218_F/RATIO": 5.6,
+    "INS-41218_PIXEL_SAMPLES": 5184.0,
+    "INS-41218_BORESIGHT_SAMPLE": 2592.5,
+    "INS-41218_FILTER_BANDWIDTH": 90.0,
+    "INS-41218_BORESIGHT_LINE": 0.0,
+    "INS-41218_PIXEL_LINES": 1.0,
+    "INS-41218_FOCAL_LENGTH": 174.82,
+    "INS-41218_FOV_ANGULAR_SIZE": [
+      0.2,
+      4e-05
+    ],
+    "INS-41218_FILTER_BANDCENTER": 970.0,
+    "INS-41218_TRANSX": [
+      0.016461898406507,
+      -0.006999999322408,
+      3.079982431615e-06
+    ],
+    "INS-41218_TRANSY": [
+      49.7917927568053,
+      3.079982431615e-06,
+      0.006999999322408
+    ],
+    "INS-41218_FOV_BOUNDARY_CORNERS": [
+      18.1982,
+      49.9121,
+      175.0,
+      18.1982,
+      49.9051,
+      175.0,
+      -18.1693,
+      49.8901,
+      175.0,
+      -18.1693
+    ],
+    "INS-41218_BORESIGHT": [
+      0.0151,
+      49.9039,
+      175.0
+    ],
+    "INS-41218_IFOV": 4e-05
   },
   "InstrumentPointing": {
     "TimeDependentFrames": [
@@ -368,10 +430,10 @@ def usgscsm_compare_dict():
     ],
     "Quaternions": [
       [
-        -0.6525755651363002,
-        -0.023151423913928198,
-        0.31744150842891783,
-        -0.6876336467074379
+        -0.6525755651363003,
+        -0.0231514239139282,
+        0.3174415084289179,
+        -0.6876336467074378
       ],
       [
         -0.6531746247480361,
@@ -380,17 +442,17 @@ def usgscsm_compare_dict():
         -0.6870646329712322
       ],
       [
-        -0.6534739684048749,
-        -0.022736404778153124,
-        0.3174715036099805,
-        -0.6867799304803299
+        -0.6534739684048748,
+        -0.022736404778153148,
+        0.31747150360998055,
+        -0.68677993048033
       ]
     ],
     "AngularVelocity": [
       [
-        3.162398161513711e-05,
-        -2.880303177599155e-05,
-        5.65207273177886e-05
+        3.1623981615137114e-05,
+        -2.8803031775991542e-05,
+        5.6520727317788564e-05
       ],
       [
         3.162398161506756e-05,
@@ -398,8 +460,8 @@ def usgscsm_compare_dict():
         5.652072731743428e-05
       ],
       [
-        3.162398161503279e-05,
-        -2.8803031777148904e-05,
+        3.1623981615032794e-05,
+        -2.8803031777148914e-05,
         5.6520727317257115e-05
       ]
     ]
@@ -415,36 +477,36 @@ def usgscsm_compare_dict():
     ],
     "Positions": [
       [
-        3508.7678822054836,
-        -1180.090578774873,
-        -404.6580659358623
+        3508.767882205483,
+        -1180.0905787748716,
+        -404.6580659358628
       ],
       [
         3509.6584138014186,
-        -1143.4324359500306,
-        -502.6029463204845
+        -1143.4324359500313,
+        -502.6029463204848
       ],
       [
         3509.4431532823473,
-        -1124.8866548757126,
-        -551.4851113671581
+        -1124.886654875713,
+        -551.4851113671591
       ]
     ],
     "Velocities": [
       [
-        0.0720400832434136,
-        1.478737567336345,
-        -3.9872650791431576
+        0.07204008324341263,
+        1.4787375673363454,
+        -3.987265079143158
       ],
       [
-        0.0003930097221540194,
-        1.502497160864039,
-        -3.978142968407851
+        0.0003930097221548436,
+        1.5024971608640412,
+        -3.9781429684078495
       ],
       [
-        -0.03540185319234352,
-        1.5140837760694028,
-        -3.972834676104136
+        -0.03540185319234399,
+        1.5140837760694033,
+        -3.9728346761041364
       ]
     ]
   },
@@ -457,16 +519,16 @@ def usgscsm_compare_dict():
     ],
     "Positions": [
       [
-        97397666.49661356,
+        97397666.49661352,
         -201380879.84291452,
-        -94392949.8261708
+        -94392949.82617083
       ]
     ],
     "Velocities": [
       [
-        21.260857263715938,
-        7.173395648419857,
-        2.73958955646446
+        21.26085726371221,
+        7.17339564842172,
+        2.739589556465391
       ]
     ]
   }
@@ -478,6 +540,7 @@ def test_kernels():
     kernels = get_image_kernels('h5270_0000_ir2')
     updated_kernels, binary_kernels = convert_kernels(kernels)
     yield updated_kernels
+    print(updated_kernels)
     for kern in binary_kernels:
         os.remove(kern)
 
@@ -632,7 +695,7 @@ class test_mex_isis3_naif(unittest.TestCase):
         self.driver =  MexHrscIsisLabelNaifSpiceDriver(label)
 
     def test_instrument_id(self):
-        assert self.driver.instrument_id == 'HRSC'
+        assert self.driver.instrument_id == 'MEX_HRSC_IR'
 
     def test_ikid(self):
         with patch('ale.drivers.mex_drivers.spice.bods2c', return_value=12345) as bods2c:
@@ -642,7 +705,7 @@ class test_mex_isis3_naif(unittest.TestCase):
     def test_fikid(self):
         with patch('ale.drivers.mex_drivers.spice.bods2c', return_value=12345) as bods2c:
             assert self.driver.fikid == 12345
-            bods2c.assert_called_with('HRSC')
+            bods2c.assert_called_with('MEX_HRSC_IR')
 
     def test_ephemeris_start_time(self):
         with patch('ale.drivers.mex_drivers.read_table_data', return_value=12345) as read_table_data, \
