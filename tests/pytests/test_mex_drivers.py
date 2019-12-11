@@ -546,7 +546,6 @@ def test_kernels():
 
 # Eventually all label/formatter combinations should be tested. For now, isis3/usgscsm and
 # pds3/isis will fail.
-@pytest.mark.xfail
 @pytest.mark.parametrize("label,formatter", [('isis3','isis'), ('pds3', 'usgscsm'),
                                               pytest.param('isis3','usgscsm', marks=pytest.mark.xfail),
                                               pytest.param('pds3','isis', marks=pytest.mark.xfail),])
@@ -573,7 +572,6 @@ def test_mex_load(test_kernels, formatter, usgscsm_compare_dict, label):
 
         usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter=formatter, verbose='true')
         assert compare_dicts(usgscsm_isd, usgscsm_compare_dict['h5270_0000_ir2'][formatter]) == []
-        assert False
 
 # ========= Test mex pds3label and naifspice driver =========
 class test_mex_pds3_naif(unittest.TestCase):

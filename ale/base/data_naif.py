@@ -535,8 +535,7 @@ class NaifSpice():
             self._naif_keywords = {**self._naif_keywords, **util.query_kernel_pool(f"*{self.ikid}*"),  **util.query_kernel_pool(f"*{self.target_id}*")}
 
             try:
-                fikid_keywords = util.query_kernel_pool(f"*{self.fikid}*")
-                self._naif_keywords = {**self._naif_keywords, **fikid_keywords}
+                self._naif_keywords = {**self._naif_keywords, **util.query_kernel_pool(f"*{self.fikid}*")}
             except AttributeError as error:
                 pass
 
