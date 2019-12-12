@@ -399,11 +399,11 @@ ale::Vec3d(-0.015370186159624, -0.0967922883337961, -0.0284606798137744)
 };
 
 States testState(ephemTimes, positions, velocities);
-testState.minimizeCache();
+States minimizedState = testState.minimizeCache();
 
 // Test the ability to recover the original coordinates and velocity within the tolerance 
 // from the reduced cache. (Aribtrarily selected the 15th index.) 
-ale::State result = testState.getState(362681869.7384);
+ale::State result = minimizedState.getState(362681869.7384);
 EXPECT_NEAR(result.position.x, -17386.3761449312, 1e-7);
 EXPECT_NEAR(result.position.y, 96555.0028814707, 1e-7);
 EXPECT_NEAR(result.position.z, 16357.3474474742, 1e-7);
@@ -412,7 +412,7 @@ EXPECT_NEAR(result.velocity.y, -0.0967913217677527, 1e-7);
 EXPECT_NEAR(result.velocity.z, -0.0284606821151287, 1e-7); 
 
 // Get all the states to check that they match exactly with ISIS's reduced cache: 
-std::vector<ale::State> results = testState.getStates();
+std::vector<ale::State> results = minimizedState.getStates();
 EXPECT_NEAR(results[0].position.x, -17382.7468835417, 1e-8);
 EXPECT_NEAR(results[0].position.y, 96577.8576989543, 1e-8);
 EXPECT_NEAR(results[0].position.z, 16364.0677257831, 1e-8);

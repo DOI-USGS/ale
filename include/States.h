@@ -9,9 +9,9 @@ namespace ale {
 
 enum interpolation {
   /// Interpolate using linear interpolation
-  LINEAR,
+  LINEAR = 0,
   /// Interpolate using spline interpolation
-  SPLINE
+  SPLINE = 1, 
 };
 
 /** A 3D cartesian vector */
@@ -21,7 +21,7 @@ struct Vec3d {
   double z;
 
   // Accepts an {x,y,z} vector
-  Vec3d(std::vector<double> vec) {
+  Vec3d(const std::vector<double>& vec) {
     if (vec.size() != 3) {
       throw std::invalid_argument("Input vector must have 3 entries.");
     }
@@ -40,7 +40,7 @@ struct State {
   Vec3d velocity;
 
   // Accepts a {x, y, z, vx, vy, vz} vector
-  State(std::vector<double> vec) {
+  State(const std::vector<double>& vec) {
     if (vec.size() != 6) {
       throw std::invalid_argument("Input vector must have 6 entries.");
     }
@@ -56,11 +56,14 @@ class States {
   public:
     // Constructors
     States();
-    States(std::vector<double> ephemTimes, std::vector<ale::Vec3d> positions, int refFrame=1);
-    States(std::vector<double> ephemTimes, std::vector<ale::Vec3d> positions, 
-           std::vector<ale::Vec3d> velocities, int refFrame=1);
+    States(const std::vector<double>& ephemTimes, const std::vector<ale::Vec3d>& positions, 
+           int refFrame=1);
 
-    States(std::vector<double> ephemTimes, std::vector<ale::State> states, int refFrame=1); 
+    States(const std::vector<double>& ephemTimes, const std::vector<ale::Vec3d>& positions, 
+           const std::vector<ale::Vec3d>& velocities, int refFrame=1);
+
+    States(const std::vector<double>& ephemTimes, const std::vector<ale::State>& states, 
+           int refFrame=1); 
 
     ~States();
     
@@ -70,7 +73,6 @@ class States {
     std::vector<ale::Vec3d> getVelocities() const; //! Returns the current velocities
     std::vector<double> getTimes() const; //! Returns the current times
     int getReferenceFrame() const; //! Returns reference frame as NAIF ID
-    bool hasMinimizedCache() const; //! Returns true if the cache has been minimized
     bool hasVelocity() const; //! Returns true if any velocities have been provided
 
   /**
@@ -108,7 +110,7 @@ class States {
    * 
    * @param tolerance Maximum error between hermite approximation and original value.
    */
-    void minimizeCache(double tolerance=0.01);
+    States minimizeCache(double tolerance=0.01);
 
   private:
   
@@ -130,7 +132,6 @@ class States {
     std::vector<ale::State> m_states; //! Represent at states internally to keep pos, vel together
     std::vector<double> m_ephemTimes; //! Time in seconds
     int m_refFrame;  //! Naif IDs for reference frames 
-    bool m_minimizedCache; 
   };
 }
 

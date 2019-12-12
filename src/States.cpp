@@ -31,7 +31,8 @@ namespace ale {
 
 
   /** Evaluates a cubic hermite at time, interpTime, between the appropriate two points in x. **/
-  double evaluateCubicHermite(const double interpTime, std::vector<double> derivs, std::vector<double> x, std::vector<double> y) {
+  double evaluateCubicHermite(const double interpTime, const std::vector<double>& derivs, 
+                              const std::vector<double>& x, const std::vector<double>& y) {
     if( (derivs.size() != x.size()) || (derivs.size() != y.size()) ) {
        throw std::invalid_argument("EvaluateCubicHermite - The size of the first derivative vector does not match the number of (x,y) data points.");
     }
@@ -57,7 +58,8 @@ namespace ale {
   }
 
   /** Evaluate velocities using a Cubic Hermite Spline at a time a, within some interval in x, **/
- double evaluateCubicHermiteFirstDeriv(const double interpTime, std::vector<double> deriv, std::vector<double> x, std::vector<double> y) {
+ double evaluateCubicHermiteFirstDeriv(const double interpTime, const std::vector<double>& deriv, 
+                                       const std::vector<double>& x, const std::vector<double>& y) {
     if(deriv.size() != x.size()) {
        throw std::invalid_argument("EvaluateCubicHermiteFirstDeriv - The size of the first derivative vector does not match the number of (x,y) data points.");
     }
@@ -93,7 +95,8 @@ namespace ale {
   
   // Stadard default gsl interpolation to use if we haven't yet reduced the cache.
   // Times must be sorted in order of least to greatest
-   double interpolateState(std::vector<double> points, std::vector<double> times, double time, interpolation interp, int d) {
+   double interpolateState(const std::vector<double>& points, const std::vector<double>& times, 
+                           double time, interpolation interp, int d) {
    size_t numPoints = points.size();
    if (numPoints < 2) {
      throw std::invalid_argument("At least two points must be input to interpolate over.");
@@ -137,7 +140,7 @@ namespace ale {
   // States Class
   
   // Empty constructor
-   States::States() : m_refFrame(0), m_minimizedCache(false) {
+   States::States() : m_refFrame(0) {
     ale::Vec3d position = {0.0, 0.0, 0.0};
     ale::Vec3d velocity = {0.0, 0.0, 0.0};
     m_states.push_back(ale::State(position, velocity)); 
@@ -147,7 +150,8 @@ namespace ale {
   }
 
 
-  States::States(std::vector<double> ephemTimes, std::vector<ale::Vec3d> positions, int refFrame) :
+  States::States(const std::vector<double>& ephemTimes, const std::vector<ale::Vec3d>& positions, 
+                 int refFrame) :
     m_ephemTimes(ephemTimes), m_refFrame(refFrame) {
     // Construct State vector from position and velocity vectors
     
@@ -159,12 +163,11 @@ namespace ale {
     for (ale::Vec3d position : positions) {
       m_states.push_back(ale::State(position, velocities)); 
     }
-    m_minimizedCache=false;
   }
 
 
-  States::States(std::vector<double> ephemTimes, std::vector<ale::Vec3d> positions, 
-                 std::vector<ale::Vec3d> velocities, int refFrame) : 
+  States::States(const std::vector<double>& ephemTimes, const std::vector<ale::Vec3d>& positions, 
+                 const std::vector<ale::Vec3d>& velocities, int refFrame) : 
     m_ephemTimes(ephemTimes), m_refFrame(refFrame) {
     
     if ((positions.size() != ephemTimes.size())||(ephemTimes.size() != velocities.size())) {
@@ -174,12 +177,12 @@ namespace ale {
     for (int i=0; i < positions.size() ;i++) {
       m_states.push_back(ale::State(positions[i], velocities[i])); 
     }
-    m_minimizedCache=false;
   }
 
 
-  States::States(std::vector<double> ephemTimes, std::vector<ale::State> states, int refFrame) :
-  m_ephemTimes(ephemTimes), m_states(states), m_refFrame(refFrame), m_minimizedCache(false) {
+  States::States(const std::vector<double>& ephemTimes, const std::vector<ale::State>& states, 
+                 int refFrame) :
+  m_ephemTimes(ephemTimes), m_states(states), m_refFrame(refFrame) {
     if (states.size() != ephemTimes.size()) {
       throw std::invalid_argument("Length of times must match number of states."); 
     }
@@ -225,11 +228,6 @@ namespace ale {
   }
 
 
-  bool States::hasMinimizedCache() const {
-    return m_minimizedCache;
-  }
-
-
   bool States::hasVelocity() const {
     std::vector<ale::Vec3d> velocities = getVelocities(); 
     bool allZero = std::all_of(velocities.begin(), velocities.end(), [](ale::Vec3d vec) 
@@ -251,7 +249,7 @@ namespace ale {
 
     ale::Vec3d position, velocity; 
 
-    if (!hasMinimizedCache()) {
+    if (interp == LINEAR || (interp == SPLINE && !hasVelocity())) {
       position = {interpolateState(xs,  m_ephemTimes, time, interp, 0),
                   interpolateState(ys,  m_ephemTimes, time, interp, 0),
                   interpolateState(zs,  m_ephemTimes, time, interp, 0)};
@@ -260,8 +258,8 @@ namespace ale {
                   interpolateState(vys, m_ephemTimes, time, interp, 0),
                   interpolateState(vzs, m_ephemTimes, time, interp, 0)};
     }
-    else {
-      // We have a minimized cache
+    else if (interp == SPLINE && hasVelocity()){
+      // Do hermite spline if velocities are available 
       double baseTime = (m_ephemTimes.at(0) + m_ephemTimes.at(m_ephemTimes.size() - 1)) / 2.;
       double timeScale = 1.0;
 
@@ -306,14 +304,12 @@ namespace ale {
   }
       
 
-  void States::minimizeCache(double tolerance) {
-    if (m_states.size() == 1) {
-      throw std::invalid_argument("Cache size is 1, cannot minimize");
-      return;
+  States States::minimizeCache(double tolerance) {
+    if (m_states.size() <= 2) {
+      throw std::invalid_argument("Cache size is 2, cannot minimize.");
     }
     if (!hasVelocity()) {
       throw std::invalid_argument("The cache can only be minimized if velocity is provided.");
-      return; 
     }
 
     // Compute scaled time to use for fitting. 
@@ -340,13 +336,11 @@ namespace ale {
       tempStates.push_back(m_states[i]);
       tempTimes.push_back(m_ephemTimes[i]);
     }
-    m_states = tempStates; 
-    m_ephemTimes = tempTimes; 
-    m_minimizedCache=true;
+    return States(tempTimes, tempStates, m_refFrame); 
    }
 
 
-  std::vector<int> States::hermiteIndices(double tolerance, std::vector <int> indexList, 
+  std::vector<int> States::hermiteIndices(double tolerance, std::vector<int> indexList, 
                                                  double baseTime, double timeScale) {
     unsigned int n = indexList.size();
     double sTime;
