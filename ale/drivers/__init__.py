@@ -24,7 +24,6 @@ from abc import ABC
 __disabled_drivers__ = ["ody_drivers",
                         "hayabusa2_drivers",
                         "juno_drivers",
-                        "mex_drivers",
                         "tgo_drivers"]
 
 # dynamically load drivers
