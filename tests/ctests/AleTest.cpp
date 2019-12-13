@@ -18,7 +18,7 @@ TEST(PositionInterpTest, LinearInterp) {
                                  {  9,  4,  1,  0,  1,  4},
                                  {-27, -8, -1,  0,  1,  8}};
 
-  vector<double> coordinate = ale::getPosition(data, times, -1.5, ale::linear);
+  vector<double> coordinate = ale::getPosition(data, times, -1.5, ale::LINEAR);
 
   ASSERT_EQ(3, coordinate.size());
   EXPECT_DOUBLE_EQ(-1.5, coordinate[0]);
@@ -34,7 +34,7 @@ TEST(PositionInterpTest, FourCoordinates) {
                                  {-27, -8, -1,  0,  1,  8},
                                  { 25,  0, -5, 25,  3,  6}};
 
-  EXPECT_THROW(ale::getPosition(data, times, 0.0, ale::linear),
+  EXPECT_THROW(ale::getPosition(data, times, 0.0, ale::LINEAR),
                invalid_argument);
 }
 
@@ -43,13 +43,13 @@ TEST(LinearInterpTest, ExampleInterpolation) {
   vector<double> times = {0,  1,  2, 3};
   vector<double> data = {0, 2, 1, 0};
 
-  EXPECT_DOUBLE_EQ(0.0, ale::interpolate(data, times, 0.0, ale::linear, 0));
-  EXPECT_DOUBLE_EQ(1.0, ale::interpolate(data, times, 0.5, ale::linear, 0));
-  EXPECT_DOUBLE_EQ(2.0, ale::interpolate(data, times, 1.0, ale::linear, 0));
-  EXPECT_DOUBLE_EQ(1.5, ale::interpolate(data, times, 1.5, ale::linear, 0));
-  EXPECT_DOUBLE_EQ(1.0, ale::interpolate(data, times, 2.0, ale::linear, 0));
-  EXPECT_DOUBLE_EQ(0.5, ale::interpolate(data, times, 2.5, ale::linear, 0));
-  EXPECT_DOUBLE_EQ(0.0, ale::interpolate(data, times, 3.0, ale::linear, 0));
+  EXPECT_DOUBLE_EQ(0.0, ale::interpolate(data, times, 0.0, ale::LINEAR, 0));
+  EXPECT_DOUBLE_EQ(1.0, ale::interpolate(data, times, 0.5, ale::LINEAR, 0));
+  EXPECT_DOUBLE_EQ(2.0, ale::interpolate(data, times, 1.0, ale::LINEAR, 0));
+  EXPECT_DOUBLE_EQ(1.5, ale::interpolate(data, times, 1.5, ale::LINEAR, 0));
+  EXPECT_DOUBLE_EQ(1.0, ale::interpolate(data, times, 2.0, ale::LINEAR, 0));
+  EXPECT_DOUBLE_EQ(0.5, ale::interpolate(data, times, 2.5, ale::LINEAR, 0));
+  EXPECT_DOUBLE_EQ(0.0, ale::interpolate(data, times, 3.0, ale::LINEAR, 0));
 }
 
 
@@ -57,7 +57,7 @@ TEST(LinearInterpTest, NoPoints) {
   vector<double> times = {};
   vector<double> data = {};
 
-  EXPECT_THROW(ale::interpolate(data, times, 0.0, ale::linear, 0),
+  EXPECT_THROW(ale::interpolate(data, times, 0.0, ale::LINEAR, 0),
                invalid_argument);
 }
 
@@ -66,7 +66,7 @@ TEST(LinearInterpTest, DifferentCounts) {
   vector<double> times = { -3, -2, -1,  0,  2};
   vector<double> data = { -3, -2, 1,  2};
 
-  EXPECT_THROW(ale::interpolate(data, times, 0.0, ale::linear, 0),
+  EXPECT_THROW(ale::interpolate(data, times, 0.0, ale::LINEAR, 0),
                invalid_argument);
 }
 
@@ -75,9 +75,9 @@ TEST(LinearInterpTest, Extrapolate) {
   vector<double> times = {0,  1,  2, 3};
   vector<double> data = {0, 2, 1, 0};
 
-  EXPECT_THROW(ale::interpolate(data, times, -1.0, ale::linear, 0),
+  EXPECT_THROW(ale::interpolate(data, times, -1.0, ale::LINEAR, 0),
                invalid_argument);
-  EXPECT_THROW(ale::interpolate(data, times, 4.0, ale::linear, 0),
+  EXPECT_THROW(ale::interpolate(data, times, 4.0, ale::LINEAR, 0),
                invalid_argument);
 }
 
@@ -93,16 +93,16 @@ TEST(SplineInterpTest, ExampleInterpolation) {
 
   // The spline interpolation is only ~1e-10 so we have to define a tolerance
   double tolerance = 1e-10;
-  EXPECT_NEAR(0.0, ale::interpolate(data, times, 0.0, ale::spline, 0), tolerance);
+  EXPECT_NEAR(0.0, ale::interpolate(data, times, 0.0, ale::SPLINE, 0), tolerance);
   EXPECT_NEAR(2.8 * 0.5 - 0.8 * 0.125,
-              ale::interpolate(data, times, 0.5, ale::spline, 0), tolerance);
-  EXPECT_NEAR(2.0, ale::interpolate(data, times, 1.0, ale::spline, 0), tolerance);
+              ale::interpolate(data, times, 0.5, ale::SPLINE, 0), tolerance);
+  EXPECT_NEAR(2.0, ale::interpolate(data, times, 1.0, ale::SPLINE, 0), tolerance);
   EXPECT_NEAR(3.375 - 5.4 * 2.25 + 8.2 * 1.5 - 1.8,
-              ale::interpolate(data, times, 1.5, ale::spline, 0), tolerance);
-  EXPECT_NEAR(1.0, ale::interpolate(data, times, 2.0, ale::spline, 0), tolerance);
+              ale::interpolate(data, times, 1.5, ale::SPLINE, 0), tolerance);
+  EXPECT_NEAR(1.0, ale::interpolate(data, times, 2.0, ale::SPLINE, 0), tolerance);
   EXPECT_NEAR(-0.2 * 15.625 + 1.8 * 6.25 - 6.2 * 2.5 + 7.8,
-              ale::interpolate(data, times, 2.5, ale::spline, 0), tolerance);
-  EXPECT_NEAR(0.0, ale::interpolate(data, times, 3.0, ale::spline, 0), tolerance);
+              ale::interpolate(data, times, 2.5, ale::SPLINE, 0), tolerance);
+  EXPECT_NEAR(0.0, ale::interpolate(data, times, 3.0, ale::SPLINE, 0), tolerance);
 }
 
 
@@ -110,7 +110,7 @@ TEST(SplineInterpTest, NoPoints) {
   vector<double> times = {};
   vector<double> data = {};
 
-  EXPECT_THROW(ale::interpolate(data, times, 0.0, ale::spline, 0),
+  EXPECT_THROW(ale::interpolate(data, times, 0.0, ale::SPLINE, 0),
                invalid_argument);
 }
 
@@ -119,7 +119,7 @@ TEST(SplineInterpTest, DifferentCounts) {
   vector<double> times = { -3, -2, -1,  0,  2};
   vector<double> data = { -3, -2, 1,  2};
 
-  EXPECT_THROW(ale::interpolate(data, times, 0.0, ale::spline, 0),
+  EXPECT_THROW(ale::interpolate(data, times, 0.0, ale::SPLINE, 0),
                invalid_argument);
 }
 
@@ -128,9 +128,9 @@ TEST(SplineInterpTest, Extrapolate) {
   vector<double> times = {0,  1,  2, 3};
   vector<double> data = {0, 2, 1, 0};
 
-  EXPECT_THROW(ale::interpolate(data, times, -1.0, ale::spline, 0),
+  EXPECT_THROW(ale::interpolate(data, times, -1.0, ale::SPLINE, 0),
                invalid_argument);
-  EXPECT_THROW(ale::interpolate(data, times, 4.0, ale::spline, 0),
+  EXPECT_THROW(ale::interpolate(data, times, 4.0, ale::SPLINE, 0),
                invalid_argument);
 }
 
@@ -283,7 +283,7 @@ TEST(RotationInterpTest, ExampleGetRotation) {
   // simple test, only checks if API hit correctly and output is normalized
   vector<double> times = {0,  1,  2, 3};
   vector<vector<double>> rots({{1,1,1,1}, {0,0,0,0}, {1,1,1,1}, {0,0,0,0}});
-  vector<double> r = ale::getRotation(rots, times, 2, ale::linear);
+  vector<double> r = ale::getRotation(rots, times, 2, ale::LINEAR);
   Eigen::Quaterniond quat(r[0], r[1], r[2], r[3]);
 
   EXPECT_DOUBLE_EQ(1, quat.norm());
@@ -294,7 +294,7 @@ TEST(RotationInterpTest, GetRotationDifferentCounts) {
   // incorrect params
   vector<double> times = {0, 1, 2};
   vector<vector<double>> rots({{1,1,1,1}, {0,0,0,0}, {1,1,1,1}, {0,0,0,0}});
-  EXPECT_THROW(ale::getRotation(rots, times, 2, ale::linear), invalid_argument);
+  EXPECT_THROW(ale::getRotation(rots, times, 2, ale::LINEAR), invalid_argument);
 }
 
 TEST(PyInterfaceTest, LoadInvalidLabel) {
@@ -310,7 +310,7 @@ TEST(PyInterfaceTest, LoadValidLabel) {
 TEST(AngularVelocityInterpTest, ExampleGetRotation) {
   vector<double> times = {0,  1};
   vector<vector<double>> rots({{0,0}, {1,0}, {0,1}, {0,0}});
-  vector<double> av = ale::getAngularVelocity(rots, times, 0.5, ale::linear);
+  vector<double> av = ale::getAngularVelocity(rots, times, 0.5, ale::LINEAR);
 
   EXPECT_DOUBLE_EQ(0, av[0]);
   EXPECT_DOUBLE_EQ(0, av[1]);

@@ -4,15 +4,9 @@
 #include<vector>
 #include <stdexcept>
 #include <gsl/gsl_interp.h>
- 
-namespace ale {
+#include <ale.h> 
 
-enum interpolation {
-  /// Interpolate using linear interpolation
-  LINEAR = 0,
-  /// Interpolate using spline interpolation
-  SPLINE = 1, 
-};
+namespace ale {
 
 /** A 3D cartesian vector */
 struct Vec3d {

@@ -21,6 +21,137 @@ using namespace std;
 
 namespace ale {
 
+
+  // Temporarily moved over from States.cpp. Will be moved into interpUtils in the future. 
+
+  /** The following helper functions are used to calculate the reduced states cache and cubic hermite 
+  to interpolate over it. They were migrated, with minor modifications, from 
+  Isis::NumericalApproximation **/
+
+  /** Determines the lower index for the interpolation interval. */
+  int interpolationIndex(const std::vector<double> &times, double interpTime) {
+    if (times.size() < 2){
+      throw std::invalid_argument("There must be at least two times.");
+    }
+    auto nextTimeIt = std::upper_bound(times.begin(), times.end(), interpTime);
+    if (nextTimeIt == times.end()) {
+      --nextTimeIt;
+    }
+    if (nextTimeIt != times.begin()) {
+      --nextTimeIt;
+    }
+    return std::distance(times.begin(), nextTimeIt);
+  }
+
+
+  /** Evaluates a cubic hermite at time, interpTime, between the appropriate two points in x. **/
+  double evaluateCubicHermite(const double interpTime, const std::vector<double>& derivs, 
+                              const std::vector<double>& x, const std::vector<double>& y) {
+    if( (derivs.size() != x.size()) || (derivs.size() != y.size()) ) {
+       throw std::invalid_argument("EvaluateCubicHermite - The size of the first derivative vector does not match the number of (x,y) data points.");
+    }
+
+    // Find the interval in which "a" exists
+    int lowerIndex = ale::interpolationIndex(x, interpTime);
+
+    double x0, x1, y0, y1, m0, m1;
+    // interpTime is contained within the interval (x0,x1)
+    x0 = x[lowerIndex];
+    x1 = x[lowerIndex+1];
+    // the corresponding known y-values for x0 and x1
+    y0 = y[lowerIndex];
+    y1 = y[lowerIndex+1];
+    // the corresponding known tangents (slopes) at (x0,y0) and (x1,y1)
+    m0 = derivs[lowerIndex];
+    m1 = derivs[lowerIndex+1];
+
+    double h, t;
+    h = x1 - x0;
+    t = (interpTime - x0) / h;
+    return (2 * t * t * t - 3 * t * t + 1) * y0 + (t * t * t - 2 * t * t + t) * h * m0 + (-2 * t * t * t + 3 * t * t) * y1 + (t * t * t - t * t) * h * m1;
+  }
+
+  /** Evaluate velocities using a Cubic Hermite Spline at a time a, within some interval in x, **/
+ double evaluateCubicHermiteFirstDeriv(const double interpTime, const std::vector<double>& deriv, 
+                                       const std::vector<double>& times, const std::vector<double>& y) {
+    if(deriv.size() != times.size()) {
+       throw std::invalid_argument("EvaluateCubicHermiteFirstDeriv - The size of the first derivative vector does not match the number of (x,y) data points.");
+    }
+
+    // find the interval in which "interpTime" exists
+    int lowerIndex = ale::interpolationIndex(times, interpTime);
+
+    double x0, x1, y0, y1, m0, m1;
+
+    // interpTime is contained within the interval (x0,x1)
+    x0 = times[lowerIndex];
+    x1 = times[lowerIndex+1];
+
+    // the corresponding known y-values for x0 and x1
+    y0 = y[lowerIndex];
+    y1 = y[lowerIndex+1];
+
+    // the corresponding known tangents (slopes) at (x0,y0) and (x1,y1)
+    m0 = deriv[lowerIndex];
+    m1 = deriv[lowerIndex+1];
+
+    double h, t;
+    h = x1 - x0;
+    t = (interpTime - x0) / h;
+    if(h != 0.0) {
+      return ((6 * t * t - 6 * t) * y0 + (3 * t * t - 4 * t + 1) * h * m0 + (-6 * t * t + 6 * t) * y1 + (3 * t * t - 2 * t) * h * m1) / h;
+
+    }
+    else {
+      throw std::invalid_argument("Error in evaluating cubic hermite velocities, values at"
+                                  "lower and upper indicies are exactly equal.");
+    }
+  }
+  
+  // Stadard default gsl interpolation to use if we haven't yet reduced the cache.
+  // Times must be sorted in order of least to greatest
+   double interpolateState(const std::vector<double>& points, const std::vector<double>& times, 
+                           double time, interpolation interp, int d) {
+   size_t numPoints = points.size();
+   if (numPoints < 2) {
+     throw std::invalid_argument("At least two points must be input to interpolate over.");
+   }
+   if (points.size() != times.size()) {
+     throw std::invalid_argument("Invalid gsl_interp_type data, must have the same number of points as times.");
+   }
+
+   // convert our interp enum into a GSL one,
+   // should be easy to add non GSL interp methods here later
+   const gsl_interp_type *interp_methods[] = {gsl_interp_linear, gsl_interp_cspline};
+
+   gsl_interp *interpolator = gsl_interp_alloc(interp_methods[interp], numPoints);
+   gsl_interp_init(interpolator, &times[0], &points[0], numPoints);
+   gsl_interp_accel *acc = gsl_interp_accel_alloc();
+
+   // GSL evaluate
+   double result;
+   switch(d) {
+     case 0:
+       result = gsl_interp_eval(interpolator, &times[0], &points[0], time, acc);
+       break;
+     case 1:
+       result = gsl_interp_eval_deriv(interpolator, &times[0], &points[0], time, acc);
+       break;
+     case 2:
+       result = gsl_interp_eval_deriv2(interpolator, &times[0], &points[0], time, acc);
+       break;
+     default:
+       throw std::invalid_argument("Invalid derivitive option, must be 0, 1 or 2.");
+       break;
+   }
+
+   // GSL clean up
+   gsl_interp_free(interpolator);
+   gsl_interp_accel_free(acc);
+
+   return result;
+ }
+
   // Position Data Functions
   vector<double> getPosition(vector<vector<double>> coords, vector<double> times, double time,
                              interpolation interp) {

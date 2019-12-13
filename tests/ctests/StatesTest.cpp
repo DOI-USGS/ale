@@ -115,10 +115,12 @@ TEST(StatesTest, ConstructorStates) {
 class TestState : public ::testing::Test {
 protected:
   States *states;
+  States *statesNoVelocity;
 
   // fixtures.h had a lot of overrides before the steup and tearDqwn functions
   void SetUp() override {
     states = NULL;
+    statesNoVelocity = NULL;
 
     //define test data values
     std::vector<double> ephemTimes = {0.0, 1.0, 2.0, 3.0};
@@ -141,6 +143,7 @@ protected:
     }
 
     states = new ale::States(ephemTimes, stateVector);
+    statesNoVelocity = new ale::States(ephemTimes, positions);
   }
 
   void TearDown() override {
@@ -148,12 +151,18 @@ protected:
       delete states;
       states = NULL;
     }
+    if (statesNoVelocity) {
+      delete statesNoVelocity;
+      statesNoVelocity = NULL;
+    }
   }
 };
 
+
+// Tests GSL spline and linear interp - force to use GSL spline by omitting velocity
 TEST_F(TestState, getPosition) {
   ale::Vec3d linear_position = states->getPosition(0.5, LINEAR);
-  ale::Vec3d spline_position = states->getPosition(2.5, SPLINE);
+  ale::Vec3d spline_position = statesNoVelocity->getPosition(2.5, SPLINE);
 
   EXPECT_NEAR(linear_position.x, 4.5, 1e-10);
   EXPECT_NEAR(linear_position.y, 2, 1e-10);
@@ -163,16 +172,13 @@ TEST_F(TestState, getPosition) {
   EXPECT_NEAR(spline_position.z, 1.7875, 1e-10);
 }
 
+
 TEST_F(TestState, getVelocity) {
   ale::Vec3d linear_velocity = states->getVelocity(0.5, LINEAR);
-  ale::Vec3d spline_velocity = states->getVelocity(2.5, SPLINE);
 
   EXPECT_NEAR(linear_velocity.x, -4.5, 1e-10);
   EXPECT_NEAR(linear_velocity.y, -2, 1e-10);
   EXPECT_NEAR(linear_velocity.z, -3.75, 1e-10);
-  EXPECT_NEAR(spline_velocity.x, -5.05, 1e-10);
-  EXPECT_NEAR(spline_velocity.y, -3.7125, 1e-10);
-  EXPECT_NEAR(spline_velocity.z, -1.7875, 1e-10);
 }
 
 // getState() and interpolateState() are tested when testing getPosition and
@@ -227,8 +233,8 @@ TEST(StatesTest, minimizeCache_true) {
 
   vector<ale::State> states = withVelocityState.getStates();
   EXPECT_EQ(states.size(), 5);
-  withVelocityState.minimizeCache(1);
-  vector<ale::State> states_min = withVelocityState.getStates();
+  States minimizedStates = withVelocityState.minimizeCache(1);
+  vector<ale::State> states_min = minimizedStates.getStates();
   EXPECT_EQ(states_min.size(), 4);
 }
 
@@ -404,12 +410,12 @@ States minimizedState = testState.minimizeCache();
 // Test the ability to recover the original coordinates and velocity within the tolerance 
 // from the reduced cache. (Aribtrarily selected the 15th index.) 
 ale::State result = minimizedState.getState(362681869.7384);
-EXPECT_NEAR(result.position.x, -17386.3761449312, 1e-7);
-EXPECT_NEAR(result.position.y, 96555.0028814707, 1e-7);
-EXPECT_NEAR(result.position.z, 16357.3474474742, 1e-7);
-EXPECT_NEAR(result.velocity.x, -0.0153700986717228, 1e-7);
-EXPECT_NEAR(result.velocity.y, -0.0967913217677527, 1e-7);
-EXPECT_NEAR(result.velocity.z, -0.0284606821151287, 1e-7); 
+EXPECT_NEAR(result.position.x, -17386.3761449312, 1e-5);
+EXPECT_NEAR(result.position.y, 96555.0028814707, 1e-4);
+EXPECT_NEAR(result.position.z, 16357.3474474742, 1e-5);
+EXPECT_NEAR(result.velocity.x, -0.0153700986717228, 1e-6);
+EXPECT_NEAR(result.velocity.y, -0.0967913217677527, 1e-6);
+EXPECT_NEAR(result.velocity.z, -0.0284606821151287, 1e-6); 
 
 // Get all the states to check that they match exactly with ISIS's reduced cache: 
 std::vector<ale::State> results = minimizedState.getStates();
