@@ -271,17 +271,6 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
 
 
     @property
-    def detector_start_line(self):
-        """
-        Returns
-        -------
-        : int
-          Detector sample corresponding to the first image sample
-        """
-        return 1
-
-
-    @property
     def detector_center_line(self):
         """
         Returns the center detector line.
