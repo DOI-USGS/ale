@@ -54,9 +54,9 @@ image_dict = {
             'detector_center': {
                 'line': 0.5,
                 'sample': 2048.0},
-            'starting_detector_line': 0,
-            'starting_detector_sample': 1,
-            'focal2pixel_lines': [0, -142.85714285714286, 0],
+            'starting_detector_line': 1,
+            'starting_detector_sample': .5,
+            'focal2pixel_lines': [0, 142.85714285714286, 0],
             'focal2pixel_samples': [0, 0, -142.85714285714286],
             'optical_distortion': {
                 'kaguyalism': {
@@ -283,5 +283,5 @@ def test_focal2pixel_samples(driver):
 def test_focal2pixel_lines(driver):
     with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=np.array([2])) as gdpool, \
          patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
-        assert driver.focal2pixel_lines == [0, -1/2, 0]
+        assert driver.focal2pixel_lines == [0, 1/2, 0]
         gdpool.assert_called_with('INS-12345_PIXEL_SIZE', 0, 1)
