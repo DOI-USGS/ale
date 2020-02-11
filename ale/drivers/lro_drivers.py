@@ -130,6 +130,24 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
         return super().detector_center_sample - 0.5
 
     @property
+    def focal2pixel_lines(self):
+        """
+        Expects ikid to be defined. This must be the integer Naif id code of
+        the instrument. For LROC NAC this is flipped depending on the spacecraft
+        direction.
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector lines
+        """
+        focal2pixel_lines = np.array(list(spice.gdpool('INS{}_ITRANSL'.format(self.ikid), 0, 3)))
+        if self.spacecraft_direction < 0:
+            return focal2pixel_lines
+        else:
+            return -focal2pixel_lines
+
+    @property
     def ephemeris_start_time(self):
         """
         The starting ephemeris time for LRO is computed by taking the
@@ -221,6 +239,22 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
           Number of samples and lines combined from the original data to produce a single pixel in this image
         """
         return self.crosstrack_summing
+
+    @property
+    def spacecraft_direction(self):
+        """
+        Returns the x axis of the first velocity vector relative to the
+        spacecraft. This indicates of the craft is moving forwards or backwards.
+        +X for backwards and -X for forwards
+
+        Returns
+        -------
+        direction : double
+                    X value of the first velocity relative to the spacecraft
+        """
+        direction = self.frame_chain.compute_rotation(self.target_frame_id, self.sensor_frame_id)._rots.as_euler('xyz')[0][0]
+        return direction
+
 
 
 class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver):
