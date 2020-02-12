@@ -130,6 +130,24 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
         return super().detector_center_sample - 0.5
 
     @property
+    def focal2pixel_lines(self):
+        """
+        Expects ikid to be defined. This must be the integer Naif id code of
+        the instrument. For LROC NAC this is flipped depending on the spacecraft
+        direction.
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector lines
+        """
+        focal2pixel_lines = np.array(list(spice.gdpool('INS{}_ITRANSL'.format(self.ikid), 0, 3)))
+        if self.spacecraft_direction < 0:
+            return focal2pixel_lines
+        else:
+            return -focal2pixel_lines
+
+    @property
     def ephemeris_start_time(self):
         """
         The starting ephemeris time for LRO is computed by taking the
@@ -221,6 +239,34 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
           Number of samples and lines combined from the original data to produce a single pixel in this image
         """
         return self.crosstrack_summing
+
+    @property
+    def spacecraft_direction(self):
+        """
+        Returns the x axis of the first velocity vector relative to the
+        spacecraft. This indicates of the craft is moving forwards or backwards.
+
+        From LROC Frame Kernel: lro_frames_2014049_v01.tf
+        "+X axis is in the direction of the velocity vector half the year. The
+        other half of the year, the +X axis is opposite the velocity vector"
+
+        Hence we rotate the first velocity vector into the sensor reference
+        frame, but the X component of that vector is inverted compared to the
+        spacecraft so a +X indicates backwards and -X indicates forwards
+
+        The returned velocity is also slightly off from the spacecraft velocity
+        due to the sensor being attached to the craft with wax.
+
+        Returns
+        -------
+        direction : double
+                    X value of the first velocity relative to the sensor
+        """
+        rotation = self.frame_chain.compute_rotation(self.target_frame_id, self.sensor_frame_id)
+        positions, velocities, times = self.sensor_position
+        velocity = rotation.rotate_velocity_at([positions[0]], [velocities[0]], [times[0]])[0]
+        return velocity[0]
+
 
 
 class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver):
@@ -344,6 +390,24 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
         return super().exposure_duration * (1 + self.multiplicative_line_error) + self.additive_line_error
 
     @property
+    def focal2pixel_lines(self):
+        """
+        Expects ikid to be defined. This must be the integer Naif id code of
+        the instrument. For LROC NAC this is flipped depending on the spacecraft
+        direction.
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector lines
+        """
+        focal2pixel_lines = np.array(list(spice.gdpool('INS{}_ITRANSL'.format(self.ikid), 0, 3)))
+        if self.spacecraft_direction < 0:
+            return focal2pixel_lines
+        else:
+            return -focal2pixel_lines
+
+    @property
     def multiplicative_line_error(self):
         """
         Returns the multiplicative line error defined in an IAK.
@@ -404,3 +468,30 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
           Number of samples and lines combined from the original data to produce a single pixel in this image
         """
         return self.label['IsisCube']['Instrument']['SpatialSumming']
+
+    @property
+    def spacecraft_direction(self):
+        """
+        Returns the x axis of the first velocity vector relative to the
+        spacecraft. This indicates of the craft is moving forwards or backwards.
+
+        From LROC Frame Kernel: lro_frames_2014049_v01.tf
+        "+X axis is in the direction of the velocity vector half the year. The
+        other half of the year, the +X axis is opposite the velocity vector"
+
+        Hence we rotate the first velocity vector into the sensor reference
+        frame, but the X component of that vector is inverted compared to the
+        spacecraft so a +X indicates backwards and -X indicates forwards
+
+        The returned velocity is also slightly off from the spacecraft velocity
+        due to the sensor being attached to the craft with wax.
+
+        Returns
+        -------
+        direction : double
+                    X value of the first velocity relative to the sensor
+        """
+        rotation = self.frame_chain.compute_rotation(self.target_frame_id, self.sensor_frame_id)
+        positions, velocities, times = self.sensor_position
+        velocity = rotation.rotate_velocity_at([positions[0]], [velocities[0]], [times[0]])[0]
+        return velocity[0]

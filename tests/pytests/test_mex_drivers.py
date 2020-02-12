@@ -153,7 +153,7 @@ def usgscsm_compare_dict():
                 "line": 0.0,
                 "sample": 2592.0
               },
-              "starting_detector_line": 1,
+              "starting_detector_line": 0,
               "starting_detector_sample": 0,
               "focal2pixel_lines": [
                 -7113.11359717265,
@@ -570,7 +570,7 @@ def test_mex_load(test_kernels, formatter, usgscsm_compare_dict, label):
         binary_exposure_durations.return_value = [0.012800790786743165, 0.012800790786743165, 0.013227428436279297]
         binary_lines.return_value = [0.5, 1.5, 15086.5]
 
-        usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter=formatter, verbose='true')
+        usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter=formatter)
         assert compare_dicts(usgscsm_isd, usgscsm_compare_dict['h5270_0000_ir2'][formatter]) == []
 
 # ========= Test mex pds3label and naifspice driver =========
@@ -637,7 +637,7 @@ class test_mex_pds3_naif(unittest.TestCase):
                                            [49.7917927568053, 3.079982431615e-06, 0.006999999322408])
 
     def test_detector_start_line(self):
-        assert self.driver.detector_start_line == 1
+        assert self.driver.detector_start_line == 0.0
 
     def test_detector_center_line(self):
         assert self.driver.detector_center_line == 0.0
