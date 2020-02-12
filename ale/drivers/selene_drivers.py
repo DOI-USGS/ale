@@ -446,6 +446,15 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
 
     @property
     def spacecraft_direction(self):
+        """
+        Gets the moving direction of the spacecraft from the label, where -1 is moving
+        as intended and 1 is moving inverted.
+
+        Returns
+        -------
+        : int
+          Moving direction of the spacecraft
+        """
         return int(self.label['SATELLITE_MOVING_DIRECTION'])
 
 
