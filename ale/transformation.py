@@ -101,7 +101,7 @@ class FrameChain(nx.DiGraph):
 
         times = np.array(ephemeris_times)
 
-        sensor_time_dependent_frames, sensor_constant_frames = cls.frame_trace(sensor_frame, center_ephemeris_time, True)
+        sensor_time_dependent_frames, sensor_constant_frames = cls.frame_trace(sensor_frame, center_ephemeris_time, nadir)
         target_time_dependent_frames, target_constant_frames = cls.frame_trace(target_frame, center_ephemeris_time)
 
         time_dependent_frames = list(zip(sensor_time_dependent_frames[:-1], sensor_time_dependent_frames[1:]))

@@ -392,9 +392,7 @@ class NaifSpice():
     @property
     def frame_chain(self):
         if not hasattr(self, '_frame_chain'):
-            nadir=False
-            if 'nadir' in self._props.keys():
-                nadir = self._props['nadir']
+            nadir = self._props.get('nadir', False)
             self._frame_chain = FrameChain.from_spice(sensor_frame=self.sensor_frame_id,
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
@@ -402,6 +400,8 @@ class NaifSpice():
                                                       nadir=nadir)
 
             if nadir:
+                # Logic for nadir calculation was taken from ISIS3
+                #  SpiceRotation::setEphemerisTimeNadir
                 rotation = self._frame_chain.compute_rotation(self.target_frame_id, 1)
                 p_vec, v_vec, times = self.sensor_position
                 rotated_positions = rotation.apply_at(p_vec, times)
