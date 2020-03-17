@@ -115,32 +115,26 @@ class FrameChain(nx.DiGraph):
         for s, d in time_dependent_frames:
             quats = np.zeros((len(times), 4))
             avs = np.zeros((len(times), 3))
-            try:
-                for j, time in enumerate(times):
-                    state_matrix = spice.sxform(spice.frmnam(s), spice.frmnam(d), time)
-                    rotation_matrix, avs[j] = spice.xf2rav(state_matrix)
-                    quat_from_rotation = spice.m2q(rotation_matrix)
-                    quats[j,:3] = quat_from_rotation[1:]
-                    quats[j,3] = quat_from_rotation[0]
+            for j, time in enumerate(times):
+                state_matrix = spice.sxform(spice.frmnam(s), spice.frmnam(d), time)
+                rotation_matrix, avs[j] = spice.xf2rav(state_matrix)
+                quat_from_rotation = spice.m2q(rotation_matrix)
+                quats[j,:3] = quat_from_rotation[1:]
+                quats[j,3] = quat_from_rotation[0]
 
-                rotation = TimeDependentRotation(quats, times, s, d, av=avs)
-                frame_chain.add_edge(rotation=rotation)
-            except Exception as e:
-                pass
+            rotation = TimeDependentRotation(quats, times, s, d, av=avs)
+            frame_chain.add_edge(rotation=rotation)
 
         for s, d in constant_frames:
-            try:
-                quats = np.zeros(4)
-                rotation_matrix = spice.pxform(spice.frmnam(s), spice.frmnam(d), times[0])
-                quat_from_rotation = spice.m2q(rotation_matrix)
-                quats[:3] = quat_from_rotation[1:]
-                quats[3] = quat_from_rotation[0]
+            quats = np.zeros(4)
+            rotation_matrix = spice.pxform(spice.frmnam(s), spice.frmnam(d), times[0])
+            quat_from_rotation = spice.m2q(rotation_matrix)
+            quats[:3] = quat_from_rotation[1:]
+            quats[3] = quat_from_rotation[0]
 
-                rotation = ConstantRotation(quats, s, d)
+            rotation = ConstantRotation(quats, s, d)
 
-                frame_chain.add_edge(rotation=rotation)
-            except Exception as e:
-                pass
+            frame_chain.add_edge(rotation=rotation)
 
         return frame_chain
 
@@ -151,8 +145,7 @@ class FrameChain(nx.DiGraph):
         frame_types = [frame_type]
 
         if nadir:
-            frame_codes.append(1)
-            frame_types.append(1)
+            return [], []
 
         while(frame_codes[-1] != 1):
             try:
