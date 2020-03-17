@@ -432,7 +432,7 @@ class NaifSpice():
         to be defined. This must be a floating point number containing the
         ephemeris time. Expects instrument_id to be defined. This must be a string
         containing the short name of the instrument. Expects reference frame to be defined.
-        This must be a sring containing the name of the target reference frame.
+        This must be a string containing the name of the target reference frame.
 
         Returns
         -------
@@ -440,18 +440,7 @@ class NaifSpice():
           Quaternions describing the orientation of the sensor
         """
         if not hasattr(self, '_orientation'):
-            ephem = self.ephemeris_time
-
-            qua = np.empty((len(ephem), 4))
-            for i, time in enumerate(ephem):
-                # Find the rotation matrix
-                camera2bodyfixed = spice.pxform(self.instrument_id,
-                                                self.reference_frame,
-                                                time)
-                q = spice.m2q(camera2bodyfixed)
-                qua[i,:3] = q[1:]
-                qua[i,3] = q[0]
-            self._orientation = qua
+            self._orientation = self.frame_chain.compute_rotation(self.sensor_frame_id, self.target_frame_id).quats
         return self._orientation.tolist()
 
     @property
