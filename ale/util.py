@@ -233,6 +233,7 @@ def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
         if isinstance(mk_paths[key], str):
             mk_paths[key] = [mk_paths[key]]
         while 'Table' in mk_paths[key]: mk_paths[key].remove('Table')
+        while 'Nadir' in mk_paths[key]: mk_paths[key].remove('Nadir')
 
     load_table_data('TargetPosition')
     load_table_data('InstrumentPosition')

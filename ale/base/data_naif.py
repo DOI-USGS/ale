@@ -392,11 +392,38 @@ class NaifSpice():
     @property
     def frame_chain(self):
         if not hasattr(self, '_frame_chain'):
+            nadir=False
+            if 'nadir' in self._props.keys():
+                nadir = self._props['nadir']
             self._frame_chain = FrameChain.from_spice(sensor_frame=self.sensor_frame_id,
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
-                                                      ephemeris_times=self.ephemeris_time)
+                                                      ephemeris_times=self.ephemeris_time,
+                                                      nadir=nadir)
+
+            if nadir:
+                rotation = self._frame_chain.compute_rotation(self.target_frame_id, 1)
+                p_vec, v_vec, times = self.sensor_position
+                rotated_positions = rotation.apply_at(p_vec, times)
+                rotated_velocities = rotation.rotate_velocity_at(p_vec, v_vec, times)
+
+                p_vec = rotated_positions
+                v_vec = rotated_velocities
+
+                velocity_axis = 2
+                trans_x = self.focal2pixel_lines
+
+                if (trans_x[0] < trans_x[1]):
+                    velocity_axis = 1
+
+                quats = [spice.m2q(spice.twovec(-p_vec[i], 3, v_vec[i], velocity_axis)) for i, time in enumerate(times)]
+                quats = np.array(quats)[:,[1,2,3,0]]
+
+                rotation = TimeDependentRotation(quats, times, 1, self.sensor_frame_id)
+                self._frame_chain.add_edge(rotation)
+
         return self._frame_chain
+
 
     @property
     def sensor_orientation(self):

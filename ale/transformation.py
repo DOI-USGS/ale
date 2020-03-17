@@ -96,12 +96,12 @@ class FrameChain(nx.DiGraph):
                      of frame rotations in the frame chain
     """
     @classmethod
-    def from_spice(cls, *args, sensor_frame, target_frame, center_ephemeris_time, ephemeris_times=[], **kwargs):
+    def from_spice(cls, sensor_frame, target_frame, center_ephemeris_time, ephemeris_times=[], nadir=False):
         frame_chain = cls()
 
         times = np.array(ephemeris_times)
 
-        sensor_time_dependent_frames, sensor_constant_frames = cls.frame_trace(sensor_frame, center_ephemeris_time)
+        sensor_time_dependent_frames, sensor_constant_frames = cls.frame_trace(sensor_frame, center_ephemeris_time, True)
         target_time_dependent_frames, target_constant_frames = cls.frame_trace(target_frame, center_ephemeris_time)
 
         time_dependent_frames = list(zip(sensor_time_dependent_frames[:-1], sensor_time_dependent_frames[1:]))
@@ -115,34 +115,44 @@ class FrameChain(nx.DiGraph):
         for s, d in time_dependent_frames:
             quats = np.zeros((len(times), 4))
             avs = np.zeros((len(times), 3))
-            for j, time in enumerate(times):
-                state_matrix = spice.sxform(spice.frmnam(s), spice.frmnam(d), time)
-                rotation_matrix, avs[j] = spice.xf2rav(state_matrix)
-                quat_from_rotation = spice.m2q(rotation_matrix)
-                quats[j,:3] = quat_from_rotation[1:]
-                quats[j,3] = quat_from_rotation[0]
+            try:
+                for j, time in enumerate(times):
+                    state_matrix = spice.sxform(spice.frmnam(s), spice.frmnam(d), time)
+                    rotation_matrix, avs[j] = spice.xf2rav(state_matrix)
+                    quat_from_rotation = spice.m2q(rotation_matrix)
+                    quats[j,:3] = quat_from_rotation[1:]
+                    quats[j,3] = quat_from_rotation[0]
 
-            rotation = TimeDependentRotation(quats, times, s, d, av=avs)
-            frame_chain.add_edge(rotation=rotation)
+                rotation = TimeDependentRotation(quats, times, s, d, av=avs)
+                frame_chain.add_edge(rotation=rotation)
+            except Exception as e:
+                pass
 
         for s, d in constant_frames:
-            quats = np.zeros(4)
-            rotation_matrix = spice.pxform(spice.frmnam(s), spice.frmnam(d), times[0])
-            quat_from_rotation = spice.m2q(rotation_matrix)
-            quats[:3] = quat_from_rotation[1:]
-            quats[3] = quat_from_rotation[0]
+            try:
+                quats = np.zeros(4)
+                rotation_matrix = spice.pxform(spice.frmnam(s), spice.frmnam(d), times[0])
+                quat_from_rotation = spice.m2q(rotation_matrix)
+                quats[:3] = quat_from_rotation[1:]
+                quats[3] = quat_from_rotation[0]
 
-            rotation = ConstantRotation(quats, s, d)
+                rotation = ConstantRotation(quats, s, d)
 
-            frame_chain.add_edge(rotation=rotation)
+                frame_chain.add_edge(rotation=rotation)
+            except Exception as e:
+                pass
 
         return frame_chain
 
     @staticmethod
-    def frame_trace(reference_frame, ephemeris_time):
+    def frame_trace(reference_frame, ephemeris_time, nadir=False):
         frame_codes = [reference_frame]
         _, frame_type, _ = spice.frinfo(frame_codes[-1])
         frame_types = [frame_type]
+
+        if nadir:
+            frame_codes.append(1)
+            frame_types.append(1)
 
         while(frame_codes[-1] != 1):
             try:
