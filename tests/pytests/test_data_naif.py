@@ -101,6 +101,25 @@ class test_data_naif(unittest.TestCase):
         assert len(times) == 1
         np.testing.assert_allclose(times[0], 297088762.61698407)
 
+    def test_sensor_orientation(self):
+        self.driver.ephemeris_time = [297088762.61698407]
+        self.driver._props = {}
+        orientation = self.driver.sensor_orientation
+        np.testing.assert_allclose(orientation[0], [0.08410784798989432, 0.017724689780841133, 0.9945884195952942, 0.058357355025882435])
+
+    def test_sensor_position(self):
+        self.driver.ephemeris_time = [297088762.61698407]
+        positions, velocities, times = self.driver.sensor_position
+        np.testing.assert_allclose(positions[0], [-616295.93509894, -97815.27289939, -3573807.40392374])
+        np.testing.assert_allclose(velocities[0], [-3386.49396159, 411.4392769, 564.95648816])
+        np.testing.assert_allclose(times[0], 297088762.61698407)
+
+    def test_nadir_sensor_orientation(self):
+        self.driver.ephemeris_time = [297088762.61698407]
+        self.driver._props = {'nadir': True}
+        orientation = self.driver.sensor_orientation
+        np.testing.assert_allclose(orientation[0], [-0.08443224924851939, -0.017974644466439982, -0.9949019866167608, -0.052135827116906064])
+
 def test_light_time_correction_keyword():
     with patch('ale.base.data_naif.spice.gcpool', return_value=['NONE']) as gcpool, \
          patch('ale.base.data_naif.NaifSpice.ikid', new_callable=PropertyMock) as ikid:
