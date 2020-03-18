@@ -142,10 +142,7 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
           focal plane to detector lines
         """
         focal2pixel_lines = np.array(list(spice.gdpool('INS{}_ITRANSL'.format(self.ikid), 0, 3)))
-        if self.spacecraft_direction < 0:
-            return focal2pixel_lines
-        else:
-            return -focal2pixel_lines
+        return focal2pixel_lines
 
     @property
     def ephemeris_start_time(self):
@@ -402,10 +399,7 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
           focal plane to detector lines
         """
         focal2pixel_lines = np.array(list(spice.gdpool('INS{}_ITRANSL'.format(self.ikid), 0, 3)))
-        if self.spacecraft_direction < 0:
-            return focal2pixel_lines
-        else:
-            return -focal2pixel_lines
+        return focal2pixel_lines
 
     @property
     def multiplicative_line_error(self):

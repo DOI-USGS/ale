@@ -292,7 +292,7 @@ class test_pds_naif(unittest.TestCase):
             spacecraft_direction.return_value = -1
             np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, 1, 0])
             spacecraft_direction.return_value = 1
-            np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, -1, 0])
+            np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, 1, 0])
 
 
 # ========= Test isislabel and naifspice driver =========
@@ -383,4 +383,4 @@ class test_isis_naif(unittest.TestCase):
             spacecraft_direction.return_value = -1
             np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, 1, 0])
             spacecraft_direction.return_value = 1
-            np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, -1, 0])
+            np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, 1, 0])

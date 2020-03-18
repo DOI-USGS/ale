@@ -392,11 +392,38 @@ class NaifSpice():
     @property
     def frame_chain(self):
         if not hasattr(self, '_frame_chain'):
+            nadir = self._props.get('nadir', False)
             self._frame_chain = FrameChain.from_spice(sensor_frame=self.sensor_frame_id,
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
-                                                      ephemeris_times=self.ephemeris_time)
+                                                      ephemeris_times=self.ephemeris_time,
+                                                      nadir=nadir)
+
+            if nadir:
+                # Logic for nadir calculation was taken from ISIS3
+                #  SpiceRotation::setEphemerisTimeNadir
+                rotation = self._frame_chain.compute_rotation(self.target_frame_id, 1)
+                p_vec, v_vec, times = self.sensor_position
+                rotated_positions = rotation.apply_at(p_vec, times)
+                rotated_velocities = rotation.rotate_velocity_at(p_vec, v_vec, times)
+
+                p_vec = rotated_positions
+                v_vec = rotated_velocities
+
+                velocity_axis = 2
+                trans_x = self.focal2pixel_lines
+
+                if (trans_x[0] < trans_x[1]):
+                    velocity_axis = 1
+
+                quats = [spice.m2q(spice.twovec(-p_vec[i], 3, v_vec[i], velocity_axis)) for i, time in enumerate(times)]
+                quats = np.array(quats)[:,[1,2,3,0]]
+
+                rotation = TimeDependentRotation(quats, times, 1, self.sensor_frame_id)
+                self._frame_chain.add_edge(rotation)
+
         return self._frame_chain
+
 
     @property
     def sensor_orientation(self):
@@ -405,7 +432,7 @@ class NaifSpice():
         to be defined. This must be a floating point number containing the
         ephemeris time. Expects instrument_id to be defined. This must be a string
         containing the short name of the instrument. Expects reference frame to be defined.
-        This must be a sring containing the name of the target reference frame.
+        This must be a string containing the name of the target reference frame.
 
         Returns
         -------
@@ -413,18 +440,7 @@ class NaifSpice():
           Quaternions describing the orientation of the sensor
         """
         if not hasattr(self, '_orientation'):
-            ephem = self.ephemeris_time
-
-            qua = np.empty((len(ephem), 4))
-            for i, time in enumerate(ephem):
-                # Find the rotation matrix
-                camera2bodyfixed = spice.pxform(self.instrument_id,
-                                                self.reference_frame,
-                                                time)
-                q = spice.m2q(camera2bodyfixed)
-                qua[i,:3] = q[1:]
-                qua[i,3] = q[0]
-            self._orientation = qua
+            self._orientation = self.frame_chain.compute_rotation(self.sensor_frame_id, self.target_frame_id).quats
         return self._orientation.tolist()
 
     @property
