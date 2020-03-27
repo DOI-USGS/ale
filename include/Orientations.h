@@ -8,7 +8,14 @@
 namespace ale {
   class Orientations {
   public:
+    /**
+     * Construct a default empty orientation object
+     */
     Orientations() {};
+    /**
+     * Construct an orientation object give a set of rotations
+     * and optionally angular velocities at specific times.
+     */
     Orientations(
       const std::vector<Rotation> &rotations,
       const std::vector<double> &times,
@@ -16,6 +23,9 @@ namespace ale {
       int destination,
       const std::vector<std::vector<double>> &avs = std::vector<std::vector<double>>()
     );
+    /**
+     * Orientations destructor
+     */
     ~Orientations() {};
 
     std::vector<Rotation> rotations() const;
@@ -24,11 +34,20 @@ namespace ale {
     int source() const;
     int destination() const;
 
+    /**
+     * Get the interpolated rotation at a specific time.
+     */
     Rotation interpolate(
       double time,
       RotationInterpolation interpType=SLERP
     ) const;
+    /**
+     * Get the interpolated angular velocity at a specific time
+     */
     std::vector<double> interpolateAV(double time) const;
+    /**
+     * Rotate a position or state vector at a specific time
+     */
     std::vector<double> rotateAt(
       double time,
       const std::vector<double> &vector,
