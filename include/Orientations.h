@@ -26,13 +26,13 @@ namespace ale {
 
     Rotation interpolate(
       double time,
-      RotationInterpolation interpType=slerp
+      RotationInterpolation interpType=SLERP
     ) const;
     std::vector<double> interpolateAV(double time) const;
     std::vector<double> rotateAt(
       double time,
       const std::vector<double> &vector,
-      RotationInterpolation interpType=slerp,
+      RotationInterpolation interpType=SLERP,
       bool invert=false
     ) const;
 
