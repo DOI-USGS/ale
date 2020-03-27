@@ -20,7 +20,7 @@ class OrientationTest : public ::testing::Test {
       avs.push_back({2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI});
       avs.push_back({2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI});
       avs.push_back({2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI});
-      orientations = Orientations(rotations, times, 0, 1, avs);
+      orientations = Orientations(rotations, times, avs);
     }
 
     vector<Rotation> rotations;
@@ -98,4 +98,40 @@ TEST_F(OrientationTest, RotateAt) {
   EXPECT_NEAR(rotatedZ[0], 1.0, 1e-10);
   EXPECT_NEAR(rotatedZ[1], 0.0, 1e-10);
   EXPECT_NEAR(rotatedZ[2], 0.0, 1e-10);
+}
+
+TEST_F(OrientationTest, RotationMultiplication) {
+  Rotation rhs( 0.5, 0.5, 0.5, 0.5);
+  orientations *= rhs;
+  vector<Rotation> outputRotations = orientations.rotations();
+  vector<vector<double>> expectedQuats = {
+    {-0.5, 0.5, 0.5, 0.5},
+    {-1.0, 0.0, 0.0, 0.0},
+    { 0.5, 0.5, 0.5, 0.5}
+  };
+  for (size_t i = 0; i < outputRotations.size(); i++) {
+    vector<double> quats = outputRotations[i].toQuaternion();
+    EXPECT_EQ(expectedQuats[i][0], quats[0]);
+    EXPECT_EQ(expectedQuats[i][1], quats[1]);
+    EXPECT_EQ(expectedQuats[i][2], quats[2]);
+    EXPECT_EQ(expectedQuats[i][3], quats[3]);
+  }
+}
+
+TEST_F(OrientationTest, OrientationMultiplication) {
+  Orientations duplicateOrientations(orientations);
+  orientations *= duplicateOrientations;
+  vector<Rotation> outputRotations = orientations.rotations();
+  vector<vector<double>> expectedQuats = {
+    {-0.5, 0.5, 0.5, 0.5},
+    {-0.5,-0.5,-0.5,-0.5},
+    { 1.0, 0.0, 0.0, 0.0}
+  };
+  for (size_t i = 0; i < outputRotations.size(); i++) {
+    vector<double> quats = outputRotations[i].toQuaternion();
+    EXPECT_EQ(expectedQuats[i][0], quats[0]);
+    EXPECT_EQ(expectedQuats[i][1], quats[1]);
+    EXPECT_EQ(expectedQuats[i][2], quats[2]);
+    EXPECT_EQ(expectedQuats[i][3], quats[3]);
+  }
 }

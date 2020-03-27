@@ -7,12 +7,9 @@ namespace ale {
   Orientations::Orientations(
     const std::vector<Rotation> &rotations,
     const std::vector<double> &times,
-    int source,
-    int destination,
     const std::vector<std::vector<double>> &avs
   ) :
-    m_rotations(rotations), m_avs(avs), m_times(times),
-    m_source(source), m_destination(destination) {
+    m_rotations(rotations), m_avs(avs), m_times(times) {
     if (m_rotations.size() < 2 || m_times.size() < 2) {
       throw std::invalid_argument("There must be at least two rotations and times.");
     }
@@ -37,16 +34,6 @@ namespace ale {
 
   std::vector<double> Orientations::times() const {
     return m_times;
-  }
-
-
-  int Orientations::source() const {
-    return m_source;
-  }
-
-
-  int Orientations::destination() const {
-    return m_destination;
   }
 
 
@@ -85,5 +72,47 @@ namespace ale {
       interpRot = interpRot.inverse();
     }
     return interpRot(vector, av);
+  }
+
+
+  Orientations &Orientations::operator*=(const Orientations &rhs) {
+    std::vector<double> mergedTimes = orderedVecMerge(m_times, rhs.m_times);
+    std::vector<Rotation> mergedRotations;
+    std::vector<std::vector<double>> mergedAvs;
+    for (double time: mergedTimes) {
+      Rotation rhsRot = rhs.interpolate(time);
+      mergedRotations.push_back(interpolate(time)*rhsRot);
+      std::vector<double> combinedAv = rhsRot.inverse()(interpolateAV(time));
+      std::vector<double> rhsAv = rhs.interpolateAV(time);
+      for (size_t i = 0; i < rhsAv.size(); i++) {
+        combinedAv[i] += rhsAv[i];
+      }
+      mergedAvs.push_back(combinedAv);
+    }
+
+    m_times = mergedTimes;
+    m_rotations = mergedRotations;
+    m_avs = mergedAvs;
+
+    return *this;
+  }
+
+
+  Orientations &Orientations::operator*=(const Rotation &rhs) {
+    std::vector<Rotation> updatedRotations;
+    for (size_t i = 0; i < m_rotations.size(); i++) {
+      updatedRotations.push_back(m_rotations[i]*rhs);
+    }
+
+    Rotation inverse = rhs.inverse();
+    std::vector<std::vector<double>> updatedAvs;
+    for (size_t i = 0; i < m_avs.size(); i++) {
+      updatedAvs.push_back(inverse(m_avs[i]));
+    }
+
+    m_rotations = updatedRotations;
+    m_avs = updatedAvs;
+
+    return *this;
   }
 }
