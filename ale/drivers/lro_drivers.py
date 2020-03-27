@@ -141,8 +141,11 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
         : list<double>
           focal plane to detector lines
         """
-        focal2pixel_lines = np.array(list(spice.gdpool('INS{}_ITRANSL'.format(self.ikid), 0, 3)))
-        return focal2pixel_lines
+        focal2pixel_lines = np.array(list(spice.gdpool('INS{}_ITRANSL'.format(self.ikid), 0, 3))) / self.sampling_factor
+        if self.spacecraft_direction < 0:
+            return -focal2pixel_lines
+        else:
+            return focal2pixel_lines
 
     @property
     def ephemeris_start_time(self):
@@ -259,10 +262,15 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
         direction : double
                     X value of the first velocity relative to the sensor
         """
-        rotation = self.frame_chain.compute_rotation(self.target_frame_id, self.sensor_frame_id)
-        positions, velocities, times = self.sensor_position
-        velocity = rotation.rotate_velocity_at([positions[0]], [velocities[0]], [times[0]])[0]
-        return velocity[0]
+        frame_chain = self.frame_chain
+        lro_bus_id = spice.bods2c('LRO_SC_BUS')
+        time = self.ephemeris_start_time
+        state, _ = spice.spkezr(self.spacecraft_name, time, 'J2000', 'None', self.target_name)
+        position = state[:3]
+        velocity = state[3:]
+        rotation = frame_chain.compute_rotation(1, lro_bus_id)
+        rotated_velocity = spice.mxv(rotation._rots.as_dcm()[0], velocity)
+        return rotated_velocity[0]
 
 
 
@@ -398,8 +406,11 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
         : list<double>
           focal plane to detector lines
         """
-        focal2pixel_lines = np.array(list(spice.gdpool('INS{}_ITRANSL'.format(self.ikid), 0, 3)))
-        return focal2pixel_lines
+        focal2pixel_lines = np.array(list(spice.gdpool('INS{}_ITRANSL'.format(self.ikid), 0, 3))) / self.sampling_factor
+        if self.spacecraft_direction < 0:
+            return -focal2pixel_lines
+        else:
+            return focal2pixel_lines
 
     @property
     def multiplicative_line_error(self):
@@ -485,7 +496,12 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
         direction : double
                     X value of the first velocity relative to the sensor
         """
-        rotation = self.frame_chain.compute_rotation(self.target_frame_id, self.sensor_frame_id)
-        positions, velocities, times = self.sensor_position
-        velocity = rotation.rotate_velocity_at([positions[0]], [velocities[0]], [times[0]])[0]
-        return velocity[0]
+        frame_chain = self.frame_chain
+        lro_bus_id = spice.bods2c('LRO_SC_BUS')
+        time = self.ephemeris_start_time
+        state, _ = spice.spkezr(self.spacecraft_name, time, 'J2000', 'None', self.target_name)
+        position = state[:3]
+        velocity = state[3:]
+        rotation = frame_chain.compute_rotation(1, lro_bus_id)
+        rotated_velocity = spice.mxv(rotation._rots.as_dcm()[0], velocity)
+        return rotated_velocity[0]
