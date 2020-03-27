@@ -245,10 +245,10 @@ namespace ale {
   ) const {
     Eigen::Quaterniond interpQuat;
     switch (interpType) {
-      case slerp:
+      case SLERP:
         interpQuat = m_impl->quat.slerp(t, nextRotation.m_impl->quat);
         break;
-      case nlerp:
+      case NLERP:
         interpQuat = Eigen::Quaterniond(
               linearInterpolate(m_impl->quat.w(), nextRotation.m_impl->quat.w(), t),
               linearInterpolate(m_impl->quat.x(), nextRotation.m_impl->quat.x(), t),

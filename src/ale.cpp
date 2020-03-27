@@ -343,7 +343,6 @@ namespace ale {
          // Initialize the Python interpreter but only once.
          first_run = !first_run;
          Py_Initialize();
-         atexit(Py_Finalize);
      }
 
      // Import the file as a Python module.

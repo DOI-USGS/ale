@@ -1,7 +1,6 @@
 #ifndef ALE_INCLUDE_ALE_H
 #define ALE_INCLUDE_ALE_H
 
-#include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
 
@@ -15,9 +14,9 @@ namespace ale {
   /// Interpolation enum for defining different methods of interpolation
   enum interpolation {
     /// Interpolate using linear interpolation
-    linear,
+    LINEAR,
     /// Interpolate using spline interpolation
-    spline
+    SPLINE
   };
 
 

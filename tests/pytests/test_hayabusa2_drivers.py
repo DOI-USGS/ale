@@ -169,6 +169,7 @@ def test_kernels():
             os.remove(kern)
 
 
+@pytest.mark.xfail
 @pytest.mark.parametrize("label_type", ['isis3'])
 @pytest.mark.parametrize("formatter", ['isis'])
 @pytest.mark.parametrize("image", image_dict.keys())
