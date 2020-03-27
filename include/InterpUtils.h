@@ -31,6 +31,11 @@ namespace ale {
    */
   int interpolationIndex(const std::vector<double> &times, double interpTime);
 
+  /**
+   * Merge, sort, and remove duplicates from two vectors
+   */
+   std::vector<double> orderedVecMerge(const std::vector<double> &x, const std::vector<double> &y);
+
 }
 
 #endif

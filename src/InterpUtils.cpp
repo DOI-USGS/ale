@@ -1,6 +1,7 @@
 #include "InterpUtils.h"
 
 #include <algorithm>
+#include <unordered_set>
 
 namespace ale {
   double linearInterpolate(double x, double y, double t) {
@@ -30,5 +31,19 @@ namespace ale {
       --nextTimeIt;
     }
     return std::distance(times.begin(), nextTimeIt);
+  }
+
+  std::vector<double> orderedVecMerge(const std::vector<double> &x, const std::vector<double> &y) {
+    std::unordered_set<double> mergedSet;
+    for (double val: x) {
+      mergedSet.insert(val);
+    }
+    for (double val: y) {
+      mergedSet.insert(val);
+    }
+    std::vector<double> merged;
+    merged.assign(mergedSet.begin(), mergedSet.end());
+    std::sort(merged.begin(), merged.end());
+    return merged;
   }
 }

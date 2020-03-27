@@ -12,6 +12,7 @@ target_link_libraries(runAleTests
                       GSL::gslcblas
                       Eigen3::Eigen
                       gtest
+                      gmock
                       Threads::Threads
                       nlohmann_json::nlohmann_json
                       )
