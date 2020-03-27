@@ -411,7 +411,9 @@ class NaifSpice():
                 v_vec = rotated_velocities
 
                 velocity_axis = 2
-                trans_x = self.focal2pixel_lines
+                # Get the default line translation with no potential flipping
+                # from the driver
+                trans_x = np.array(list(spice.gdpool('INS{}_ITRANSL'.format(self.ikid), 0, 3)))
 
                 if (trans_x[0] < trans_x[1]):
                     velocity_axis = 1

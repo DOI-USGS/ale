@@ -271,17 +271,18 @@ class test_pds_naif(unittest.TestCase):
     def test_spacecraft_direction(self, compute_rotation, from_spice, frame_chain):
         with patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.target_frame_id', \
              new_callable=PropertyMock) as target_frame_id, \
-             patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.sensor_frame_id', \
-             new_callable=PropertyMock) as sensor_frame_id, \
              patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.ephemeris_start_time', \
              new_callable=PropertyMock) as ephemeris_start_time, \
-             patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.ephemeris_stop_time', \
-             new_callable=PropertyMock) as ephemeris_end_time, \
-             patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.sensor_position', \
-             new_callable=PropertyMock) as sensor_position:
-            sensor_position.return_value = [[np.array([50, 50, 50])], [np.array([1, 1, 1])], [0]]
-            assert self.driver.spacecraft_direction < 0
-            compute_rotation.assert_called_with(target_frame_id.return_value, sensor_frame_id.return_value)
+             patch('ale.drivers.lro_drivers.spice.bods2c', return_value=-12345) as bods2c, \
+             patch('ale.drivers.lro_drivers.spice.spkezr', return_value=[[1, 1, 1, 1, 1, 1], 0]) as spkezr, \
+             patch('ale.drivers.lro_drivers.spice.mxv', return_value=[1, 1, 1]) as mxv:
+            ephemeris_start_time.return_value = 0
+            assert self.driver.spacecraft_direction > 0
+            bods2c.assert_called_with('LRO_SC_BUS')
+            spkezr.assert_called_with(self.driver.spacecraft_name, 0, 'J2000', 'None', self.driver.target_name)
+            compute_rotation.assert_called_with(1, -12345)
+            np.testing.assert_array_equal(np.array([[-1.0, 0.0, 0.0], [0.0, -1.0, 0.0], [0.0, 0.0, 1.0]]), mxv.call_args[0][0])
+            np.testing.assert_array_equal(np.array([1, 1, 1]), mxv.call_args[0][1])
 
     def test_focal2pixel_lines(self):
         with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=[0, 1, 0]) as gdpool, \
@@ -290,7 +291,7 @@ class test_pds_naif(unittest.TestCase):
              patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.spacecraft_direction', \
              new_callable=PropertyMock) as spacecraft_direction:
             spacecraft_direction.return_value = -1
-            np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, 1, 0])
+            np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, -1, 0])
             spacecraft_direction.return_value = 1
             np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, 1, 0])
 
@@ -362,17 +363,19 @@ class test_isis_naif(unittest.TestCase):
     def test_spacecraft_direction(self, compute_rotation, from_spice, frame_chain):
         with patch('ale.drivers.lro_drivers.LroLrocIsisLabelNaifSpiceDriver.target_frame_id', \
              new_callable=PropertyMock) as target_frame_id, \
-             patch('ale.drivers.lro_drivers.LroLrocIsisLabelNaifSpiceDriver.sensor_frame_id', \
-             new_callable=PropertyMock) as sensor_frame_id, \
              patch('ale.drivers.lro_drivers.LroLrocIsisLabelNaifSpiceDriver.ephemeris_start_time', \
              new_callable=PropertyMock) as ephemeris_start_time, \
-             patch('ale.drivers.lro_drivers.LroLrocIsisLabelNaifSpiceDriver.ephemeris_stop_time', \
-             new_callable=PropertyMock) as ephemeris_end_time, \
-             patch('ale.drivers.lro_drivers.LroLrocIsisLabelNaifSpiceDriver.sensor_position', \
-             new_callable=PropertyMock) as sensor_position:
-            sensor_position.return_value = [[np.array([50, 50, 50])], [np.array([1, 1, 1])], [0]]
-            assert self.driver.spacecraft_direction < 0
-            compute_rotation.assert_called_with(target_frame_id.return_value, sensor_frame_id.return_value)
+             patch('ale.drivers.lro_drivers.spice.cidfrm', return_value=[-12345]) as cidfrm, \
+             patch('ale.drivers.lro_drivers.spice.scs2e', return_value=0) as scs2e, \
+             patch('ale.drivers.lro_drivers.spice.bods2c', return_value=-12345) as bods2c, \
+             patch('ale.drivers.lro_drivers.spice.spkezr', return_value=[[1, 1, 1, 1, 1, 1], 0]) as spkezr, \
+             patch('ale.drivers.lro_drivers.spice.mxv', return_value=[1, 1, 1]) as mxv:
+            ephemeris_start_time.return_value = 0
+            assert self.driver.spacecraft_direction > 0
+            spkezr.assert_called_with(self.driver.spacecraft_name, 0, 'J2000', 'None', self.driver.target_name)
+            compute_rotation.assert_called_with(1, -12345)
+            np.testing.assert_array_equal(np.array([[-1.0, 0.0, 0.0], [0.0, -1.0, 0.0], [0.0, 0.0, 1.0]]), mxv.call_args[0][0])
+            np.testing.assert_array_equal(np.array([1, 1, 1]), mxv.call_args[0][1])
 
     def test_focal2pixel_lines(self):
         with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=[0, 1, 0]) as gdpool, \
@@ -381,6 +384,6 @@ class test_isis_naif(unittest.TestCase):
              patch('ale.drivers.lro_drivers.LroLrocIsisLabelNaifSpiceDriver.spacecraft_direction', \
              new_callable=PropertyMock) as spacecraft_direction:
             spacecraft_direction.return_value = -1
-            np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, 1, 0])
+            np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, -1, 0])
             spacecraft_direction.return_value = 1
             np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, 1, 0])
