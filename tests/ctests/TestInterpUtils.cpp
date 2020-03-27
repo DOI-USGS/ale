@@ -1,4 +1,4 @@
-#include "gtest/gtest.h"
+#include "gmock/gmock.h"
 
 #include "InterpUtils.h"
 
@@ -37,4 +37,11 @@ TEST(InterpUtilsTest, interpolationIndex) {
   EXPECT_EQ(interpolationIndex({1, 3, 5, 6}, 4), 1);
   EXPECT_EQ(interpolationIndex({1, 3, 5, 6}, 0), 0);
   EXPECT_EQ(interpolationIndex({1, 3, 5, 6}, 8), 2);
+}
+
+TEST(InterpUtilsTest, orderedVecMerge) {
+  vector<double> vec1 = {0, 2, 4, 3, 5};
+  vector<double> vec2 = {-10, 4, 5, 6, 0};
+  vector<double> merged = orderedVecMerge(vec1, vec2);
+  ASSERT_THAT(orderedVecMerge(vec1, vec2), testing::ElementsAre(-10, 0, 2, 3, 4, 5, 6));
 }
