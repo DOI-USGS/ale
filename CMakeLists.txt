@@ -38,6 +38,7 @@ add_library(ale SHARED
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Isd.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Util.cpp)
 set(ALE_HEADERS "${ALE_BUILD_INCLUDE_DIR}/ale.h"
+                "${ALE_BUILD_INCLUDE_DIR}/InterpUtils.h"
                 "${ALE_BUILD_INCLUDE_DIR}/Rotation.h"
                 "${ALE_BUILD_INCLUDE_DIR}/Isd.h"
                 "${ALE_BUILD_INCLUDE_DIR}/Orientations.h"
