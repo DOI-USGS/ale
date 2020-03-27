@@ -99,7 +99,7 @@ namespace ale {
       /**
        * Rotate a vector
        *
-       * @param vector The vector to rotate. Cab be a 3 element position or 6 element state.
+       * @param vector The vector to rotate. Can be a 3 element position or 6 element state.
        * @param av The angular velocity to use when rotating state vectors. Defaults to 0.
        *
        * @return The rotated vector.
