@@ -19,8 +19,6 @@ namespace ale {
     Orientations(
       const std::vector<Rotation> &rotations,
       const std::vector<double> &times,
-      int source,
-      int destination,
       const std::vector<std::vector<double>> &avs = std::vector<std::vector<double>>()
     );
     /**
@@ -28,11 +26,12 @@ namespace ale {
      */
     ~Orientations() {};
 
+    /**
+     * Const accessor methods
+     */
     std::vector<Rotation> rotations() const;
     std::vector<std::vector<double>> angularVelocities() const;
     std::vector<double> times() const;
-    int source() const;
-    int destination() const;
 
     /**
      * Get the interpolated rotation at a specific time.
@@ -55,12 +54,19 @@ namespace ale {
       bool invert=false
     ) const;
 
+    /**
+     * Multiply this orientation by another orientation
+     */
+    Orientations &operator*=(const Orientations &rhs);
+    /**
+     * Multiply this orientation by a constant rotation
+     */
+    Orientations &operator*=(const Rotation &rhs);
+
   private:
     std::vector<Rotation> m_rotations;
     std::vector<std::vector<double>> m_avs;
     std::vector<double> m_times;
-    int m_source;
-    int m_destination;
   };
 }
 
