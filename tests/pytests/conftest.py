@@ -3,6 +3,8 @@ import os
 import re
 import warnings
 import numpy as np
+import json
+
 import ale
 
 from glob import glob
@@ -92,6 +94,17 @@ def get_image_label(image, label_type='pds3'):
         raise Exception(f'Could not find label file for {image}')
 
     return label_file[0]
+
+def get_isd(instrument):
+    if not isinstance(instrument, str):
+        raise KeyError('instrument name is not a string')
+
+    label_file = glob(os.path.join(data_root, 'isds',f'{instrument}_isd.json'))
+    if not label_file:
+        raise Exception(f'Could not find label file for {instrument}')
+
+    return json.load(open(label_file[0]))
+
 
 def get_image_kernels(image):
     """
