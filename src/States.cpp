@@ -161,8 +161,8 @@ namespace ale {
       double timeScale = 1.0;
 
       std::vector<double> scaledEphemTimes;
-      for(unsigned int i = 0; i < m_ephemTimes.size(); i++) {
-        scaledEphemTimes.push_back((m_ephemTimes[i] - baseTime) / timeScale);
+      for(unsigned int i = 0; i < interpTimes.size(); i++) {
+        scaledEphemTimes.push_back((interpTimes[i] - baseTime) / timeScale);
       }
       double sTime = (time - baseTime) / timeScale;
       position.x = ale::evaluateCubicHermite(sTime, vxs, scaledEphemTimes, xs);
