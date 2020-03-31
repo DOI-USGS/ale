@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "ale.h"
+#include "Isd.h"
 
 #include <stdexcept>
 #include <cmath>
@@ -11,6 +12,7 @@
 #include <Eigen/Geometry>
 
 using namespace std;
+
 
 TEST(PositionInterpTest, LinearInterp) {
   vector<double> times = { -3, -2, -1,  0,  1,  2};
@@ -289,12 +291,17 @@ TEST(RotationInterpTest, ExampleGetRotation) {
   EXPECT_DOUBLE_EQ(1, quat.norm());
 }
 
-
 TEST(RotationInterpTest, GetRotationDifferentCounts) {
   // incorrect params
   vector<double> times = {0, 1, 2};
   vector<vector<double>> rots({{1,1,1,1}, {0,0,0,0}, {1,1,1,1}, {0,0,0,0}});
   EXPECT_THROW(ale::getRotation(rots, times, 2, ale::LINEAR), invalid_argument);
+}
+
+TEST(RotationInterpTest, InvalidTime) {
+  vector<double> times = {0, 1, 2};
+  vector<vector<double>> rots({{1,1,1,1}, {0,0,0,0}, {1,1,1,1}});
+  EXPECT_THROW(ale::getRotation(rots, times, 3, ale::LINEAR), invalid_argument);
 }
 
 TEST(PyInterfaceTest, LoadInvalidLabel) {
@@ -315,4 +322,43 @@ TEST(AngularVelocityInterpTest, ExampleGetRotation) {
   EXPECT_DOUBLE_EQ(0, av[0]);
   EXPECT_DOUBLE_EQ(0, av[1]);
   EXPECT_DOUBLE_EQ(2 * sqrt(2), av[2]);
+}
+
+TEST(AngularVelocityInterpTest, InvalidTime) {
+  vector<double> times = {0, 1, 2};
+  vector<vector<double>> rots({{0,0}, {1,0}, {0,1}, {0,0}});
+  EXPECT_THROW(ale::getAngularVelocity(rots, times, 3, ale::LINEAR), invalid_argument);
+}
+
+TEST(VelocityInterpTest, ExampleGetVelocity) {
+  vector<double> times = {0, 1, 2};
+  vector<vector<double>> coords({{1, 1, 1}, {2, 2, 2}, {3, 3, 3}});
+  vector<double> v = ale::getVelocity(coords, times, 1, ale::LINEAR);
+
+  //not sure what the values are expected to look like
+  EXPECT_DOUBLE_EQ(v[0], 0);
+  EXPECT_DOUBLE_EQ(v[1], 0);
+  EXPECT_DOUBLE_EQ(v[2], 0);
+}
+
+TEST(VelocityInterpTest, InvalidTime) {
+  vector<double> times = {0, 1, 2};
+  vector<vector<double>> coords({{1, 1, 1}, {2, 2, 2}, {3, 3, 3}});
+  EXPECT_THROW(ale::getVelocity(coords, times, 3, ale::LINEAR), invalid_argument);
+}
+
+TEST(Interpolation, Derivative2)
+{
+  //only checks that case 2 of the switch block is hit
+  vector<double> points = {0, 0, 0};
+  vector<double> times = {0, 1, 2};
+
+  EXPECT_DOUBLE_EQ(ale::interpolate(points, times, 1, ale::LINEAR, 2), 0);
+}
+
+TEST(Interpolation, InvalidDerivative) {
+  vector<double> points = {0, 0, 0};
+  vector<double> times = {0, 1, 2};
+
+  EXPECT_THROW(ale::interpolate(points, times, 1, ale::LINEAR, 3), invalid_argument);
 }

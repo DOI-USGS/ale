@@ -16,16 +16,25 @@ from collections import OrderedDict
 
 from ale.formatters.usgscsm_formatter import to_usgscsm
 from ale.formatters.isis_formatter import to_isis
+from ale.formatters.formatter import to_isd
 from ale.base.data_isis import IsisSpice
 
 from abc import ABC
 
+# Explicit list of disabled drivers
+__disabled_drivers__ = ["ody_drivers",
+                        "hayabusa2_drivers",
+                        "juno_drivers",
+                        "tgo_drivers"]
+
 # dynamically load drivers
 __all__ = [os.path.splitext(os.path.basename(d))[0] for d in glob(os.path.join(os.path.dirname(__file__), '*_drivers.py'))]
+__all__ = [driver for driver in __all__ if driver not in __disabled_drivers__]
 __driver_modules__ = [importlib.import_module('.'+m, package='ale.drivers') for m in __all__]
 
 __formatters__ = {'usgscsm': to_usgscsm,
-                  'isis': to_isis}
+                  'isis': to_isis,
+                  'ale' : to_isd}
 
 def sort_drivers(drivers=[]):
     return list(sorted(drivers, key=lambda x:IsisSpice in x.__bases__, reverse=False))
@@ -44,7 +53,7 @@ class AleJsonEncoder(json.JSONEncoder):
             return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
-def load(label, props={}, formatter='usgscsm', verbose=False):
+def load(label, props={}, formatter='ale', verbose=False):
     """
     Attempt to load a given label from all possible drivers
 
@@ -79,6 +88,6 @@ def load(label, props={}, formatter='usgscsm', verbose=False):
                 traceback.print_exc()
     raise Exception('No Such Driver for Label')
 
-def loads(label, props='', formatter='usgscsm', verbose=False):
+def loads(label, props='', formatter='ale', verbose=False):
     res = load(label, props, formatter, verbose=verbose)
     return json.dumps(res, cls=AleJsonEncoder)

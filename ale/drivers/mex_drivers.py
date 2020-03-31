@@ -271,17 +271,6 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
 
 
     @property
-    def detector_start_line(self):
-        """
-        Returns
-        -------
-        : int
-          Detector sample corresponding to the first image sample
-        """
-        return 1
-
-
-    @property
     def detector_center_line(self):
         """
         Returns the center detector line.
@@ -506,8 +495,7 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
             """
             if(super().instrument_id != "HRSC"):
                 raise Exception ("Instrument ID is wrong.")
-
-            return super().instrument_id
+            return self.label['IsisCube']['Archive']['DetectorId']
 
         @property
         def sensor_model_version(self):
@@ -587,7 +575,7 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
 
             Expects filter_number to be defined. This should be an integer containing
             the filter number from the pds3 label.
-            Expects ikid to be defined. This should be the integer Naid ID code for
+            Expects ikid to be defined. This should be the integer Naif ID code for
             the instrument.
 
             Returns

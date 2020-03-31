@@ -277,6 +277,7 @@ def test_kernels():
         for kern in kern_list:
             os.remove(kern)
 
+@pytest.mark.xfail
 @pytest.mark.parametrize("label_type", ['isis3'])
 @pytest.mark.parametrize("formatter", ['isis'])
 @pytest.mark.parametrize("image", image_dict.keys())
@@ -334,4 +335,3 @@ class test_themisvis_isis_naif(unittest.TestCase):
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
-

@@ -7,7 +7,7 @@
 # Specify the required version of CMake.
 # cmake 3.10 required for ctest/gtest integration
 cmake_minimum_required(VERSION 3.10)
-project(ale VERSION 0.6.5 DESCRIPTION "Abstraction Library for Ephemerides ")
+project(ale VERSION 0.7.3 DESCRIPTION "Abstraction Library for Ephemerides ")
 
 # include what we need
 include(GNUInstallDirs)
@@ -17,8 +17,15 @@ set(CMAKE_CXX_STANDARD 11)
 # Third Party Dependencies
 find_package(GSL           REQUIRED)
 find_package(Eigen3 3.3    REQUIRED NO_MODULE)
-find_package(Python        REQUIRED COMPONENTS Development)
 find_package(nlohmann_json REQUIRED)
+
+# If there is an Anaconda environment activated, search that for Python first
+if(EXISTS $ENV{CONDA_PREFIX})
+  message("Searching $ENV{CONDA_PREFIX} for Python libraries")
+  set(Python_ROOT_DIR $ENV{CONDA_PREFIX})
+  set(Python_FIND_STRATEGY LOCATION)
+endif()
+find_package(Python        REQUIRED COMPONENTS Development)
 
 # Library setup
 set(ALE_BUILD_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/")
@@ -27,12 +34,16 @@ add_library(ale SHARED
             ${CMAKE_CURRENT_SOURCE_DIR}/src/ale.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Rotation.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/States.cpp)
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Isd.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Util.cpp)
 set(ALE_HEADERS "${ALE_BUILD_INCLUDE_DIR}/ale.h"
                 "${ALE_BUILD_INCLUDE_DIR}/Rotation.h"
-                "${ALE_BUILD_INCLUDE_DIR}/States.h")
+                "${ALE_BUILD_INCLUDE_DIR}/States.h"
+                "${ALE_BUILD_INCLUDE_DIR}/Isd.h"
+                "${ALE_BUILD_INCLUDE_DIR}/Util.h")
 set_target_properties(ale PROPERTIES
-                      VERSION             ${PROJECT_VERSION}
-                      SOVERSION           0)
+                      VERSION   ${PROJECT_VERSION}
+                      SOVERSION 0)
 # Use generator expressions so that downstream projects can use this target
 target_include_directories(ale
                            PUBLIC

@@ -1,12 +1,11 @@
 #ifndef ALE_INCLUDE_ALE_H
 #define ALE_INCLUDE_ALE_H
 
-#include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
 
 #include <gsl/gsl_interp.h>
- 
+
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
@@ -17,32 +16,32 @@ namespace ale {
     /// Interpolate using linear interpolation
     LINEAR = 0,
     /// Interpolate using spline interpolation
-    SPLINE = 1, 
+    SPLINE = 1,
   };
 
 
   // Temporarily moved interpolation and associated helper functions over from States. Will be
-  // moved to interpUtils in the future. 
+  // moved to interpUtils in the future.
 
-  /** The following helper functions are used to calculate the reduced states cache and cubic hermite 
-  to interpolate over it. They were migrated, with minor modifications, from 
+  /** The following helper functions are used to calculate the reduced states cache and cubic hermite
+  to interpolate over it. They were migrated, with minor modifications, from
   Isis::NumericalApproximation **/
 
   /** Determines the lower index for the interpolation interval. */
   int interpolationIndex(const std::vector<double> &times, double interpTime);
 
   /** Evaluates a cubic hermite at time, interpTime, between the appropriate two points in x. **/
-  double evaluateCubicHermite(const double interpTime, const std::vector<double>& derivs, 
+  double evaluateCubicHermite(const double interpTime, const std::vector<double>& derivs,
                               const std::vector<double>& x, const std::vector<double>& y);
 
   /** Evaluate velocities using a Cubic Hermite Spline at a time a, within some interval in x, **/
-  double evaluateCubicHermiteFirstDeriv(const double interpTime, const std::vector<double>& deriv, 
+  double evaluateCubicHermiteFirstDeriv(const double interpTime, const std::vector<double>& deriv,
                                        const std::vector<double>& times, const std::vector<double>& y);
-  
+
   // Stadard default gsl interpolation to use if we haven't yet reduced the cache.
   // Times must be sorted in order of least to greatest
-  double interpolateState(const std::vector<double>& points, const std::vector<double>& times, 
-                           double time, interpolation interp, int d); 
+  double interpolateState(const std::vector<double>& points, const std::vector<double>& times,
+                           double time, interpolation interp, int d);
 
   /**
    *@brief Get the position of the spacecraft at a given time based on a set of coordinates, and their associated times

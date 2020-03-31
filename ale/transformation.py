@@ -96,12 +96,12 @@ class FrameChain(nx.DiGraph):
                      of frame rotations in the frame chain
     """
     @classmethod
-    def from_spice(cls, *args, sensor_frame, target_frame, center_ephemeris_time, ephemeris_times=[], **kwargs):
+    def from_spice(cls, sensor_frame, target_frame, center_ephemeris_time, ephemeris_times=[], nadir=False):
         frame_chain = cls()
 
         times = np.array(ephemeris_times)
 
-        sensor_time_dependent_frames, sensor_constant_frames = cls.frame_trace(sensor_frame, center_ephemeris_time)
+        sensor_time_dependent_frames, sensor_constant_frames = cls.frame_trace(sensor_frame, center_ephemeris_time, nadir)
         target_time_dependent_frames, target_constant_frames = cls.frame_trace(target_frame, center_ephemeris_time)
 
         time_dependent_frames = list(zip(sensor_time_dependent_frames[:-1], sensor_time_dependent_frames[1:]))
@@ -139,10 +139,13 @@ class FrameChain(nx.DiGraph):
         return frame_chain
 
     @staticmethod
-    def frame_trace(reference_frame, ephemeris_time):
+    def frame_trace(reference_frame, ephemeris_time, nadir=False):
         frame_codes = [reference_frame]
         _, frame_type, _ = spice.frinfo(frame_codes[-1])
         frame_types = [frame_type]
+
+        if nadir:
+            return [], []
 
         while(frame_codes[-1] != 1):
             try:

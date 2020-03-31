@@ -245,7 +245,10 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
           focal plane to detector lines
         """
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0]
-        return [0, -1/pixel_size, 0]
+        if self.spacecraft_direction < 0:
+            return [0, -1/pixel_size, 0]
+        elif self.spacecraft_direction > 0:
+            return [0, 1/pixel_size, 0]
 
 
     @property
@@ -306,7 +309,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         return spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 1, 1)[0]
 
     @property
-    def line_exposure_duration(self):
+    def exposure_duration(self):
         """
         Returns Line Exposure Duration
 
@@ -432,7 +435,27 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         : int
           Detector sample corresponding to the first image sample
         """
-        return self.label["FIRST_PIXEL_NUMBER"]
+        return self.label["FIRST_PIXEL_NUMBER"] - .5
+
+    @property
+    def detector_start_line(self):
+        if self.spacecraft_direction < 0:
+            return super().detector_start_line
+        elif self.spacecraft_direction > 0:
+            return 1
+
+    @property
+    def spacecraft_direction(self):
+        """
+        Gets the moving direction of the spacecraft from the label, where -1 is moving
+        as intended and 1 is moving inverted.
+
+        Returns
+        -------
+        : int
+          Moving direction of the spacecraft
+        """
+        return int(self.label['SATELLITE_MOVING_DIRECTION'])
 
 
     @property
