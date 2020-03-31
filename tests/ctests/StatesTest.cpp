@@ -120,16 +120,16 @@ protected:
     std::vector<double> ephemTimes = {0.0, 1.0, 2.0, 3.0};
 
     std::vector<ale::Vec3d> positions = {
-      ale::Vec3d(4.0, 1.0, 4.0),
-      ale::Vec3d (5.0, 3.0, 3.5),
-      ale::Vec3d (4.0, 3.5, 2.5),
-      ale::Vec3d (7.0, 4.0, 1.0)};
+      ale::Vec3d(4, 0, 0),
+      ale::Vec3d(5, 3, 0.064),
+      ale::Vec3d(6, 4, 0.512),
+      ale::Vec3d(7, 3, 1.728)};
 
     std::vector<ale::Vec3d> velocities = {
-      ale::Vec3d(-4.0, -1.0, -4.0),
-      ale::Vec3d(-5.0, -3.0, -3.5),
-      ale::Vec3d(-4.0, -3.5, -2.5),
-      ale::Vec3d(-7.0, -4.0, -1.0)};
+      ale::Vec3d(1, 4, 0),
+      ale::Vec3d(1, 2, 0.48),
+      ale::Vec3d(1, 0, 1.92),
+      ale::Vec3d(1, -2, 4.32)};
 
     std::vector<ale::State> stateVector;
     for (int i=0; i < positions.size(); i++) {
@@ -155,24 +155,38 @@ protected:
 
 // Tests GSL spline and linear interp - force to use GSL spline by omitting velocity
 TEST_F(TestState, getPosition) {
-  ale::Vec3d linear_position = states->getPosition(0.5, LINEAR);
-  ale::Vec3d spline_position = statesNoVelocity->getPosition(2.5, SPLINE);
+  double time = 1.5;
 
-  EXPECT_NEAR(linear_position.x, 4.5, 1e-10);
-  EXPECT_NEAR(linear_position.y, 2, 1e-10);
-  EXPECT_NEAR(linear_position.z, 3.75, 1e-10);
-  EXPECT_NEAR(spline_position.x, 5.05, 1e-10);
-  EXPECT_NEAR(spline_position.y, 3.7125, 1e-10);
-  EXPECT_NEAR(spline_position.z, 1.7875, 1e-10);
+  ale::Vec3d linear_position = states->getPosition(time, LINEAR);
+  ale::Vec3d spline_position = states->getPosition(time, SPLINE);
+  ale::Vec3d linear_no_vel_position = statesNoVelocity->getPosition(time, LINEAR);
+  ale::Vec3d spline_no_vel_position = statesNoVelocity->getPosition(time, SPLINE);
+
+  double linear_x = 5.5;
+  double linear_y = 3.5;
+  double linear_z = 0.288;
+
+  EXPECT_NEAR(linear_position.x, linear_x, 1e-10);
+  EXPECT_NEAR(linear_position.y, linear_y, 1e-10);
+  EXPECT_NEAR(linear_position.z, linear_z, 1e-10);
+  EXPECT_NEAR(spline_position.x, 5.5, 1e-10);
+  EXPECT_NEAR(spline_position.y, 3.75, 1e-10);
+  EXPECT_NEAR(spline_position.z, 0.108, 1e-10);
+  EXPECT_NEAR(linear_no_vel_position.x, linear_x, 1e-10);
+  EXPECT_NEAR(linear_no_vel_position.y, linear_y, 1e-10);
+  EXPECT_NEAR(linear_no_vel_position.z, linear_z, 1e-10);
+  EXPECT_NEAR(spline_no_vel_position.x, 5.5, 1e-10);
+  EXPECT_NEAR(spline_no_vel_position.y, 3.8, 1e-10);
+  EXPECT_NEAR(spline_no_vel_position.z, 0.2016, 1e-10);
 }
 
 
 TEST_F(TestState, getVelocity) {
   ale::Vec3d linear_velocity = states->getVelocity(0.5, LINEAR);
 
-  EXPECT_NEAR(linear_velocity.x, -4.5, 1e-10);
-  EXPECT_NEAR(linear_velocity.y, -2, 1e-10);
-  EXPECT_NEAR(linear_velocity.z, -3.75, 1e-10);
+  EXPECT_NEAR(linear_velocity.x, 1, 1e-10);
+  EXPECT_NEAR(linear_velocity.y, 3, 1e-10);
+  EXPECT_NEAR(linear_velocity.z, 0.24, 1e-10);
 }
 
 // getState() and interpolateState() are tested when testing getPosition and
@@ -203,11 +217,11 @@ TEST_F(TestState, getPositions) {
   std::vector<ale::Vec3d> positions = states->getPositions();
   EXPECT_EQ(positions.size(), 4);
   EXPECT_NEAR(positions[0].x, 4.0, 1e-10);
-  EXPECT_NEAR(positions[0].y, 1.0, 1e-10);
-  EXPECT_NEAR(positions[0].z, 4.0, 1e-10);
+  EXPECT_NEAR(positions[0].y, 0.0, 1e-10);
+  EXPECT_NEAR(positions[0].z, 0.0, 1e-10);
   EXPECT_NEAR(positions[3].x, 7.0, 1e-10);
-  EXPECT_NEAR(positions[3].y, 4.0, 1e-10);
-  EXPECT_NEAR(positions[3].z, 1.0, 1e-10);
+  EXPECT_NEAR(positions[3].y, 3.0, 1e-10);
+  EXPECT_NEAR(positions[3].z, 1.728, 1e-10);
 }
 
 // minimizeCache
