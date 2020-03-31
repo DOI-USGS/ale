@@ -2,7 +2,7 @@ import pytest
 import json
 import numpy as np
 
-from ale.formatters import usgscsm_formatter
+from ale.formatters import formatter
 from ale.base.base import Driver
 from ale.base.type_sensor import LineScanner, Framer
 from ale.transformation import FrameChain
@@ -106,7 +106,7 @@ class TestDriver(Driver, NaifSpice):
         return 100
 
     @property
-    def isis_naif_keywords(self):
+    def naif_keywords(self):
         return {
             'keyword_1' : 0,
             'keyword_2' : 'test'
@@ -170,6 +170,11 @@ class TestLineScanner(LineScanner, TestDriver):
         return .01
 
 
+@pytest.fixture
+def driver():
+    return TestFramer('')
+
+
 class TestFramer(Framer, TestDriver):
     """
     Test class for overriding properties from the Framer class
@@ -210,135 +215,136 @@ def test_frame_driver():
     return TestFramer("")
 
 def test_frame_name_model(test_frame_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
+    isd = formatter.to_isd(test_frame_driver)
     assert isd['name_model'] == 'USGS_ASTRO_FRAME_SENSOR_MODEL'
 
 def test_line_scan_name_model(test_line_scan_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_line_scan_driver)
+    isd = formatter.to_isd(test_line_scan_driver)
     assert isd['name_model'] == 'USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL'
 
 def test_name_platform(test_frame_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
+    isd = formatter.to_isd(test_frame_driver)
     assert isd['name_platform'] == 'Test Platform'
 
 def test_name_sensor(test_frame_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
+    isd = formatter.to_isd(test_frame_driver)
     assert isd['name_sensor'] == 'Test Frame Sensor'
 
 def test_frame_center_ephemeris_time(test_frame_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
+    isd = formatter.to_isd(test_frame_driver)
     assert isd['center_ephemeris_time'] == 850
 
 def test_summing(test_frame_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
+    isd = formatter.to_isd(test_frame_driver)
     assert isd['detector_sample_summing'] == 2
     assert isd['detector_line_summing'] == 4
 
 def test_focal_to_pixel(test_frame_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
+    isd = formatter.to_isd(test_frame_driver)
     assert isd['focal2pixel_lines'] == [0.1, 0.2, 0.3]
     assert isd['focal2pixel_samples'] == [0.3, 0.2, 0.1]
 
 def test_focal_length(test_frame_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
+    isd = formatter.to_isd(test_frame_driver)
     focal_model = isd['focal_length_model']
     assert focal_model['focal_length'] == 500
 
 def test_image_size(test_frame_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
+    isd = formatter.to_isd(test_frame_driver)
     assert isd['image_lines'] == 512
     assert isd['image_samples'] == 1024
 
 def test_detector_center(test_frame_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
+    isd = formatter.to_isd(test_frame_driver)
     detector_center = isd['detector_center']
     assert detector_center['line'] == 256
     assert detector_center['sample'] == 512
 
 def test_distortion(test_frame_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
+    isd = formatter.to_isd(test_frame_driver)
     optical_distortion = isd['optical_distortion']
     assert optical_distortion['radial']['coefficients'] == [0.0, 1.0, 0.1]
 
 def test_radii(test_frame_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
+    isd = formatter.to_isd(test_frame_driver)
     radii_obj = isd['radii']
     assert radii_obj['semimajor'] == 1100
     assert radii_obj['semiminor'] == 1000
     assert radii_obj['unit'] == 'km'
 
 def test_reference_height(test_frame_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
+    isd = formatter.to_isd(test_frame_driver)
     reference_height = isd['reference_height']
     assert reference_height['maxheight'] == 1000
     assert reference_height['minheight'] == -1000
     assert reference_height['unit'] == 'm'
 
-def test_framer_sensor_position(test_frame_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
-    sensor_position_obj = isd['sensor_position']
-    assert sensor_position_obj['positions'] == [[0, 1, 2]]
-    assert sensor_position_obj['velocities'] == [[0, -1, -2]]
-    assert sensor_position_obj['unit'] == 'm'
-
-def test_sensor_orientation(test_frame_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
-    sensor_orientation_obj = isd['sensor_orientation']
-
-    assert sensor_orientation_obj['quaternions'].tolist() ==  [[0, 0, 0, -1], [0, 0, 0, -1]]
-
 def test_detector_start(test_frame_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
+    isd = formatter.to_isd(test_frame_driver)
     assert isd['starting_detector_line'] == 0
     assert isd['starting_detector_sample'] == 8
 
-def test_framer_sun_position(test_frame_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
-    sun_position_obj = isd['sun_position']
-    assert sun_position_obj['positions'] == [[0, 1, 2]]
-    assert sun_position_obj['velocities'] == [[0, -1, -2]]
-    assert sun_position_obj['unit'] == 'm'
-
 def test_starting_ephemeris_time(test_line_scan_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_line_scan_driver)
+    isd = formatter.to_isd(test_line_scan_driver)
     assert isd['starting_ephemeris_time'] == 800
 
 def test_line_scan_rate(test_line_scan_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_line_scan_driver)
+    isd = formatter.to_isd(test_line_scan_driver)
     assert isd['line_scan_rate'] == [[0.5, -50, 0.01]]
 
-def test_position_times(test_line_scan_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_line_scan_driver)
-    assert isd['t0_ephemeris'] == -50
-    assert isd['dt_ephemeris'] == 100.0 / 155.0
-
-def test_rotation_times(test_line_scan_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_line_scan_driver)
-    assert isd['t0_quaternion'] == -50
-    assert isd['dt_quaternion'] == 100.0 / 155.0
-
 def test_interpolation_method(test_line_scan_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_line_scan_driver)
+    isd = formatter.to_isd(test_line_scan_driver)
     assert isd['interpolation_method'] == 'lagrange'
 
-def test_line_scan_sensor_position(test_line_scan_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_line_scan_driver)
-    sensor_position_obj = isd['sensor_position']
-    expected_positions = np.vstack((np.linspace(0, 3, 156),
-                                    np.linspace(1, 4, 156),
-                                    np.linspace(2, 5, 156))).T
-    expected_velocities = np.vstack((np.linspace(0.03, 0.03, 156),
-                                     np.linspace(0.03, 0.03, 156),
-                                     np.linspace(0.03, 0.03, 156))).T
-    np.testing.assert_almost_equal(sensor_position_obj['positions'],
-                                   expected_positions)
-    np.testing.assert_almost_equal(sensor_position_obj['velocities'],
-                                   expected_velocities)
-    assert sensor_position_obj['unit'] == 'm'
+def test_camera_version(driver):
+    meta_data = formatter.to_isd(driver)
+    assert meta_data['IsisCameraVersion'] == 1
 
-def test_line_scan_sun_position(test_line_scan_driver):
-    isd = usgscsm_formatter.to_usgscsm(test_line_scan_driver)
-    sun_position_obj = isd['sun_position']
-    assert sun_position_obj['positions'] == [[0, 1, 2], [3, 4, 5]]
-    assert sun_position_obj['velocities'] == [[0, -1, -2], [-3, -4, -5]]
-    assert sun_position_obj['unit'] == 'm'
+def test_instrument_pointing(driver):
+    meta_data = formatter.to_isd(driver)
+    pointing = meta_data['InstrumentPointing']
+    assert pointing['TimeDependentFrames'] == [1000, 1]
+    assert pointing['ConstantFrames'] == [1010, 1000]
+    np.testing.assert_equal(pointing['ConstantRotation'], np.array([1., 0., 0., 0., 1., 0., 0., 0., 1.]))
+    assert pointing['CkTableStartTime'] == 800
+    assert pointing['CkTableEndTime'] == 900
+    assert pointing['CkTableOriginalSize'] == 2
+    np.testing.assert_equal(pointing['EphemerisTimes'], np.array([800, 900]))
+    np.testing.assert_equal(pointing['Quaternions'], np.array([[-1, 0, 0, 0], [-1, 0, 0, 0]]))
+
+def test_instrument_position(driver):
+    meta_data = formatter.to_isd(driver)
+    position = meta_data['InstrumentPosition']
+    assert position['SpkTableStartTime'] == 850
+    assert position['SpkTableEndTime'] == 850
+    assert position['SpkTableOriginalSize'] == 1
+    np.testing.assert_equal(position['EphemerisTimes'], np.array([850]))
+    np.testing.assert_equal(position['Positions'], np.array([[0, 0.001, 0.002]]))
+    np.testing.assert_equal(position['Velocities'], np.array([[0, -0.001, -0.002]]))
+
+def test_body_rotation(driver):
+    meta_data = formatter.to_isd(driver)
+    rotation = meta_data['BodyRotation']
+    assert rotation['TimeDependentFrames'] == [100, 1]
+    assert rotation['CkTableStartTime'] == 800
+    assert rotation['CkTableEndTime'] == 900
+    assert rotation['CkTableOriginalSize'] == 2
+    np.testing.assert_equal(rotation['EphemerisTimes'], np.array([800, 900]))
+    np.testing.assert_equal(rotation['Quaternions'], np.array([[-1, 0, 0, 0], [-1, 0, 0, 0]]))
+
+def test_sun_position(driver):
+    meta_data = formatter.to_isd(driver)
+    position = meta_data['SunPosition']
+    assert position['SpkTableStartTime'] == 850
+    assert position['SpkTableEndTime'] == 850
+    assert position['SpkTableOriginalSize'] == 1
+    np.testing.assert_equal(position['EphemerisTimes'], np.array([850]))
+    np.testing.assert_equal(position['Positions'], np.array([[0.0, 0.001, 0.002]]))
+    np.testing.assert_equal(position['Velocities'], np.array([[0.0, -0.001, -0.002]]))
+
+def test_naif_keywords(driver):
+    meta_data = formatter.to_isd(driver)
+    assert meta_data['NaifKeywords'] == {
+        'keyword_1' : 0,
+        'keyword_2' : 'test'
+    }
