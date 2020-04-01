@@ -107,50 +107,6 @@ namespace ale {
                                   "lower and upper indicies are exactly equal.");
     }
   }
-  
-  // Stadard default gsl interpolation to use if we haven't yet reduced the cache.
-  // Times must be sorted in order of least to greatest
-   double interpolateState(const std::vector<double>& points, const std::vector<double>& times, 
-                           double time, interpolation interp, int d) {
-   size_t numPoints = points.size();
-   if (numPoints < 2) {
-     throw std::invalid_argument("At least two points must be input to interpolate over.");
-   }
-   if (points.size() != times.size()) {
-     throw std::invalid_argument("Invalid gsl_interp_type data, must have the same number of points as times.");
-   }
-
-   // convert our interp enum into a GSL one,
-   // should be easy to add non GSL interp methods here later
-   const gsl_interp_type *interp_methods[] = {gsl_interp_linear, gsl_interp_cspline};
-
-   gsl_interp *interpolator = gsl_interp_alloc(interp_methods[interp], numPoints);
-   gsl_interp_init(interpolator, &times[0], &points[0], numPoints);
-   gsl_interp_accel *acc = gsl_interp_accel_alloc();
-
-   // GSL evaluate
-   double result;
-   switch(d) {
-     case 0:
-       result = gsl_interp_eval(interpolator, &times[0], &points[0], time, acc);
-       break;
-     case 1:
-       result = gsl_interp_eval_deriv(interpolator, &times[0], &points[0], time, acc);
-       break;
-     case 2:
-       result = gsl_interp_eval_deriv2(interpolator, &times[0], &points[0], time, acc);
-       break;
-     default:
-       throw std::invalid_argument("Invalid derivitive option, must be 0, 1 or 2.");
-       break;
-   }
-
-   // GSL clean up
-   gsl_interp_free(interpolator);
-   gsl_interp_accel_free(acc);
-
-   return result;
- }
 
   // Position Data Functions
   vector<double> getPosition(vector<vector<double>> coords, vector<double> times, double time,
