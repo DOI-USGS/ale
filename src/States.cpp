@@ -104,9 +104,7 @@ namespace ale {
 
 
   ale::State States::getState(double time, ale::interpolation interp) const {
-    std::vector<double> xs, ys, zs, vxs, vys, vzs;
     int lowerBound = ale::interpolationIndex(m_ephemTimes, time);
-    std::vector<double> interpTimes = {};
     int interpStart;
     int interpStop;
 
@@ -132,6 +130,7 @@ namespace ale {
     }
 
     ale::State state;
+    std::vector<double> xs, ys, zs, vxs, vys, vzs, interpTimes;
 
     for (int i = interpStart; i <= interpStop; i++) {
       state = m_states[i];
@@ -157,8 +156,8 @@ namespace ale {
     }
     else if (interp == SPLINE && hasVelocity()){
       // Do hermite spline if velocities are available
-      double baseTime = (m_ephemTimes.at(0) + m_ephemTimes.at(m_ephemTimes.size() - 1)) / 2.;
-      double timeScale = 1.0;
+      double baseTime = (interpTimes.front() + interpTimes.back()) / 2.0;
+      double timeScale = (interpTimes.back() - interpTimes.front()) / 2;
 
       std::vector<double> scaledEphemTimes;
       for(unsigned int i = 0; i < interpTimes.size(); i++) {
