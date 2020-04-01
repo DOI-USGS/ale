@@ -146,24 +146,23 @@ namespace ale {
     ale::Vec3d position, velocity;
 
     if ( interp == LINEAR || (interp == SPLINE && !hasVelocity())) {
-      position = {interpolateState(xs,  interpTimes, time, interp, 0),
-                  interpolateState(ys,  interpTimes, time, interp, 0),
-                  interpolateState(zs,  interpTimes, time, interp, 0)};
+      position = {interpolate(xs,  interpTimes, time, interp, 0),
+                  interpolate(ys,  interpTimes, time, interp, 0),
+                  interpolate(zs,  interpTimes, time, interp, 0)};
 
-      velocity = {interpolateState(vxs, interpTimes, time, interp, 0),
-                  interpolateState(vys, interpTimes, time, interp, 0),
-                  interpolateState(vzs, interpTimes, time, interp, 0)};
+      velocity = {interpolate(xs, interpTimes, time, interp, 1),
+                  interpolate(ys, interpTimes, time, interp, 1),
+                  interpolate(zs, interpTimes, time, interp, 1)};
     }
     else if (interp == SPLINE && hasVelocity()){
       // Do hermite spline if velocities are available
-      double baseTime = (interpTimes.front() + interpTimes.back()) / 2.0;
-      double timeScale = (interpTimes.back() - interpTimes.front()) / 2;
+      double baseTime = (interpTimes.front() + interpTimes.back()) / 2;
 
       std::vector<double> scaledEphemTimes;
       for(unsigned int i = 0; i < interpTimes.size(); i++) {
-        scaledEphemTimes.push_back((interpTimes[i] - baseTime) / timeScale);
+        scaledEphemTimes.push_back(interpTimes[i] - baseTime);
       }
-      double sTime = (time - baseTime) / timeScale;
+      double sTime = time - baseTime;
       position.x = ale::evaluateCubicHermite(sTime, vxs, scaledEphemTimes, xs);
       position.y = ale::evaluateCubicHermite(sTime, vys, scaledEphemTimes, ys);
       position.z = ale::evaluateCubicHermite(sTime, vzs, scaledEphemTimes, zs);
