@@ -1,0 +1,332 @@
+{
+  "IsisCameraVersion": 1,
+  "NaifKeywords": {
+    "BODY602_RADII": [
+      256.6,
+      251.4,
+      248.3
+    ],
+    "BODY_FRAME_CODE": 10040,
+    "BODY_CODE": 602,
+    "INS-82360_P0_UV3_FOCAL_LENGTH": 2002.71,
+    "INS-82360_P60_IR1_FOCAL_LENGTH": 2002.36,
+    "INS-82360_BL1_CL2_FOCAL_LENGTH": 2002.79,
+    "INS-82360_MODE_NAME": "NOMINAL",
+    "TKFRAME_-82360_UNITS": "DEGREES",
+    "INS-82360_P60_MT1_FOCAL_LENGTH": 2002.34,
+    "INS-82360_IR2_CL2_FOCAL_LENGTH": 2002.71,
+    "INS-82360_HAL_CL2_FOCAL_LENGTH": 2002.94,
+    "INS-82360_P60_UV3_FOCAL_LENGTH": 2002.51,
+    "INS-82360_CL1_CL2_FOCAL_LENGTH": 2002.88,
+    "FRAME_-82360_NAME": "CASSINI_ISS_NAC",
+    "INS-82360_BORESIGHT": [
+      0.0,
+      0.0,
+      1.0
+    ],
+    "INS-82360_UV1_CL2_FOCAL_LENGTH": 2003.03,
+    "INS-82360_IR2_IR3_FOCAL_LENGTH": 2002.55,
+    "INS-82360_ITRANSL": [
+      0.0,
+      0.0,
+      83.33333333333333
+    ],
+    "INS-82360_ITRANSS": [
+      0.0,
+      83.33333333333333,
+      0.0
+    ],
+    "INS-82360_P0_CB1_FOCAL_LENGTH": 2002.3,
+    "INS-82360_CL1_IR3_FOCAL_LENGTH": 2002.65,
+    "INS-82360_IRP0_CB3_FOCAL_LENGTH": 2002.74,
+    "INS-82360_PIXEL_LINES": 1024.0,
+    "TKFRAME_-82360_AXES": [
+      1.0,
+      2.0,
+      3.0
+    ],
+    "INS-82360_CL1_MT3_FOCAL_LENGTH": 2002.87,
+    "TKFRAME_-82360_SPEC": "ANGLES",
+    "INS-82360_DEFAULT_FOCAL_LENGTH": 2003.44,
+    "INS-82360_P60_CB1_FOCAL_LENGTH": 2002.18,
+    "INS-82360_FOV_CROSS_ANGLE": 0.175,
+    "INS-82360_P0_BL2_FOCAL_LENGTH": 2002.19,
+    "INS-82360_FOV_CENTER_PIXEL": [
+      511.5,
+      511.5
+    ],
+    "INS-82360_RED_CL2_FOCAL_LENGTH": 2002.69,
+    "INS-82360_PLATFORM_ID": -82000.0,
+    "INS-82360_IRP0_MT2_FOCAL_LENGTH": 2002.72,
+    "INS-82360_FOV_SHAPE": "RECTANGLE",
+    "INS-82360_CL1_CB3_FOCAL_LENGTH": 2002.68,
+    "INS-82360_FOV_REF_ANGLE": 0.175,
+    "INS-82360_P60_BL2_FOCAL_LENGTH": 2002.13,
+    "INS-82360_TRIGGER_OFFSET": "0:01:00.0",
+    "INS-82360_P120_GRN_FOCAL_LENGTH": 2002.38,
+    "INS-82360_IRP0_CB2_FOCAL_LENGTH": 2002.48,
+    "FRAME_-82360_CLASS_ID": -82360.0,
+    "INS-82360_UV2_UV3_FOCAL_LENGTH": 2002.9,
+    "INS-82360_IR4_CL2_FOCAL_LENGTH": 2002.89,
+    "INS-82360_CL1_MT2_FOCAL_LENGTH": 2002.91,
+    "INS-82360_IR4_IR3_FOCAL_LENGTH": 2002.81,
+    "TKFRAME_-82360_ANGLES": [
+      -90.009796,
+      -0.033,
+      89.9148
+    ],
+    "INS-82360_FOV_FRAME": "CASSINI_ISS_NAC",
+    "INS-82360_CL1_GRN_FOCAL_LENGTH": 2002.75,
+    "INS-82360_IRP0_IR1_FOCAL_LENGTH": 2002.6,
+    "INS-82360_BORESIGHT_SAMPLE": 512.5,
+    "FRAME_-82360_CENTER": -82.0,
+    "INS-82360_P120_IR1_FOCAL_LENGTH": 2002.39,
+    "INS-82360_FOV_CLASS_SPEC": "ANGLES",
+    "INS-82360_FOV_REF_VECTOR": [
+      1.0,
+      0.0,
+      0.0
+    ],
+    "INS-82360_P120_MT1_FOCAL_LENGTH": 2002.54,
+    "TKFRAME_-82360_RELATIVE": "CASSINI_SC_COORD",
+    "INS-82360_CL1_CB2_FOCAL_LENGTH": 2002.66,
+    "INS-82360_P120_UV3_FOCAL_LENGTH": 2002.71,
+    "INS-82360_PIXEL_PITCH": 0.012,
+    "INS-82360_FOCAL_LENGTH": 2003.44,
+    "INS-82360_IR2_IR1_FOCAL_LENGTH": 2002.56,
+    "INS-82360_RED_GRN_FOCAL_LENGTH": 2002.61,
+    "INS-82360_CL1_IR1_FOCAL_LENGTH": 2002.74,
+    "INS-82360_P120_CB1_FOCAL_LENGTH": 2002.28,
+    "INS-82360_CL1_MT1_FOCAL_LENGTH": 2002.88,
+    "FRAME_-82360_CLASS": 4.0,
+    "INS-82360_BORESIGHT_LINE": 512.5,
+    "INS-82360_PIXEL_SIZE": 12.0,
+    "INS-82360_CL1_UV3_FOCAL_LENGTH": 2003.09,
+    "INS-82360_IFOV": 6.0,
+    "INS-82360_TRANSX": [
+      0.0,
+      0.012,
+      0.0
+    ],
+    "INS-82360_TRANSY": [
+      0.0,
+      0.0,
+      0.012
+    ],
+    "INS-82360_F/NUMBER": 10.5,
+    "INS-82360_UV2_CL2_FOCAL_LENGTH": 2002.91,
+    "INS-82360_P0_GRN_FOCAL_LENGTH": 2002.38,
+    "INS-82360_CK_REFERENCE_ID": 1.0,
+    "INS-82360_CK_FRAME_ID": -915240.0,
+    "INS-82360_P120_BL2_FOCAL_LENGTH": 2002.11,
+    "INS-82360_PIXEL_SAMPLES": 1024.0,
+    "INS-82360_RED_IR1_FOCAL_LENGTH": 2002.48,
+    "INS-82360_CL1_CB1_FOCAL_LENGTH": 2002.66,
+    "INS-82360_FL_UNCERTAINTY": 0.03,
+    "INS-82360_P60_GRN_FOCAL_LENGTH": 2002.28,
+    "INS-82360_CYCLE_DURATION": "0:01:00.0",
+    "INS-82360_WAVELENGTH_RANGE": [
+      200.0,
+      1100.0
+    ],
+    "INS-82360_FOV_ANGLE_UNITS": "DEGREES",
+    "INS-82360_K1": 8e-06,
+    "INS-82360_P0_IR1_FOCAL_LENGTH": 2002.35,
+    "INS-82360_CL1_BL2_FOCAL_LENGTH": 2002.37,
+    "INS-82360_IRP0_IR3_FOCAL_LENGTH": 2002.48,
+    "INS-82360_CCD_CENTER": [
+      512.5,
+      512.5
+    ],
+    "INS-82360_P0_MT1_FOCAL_LENGTH": 2002.4,
+    "INS_-82360_FRAME_ID": 14082360.0,
+    "INS-82360_IRP0_MT3_FOCAL_LENGTH": 2002.72,
+    "BODY602_CCOEF": [
+      0.0,
+      0.0,
+      0.0015497999999999998
+    ],
+    "BODY602_POLE_DEC": [
+      83.52,
+      -0.004,
+      0.0
+    ],
+    "BODY602_POLE_RA": [
+      40.66,
+      -0.036,
+      0.0
+    ],
+    "BODY602_PM": [
+      6.32,
+      262.7318996,
+      0.0
+    ],
+    "BODY602_JCOEF": [
+      0.0,
+      0.0054352
+    ],
+    "BODY602_LONG_AXIS": 0.0,
+    "BODY602_GM/PRIMARY": 1.29181e-07,
+    "BODY602_GM": 7.211777492985
+  },
+  "detector_sample_summing": 1,
+  "detector_line_summing": 1,
+  "focal_length_model": {
+    "focal_length": 2003.09
+  },
+  "detector_center": {
+    "line": 512,
+    "sample": 512
+  },
+  "starting_detector_line": 0,
+  "starting_detector_sample": 0,
+  "focal2pixel_lines": [
+    0.0,
+    0.0,
+    83.33333333333333
+  ],
+  "focal2pixel_samples": [
+    0.0,
+    83.33333333333333,
+    0.0
+  ],
+  "optical_distortion": {
+    "radial": {
+      "coefficients": [
+        0,
+        -8e-06,
+        0
+      ]
+    }
+  },
+  "image_lines": 1024,
+  "image_samples": 1024,
+  "name_platform": "CASSINI ORBITER",
+  "name_sensor": "IMAGING SCIENCE SUBSYSTEM - NARROW ANGLE",
+  "reference_height": {
+    "maxheight": 1000,
+    "minheight": -1000,
+    "unit": "m"
+  },
+  "name_model": "USGS_ASTRO_FRAME_SENSOR_MODEL",
+  "center_ephemeris_time": 376938208.24072826,
+  "radii": {
+    "semimajor": 256.6,
+    "semiminor": 248.3,
+    "unit": "km"
+  },
+  "InstrumentPointing": {
+    "TimeDependentFrames": [
+      -82000,
+      1
+    ],
+    "CkTableStartTime": 376938208.24072826,
+    "CkTableEndTime": 376938208.24072826,
+    "CkTableOriginalSize": 1,
+    "EphemerisTimes": [
+      376938208.24072826
+    ],
+    "Quaternions": [
+      [
+        -0.714592970784935,
+        0.21489250965350096,
+        0.44184670438419815,
+        -0.4979453636940545
+      ]
+    ],
+    "AngularVelocity": [
+      [
+        -0.0007574572640014708,
+        -0.0003505925165897519,
+        -0.00010610139650303626
+      ]
+    ],
+    "ConstantFrames": [
+      14082360,
+      -82360,
+      -82000
+    ],
+    "ConstantRotation": [
+      -0.0014870197280318354,
+      -0.00017182872562465645,
+      0.9999988796229811,
+      -0.9999987285211891,
+      -0.0005757037366556639,
+      -0.0014871184258905545,
+      0.0005759586213144874,
+      -0.999999819520032,
+      -0.00017097242433417037
+    ]
+  },
+  "BodyRotation": {
+    "TimeDependentFrames": [
+      10040,
+      1
+    ],
+    "CkTableStartTime": 376938208.24072826,
+    "CkTableEndTime": 376938208.24072826,
+    "CkTableOriginalSize": 1,
+    "EphemerisTimes": [
+      376938208.24072826
+    ],
+    "Quaternions": [
+      [
+        -0.49726210411698374,
+        0.01884225276113552,
+        0.0532896313700967,
+        0.8657572318545625
+      ]
+    ],
+    "AngularVelocity": [
+      [
+        4.544323197605555e-06,
+        3.902625629848413e-06,
+        5.273422216698314e-05
+      ]
+    ]
+  },
+  "InstrumentPosition": {
+    "SpkTableStartTime": 376938208.24072826,
+    "SpkTableEndTime": 376938208.24072826,
+    "SpkTableOriginalSize": 1,
+    "EphemerisTimes": [
+      376938208.24072826
+    ],
+    "Positions": [
+      [
+        21961.77283021467,
+        10151.980187116338,
+        -3287.1339343305876
+      ]
+    ],
+    "Velocities": [
+      [
+        5.455579135911339,
+        -3.302834463297056,
+        -0.20371606661791924
+      ]
+    ]
+  },
+  "SunPosition": {
+    "SpkTableStartTime": 376938208.24072826,
+    "SpkTableEndTime": 376938208.24072826,
+    "SpkTableOriginalSize": 1,
+    "EphemerisTimes": [
+      376938208.24072826
+    ],
+    "Positions": [
+      [
+        1342712164.7010403,
+        521645736.9735198,
+        157522069.3546536
+      ]
+    ],
+    "Velocities": [
+      [
+        -15.573457955043763,
+        5.743795762971043,
+        4.859416365721263
+      ]
+    ]
+  }
+}
