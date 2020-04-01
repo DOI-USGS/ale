@@ -33,7 +33,7 @@ set(ALE_INSTALL_INCLUDE_DIR "include/ale")
 add_library(ale SHARED
             ${CMAKE_CURRENT_SOURCE_DIR}/src/ale.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Rotation.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/States.cpp)
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/States.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Isd.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Util.cpp)
 set(ALE_HEADERS "${ALE_BUILD_INCLUDE_DIR}/ale.h"
