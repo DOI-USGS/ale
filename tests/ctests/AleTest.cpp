@@ -391,17 +391,3 @@ TEST(EvaluateCubicHermiteFirstDeriv, InvalidVelocities) {
 
   EXPECT_THROW(ale::evaluateCubicHermiteFirstDeriv(0.0, derivs, times, y), invalid_argument);
 }
-
-TEST(InterpolateState, InvalidNumPoints) {
-  std::vector<double> points = {};
-  std::vector<double> times = {};
-
-  EXPECT_THROW(ale::interpolateState(points, times, 0.0, ale::LINEAR, 0), invalid_argument);
-}
-
-TEST(InterpolateState, InvalidPointsTimes) {
-  std::vector<double> points = {0.0, 1.0, 2.0};
-  std::vector<double> times = {};
-
-  EXPECT_THROW(ale::interpolateState(points, times, 0.0, ale::LINEAR, 0), invalid_argument);
-}
