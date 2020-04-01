@@ -38,11 +38,6 @@ namespace ale {
   double evaluateCubicHermiteFirstDeriv(const double interpTime, const std::vector<double>& deriv,
                                        const std::vector<double>& times, const std::vector<double>& y);
 
-  // Stadard default gsl interpolation to use if we haven't yet reduced the cache.
-  // Times must be sorted in order of least to greatest
-  double interpolateState(const std::vector<double>& points, const std::vector<double>& times,
-                           double time, interpolation interp, int d);
-
   /**
    *@brief Get the position of the spacecraft at a given time based on a set of coordinates, and their associated times
    *@param coords A vector of double vectors of coordinates
