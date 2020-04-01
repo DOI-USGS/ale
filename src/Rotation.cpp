@@ -1,20 +1,16 @@
 #include "Rotation.h"
 
-#include <algorithm>
 #include <exception>
 
 #include <Eigen/Geometry>
+
+#include "InterpUtils.h"
 
 namespace ale {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper Functions
 ///////////////////////////////////////////////////////////////////////////////
-
-  // Linearly interpolate between two values
-  double linearInterpolate(double x, double y, double t) {
-    return x + t * (y - x);
-  }
 
 
   // Helper function to convert an axis number into a unit Eigen vector down that axis.
