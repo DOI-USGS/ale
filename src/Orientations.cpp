@@ -54,14 +54,14 @@ namespace ale {
     return interpAv;
   }
 
-  ale::Vec3d Orientations::rotateAvAt(
+  ale::Vec3d Orientations::rotateVectorAt(
     double time,
-    const ale::Vec3d &av,
+    const ale::Vec3d &vector,
     RotationInterpolation interpType,
     bool invert
   ) const {
     Rotation interpRot = interpolate(time, interpType);
-    return interpRot(av);
+    return interpRot(vector);
   }
 
 
@@ -72,7 +72,7 @@ namespace ale {
     bool invert
   ) const {
     Rotation interpRot = interpolate(time, interpType);
-    ale::Vec3d av;
+    ale::Vec3d av(0.0, 0.0, 0.0);
     if (!m_avs.empty()) {
       av = interpolateAV(time);
     }

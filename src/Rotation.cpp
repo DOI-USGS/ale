@@ -196,10 +196,9 @@ namespace ale {
 
 
   ale::Vec3d Rotation::operator()(const ale::Vec3d &vector) const {
-    std::vector<double> tempVec = {vector.x, vector.y, vector.z};
-    Eigen::Map<Eigen::Vector3d> eigenVector((double *)tempVec.data());
+    Eigen::Vector3d eigenVector(vector.x, vector.y, vector.z);
     Eigen::Vector3d rotatedVector = m_impl->quat._transformVector(eigenVector);
-    tempVec = std::vector<double>(rotatedVector.data(), rotatedVector.data() + rotatedVector.size());
+    std::vector<double> tempVec = std::vector<double>(rotatedVector.data(), rotatedVector.data() + rotatedVector.size());
     return Vec3d(tempVec);
   }
 
@@ -209,17 +208,15 @@ namespace ale {
   ) const {
     ale::Vec3d position = state.position;
     ale::Vec3d velocity = state.velocity;
-    std::vector<double> positionVec = {position.x, position.y, position.z};
-    std::vector<double> velocityVec = {velocity.x, velocity.y, velocity.z};
 
-    Eigen::Map<Eigen::Vector3d> positionVector((double *)positionVec.data());
-    Eigen::Map<Eigen::Vector3d> velocityVector((double *)velocityVec.data());
+    Eigen::Vector3d positionVector(position.x, position.y, position.z);
+    Eigen::Vector3d velocityVector(velocity.x, velocity.y, velocity.z);
     Eigen::Quaterniond::Matrix3 rotMat = m_impl->quat.toRotationMatrix();
     Eigen::Quaterniond::Matrix3 avMat = avSkewMatrix(av);
     Eigen::Quaterniond::Matrix3 rotationDerivative = rotMat * avMat;
     Eigen::Vector3d rotatedPosition = rotMat * positionVector;
     Eigen::Vector3d rotatedVelocity = rotMat * velocityVector + rotationDerivative * positionVector;
-    
+
     return State({rotatedPosition(0), rotatedPosition(1), rotatedPosition(2),
                   rotatedVelocity(0), rotatedVelocity(1), rotatedVelocity(2)});
   }

@@ -45,9 +45,9 @@ namespace ale {
      */
     ale::Vec3d interpolateAV(double time) const;
 
-    ale::Vec3d rotateAvAt(
+    ale::Vec3d rotateVectorAt(
       double time,
-      const ale::Vec3d &av,
+      const ale::Vec3d &vector,
       RotationInterpolation interpType=SLERP,
       bool invert=false
     ) const;

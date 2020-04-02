@@ -81,15 +81,15 @@ TEST_F(OrientationTest, InterpolateAv) {
 }
 
 TEST_F(OrientationTest, RotateAt) {
-  Vec3d rotatedX = orientations.rotateAvAt(0.0, Vec3d(1.0, 0.0, 0.0));
+  Vec3d rotatedX = orientations.rotateVectorAt(0.0, Vec3d(1.0, 0.0, 0.0));
   EXPECT_NEAR(rotatedX.x, 0.0, 1e-10);
   EXPECT_NEAR(rotatedX.y, 1.0, 1e-10);
   EXPECT_NEAR(rotatedX.z, 0.0, 1e-10);
-  Vec3d rotatedY = orientations.rotateAvAt(0.0, Vec3d(0.0, 1.0, 0.0));
+  Vec3d rotatedY = orientations.rotateVectorAt(0.0, Vec3d(0.0, 1.0, 0.0));
   EXPECT_NEAR(rotatedY.x, 0.0, 1e-10);
   EXPECT_NEAR(rotatedY.y, 0.0, 1e-10);
   EXPECT_NEAR(rotatedY.z, 1.0, 1e-10);
-  Vec3d rotatedZ = orientations.rotateAvAt(0.0, Vec3d(0.0, 0.0, 1.0));
+  Vec3d rotatedZ = orientations.rotateVectorAt(0.0, Vec3d(0.0, 0.0, 1.0));
   EXPECT_NEAR(rotatedZ.x, 1.0, 1e-10);
   EXPECT_NEAR(rotatedZ.y, 0.0, 1e-10);
   EXPECT_NEAR(rotatedZ.z, 0.0, 1e-10);
