@@ -347,8 +347,14 @@ TEST(VelocityInterpTest, InvalidTime) {
   EXPECT_THROW(ale::getVelocity(coords, times, 3, ale::LINEAR), invalid_argument);
 }
 
-TEST(Interpolation, Derivative2)
-{
+TEST(Interpolation, Derivative1) {
+  vector<double> points = {0, 2, 4};
+  vector<double> times = {0, 1, 2};
+
+  EXPECT_DOUBLE_EQ(ale::interpolate(points, times, 1, ale::LINEAR, 1), 2);
+}
+
+TEST(Interpolation, Derivative2) {
   //only checks that case 2 of the switch block is hit
   vector<double> points = {0, 0, 0};
   vector<double> times = {0, 1, 2};
@@ -361,4 +367,54 @@ TEST(Interpolation, InvalidDerivative) {
   vector<double> times = {0, 1, 2};
 
   EXPECT_THROW(ale::interpolate(points, times, 1, ale::LINEAR, 3), invalid_argument);
+}
+
+TEST(InterpIndex, InvalidTimes) {
+  std::vector<double> times = {};
+
+  EXPECT_THROW(ale::interpolationIndex(times, 0), invalid_argument);
+}
+
+TEST(EvaluateCubicHermite, SimplyPolynomial) {
+  // Cubic function is y = x^3 - 2x^2 + 1
+  // derivative is dy/dx = 3x^2 - 4x
+  std::vector<double> derivs = {7.0, -1.0};
+  std::vector<double> x = {-1.0, 1.0};
+  std::vector<double> y = {-2.0, 0.0};
+
+  EXPECT_DOUBLE_EQ(ale::evaluateCubicHermite(0.0, derivs, x, y), 1.0);
+}
+
+TEST(EvaluateCubicHermite, InvalidDervisXY) {
+  std::vector<double> derivs = {};
+  std::vector<double> x = {1.0};
+  std::vector<double> y = {1.0};
+
+  EXPECT_THROW(ale::evaluateCubicHermite(0.0, derivs, x, y), invalid_argument);
+}
+
+TEST(EvaluateCubicHermiteFirstDeriv, SimplyPolynomial) {
+  // Cubic function is y = x^3 - 2x^2 + 1
+  // derivative is dy/dx = 3x^2 - 4x
+  std::vector<double> derivs = {7.0, -1.0};
+  std::vector<double> x = {-1.0, 1.0};
+  std::vector<double> y = {-2.0, 0.0};
+
+  EXPECT_DOUBLE_EQ(ale::evaluateCubicHermiteFirstDeriv(0.5, derivs, x, y), -1.25);
+}
+
+TEST(EvaluateCubicHermiteFirstDeriv, InvalidDervisTimes) {
+  std::vector<double> derivs = {};
+  std::vector<double> times = {1.0};
+  std::vector<double> y = {1.0};
+
+  EXPECT_THROW(ale::evaluateCubicHermiteFirstDeriv(0.0, derivs, times, y), invalid_argument);
+}
+
+TEST(EvaluateCubicHermiteFirstDeriv, InvalidVelocities) {
+  std::vector<double> derivs = {5.0, 6.0};
+  std::vector<double> times = {1.0, 1.0};
+  std::vector<double> y = {1.0};
+
+  EXPECT_THROW(ale::evaluateCubicHermiteFirstDeriv(0.0, derivs, times, y), invalid_argument);
 }
