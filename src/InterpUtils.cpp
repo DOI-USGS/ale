@@ -21,6 +21,16 @@ namespace ale {
     return interpVec;
   }
 
+  ale::Vec3d linearInterpolate(const ale::Vec3d &x, const ale::Vec3d &y, double t) {
+    ale::Vec3d interpVec;
+
+    interpVec.x = linearInterpolate(x.x, y.x, t);
+    interpVec.y = linearInterpolate(x.y, y.y, t);
+    interpVec.z = linearInterpolate(x.z, y.z, t);
+
+    return interpVec;
+  }
+
   int interpolationIndex(const std::vector<double> &times, double interpTime) {
     if (times.size() < 2){
       throw std::invalid_argument("There must be at least two times.");

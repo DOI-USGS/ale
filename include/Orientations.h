@@ -19,7 +19,7 @@ namespace ale {
     Orientations(
       const std::vector<Rotation> &rotations,
       const std::vector<double> &times,
-      const std::vector<std::vector<double>> &avs = std::vector<std::vector<double>>()
+      const std::vector<Vec3d> &avs = std::vector<ale::Vec3d>()
     );
     /**
      * Orientations destructor
@@ -30,7 +30,7 @@ namespace ale {
      * Const accessor methods
      */
     std::vector<Rotation> rotations() const;
-    std::vector<std::vector<double>> angularVelocities() const;
+    std::vector<ale::Vec3d> angularVelocities() const;
     std::vector<double> times() const;
 
     /**
@@ -43,13 +43,21 @@ namespace ale {
     /**
      * Get the interpolated angular velocity at a specific time
      */
-    std::vector<double> interpolateAV(double time) const;
+    ale::Vec3d interpolateAV(double time) const;
+
+    ale::Vec3d rotateAvAt(
+      double time,
+      const ale::Vec3d &av,
+      RotationInterpolation interpType=SLERP,
+      bool invert=false
+    ) const;
+
     /**
      * Rotate a position or state vector at a specific time
      */
-    std::vector<double> rotateAt(
+    ale::State rotateStateAt(
       double time,
-      const std::vector<double> &vector,
+      const ale::State &state,
       RotationInterpolation interpType=SLERP,
       bool invert=false
     ) const;
@@ -65,7 +73,7 @@ namespace ale {
 
   private:
     std::vector<Rotation> m_rotations;
-    std::vector<std::vector<double>> m_avs;
+    std::vector<ale::Vec3d> m_avs;
     std::vector<double> m_times;
   };
 }
