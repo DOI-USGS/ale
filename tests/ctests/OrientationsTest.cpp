@@ -17,22 +17,22 @@ class OrientationTest : public ::testing::Test {
       times.push_back(0);
       times.push_back(2);
       times.push_back(4);
-      avs.push_back({2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI});
-      avs.push_back({2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI});
-      avs.push_back({2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI});
+      avs.push_back(Vec3d(2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI));
+      avs.push_back(Vec3d(2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI));
+      avs.push_back(Vec3d(2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI));
       orientations = Orientations(rotations, times, avs);
     }
 
     vector<Rotation> rotations;
     vector<double> times;
-    vector<vector<double>> avs;
+    vector<Vec3d> avs;
     Orientations orientations;
 };
 
 TEST_F(OrientationTest, ConstructorAccessors) {
   vector<Rotation> outputRotations = orientations.rotations();
   vector<double> outputTimes = orientations.times();
-  vector<vector<double>> outputAvs = orientations.angularVelocities();
+  vector<Vec3d> outputAvs = orientations.angularVelocities();
   ASSERT_EQ(outputRotations.size(), rotations.size());
   for (size_t i = 0; i < outputRotations.size(); i++) {
     vector<double> quats = rotations[i].toQuaternion();
@@ -46,11 +46,10 @@ TEST_F(OrientationTest, ConstructorAccessors) {
   for (size_t i = 0; i < outputTimes.size(); i++) {
     EXPECT_EQ(outputTimes[0], times[0]);
   }
-  ASSERT_EQ(outputAvs.size(), avs.size());
   for (size_t i = 0; i < outputAvs.size(); i++) {
-    EXPECT_EQ(outputAvs[i][0], avs[i][0]);
-    EXPECT_EQ(outputAvs[i][1], avs[i][1]);
-    EXPECT_EQ(outputAvs[i][2], avs[i][2]);
+    EXPECT_EQ(outputAvs[i].x, avs[i].x);
+    EXPECT_EQ(outputAvs[i].y, avs[i].y);
+    EXPECT_EQ(outputAvs[i].z, avs[i].z);
   }
 }
 
@@ -75,29 +74,25 @@ TEST_F(OrientationTest, InterpolateAtRotation) {
 }
 
 TEST_F(OrientationTest, InterpolateAv) {
-  vector<double> interpAv = orientations.interpolateAV(0.25);
-  ASSERT_EQ(interpAv.size(), 3);
-  EXPECT_NEAR(interpAv[0], 2.0 / 3.0 * M_PI, 1e-10);
-  EXPECT_NEAR(interpAv[1], 2.0 / 3.0 * M_PI, 1e-10);
-  EXPECT_NEAR(interpAv[2], 2.0 / 3.0 * M_PI, 1e-10);
+  Vec3d interpAv = orientations.interpolateAV(0.25);
+  EXPECT_NEAR(interpAv.x, 2.0 / 3.0 * M_PI, 1e-10);
+  EXPECT_NEAR(interpAv.y, 2.0 / 3.0 * M_PI, 1e-10);
+  EXPECT_NEAR(interpAv.z, 2.0 / 3.0 * M_PI, 1e-10);
 }
 
 TEST_F(OrientationTest, RotateAt) {
-  vector<double> rotatedX = orientations.rotateAt(0.0, {1.0, 0.0, 0.0});
-  ASSERT_EQ(rotatedX.size(), 3);
-  EXPECT_NEAR(rotatedX[0], 0.0, 1e-10);
-  EXPECT_NEAR(rotatedX[1], 1.0, 1e-10);
-  EXPECT_NEAR(rotatedX[2], 0.0, 1e-10);
-  vector<double> rotatedY = orientations.rotateAt(0.0, {0.0, 1.0, 0.0});
-  ASSERT_EQ(rotatedY.size(), 3);
-  EXPECT_NEAR(rotatedY[0], 0.0, 1e-10);
-  EXPECT_NEAR(rotatedY[1], 0.0, 1e-10);
-  EXPECT_NEAR(rotatedY[2], 1.0, 1e-10);
-  vector<double> rotatedZ = orientations.rotateAt(0.0, {0.0, 0.0, 1.0});
-  ASSERT_EQ(rotatedZ.size(), 3);
-  EXPECT_NEAR(rotatedZ[0], 1.0, 1e-10);
-  EXPECT_NEAR(rotatedZ[1], 0.0, 1e-10);
-  EXPECT_NEAR(rotatedZ[2], 0.0, 1e-10);
+  Vec3d rotatedX = orientations.rotateAvAt(0.0, Vec3d(1.0, 0.0, 0.0));
+  EXPECT_NEAR(rotatedX.x, 0.0, 1e-10);
+  EXPECT_NEAR(rotatedX.y, 1.0, 1e-10);
+  EXPECT_NEAR(rotatedX.z, 0.0, 1e-10);
+  Vec3d rotatedY = orientations.rotateAvAt(0.0, Vec3d(0.0, 1.0, 0.0));
+  EXPECT_NEAR(rotatedY.x, 0.0, 1e-10);
+  EXPECT_NEAR(rotatedY.y, 0.0, 1e-10);
+  EXPECT_NEAR(rotatedY.z, 1.0, 1e-10);
+  Vec3d rotatedZ = orientations.rotateAvAt(0.0, Vec3d(0.0, 0.0, 1.0));
+  EXPECT_NEAR(rotatedZ.x, 1.0, 1e-10);
+  EXPECT_NEAR(rotatedZ.y, 0.0, 1e-10);
+  EXPECT_NEAR(rotatedZ.z, 0.0, 1e-10);
 }
 
 TEST_F(OrientationTest, RotationMultiplication) {
