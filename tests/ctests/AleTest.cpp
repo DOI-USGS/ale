@@ -418,3 +418,77 @@ TEST(EvaluateCubicHermiteFirstDeriv, InvalidVelocities) {
 
   EXPECT_THROW(ale::evaluateCubicHermiteFirstDeriv(0.0, derivs, times, y), invalid_argument);
 }
+
+// The following tests all use the following equations
+//
+// v = -t^3 - 7x^2 + 3x + 16
+//
+// The full set of values is:
+//  t   v
+// -3  -83
+// -2  -26
+// -1   5
+//  0   16
+//  1   13
+//  2   2
+//  3  -11
+//  4  -20
+//  5  -19
+//  6  -2
+//  7   37
+
+TEST(LagrangeInterpolate, SecondOrder) {
+  std::vector<double> times  = {-3,  -2, -1, 0,  1,   3,   5};
+  std::vector<double> values = {-83, -26, 5, 16, 13, -11, -19};
+
+  EXPECT_DOUBLE_EQ(ale::lagrangeInterpolate(times, values, 1.5, 2), 7);
+}
+
+TEST(LagrangeInterpolate, FourthOrder) {
+  std::vector<double> times  = {-3,  -2, -1, 0,  1,   3,   5};
+  std::vector<double> values = {-83, -26, 5, 16, 13, -11, -19};
+
+  EXPECT_DOUBLE_EQ(ale::lagrangeInterpolate(times, values, 1.5, 4), 8.125);
+}
+
+TEST(LagrangeInterpolate, ReducedOrder) {
+  std::vector<double> times  = {-3,  -2, -1, 0,  1,   3,   5};
+  std::vector<double> values = {-83, -26, 5, 16, 13, -11, -19};
+
+  EXPECT_DOUBLE_EQ(ale::lagrangeInterpolate(times, values, 3.5, 4), -13);
+  EXPECT_DOUBLE_EQ(ale::lagrangeInterpolate(times, values, -2.5, 4), -54.5);
+}
+
+TEST(LagrangeInterpolate, InvalidArguments) {
+  std::vector<double> times  = {-3,  -2, -1, 0,  1,   3,   5};
+  std::vector<double> values = {-83, -26, 5, 16, 13};
+  EXPECT_THROW(ale::lagrangeInterpolate(times, values, 3.5, 4), invalid_argument);
+}
+
+TEST(lagrangeInterpolateDerivative, SecondOrder) {
+  std::vector<double> times  = {-3,  -2, -1, 0,  1,   3,   5};
+  std::vector<double> values = {-83, -26, 5, 16, 13, -11, -19};
+
+  EXPECT_DOUBLE_EQ(ale::lagrangeInterpolateDerivative(times, values, 1.5, 2), -12);
+}
+
+TEST(LagrangeInterpolateDerivative, FourthOrder) {
+  std::vector<double> times  = {-3,  -2, -1, 0,  1,   3,   5};
+  std::vector<double> values = {-83, -26, 5, 16, 13, -11, -19};
+
+  EXPECT_DOUBLE_EQ(ale::lagrangeInterpolateDerivative(times, values, 1.5, 4), -11.25);
+}
+
+TEST(LagrangeInterpolateDerivative, ReducedOrder) {
+  std::vector<double> times  = {-3,  -2, -1, 0,  1,   3,   5};
+  std::vector<double> values = {-83, -26, 5, 16, 13, -11, -19};
+
+  EXPECT_DOUBLE_EQ(ale::lagrangeInterpolateDerivative(times, values, 3.5, 4), -4);
+  EXPECT_DOUBLE_EQ(ale::lagrangeInterpolateDerivative(times, values, -2.5, 4), 57);
+}
+
+TEST(LagrangeInterpolateDerivative, InvalidArguments) {
+  std::vector<double> times  = {-3,  -2, -1, 0,  1,   3,   5};
+  std::vector<double> values = {-83, -26, 5, 16, 13};
+  EXPECT_THROW(ale::lagrangeInterpolateDerivative(times, values, 3.5, 4), invalid_argument);
+}

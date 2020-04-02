@@ -12,6 +12,7 @@
 #include <iostream>
 #include <Python.h>
 
+#include <algorithm>
 #include <string>
 #include <iostream>
 #include <stdexcept>
@@ -22,10 +23,10 @@ using namespace std;
 namespace ale {
 
 
-  // Temporarily moved over from States.cpp. Will be moved into interpUtils in the future. 
+  // Temporarily moved over from States.cpp. Will be moved into interpUtils in the future.
 
-  /** The following helper functions are used to calculate the reduced states cache and cubic hermite 
-  to interpolate over it. They were migrated, with minor modifications, from 
+  /** The following helper functions are used to calculate the reduced states cache and cubic hermite
+  to interpolate over it. They were migrated, with minor modifications, from
   Isis::NumericalApproximation **/
 
   /** Determines the lower index for the interpolation interval. */
@@ -45,7 +46,7 @@ namespace ale {
 
 
   /** Evaluates a cubic hermite at time, interpTime, between the appropriate two points in x. **/
-  double evaluateCubicHermite(const double interpTime, const std::vector<double>& derivs, 
+  double evaluateCubicHermite(const double interpTime, const std::vector<double>& derivs,
                               const std::vector<double>& x, const std::vector<double>& y) {
     if( (derivs.size() != x.size()) || (derivs.size() != y.size()) ) {
        throw std::invalid_argument("EvaluateCubicHermite - The size of the first derivative vector does not match the number of (x,y) data points.");
@@ -72,7 +73,7 @@ namespace ale {
   }
 
   /** Evaluate velocities using a Cubic Hermite Spline at a time a, within some interval in x, **/
- double evaluateCubicHermiteFirstDeriv(const double interpTime, const std::vector<double>& deriv, 
+ double evaluateCubicHermiteFirstDeriv(const double interpTime, const std::vector<double>& deriv,
                                        const std::vector<double>& times, const std::vector<double>& y) {
     if(deriv.size() != times.size()) {
        throw std::invalid_argument("EvaluateCubicHermiteFirstDeriv - The size of the first derivative vector does not match the number of (x,y) data points.");
@@ -333,6 +334,70 @@ namespace ale {
     return derivatives.back();
   }
 
+  double lagrangeInterpolate(std::vector<double> times, std::vector<double> values,
+                             double time, int order) {
+    // Ensure the times and values have the same length
+    if (times.size() != values.size()) {
+      throw invalid_argument("Times and values must have the same length.");
+    }
+
+    // Get the correct interpolation window
+    int index = interpolationIndex(times, time);
+    int windowSize = min(index + 1, (int) times.size() - index - 1);
+    windowSize = min(windowSize, (int) order / 2);
+    int startIndex = index - windowSize + 1;
+    int endIndex = index + windowSize + 1;
+
+    // Interpolate
+    double result = 0;
+    for (int i = startIndex; i < endIndex; i++) {
+      double weight = 1;
+      double numerator = 1;
+      for (int j = startIndex; j < endIndex; j++) {
+        if (i == j) {
+          continue;
+        }
+        weight *= times[i] - times[j];
+        numerator *= time - times[j];
+      }
+      result += numerator * values[i] / weight;
+    }
+    return result;
+  }
+
+  double lagrangeInterpolateDerivative(std::vector<double> times, std::vector<double> values,
+                                       double time, int order) {
+    // Ensure the times and values have the same length
+    if (times.size() != values.size()) {
+      throw invalid_argument("Times and values must have the same length.");
+    }
+
+    // Get the correct interpolation window
+    int index = interpolationIndex(times, time);
+    int windowSize = min(index + 1, (int) times.size() - index - 1);
+    windowSize = min(windowSize, (int) order / 2);
+    int startIndex = index - windowSize + 1;
+    int endIndex = index + windowSize + 1;
+
+    // Interpolate
+    double result = 0;
+    for (int i = startIndex; i < endIndex; i++) {
+      double weight = 1;
+      double derivativeWeight = 0;
+      double numerator = 1;
+      for (int j = startIndex; j < endIndex; j++) {
+        if (i == j) {
+          continue;
+        }
+        weight *= times[i] - times[j];
+        numerator *= time - times[j];
+        derivativeWeight += 1.0 / (time - times[j]);
+      }
+      result += numerator * values[i] * derivativeWeight / weight;
+    }
+    return result;
+  }
+
  double interpolate(vector<double> points, vector<double> times, double time, interpolation interp, int d) {
    size_t numPoints = points.size();
    if (numPoints < 2) {
@@ -467,7 +532,7 @@ namespace ale {
      PyTuple_SetItem(pArgs, 2, pStringFormatter);
 
      // Call the function with the arguments.
-     PyObject* pResult = PyObject_CallObject(pFunc, pArgs); 
+     PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
 
      if(!pResult) {
         throw invalid_argument("No Valid instrument found for label.");
@@ -483,10 +548,10 @@ namespace ale {
      char *temp_str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
      cResult = temp_str; // copy into std::string
 
-     Py_DECREF(pResultStr); 
+     Py_DECREF(pResultStr);
      Py_DECREF(pStringFileName);
      Py_DECREF(pStringProps);
-     Py_DECREF(pStringFormatter); 
+     Py_DECREF(pStringFormatter);
 
      return cResult;
  }

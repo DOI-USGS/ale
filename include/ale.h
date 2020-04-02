@@ -17,6 +17,8 @@ namespace ale {
     LINEAR = 0,
     /// Interpolate using spline interpolation
     SPLINE = 1,
+    /// Interpolate using Lagrange polynomials up to 8th order
+    LAGRANGE = 2
   };
 
 
@@ -124,6 +126,11 @@ namespace ale {
    *@return Evalutation of the given polynomial as a double
    */
   double evaluatePolynomial(std::vector<double> coeffs, double time, int d);
+
+  double lagrangeInterpolate(std::vector<double> times, std::vector<double> values,
+                             double time, int order=8);
+  double lagrangeInterpolateDerivative(std::vector<double> times, std::vector<double> values,
+                                       double time, int order=8);
 
   /**
    *@brief Interpolates the spacecrafts position along a path generated from a set of points,
