@@ -7,7 +7,7 @@ namespace ale {
   Orientations::Orientations(
     const std::vector<Rotation> &rotations,
     const std::vector<double> &times,
-    const std::vector<std::vector<double>> &avs
+    const std::vector<ale::Vec3d> &avs
   ) :
     m_rotations(rotations), m_avs(avs), m_times(times) {
     if (m_rotations.size() < 2 || m_times.size() < 2) {
@@ -27,7 +27,7 @@ namespace ale {
   }
 
 
-  std::vector<std::vector<double>> Orientations::angularVelocities() const {
+  std::vector<ale::Vec3d> Orientations::angularVelocities() const {
     return m_avs;
   }
 
@@ -47,46 +47,56 @@ namespace ale {
   }
 
 
-  std::vector<double> Orientations::interpolateAV(double time) const {
+  ale::Vec3d Orientations::interpolateAV(double time) const {
     int interpIndex = interpolationIndex(m_times, time);
     double t = (time - m_times[interpIndex]) / (m_times[interpIndex + 1] - m_times[interpIndex]);
-    std::vector<double> interpAv = linearInterpolate(m_avs[interpIndex], m_avs[interpIndex + 1], t);
+    ale::Vec3d interpAv = ale::Vec3d(linearInterpolate(m_avs[interpIndex], m_avs[interpIndex + 1], t));
     return interpAv;
   }
 
-
-  std::vector<double> Orientations::rotateAt(
+  ale::Vec3d Orientations::rotateAvAt(
     double time,
-    const std::vector<double> &vector,
+    const ale::Vec3d &av,
     RotationInterpolation interpType,
     bool invert
   ) const {
     Rotation interpRot = interpolate(time, interpType);
-    std::vector<double> av = {0.0, 0.0, 0.0};
+    return interpRot(av);
+  }
+
+
+  ale::State Orientations::rotateStateAt(
+    double time,
+    const ale::State &state,
+    RotationInterpolation interpType,
+    bool invert
+  ) const {
+    Rotation interpRot = interpolate(time, interpType);
+    ale::Vec3d av;
     if (!m_avs.empty()) {
       av = interpolateAV(time);
     }
     if (invert) {
-      std::vector<double> negAv = interpRot(av);
-      av = {-negAv[0], -negAv[1], -negAv[2]};
+      ale::Vec3d negAv = interpRot(av);
+      av = {-negAv.x, -negAv.y, -negAv.z};
       interpRot = interpRot.inverse();
     }
-    return interpRot(vector, av);
+    return interpRot(state, av);
   }
 
 
   Orientations &Orientations::operator*=(const Orientations &rhs) {
     std::vector<double> mergedTimes = orderedVecMerge(m_times, rhs.m_times);
     std::vector<Rotation> mergedRotations;
-    std::vector<std::vector<double>> mergedAvs;
+    std::vector<ale::Vec3d> mergedAvs;
     for (double time: mergedTimes) {
       Rotation rhsRot = rhs.interpolate(time);
       mergedRotations.push_back(interpolate(time)*rhsRot);
-      std::vector<double> combinedAv = rhsRot.inverse()(interpolateAV(time));
-      std::vector<double> rhsAv = rhs.interpolateAV(time);
-      for (size_t i = 0; i < rhsAv.size(); i++) {
-        combinedAv[i] += rhsAv[i];
-      }
+      ale::Vec3d combinedAv = rhsRot.inverse()(interpolateAV(time));
+      ale::Vec3d rhsAv = rhs.interpolateAV(time);
+      combinedAv.x += rhsAv.x;
+      combinedAv.y += rhsAv.y;
+      combinedAv.z += rhsAv.z;
       mergedAvs.push_back(combinedAv);
     }
 
@@ -105,7 +115,7 @@ namespace ale {
     }
 
     Rotation inverse = rhs.inverse();
-    std::vector<std::vector<double>> updatedAvs;
+    std::vector<Vec3d> updatedAvs;
     for (size_t i = 0; i < m_avs.size(); i++) {
       updatedAvs.push_back(inverse(m_avs[i]));
     }

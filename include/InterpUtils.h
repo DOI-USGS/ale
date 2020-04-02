@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include "Util.h"
+
 namespace ale {
   /**
    * Linearly interpolate between two values.
@@ -19,6 +21,8 @@ namespace ale {
    * @param t The distance to interpolate. 0 is x and 1 is y.
    */
   std::vector<double> linearInterpolate(const std::vector<double> &x, const std::vector<double> &y, double t);
+
+  ale::Vec3d linearInterpolate(const ale::Vec3d &x, const ale::Vec3d &y, double t);
 
   /**
    * Compute the index of the first time to use when interpolating at a given time.

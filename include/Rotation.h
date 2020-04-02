@@ -4,6 +4,9 @@
 #include <memory>
 #include <vector>
 
+#include "States.h"
+#include "Util.h"
+
 namespace ale {
 
   enum RotationInterpolation {
@@ -79,7 +82,7 @@ namespace ale {
        *
        * @return The state rotation matrix in row-major order.
        */
-      std::vector<double> toStateRotationMatrix(const std::vector<double> &av) const;
+      std::vector<double> toStateRotationMatrix(const ale::Vec3d &av) const;
       /**
        * The rotation as Euler angles.
        *
@@ -104,7 +107,9 @@ namespace ale {
        *
        * @return The rotated vector.
        */
-      std::vector<double> operator()(const std::vector<double>& vector, const std::vector<double>& av = {0.0, 0.0, 0.0}) const;
+      ale::Vec3d operator()(const ale::Vec3d &av) const;
+
+      ale::State operator()(const ale::State &state, const ale::Vec3d& av = Vec3d(0.0, 0.0, 0.0)) const;
       /**
        * Get the inverse rotation.
        */
