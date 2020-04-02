@@ -7,52 +7,10 @@ import json
 
 import unittest
 from unittest.mock import patch
-from conftest import get_image_label, get_image_kernels, convert_kernels, compare_dicts
+from conftest import get_image_label, get_image_kernels, get_isd, convert_kernels, compare_dicts
 
 import ale
 from ale.drivers.dawn_drivers import DawnFcPds3NaifSpiceDriver
-
-@pytest.fixture()
-def usgscsm_compare_dict():
-    return {
-    'radii': {
-        'semimajor': 482.0,
-        'semiminor': 446.0,
-        'unit': 'km'},
-    'sensor_position': {
-        'positions': [[257924.25395483, 15116.92833465, -4862688.37323513]],
-        'velocities': [[-104.55513399, -85.04943875, -5.79043523]],
-        'unit': 'm'},
-    'sun_position': {
-        'positions': [[3.60779830e+11, 2.46614935e+11, 3.05966427e+10]],
-        'velocities': [[ 4.74251599e+07, -6.93781387e+07,  1.94478534e+02]],
-        'unit': 'm'},
-    'sensor_orientation': {
-        'quaternions': [[0.00184844, 0.02139268, -0.27802966, -0.96033246]]},
-    'detector_sample_summing': 1,
-    'detector_line_summing': 1,
-    'focal_length_model': {
-        'focal_length': 150.08},
-    'detector_center': {
-        'line': 512.0,
-        'sample': 512.0},
-    'starting_detector_line': 0,
-    'starting_detector_sample': 0,
-    'focal2pixel_lines': [0.0, 0.0, 71.40816909454442],
-    'focal2pixel_samples': [0.0, 71.40816909454442, 0.0],
-    'optical_distortion': {
-        'dawnfc': {
-            'coefficients': [9.2e-06]}},
-    'image_lines': 1024,
-    'image_samples': 1024,
-    'name_platform': 'DAWN',
-    'name_sensor': 'FRAMING CAMERA 2',
-    'reference_height': {
-        'maxheight': 1000,
-        'minheight': -1000,
-        'unit': 'm'},
-    'name_model': 'USGS_ASTRO_FRAME_SENSOR_MODEL',
-    'center_ephemeris_time': 488002614.62294483}
 
 @pytest.fixture(scope="module", autouse=True)
 def test_kernels():
@@ -62,12 +20,14 @@ def test_kernels():
     for kern in binary_kernels:
         os.remove(kern)
 
-def test_dawn_load(test_kernels, usgscsm_compare_dict):
+def test_load(test_kernels):
     label_file = get_image_label('FC21A0038582_15170161546F6F')
-    usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter='usgscsm')
-    assert compare_dicts(usgscsm_isd, usgscsm_compare_dict) == []
+    compare_dict = get_isd("dawnfc")
 
-
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels})
+    isd_obj = json.loads(isd_str)
+    print(json.dumps(isd_obj, indent=2))
+    assert compare_dicts(isd_obj, compare_dict) == []
 
 # ========= Test pds3label and naifspice driver =========
 class test_pds3_naif(unittest.TestCase):
