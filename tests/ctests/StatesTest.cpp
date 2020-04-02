@@ -192,7 +192,7 @@ TEST_F(TestState, getPosition) {
 
 
 TEST_F(TestState, getVelocity) {
-  double time = 1.0;
+  double time = 1.5;
   ale::Vec3d linear_velocity = states->getVelocity(time, LINEAR);
   ale::Vec3d spline_velocity = states->getVelocity(time, SPLINE);
   ale::Vec3d linear_no_vel_velocity = statesNoVelocity->getVelocity(time, LINEAR);
@@ -202,14 +202,14 @@ TEST_F(TestState, getVelocity) {
   EXPECT_NEAR(linear_velocity.y, 1, 1e-10);
   EXPECT_NEAR(linear_velocity.z, 0.448, 1e-10);
   EXPECT_NEAR(spline_velocity.x, 1, 1e-10);
-  EXPECT_NEAR(spline_velocity.y, 2, 1e-10);
-  EXPECT_NEAR(spline_velocity.z, 0.48, 1e-10);
+  EXPECT_NEAR(spline_velocity.y, 1, 1e-10);
+  EXPECT_NEAR(spline_velocity.z, 0.072, 1e-10);
   EXPECT_NEAR(linear_no_vel_velocity.x, 1, 1e-10);
   EXPECT_NEAR(linear_no_vel_velocity.y, 1, 1e-10);
   EXPECT_NEAR(linear_no_vel_velocity.z, 0.448, 1e-10);
   EXPECT_NEAR(spline_no_vel_velocity.x, 1, 1e-10);
-  EXPECT_NEAR(spline_no_vel_velocity.y, 2.2, 1e-10);
-  EXPECT_NEAR(spline_no_vel_velocity.z, 0.1664, 1e-10);
+  EXPECT_NEAR(spline_no_vel_velocity.y, 1, 1e-10);
+  EXPECT_NEAR(spline_no_vel_velocity.z, 0.416, 1e-10);
 }
 
 // getState() and interpolateState() are tested when testing getPosition and
