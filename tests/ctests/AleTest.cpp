@@ -6,8 +6,6 @@
 #include <stdexcept>
 #include <cmath>
 
-#include <gsl/gsl_interp.h>
-
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 

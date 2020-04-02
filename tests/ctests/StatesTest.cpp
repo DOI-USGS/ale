@@ -163,7 +163,7 @@ protected:
 };
 
 
-// Tests GSL spline and linear interp - force to use GSL spline by omitting velocity
+// Tests spline, linear, and lagrange interp - force to use spline by omitting velocity
 TEST_F(TestState, getPosition) {
   double time = 1.5;
 
@@ -186,8 +186,8 @@ TEST_F(TestState, getPosition) {
   EXPECT_NEAR(linear_no_vel_position.y, linear_y, 1e-10);
   EXPECT_NEAR(linear_no_vel_position.z, linear_z, 1e-10);
   EXPECT_NEAR(spline_no_vel_position.x, 5.5, 1e-10);
-  EXPECT_NEAR(spline_no_vel_position.y, 3.8, 1e-10);
-  EXPECT_NEAR(spline_no_vel_position.z, 0.2016, 1e-10);
+  EXPECT_NEAR(spline_no_vel_position.y, 3.75, 1e-10);
+  EXPECT_NEAR(spline_no_vel_position.z, 0.216, 1e-10);
 }
 
 
@@ -209,7 +209,7 @@ TEST_F(TestState, getVelocity) {
   EXPECT_NEAR(linear_no_vel_velocity.z, 0.448, 1e-10);
   EXPECT_NEAR(spline_no_vel_velocity.x, 1, 1e-10);
   EXPECT_NEAR(spline_no_vel_velocity.y, 1, 1e-10);
-  EXPECT_NEAR(spline_no_vel_velocity.z, 0.416, 1e-10);
+  EXPECT_NEAR(spline_no_vel_velocity.z, 0.432, 1e-10);
 }
 
 // getState() and interpolateState() are tested when testing getPosition and

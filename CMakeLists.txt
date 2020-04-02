@@ -15,7 +15,6 @@ include(GNUInstallDirs)
 set(CMAKE_CXX_STANDARD 11)
 
 # Third Party Dependencies
-find_package(GSL           REQUIRED)
 find_package(Eigen3 3.3    REQUIRED NO_MODULE)
 find_package(nlohmann_json REQUIRED)
 
@@ -52,8 +51,6 @@ target_include_directories(ale
 
 target_link_libraries(ale
                       PRIVATE
-                      GSL::gsl
-                      GSL::gslcblas
                       Eigen3::Eigen
                       Python::Python
                       nlohmann_json::nlohmann_json)

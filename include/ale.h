@@ -20,7 +20,7 @@ namespace ale {
 
 
   // Temporarily moved interpolation and associated helper functions over from States. Will be
-  // moved to interpUtils in the future.
+  // move to interpUtils in the future.
 
   /** The following helper functions are used to calculate the reduced states cache and cubic hermite
   to interpolate over it. They were migrated, with minor modifications, from
@@ -37,9 +37,9 @@ namespace ale {
   double evaluateCubicHermiteFirstDeriv(const double interpTime, const std::vector<double>& deriv,
                                        const std::vector<double>& times, const std::vector<double>& y);
 
-  double lagrangeInterpolate(std::vector<double> times, std::vector<double> values,
+  double lagrangeInterpolate(const std::vector<double>& times, const std::vector<double>& values,
                              double time, int order=8);
-  double lagrangeInterpolateDerivative(std::vector<double> times, std::vector<double> values,
+  double lagrangeInterpolateDerivative(const std::vector<double>& times, const std::vector<double>& values,
                                        double time, int order=8);
 
   /**

@@ -102,7 +102,8 @@ namespace ale {
     }
   }
 
-  double lagrangeInterpolate(std::vector<double> times, std::vector<double> values,
+  double lagrangeInterpolate(const std::vector<double>& times,
+                             const std::vector<double>& values,
                              double time, int order) {
     // Ensure the times and values have the same length
     if (times.size() != values.size()) {
@@ -133,7 +134,8 @@ namespace ale {
     return result;
   }
 
-  double lagrangeInterpolateDerivative(std::vector<double> times, std::vector<double> values,
+  double lagrangeInterpolateDerivative(const std::vector<double>& times,
+                                       const std::vector<double>& values,
                                        double time, int order) {
     // Ensure the times and values have the same length
     if (times.size() != values.size()) {
