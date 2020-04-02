@@ -4,8 +4,6 @@
 #include <string>
 #include <vector>
 
-#include <gsl/gsl_interp.h>
-
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
@@ -15,10 +13,10 @@ namespace ale {
   enum interpolation {
     /// Interpolate using linear interpolation
     LINEAR = 0,
-    /// Interpolate using spline interpolation
+    /// Interpolate using a cubic spline
     SPLINE = 1,
     /// Interpolate using Lagrange polynomials up to 8th order
-    LAGRANGE = 2
+    LAGRANGE = 2,
   };
 
 
@@ -39,93 +37,6 @@ namespace ale {
   /** Evaluate velocities using a Cubic Hermite Spline at a time a, within some interval in x, **/
   double evaluateCubicHermiteFirstDeriv(const double interpTime, const std::vector<double>& deriv,
                                        const std::vector<double>& times, const std::vector<double>& y);
-
-  /**
-   *@brief Get the position of the spacecraft at a given time based on a set of coordinates, and their associated times
-   *@param coords A vector of double vectors of coordinates
-   *@param times A double vector of times
-   *@param time Time to observe the spacecraft's position at
-   *@param interp Interpolation type
-   *@return A vector double of the spacecrafts position
-   */
-  std::vector<double> getPosition(std::vector<std::vector<double>> coords,
-                                  std::vector<double> times,
-                                  double time, interpolation interp);
-  /**
-   *@brief Get the velocity of the spacecraft at a given time based on a set of coordinates, and their associated times
-   *@param coords A vector of double vectors of coordinates
-   *@param times A double vector of times
-   *@param time Time to observe the spacecraft's velocity at
-   *@param interp Interpolation type
-   *@return A vector double of the spacecrafts velocity
-   */
-  std::vector<double> getVelocity(std::vector<std::vector<double>> coords,
-                                  std::vector<double> times,
-                                  double time, const interpolation interp);
-  /**
-   *@brief Get the position of the spacecraft at a given time based on a derived function from a set of coeffcients
-   *@param coeffs A vector of double vector of coeffcients
-   *@param time Time to observe the spacecraft's position at
-   *@return A vector double of the spacecrafts position
-   */
-  std::vector<double> getPosition(std::vector<std::vector<double>> coeffs, double time);
-
-  /**
-   *@brief Get the velocity of the spacecraft at a given time based on a derived function from a set of coeffcients
-   *@param coeffs A vector of double vector of coeffcients
-   *@param time Time to observe the spacecraft's velocity at
-   *@return A vector double of the spacecrafts velocity
-   */
-  std::vector<double> getVelocity(std::vector<std::vector<double>> coeffs, double time);
-
-  /**
-   *@brief Get the rotation of the spacecraft at a given time based on a set of rotations, and their associated times
-   *@param rotations A vector of double vector of rotations
-   *@param times A double vector of times
-   *@param time Time to observe the spacecraft's rotation at
-   *@param interp Interpolation type
-   *@return A vector double of the spacecrafts rotation
-   */
-  std::vector<double> getRotation(std::vector<std::vector<double>> rotations,
-                                  std::vector<double> times,
-                                  double time, interpolation interp);
-
-  /**
-   *@brief Get the angular velocity of the spacecraft at a given time based on a set of rotations, and their associated times
-   *@param rotations A vector of double vector of rotations
-   *@param times A double vector of times
-   *@param time Time to observe the spacecraft's angular velocity at
-   *@param interp Interpolation type
-   *@return A vector double of the spacecrafts angular velocity
-   */
-  std::vector<double> getAngularVelocity(std::vector<std::vector<double>> rotations,
-                                         std::vector<double> times,
-                                         double time, interpolation interp);
-
-   /**
-    *@brief Get the rotation of the spacecraft at a given time based on a derived function from a set of coeffcients
-    *@param coeffs A vector of double vector of coeffcients
-    *@param time Time to observe the spacecraft's rotation at
-    *@return A vector double of the spacecrafts rotation
-    */
-  std::vector<double> getRotation(std::vector<std::vector<double>> coeffs, double time);
-
-  /**
-   *@brief Get the angular velocity of the spacecraft at a given time based on a derived function from a set of coeffcients
-   *@param coeffs A vector of double vector of coeffcients
-   *@param time Time to observe the spacecraft's angular velocity at
-   *@return A vector double of the spacecrafts angular velocity
-   */
-  std::vector<double> getAngularVelocity(std::vector<std::vector<double>> coeffs, double time);
-
-  /**
-   *@brief Generates a derivatives in respect to time from a polynomial constructed using the given coeffcients, time, and derivation number
-   *@param coeffs A double vector of coefficients can be any number of coefficients
-   *@param time Time to use when deriving
-   *@param d The order of the derivative to generate (Currently supports 0, 1, and 2)
-   *@return Evalutation of the given polynomial as a double
-   */
-  double evaluatePolynomial(std::vector<double> coeffs, double time, int d);
 
   double lagrangeInterpolate(std::vector<double> times, std::vector<double> values,
                              double time, int order=8);

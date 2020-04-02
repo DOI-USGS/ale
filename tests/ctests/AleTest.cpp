@@ -14,33 +14,6 @@
 using namespace std;
 
 
-TEST(PositionInterpTest, LinearInterp) {
-  vector<double> times = { -3, -2, -1,  0,  1,  2};
-  vector<vector<double>> data = {{ -3, -2, -1,  0,  1,  2},
-                                 {  9,  4,  1,  0,  1,  4},
-                                 {-27, -8, -1,  0,  1,  8}};
-
-  vector<double> coordinate = ale::getPosition(data, times, -1.5, ale::LINEAR);
-
-  ASSERT_EQ(3, coordinate.size());
-  EXPECT_DOUBLE_EQ(-1.5, coordinate[0]);
-  EXPECT_DOUBLE_EQ(2.5,  coordinate[1]);
-  EXPECT_DOUBLE_EQ(-4.5, coordinate[2]);
-}
-
-
-TEST(PositionInterpTest, FourCoordinates) {
-  vector<double> times = { -3, -2, -1,  0,  1,  2};
-  vector<vector<double>> data = {{ -3, -2, -1,  0,  1,  2},
-                                 {  9,  4,  1,  0,  1,  4},
-                                 {-27, -8, -1,  0,  1,  8},
-                                 { 25,  0, -5, 25,  3,  6}};
-
-  EXPECT_THROW(ale::getPosition(data, times, 0.0, ale::LINEAR),
-               invalid_argument);
-}
-
-
 TEST(LinearInterpTest, ExampleInterpolation) {
   vector<double> times = {0,  1,  2, 3};
   vector<double> data = {0, 2, 1, 0};
@@ -59,8 +32,7 @@ TEST(LinearInterpTest, NoPoints) {
   vector<double> times = {};
   vector<double> data = {};
 
-  EXPECT_THROW(ale::interpolate(data, times, 0.0, ale::LINEAR, 0),
-               invalid_argument);
+  EXPECT_THROW(ale::interpolate(data, times, 0.0, ale::LINEAR, 0), invalid_argument);
 }
 
 
@@ -68,8 +40,7 @@ TEST(LinearInterpTest, DifferentCounts) {
   vector<double> times = { -3, -2, -1,  0,  2};
   vector<double> data = { -3, -2, 1,  2};
 
-  EXPECT_THROW(ale::interpolate(data, times, 0.0, ale::LINEAR, 0),
-               invalid_argument);
+  EXPECT_THROW(ale::interpolate(data, times, 0.0, ale::LINEAR, 0), invalid_argument);
 }
 
 
@@ -77,34 +48,24 @@ TEST(LinearInterpTest, Extrapolate) {
   vector<double> times = {0,  1,  2, 3};
   vector<double> data = {0, 2, 1, 0};
 
-  EXPECT_THROW(ale::interpolate(data, times, -1.0, ale::LINEAR, 0),
-               invalid_argument);
-  EXPECT_THROW(ale::interpolate(data, times, 4.0, ale::LINEAR, 0),
-               invalid_argument);
+  EXPECT_DOUBLE_EQ(ale::interpolate(data, times, -1.0, ale::LINEAR, 0), -2);
+  EXPECT_DOUBLE_EQ(ale::interpolate(data, times, 4.0, ale::LINEAR, 0), -1);
 }
 
 
 TEST(SplineInterpTest, ExampleInterpolation) {
   // From http://www.maths.nuigalway.ie/~niall/teaching/Archive/1617/MA378/2-2-CubicSplines.pdf
-  vector<double> times = {0,  1,  2, 3};
-  vector<double> data = {0, 2, 1, 0};
-  // Spline functions is:
-  //        2.8x - 0.8x^3,                 x in [0, 1]
-  // S(x) = x^3 - 5.4x^2 + 8.2x - 1.8,     x in [1, 2]
-  //        -0.2x^3 + 1.8x^2 - 6.2x + 7.8, x in [2, 3]
+  vector<double> times = {0, 1, 2, 3};
+  vector<double> data  = {2, 4, 3, 2};
+  // function is f(t) = 0.5t^3 - 3t^2 + 4.5t + 2
 
-  // The spline interpolation is only ~1e-10 so we have to define a tolerance
-  double tolerance = 1e-10;
-  EXPECT_NEAR(0.0, ale::interpolate(data, times, 0.0, ale::SPLINE, 0), tolerance);
-  EXPECT_NEAR(2.8 * 0.5 - 0.8 * 0.125,
-              ale::interpolate(data, times, 0.5, ale::SPLINE, 0), tolerance);
-  EXPECT_NEAR(2.0, ale::interpolate(data, times, 1.0, ale::SPLINE, 0), tolerance);
-  EXPECT_NEAR(3.375 - 5.4 * 2.25 + 8.2 * 1.5 - 1.8,
-              ale::interpolate(data, times, 1.5, ale::SPLINE, 0), tolerance);
-  EXPECT_NEAR(1.0, ale::interpolate(data, times, 2.0, ale::SPLINE, 0), tolerance);
-  EXPECT_NEAR(-0.2 * 15.625 + 1.8 * 6.25 - 6.2 * 2.5 + 7.8,
-              ale::interpolate(data, times, 2.5, ale::SPLINE, 0), tolerance);
-  EXPECT_NEAR(0.0, ale::interpolate(data, times, 3.0, ale::SPLINE, 0), tolerance);
+  EXPECT_DOUBLE_EQ(ale::interpolate(data, times, 0.0, ale::SPLINE, 0), 2.0);
+  EXPECT_DOUBLE_EQ(ale::interpolate(data, times, 0.5, ale::SPLINE, 0), 3.0);
+  EXPECT_DOUBLE_EQ(ale::interpolate(data, times, 1.0, ale::SPLINE, 0), 4.0);
+  EXPECT_DOUBLE_EQ(ale::interpolate(data, times, 1.5, ale::SPLINE, 0), 3.6875);
+  EXPECT_DOUBLE_EQ(ale::interpolate(data, times, 2.0, ale::SPLINE, 0), 3.0);
+  EXPECT_DOUBLE_EQ(ale::interpolate(data, times, 2.5, ale::SPLINE, 0), 2.5);
+  EXPECT_DOUBLE_EQ(ale::interpolate(data, times, 3.0, ale::SPLINE, 0), 2.0);
 }
 
 
@@ -112,8 +73,7 @@ TEST(SplineInterpTest, NoPoints) {
   vector<double> times = {};
   vector<double> data = {};
 
-  EXPECT_THROW(ale::interpolate(data, times, 0.0, ale::SPLINE, 0),
-               invalid_argument);
+  EXPECT_THROW(ale::interpolate(data, times, 0.0, ale::SPLINE, 0), invalid_argument);
 }
 
 
@@ -121,246 +81,35 @@ TEST(SplineInterpTest, DifferentCounts) {
   vector<double> times = { -3, -2, -1,  0,  2};
   vector<double> data = { -3, -2, 1,  2};
 
-  EXPECT_THROW(ale::interpolate(data, times, 0.0, ale::SPLINE, 0),
-               invalid_argument);
+  EXPECT_THROW(ale::interpolate(data, times, 0.0, ale::SPLINE, 0), invalid_argument);
 }
 
-
-TEST(SplineInterpTest, Extrapolate) {
-  vector<double> times = {0,  1,  2, 3};
-  vector<double> data = {0, 2, 1, 0};
-
-  EXPECT_THROW(ale::interpolate(data, times, -1.0, ale::SPLINE, 0),
-               invalid_argument);
-  EXPECT_THROW(ale::interpolate(data, times, 4.0, ale::SPLINE, 0),
-               invalid_argument);
-}
-
-
-TEST(PolynomialTest, Evaluate) {
-  vector<double> coeffs = {1.0, 2.0, 3.0}; // 1 + 2x + 3x^2
-  EXPECT_EQ(2.0, ale::evaluatePolynomial(coeffs, -1, 0));
-}
-
-
-TEST(PolynomialTest, Derivatives) {
-  vector<double> coeffs = {1.0, 2.0, 3.0}; // 1 + 2x + 3x^2
-  EXPECT_EQ(-4.0, ale::evaluatePolynomial(coeffs, -1, 1));
-  EXPECT_EQ(6.0, ale::evaluatePolynomial(coeffs, -1, 2));
-}
-
-
-TEST(PolynomialTest, EmptyCoeffs) {
-  vector<double> coeffs = {};
-  EXPECT_THROW(ale::evaluatePolynomial(coeffs, -1, 1), invalid_argument);
-}
-
-TEST(PolynomialTest, BadDerivative) {
-  vector<double> coeffs = {1.0, 2.0, 3.0};
-  EXPECT_THROW(ale::evaluatePolynomial(coeffs, -1, -1), invalid_argument);
-}
-
-
-TEST(PoisitionCoeffTest, SecondOrderPolynomial) {
-  double time = 2.0;
-  vector<vector<double>> coeffs = {{1.0, 2.0, 3.0},
-                                   {1.0, 3.0, 2.0},
-                                   {3.0, 2.0, 1.0}};
-
-  vector<double> coordinate = ale::getPosition(coeffs, time);
-
-  ASSERT_EQ(3, coordinate.size());
-  EXPECT_DOUBLE_EQ(17.0, coordinate[0]);
-  EXPECT_DOUBLE_EQ(15.0, coordinate[1]);
-  EXPECT_DOUBLE_EQ(11.0, coordinate[2]);
-}
-
-
-TEST(PoisitionCoeffTest, DifferentPolynomialDegrees) {
-  double time = 2.0;
-  vector<vector<double>> coeffs = {{1.0},
-                                   {1.0, 2.0},
-                                   {1.0, 2.0, 3.0}};
-
-  vector<double> coordinate = ale::getPosition(coeffs, time);
-
-  ASSERT_EQ(3, coordinate.size());
-  EXPECT_DOUBLE_EQ(1.0,  coordinate[0]);
-  EXPECT_DOUBLE_EQ(5.0,  coordinate[1]);
-  EXPECT_DOUBLE_EQ(17.0, coordinate[2]);
-}
-
-
-TEST(PoisitionCoeffTest, NegativeInputs) {
-  double time = -2.0;
-  vector<vector<double>> coeffs = {{-1.0, -2.0, -3.0},
-                                   {1.0, -2.0, 3.0},
-                                   {-1.0, 2.0, -3.0}};
-
-  vector<double> coordinate = ale::getPosition(coeffs, time);
-
-  ASSERT_EQ(3, coordinate.size());
-  EXPECT_DOUBLE_EQ(-9.0,  coordinate[0]);
-  EXPECT_DOUBLE_EQ(17.0,  coordinate[1]);
-  EXPECT_DOUBLE_EQ(-17.0, coordinate[2]);
-}
-
-
-TEST(PoisitionCoeffTest, InvalidInput) {
-  double valid_time = 0.0;
-  vector<vector<double>> invalid_coeffs_sizes = {{3.0, 2.0, 1.0},
-                                                 {1.0, 2.0, 3.0}};
-
-  EXPECT_THROW(ale::getPosition(invalid_coeffs_sizes, valid_time), invalid_argument);
-}
-
-
-TEST(VelocityCoeffTest, SecondOrderPolynomial) {
-  double time = 2.0;
-  vector<vector<double>> coeffs = {{1.0, 2.0, 3.0},
-                                   {1.0, 3.0, 2.0},
-                                   {3.0, 2.0, 1.0}};
-
-  vector<double> coordinate = ale::getVelocity(coeffs, time);
-
-  ASSERT_EQ(3, coordinate.size());
-  EXPECT_DOUBLE_EQ(14.0, coordinate[0]);
-  EXPECT_DOUBLE_EQ(11.0, coordinate[1]);
-  EXPECT_DOUBLE_EQ(6.0, coordinate[2]);
-}
-
-
-TEST(VelocityCoeffTest, InvalidInput) {
-  double valid_time = 0.0;
-  vector<vector<double>> invalid_coeffs_sizes = {{3.0, 2.0, 1.0},
-                                                 {1.0, 2.0, 3.0}};
-
-  EXPECT_THROW(ale::getVelocity(invalid_coeffs_sizes, valid_time), invalid_argument);
-}
-
-TEST(RotationCoeffTest, ZeroOrderPolynomial) {
-  double time = 1.0;
-  vector<vector<double>> coeffs = {{90},
-                                                            {0},
-                                                            {0}};
-
-  vector<double> coordinate = ale::getRotation(coeffs, time);
-
-  ASSERT_EQ(4, coordinate.size());
-  EXPECT_DOUBLE_EQ(1 / sqrt(2), coordinate[0]);
-  EXPECT_DOUBLE_EQ(0, coordinate[1]);
-  EXPECT_DOUBLE_EQ(0, coordinate[2]);
-  EXPECT_DOUBLE_EQ(1 / sqrt(2), coordinate[3]);
-}
-
-TEST(RotationCoeffTest, InvalidInput) {
-  double time = 1.0;
-  vector<vector<double>> coeffs = {{90},
-                                                            {0}};
-
-  EXPECT_THROW(ale::getRotation(coeffs, time), invalid_argument);
-}
-
-TEST(AngularVelocityCoeffTest, DefaultAngularExample) {
-  vector<vector<double>> coeffs = {{0, 90}, {0, 90}, {0, 90}};
-  double time = 1.0;
-
-  vector<double> av = ale::getAngularVelocity(coeffs, time);
-
-  ASSERT_EQ(3, av.size());
-  EXPECT_DOUBLE_EQ(90, av[0]);
-  EXPECT_DOUBLE_EQ(90, av[1]);
-  EXPECT_DOUBLE_EQ(90, av[2]);
-}
-
-TEST(AngularVelocityCoeffTest, InvalidInput) {
-  vector<vector<double>> coeffs = {{0, 90}, {0, 90}};
-  double time = 2.0;
-
-  EXPECT_THROW(ale::getAngularVelocity(coeffs, time), invalid_argument);
-}
-
-
-TEST(RotationInterpTest, ExampleGetRotation) {
-  // simple test, only checks if API hit correctly and output is normalized
-  vector<double> times = {0,  1,  2, 3};
-  vector<vector<double>> rots({{1,1,1,1}, {0,0,0,0}, {1,1,1,1}, {0,0,0,0}});
-  vector<double> r = ale::getRotation(rots, times, 2, ale::LINEAR);
-  Eigen::Quaterniond quat(r[0], r[1], r[2], r[3]);
-
-  EXPECT_DOUBLE_EQ(1, quat.norm());
-}
-
-TEST(RotationInterpTest, GetRotationDifferentCounts) {
-  // incorrect params
-  vector<double> times = {0, 1, 2};
-  vector<vector<double>> rots({{1,1,1,1}, {0,0,0,0}, {1,1,1,1}, {0,0,0,0}});
-  EXPECT_THROW(ale::getRotation(rots, times, 2, ale::LINEAR), invalid_argument);
-}
-
-TEST(RotationInterpTest, InvalidTime) {
-  vector<double> times = {0, 1, 2};
-  vector<vector<double>> rots({{1,1,1,1}, {0,0,0,0}, {1,1,1,1}});
-  EXPECT_THROW(ale::getRotation(rots, times, 3, ale::LINEAR), invalid_argument);
-}
 
 TEST(PyInterfaceTest, LoadInvalidLabel) {
   std::string label = "Not a Real Label";
   EXPECT_THROW(ale::load(label), invalid_argument);
 }
 
+
 TEST(PyInterfaceTest, LoadValidLabel) {
   std::string label = "../pytests/data/EN1072174528M/EN1072174528M_spiceinit.lbl";
   ale::load(label, "", "isis");
 }
 
-TEST(AngularVelocityInterpTest, ExampleGetRotation) {
-  vector<double> times = {0,  1};
-  vector<vector<double>> rots({{0,0}, {1,0}, {0,1}, {0,0}});
-  vector<double> av = ale::getAngularVelocity(rots, times, 0.5, ale::LINEAR);
-
-  EXPECT_DOUBLE_EQ(0, av[0]);
-  EXPECT_DOUBLE_EQ(0, av[1]);
-  EXPECT_DOUBLE_EQ(2 * sqrt(2), av[2]);
-}
-
-TEST(AngularVelocityInterpTest, InvalidTime) {
-  vector<double> times = {0, 1, 2};
-  vector<vector<double>> rots({{0,0}, {1,0}, {0,1}, {0,0}});
-  EXPECT_THROW(ale::getAngularVelocity(rots, times, 3, ale::LINEAR), invalid_argument);
-}
-
-TEST(VelocityInterpTest, ExampleGetVelocity) {
-  vector<double> times = {0, 1, 2};
-  vector<vector<double>> coords({{1, 1, 1}, {2, 2, 2}, {3, 3, 3}});
-  vector<double> v = ale::getVelocity(coords, times, 1, ale::LINEAR);
-
-  //not sure what the values are expected to look like
-  EXPECT_DOUBLE_EQ(v[0], 0);
-  EXPECT_DOUBLE_EQ(v[1], 0);
-  EXPECT_DOUBLE_EQ(v[2], 0);
-}
-
-TEST(VelocityInterpTest, InvalidTime) {
-  vector<double> times = {0, 1, 2};
-  vector<vector<double>> coords({{1, 1, 1}, {2, 2, 2}, {3, 3, 3}});
-  EXPECT_THROW(ale::getVelocity(coords, times, 3, ale::LINEAR), invalid_argument);
-}
 
 TEST(Interpolation, Derivative1) {
   vector<double> points = {0, 2, 4};
   vector<double> times = {0, 1, 2};
-
-  EXPECT_DOUBLE_EQ(ale::interpolate(points, times, 1, ale::LINEAR, 1), 2);
+  EXPECT_NO_THROW(ale::interpolate(points, times, 1, ale::LINEAR, 1));
 }
+
 
 TEST(Interpolation, Derivative2) {
-  //only checks that case 2 of the switch block is hit
   vector<double> points = {0, 0, 0};
   vector<double> times = {0, 1, 2};
-
-  EXPECT_DOUBLE_EQ(ale::interpolate(points, times, 1, ale::LINEAR, 2), 0);
+  EXPECT_THROW(ale::interpolate(points, times, 1, ale::LINEAR, 2), invalid_argument);
 }
+
 
 TEST(Interpolation, InvalidDerivative) {
   vector<double> points = {0, 0, 0};
@@ -369,13 +118,15 @@ TEST(Interpolation, InvalidDerivative) {
   EXPECT_THROW(ale::interpolate(points, times, 1, ale::LINEAR, 3), invalid_argument);
 }
 
+
 TEST(InterpIndex, InvalidTimes) {
   std::vector<double> times = {};
 
   EXPECT_THROW(ale::interpolationIndex(times, 0), invalid_argument);
 }
 
-TEST(EvaluateCubicHermite, SimplyPolynomial) {
+
+TEST(EvaluateCubicHermite, SimplePolynomial) {
   // Cubic function is y = x^3 - 2x^2 + 1
   // derivative is dy/dx = 3x^2 - 4x
   std::vector<double> derivs = {7.0, -1.0};
@@ -393,6 +144,7 @@ TEST(EvaluateCubicHermite, InvalidDervisXY) {
   EXPECT_THROW(ale::evaluateCubicHermite(0.0, derivs, x, y), invalid_argument);
 }
 
+
 TEST(EvaluateCubicHermiteFirstDeriv, SimplyPolynomial) {
   // Cubic function is y = x^3 - 2x^2 + 1
   // derivative is dy/dx = 3x^2 - 4x
@@ -403,6 +155,7 @@ TEST(EvaluateCubicHermiteFirstDeriv, SimplyPolynomial) {
   EXPECT_DOUBLE_EQ(ale::evaluateCubicHermiteFirstDeriv(0.5, derivs, x, y), -1.25);
 }
 
+
 TEST(EvaluateCubicHermiteFirstDeriv, InvalidDervisTimes) {
   std::vector<double> derivs = {};
   std::vector<double> times = {1.0};
@@ -410,6 +163,7 @@ TEST(EvaluateCubicHermiteFirstDeriv, InvalidDervisTimes) {
 
   EXPECT_THROW(ale::evaluateCubicHermiteFirstDeriv(0.0, derivs, times, y), invalid_argument);
 }
+
 
 TEST(EvaluateCubicHermiteFirstDeriv, InvalidVelocities) {
   std::vector<double> derivs = {5.0, 6.0};
@@ -444,12 +198,14 @@ TEST(LagrangeInterpolate, SecondOrder) {
   EXPECT_DOUBLE_EQ(ale::lagrangeInterpolate(times, values, 1.5, 2), 7);
 }
 
+
 TEST(LagrangeInterpolate, FourthOrder) {
   std::vector<double> times  = {-3,  -2, -1, 0,  1,   3,   5};
   std::vector<double> values = {-83, -26, 5, 16, 13, -11, -19};
 
   EXPECT_DOUBLE_EQ(ale::lagrangeInterpolate(times, values, 1.5, 4), 8.125);
 }
+
 
 TEST(LagrangeInterpolate, ReducedOrder) {
   std::vector<double> times  = {-3,  -2, -1, 0,  1,   3,   5};
@@ -459,11 +215,13 @@ TEST(LagrangeInterpolate, ReducedOrder) {
   EXPECT_DOUBLE_EQ(ale::lagrangeInterpolate(times, values, -2.5, 4), -54.5);
 }
 
+
 TEST(LagrangeInterpolate, InvalidArguments) {
   std::vector<double> times  = {-3,  -2, -1, 0,  1,   3,   5};
   std::vector<double> values = {-83, -26, 5, 16, 13};
   EXPECT_THROW(ale::lagrangeInterpolate(times, values, 3.5, 4), invalid_argument);
 }
+
 
 TEST(lagrangeInterpolateDerivative, SecondOrder) {
   std::vector<double> times  = {-3,  -2, -1, 0,  1,   3,   5};
@@ -472,12 +230,14 @@ TEST(lagrangeInterpolateDerivative, SecondOrder) {
   EXPECT_DOUBLE_EQ(ale::lagrangeInterpolateDerivative(times, values, 1.5, 2), -12);
 }
 
+
 TEST(LagrangeInterpolateDerivative, FourthOrder) {
   std::vector<double> times  = {-3,  -2, -1, 0,  1,   3,   5};
   std::vector<double> values = {-83, -26, 5, 16, 13, -11, -19};
 
   EXPECT_DOUBLE_EQ(ale::lagrangeInterpolateDerivative(times, values, 1.5, 4), -11.25);
 }
+
 
 TEST(LagrangeInterpolateDerivative, ReducedOrder) {
   std::vector<double> times  = {-3,  -2, -1, 0,  1,   3,   5};
@@ -486,6 +246,7 @@ TEST(LagrangeInterpolateDerivative, ReducedOrder) {
   EXPECT_DOUBLE_EQ(ale::lagrangeInterpolateDerivative(times, values, 3.5, 4), -4);
   EXPECT_DOUBLE_EQ(ale::lagrangeInterpolateDerivative(times, values, -2.5, 4), 57);
 }
+
 
 TEST(LagrangeInterpolateDerivative, InvalidArguments) {
   std::vector<double> times  = {-3,  -2, -1, 0,  1,   3,   5};
