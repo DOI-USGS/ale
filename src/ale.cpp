@@ -22,21 +22,6 @@ namespace ale {
   to interpolate over it. They were migrated, with minor modifications, from
   Isis::NumericalApproximation **/
 
-  /** Determines the lower index for the interpolation interval. */
-  int interpolationIndex(const std::vector<double> &times, double interpTime) {
-    if (times.size() < 2){
-      throw std::invalid_argument("There must be at least two times.");
-    }
-    auto nextTimeIt = std::upper_bound(times.begin(), times.end(), interpTime);
-    if (nextTimeIt == times.end()) {
-      --nextTimeIt;
-    }
-    if (nextTimeIt != times.begin()) {
-      --nextTimeIt;
-    }
-    return std::distance(times.begin(), nextTimeIt);
-  }
-
 
   /** Evaluates a cubic hermite at time, interpTime, between the appropriate two points in x. **/
   double evaluateCubicHermite(const double interpTime, const std::vector<double>& derivs,

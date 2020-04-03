@@ -10,6 +10,7 @@ target_link_libraries(runAleTests
                       ale
                       Eigen3::Eigen
                       gtest
+                      gmock
                       Threads::Threads
                       nlohmann_json::nlohmann_json
                       )
