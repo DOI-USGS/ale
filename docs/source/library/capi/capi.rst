@@ -3,7 +3,7 @@
 
 The :mod:`src` module
 
-.. doxygenfile:: ale.h
+.. doxygenfile:: Ale.h
   :project: ale
 
 .. versionadded:: 0.1.0

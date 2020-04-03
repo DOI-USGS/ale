@@ -3,7 +3,7 @@
 
 #include<vector>
 #include <stdexcept>
-#include <ale.h>
+#include <Ale.h>
 
 #include "Util.h"
 

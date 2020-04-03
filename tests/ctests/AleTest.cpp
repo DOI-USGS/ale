@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "ale.h"
+#include "Ale.h"
 #include "Isd.h"
 
 #include <stdexcept>

@@ -30,14 +30,14 @@ find_package(Python        REQUIRED COMPONENTS Development)
 set(ALE_BUILD_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 set(ALE_INSTALL_INCLUDE_DIR "include/ale")
 add_library(ale SHARED
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/ale.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Ale.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/InterpUtils.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Rotation.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Orientations.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/States.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Isd.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Util.cpp)
-set(ALE_HEADERS "${ALE_BUILD_INCLUDE_DIR}/ale.h"
+set(ALE_HEADERS "${ALE_BUILD_INCLUDE_DIR}/Ale.h"
                 "${ALE_BUILD_INCLUDE_DIR}/InterpUtils.h"
                 "${ALE_BUILD_INCLUDE_DIR}/Rotation.h"
                 "${ALE_BUILD_INCLUDE_DIR}/Orientations.h"
