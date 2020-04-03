@@ -22,30 +22,15 @@ using namespace std;
 namespace ale {
 
 
-  // Temporarily moved over from States.cpp. Will be moved into interpUtils in the future. 
+  // Temporarily moved over from States.cpp. Will be moved into interpUtils in the future.
 
-  /** The following helper functions are used to calculate the reduced states cache and cubic hermite 
-  to interpolate over it. They were migrated, with minor modifications, from 
+  /** The following helper functions are used to calculate the reduced states cache and cubic hermite
+  to interpolate over it. They were migrated, with minor modifications, from
   Isis::NumericalApproximation **/
-
-  /** Determines the lower index for the interpolation interval. */
-  int interpolationIndex(const std::vector<double> &times, double interpTime) {
-    if (times.size() < 2){
-      throw std::invalid_argument("There must be at least two times.");
-    }
-    auto nextTimeIt = std::upper_bound(times.begin(), times.end(), interpTime);
-    if (nextTimeIt == times.end()) {
-      --nextTimeIt;
-    }
-    if (nextTimeIt != times.begin()) {
-      --nextTimeIt;
-    }
-    return std::distance(times.begin(), nextTimeIt);
-  }
 
 
   /** Evaluates a cubic hermite at time, interpTime, between the appropriate two points in x. **/
-  double evaluateCubicHermite(const double interpTime, const std::vector<double>& derivs, 
+  double evaluateCubicHermite(const double interpTime, const std::vector<double>& derivs,
                               const std::vector<double>& x, const std::vector<double>& y) {
     if( (derivs.size() != x.size()) || (derivs.size() != y.size()) ) {
        throw std::invalid_argument("EvaluateCubicHermite - The size of the first derivative vector does not match the number of (x,y) data points.");
@@ -72,7 +57,7 @@ namespace ale {
   }
 
   /** Evaluate velocities using a Cubic Hermite Spline at a time a, within some interval in x, **/
- double evaluateCubicHermiteFirstDeriv(const double interpTime, const std::vector<double>& deriv, 
+ double evaluateCubicHermiteFirstDeriv(const double interpTime, const std::vector<double>& deriv,
                                        const std::vector<double>& times, const std::vector<double>& y) {
     if(deriv.size() != times.size()) {
        throw std::invalid_argument("EvaluateCubicHermiteFirstDeriv - The size of the first derivative vector does not match the number of (x,y) data points.");
@@ -467,7 +452,7 @@ namespace ale {
      PyTuple_SetItem(pArgs, 2, pStringFormatter);
 
      // Call the function with the arguments.
-     PyObject* pResult = PyObject_CallObject(pFunc, pArgs); 
+     PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
 
      if(!pResult) {
         throw invalid_argument("No Valid instrument found for label.");
@@ -483,10 +468,10 @@ namespace ale {
      char *temp_str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
      cResult = temp_str; // copy into std::string
 
-     Py_DECREF(pResultStr); 
+     Py_DECREF(pResultStr);
      Py_DECREF(pStringFileName);
      Py_DECREF(pStringProps);
-     Py_DECREF(pStringFormatter); 
+     Py_DECREF(pStringFormatter);
 
      return cResult;
  }
