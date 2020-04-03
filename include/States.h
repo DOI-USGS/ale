@@ -1,10 +1,10 @@
 #ifndef ALE_STATES_H
 #define ALE_STATES_H
 
-#include<vector>
+#include <vector>
 #include <stdexcept>
-#include <Ale.h>
 
+#include "InterpUtils.h"
 #include "Util.h"
 
 namespace ale {
