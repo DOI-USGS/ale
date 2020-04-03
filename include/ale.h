@@ -6,6 +6,8 @@
 
 #include <gsl/gsl_interp.h>
 
+#include "InterpUtils.h"
+
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
@@ -26,9 +28,6 @@ namespace ale {
   /** The following helper functions are used to calculate the reduced states cache and cubic hermite
   to interpolate over it. They were migrated, with minor modifications, from
   Isis::NumericalApproximation **/
-
-  /** Determines the lower index for the interpolation interval. */
-  int interpolationIndex(const std::vector<double> &times, double interpTime);
 
   /** Evaluates a cubic hermite at time, interpTime, between the appropriate two points in x. **/
   double evaluateCubicHermite(const double interpTime, const std::vector<double>& derivs,
