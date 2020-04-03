@@ -26,10 +26,8 @@ requirements:
   build:
   - cmake>=3.10
   - eigen
-  - gsl
   run:
   - eigen
-  - gsl
   - networkx
   - numpy
   - openblas
