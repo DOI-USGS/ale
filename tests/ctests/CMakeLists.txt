@@ -9,7 +9,7 @@ set (ALE_TEST_SOURCE ${CMAKE_SOURCE_DIR}/tests/ctests/IsdTests.cpp
                      ${CMAKE_SOURCE_DIR}/tests/ctests/TestMain.cpp)
 
 if(ALE_BUILD_LOAD)
-  list(APPEND ALE_TEST_SOURCE ${CMAKE_SOURCE_DIR}/tests/ctests/AleTests.cpp)
+  list(APPEND ALE_TEST_SOURCE ${CMAKE_SOURCE_DIR}/tests/ctests/LoadTests.cpp)
 endif()
 
 # setup test executable

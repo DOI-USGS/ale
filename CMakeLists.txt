@@ -49,8 +49,8 @@ set(ALE_PRIVATE_LINKS Eigen3::Eigen)
 set(ALE_PUBLIC_LINKS nlohmann_json::nlohmann_json)
 
 if(ALE_BUILD_LOAD)
-  list(APPEND ALE_SRC_FILES    ${CMAKE_CURRENT_SOURCE_DIR}/src/Ale.cpp)
-  list(APPEND ALE_HEADER_FILES ${ALE_BUILD_INCLUDE_DIR}/Ale.h)
+  list(APPEND ALE_SRC_FILES    ${CMAKE_CURRENT_SOURCE_DIR}/src/Load.cpp)
+  list(APPEND ALE_HEADER_FILES ${ALE_BUILD_INCLUDE_DIR}/Load.h)
   list(APPEND ALE_PRIVATE_LINKS Python::Python)
 endif()
 
