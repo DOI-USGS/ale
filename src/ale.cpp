@@ -174,7 +174,7 @@ namespace ale {
        order = 8;
        break;
      default:
-       throw invalid_argument("Invalid derivitive option, must be 0 or 1.");
+       throw invalid_argument("Invalid interpolation option, must be LINEAR, SPLINE, or LAGRANGE.");
    }
 
    double result;
