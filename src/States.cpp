@@ -2,9 +2,6 @@
 
 #include <iostream>
 #include <algorithm>
-#include <gsl/gsl_interp.h>
-#include <gsl/gsl_spline.h>
-#include <gsl/gsl_poly.h>
 #include <cmath>
 #include <float.h>
 
@@ -105,29 +102,9 @@ namespace ale {
 
   ale::State States::getState(double time, ale::interpolation interp) const {
     int lowerBound = ale::interpolationIndex(m_ephemTimes, time);
-    int interpStart;
-    int interpStop;
-
-    if (m_ephemTimes.size() <= 3) {
-      interpStart = 0;
-      interpStop = m_ephemTimes.size() - 1;
-    }
-    else if (lowerBound == 0) {
-      interpStart = lowerBound;
-      interpStop = lowerBound + 3;
-    }
-    else if (lowerBound == m_ephemTimes.size() - 1) {
-      interpStart = lowerBound - 3;
-      interpStop = lowerBound;
-    }
-    else if (lowerBound == m_ephemTimes.size() - 2) {
-      interpStart = lowerBound - 2;
-      interpStop = lowerBound + 1;
-    }
-    else {
-      interpStart = lowerBound - 1;
-      interpStop = lowerBound + 2;
-    }
+    // try to copy the surrounding 8 points as that's the most possibly needed
+    int interpStart = std::max(0, lowerBound - 3);
+    int interpStop = std::min(lowerBound + 4, (int) m_ephemTimes.size() - 1);
 
     ale::State state;
     std::vector<double> xs, ys, zs, vxs, vys, vzs, interpTimes;

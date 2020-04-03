@@ -8,8 +8,6 @@ add_executable(runAleTests ${test_source})
 target_link_libraries(runAleTests
                       PRIVATE
                       ale
-                      GSL::gsl
-                      GSL::gslcblas
                       Eigen3::Eigen
                       gtest
                       gmock

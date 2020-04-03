@@ -3,7 +3,6 @@
 
 #include<vector>
 #include <stdexcept>
-#include <gsl/gsl_interp.h>
 #include <ale.h>
 
 #include "Util.h"
@@ -55,7 +54,7 @@ class States {
    * Returns a single state by interpolating state.
    * If the Cache has been minimized, a cubic hermite is used to interpolate the
    * position and velocity over the reduced cache.
-   * If not, a standard gsl interpolation will be done.
+   * If not, a standard lagrange interpolation will be done.
    *
    * @param time Time to get a value at
    * @param interp Interpolation type to use. Will be ignored if cache is minimized.
