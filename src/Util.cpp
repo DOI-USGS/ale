@@ -1,6 +1,19 @@
 #include <stdexcept>
+#include <algorithm>
 
+#include "ale.h"
 #include "Util.h"
+
+
+bool iequals(const string& a, const string& b)
+{
+    return std::equal(a.begin(), a.end(),
+                      b.begin(), b.end(),
+                      [](char a, char b) {
+                          return tolower(a) == tolower(b);
+                      });
+}
+
 
 std::string ale::getSensorModelName(json isd) {
   std::string name = "";
@@ -31,6 +44,17 @@ std::string ale::getSensorName(json isd) {
   }
   return name;
 }
+
+std::string ale::getIsisCameraVersion(json isd) {
+  std::string name = "";
+  try {
+    name = isd.at("IsisCameraVersion");
+  } catch (...) {
+    throw std::runtime_error("Could not parse the sensor name.");
+  }
+  return name;
+}
+
 
 std::string ale::getPlatformName(json isd) {
   std::string name = "";
@@ -90,6 +114,28 @@ double ale::getCenterTime(json isd) {
     time = isd.at("center_ephemeris_time");
   } catch (...) {
     throw std::runtime_error("Could not parse the center image time.");
+  }
+  return time;
+}
+
+ale::interpolation ale::getInterpolationMethod(json isd) {
+  std::string interpoMethod = "linear";
+  try {
+    interpMethod = isd.at("interpolation_method");
+     
+    if (iequals(interpMethod, "linear")) {
+      return ale::interpolation::LINEAR;
+    }
+    else if (iequals(interpMethod, "spline")){ 
+      return ale::interpolation::SPLINE;
+    } 
+    else if (iequals(interpMethod, "lagrange")) {
+      // return ale::interpolation::LAGRANGE;
+      // temporary stand-in  
+      throw "Not implemented"; 
+    }
+  } catch (...) {
+    throw std::runtime_error("Could not parse the interpolation method.");
   }
   return time;
 }
@@ -469,4 +515,80 @@ std::vector<double> ale::getSensorOrientations(json isd) {
     throw std::runtime_error("Could not parse the sensor orientations.");
   }
   return quaternions;
+}
+
+
+std::vector<double> ale::getJsonDouble1Array(json obj) {
+  std::vector<double> positions;
+  try {
+    for (auto &location : obj) {
+      positions.push_back(location.get<double>());
+    }
+  } catch (...) {
+    throw std::runtime_error("Could not parse the sensor positions.");
+  }
+  return positions;
+}
+
+
+std::vector<Vec3d> ale::getJsonVec3dArray(json obj) {
+  std::vector<Vec3d> positions;
+  try {
+    for (auto &location : obj) {
+      Vec3d vec(location[0].get<double>(),location[1].get<double>(), location[2].get<double>() );
+      positions.append(vec);
+    }
+  } catch (...) {
+    throw std::runtime_error("Could not parse the sensor positions.");
+  }
+  return positions;
+}
+
+
+ale::States getInstrumentPosition(json isd) {
+  try {
+    std::vector<Vec3d> positions = getJsonVec3dArray(isd.at("InstrumentPosition").at("Positions"));
+    std::vector<double> times = getJsonDouble1Array(isd.at("InstrumentPosition").at("EphemerisTimes")); 
+     
+    json frames = json.at("InstrumentPointing").at("TimeDependantFrames");
+    int reFrame = frames.at(frames.size()-1).get<int>();
+
+    bool hasVelocities = isd.at("InstrumentPosition").find("Velocities") != isd.at("InstrumentPosition").end();
+    if (hasVelocities) {
+      std::vector<Vec3d> velocities = getJsonVec3dArray(isd.at("InstrumentPositions").at("Velocities")); 
+      States states(times, positions, velocties, refFrame);  
+      return states;
+    }
+    else {
+      States states(times, positions, refFrame);
+      return states; 
+    }
+  } catch (...) {
+    throw std::runtime_error("Could not parse the instrument position");
+  }
+}
+
+
+ale::States getSunPosition(json isd) {
+  try {
+    json sp = isd.at("SunPosition");
+    std::vector<Vec3d> positions = getJsonVec3dArray(isd.at("SunPosition").at("Positions"));
+    std::vector<double> times = getJsonDouble1Array(isd.at("SunPosition").at("EphemerisTimes")); 
+     
+    json frames = json.at("SunPointing").at("TimeDependantFrames");
+    int reFrame = frames.at(frames.size()-1).get<int>();
+
+    bool hasVelocities = isd.at("SunPosition").find("Velocities") != isd.at("SunPosition").end();
+    if (hasVelocities) {
+      std::vector<Vec3d> velocities = getJsonVec3dArray(isd.at("InstrumentPositions").at("Velocities")); 
+      States states(times, positions, velocties, refFrame);  
+      return states;
+    }
+    else {
+      States states(times, positions, refFrame);
+      return states; 
+    }
+  } catch (...) {
+    throw std::runtime_error("Could not parse the instrument position");
+  }
 }

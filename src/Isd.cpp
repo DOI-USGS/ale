@@ -1,3 +1,4 @@
+
 #include "Isd.h"
 #include "Util.h"
 
@@ -41,4 +42,30 @@ ale::Isd::Isd(std::string isd_file) {
 
   distortion_model = getDistortionModel(isd);
   distortion_coefficients = getDistortionCoeffs(isd);
+  
+  interpMethod = getInterpolationMethod(isd); 
+   
+  inst_pos = getInstrumentPosition(isd);
+  sun_pos = getSunPosition(isd);
+
+  // interpolation method 
+  // instrument pointing 
+  //    timedependantframes
+  //    constant frames
+  //    constant rotation 
+  //    CkTableStartTime 
+  //    CkTableendTime 
+  //    CkTableOriginalSize 
+  //    EphemerisTimes
+  //    Quats
+  //    AVs
+  // BodyRotation
+  // InstrumentPosition 
+  //   SpkTableStartTime 
+  //   SpkTableEndTime 
+  //   SpkTablwOriginalSize 
+  //   EphemerisTimes 
+  //   Positions 
+  //   Velocities 
+  // SunPosition 
 }

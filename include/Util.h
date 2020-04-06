@@ -4,38 +4,23 @@
 #include <string>
 #include <nlohmann/json.hpp>
 
-#include "Isd.h"
+#include "ale.h"
 #include "Distortion.h"
+#include "States.h"
 
 namespace ale {
   using json = nlohmann::json;
 
-  /** A 3D cartesian vector */
-  struct Vec3d {
-    double x;
-    double y;
-    double z;
-
-    // Accepts an {x,y,z} vector
-    Vec3d(const std::vector<double>& vec) {
-      if (vec.size() != 3) {
-        throw std::invalid_argument("Input vector must have 3 entries.");
-      }
-      x = vec[0];
-      y = vec[1];
-      z = vec[2];
-    };
-
-    Vec3d(double x, double y, double z) : x(x), y(y), z(z) {};
-    Vec3d() : x(0.0), y(0.0), z(0.0) {};
-  };
-
+  std::vector<Vec3d> ale::getJsonVec3dArray(json obj);
+  
+  interpolation ale::getInterpolationMethod(json isd);
   double getMinHeight(nlohmann::json isd);
   std::string getSensorModelName(json isd);
   std::string getImageId(json isd);
   std::string getSensorName(json isd);
   std::string getPlatformName(json isd);
   std::string getLogFile(nlohmann::json isd);
+  std::string getIsisCameraVersion(json isd);
   int getTotalLines(json isd);
   int getTotalSamples(json isd);
   double getStartingTime(json isd);
@@ -61,6 +46,9 @@ namespace ale {
   std::vector<double> getSensorPositions(json isd);
   std::vector<double> getSensorVelocities(json isd);
   std::vector<double> getSensorOrientations(json isd);
+
+  States getIntrumentPosition(json isd);
+  States getSunPosition(json isd);
 }
 
 #endif
