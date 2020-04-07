@@ -13,6 +13,20 @@
 namespace ale {
   using json = nlohmann::json;
 
+  template<typename T>
+  std::vector<T> getJsonArray(json obj) {
+    std::vector<T> positions;
+    try {
+      for (auto &location : obj) {
+        positions.push_back(location.get<T>());
+      }
+    } catch (...) {
+      throw std::runtime_error("Could not parse the json array.");
+    }
+    return positions;
+  }
+
+
   interpolation getInterpolationMethod(json isd);
   double getMinHeight(nlohmann::json isd);
   std::string getSensorModelName(json isd);

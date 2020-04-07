@@ -7,9 +7,13 @@ namespace ale {
   Orientations::Orientations(
     const std::vector<Rotation> &rotations,
     const std::vector<double> &times,
-    const std::vector<Vec3d> &avs
+    const std::vector<Vec3d> &avs,
+    const int refFrame, 
+    const Rotation &const_rot, 
+    const std::vector<int> const_frames, 
+    const std::vector<int> time_dependent_frames
   ) :
-    m_rotations(rotations), m_avs(avs), m_times(times) {
+    m_rotations(rotations), m_avs(avs), m_times(times), m_refFrame(refFrame), m_timeDepRefFrames(time_dependent_frames), m_constRefFrames(const_frames), m_constRotation(const_rot) {
     if (m_rotations.size() < 2 || m_times.size() < 2) {
       throw std::invalid_argument("There must be at least two rotations and times.");
     }
@@ -35,7 +39,22 @@ namespace ale {
   std::vector<double> Orientations::times() const {
     return m_times;
   }
+  
+  std::vector<int> Orientations::timeDepedentReferenceFrames() const {
+    return m_timeDepRefFrames; 
+  }
 
+  std::vector<int> Orientations::constantReferenceFrames() const {
+    return m_constRefFrames; 
+  }
+  
+  int Orientations::referenceFrame() const {
+    return m_refFrame; 
+  }
+
+  Rotation Orientations::constantRotation() const {
+    return m_constRotation; 
+  }
 
   Rotation Orientations::interpolate(
     double time,
