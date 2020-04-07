@@ -1,6 +1,8 @@
 #ifndef ALE_VECTORS_H
 #define ALE_VECTORS_H
 
+#include <stdexcept>
+
 namespace ale {
 /** A 3D cartesian vector */
 struct Vec3d {
