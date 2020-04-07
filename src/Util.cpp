@@ -591,9 +591,6 @@ Orientations getBodyRotation(json isd) {
     Rotation constRot(rotArray);
 
     Orientations orientation(rotations, times, velocities, refFrame, constRot, constFrames, timeDepFrames);  
-    
-
-
     return orientation;
   
   } catch (...) {

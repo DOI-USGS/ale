@@ -35,13 +35,13 @@ namespace ale {
     /**
      * Const accessor methods
      */
-    std::vector<Rotation> rotations() const;
-    std::vector<ale::Vec3d> angularVelocities() const;
-    std::vector<double> times() const;
-    std::vector<int> constantReferenceFrames() const; 
-    std::vector<int> timeDepedentReferenceFrames() const;
-    int referenceFrame() const;
-    Rotation constantRotation() const; 
+    std::vector<Rotation> getRotations() const;
+    std::vector<ale::Vec3d> getAngularVelocities() const;
+    std::vector<double> getTimes() const;
+    std::vector<int> getConstantFrames() const; 
+    std::vector<int> getTimeDependentFrames() const;
+    int getReferenceFrame() const;
+    Rotation getConstantRotation() const; 
 
     /**
      * Get the interpolated rotation at a specific time.
@@ -86,8 +86,8 @@ namespace ale {
     std::vector<Rotation> m_rotations;
     std::vector<ale::Vec3d> m_avs;
     std::vector<double> m_times;
-    std::vector<int> m_timeDepRefFrames; 
-    std::vector<int> m_constRefFrames; 
+    std::vector<int> m_timeDepFrames; 
+    std::vector<int> m_constFrames; 
     Rotation m_constRotation;
     int m_refFrame; 
   };

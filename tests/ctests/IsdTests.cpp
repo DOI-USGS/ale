@@ -181,7 +181,6 @@ TEST(Isd, GetSunPositions) {
   ASSERT_EQ(velocity[0].x, 1);
   ASSERT_EQ(velocity[0].y, 2);
   ASSERT_EQ(velocity[0].z, 3);
-
 }
 
 TEST(Isd, NoSunPositions) {
@@ -257,6 +256,63 @@ TEST(Isd, NoSensorPositions) {
   }
 }
 
+TEST(Isd, GetInstrumentPointing) {
+  ale::json pointing  = {
+    {"instrument_pointing",{
+       {"ephemeris_times", {300, 600}},
+       {"quaternions", {{1,1,1,1}, {2,2,2,2}}},
+       {"angular_velocities", {{1,1,1}, {2,2,2}}},
+       {"reference_frame", 2},
+       {"time_dependent_frames", {1,2,3}},
+       {"constant_frames", {4,5,6}},
+       {"constant_rotation", {-1,0,0,0,-1,0,0,0,-1}}
+  }}};
+
+  ale::Orientations instPointing = ale::getInstrumentPointing(pointing);
+  std::vector<ale::Rotation> rotations = instPointing.getRotations();
+  std::vector<ale::Vec3d> velocities = instPointing.getAngularVelocities();
+  std::vector<int> constFrames = instPointing.getConstantFrames(); 
+  std::vector<int> timeDepFrames = instPointing.getTimeDependentFrames(); 
+
+  ASSERT_EQ(rotations.size(), 2);
+  ASSERT_EQ(instPointing.getReferenceFrame(), 2);
+  ASSERT_EQ(instPointing.getTimes()[0], 300);
+  ASSERT_EQ(instPointing.getTimes()[1], 600);
+
+  ASSERT_EQ(constFrames[0], 4);
+  ASSERT_EQ(constFrames[1], 5);
+  ASSERT_EQ(constFrames[2], 6);
+
+  ASSERT_EQ(timeDepFrames[0], 1);
+  ASSERT_EQ(timeDepFrames[1], 2);
+  ASSERT_EQ(timeDepFrames[2], 3);
+
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[0], .5);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[1], .5);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[2], .5);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[3], .5);
+ 
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[0], .5);
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[1], .5);
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[2], .5);
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[3], .5);
+   
+  ASSERT_DOUBLE_EQ(velocities[0].x, 1);
+  ASSERT_DOUBLE_EQ(velocities[0].y, 1);
+  ASSERT_DOUBLE_EQ(velocities[0].z, 1); 
+  
+  ASSERT_DOUBLE_EQ(velocities[1].x, 2);
+  ASSERT_DOUBLE_EQ(velocities[1].y, 2);
+  ASSERT_DOUBLE_EQ(velocities[1].z, 2);
+  
+  std::vector<double> rotmat = instPointing.getConstantRotation().toQuaternion();
+  ASSERT_DOUBLE_EQ(rotmat[0], 0);
+  ASSERT_DOUBLE_EQ(rotmat[1], 1);
+  ASSERT_DOUBLE_EQ(rotmat[2], 0);
+  ASSERT_DOUBLE_EQ(rotmat[3], 0);
+}
+
+
 TEST(Isd, NoSensorOrientations) {
   ale::json j;
   try {
@@ -270,6 +326,64 @@ TEST(Isd, NoSensorOrientations) {
     FAIL() << "Expected an Excpetion with message: \"Could not parse the instrument pointing\"";
   }
 }
+
+TEST(Isd, GetBodyRotation) {
+  ale::json br = {
+    {"body_rotation",{
+       {"ephemeris_times", {300, 600}},
+       {"quaternions", {{1,1,1,1}, {2,2,2,2}}},
+       {"angular_velocities", {{1,1,1}, {2,2,2}}},
+       {"reference_frame", 2},
+       {"time_dependent_frames", {1,2,3}},
+       {"constant_frames", {4,5,6}},
+       {"constant_rotation", {-1,0,0,0,-1,0,0,0,-1}}
+  }}};
+
+  ale::Orientations bodyRot = ale::getBodyRotation(br);
+  std::vector<ale::Rotation> rotations = bodyRot.getRotations();
+  std::vector<ale::Vec3d> velocities = bodyRot.getAngularVelocities();
+  std::vector<int> constFrames = bodyRot.getConstantFrames(); 
+  std::vector<int> timeDepFrames = bodyRot.getTimeDependentFrames(); 
+
+  ASSERT_EQ(rotations.size(), 2);
+  ASSERT_EQ(bodyRot.getReferenceFrame(), 2);
+  ASSERT_EQ(bodyRot.getTimes()[0], 300);
+  ASSERT_EQ(bodyRot.getTimes()[1], 600);
+
+  ASSERT_EQ(constFrames[0], 4);
+  ASSERT_EQ(constFrames[1], 5);
+  ASSERT_EQ(constFrames[2], 6);
+
+  ASSERT_EQ(timeDepFrames[0], 1);
+  ASSERT_EQ(timeDepFrames[1], 2);
+  ASSERT_EQ(timeDepFrames[2], 3);
+
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[0], .5);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[1], .5);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[2], .5);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[3], .5);
+ 
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[0], .5);
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[1], .5);
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[2], .5);
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[3], .5);
+   
+  ASSERT_DOUBLE_EQ(velocities[0].x, 1);
+  ASSERT_DOUBLE_EQ(velocities[0].y, 1);
+  ASSERT_DOUBLE_EQ(velocities[0].z, 1); 
+  
+  ASSERT_DOUBLE_EQ(velocities[1].x, 2);
+  ASSERT_DOUBLE_EQ(velocities[1].y, 2);
+  ASSERT_DOUBLE_EQ(velocities[1].z, 2);
+  
+  std::vector<double> rotmat = bodyRot.getConstantRotation().toQuaternion();
+  ASSERT_DOUBLE_EQ(rotmat[0], 0);
+  ASSERT_DOUBLE_EQ(rotmat[1], 1);
+  ASSERT_DOUBLE_EQ(rotmat[2], 0);
+  ASSERT_DOUBLE_EQ(rotmat[3], 0);
+}
+
+
 
 TEST(Isd, BadNameModel) {
   std::string bad_json_str("{}");
