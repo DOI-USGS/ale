@@ -1,6 +1,7 @@
 #include "InterpUtils.h"
 
 #include <exception>
+#include <stdexcept>
 
 #include <algorithm>
 #include <unordered_set>
