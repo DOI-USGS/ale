@@ -13,7 +13,7 @@ namespace ale {
   };
 
   /// Interpolation enum for defining different methods of interpolation
-  enum interpolation {
+  enum PositionInterpolation {
     /// Interpolate using linear interpolation
     LINEAR = 0,
     /// Interpolate using a cubic spline
@@ -85,7 +85,7 @@ namespace ale {
                     (Currently supports 0, 1, and 2)
     *@return
    */
-   double interpolate(std::vector<double> points, std::vector<double> times, double time, interpolation interp, int d);
+   double interpolate(std::vector<double> points, std::vector<double> times, double time, PositionInterpolation interp, int d);
 
 }
 

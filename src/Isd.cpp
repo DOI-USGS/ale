@@ -2,7 +2,6 @@
 #include "Isd.h"
 #include "Util.h"
 
-
 ale::Isd::Isd(std::string isd_file) {
   json isd = json::parse(isd_file);
 

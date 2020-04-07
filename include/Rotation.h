@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "States.h"
+#include "Vectors.h"
 
 namespace ale {
 
@@ -18,8 +19,7 @@ namespace ale {
        */
       Rotation();
       /**
-       * Construct a rotation from a quaternion.
-       *
+       * Construct a rotatiorotationsquaternrotations*
        * @param w The scalar component of the quaternion.
        * @param x The x value of the vector component of the quaternion.
        * @param y The y value of the vector component of the quaternion.

@@ -119,25 +119,25 @@ double getCenterTime(json isd) {
   return time;
 }
 
-interpolation getInterpolationMethod(json isd) {
+PositionInterpolation getInterpolationMethod(json isd) {
   std::string interpMethod = "linear";
   try {
     interpMethod = isd.at("interpolation_method");
      
     if (iequals(interpMethod, "linear")) {
-      return interpolation::LINEAR;
+      return PositionInterpolation::LINEAR;
     }
     else if (iequals(interpMethod, "spline")){ 
-      return interpolation::SPLINE;
+      return PositionInterpolation::SPLINE;
     } 
     else if (iequals(interpMethod, "lagrange")) {
-      return interpolation::LAGRANGE;
+      return PositionInterpolation::LAGRANGE;
     }
   } catch (...) {
     throw std::runtime_error("Could not parse the interpolation method.");
   }
   
-  return interpolation::LINEAR;
+  return PositionInterpolation::LINEAR;
 }
 
 std::vector<std::vector<double>> getLineScanRate(json isd) {

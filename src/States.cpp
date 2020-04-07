@@ -100,7 +100,7 @@ namespace ale {
   }
 
 
-  State States::getState(double time, interpolation interp) const {
+  State States::getState(double time, PositionInterpolation interp) const {
     int lowerBound = interpolationIndex(m_ephemTimes, time);
     // try to copy the surrounding 8 points as that's the most possibly needed
     int interpStart = std::max(0, lowerBound - 3);
@@ -152,13 +152,13 @@ namespace ale {
   }
 
 
-  Vec3d States::getPosition(double time, interpolation interp) const {
+  Vec3d States::getPosition(double time, PositionInterpolation interp) const {
     State interpState = getState(time, interp);
     return interpState.position;
   }
 
 
-  Vec3d States::getVelocity(double time, interpolation interp) const {
+  Vec3d States::getVelocity(double time, PositionInterpolation interp) const {
     State interpState = getState(time, interp);
     return interpState.velocity;
   }

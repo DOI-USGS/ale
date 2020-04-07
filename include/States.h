@@ -62,13 +62,13 @@ class States {
    *
    * @return State
    */
-    State getState(double time, interpolation interp=LINEAR) const;
+    State getState(double time, PositionInterpolation interp=LINEAR) const;
 
     /** Gets a position at a single time. Operates the same way as getState() **/
-    Vec3d getPosition(double time, interpolation interp=LINEAR) const;
+    Vec3d getPosition(double time, PositionInterpolation interp=LINEAR) const;
 
     /** Gets a velocity at a single time. Operates the same way as getState() **/
-    Vec3d getVelocity(double time, interpolation interp=LINEAR) const;
+    Vec3d getVelocity(double time, PositionInterpolation interp=LINEAR) const;
 
     /** Returns the first ephemeris time **/
     double getStartTime();
@@ -80,7 +80,8 @@ class States {
    * Perform a cache reduction. After running this, getStates(), getPositions(),
    * and getVelocities() will return vectors of reduced size, and getState(),
    * getPosition(), and getVelocity() will
-   * returns values interpolated over the reduced cache using a cubic hermite spline
+   * returns values interpolated over the reduced cache using a cubic hermite splineGSW#|
+   * 1111111
    *
    * Adapted from Isis::SpicePosition::reduceCache().
    *

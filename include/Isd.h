@@ -5,7 +5,8 @@
 #include <vector>
 #include <map>
 
-#include "Util.h"
+#include <nlohmann/json.hpp>
+
 #include "Distortion.h"
 
 #include "Rotation.h"
@@ -62,7 +63,7 @@ namespace ale {
 
     json naif_keywords;
     
-    interpolation interpMethod;
+    PositionInterpolation interpMethod;
     
     Rotation const_rotation; 
 

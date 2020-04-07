@@ -61,8 +61,6 @@ namespace ale {
   }
 
 
-  // Temporarily moved over from States.cpp. Will be moved into interpUtils in the future.
-
   /** The following helper functions are used to calculate the reduced states cache and cubic hermite
   to interpolate over it. They were migrated, with minor modifications, from
   Isis::NumericalApproximation **/
@@ -198,7 +196,7 @@ namespace ale {
     return result;
   }
 
- double interpolate(std::vector<double> points, std::vector<double> times, double time, interpolation interp, int d) {
+ double interpolate(std::vector<double> points, std::vector<double> times, double time, PositionInterpolation interp, int d) {
    size_t numPoints = points.size();
    if (numPoints < 2) {
      throw std::invalid_argument("At least two points must be input to interpolate over.");

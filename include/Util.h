@@ -27,7 +27,7 @@ namespace ale {
   }
 
 
-  interpolation getInterpolationMethod(json isd);
+  PositionInterpolation getInterpolationMethod(json isd);
   double getMinHeight(nlohmann::json isd);
   std::string getSensorModelName(json isd);
   std::string getImageId(json isd);
