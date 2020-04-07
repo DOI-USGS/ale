@@ -47,25 +47,7 @@ ale::Isd::Isd(std::string isd_file) {
    
   inst_pos = getInstrumentPosition(isd);
   sun_pos = getSunPosition(isd);
-
-  // interpolation method 
-  // instrument pointing 
-  //    timedependantframes
-  //    constant frames
-  //    constant rotation 
-  //    CkTableStartTime 
-  //    CkTableendTime 
-  //    CkTableOriginalSize 
-  //    EphemerisTimes
-  //    Quats
-  //    AVs
-  // BodyRotation
-  // InstrumentPosition 
-  //   SpkTableStartTime 
-  //   SpkTableEndTime 
-  //   SpkTablwOriginalSize 
-  //   EphemerisTimes 
-  //   Positions 
-  //   Velocities 
-  // SunPosition 
-}
+  
+  inst_pointing = getInstrumentPointing(isd);
+  body_rotation = getBodyRotation(isd); 
+ }

@@ -3,35 +3,12 @@
 
 #include <vector>
 #include <stdexcept>
-#include <gsl/gsl_interp.h>
 
-#include "ale.h"
-#include "Util.h"
+
+#include "Vectors.h"
+#include "InterpUtils.h"
 
 namespace ale {
-
-
-/** A 3D cartesian vector */
-struct Vec3d {
-  double x;
-  double y;
-  double z;
-
-  // Accepts an {x,y,z} vector
-  Vec3d(const std::vector<double>& vec) {
-    if (vec.size() != 3) {
-      throw std::invalid_argument("Input vector must have 3 entries.");
-    }
-    x = vec[0];
-    y = vec[1];
-    z = vec[2];
-  };
-
-  Vec3d(double x, double y, double z) : x(x), y(y), z(z) {};
-  Vec3d() : x(0.0), y(0.0), z(0.0) {};
-};
-
-
 
 /** A state vector with position and velocity*/
 struct State {
@@ -55,21 +32,21 @@ class States {
   public:
     // Constructors
     States();
-    States(const std::vector<double>& ephemTimes, const std::vector<ale::Vec3d>& positions,
+    States(const std::vector<double>& ephemTimes, const std::vector<Vec3d>& positions,
            int refFrame=1);
 
-    States(const std::vector<double>& ephemTimes, const std::vector<ale::Vec3d>& positions,
-           const std::vector<ale::Vec3d>& velocities, int refFrame=1);
+    States(const std::vector<double>& ephemTimes, const std::vector<Vec3d>& positions,
+           const std::vector<Vec3d>& velocities, int refFrame=1);
 
-    States(const std::vector<double>& ephemTimes, const std::vector<ale::State>& states,
+    States(const std::vector<double>& ephemTimes, const std::vector<State>& states,
            int refFrame=1);
 
     ~States();
 
     // Getters
-    std::vector<ale::State> getStates() const; //! Returns state vectors (6-element positions&velocities)
-    std::vector<ale::Vec3d> getPositions() const; //! Returns the current positions
-    std::vector<ale::Vec3d> getVelocities() const; //! Returns the current velocities
+    std::vector<State> getStates() const; //! Returns state vectors (6-element positions&velocities)
+    std::vector<Vec3d> getPositions() const; //! Returns the current positions
+    std::vector<Vec3d> getVelocities() const; //! Returns the current velocities
     std::vector<double> getTimes() const; //! Returns the current times
     int getReferenceFrame() const; //! Returns reference frame as NAIF ID
     bool hasVelocity() const; //! Returns true if any velocities have been provided
@@ -78,12 +55,12 @@ class States {
    * Returns a single state by interpolating state.
    * If the Cache has been minimized, a cubic hermite is used to interpolate the
    * position and velocity over the reduced cache.
-   * If not, a standard gsl interpolation will be done.
+   * If not, a standard lagrange interpolation will be done.
    *
    * @param time Time to get a value at
    * @param interp Interpolation type to use. Will be ignored if cache is minimized.
    *
-   * @return ale::State
+   * @return State
    */
     State getState(double time, interpolation interp=LINEAR) const;
 

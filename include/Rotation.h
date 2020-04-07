@@ -5,14 +5,8 @@
 #include <vector>
 
 #include "States.h"
-#include "Util.h"
 
 namespace ale {
-
-  enum RotationInterpolation {
-    SLERP, // Spherical interpolation
-    NLERP // Normalized linear interpolation
-  };
 
   /**
    * A generic 3D rotation.
@@ -82,7 +76,7 @@ namespace ale {
        *
        * @return The state rotation matrix in row-major order.
        */
-      std::vector<double> toStateRotationMatrix(const ale::Vec3d &av) const;
+      std::vector<double> toStateRotationMatrix(const Vec3d &av) const;
       /**
        * The rotation as Euler angles.
        *
@@ -107,9 +101,9 @@ namespace ale {
        *
        * @return The rotated vector.
        */
-      ale::Vec3d operator()(const ale::Vec3d &av) const;
+      Vec3d operator()(const Vec3d &av) const;
 
-      ale::State operator()(const ale::State &state, const ale::Vec3d& av = Vec3d(0.0, 0.0, 0.0)) const;
+      State operator()(const State &state, const Vec3d& av = Vec3d(0.0, 0.0, 0.0)) const;
       /**
        * Get the inverse rotation.
        */

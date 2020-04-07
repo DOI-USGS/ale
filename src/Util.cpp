@@ -1,21 +1,22 @@
 #include <stdexcept>
 #include <algorithm>
+#include <iostream>
 
 #include "ale.h"
 #include "Util.h"
 
-
-bool iequals(const string& a, const string& b)
+namespace ale {
+bool iequals(const std::string& a, const std::string& b)
 {
     return std::equal(a.begin(), a.end(),
-                      b.begin(), b.end(),
+                      b.begin(),
                       [](char a, char b) {
                           return tolower(a) == tolower(b);
                       });
 }
 
 
-std::string ale::getSensorModelName(json isd) {
+std::string getSensorModelName(json isd) {
   std::string name = "";
   try {
     name = isd.at("name_model");
@@ -25,7 +26,7 @@ std::string ale::getSensorModelName(json isd) {
   return name;
 }
 
-std::string ale::getImageId(json isd) {
+std::string getImageId(json isd) {
   std::string id = "";
   try {
     id = isd.at("image_identifier");
@@ -35,7 +36,7 @@ std::string ale::getImageId(json isd) {
   return id;
 }
 
-std::string ale::getSensorName(json isd) {
+std::string getSensorName(json isd) {
   std::string name = "";
   try {
     name = isd.at("name_sensor");
@@ -45,7 +46,7 @@ std::string ale::getSensorName(json isd) {
   return name;
 }
 
-std::string ale::getIsisCameraVersion(json isd) {
+std::string getIsisCameraVersion(json isd) {
   std::string name = "";
   try {
     name = isd.at("IsisCameraVersion");
@@ -56,7 +57,7 @@ std::string ale::getIsisCameraVersion(json isd) {
 }
 
 
-std::string ale::getPlatformName(json isd) {
+std::string getPlatformName(json isd) {
   std::string name = "";
   try {
     name = isd.at("name_platform");
@@ -66,7 +67,7 @@ std::string ale::getPlatformName(json isd) {
   return name;
 }
 
-std::string ale::getLogFile(nlohmann::json isd) {
+std::string getLogFile(nlohmann::json isd) {
   std::string file = "";
   try {
     file = isd.at("log_file");
@@ -76,7 +77,7 @@ std::string ale::getLogFile(nlohmann::json isd) {
   return file;
 }
 
-int ale::getTotalLines(json isd) {
+int getTotalLines(json isd) {
   int lines = 0;
   try {
     lines = isd.at("image_lines");
@@ -87,7 +88,7 @@ int ale::getTotalLines(json isd) {
   return lines;
 }
 
-int ale::getTotalSamples(json isd) {
+int getTotalSamples(json isd) {
   int samples = 0;
   try {
     samples = isd.at("image_samples");
@@ -98,7 +99,7 @@ int ale::getTotalSamples(json isd) {
   return samples;
 }
 
-double ale::getStartingTime(json isd) {
+double getStartingTime(json isd) {
   double time = 0.0;
   try {
     time = isd.at("starting_ephemeris_time");
@@ -108,7 +109,7 @@ double ale::getStartingTime(json isd) {
   return time;
 }
 
-double ale::getCenterTime(json isd) {
+double getCenterTime(json isd) {
   double time = 0.0;
   try {
     time = isd.at("center_ephemeris_time");
@@ -118,29 +119,28 @@ double ale::getCenterTime(json isd) {
   return time;
 }
 
-ale::interpolation ale::getInterpolationMethod(json isd) {
-  std::string interpoMethod = "linear";
+interpolation getInterpolationMethod(json isd) {
+  std::string interpMethod = "linear";
   try {
     interpMethod = isd.at("interpolation_method");
      
     if (iequals(interpMethod, "linear")) {
-      return ale::interpolation::LINEAR;
+      return interpolation::LINEAR;
     }
     else if (iequals(interpMethod, "spline")){ 
-      return ale::interpolation::SPLINE;
+      return interpolation::SPLINE;
     } 
     else if (iequals(interpMethod, "lagrange")) {
-      // return ale::interpolation::LAGRANGE;
-      // temporary stand-in  
-      throw "Not implemented"; 
+      return interpolation::LAGRANGE;
     }
   } catch (...) {
     throw std::runtime_error("Could not parse the interpolation method.");
   }
-  return time;
+  
+  return interpolation::LINEAR;
 }
 
-std::vector<std::vector<double>> ale::getLineScanRate(json isd) {
+std::vector<std::vector<double>> getLineScanRate(json isd) {
   std::vector<std::vector<double>> lines;
   try {
     for (auto &scanRate : isd.at("line_scan_rate")) {
@@ -154,7 +154,7 @@ std::vector<std::vector<double>> ale::getLineScanRate(json isd) {
 }
 
 
-int ale::getSampleSumming(json isd) {
+int getSampleSumming(json isd) {
   int summing = 0;
   try {
     summing = isd.at("detector_sample_summing");
@@ -165,7 +165,7 @@ int ale::getSampleSumming(json isd) {
   return summing;
 }
 
-int ale::getLineSumming(json isd) {
+int getLineSumming(json isd) {
   int summing = 0;
   try {
     summing = isd.at("detector_line_summing");
@@ -176,7 +176,7 @@ int ale::getLineSumming(json isd) {
   return summing;
 }
 
-double ale::getFocalLength(json isd) {
+double getFocalLength(json isd) {
   double length = 0.0;
   try {
     length = isd.at("focal_length_model").at("focal_length");
@@ -186,7 +186,7 @@ double ale::getFocalLength(json isd) {
   return length;
 }
 
-double ale::getFocalLengthUncertainty(json isd) {
+double getFocalLengthUncertainty(json isd) {
   double uncertainty = 1.0;
   try {
     uncertainty = isd.at("focal_length_model").value("focal_uncertainty", uncertainty);
@@ -196,7 +196,7 @@ double ale::getFocalLengthUncertainty(json isd) {
   return uncertainty;
 }
 
-std::vector<double> ale::getFocal2PixelLines(json isd) {
+std::vector<double> getFocal2PixelLines(json isd) {
   std::vector<double> transformation;
   try {
     transformation = isd.at("focal2pixel_lines").get<std::vector<double>>();
@@ -207,7 +207,7 @@ std::vector<double> ale::getFocal2PixelLines(json isd) {
   return transformation;
 }
 
-std::vector<double> ale::getFocal2PixelSamples(json isd) {
+std::vector<double> getFocal2PixelSamples(json isd) {
   std::vector<double> transformation;
   try {
     transformation = isd.at("focal2pixel_samples").get<std::vector<double>>();
@@ -218,7 +218,7 @@ std::vector<double> ale::getFocal2PixelSamples(json isd) {
   return transformation;
 }
 
-double ale::getDetectorCenterLine(json isd) {
+double getDetectorCenterLine(json isd) {
   double line;
   try {
     line = isd.at("detector_center").at("line");
@@ -228,7 +228,7 @@ double ale::getDetectorCenterLine(json isd) {
   return line;
 }
 
-double ale::getDetectorCenterSample(json isd) {
+double getDetectorCenterSample(json isd) {
   double sample;
   try {
     sample = isd.at("detector_center").at("sample");
@@ -238,7 +238,7 @@ double ale::getDetectorCenterSample(json isd) {
   return sample;
 }
 
-double ale::getDetectorStartingLine(json isd) {
+double getDetectorStartingLine(json isd) {
   double line;
   try {
     line = isd.at("starting_detector_line");
@@ -248,7 +248,7 @@ double ale::getDetectorStartingLine(json isd) {
   return line;
 }
 
-double ale::getDetectorStartingSample(json isd) {
+double getDetectorStartingSample(json isd) {
   double sample;
   try {
     sample = isd.at("starting_detector_sample");
@@ -258,7 +258,7 @@ double ale::getDetectorStartingSample(json isd) {
   return sample;
 }
 
-double ale::getMinHeight(json isd) {
+double getMinHeight(json isd) {
   double height = 0.0;
   try {
     json referenceHeight = isd.at("reference_height");
@@ -271,7 +271,7 @@ double ale::getMinHeight(json isd) {
   return height;
 }
 
-double ale::getMaxHeight(json isd) {
+double getMaxHeight(json isd) {
   double height = 0.0;
   try {
     json referenceHeight = isd.at("reference_height");
@@ -285,7 +285,7 @@ double ale::getMaxHeight(json isd) {
   return height;
 }
 
-double ale::getSemiMajorRadius(json isd) {
+double getSemiMajorRadius(json isd) {
   double radius = 0.0;
   try {
     json radii = isd.at("radii");
@@ -299,7 +299,7 @@ double ale::getSemiMajorRadius(json isd) {
   return radius;
 }
 
-double ale::getSemiMinorRadius(json isd) {
+double getSemiMinorRadius(json isd) {
   double radius = 0.0;
   try {
     json radii = isd.at("radii");
@@ -315,7 +315,7 @@ double ale::getSemiMinorRadius(json isd) {
 
 // Converts the distortion model name from the ISD (string) to the enumeration
 // type. Defaults to transverse
-ale::DistortionType ale::getDistortionModel(json isd) {
+DistortionType getDistortionModel(json isd) {
   try {
     json distoriton_subset = isd.at("optical_distortion");
 
@@ -340,10 +340,10 @@ ale::DistortionType ale::getDistortionModel(json isd) {
   return DistortionType::TRANSVERSE;
 }
 
-std::vector<double> ale::getDistortionCoeffs(json isd) {
+std::vector<double> getDistortionCoeffs(json isd) {
   std::vector<double> coefficients;
 
-  ale::DistortionType distortion = getDistortionModel(isd);
+  DistortionType distortion = getDistortionModel(isd);
 
   switch (distortion) {
   case DistortionType::TRANSVERSE: {
@@ -457,68 +457,8 @@ std::vector<double> ale::getDistortionCoeffs(json isd) {
   return coefficients;
 }
 
-std::vector<double> ale::getSunPositions(json isd) {
-  std::vector<double> positions;
-  try {
-    json jayson = isd.at("sun_position");
-    for (auto &location : jayson.at("positions")) {
-      positions.push_back(location[0].get<double>());
-      positions.push_back(location[1].get<double>());
-      positions.push_back(location[2].get<double>());
-    }
-  } catch (...) {
-    throw std::runtime_error("Could not parse the sun positions.");
-  }
-  return positions;
-}
 
-std::vector<double> ale::getSensorPositions(json isd) {
-  std::vector<double> positions;
-  try {
-    json jayson = isd.at("sensor_position");
-    for (auto &location : jayson.at("positions")) {
-      positions.push_back(location[0].get<double>());
-      positions.push_back(location[1].get<double>());
-      positions.push_back(location[2].get<double>());
-    }
-  } catch (...) {
-    throw std::runtime_error("Could not parse the sensor positions.");
-  }
-  return positions;
-}
-
-std::vector<double> ale::getSensorVelocities(json isd) {
-  std::vector<double> velocities;
-  try {
-    json jayson = isd.at("sensor_position");
-    for (auto &velocity : jayson.at("velocities")) {
-      velocities.push_back(velocity[0].get<double>());
-      velocities.push_back(velocity[1].get<double>());
-      velocities.push_back(velocity[2].get<double>());
-    }
-  } catch (...) {
-    throw std::runtime_error("Could not parse the sensor velocities.");
-  }
-  return velocities;
-}
-
-std::vector<double> ale::getSensorOrientations(json isd) {
-  std::vector<double> quaternions;
-  try {
-    for (auto &quaternion : isd.at("sensor_orientation").at("quaternions")) {
-      quaternions.push_back(quaternion[0]);
-      quaternions.push_back(quaternion[1]);
-      quaternions.push_back(quaternion[2]);
-      quaternions.push_back(quaternion[3]);
-    }
-  } catch (...) {
-    throw std::runtime_error("Could not parse the sensor orientations.");
-  }
-  return quaternions;
-}
-
-
-std::vector<double> ale::getJsonDouble1Array(json obj) {
+std::vector<double> getJsonDoubleArray(json obj) {
   std::vector<double> positions;
   try {
     for (auto &location : obj) {
@@ -531,12 +471,12 @@ std::vector<double> ale::getJsonDouble1Array(json obj) {
 }
 
 
-std::vector<Vec3d> ale::getJsonVec3dArray(json obj) {
+std::vector<Vec3d> getJsonVec3dArray(json obj) {
   std::vector<Vec3d> positions;
   try {
     for (auto &location : obj) {
       Vec3d vec(location[0].get<double>(),location[1].get<double>(), location[2].get<double>() );
-      positions.append(vec);
+      positions.push_back(vec);
     }
   } catch (...) {
     throw std::runtime_error("Could not parse the sensor positions.");
@@ -545,18 +485,35 @@ std::vector<Vec3d> ale::getJsonVec3dArray(json obj) {
 }
 
 
-ale::States getInstrumentPosition(json isd) {
+std::vector<Rotation> getJsonQuatArray(json obj) {
+  std::vector<Rotation> quats;
   try {
-    std::vector<Vec3d> positions = getJsonVec3dArray(isd.at("InstrumentPosition").at("Positions"));
-    std::vector<double> times = getJsonDouble1Array(isd.at("InstrumentPosition").at("EphemerisTimes")); 
-     
-    json frames = json.at("InstrumentPointing").at("TimeDependantFrames");
-    int reFrame = frames.at(frames.size()-1).get<int>();
+    for (auto &location : obj) {
+      Rotation vec(location[0].get<double>(),location[1].get<double>(), location[2].get<double>(), location[2].get<double>() );
+      quats.push_back(vec);
+    }
+  } catch (...) {
+    throw std::runtime_error("Could not parse the quaternion json object.");
+  }
+  return quats;
+}
 
-    bool hasVelocities = isd.at("InstrumentPosition").find("Velocities") != isd.at("InstrumentPosition").end();
+
+States getInstrumentPosition(json isd) {
+  try {
+
+    std::cout << "1" << std::endl;
+    json ipos = isd.at("instrument_position");
+    std::vector<Vec3d> positions = getJsonVec3dArray(ipos.at("positions"));
+    std::vector<double> times = getJsonDoubleArray(ipos.at("ephemeris_times")); 
+    std::cout << "2" << std::endl; 
+    int refFrame = ipos.at("reference_frame").get<int>();
+    
+    bool hasVelocities = ipos.find("velocities") != ipos.end();
+    std::cout << "3" << std::endl; 
     if (hasVelocities) {
-      std::vector<Vec3d> velocities = getJsonVec3dArray(isd.at("InstrumentPositions").at("Velocities")); 
-      States states(times, positions, velocties, refFrame);  
+      std::vector<Vec3d> velocities = getJsonVec3dArray(ipos.at("velocities")); 
+      States states(times, positions, velocities, refFrame);  
       return states;
     }
     else {
@@ -569,19 +526,16 @@ ale::States getInstrumentPosition(json isd) {
 }
 
 
-ale::States getSunPosition(json isd) {
+States getSunPosition(json isd) {
   try {
-    json sp = isd.at("SunPosition");
-    std::vector<Vec3d> positions = getJsonVec3dArray(isd.at("SunPosition").at("Positions"));
-    std::vector<double> times = getJsonDouble1Array(isd.at("SunPosition").at("EphemerisTimes")); 
-     
-    json frames = json.at("SunPointing").at("TimeDependantFrames");
-    int reFrame = frames.at(frames.size()-1).get<int>();
-
-    bool hasVelocities = isd.at("SunPosition").find("Velocities") != isd.at("SunPosition").end();
+    json spos = isd.at("sun_position");
+    std::vector<Vec3d> positions = getJsonVec3dArray(spos.at("positions"));
+    std::vector<double> times = getJsonDoubleArray(spos.at("ephemeris_times")); 
+    int refFrame = spos.at("reference_frame").get<int>();
+    bool hasVelocities = spos.find("velocities") != spos.end();
     if (hasVelocities) {
-      std::vector<Vec3d> velocities = getJsonVec3dArray(isd.at("InstrumentPositions").at("Velocities")); 
-      States states(times, positions, velocties, refFrame);  
+      std::vector<Vec3d> velocities = getJsonVec3dArray(spos.at("velocities")); 
+      States states(times, positions, velocities, refFrame);  
       return states;
     }
     else {
@@ -589,6 +543,39 @@ ale::States getSunPosition(json isd) {
       return states; 
     }
   } catch (...) {
-    throw std::runtime_error("Could not parse the instrument position");
+    throw std::runtime_error("Could not parse the sun position");
   }
+}
+
+Orientations getInstrumentPointing(json isd) { 
+  try {
+    json pointing = isd.at("instrument_pointing");
+    
+    std::vector<Rotation> rotations = getJsonQuatArray(pointing.at("quaternions"));
+    std::vector<double> times = getJsonDoubleArray(pointing.at("ephemeris_times")); 
+    std::vector<Vec3d> velocities = getJsonVec3dArray(pointing.at("angular_velocities")); 
+    
+    Orientations orientation(rotations, times, velocities);  
+    return orientation;
+  
+  } catch (...) {
+    throw std::runtime_error("Could not parse the instrument pointing");
+  } 
+}
+
+Orientations getBodyRotation(json isd) { 
+  try {
+    json bodrot = isd.at("body_rotation");
+    std::vector<Rotation> rotations = getJsonQuatArray(bodrot.at("quaternions"));
+    std::vector<double> times = getJsonDoubleArray(bodrot.at("ephemeris_times")); 
+    std::vector<Vec3d> velocities = getJsonVec3dArray(bodrot.at("angular_velocities")); 
+  
+    Orientations orientation(rotations, times, velocities);  
+    return orientation;
+  
+  } catch (...) {
+    throw std::runtime_error("Could not parse the body rotation");
+  } 
+}
+
 }

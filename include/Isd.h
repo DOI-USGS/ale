@@ -10,6 +10,7 @@
 
 #include "Rotation.h"
 #include "States.h"
+#include "Orientations.h"
 
 namespace ale {
 
@@ -62,12 +63,14 @@ namespace ale {
     json naif_keywords;
     
     interpolation interpMethod;
+    
+    Rotation const_rotation; 
 
     States inst_pos;
     States sun_pos;
 
-    Oriantations inst_orientation;
-    Orientations body_orientaion;
+    Orientations inst_pointing;
+    Orientations body_rotation;
   };
 }
 

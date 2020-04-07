@@ -2,9 +2,6 @@
 
 #include <iostream>
 #include <algorithm>
-#include <gsl/gsl_interp.h>
-#include <gsl/gsl_spline.h>
-#include <gsl/gsl_poly.h>
 #include <cmath>
 #include <float.h>
 
@@ -17,7 +14,7 @@ namespace ale {
   }
 
 
-  States::States(const std::vector<double>& ephemTimes, const std::vector<ale::Vec3d>& positions,
+  States::States(const std::vector<double>& ephemTimes, const std::vector<Vec3d>& positions,
                  int refFrame) :
     m_ephemTimes(ephemTimes), m_refFrame(refFrame) {
     // Construct State vector from position and velocity vectors
@@ -26,15 +23,15 @@ namespace ale {
       throw std::invalid_argument("Length of times must match number of positions");
     }
 
-    ale::Vec3d velocities = {0.0, 0.0, 0.0};
-    for (ale::Vec3d position : positions) {
-      m_states.push_back(ale::State(position, velocities));
+    Vec3d velocities = {0.0, 0.0, 0.0};
+    for (Vec3d position : positions) {
+      m_states.push_back(State(position, velocities));
     }
   }
 
 
-  States::States(const std::vector<double>& ephemTimes, const std::vector<ale::Vec3d>& positions,
-                 const std::vector<ale::Vec3d>& velocities, int refFrame) :
+  States::States(const std::vector<double>& ephemTimes, const std::vector<Vec3d>& positions,
+                 const std::vector<Vec3d>& velocities, int refFrame) :
     m_ephemTimes(ephemTimes), m_refFrame(refFrame) {
 
     if ((positions.size() != ephemTimes.size())||(ephemTimes.size() != velocities.size())) {
@@ -42,12 +39,12 @@ namespace ale {
     }
 
     for (int i=0; i < positions.size() ;i++) {
-      m_states.push_back(ale::State(positions[i], velocities[i]));
+      m_states.push_back(State(positions[i], velocities[i]));
     }
   }
 
 
-  States::States(const std::vector<double>& ephemTimes, const std::vector<ale::State>& states,
+  States::States(const std::vector<double>& ephemTimes, const std::vector<State>& states,
                  int refFrame) :
   m_ephemTimes(ephemTimes), m_states(states), m_refFrame(refFrame) {
     if (states.size() != ephemTimes.size()) {
@@ -59,26 +56,26 @@ namespace ale {
   States::~States() {}
 
   // Getters
-  std::vector<ale::State> States::getStates() const {
+  std::vector<State> States::getStates() const {
     return m_states;
   }
 
-  std::vector<ale::Vec3d> States::getPositions() const {
+  std::vector<Vec3d> States::getPositions() const {
     // extract positions from state vector
-    std::vector<ale::Vec3d> positions;
+    std::vector<Vec3d> positions;
 
-    for(ale::State state : m_states) {
+    for(State state : m_states) {
         positions.push_back(state.position);
     }
     return positions;
   }
 
 
-  std::vector<ale::Vec3d> States::getVelocities() const {
+  std::vector<Vec3d> States::getVelocities() const {
     // extract velocities from state vector
-    std::vector<ale::Vec3d> velocities;
+    std::vector<Vec3d> velocities;
 
-    for(ale::State state : m_states) {
+    for(State state : m_states) {
         velocities.push_back(state.velocity);
     }
     return velocities;
@@ -96,40 +93,20 @@ namespace ale {
 
 
   bool States::hasVelocity() const {
-    std::vector<ale::Vec3d> velocities = getVelocities();
-    bool allZero = std::all_of(velocities.begin(), velocities.end(), [](ale::Vec3d vec)
+    std::vector<Vec3d> velocities = getVelocities();
+    bool allZero = std::all_of(velocities.begin(), velocities.end(), [](Vec3d vec)
                                { return vec.x==0.0 && vec.y==0.0 && vec.z==0.0; });
     return !allZero;
   }
 
 
-  ale::State States::getState(double time, ale::interpolation interp) const {
-    int lowerBound = ale::interpolationIndex(m_ephemTimes, time);
-    int interpStart;
-    int interpStop;
+  State States::getState(double time, interpolation interp) const {
+    int lowerBound = interpolationIndex(m_ephemTimes, time);
+    // try to copy the surrounding 8 points as that's the most possibly needed
+    int interpStart = std::max(0, lowerBound - 3);
+    int interpStop = std::min(lowerBound + 4, (int) m_ephemTimes.size() - 1);
 
-    if (m_ephemTimes.size() <= 3) {
-      interpStart = 0;
-      interpStop = m_ephemTimes.size() - 1;
-    }
-    else if (lowerBound == 0) {
-      interpStart = lowerBound;
-      interpStop = lowerBound + 3;
-    }
-    else if (lowerBound == m_ephemTimes.size() - 1) {
-      interpStart = lowerBound - 3;
-      interpStop = lowerBound;
-    }
-    else if (lowerBound == m_ephemTimes.size() - 2) {
-      interpStart = lowerBound - 2;
-      interpStop = lowerBound + 1;
-    }
-    else {
-      interpStart = lowerBound - 1;
-      interpStop = lowerBound + 2;
-    }
-
-    ale::State state;
+    State state;
     std::vector<double> xs, ys, zs, vxs, vys, vzs, interpTimes;
 
     for (int i = interpStart; i <= interpStop; i++) {
@@ -143,7 +120,7 @@ namespace ale {
       vzs.push_back(state.velocity.z);
     }
 
-    ale::Vec3d position, velocity;
+    Vec3d position, velocity;
 
     if ( interp == LINEAR || (interp == SPLINE && !hasVelocity())) {
       position = {interpolate(xs,  interpTimes, time, interp, 0),
@@ -163,26 +140,26 @@ namespace ale {
         scaledEphemTimes.push_back(interpTimes[i] - baseTime);
       }
       double sTime = time - baseTime;
-      position.x = ale::evaluateCubicHermite(sTime, vxs, scaledEphemTimes, xs);
-      position.y = ale::evaluateCubicHermite(sTime, vys, scaledEphemTimes, ys);
-      position.z = ale::evaluateCubicHermite(sTime, vzs, scaledEphemTimes, zs);
+      position.x = evaluateCubicHermite(sTime, vxs, scaledEphemTimes, xs);
+      position.y = evaluateCubicHermite(sTime, vys, scaledEphemTimes, ys);
+      position.z = evaluateCubicHermite(sTime, vzs, scaledEphemTimes, zs);
 
-      velocity.x = ale::evaluateCubicHermiteFirstDeriv(sTime, vxs, scaledEphemTimes, xs);
-      velocity.y = ale::evaluateCubicHermiteFirstDeriv(sTime, vys, scaledEphemTimes, ys);
-      velocity.z = ale::evaluateCubicHermiteFirstDeriv(sTime, vzs, scaledEphemTimes, zs);
+      velocity.x = evaluateCubicHermiteFirstDeriv(sTime, vxs, scaledEphemTimes, xs);
+      velocity.y = evaluateCubicHermiteFirstDeriv(sTime, vys, scaledEphemTimes, ys);
+      velocity.z = evaluateCubicHermiteFirstDeriv(sTime, vzs, scaledEphemTimes, zs);
     }
-    return ale::State(position, velocity);
+    return State(position, velocity);
   }
 
 
-  ale::Vec3d States::getPosition(double time, ale::interpolation interp) const {
-    ale::State interpState = getState(time, interp);
+  Vec3d States::getPosition(double time, interpolation interp) const {
+    State interpState = getState(time, interp);
     return interpState.position;
   }
 
 
-  ale::Vec3d States::getVelocity(double time, ale::interpolation interp) const {
-    ale::State interpState = getState(time, interp);
+  Vec3d States::getVelocity(double time, interpolation interp) const {
+    State interpState = getState(time, interp);
     return interpState.velocity;
   }
 
@@ -223,7 +200,7 @@ namespace ale {
     std::vector <int> indexList = hermiteIndices(tolerance, inputIndices, baseTime, timeScale);
 
     // Update m_states and m_ephemTimes to only save the necessary indicies in the index list
-    std::vector<ale::State> tempStates;
+    std::vector<State> tempStates;
     std::vector<double> tempTimes;
 
     for(int i : indexList) {
@@ -260,9 +237,9 @@ namespace ale {
         sTime = (m_ephemTimes[line] - baseTime) / timeScale;
 
         // find the errors at each value
-        xerror = fabs(ale::evaluateCubicHermite(sTime, vx, scaledEphemTimes, x) - m_states[line].position.x);
-        yerror = fabs(ale::evaluateCubicHermite(sTime, vy, scaledEphemTimes, y) - m_states[line].position.y);
-        zerror = fabs(ale::evaluateCubicHermite(sTime, vz, scaledEphemTimes, z) - m_states[line].position.z);
+        xerror = fabs(evaluateCubicHermite(sTime, vx, scaledEphemTimes, x) - m_states[line].position.x);
+        yerror = fabs(evaluateCubicHermite(sTime, vy, scaledEphemTimes, y) - m_states[line].position.y);
+        zerror = fabs(evaluateCubicHermite(sTime, vz, scaledEphemTimes, z) - m_states[line].position.z);
 
         if(xerror > tolerance || yerror > tolerance || zerror > tolerance) {
           // if any error is greater than tolerance, no need to continue looking, break

@@ -4,16 +4,16 @@
 #include <string>
 #include <nlohmann/json.hpp>
 
-#include "ale.h"
+#include "InterpUtils.h"
 #include "Distortion.h"
 #include "States.h"
+#include "Orientations.h"
+#include "Vectors.h"
 
 namespace ale {
   using json = nlohmann::json;
 
-  std::vector<Vec3d> ale::getJsonVec3dArray(json obj);
-  
-  interpolation ale::getInterpolationMethod(json isd);
+  interpolation getInterpolationMethod(json isd);
   double getMinHeight(nlohmann::json isd);
   std::string getSensorModelName(json isd);
   std::string getImageId(json isd);
@@ -42,13 +42,16 @@ namespace ale {
   double getSemiMinorRadius(json isd);
   DistortionType getDistortionModel(json isd);
   std::vector<double> getDistortionCoeffs(json isd);
-  std::vector<double> getSunPositions(json isd);
-  std::vector<double> getSensorPositions(json isd);
-  std::vector<double> getSensorVelocities(json isd);
-  std::vector<double> getSensorOrientations(json isd);
+  
+  std::vector<double> getJsonDoubleArray(json obj);
+  std::vector<Vec3d> getJsonVec3dArray(json obj);
+  std::vector<Rotation> getJsonQuatArray(json obj);
 
-  States getIntrumentPosition(json isd);
+  States getInstrumentPosition(json isd);
   States getSunPosition(json isd);
+
+  Orientations getBodyRotation(json isd);
+  Orientations getInstrumentPointing(json isd);
 }
 
 #endif
