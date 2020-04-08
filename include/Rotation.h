@@ -19,7 +19,7 @@ namespace ale {
        */
       Rotation();
       /**
-       * Construct a rotatiorotationsquaternrotations*
+       * Construct a rotation from a quaternion
        * @param w The scalar component of the quaternion.
        * @param x The x value of the vector component of the quaternion.
        * @param y The y value of the vector component of the quaternion.

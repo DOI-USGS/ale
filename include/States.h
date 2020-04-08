@@ -80,8 +80,7 @@ class States {
    * Perform a cache reduction. After running this, getStates(), getPositions(),
    * and getVelocities() will return vectors of reduced size, and getState(),
    * getPosition(), and getVelocity() will
-   * returns values interpolated over the reduced cache using a cubic hermite splineGSW#|
-   * 1111111
+   * returns values interpolated over the reduced cache using a cubic hermite spline
    *
    * Adapted from Isis::SpicePosition::reduceCache().
    *
@@ -106,7 +105,7 @@ class States {
    */
     std::vector<int> hermiteIndices(double tolerance, std::vector <int> indexList,
                                     double baseTime, double timeScale);
-    std::vector<State> m_states; //! Represent at states internally to keep pos, vel together
+    std::vector<State> m_states; //! Represent as states internally to keep pos, vel together
     std::vector<double> m_ephemTimes; //! Time in seconds
     int m_refFrame;  //! Naif IDs for reference frames
   };

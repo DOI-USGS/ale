@@ -260,8 +260,8 @@ TEST(Isd, GetInstrumentPointing) {
   ale::json pointing  = {
     {"instrument_pointing",{
        {"ephemeris_times", {300, 600}},
-       {"quaternions", {{1,1,1,1}, {2,2,2,2}}},
-       {"angular_velocities", {{1,1,1}, {2,2,2}}},
+       {"quaternions", {{1,2,3,4}, {4,3,2,1}}},
+       {"angular_velocities", {{11,12,13}, {21,22,23}}},
        {"reference_frame", 2},
        {"time_dependent_frames", {1,2,3}},
        {"constant_frames", {4,5,6}},
@@ -287,23 +287,23 @@ TEST(Isd, GetInstrumentPointing) {
   ASSERT_EQ(timeDepFrames[1], 2);
   ASSERT_EQ(timeDepFrames[2], 3);
 
-  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[0], .5);
-  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[1], .5);
-  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[2], .5);
-  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[3], .5);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[0], 0.18257418583505536);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[1], 0.36514837167011072);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[2], 0.54772255750516607);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[3], 0.73029674334022143);
  
-  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[0], .5);
-  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[1], .5);
-  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[2], .5);
-  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[3], .5);
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[0], 0.73029674334022143);
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[1], 0.54772255750516607);
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[2], 0.36514837167011072);
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[3], 0.18257418583505536);
    
-  ASSERT_DOUBLE_EQ(velocities[0].x, 1);
-  ASSERT_DOUBLE_EQ(velocities[0].y, 1);
-  ASSERT_DOUBLE_EQ(velocities[0].z, 1); 
+  ASSERT_DOUBLE_EQ(velocities[0].x, 11);
+  ASSERT_DOUBLE_EQ(velocities[0].y, 12);
+  ASSERT_DOUBLE_EQ(velocities[0].z, 13); 
   
-  ASSERT_DOUBLE_EQ(velocities[1].x, 2);
-  ASSERT_DOUBLE_EQ(velocities[1].y, 2);
-  ASSERT_DOUBLE_EQ(velocities[1].z, 2);
+  ASSERT_DOUBLE_EQ(velocities[1].x, 21);
+  ASSERT_DOUBLE_EQ(velocities[1].y, 22);
+  ASSERT_DOUBLE_EQ(velocities[1].z, 23);
   
   std::vector<double> rotmat = instPointing.getConstantRotation().toQuaternion();
   ASSERT_DOUBLE_EQ(rotmat[0], 0);
@@ -331,8 +331,8 @@ TEST(Isd, GetBodyRotation) {
   ale::json br = {
     {"body_rotation",{
        {"ephemeris_times", {300, 600}},
-       {"quaternions", {{1,1,1,1}, {2,2,2,2}}},
-       {"angular_velocities", {{1,1,1}, {2,2,2}}},
+       {"quaternions", {{1,2,3,4}, {4,3,2,1}}},
+       {"angular_velocities", {{11,12,13}, {21,22,23}}},
        {"reference_frame", 2},
        {"time_dependent_frames", {1,2,3}},
        {"constant_frames", {4,5,6}},
@@ -358,23 +358,23 @@ TEST(Isd, GetBodyRotation) {
   ASSERT_EQ(timeDepFrames[1], 2);
   ASSERT_EQ(timeDepFrames[2], 3);
 
-  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[0], .5);
-  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[1], .5);
-  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[2], .5);
-  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[3], .5);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[0], 0.18257418583505536);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[1], 0.36514837167011072);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[2], 0.54772255750516607);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[3], 0.73029674334022143);
  
-  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[0], .5);
-  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[1], .5);
-  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[2], .5);
-  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[3], .5);
-   
-  ASSERT_DOUBLE_EQ(velocities[0].x, 1);
-  ASSERT_DOUBLE_EQ(velocities[0].y, 1);
-  ASSERT_DOUBLE_EQ(velocities[0].z, 1); 
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[0], 0.73029674334022143);
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[1], 0.54772255750516607);
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[2], 0.36514837167011072);
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[3], 0.18257418583505536);
   
-  ASSERT_DOUBLE_EQ(velocities[1].x, 2);
-  ASSERT_DOUBLE_EQ(velocities[1].y, 2);
-  ASSERT_DOUBLE_EQ(velocities[1].z, 2);
+  ASSERT_DOUBLE_EQ(velocities[0].x, 11);
+  ASSERT_DOUBLE_EQ(velocities[0].y, 12);
+  ASSERT_DOUBLE_EQ(velocities[0].z, 13); 
+  
+  ASSERT_DOUBLE_EQ(velocities[1].x, 21);
+  ASSERT_DOUBLE_EQ(velocities[1].y, 22);
+  ASSERT_DOUBLE_EQ(velocities[1].z, 23);
   
   std::vector<double> rotmat = bodyRot.getConstantRotation().toQuaternion();
   ASSERT_DOUBLE_EQ(rotmat[0], 0);

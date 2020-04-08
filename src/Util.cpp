@@ -2,12 +2,11 @@
 #include <algorithm>
 #include <iostream>
 
-#include "ale.h"
 #include "Util.h"
 
 namespace ale {
-bool iequals(const std::string& a, const std::string& b)
-{
+
+bool iequals(const std::string& a, const std::string& b) {
     return std::equal(a.begin(), a.end(),
                       b.begin(),
                       [](char a, char b) {
@@ -67,7 +66,7 @@ std::string getPlatformName(json isd) {
   return name;
 }
 
-std::string getLogFile(nlohmann::json isd) {
+std::string getLogFile(json isd) {
   std::string file = "";
   try {
     file = isd.at("log_file");
@@ -475,7 +474,7 @@ std::vector<Rotation> getJsonQuatArray(json obj) {
   std::vector<Rotation> quats;
   try {
     for (auto &location : obj) {
-      Rotation vec(location[0].get<double>(),location[1].get<double>(), location[2].get<double>(), location[2].get<double>() );
+      Rotation vec(location[0].get<double>(),location[1].get<double>(), location[2].get<double>(), location[3].get<double>() );
       quats.push_back(vec);
     }
   } catch (...) {
@@ -493,15 +492,13 @@ States getInstrumentPosition(json isd) {
     int refFrame = ipos.at("reference_frame").get<int>();
     
     bool hasVelocities = ipos.find("velocities") != ipos.end();
+    
     if (hasVelocities) {
       std::vector<Vec3d> velocities = getJsonVec3dArray(ipos.at("velocities")); 
-      States states(times, positions, velocities, refFrame);  
-      return states;
+      return States(times, positions, velocities, refFrame);  
     }
-    else {
-      States states(times, positions, refFrame);
-      return states; 
-    }
+    
+    return States(times, positions, refFrame);
   } catch (...) {
     throw std::runtime_error("Could not parse the instrument position");
   }
@@ -515,15 +512,14 @@ States getSunPosition(json isd) {
     std::vector<double> times = getJsonArray<double>(spos.at("ephemeris_times")); 
     int refFrame = spos.at("reference_frame").get<int>();
     bool hasVelocities = spos.find("velocities") != spos.end();
+    
     if (hasVelocities) {
       std::vector<Vec3d> velocities = getJsonVec3dArray(spos.at("velocities")); 
-      States states(times, positions, velocities, refFrame);  
-      return states;
+      return States(times, positions, velocities, refFrame);  
     }
-    else {
-      States states(times, positions, refFrame);
-      return states; 
-    }
+    
+    return States(times, positions, refFrame);
+  
   } catch (...) {
     throw std::runtime_error("Could not parse the sun position");
   }
