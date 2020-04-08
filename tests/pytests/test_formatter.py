@@ -298,53 +298,53 @@ def test_interpolation_method(test_line_scan_driver):
 
 def test_camera_version(driver):
     meta_data = formatter.to_isd(driver)
-    assert meta_data['IsisCameraVersion'] == 1
+    assert meta_data['isis_camera_version'] == 1
 
 def test_instrument_pointing(driver):
     meta_data = formatter.to_isd(driver)
-    pointing = meta_data['InstrumentPointing']
-    assert pointing['TimeDependentFrames'] == [1000, 1]
-    assert pointing['ConstantFrames'] == [1010, 1000]
-    np.testing.assert_equal(pointing['ConstantRotation'], np.array([1., 0., 0., 0., 1., 0., 0., 0., 1.]))
-    assert pointing['CkTableStartTime'] == 800
-    assert pointing['CkTableEndTime'] == 900
-    assert pointing['CkTableOriginalSize'] == 2
-    np.testing.assert_equal(pointing['EphemerisTimes'], np.array([800, 900]))
-    np.testing.assert_equal(pointing['Quaternions'], np.array([[-1, 0, 0, 0], [-1, 0, 0, 0]]))
+    pointing = meta_data['instrument_pointing']
+    assert pointing['time_dependent_frames'] == [1000, 1]
+    assert pointing['constant_frames'] == [1010, 1000]
+    np.testing.assert_equal(pointing['constant_rotation'], np.array([1., 0., 0., 0., 1., 0., 0., 0., 1.]))
+    assert pointing['ck_table_start_time'] == 800
+    assert pointing['ck_table_end_time'] == 900
+    assert pointing['ck_table_original_size'] == 2
+    np.testing.assert_equal(pointing['ephemeris_times'], np.array([800, 900]))
+    np.testing.assert_equal(pointing['quaternions'], np.array([[-1, 0, 0, 0], [-1, 0, 0, 0]]))
 
 def test_instrument_position(driver):
     meta_data = formatter.to_isd(driver)
-    position = meta_data['InstrumentPosition']
-    assert position['SpkTableStartTime'] == 850
-    assert position['SpkTableEndTime'] == 850
-    assert position['SpkTableOriginalSize'] == 1
-    np.testing.assert_equal(position['EphemerisTimes'], np.array([850]))
-    np.testing.assert_equal(position['Positions'], np.array([[0, 0.001, 0.002]]))
-    np.testing.assert_equal(position['Velocities'], np.array([[0, -0.001, -0.002]]))
+    position = meta_data['instrument_position']
+    assert position['spk_table_start_time'] == 850
+    assert position['spk_table_end_time'] == 850
+    assert position['spk_table_original_size'] == 1
+    np.testing.assert_equal(position['ephemeris_times'], np.array([850]))
+    np.testing.assert_equal(position['positions'], np.array([[0, 0.001, 0.002]]))
+    np.testing.assert_equal(position['velocities'], np.array([[0, -0.001, -0.002]]))
 
 def test_body_rotation(driver):
     meta_data = formatter.to_isd(driver)
-    rotation = meta_data['BodyRotation']
-    assert rotation['TimeDependentFrames'] == [100, 1]
-    assert rotation['CkTableStartTime'] == 800
-    assert rotation['CkTableEndTime'] == 900
-    assert rotation['CkTableOriginalSize'] == 2
-    np.testing.assert_equal(rotation['EphemerisTimes'], np.array([800, 900]))
-    np.testing.assert_equal(rotation['Quaternions'], np.array([[-1, 0, 0, 0], [-1, 0, 0, 0]]))
+    rotation = meta_data['body_rotation']
+    assert rotation['time_dependent_frames'] == [100, 1]
+    assert rotation['ck_table_start_time'] == 800
+    assert rotation['ck_table_end_time'] == 900
+    assert rotation['ck_table_original_size'] == 2
+    np.testing.assert_equal(rotation['ephemeris_times'], np.array([800, 900]))
+    np.testing.assert_equal(rotation['quaternions'], np.array([[-1, 0, 0, 0], [-1, 0, 0, 0]]))
 
 def test_sun_position(driver):
     meta_data = formatter.to_isd(driver)
-    position = meta_data['SunPosition']
-    assert position['SpkTableStartTime'] == 850
-    assert position['SpkTableEndTime'] == 850
-    assert position['SpkTableOriginalSize'] == 1
-    np.testing.assert_equal(position['EphemerisTimes'], np.array([850]))
-    np.testing.assert_equal(position['Positions'], np.array([[0.0, 0.001, 0.002]]))
-    np.testing.assert_equal(position['Velocities'], np.array([[0.0, -0.001, -0.002]]))
+    position = meta_data['sun_position']
+    assert position['spk_table_start_time'] == 850
+    assert position['spk_table_end_time'] == 850
+    assert position['spk_table_original_size'] == 1
+    np.testing.assert_equal(position['ephemeris_times'], np.array([850]))
+    np.testing.assert_equal(position['positions'], np.array([[0.0, 0.001, 0.002]]))
+    np.testing.assert_equal(position['velocities'], np.array([[0.0, -0.001, -0.002]]))
 
 def test_naif_keywords(driver):
     meta_data = formatter.to_isd(driver)
-    assert meta_data['NaifKeywords'] == {
+    assert meta_data['naif_keywords'] == {
         'keyword_1' : 0,
         'keyword_2' : 'test'
     }

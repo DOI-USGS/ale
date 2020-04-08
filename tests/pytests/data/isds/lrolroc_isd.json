@@ -1,6 +1,6 @@
 {
-  "IsisCameraVersion": 2,
-  "NaifKeywords": {
+  "isis_camera_version": 2,
+  "naif_keywords": {
     "BODY301_RADII": [
       1737.4,
       1737.4,
@@ -191,16 +191,17 @@
     "semiminor": 1737.4,
     "unit": "km"
   },
-  "InstrumentPointing": {
-    "TimeDependentFrames": [
+  "instrument_pointing": {
+    "reference_frame" : 1, 
+    "time_dependent_frames": [
       -85600,
       -85000,
       1
     ],
-    "CkTableStartTime": 302228504.36824864,
-    "CkTableEndTime": 302228504.7816205,
-    "CkTableOriginalSize": 6,
-    "EphemerisTimes": [
+    "ck_table_start_time": 302228504.36824864,
+    "ck_table_end_time": 302228504.7816205,
+    "ck_table_original_size": 6,
+    "ephemeris_times": [
       302228504.36824864,
       302228504.450923,
       302228504.5335974,
@@ -208,7 +209,7 @@
       302228504.6989461,
       302228504.7816205
     ],
-    "Quaternions": [
+    "quaternions": [
       [
         0.22984449090659237,
         0.8562360121526155,
@@ -246,7 +247,7 @@
         0.4625562996626938
       ]
     ],
-    "AngularVelocity": [
+    "angular_velocity": [
       [
         0.00015796288676771882,
         -0.0007643782570599635,
@@ -278,10 +279,10 @@
         -0.00032321391571062645
       ]
     ],
-    "ConstantFrames": [
+    "constant_frames": [
       -85600
     ],
-    "ConstantRotation": [
+    "constant_rotation": [
       1.0,
       0.0,
       0.0,
@@ -293,15 +294,16 @@
       1.0
     ]
   },
-  "BodyRotation": {
-    "TimeDependentFrames": [
+  "body_rotation": {
+    "reference_frame" : 1, 
+    "time_dependent_frames": [
       31006,
       1
     ],
-    "CkTableStartTime": 302228504.36824864,
-    "CkTableEndTime": 302228504.7816205,
-    "CkTableOriginalSize": 6,
-    "EphemerisTimes": [
+    "ck_table_start_time": 302228504.36824864,
+    "ck_table_end_time": 302228504.7816205,
+    "ck_table_original_size": 6,
+    "ephemeris_times": [
       302228504.36824864,
       302228504.450923,
       302228504.5335974,
@@ -309,7 +311,7 @@
       302228504.6989461,
       302228504.7816205
     ],
-    "Quaternions": [
+    "quaternions": [
       [
         -0.8896294526439446,
         0.18337484217069425,
@@ -347,7 +349,7 @@
         0.41209238745406124
       ]
     ],
-    "AngularVelocity": [
+    "angular_velocity": [
       [
         6.23828510009553e-08,
         -1.0257490014652093e-06,
@@ -379,12 +381,12 @@
         2.4553540362574277e-06
       ]
     ],
-    "ConstantFrames": [
+    "constant_frames": [
       31001,
       31007,
       31006
     ],
-    "ConstantRotation": [
+    "constant_rotation": [
       0.9999998732547144,
       -0.00032928542237557133,
       0.00038086961867138755,
@@ -396,11 +398,12 @@
       0.9999999274681067
     ]
   },
-  "InstrumentPosition": {
-    "SpkTableStartTime": 302228504.36824864,
-    "SpkTableEndTime": 302228504.7816205,
-    "SpkTableOriginalSize": 6,
-    "EphemerisTimes": [
+  "instrument_position": {
+    "reference_frame" : 1, 
+    "spk_table_start_time": 302228504.36824864,
+    "spk_table_end_time": 302228504.7816205,
+    "spk_table_original_size": 6,
+    "ephemeris_times": [
       302228504.36824864,
       302228504.450923,
       302228504.5335974,
@@ -408,7 +411,7 @@
       302228504.6989461,
       302228504.7816205
     ],
-    "Positions": [
+    "positions": [
       [
         -1516.1039882048947,
         -668.6745734893002,
@@ -440,7 +443,7 @@
         901.6112334649276
       ]
     ],
-    "Velocities": [
+    "velocities": [
       [
         -0.8710817993164441,
         0.3913754105818205,
@@ -473,21 +476,22 @@
       ]
     ]
   },
-  "SunPosition": {
-    "SpkTableStartTime": 302228504.5749346,
-    "SpkTableEndTime": 302228504.5749346,
-    "SpkTableOriginalSize": 1,
-    "EphemerisTimes": [
+  "sun_position": {
+    "reference_frame" : 1, 
+    "spk_table_start_time": 302228504.5749346,
+    "spk_table_end_time": 302228504.5749346,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
       302228504.5749346
     ],
-    "Positions": [
+    "positions": [
       [
         -91885596.62561405,
         111066639.06681778,
         48186230.75049895
       ]
     ],
-    "Velocities": [
+    "velocities": [
       [
         -23.97582426247181,
         -15.920790540011309,
