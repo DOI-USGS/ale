@@ -7,8 +7,8 @@
 
 namespace ale {
 
-   // Empty constructor
-   States::States() : m_refFrame(0) {
+  // Empty constructor
+  States::States() : m_refFrame(0) {
     m_states = {};
     m_ephemTimes = {};
   }
