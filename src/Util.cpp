@@ -4,6 +4,8 @@
 
 #include "Util.h"
 
+using json = nlohmann::json;
+
 namespace ale {
 
 bool iequals(const std::string& a, const std::string& b) {
@@ -122,20 +124,20 @@ PositionInterpolation getInterpolationMethod(json isd) {
   std::string interpMethod = "linear";
   try {
     interpMethod = isd.at("interpolation_method");
-     
+
     if (iequals(interpMethod, "linear")) {
       return PositionInterpolation::LINEAR;
     }
-    else if (iequals(interpMethod, "spline")){ 
+    else if (iequals(interpMethod, "spline")){
       return PositionInterpolation::SPLINE;
-    } 
+    }
     else if (iequals(interpMethod, "lagrange")) {
       return PositionInterpolation::LAGRANGE;
     }
   } catch (...) {
     throw std::runtime_error("Could not parse the interpolation method.");
   }
-  
+
   return PositionInterpolation::LINEAR;
 }
 
@@ -488,16 +490,16 @@ States getInstrumentPosition(json isd) {
   try {
     json ipos = isd.at("instrument_position");
     std::vector<Vec3d> positions = getJsonVec3dArray(ipos.at("positions"));
-    std::vector<double> times = getJsonArray<double>(ipos.at("ephemeris_times")); 
+    std::vector<double> times = getJsonArray<double>(ipos.at("ephemeris_times"));
     int refFrame = ipos.at("reference_frame").get<int>();
-    
+
     bool hasVelocities = ipos.find("velocities") != ipos.end();
-    
+
     if (hasVelocities) {
-      std::vector<Vec3d> velocities = getJsonVec3dArray(ipos.at("velocities")); 
-      return States(times, positions, velocities, refFrame);  
+      std::vector<Vec3d> velocities = getJsonVec3dArray(ipos.at("velocities"));
+      return States(times, positions, velocities, refFrame);
     }
-    
+
     return States(times, positions, refFrame);
   } catch (...) {
     throw std::runtime_error("Could not parse the instrument position");
@@ -509,37 +511,37 @@ States getSunPosition(json isd) {
   try {
     json spos = isd.at("sun_position");
     std::vector<Vec3d> positions = getJsonVec3dArray(spos.at("positions"));
-    std::vector<double> times = getJsonArray<double>(spos.at("ephemeris_times")); 
+    std::vector<double> times = getJsonArray<double>(spos.at("ephemeris_times"));
     int refFrame = spos.at("reference_frame").get<int>();
     bool hasVelocities = spos.find("velocities") != spos.end();
-    
+
     if (hasVelocities) {
-      std::vector<Vec3d> velocities = getJsonVec3dArray(spos.at("velocities")); 
-      return States(times, positions, velocities, refFrame);  
+      std::vector<Vec3d> velocities = getJsonVec3dArray(spos.at("velocities"));
+      return States(times, positions, velocities, refFrame);
     }
-    
+
     return States(times, positions, refFrame);
-  
+
   } catch (...) {
     throw std::runtime_error("Could not parse the sun position");
   }
 }
 
-Orientations getInstrumentPointing(json isd) { 
+Orientations getInstrumentPointing(json isd) {
   try {
     json pointing = isd.at("instrument_pointing");
-    
+
     std::vector<Rotation> rotations = getJsonQuatArray(pointing.at("quaternions"));
-    std::vector<double> times = getJsonArray<double>(pointing.at("ephemeris_times")); 
+    std::vector<double> times = getJsonArray<double>(pointing.at("ephemeris_times"));
     std::vector<Vec3d> velocities = getJsonVec3dArray(pointing.at("angular_velocities"));
-    int refFrame = pointing.at("reference_frame").get<int>(); 
-    
+    int refFrame = pointing.at("reference_frame").get<int>();
+
     std::vector<int> constFrames;
     if (pointing.find("constant_frames") != pointing.end()){
       constFrames  = getJsonArray<int>(pointing.at("constant_frames"));
     }
-    
-    std::vector<int> timeDepFrames; 
+
+    std::vector<int> timeDepFrames;
     if (pointing.find("time_dependent_frames") != pointing.end()){
       timeDepFrames = getJsonArray<int>(pointing.at("time_dependent_frames"));
     }
@@ -547,34 +549,34 @@ Orientations getInstrumentPointing(json isd) {
     std::vector<double> rotArray = {1,0,0,0,1,0,0,0,1};
     if (pointing.find("time_dependent_frames") != pointing.end()){
       rotArray = getJsonArray<double>(pointing.at("constant_rotation"));
-    } 
+    }
 
     Rotation constRot(rotArray);
 
-    Orientations orientation(rotations, times, velocities, refFrame, constRot, constFrames, timeDepFrames);  
-    
+    Orientations orientation(rotations, times, velocities, refFrame, constRot, constFrames, timeDepFrames);
+
     return orientation;
-  
+
   } catch (...) {
     throw std::runtime_error("Could not parse the instrument pointing");
-  } 
+  }
 }
 
-Orientations getBodyRotation(json isd) { 
+Orientations getBodyRotation(json isd) {
   try {
     json bodrot = isd.at("body_rotation");
     std::vector<Rotation> rotations = getJsonQuatArray(bodrot.at("quaternions"));
-    std::vector<double> times = getJsonArray<double>(bodrot.at("ephemeris_times")); 
-    std::vector<Vec3d> velocities = getJsonVec3dArray(bodrot.at("angular_velocities")); 
-   
-    int refFrame = bodrot.at("reference_frame").get<int>(); 
-    
+    std::vector<double> times = getJsonArray<double>(bodrot.at("ephemeris_times"));
+    std::vector<Vec3d> velocities = getJsonVec3dArray(bodrot.at("angular_velocities"));
+
+    int refFrame = bodrot.at("reference_frame").get<int>();
+
     std::vector<int> constFrames;
     if (bodrot.find("constant_frames") != bodrot.end()){
       constFrames  = getJsonArray<int>(bodrot.at("constant_frames"));
     }
-    
-    std::vector<int> timeDepFrames; 
+
+    std::vector<int> timeDepFrames;
     if (bodrot.find("time_dependent_frames") != bodrot.end()){
       timeDepFrames = getJsonArray<int>(bodrot.at("time_dependent_frames"));
     }
@@ -582,16 +584,16 @@ Orientations getBodyRotation(json isd) {
     std::vector<double> rotArray = {1,0,0,0,1,0,0,0,1};
     if (bodrot.find("constant_rotation") != bodrot.end()){
       rotArray = getJsonArray<double>(bodrot.at("constant_rotation"));
-    } 
+    }
 
     Rotation constRot(rotArray);
 
-    Orientations orientation(rotations, times, velocities, refFrame, constRot, constFrames, timeDepFrames);  
+    Orientations orientation(rotations, times, velocities, refFrame, constRot, constFrames, timeDepFrames);
     return orientation;
-  
+
   } catch (...) {
     throw std::runtime_error("Could not parse the body rotation");
-  } 
+  }
 }
 
 }
