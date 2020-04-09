@@ -57,8 +57,8 @@ target_link_libraries(ale
                       nlohmann_json::nlohmann_json)
 
 # Optional build tests
-option (BUILD_TESTS "Build tests" ON)
-if(BUILD_TESTS)
+option (ALE_BUILD_TESTS "Build tests" ON)
+if(ALE_BUILD_TESTS)
     include(cmake/gtest.cmake)
     include(GoogleTest)
     include(CTest)
