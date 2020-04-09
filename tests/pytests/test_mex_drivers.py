@@ -31,7 +31,7 @@ def test_mex_src_load(test_mex_src_kernels):
     compare_dict = get_isd("mexsrc")
     isd_str = ale.loads(label_file, props={'kernels': test_mex_src_kernels}, verbose=True)
     isd_obj = json.loads(isd_str)
-    #print(json.dumps(isd_obj, indent=2))
+    print(json.dumps(isd_obj, indent=2))
     assert compare_dicts(isd_obj, compare_dict) == []
 
 @pytest.mark.parametrize("label", ('isis3', 'pds3'))
@@ -56,7 +56,7 @@ def test_mex_hrsc_load(label, test_mex_hrsc_kernels):
         binary_exposure_durations.return_value = [0.012800790786743165, 0.012800790786743165, 0.013227428436279297]
         binary_lines.return_value = [0.5, 1.5, 15086.5]
 
-        isd_str = ale.loads(label_file, props={'kernels': test_mex_hrsc_kernels}, verbose=True, formatter='isis') # ISIS3 input ONLY WORKS WITH ISIS FORMATTER
+        isd_str = ale.loads(label_file, props={'kernels': test_mex_hrsc_kernels}, verbose=True) # ISIS3 input ONLY WORKS WITH ISIS FORMATTER
         isd_obj = json.loads(isd_str)
         print(json.dumps(isd_obj, indent=2))
         compare_dict = get_isd("mexhrsc")
