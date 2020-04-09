@@ -69,8 +69,8 @@ target_link_libraries(ale PRIVATE ${ALE_PRIVATE_LINKS}
                           PUBLIC ${ALE_PUBLIC_LINKS})
 
 # Optional build tests
-option (BUILD_TESTS "Build tests" ON)
-if(BUILD_TESTS)
+option (ALE_BUILD_TESTS "Build tests" ON)
+if(ALE_BUILD_TESTS)
     include(cmake/gtest.cmake)
     include(GoogleTest)
     include(CTest)

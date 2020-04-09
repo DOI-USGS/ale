@@ -5,11 +5,13 @@
 #include <vector>
 #include <map>
 
-#include "Util.h"
+#include <nlohmann/json.hpp>
+
 #include "Distortion.h"
 
-//#include "Rotation.h"
-//#include "State.h"
+#include "Rotation.h"
+#include "States.h"
+#include "Orientations.h"
 
 namespace ale {
 
@@ -24,7 +26,7 @@ namespace ale {
     std::string name_platform;
     std::string image_id;
     std::string name_sensor;
-
+    
     double semi_major;
     double semi_minor;
 
@@ -59,19 +61,17 @@ namespace ale {
     double starting_ephemeris_time;
     double center_ephemeris_time;
 
-    double t0_ephemeris_time;
-    double dt_ephemeris_time;
-
-    double t0_quaternions;
-    double dt_quaternions;
-
     json naif_keywords;
+    
+    PositionInterpolation interpMethod;
+    
+    Rotation const_rotation; 
 
-    //Positions sensor_pos;
-    //Positions sun_pos;
+    States inst_pos;
+    States sun_pos;
 
-    //Rotation sensor_orientation;
-    //Rotation body_orientaion;
+    Orientations inst_pointing;
+    Orientations body_rotation;
   };
 }
 

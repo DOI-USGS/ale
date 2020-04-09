@@ -6,6 +6,7 @@
 
 #include "Isd.h"
 #include "Util.h"
+#include "Vectors.h"
 
 void ASSERT_DOUBLE_VECTOR_EQ(std::vector<double> v1, std::vector<double> v2) {
   ASSERT_EQ(v1.size(), v2.size()) << "The two input vectors are different in size";
@@ -29,10 +30,11 @@ void ASSERT_DOUBLE_2D_VECTOR_EQ(std::vector<std::vector<double>> v1, std::vector
 }
 
 TEST(Isd, Constructor) {
-  std::string json_str = "{\"image_identifier\":\"TEST_IMAGE\",\"sensor_position\":{\"ephemeris_times\":[297088762.24158406,297088762.3917441,297088762.5419041,297088762.69206405,297088762.84222406,297088762.9923841],\"positions\":[[-1885.29806756,913.1652236,-2961.966828],[-1885.59280128,912.7436266,-2961.91056824],[-1885.88749707,912.32201117,-2961.85424884],[-1886.18215477,911.90037749,-2961.79786985],[-1886.47677475,911.47872522,-2961.7414312],[-1886.77135665,911.05705456,-2961.68493293]],\"velocities\":[[-1.9629237646703683,-2.80759072221274,0.37446657801485306],[-1.9626712192798401,-2.807713482051373,0.3748636774173111],[-1.9624186346660286,-2.807836185534424,0.3752607691067297],[-1.9621660109346446,-2.8079588326107823,0.37565785291714804],[-1.9619133478903363,-2.8080814233753033,0.37605492915558875],[-1.961660645638678,-2.8082039577768683,0.37645199765665144]],\"position_units\":\"KM\",\"time_units\":\"S\",\"reference_frame\":1},\"sun_position\":{\"ephemeris_times\":[297088762.24158406,297088762.3917441,297088762.5419041,297088762.69206405,297088762.84222406,297088762.9923841],\"positions\":[[-1885.29806756,913.1652236,-2961.966828]],\"velocities\":[[-1.9629237646703683,-2.80759072221274,0.37446657801485306]],\"position_units\":\"KM\",\"time_units\":\"S\",\"reference_frame\":1},\"sensor_orientation\":{\"time_dependent_framess\":[-74000,-74900,1],\"constant_frames\":[-74021,-74020,-74699,-74690,-74000],\"reference_frame\":1,\"constant_rotation\":[0.9999995608798441,-1.51960241928035e-05,0.0009370214510594064,1.5276552075356694e-05,0.9999999961910578,-8.593317911879532e-05,-0.000937020141647677,8.594745584079714e-05,0.9999995573030465],\"ephemeris_times\":[297088762.24158406,297088762.3917441,297088762.5419041,297088762.69206405,297088762.84222406,297088762.9923841],\"quaternions\":[[0.42061125,0.18606223,-0.23980124,0.85496338],[0.42062261,0.18612356,-0.23976951,0.85495335],[0.42063547,0.18618438,-0.23973759,0.85494273],[0.42064763,0.18624551,-0.2397057,0.85493237],[0.42065923,0.18630667,-0.23967382,0.85492228],[0.42067144,0.18636687,-0.23964185,0.85491211]],\"angular_velocities\":[[-0.0006409728984903079,0.0005054077299115119,0.0004718267948468069],[-0.0006410700774431097,0.0005044862657976017,0.0004731836236807216],[-0.0006408186407087456,0.0004992170698116158,0.0004802237192760833],[-0.0006363961683672021,0.0004989647975959612,0.00047654664046286975],[-0.0006376443791903504,0.0004996117504290811,0.00047678850931380653],[-0.0006404093657132724,0.0005028749658176146,0.0004805228583087444]]},\"body_rotation\":{\"time_dependent_frames\":[10014,1],\"reference_frame\":1,\"ephemeris_times\":[297088762.24158406,297088762.3917441,297088762.5419041,297088762.69206405,297088762.84222406,297088762.9923841],\"quaternions\":[[-0.8371209459443085,0.2996928944391797,0.10720760458181891,0.4448811306448063],[-0.8371185783490869,0.2996934649760026,0.1072060096645597,0.4448855856569007],[-0.8371162107293473,0.2996940355045328,0.10720441474371896,0.44489004065791765],[-0.8371138430875174,0.2996946060241849,0.1072028198209324,0.44489449564328926],[-0.8371114754203602,0.2996951765357392,0.10720122489401934,0.44489895061910595],[-0.8371091077303039,0.29969574703861046,0.10719962996461516,0.4449034055807993]],\"angular_velocities\":[[3.16238646979841e-05,-2.880432898124293e-05,5.6520131658726165e-05],[3.1623864697983686e-05,-2.880432898124763e-05,5.652013165872402e-05],[3.162386469798325e-05,-2.880432898125237e-05,5.652013165872185e-05],[3.162386469798283e-05,-2.880432898125708e-05,5.6520131658719694e-05],[3.1623864697982405e-05,-2.8804328981261782e-05,5.6520131658717505e-05],[3.162386469798195e-05,-2.88043289812665e-05,5.652013165871536e-05]]},\"radii\":{\"semimajor\":3396.19,\"semiminor\":3376.2,\"unit\":\"km\"},\"detector_sample_summing\":1,\"detector_line_summing\":1,\"focal_length_model\":{\"focal_length\":352.9271664},\"detector_center\":{\"line\":0.430442527,\"sample\":2542.96099},\"starting_detector_line\":0,\"starting_detector_sample\":0,\"focal2pixel_lines\":[0.0,142.85714285714,0.0],\"focal2pixel_samples\":[0.0,0.0,142.85714285714],\"optical_distortion\":{\"radial\":{\"coefficients\":[-0.0073433925920054505,2.8375878636241697e-05,1.2841989124027099e-08]}},\"image_lines\":400,\"image_samples\":5056,\"name_platform\":\"MARS_RECONNAISSANCE_ORBITER\",\"name_sensor\":\"CONTEXT CAMERA\",\"reference_height\":{\"maxheight\":1000,\"minheight\":-1000,\"unit\":\"m\"},\"name_model\":\"USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL\",\"interpolation_method\":\"lagrange\",\"line_scan_rate\":[[0.5,-0.37540000677108765,0.001877]],\"starting_ephemeris_time\":297088762.24158406,\"center_ephemeris_time\":297088762.61698407,\"t0_ephemeris\":-0.37540000677108765,\"dt_ephemeris\":0.15016000270843505,\"t0_quaternion\":-0.37540000677108765,\"dt_quaternion\":0.15016000270843505,\"naif_keywords\":{}}";
+  std::string json_str = "{\"image_identifier\":\"TEST_IMAGE\",\"instrument_position\":{\"ephemeris_times\":[297088762.24158406,297088762.3917441,297088762.5419041,297088762.69206405,297088762.84222406,297088762.9923841],\"positions\":[[-1885.29806756,913.1652236,-2961.966828],[-1885.59280128,912.7436266,-2961.91056824],[-1885.88749707,912.32201117,-2961.85424884],[-1886.18215477,911.90037749,-2961.79786985],[-1886.47677475,911.47872522,-2961.7414312],[-1886.77135665,911.05705456,-2961.68493293]],\"velocities\":[[-1.9629237646703683,-2.80759072221274,0.37446657801485306],[-1.9626712192798401,-2.807713482051373,0.3748636774173111],[-1.9624186346660286,-2.807836185534424,0.3752607691067297],[-1.9621660109346446,-2.8079588326107823,0.37565785291714804],[-1.9619133478903363,-2.8080814233753033,0.37605492915558875],[-1.961660645638678,-2.8082039577768683,0.37645199765665144]],\"position_units\":\"KM\",\"time_units\":\"S\",\"reference_frame\":1},\"sun_position\":{\"ephemeris_times\":[297088762.24158406],\"positions\":[[-1885.29806756,913.1652236,-2961.966828]],\"velocities\":[[-1.9629237646703683,-2.80759072221274,0.37446657801485306]],\"position_units\":\"KM\",\"time_units\":\"S\",\"reference_frame\":1},\"instrument_pointing\":{\"time_dependent_frames\":[-74000,-74900,1],\"constant_frames\":[-74021,-74020,-74699,-74690,-74000],\"reference_frame\":1,\"constant_rotation\":[0.9999995608798441,-1.51960241928035e-05,0.0009370214510594064,1.5276552075356694e-05,0.9999999961910578,-8.593317911879532e-05,-0.000937020141647677,8.594745584079714e-05,0.9999995573030465],\"ephemeris_times\":[297088762.24158406,297088762.3917441,297088762.5419041,297088762.69206405,297088762.84222406,297088762.9923841],\"quaternions\":[[0.42061125,0.18606223,-0.23980124,0.85496338],[0.42062261,0.18612356,-0.23976951,0.85495335],[0.42063547,0.18618438,-0.23973759,0.85494273],[0.42064763,0.18624551,-0.2397057,0.85493237],[0.42065923,0.18630667,-0.23967382,0.85492228],[0.42067144,0.18636687,-0.23964185,0.85491211]],\"angular_velocities\":[[-0.0006409728984903079,0.0005054077299115119,0.0004718267948468069],[-0.0006410700774431097,0.0005044862657976017,0.0004731836236807216],[-0.0006408186407087456,0.0004992170698116158,0.0004802237192760833],[-0.0006363961683672021,0.0004989647975959612,0.00047654664046286975],[-0.0006376443791903504,0.0004996117504290811,0.00047678850931380653],[-0.0006404093657132724,0.0005028749658176146,0.0004805228583087444]]},\"body_rotation\":{\"time_dependent_frames\":[10014,1],\"reference_frame\":1,\"ephemeris_times\":[297088762.24158406,297088762.3917441,297088762.5419041,297088762.69206405,297088762.84222406,297088762.9923841],\"quaternions\":[[-0.8371209459443085,0.2996928944391797,0.10720760458181891,0.4448811306448063],[-0.8371185783490869,0.2996934649760026,0.1072060096645597,0.4448855856569007],[-0.8371162107293473,0.2996940355045328,0.10720441474371896,0.44489004065791765],[-0.8371138430875174,0.2996946060241849,0.1072028198209324,0.44489449564328926],[-0.8371114754203602,0.2996951765357392,0.10720122489401934,0.44489895061910595],[-0.8371091077303039,0.29969574703861046,0.10719962996461516,0.4449034055807993]],\"angular_velocities\":[[3.16238646979841e-05,-2.880432898124293e-05,5.6520131658726165e-05],[3.1623864697983686e-05,-2.880432898124763e-05,5.652013165872402e-05],[3.162386469798325e-05,-2.880432898125237e-05,5.652013165872185e-05],[3.162386469798283e-05,-2.880432898125708e-05,5.6520131658719694e-05],[3.1623864697982405e-05,-2.8804328981261782e-05,5.6520131658717505e-05],[3.162386469798195e-05,-2.88043289812665e-05,5.652013165871536e-05]]},\"radii\":{\"semimajor\":3396.19,\"semiminor\":3376.2,\"unit\":\"km\"},\"detector_sample_summing\":1,\"detector_line_summing\":1,\"focal_length_model\":{\"focal_length\":352.9271664},\"detector_center\":{\"line\":0.430442527,\"sample\":2542.96099},\"starting_detector_line\":0,\"starting_detector_sample\":0,\"focal2pixel_lines\":[0.0,142.85714285714,0.0],\"focal2pixel_samples\":[0.0,0.0,142.85714285714],\"optical_distortion\":{\"radial\":{\"coefficients\":[-0.0073433925920054505,2.8375878636241697e-05,1.2841989124027099e-08]}},\"image_lines\":400,\"image_samples\":5056,\"name_platform\":\"MARS_RECONNAISSANCE_ORBITER\",\"name_sensor\":\"CONTEXT CAMERA\",\"reference_height\":{\"maxheight\":1000,\"minheight\":-1000,\"unit\":\"m\"},\"name_model\":\"USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL\",\"interpolation_method\":\"lagrange\",\"line_scan_rate\":[[0.5,-0.37540000677108765,0.001877]],\"starting_ephemeris_time\":297088762.24158406,\"center_ephemeris_time\":297088762.61698407,\"t0_ephemeris\":-0.37540000677108765,\"dt_ephemeris\":0.15016000270843505,\"t0_quaternion\":-0.37540000677108765,\"dt_quaternion\":0.15016000270843505,\"naif_keywords\":{}}";
 
   ale::Isd isd(json_str);
-
+  
+  
   ASSERT_EQ(isd.usgscsm_name_model, "USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL");
   ASSERT_EQ(isd.name_platform, "MARS_RECONNAISSANCE_ORBITER");
   ASSERT_EQ(isd.image_id, "TEST_IMAGE");
@@ -147,112 +149,240 @@ TEST(Isd, BadLogFile) {
 }
 
 TEST(Isd, GetSunPositions) {
-  ale::json j;
-  j["sun_position"]["positions"] = {{1, 2, 3}, {4, 5, 6}};
-  std::vector<double> positions = ale::getSunPositions(j);
-  ASSERT_EQ(positions.size(), 6);
-  EXPECT_DOUBLE_EQ(positions[0], 1);
-  EXPECT_DOUBLE_EQ(positions[1], 2);
-  EXPECT_DOUBLE_EQ(positions[2], 3);
-  EXPECT_DOUBLE_EQ(positions[3], 4);
-  EXPECT_DOUBLE_EQ(positions[4], 5);
-  EXPECT_DOUBLE_EQ(positions[5], 6);
+  ale::json jsunpos  = {
+    {"sun_position",{
+       {"ephemeris_times", {300}},
+       {"positions", {{10, 12, 13}}},
+       {"reference_frame", 2}
+  }}};
+
+  ale::States sunPosObj = ale::getSunPosition(jsunpos);
+  std::vector<ale::Vec3d> position = sunPosObj.getPositions();
+  std::vector<ale::Vec3d> velocity = sunPosObj.getVelocities();
+
+  ASSERT_EQ(sunPosObj.getStates().size(), 1);
+  ASSERT_EQ(sunPosObj.getReferenceFrame(), 2);
+  ASSERT_EQ(sunPosObj.getTimes()[0], 300);
+  
+  ASSERT_EQ(position[0].x, 10);
+  ASSERT_EQ(position[0].y, 12);
+  ASSERT_EQ(position[0].z, 13);
+
+  ASSERT_EQ(velocity[0].x, 0);
+  ASSERT_EQ(velocity[0].y, 0);
+  ASSERT_EQ(velocity[0].z, 0);
+
+  jsunpos["sun_position"]["velocities"] = {{1, 2, 3}};
+  
+  sunPosObj = ale::getSunPosition(jsunpos);
+  velocity = sunPosObj.getVelocities();
+  
+  ASSERT_EQ(velocity[0].x, 1);
+  ASSERT_EQ(velocity[0].y, 2);
+  ASSERT_EQ(velocity[0].z, 3);
 }
 
 TEST(Isd, NoSunPositions) {
   ale::json j;
   try {
-    ale::getSunPositions(j);
+    ale::getSunPosition(j);
     FAIL() << "Expected an exception to be thrown";
   }
   catch(std::exception &e) {
-    EXPECT_EQ(std::string(e.what()), "Could not parse the sun positions.");
+    EXPECT_EQ(std::string(e.what()), "Could not parse the sun position");
   }
   catch(...) {
-    FAIL() << "Expected an Excpetion with message: \"Could not parse the sun positions.\"";
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the sun position.\"";
   }
 }
 
-TEST(Isd, GetSensorPositions) {
-  ale::json j;
-  j["sensor_position"]["positions"] = {{1, 2, 3}, {4, 5, 6}};
-  std::vector<double> positions = ale::getSensorPositions(j);
-  ASSERT_EQ(positions.size(), 6);
-  EXPECT_DOUBLE_EQ(positions[0], 1);
-  EXPECT_DOUBLE_EQ(positions[1], 2);
-  EXPECT_DOUBLE_EQ(positions[2], 3);
-  EXPECT_DOUBLE_EQ(positions[3], 4);
-  EXPECT_DOUBLE_EQ(positions[4], 5);
-  EXPECT_DOUBLE_EQ(positions[5], 6);
-}
+TEST(Isd, GetInstrumentPositions) {
+  ale::json jinstpos  = {
+    {"instrument_position",{
+       {"ephemeris_times", {300, 400}},
+       {"positions", {{10, 11, 12}, {11, 12,13}}},
+       {"reference_frame", 4}
+  }}};
+
+  ale::States instPosObj = ale::getInstrumentPosition(jinstpos);
+  std::vector<ale::Vec3d> positions = instPosObj.getPositions();
+  std::vector<ale::Vec3d> velocities = instPosObj.getVelocities();
+  
+  ASSERT_EQ(instPosObj.getStates().size(), 2);
+  ASSERT_EQ(instPosObj.getReferenceFrame(), 4);
+  
+  ASSERT_EQ(instPosObj.getTimes()[0], 300);
+  ASSERT_EQ(instPosObj.getTimes()[1], 400);
+  
+  ASSERT_EQ(positions[0].x, 10);
+  ASSERT_EQ(positions[0].y, 11);
+  ASSERT_EQ(positions[0].z, 12);
+
+  ASSERT_EQ(positions[1].x, 11);
+  ASSERT_EQ(positions[1].y, 12);
+  ASSERT_EQ(positions[1].z, 13);
+  
+  ASSERT_EQ(velocities[0].x, 0);
+  ASSERT_EQ(velocities[0].y, 0);
+  ASSERT_EQ(velocities[0].z, 0);
+
+  jinstpos["instrument_position"]["velocities"] = {{0, 1, 2}, {3, 4, 5}};
+  
+  instPosObj = ale::getInstrumentPosition(jinstpos);
+  velocities = instPosObj.getVelocities();
+  
+  ASSERT_EQ(velocities[0].x, 0);
+  ASSERT_EQ(velocities[0].y, 1);
+  ASSERT_EQ(velocities[0].z, 2);
+
+  ASSERT_EQ(velocities[1].x, 3);
+  ASSERT_EQ(velocities[1].y, 4);
+  ASSERT_EQ(velocities[1].z, 5);
+
+ }
 
 TEST(Isd, NoSensorPositions) {
   ale::json j;
   try {
-    ale::getSensorPositions(j);
+    ale::getInstrumentPosition(j);
     FAIL() << "Expected an exception to be thrown";
   }
   catch(std::exception &e) {
-    EXPECT_EQ(std::string(e.what()), "Could not parse the sensor positions.");
+    EXPECT_EQ(std::string(e.what()), "Could not parse the instrument position");
   }
   catch(...) {
-    FAIL() << "Expected an Excpetion with message: \"Could not parse the sensor positions.\"";
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the instrument position\"";
   }
 }
 
-TEST(Isd, GetSensorVelocities)
-{
-  ale::json j;
-  j["sensor_position"]["velocities"] = {{1, 2, 3}, {4, 5, 6}};
-  std::vector<double> velocities = ale::getSensorVelocities(j);
-  ASSERT_EQ(velocities.size(), 6);
-  EXPECT_DOUBLE_EQ(velocities[0], 1);
-  EXPECT_DOUBLE_EQ(velocities[1], 2);
-  EXPECT_DOUBLE_EQ(velocities[2], 3);
-  EXPECT_DOUBLE_EQ(velocities[3], 4);
-  EXPECT_DOUBLE_EQ(velocities[4], 5);
-  EXPECT_DOUBLE_EQ(velocities[5], 6);
+TEST(Isd, GetInstrumentPointing) {
+  ale::json pointing  = {
+    {"instrument_pointing",{
+       {"ephemeris_times", {300, 600}},
+       {"quaternions", {{1,2,3,4}, {4,3,2,1}}},
+       {"angular_velocities", {{11,12,13}, {21,22,23}}},
+       {"reference_frame", 2},
+       {"time_dependent_frames", {1,2,3}},
+       {"constant_frames", {4,5,6}},
+       {"constant_rotation", {-1,0,0,0,-1,0,0,0,-1}}
+  }}};
+
+  ale::Orientations instPointing = ale::getInstrumentPointing(pointing);
+  std::vector<ale::Rotation> rotations = instPointing.getRotations();
+  std::vector<ale::Vec3d> velocities = instPointing.getAngularVelocities();
+  std::vector<int> constFrames = instPointing.getConstantFrames(); 
+  std::vector<int> timeDepFrames = instPointing.getTimeDependentFrames(); 
+
+  ASSERT_EQ(rotations.size(), 2);
+  ASSERT_EQ(instPointing.getReferenceFrame(), 2);
+  ASSERT_EQ(instPointing.getTimes()[0], 300);
+  ASSERT_EQ(instPointing.getTimes()[1], 600);
+
+  ASSERT_EQ(constFrames[0], 4);
+  ASSERT_EQ(constFrames[1], 5);
+  ASSERT_EQ(constFrames[2], 6);
+
+  ASSERT_EQ(timeDepFrames[0], 1);
+  ASSERT_EQ(timeDepFrames[1], 2);
+  ASSERT_EQ(timeDepFrames[2], 3);
+
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[0], 0.18257418583505536);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[1], 0.36514837167011072);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[2], 0.54772255750516607);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[3], 0.73029674334022143);
+ 
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[0], 0.73029674334022143);
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[1], 0.54772255750516607);
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[2], 0.36514837167011072);
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[3], 0.18257418583505536);
+   
+  ASSERT_DOUBLE_EQ(velocities[0].x, 11);
+  ASSERT_DOUBLE_EQ(velocities[0].y, 12);
+  ASSERT_DOUBLE_EQ(velocities[0].z, 13); 
+  
+  ASSERT_DOUBLE_EQ(velocities[1].x, 21);
+  ASSERT_DOUBLE_EQ(velocities[1].y, 22);
+  ASSERT_DOUBLE_EQ(velocities[1].z, 23);
+  
+  std::vector<double> rotmat = instPointing.getConstantRotation().toQuaternion();
+  ASSERT_DOUBLE_EQ(rotmat[0], 0);
+  ASSERT_DOUBLE_EQ(rotmat[1], 1);
+  ASSERT_DOUBLE_EQ(rotmat[2], 0);
+  ASSERT_DOUBLE_EQ(rotmat[3], 0);
 }
 
-TEST(Isd, NoSensorVelocities) {
-  ale::json j;
-  try {
-    ale::getSensorVelocities(j);
-    FAIL() << "Expected an exception to be thrown";
-  }
-  catch(std::exception &e) {
-    EXPECT_EQ(std::string(e.what()), "Could not parse the sensor velocities.");
-  }
-  catch(...) {
-    FAIL() << "Expected an Excpetion with message: \"Could not parse the sensor velocities.\"";
-  }
-}
-
-TEST(Isd, GetSensorOrientations)
-{
-  ale::json j;
-  j["sensor_orientation"]["quaternions"] = {{1, 2, 3, 4}};
-  std::vector<double> quats = ale::getSensorOrientations(j);
-  ASSERT_EQ(quats.size(), 4);
-  EXPECT_DOUBLE_EQ(quats[0], 1);
-  EXPECT_DOUBLE_EQ(quats[1], 2);
-  EXPECT_DOUBLE_EQ(quats[2], 3);
-  EXPECT_DOUBLE_EQ(quats[3], 4);
-}
 
 TEST(Isd, NoSensorOrientations) {
   ale::json j;
   try {
-    ale::getSensorOrientations(j);
+    ale::getInstrumentPointing(j);
     FAIL() << "Expected an exception to be thrown";
   }
   catch(std::exception &e) {
-    EXPECT_EQ(std::string(e.what()), "Could not parse the sensor orientations.");
+    EXPECT_EQ(std::string(e.what()), "Could not parse the instrument pointing");
   }
   catch(...) {
-    FAIL() << "Expected an Excpetion with message: \"Could not parse the sensor orientations.\"";
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the instrument pointing\"";
   }
 }
+
+TEST(Isd, GetBodyRotation) {
+  ale::json br = {
+    {"body_rotation",{
+       {"ephemeris_times", {300, 600}},
+       {"quaternions", {{1,2,3,4}, {4,3,2,1}}},
+       {"angular_velocities", {{11,12,13}, {21,22,23}}},
+       {"reference_frame", 2},
+       {"time_dependent_frames", {1,2,3}},
+       {"constant_frames", {4,5,6}},
+       {"constant_rotation", {-1,0,0,0,-1,0,0,0,-1}}
+  }}};
+
+  ale::Orientations bodyRot = ale::getBodyRotation(br);
+  std::vector<ale::Rotation> rotations = bodyRot.getRotations();
+  std::vector<ale::Vec3d> velocities = bodyRot.getAngularVelocities();
+  std::vector<int> constFrames = bodyRot.getConstantFrames(); 
+  std::vector<int> timeDepFrames = bodyRot.getTimeDependentFrames(); 
+
+  ASSERT_EQ(rotations.size(), 2);
+  ASSERT_EQ(bodyRot.getReferenceFrame(), 2);
+  ASSERT_EQ(bodyRot.getTimes()[0], 300);
+  ASSERT_EQ(bodyRot.getTimes()[1], 600);
+
+  ASSERT_EQ(constFrames[0], 4);
+  ASSERT_EQ(constFrames[1], 5);
+  ASSERT_EQ(constFrames[2], 6);
+
+  ASSERT_EQ(timeDepFrames[0], 1);
+  ASSERT_EQ(timeDepFrames[1], 2);
+  ASSERT_EQ(timeDepFrames[2], 3);
+
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[0], 0.18257418583505536);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[1], 0.36514837167011072);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[2], 0.54772255750516607);
+  ASSERT_DOUBLE_EQ(rotations[0].toQuaternion()[3], 0.73029674334022143);
+ 
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[0], 0.73029674334022143);
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[1], 0.54772255750516607);
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[2], 0.36514837167011072);
+  ASSERT_DOUBLE_EQ(rotations[1].toQuaternion()[3], 0.18257418583505536);
+  
+  ASSERT_DOUBLE_EQ(velocities[0].x, 11);
+  ASSERT_DOUBLE_EQ(velocities[0].y, 12);
+  ASSERT_DOUBLE_EQ(velocities[0].z, 13); 
+  
+  ASSERT_DOUBLE_EQ(velocities[1].x, 21);
+  ASSERT_DOUBLE_EQ(velocities[1].y, 22);
+  ASSERT_DOUBLE_EQ(velocities[1].z, 23);
+  
+  std::vector<double> rotmat = bodyRot.getConstantRotation().toQuaternion();
+  ASSERT_DOUBLE_EQ(rotmat[0], 0);
+  ASSERT_DOUBLE_EQ(rotmat[1], 1);
+  ASSERT_DOUBLE_EQ(rotmat[2], 0);
+  ASSERT_DOUBLE_EQ(rotmat[3], 0);
+}
+
+
 
 TEST(Isd, BadNameModel) {
   std::string bad_json_str("{}");

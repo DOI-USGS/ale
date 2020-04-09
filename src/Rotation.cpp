@@ -39,7 +39,7 @@ namespace ale {
    * as the AV from the destination to the source. This matches how NAIF
    * defines AV.
    */
-  Eigen::Quaterniond::Matrix3 avSkewMatrix(const ale::Vec3d& av) {
+  Eigen::Quaterniond::Matrix3 avSkewMatrix(const Vec3d& av) {
     Eigen::Quaterniond::Matrix3 avMat;
     avMat <<  0.0,    av.z, -av.y,
              -av.z,  0.0,    av.x,
@@ -153,7 +153,7 @@ namespace ale {
   }
 
 
-  std::vector<double> Rotation::toStateRotationMatrix(const ale::Vec3d &av) const {
+  std::vector<double> Rotation::toStateRotationMatrix(const Vec3d &av) const {
     Eigen::Quaterniond::Matrix3 rotMat = m_impl->quat.toRotationMatrix();
     Eigen::Quaterniond::Matrix3 avMat = avSkewMatrix(av);
     Eigen::Quaterniond::Matrix3 dtMat = rotMat * avMat;
@@ -195,19 +195,19 @@ namespace ale {
   }
 
 
-  ale::Vec3d Rotation::operator()(const ale::Vec3d &vector) const {
+  Vec3d Rotation::operator()(const Vec3d &vector) const {
     Eigen::Vector3d eigenVector(vector.x, vector.y, vector.z);
     Eigen::Vector3d rotatedVector = m_impl->quat._transformVector(eigenVector);
     std::vector<double> tempVec = std::vector<double>(rotatedVector.data(), rotatedVector.data() + rotatedVector.size());
     return Vec3d(tempVec);
   }
 
-  ale::State Rotation::operator()(
-        const ale::State& state,
-        const ale::Vec3d& av
+  State Rotation::operator()(
+        const State& state,
+        const Vec3d& av
   ) const {
-    ale::Vec3d position = state.position;
-    ale::Vec3d velocity = state.velocity;
+    Vec3d position = state.position;
+    Vec3d velocity = state.velocity;
 
     Eigen::Vector3d positionVector(position.x, position.y, position.z);
     Eigen::Vector3d velocityVector(velocity.x, velocity.y, velocity.z);

@@ -4,62 +4,67 @@
 #include <string>
 #include <nlohmann/json.hpp>
 
-#include "Isd.h"
+#include "InterpUtils.h"
 #include "Distortion.h"
+#include "States.h"
+#include "Orientations.h"
+#include "Vectors.h"
 
 namespace ale {
 
-  /** A 3D cartesian vector */
-  struct Vec3d {
-    double x;
-    double y;
-    double z;
-
-    // Accepts an {x,y,z} vector
-    Vec3d(const std::vector<double>& vec) {
-      if (vec.size() != 3) {
-        throw std::invalid_argument("Input vector must have 3 entries.");
+  template<typename T>
+  std::vector<T> getJsonArray(json obj) {
+    std::vector<T> positions;
+    try {
+      for (auto &location : obj) {
+        positions.push_back(location.get<T>());
       }
-      x = vec[0];
-      y = vec[1];
-      z = vec[2];
-    };
+    } catch (...) {
+      throw std::runtime_error("Could not parse the json array.");
+    }
+    return positions;
+  }
 
-    Vec3d(double x, double y, double z) : x(x), y(y), z(z) {};
-    Vec3d() : x(0.0), y(0.0), z(0.0) {};
-  };
 
+  PositionInterpolation getInterpolationMethod(json isd);
   double getMinHeight(nlohmann::json isd);
   std::string getSensorModelName(nlohmann::json isd);
   std::string getImageId(nlohmann::json isd);
   std::string getSensorName(nlohmann::json isd);
   std::string getPlatformName(nlohmann::json isd);
   std::string getLogFile(nlohmann::json isd);
-  int getTotalLines(nlohmann::json isd);
-  int getTotalSamples(nlohmann::json isd);
-  double getStartingTime(nlohmann::json isd);
-  double getCenterTime(nlohmann::json isd);
-  std::vector<std::vector<double>> getLineScanRate(nlohmann::json isd);
-  int getSampleSumming(nlohmann::json isd);
-  int getLineSumming(nlohmann::json isd);
-  double getFocalLength(nlohmann::json isd);
-  double getFocalLengthUncertainty(nlohmann::json isd);
-  std::vector<double> getFocal2PixelLines(nlohmann::json isd);
-  std::vector<double> getFocal2PixelSamples(nlohmann::json isd);
-  double getDetectorCenterLine(nlohmann::json isd);
-  double getDetectorCenterSample(nlohmann::json isd);
-  double getDetectorStartingLine(nlohmann::json isd);
-  double getDetectorStartingSample(nlohmann::json isd);
-  double getMinHeight(nlohmann::json isd);
-  double getMaxHeight(nlohmann::json isd);
-  double getSemiMajorRadius(nlohmann::json isd);
-  double getSemiMinorRadius(nlohmann::json isd);
-  DistortionType getDistortionModel(nlohmann::json isd);
-  std::vector<double> getDistortionCoeffs(nlohmann::json isd);
-  std::vector<double> getSunPositions(nlohmann::json isd);
-  std::vector<double> getSensorPositions(nlohmann::json isd);
-  std::vector<double> getSensorVelocities(nlohmann::json isd);
-  std::vector<double> getSensorOrientations(nlohmann::json isd);
+  std::string getIsisCameraVersion(json isd);
+  int getTotalLines(json isd);
+  int getTotalSamples(json isd);
+  double getStartingTime(json isd);
+  double getCenterTime(json isd);
+  std::vector<std::vector<double>> getLineScanRate(json isd);
+  int getSampleSumming(json isd);
+  int getLineSumming(json isd);
+  double getFocalLength(json isd);
+  double getFocalLengthUncertainty(json isd);
+  std::vector<double> getFocal2PixelLines(json isd);
+  std::vector<double> getFocal2PixelSamples(json isd);
+  double getDetectorCenterLine(json isd);
+  double getDetectorCenterSample(json isd);
+  double getDetectorStartingLine(json isd);
+  double getDetectorStartingSample(json isd);
+  double getMinHeight(json isd);
+  double getMaxHeight(json isd);
+  double getSemiMajorRadius(json isd);
+  double getSemiMinorRadius(json isd);
+  DistortionType getDistortionModel(json isd);
+  std::vector<double> getDistortionCoeffs(json isd);
+
+  std::vector<double> getJsonDoubleArray(json obj);
+  std::vector<Vec3d> getJsonVec3dArray(json obj);
+  std::vector<Rotation> getJsonQuatArray(json obj);
+
+  States getInstrumentPosition(json isd);
+  States getSunPosition(json isd);
+
+  Orientations getBodyRotation(json isd);
+  Orientations getInstrumentPointing(json isd);
 }
 
 #endif

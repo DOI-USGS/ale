@@ -30,9 +30,9 @@ class OrientationTest : public ::testing::Test {
 };
 
 TEST_F(OrientationTest, ConstructorAccessors) {
-  vector<Rotation> outputRotations = orientations.rotations();
-  vector<double> outputTimes = orientations.times();
-  vector<Vec3d> outputAvs = orientations.angularVelocities();
+  vector<Rotation> outputRotations = orientations.getRotations();
+  vector<double> outputTimes = orientations.getTimes();
+  vector<Vec3d> outputAvs = orientations.getAngularVelocities();
   ASSERT_EQ(outputRotations.size(), rotations.size());
   for (size_t i = 0; i < outputRotations.size(); i++) {
     vector<double> quats = rotations[i].toQuaternion();
@@ -98,7 +98,7 @@ TEST_F(OrientationTest, RotateAt) {
 TEST_F(OrientationTest, RotationMultiplication) {
   Rotation rhs( 0.5, 0.5, 0.5, 0.5);
   orientations *= rhs;
-  vector<Rotation> outputRotations = orientations.rotations();
+  vector<Rotation> outputRotations = orientations.getRotations();
   vector<vector<double>> expectedQuats = {
     {-0.5, 0.5, 0.5, 0.5},
     {-1.0, 0.0, 0.0, 0.0},
@@ -116,7 +116,7 @@ TEST_F(OrientationTest, RotationMultiplication) {
 TEST_F(OrientationTest, OrientationMultiplication) {
   Orientations duplicateOrientations(orientations);
   orientations *= duplicateOrientations;
-  vector<Rotation> outputRotations = orientations.rotations();
+  vector<Rotation> outputRotations = orientations.getRotations();
   vector<vector<double>> expectedQuats = {
     {-0.5, 0.5, 0.5, 0.5},
     {-0.5,-0.5,-0.5,-0.5},
