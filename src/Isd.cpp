@@ -2,6 +2,8 @@
 #include "Isd.h"
 #include "Util.h"
 
+using json = nlohmann::json;
+
 ale::Isd::Isd(std::string isd_file) {
   json isd = json::parse(isd_file);
 
@@ -41,12 +43,12 @@ ale::Isd::Isd(std::string isd_file) {
 
   distortion_model = getDistortionModel(isd);
   distortion_coefficients = getDistortionCoeffs(isd);
-  
-  interpMethod = getInterpolationMethod(isd); 
-   
+
+  interpMethod = getInterpolationMethod(isd);
+
   inst_pos = getInstrumentPosition(isd);
   sun_pos = getSunPosition(isd);
-  
+
   inst_pointing = getInstrumentPointing(isd);
-  body_rotation = getBodyRotation(isd); 
+  body_rotation = getBodyRotation(isd);
  }

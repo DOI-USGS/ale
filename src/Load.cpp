@@ -1,8 +1,7 @@
-#include "ale.h"
+#include "Load.h"
 
 #include <nlohmann/json.hpp>
 
-#include <iostream>
 #include <Python.h>
 
 #include <string>
@@ -10,9 +9,9 @@
 #include <stdexcept>
 
 using json = nlohmann::json;
+using namespace std;
 
 namespace ale {
-
  std::string getPyTraceback() {
     PyObject* err = PyErr_Occurred();
     if (err != NULL) {
@@ -33,7 +32,7 @@ namespace ale {
         Py_DECREF(module_name);
 
         if (pyth_module == NULL) {
-            throw std::runtime_error("getPyTraceback - Failed to import Python traceback Library");
+            throw runtime_error("getPyTraceback - Failed to import Python traceback Library");
         }
 
         pyth_func = PyObject_GetAttrString(pyth_module, "format_exception");
@@ -60,7 +59,6 @@ namespace ale {
     return "";
  }
 
-
  std::string loads(std::string filename, std::string props, std::string formatter, bool verbose) {
      static bool first_run = true;
      if(first_run) {
@@ -72,7 +70,7 @@ namespace ale {
      // Import the file as a Python module.
      PyObject *pModule = PyImport_Import(PyUnicode_FromString("ale"));
      if(!pModule) {
-       throw std::runtime_error("Failed to import ale. Make sure the ale python library is correctly installed.");
+       throw runtime_error("Failed to import ale. Make sure the ale python library is correctly installed.");
      }
      // Create a dictionary for the contents of the module.
      PyObject *pDict = PyModule_GetDict(pModule);
@@ -82,7 +80,7 @@ namespace ale {
      if(!pFunc) {
        // import errors do not set a PyError flag, need to use a custom
        // error message instead.
-       throw std::runtime_error("Failed to import ale.loads function from Python."
+       throw runtime_error("Failed to import ale.loads function from Python."
                            "This Usually indicates an error in the Ale Python Library."
                            "Check if Installed correctly and the function ale.loads exists.");
      }
@@ -90,7 +88,7 @@ namespace ale {
      // Create a Python tuple to hold the arguments to the method.
      PyObject *pArgs = PyTuple_New(3);
      if(!pArgs) {
-       throw std::runtime_error(getPyTraceback());
+       throw runtime_error(getPyTraceback());
      }
 
      // Set the Python int as the first and second arguments to the method.
@@ -107,14 +105,14 @@ namespace ale {
      PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
 
      if(!pResult) {
-        throw std::invalid_argument("No Valid instrument found for label.");
+        throw invalid_argument("No Valid instrument found for label.");
      }
 
      PyObject *pResultStr = PyObject_Str(pResult);
      PyObject *temp_bytes = PyUnicode_AsUTF8String(pResultStr); // Owned reference
 
      if(!temp_bytes){
-       throw std::invalid_argument(getPyTraceback());
+       throw invalid_argument(getPyTraceback());
      }
      std::string cResult;
      char *temp_str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer

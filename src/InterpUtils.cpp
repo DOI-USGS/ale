@@ -7,6 +7,7 @@
 #include <unordered_set>
 
 namespace ale {
+
   double linearInterpolate(double x, double y, double t) {
     return x + t * (y - x);
   }
