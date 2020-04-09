@@ -17,7 +17,6 @@ from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import LineScanner
 from ale.base.type_sensor import Framer
 from ale.base.type_distortion import RadialDistortion
-from ale.util import find_latest_metakernel
 
 FILTER_SPECIFIC_LOOKUP = {
     # This table contains the filter specific information from the ISIS iak kernel. The format is as follows:
@@ -587,6 +586,7 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
             return spice.bods2c(self.instrument_id)
 
 
+
 class MexSrcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDistortion, Driver):
     """
     Driver for a PDS3 Mars Express (Mex) High Resolution Stereo Camera (HRSC) - SRC image.
@@ -615,7 +615,7 @@ class MexSrcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDistortion, 
         : int
           Naif ID used to for indentifying the instrument in Spice kernels
         """
-        return spice.bods2c("MEX_HRSC_SRC") # should be -41220
+        return spice.bods2c("MEX_HRSC_SRC")
 
 
     @property
