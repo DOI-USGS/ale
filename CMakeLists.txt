@@ -31,7 +31,7 @@ if(ALE_BUILD_LOAD)
 endif()
 
 # Library setup
-set(ALE_BUILD_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/")
+set(ALE_BUILD_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/ale")
 set(ALE_INSTALL_INCLUDE_DIR "include/ale")
 set(ALE_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/InterpUtils.cpp
                   ${CMAKE_CURRENT_SOURCE_DIR}/src/Rotation.cpp
@@ -62,8 +62,9 @@ set_target_properties(ale PROPERTIES
 # Use generator expressions so that downstream projects can use this target
 target_include_directories(ale
                            PUBLIC
-                           $<BUILD_INTERFACE:${ALE_BUILD_INCLUDE_DIR}>
-                           $<INSTALL_INTERFACE:include>)
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                           $<INSTALL_INTERFACE:include>
+                           PRIVATE)
 
 target_link_libraries(ale PRIVATE ${ALE_PRIVATE_LINKS}
                           PUBLIC ${ALE_PUBLIC_LINKS})

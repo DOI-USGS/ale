@@ -4,8 +4,8 @@
 #include <memory>
 #include <vector>
 
-#include "States.h"
-#include "Vectors.h"
+#include "ale/States.h"
+#include "ale/Vectors.h"
 
 namespace ale {
 

@@ -1,10 +1,10 @@
-#include "Rotation.h"
+#include "ale/Rotation.h"
 
 #include <exception>
 
 #include <Eigen/Geometry>
 
-#include "InterpUtils.h"
+#include "ale/InterpUtils.h"
 
 namespace ale {
 

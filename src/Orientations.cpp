@@ -1,6 +1,6 @@
-#include "Orientations.h"
+#include "ale/Orientations.h"
 
-#include "InterpUtils.h"
+#include "ale/InterpUtils.h"
 
 namespace ale {
 
@@ -8,9 +8,9 @@ namespace ale {
     const std::vector<Rotation> &rotations,
     const std::vector<double> &times,
     const std::vector<Vec3d> &avs,
-    const int refFrame, 
-    const Rotation &const_rot, 
-    const std::vector<int> const_frames, 
+    const int refFrame,
+    const Rotation &const_rot,
+    const std::vector<int> const_frames,
     const std::vector<int> time_dependent_frames
   ) :
     m_rotations(rotations), m_avs(avs), m_times(times), m_refFrame(refFrame), m_timeDepFrames(time_dependent_frames), m_constFrames(const_frames), m_constRotation(const_rot) {
@@ -39,21 +39,21 @@ namespace ale {
   std::vector<double> Orientations::getTimes() const {
     return m_times;
   }
-  
+
   std::vector<int> Orientations::getTimeDependentFrames() const {
-    return m_timeDepFrames; 
+    return m_timeDepFrames;
   }
 
   std::vector<int> Orientations::getConstantFrames() const {
-    return m_constFrames; 
+    return m_constFrames;
   }
-  
+
   int Orientations::getReferenceFrame() const {
-    return m_refFrame; 
+    return m_refFrame;
   }
 
   Rotation Orientations::getConstantRotation() const {
-    return m_constRotation; 
+    return m_constRotation;
   }
 
   Rotation Orientations::interpolate(
