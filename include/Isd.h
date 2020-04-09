@@ -15,8 +15,6 @@
 
 namespace ale {
 
-  using json = nlohmann::json;
-
   class Isd {
     public:
 
@@ -26,7 +24,7 @@ namespace ale {
     std::string name_platform;
     std::string image_id;
     std::string name_sensor;
-    
+
     double semi_major;
     double semi_minor;
 
@@ -61,11 +59,11 @@ namespace ale {
     double starting_ephemeris_time;
     double center_ephemeris_time;
 
-    json naif_keywords;
-    
+    nlohmann::json naif_keywords;
+
     PositionInterpolation interpMethod;
-    
-    Rotation const_rotation; 
+
+    Rotation const_rotation;
 
     States inst_pos;
     States sun_pos;
