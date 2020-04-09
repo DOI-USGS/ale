@@ -3,9 +3,25 @@
 
 #include <vector>
 
-#include "Util.h"
+#include "Vectors.h"
 
 namespace ale {
+
+  enum RotationInterpolation {
+    SLERP, // Spherical interpolation
+    NLERP // Normalized linear interpolation
+  };
+
+  /// Interpolation enum for defining different methods of interpolation
+  enum PositionInterpolation {
+    /// Interpolate using linear interpolation
+    LINEAR = 0,
+    /// Interpolate using a cubic spline
+    SPLINE = 1,
+    /// Interpolate using Lagrange polynomials up to 8th order
+    LAGRANGE = 2,
+  };
+
   /**
    * Linearly interpolate between two values.
    * @param x The first value.
@@ -22,7 +38,7 @@ namespace ale {
    */
   std::vector<double> linearInterpolate(const std::vector<double> &x, const std::vector<double> &y, double t);
 
-  ale::Vec3d linearInterpolate(const ale::Vec3d &x, const ale::Vec3d &y, double t);
+  Vec3d linearInterpolate(const Vec3d &x, const Vec3d &y, double t);
 
   /**
    * Compute the index of the first time to use when interpolating at a given time.
@@ -39,6 +55,37 @@ namespace ale {
    * Merge, sort, and remove duplicates from two vectors
    */
    std::vector<double> orderedVecMerge(const std::vector<double> &x, const std::vector<double> &y);
+
+
+   /** The following helper functions are used to calculate the reduced states cache and cubic hermite
+   to interpolate over it. They were migrated, with minor modifications, from
+   Isis::NumericalApproximation **/
+
+   /** Evaluates a cubic hermite at time, interpTime, between the appropriate two points in x. **/
+   double evaluateCubicHermite(const double interpTime, const std::vector<double>& derivs,
+                            const std::vector<double>& x, const std::vector<double>& y);
+
+   /** Evaluate velocities using a Cubic Hermite Spline at a time a, within some interval in x, **/
+   double evaluateCubicHermiteFirstDeriv(const double interpTime, const std::vector<double>& deriv,
+                                     const std::vector<double>& times, const std::vector<double>& y);
+
+   double lagrangeInterpolate(const std::vector<double>& times, const std::vector<double>& values,
+                           double time, int order=8);
+   double lagrangeInterpolateDerivative(const std::vector<double>& times, const std::vector<double>& values,
+                                     double time, int order=8);
+
+   /**
+    *@brief Interpolates the spacecrafts position along a path generated from a set of points,
+              times, and a time of observation
+    *@param points A double vector of points
+    *@param times A double vector of times
+    *@param time A double to use as the time of observation
+    *@param interp An interpolation enum dictating what type of interpolation to use
+    *@param d The order of the derivative to generate when interpolating
+                    (Currently supports 0, 1, and 2)
+    *@return
+   */
+   double interpolate(std::vector<double> points, std::vector<double> times, double time, PositionInterpolation interp, int d);
 
 }
 

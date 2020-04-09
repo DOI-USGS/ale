@@ -1,6 +1,6 @@
 {
-  "IsisCameraVersion": 1,
-  "NaifKeywords": {
+  "isis_camera_version": 1,
+  "naif_keywords": {
     "BODY301_RADII": [
       1737.4,
       1737.4,
@@ -191,15 +191,16 @@
     "semiminor": 1737.4,
     "unit": "km"
   },
-  "InstrumentPointing": {
-    "TimeDependentFrames": [
+  "instrument_pointing": {
+    "reference_frame" : 1,
+    "time_dependent_frames": [
       -131000,
       1
     ],
-    "CkTableStartTime": 292234259.82293594,
-    "CkTableEndTime": 292234262.42293596,
-    "CkTableOriginalSize": 6,
-    "EphemerisTimes": [
+    "ck_table_start_time": 292234259.82293594,
+    "ck_table_end_time": 292234262.42293596,
+    "ck_table_original_size": 6,
+    "ephemeris_times": [
       292234259.82293594,
       292234260.3429359,
       292234260.86293596,
@@ -207,7 +208,7 @@
       292234261.902936,
       292234262.42293596
     ],
-    "Quaternions": [
+    "quaternions": [
       [
         -0.11368345174719045,
         0.09298596444784424,
@@ -245,7 +246,7 @@
         -0.968551426254611
       ]
     ],
-    "AngularVelocity": [
+    "angular_velocity": [
       [
         0.0030447825014591214,
         0.00010000000000000005,
@@ -277,12 +278,12 @@
         -5.421010862427522e-20
       ]
     ],
-    "ConstantFrames": [
+    "constant_frames": [
       -131350,
       -131320,
       -131000
     ],
-    "ConstantRotation": [
+    "constant_rotation": [
       0.9662180936858615,
       -0.0009130086708890376,
       -0.25772419725207507,
@@ -294,15 +295,16 @@
       0.9662183691750111
     ]
   },
-  "BodyRotation": {
-    "TimeDependentFrames": [
+  "body_rotation": {
+    "reference_frame" : 1,
+    "time_dependent_frames": [
       10020,
       1
     ],
-    "CkTableStartTime": 292234259.82293594,
-    "CkTableEndTime": 292234262.42293596,
-    "CkTableOriginalSize": 6,
-    "EphemerisTimes": [
+    "ck_table_start_time": 292234259.82293594,
+    "ck_table_end_time": 292234262.42293596,
+    "ck_table_original_size": 6,
+    "ephemeris_times": [
       292234259.82293594,
       292234260.3429359,
       292234260.86293596,
@@ -310,7 +312,7 @@
       292234261.902936,
       292234262.42293596
     ],
-    "Quaternions": [
+    "quaternions": [
       [
         -0.9366199858891122,
         0.18349494110821096,
@@ -348,7 +350,7 @@
         -0.290467693256969
       ]
     ],
-    "AngularVelocity": [
+    "angular_velocity": [
       [
         5.82758225576212e-08,
         -1.019441640177111e-06,
@@ -381,11 +383,12 @@
       ]
     ]
   },
-  "InstrumentPosition": {
-    "SpkTableStartTime": 292234259.82293594,
-    "SpkTableEndTime": 292234262.42293596,
-    "SpkTableOriginalSize": 6,
-    "EphemerisTimes": [
+  "instrument_position": {
+    "reference_frame" : 1,
+    "spk_table_start_time": 292234259.82293594,
+    "spk_table_end_time": 292234262.42293596,
+    "spk_table_original_size": 6,
+    "ephemeris_times": [
       292234259.82293594,
       292234260.3429359,
       292234260.86293596,
@@ -393,7 +396,7 @@
       292234261.902936,
       292234262.42293596
     ],
-    "Positions": [
+    "positions": [
       [
         242.79442620277422,
         738.203001908958,
@@ -425,7 +428,7 @@
         -1613.827152851969
       ]
     ],
-    "Velocities": [
+    "velocities": [
       [
         -1.5862908231149133,
         -0.28618937128869254,
@@ -458,21 +461,22 @@
       ]
     ]
   },
-  "SunPosition": {
-    "SpkTableStartTime": 292234261.12293595,
-    "SpkTableEndTime": 292234261.12293595,
-    "SpkTableOriginalSize": 1,
-    "EphemerisTimes": [
+  "sun_position": {
+    "reference_frame" : 1, 
+    "spk_table_start_time": 292234261.12293595,
+    "spk_table_end_time": 292234261.12293595,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
       292234261.12293595
     ],
-    "Positions": [
+    "positions": [
       [
         144178551.68571115,
         37762451.38900038,
         16383592.932550186
       ]
     ],
-    "Velocities": [
+    "velocities": [
       [
         -7.182591994538903,
         27.132956790118943,
