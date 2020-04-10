@@ -274,7 +274,6 @@ TEST(Isd, GetInstrumentPointing) {
   std::vector<int> timeDepFrames = instPointing.getTimeDependentFrames();
 
   ASSERT_EQ(rotations.size(), 2);
-  ASSERT_EQ(instPointing.getReferenceFrame(), 2);
   ASSERT_EQ(instPointing.getTimes()[0], 300);
   ASSERT_EQ(instPointing.getTimes()[1], 600);
 
@@ -345,7 +344,6 @@ TEST(Isd, GetBodyRotation) {
   std::vector<int> timeDepFrames = bodyRot.getTimeDependentFrames();
 
   ASSERT_EQ(rotations.size(), 2);
-  ASSERT_EQ(bodyRot.getReferenceFrame(), 2);
   ASSERT_EQ(bodyRot.getTimes()[0], 300);
   ASSERT_EQ(bodyRot.getTimes()[1], 600);
 
