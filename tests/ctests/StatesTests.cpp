@@ -3,8 +3,8 @@
 #include <cmath>
 #include <exception>
 
-#include "States.h"
-#include "Vectors.h"
+#include "ale/States.h"
+#include "ale/Vectors.h"
 
 using namespace std;
 using namespace ale;
