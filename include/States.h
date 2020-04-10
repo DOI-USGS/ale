@@ -1,6 +1,8 @@
 #ifndef ALE_STATES_H
 #define ALE_STATES_H
 
+#include <cmath>
+#include <limits>
 #include <vector>
 #include <stdexcept>
 
@@ -23,8 +25,17 @@ namespace ale {
       velocity = {vec[3], vec[4], vec[5]};
     };
 
+    State(Vec3d position) : position(position) {
+      velocity = {std::numeric_limits<double>::quiet_NaN(),
+                  std::numeric_limits<double>::quiet_NaN(),
+                  std::numeric_limits<double>::quiet_NaN()};
+    };
     State(Vec3d position, Vec3d velocity) : position(position), velocity(velocity) {};
     State() {};
+
+    bool hasVelocity() const {
+      return !(std::isnan(velocity.x) && std::isnan(velocity.y) && std::isnan(velocity.z));
+    }
   };
 
   class States {

@@ -29,15 +29,10 @@ TEST(StatesTest, ConstructorPositionNoVelocity) {
   EXPECT_NEAR(states[0].position.x, 4.0, 1e-10);
   EXPECT_NEAR(states[0].position.y, 1.0, 1e-10);
   EXPECT_NEAR(states[0].position.z, 4.0, 1e-10);
-  EXPECT_NEAR(states[0].velocity.x, 0.0, 1e-10);
-  EXPECT_NEAR(states[0].velocity.y, 0.0, 1e-10);
-  EXPECT_NEAR(states[0].velocity.z, 0.0, 1e-10);
   EXPECT_NEAR(states[3].position.x, 7.0, 1e-10);
   EXPECT_NEAR(states[3].position.y, 4.0, 1e-10);
   EXPECT_NEAR(states[3].position.z, 1.0, 1e-10);
-  EXPECT_NEAR(states[3].velocity.x, 0.0, 1e-10);
-  EXPECT_NEAR(states[3].velocity.y, 0.0, 1e-10);
-  EXPECT_NEAR(states[3].velocity.z, 0.0, 1e-10);
+  EXPECT_FALSE(noVelocityState.hasVelocity());
 }
 
 TEST(StatesTest, ConstructorPositionAndVelocity) {
