@@ -23,9 +23,8 @@ namespace ale {
       throw std::invalid_argument("Length of times must match number of positions");
     }
 
-    Vec3d velocities = {0.0, 0.0, 0.0};
     for (Vec3d position : positions) {
-      m_states.push_back(State(position, velocities));
+      m_states.push_back(State(position));
     }
   }
 
@@ -93,10 +92,9 @@ namespace ale {
 
 
   bool States::hasVelocity() const {
-    std::vector<Vec3d> velocities = getVelocities();
-    bool allZero = std::all_of(velocities.begin(), velocities.end(), [](Vec3d vec)
-                               { return vec.x==0.0 && vec.y==0.0 && vec.z==0.0; });
-    return !allZero;
+    bool allVelocity = std::all_of(m_states.begin(), m_states.end(), [](State vec)
+                                   { return vec.hasVelocity(); });
+    return allVelocity;
   }
 
 

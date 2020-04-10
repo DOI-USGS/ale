@@ -158,7 +158,6 @@ TEST(Isd, GetSunPositions) {
 
   ale::States sunPosObj = ale::getSunPosition(jsunpos);
   std::vector<ale::Vec3d> position = sunPosObj.getPositions();
-  std::vector<ale::Vec3d> velocity = sunPosObj.getVelocities();
 
   ASSERT_EQ(sunPosObj.getStates().size(), 1);
   ASSERT_EQ(sunPosObj.getReferenceFrame(), 2);
@@ -168,14 +167,12 @@ TEST(Isd, GetSunPositions) {
   ASSERT_EQ(position[0].y, 12);
   ASSERT_EQ(position[0].z, 13);
 
-  ASSERT_EQ(velocity[0].x, 0);
-  ASSERT_EQ(velocity[0].y, 0);
-  ASSERT_EQ(velocity[0].z, 0);
+  ASSERT_FALSE(sunPosObj.hasVelocity());
 
   jsunpos["sun_position"]["velocities"] = {{1, 2, 3}};
 
   sunPosObj = ale::getSunPosition(jsunpos);
-  velocity = sunPosObj.getVelocities();
+  std::vector<ale::Vec3d> velocity = sunPosObj.getVelocities();
 
   ASSERT_EQ(velocity[0].x, 1);
   ASSERT_EQ(velocity[0].y, 2);
@@ -206,7 +203,6 @@ TEST(Isd, GetInstrumentPositions) {
 
   ale::States instPosObj = ale::getInstrumentPosition(jinstpos);
   std::vector<ale::Vec3d> positions = instPosObj.getPositions();
-  std::vector<ale::Vec3d> velocities = instPosObj.getVelocities();
 
   ASSERT_EQ(instPosObj.getStates().size(), 2);
   ASSERT_EQ(instPosObj.getReferenceFrame(), 4);
@@ -222,14 +218,12 @@ TEST(Isd, GetInstrumentPositions) {
   ASSERT_EQ(positions[1].y, 12);
   ASSERT_EQ(positions[1].z, 13);
 
-  ASSERT_EQ(velocities[0].x, 0);
-  ASSERT_EQ(velocities[0].y, 0);
-  ASSERT_EQ(velocities[0].z, 0);
+  ASSERT_FALSE(instPosObj.hasVelocity());
 
   jinstpos["instrument_position"]["velocities"] = {{0, 1, 2}, {3, 4, 5}};
 
   instPosObj = ale::getInstrumentPosition(jinstpos);
-  velocities = instPosObj.getVelocities();
+  std::vector<ale::Vec3d> velocities = instPosObj.getVelocities();
 
   ASSERT_EQ(velocities[0].x, 0);
   ASSERT_EQ(velocities[0].y, 1);
