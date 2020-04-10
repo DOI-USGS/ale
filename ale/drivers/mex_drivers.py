@@ -15,8 +15,8 @@ from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import LineScanner
+from ale.base.type_sensor import Framer
 from ale.base.type_distortion import RadialDistortion
-from ale.util import find_latest_metakernel
 
 FILTER_SPECIFIC_LOOKUP = {
     # This table contains the filter specific information from the ISIS iak kernel. The format is as follows:
@@ -497,6 +497,21 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
                 raise Exception ("Instrument ID is wrong.")
             return self.label['IsisCube']['Archive']['DetectorId']
 
+
+        @property
+        def sensor_name(self):
+            """
+            Returns the name of the instrument. Need to over-ride isis_label because
+            InstrumentName is not defined in the ISIS label for MEX HSRC cubes.
+
+            Returns
+            -------
+            : str
+              Name of the sensor
+            """
+            return self.instrument_id
+
+
         @property
         def sensor_model_version(self):
             """
@@ -584,3 +599,135 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
               Naif ID code used in calculating focal length
             """
             return spice.bods2c(self.instrument_id)
+
+
+class MexSrcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDistortion, Driver):
+    """
+    Driver for a PDS3 Mars Express (Mex) High Resolution Stereo Camera (HRSC) - Super Resolution 
+    Channel (SRC) image.
+    """
+
+    @property
+    def odtk(self):
+        """
+        The coefficients for the distortion model. No distortion model, so pass in all zeroes.
+
+        Returns
+        -------
+        : list
+          Radial distortion coefficients.
+        """
+        return [0.0, 0.0, 0.0]
+
+
+    @property
+    def ikid(self):
+        """
+        Returns the Naif ID code for HRSC SRC. 
+
+        Returns
+        -------
+        : int
+          Naif ID used to for indentifying the instrument in Spice kernels
+        """
+        return spice.bods2c("MEX_HRSC_SRC")
+
+
+    @property
+    def instrument_id(self):
+        """
+        Returns the short name of the instrument
+
+        MEX HRSC has nine different filters each with their own name.
+
+         Returns
+        -------
+        : str
+          Short name of the instrument
+        """
+        if(super().instrument_id != "HRSC"):
+            raise Exception ("Instrument ID is wrong.")
+        return self.label['DETECTOR_ID']
+
+
+    @property
+    def spacecraft_name(self):
+        """
+        Spacecraft name used in various SPICE calls to acquire
+        ephemeris data. MEX HRSC img PDS3 labels do not the have SPACECRAFT_NAME
+        keyword, so we override it here to use the label_pds3 property for
+        instrument_host_id
+
+        Returns
+        -------
+        : str
+          Spacecraft name
+        """
+        return self.instrument_host_id
+
+
+    @property
+    def focal2pixel_lines(self):
+        """
+        NOTE: These values are pulled from ISIS iak kernels.
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector lines
+        """
+        return [0.0, 0.0, 111.111111111111]
+
+
+    @property
+    def focal2pixel_samples(self):
+        """
+        NOTE: These values are pulled from ISIS iak kernels.
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector samples
+        """
+        return [0.0, 111.111111111111, 0.0]
+
+
+    @property
+    def detector_center_line(self):
+        """
+        Returns the center detector line.
+
+        Returns
+        -------
+        : float
+          Detector line of the principal point
+        """
+        return 512.0
+
+
+    @property
+    def detector_center_sample(self):
+        """
+        Returns the center detector sample.
+
+        This is
+        different from ISIS's center sample because ISIS uses
+        0.5-based samples.
+
+        Returns
+        -------
+        : float
+          Detector sample of the principal point
+        """
+        return 512.0
+
+
+    @property
+    def sensor_model_version(self):
+        """
+        Returns
+        -------
+        : int
+          ISIS sensor model version
+        """
+        return 1
