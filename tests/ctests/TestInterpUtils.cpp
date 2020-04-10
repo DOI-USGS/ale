@@ -1,6 +1,6 @@
 #include "gmock/gmock.h"
 
-#include "InterpUtils.h"
+#include "ale/InterpUtils.h"
 
 #include <cmath>
 #include <exception>

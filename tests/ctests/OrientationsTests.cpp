@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "Orientations.h"
+#include "ale/Orientations.h"
 
 #include <cmath>
 #include <exception>

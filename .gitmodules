@@ -2,3 +2,9 @@
 	path = googletest
 	url = https://github.com/abseil/googletest.git
 	branch = release-1.8.1
+[submodule "json"]
+	path = json
+	url = https://github.com/nlohmann/json.git
+[submodule "eigen"]
+	path = eigen
+	url = https://gitlab.com/libeigen/eigen.git

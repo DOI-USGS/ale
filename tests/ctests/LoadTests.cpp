@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "Load.h"
+#include "ale/Load.h"
 
 #include <stdexcept>
 

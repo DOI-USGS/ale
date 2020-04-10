@@ -5,8 +5,8 @@
 #include <stdexcept>
 
 
-#include "Vectors.h"
-#include "InterpUtils.h"
+#include "ale/Vectors.h"
+#include "ale/InterpUtils.h"
 
 namespace ale {
   /** A state vector with position and velocity*/
