@@ -713,7 +713,6 @@ class MexSrcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDistortion, 
         This is
         different from ISIS's center sample because ISIS uses
         0.5-based samples.
-usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter=formatter)
 
         Returns
         -------
