@@ -34,7 +34,7 @@ namespace ale {
     State() {};
 
     bool hasVelocity() const {
-      return !(std::isnan(velocity.x) && std::isnan(velocity.y) && std::isnan(velocity.z));
+      return !(std::isnan(velocity.x) || std::isnan(velocity.y) || std::isnan(velocity.z));
     }
   };
 
