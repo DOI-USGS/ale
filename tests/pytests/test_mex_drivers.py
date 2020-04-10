@@ -5,10 +5,9 @@ import spiceypy as spice
 import json
 from unittest.mock import patch, PropertyMock
 import unittest
-from conftest import get_image_label, get_image_kernels, convert_kernels, compare_dicts
+from conftest import get_image_label, get_image_kernels, convert_kernels, get_isd, compare_dicts
 import ale
-from ale.drivers.mex_drivers import MexHrscPds3NaifSpiceDriver, MexHrscIsisLabelNaifSpiceDriver
-from ale.formatters.usgscsm_formatter import to_usgscsm
+from ale.drivers.mex_drivers import MexHrscPds3NaifSpiceDriver, MexHrscIsisLabelNaifSpiceDriver, MexSrcPds3NaifSpiceDriver 
 
 @pytest.fixture()
 def usgscsm_compare_dict():
@@ -535,21 +534,39 @@ def usgscsm_compare_dict():
 }
 }}
 
-@pytest.fixture(scope="module")
-def test_kernels():
+
+@pytest.fixture()
+def test_mex_src_kernels(scope="module", autouse=True):
+    kernels = get_image_kernels("H0010_0023_SR2")
+    updated_kernels = kernels
+    updated_kernels, binary_kernels = convert_kernels(kernels)
+    yield updated_kernels
+    for kern in binary_kernels:
+        os.remove(kern)
+
+@pytest.fixture()
+def test_mex_hrsc_kernels(scope="module", autouse=True):
     kernels = get_image_kernels('h5270_0000_ir2')
     updated_kernels, binary_kernels = convert_kernels(kernels)
     yield updated_kernels
-    print(updated_kernels)
     for kern in binary_kernels:
         os.remove(kern)
+
+def test_mex_src_load(test_mex_src_kernels):
+    label_file = get_image_label("H0010_0023_SR2", 'pds3')
+    compare_dict = get_isd("mexsrc")
+    isd_str = ale.loads(label_file, props={'kernels': test_mex_src_kernels}, verbose=True)
+    isd_obj = json.loads(isd_str)
+    print(json.dumps(isd_obj, indent=2))
+    assert compare_dicts(isd_obj, compare_dict) == []
+
 
 # Eventually all label/formatter combinations should be tested. For now, isis3/usgscsm and
 # pds3/isis will fail.
 @pytest.mark.parametrize("label,formatter", [('isis3','isis'), ('pds3', 'usgscsm'),
                                               pytest.param('isis3','usgscsm', marks=pytest.mark.xfail),
                                               pytest.param('pds3','isis', marks=pytest.mark.xfail),])
-def test_mex_load(test_kernels, formatter, usgscsm_compare_dict, label):
+def test_mex_load(test_mex_hrsc_kernels, formatter, usgscsm_compare_dict, label):
     label_file = get_image_label('h5270_0000_ir2', label)
 
     with patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_ephemeris_times', \
@@ -570,7 +587,7 @@ def test_mex_load(test_kernels, formatter, usgscsm_compare_dict, label):
         binary_exposure_durations.return_value = [0.012800790786743165, 0.012800790786743165, 0.013227428436279297]
         binary_lines.return_value = [0.5, 1.5, 15086.5]
 
-        usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter=formatter)
+        usgscsm_isd = ale.load(label_file, props={'kernels': test_mex_hrsc_kernels}, formatter=formatter)
         assert compare_dicts(usgscsm_isd, usgscsm_compare_dict['h5270_0000_ir2'][formatter]) == []
 
 # ========= Test mex pds3label and naifspice driver =========
@@ -686,7 +703,7 @@ class test_mex_pds3_naif(unittest.TestCase):
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
 
-# ========= Test mex pds3label and naifspice driver =========
+# ========= Test mex isis3label and naifspice driver =========
 class test_mex_isis3_naif(unittest.TestCase):
 
     def setUp(self):
@@ -737,6 +754,54 @@ class test_mex_isis3_naif(unittest.TestCase):
                                                                    'LineStart': [1, 6665, 6666]}) as parse_table:
 
              assert self.driver.center_ephemeris_time == (255744599.02748165 + 255744684.34504557 + ((15088 - 6666 + 1) * 0.013227428436279297)) / 2
+
+    def test_sensor_model_version(self):
+        assert self.driver.sensor_model_version == 1
+
+
+# ========= Test mex - SRC - pds3label and naifspice driver =========
+class test_mex_src_pds3_naif(unittest.TestCase):
+    def setUp(self):
+        label = get_image_label("H0010_0023_SR2", "pds3")
+        self.driver =  MexSrcPds3NaifSpiceDriver(label)
+
+    def test_short_mission_name(self):
+        assert self.driver.short_mission_name=='mex'
+
+    def test_odtk(self):
+        assert self.driver.odtk == [0.0, 0.0, 0.0]
+
+    def test_ikid(self):
+        with patch('ale.drivers.mex_drivers.spice.bods2c', return_value=12345) as bods2c:
+            assert self.driver.ikid == 12345
+            bods2c.assert_called_with('MEX_HRSC_SRC')
+
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == 'MEX_HRSC_SRC'
+
+    def test_spacecraft_name(self):
+        assert self.driver.spacecraft_name =='MEX'
+
+    def test_focal_length(self):
+        with patch('ale.drivers.mex_drivers.spice.gdpool', return_value=[10.0]) as gdpool, \
+        patch('ale.drivers.mex_drivers.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.ikid == -12345
+            bods2c.assert_called_with('MEX_HRSC_SRC')
+            assert self.driver.focal_length == 10.0
+ 
+    def test_focal2pixel_lines(self):
+        np.testing.assert_almost_equal(self.driver.focal2pixel_lines,
+                                           [0.0, 0.0, 111.1111111])
+
+    def test_focal2pixel_samples(self):
+        np.testing.assert_almost_equal(self.driver.focal2pixel_samples,
+                                           [0.0, 111.1111111, 0.0])
+
+    def test_detector_center_line(self):
+        assert self.driver.detector_center_line == 512.0
+
+    def test_detector_center_sample(self):
+        assert self.driver.detector_center_sample == 512.0
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1

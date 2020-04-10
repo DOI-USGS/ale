@@ -1,0 +1,145 @@
+PDS_VERSION_ID               = PDS3
+
+/* FILE DATA ELEMENTS */
+RECORD_TYPE                  = FIXED_LENGTH
+RECORD_BYTES                 = 2016
+FILE_RECORDS                 = 1016
+LABEL_RECORDS                = 5
+
+/* POINTERS TO DATA OBJECTS */
+^IMAGE_HEADER                = 6
+^IMAGE                       = 9
+
+/* IDENTIFICATION DATA ELEMENTS */
+FILE_NAME                    = H0010_0023_SR2.IMG
+DATA_SET_ID                  = MEX-M-HRSC-3-RDR-V3.0
+DATA_SET_NAME                = "MARS EXPRESS HRSC RADIOMETRIC RDR V3.0"
+DETECTOR_ID                  = MEX_HRSC_SRC
+EVENT_TYPE                   = MARS-REGIONAL-MAPPING-Vo-Im-Tc
+INSTRUMENT_HOST_ID           = MEX
+INSTRUMENT_HOST_NAME         = "MARS EXPRESS"
+INSTRUMENT_ID                = HRSC
+INSTRUMENT_NAME              = "HIGH RESOLUTION STEREO CAMERA"
+MISSION_NAME                 = "MARS EXPRESS"
+MISSION_PHASE_NAME           = MC_Phase_0
+PROCESSING_LEVEL_ID          = 2
+PRODUCT_CREATION_TIME        = 2015-03-17T09:07:21.000Z
+PRODUCT_ID                   = H0010_0023_SR2.IMG
+RELEASE_ID                   = 0001
+REVISION_ID                  = 0000
+
+/* TIME DATA ELEMENTS */
+SPACECRAFT_CLOCK_START_COUNT = 1/0021823325.32303
+SPACECRAFT_CLOCK_STOP_COUNT  = 1/0021823574.56834
+IMAGE_TIME                   = 2004-01-10T14:02:57.819Z
+START_TIME                   = 2004-01-10T14:02:57.817Z
+STOP_TIME                    = 2004-01-10T14:02:57.820Z
+
+/* ORBITAL DATA ELEMENTS */
+ASCENDING_NODE_LONGITUDE     = 228.73
+MAXIMUM_RESOLUTION           = 2.529 <m/pixel>
+FOOTPRINT_POINT_LATITUDE     = (-6.20052, -6.19903, -6.19702, -6.1957,
+                                -6.19442, -6.19297, -6.19016, -6.18836,
+                                -6.1864, -6.18478, -6.18308, -6.18163,
+                                -6.18013, -6.1777, -6.17651, -6.17536,
+                                -6.17314, -6.17164, -6.16926, -6.1675,
+                                -6.16613, -6.16464, -6.16306, -6.16169,
+                                -6.16003, -6.15883, -6.15883, -6.15883,
+                                -6.15883, -6.15883, -6.15883, -6.15883,
+                                -6.15883, -6.15883, -6.15883, -6.15883,
+                                -6.15883, -6.15883, -6.15883, -6.15883,
+                                -6.15883, -6.15883, -6.15883, -6.15883,
+                                -6.15883, -6.15883, -6.15883, -6.15883,
+                                -6.15883, -6.15883, -6.15956, -6.16225,
+                                -6.1634, -6.16545, -6.16776, -6.17016,
+                                -6.17174, -6.17417, -6.17605, -6.17741,
+                                -6.17929, -6.18095, -6.18249, -6.18492,
+                                -6.18671, -6.18804, -6.18987, -6.19102,
+                                -6.19252, -6.19486, -6.19631, -6.19845,
+                                -6.20015, -6.20182, -6.20182, -6.20182,
+                                -6.20182, -6.20182, -6.20182, -6.20181,
+                                -6.20181, -6.20181, -6.20181, -6.20181,
+                                -6.20181, -6.20181, -6.20181, -6.20181,
+                                -6.20181, -6.20181, -6.20181, -6.20181,
+                                -6.20181, -6.20181, -6.2018, -6.2018, -6.2018,
+                                -6.2018, -6.2018, -6.20052)
+FOOTPRINT_POINT_LONGITUDE    = (90.457, 90.457, 90.457, 90.457, 90.457,
+                                90.457, 90.457, 90.457, 90.457, 90.457, 90.457,
+                                90.457, 90.457, 90.457, 90.457, 90.457, 90.457,
+                                90.457, 90.457, 90.4571, 90.4571, 90.4571,
+                                90.4571, 90.4571, 90.4571, 90.4571, 90.4589,
+                                90.4606, 90.4623, 90.464, 90.4657, 90.4674,
+                                90.4692, 90.4709, 90.4726, 90.4743, 90.476,
+                                90.4778, 90.4795, 90.4812, 90.4829, 90.4846,
+                                90.4864, 90.4881, 90.4898, 90.4915, 90.4932,
+                                90.495, 90.4967, 90.4984, 90.5004, 90.5004,
+                                90.5004, 90.5004, 90.5004, 90.5002, 90.5002,
+                                90.5002, 90.5002, 90.5002, 90.5002, 90.5002,
+                                90.5002, 90.5002, 90.5002, 90.5002, 90.5002,
+                                90.5002, 90.5002, 90.5002, 90.5002, 90.5002,
+                                90.5002, 90.5002, 90.4984, 90.4967, 90.495,
+                                90.4933, 90.4916, 90.4899, 90.4881, 90.4864,
+                                90.4847, 90.483, 90.4813, 90.4795, 90.4778,
+                                90.4761, 90.4744, 90.4727, 90.471, 90.4692,
+                                90.4675, 90.4658, 90.4641, 90.4624, 90.4606,
+                                90.4589, 90.4572, 90.457)
+ORBIT_NUMBER                 = 10
+ORBITAL_ECCENTRICITY         = 0.717
+ORBITAL_INCLINATION          = 86.63
+ORBITAL_SEMIMAJOR_AXIS       = 12956.1
+PERIAPSIS_ALTITUDE           = 274.15
+PERIAPSIS_ARGUMENT_ANGLE     = 357.88
+PERIAPSIS_TIME               = 2004-01-10T14:03:56.000Z
+SPACECRAFT_ORIENTATION       = (0.0, 1.0, 0.0)
+^MEX_ORIENTATION_DESC        = MEX_ORIENTATION_DESC.TXT
+SPACECRAFT_POINTING_MODE     = NADIR
+^MEX_POINTING_DESC           = MEX_POINTING_DESC.TXT
+RIGHT_ASCENSION              = -1e+32
+DECLINATION                  = -1e+32
+OFFSET_ANGLE                 = -1e+32
+SPACECRAFT_SOLAR_DISTANCE    = 2.22398e+08
+TARGET_NAME                  = MARS
+
+/* CAMERA DATA ELEMENTS */
+BUFFER_MODE_ID               = DIRECT
+EXPOSURE_DURATION            = 3.024 <ms>
+INST_CMPRS_NAME              = "DISCRETE COSINE TRANSFORMATION (DCT)"
+INST_CMPRS_RATIO             = 17.5589
+INST_CMPRS_QUALITY           = 0
+INST_CMPRS_QUANTZ_TBL_ID     = 0
+INSTRUMENT_TEMPERATURE       = 14.2424 <degC>
+LINE_FIRST_PIXEL             = 9
+MISSING_FRAMES               = 0
+SAMPLE_FIRST_PIXEL           = 13
+START_BIT                    = 0
+
+/* RADIOMETRIC DATA ELEMENTS */
+BANDWIDTH                    = 250.0 <nm>
+CENTER_FILTER_WAVELENGTH     = 600.0 <nm>
+RADIANCE_OFFSET              = -9.99e+31 <W*m**-2*sr**-1>
+RADIANCE_SCALING_FACTOR      = -9.99e+31 <W*m**-2*sr**-1>
+REFLECTANCE_SCALING_FACTOR   = -9.99e+31
+
+/* DATA OBJECT DEFINITIONS */
+Object = IMAGE
+  INTERCHANGE_FORMAT = BINARY
+  LINES              = 1008
+  LINE_SAMPLES       = 1008
+  SAMPLE_TYPE        = MSB_INTEGER
+  SAMPLE_BITS        = 16
+  BANDS              = 1
+  BAND_STORAGE_TYPE  = BAND_SEQUENTIAL
+  MAXIMUM            = 4683
+  MEAN               = 3512.55
+  MINIMUM            = 2940
+  STANDARD_DEVIATION = 98.1897
+End_Object
+
+/* IMAGE HEADER DATA ELEMENTS */
+Object = IMAGE_HEADER
+  HEADER_TYPE        = VICAR2
+  INTERCHANGE_FORMAT = ASCII
+  BYTES              = 6048
+  ^DESCRIPTION       = VICAR2.TXT
+End_Object
+End
