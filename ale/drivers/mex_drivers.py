@@ -497,6 +497,21 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
                 raise Exception ("Instrument ID is wrong.")
             return self.label['IsisCube']['Archive']['DetectorId']
 
+
+        @property
+        def sensor_name(self):
+            """
+            Returns the name of the instrument. Need to over-ride isis_label because
+            InstrumentName is not defined in the ISIS label for MEX HSRC cubes.
+
+            Returns
+            -------
+            : str
+              Name of the sensor
+            """
+            return self.instrument_id
+
+
         @property
         def sensor_model_version(self):
             """
@@ -586,10 +601,10 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
             return spice.bods2c(self.instrument_id)
 
 
-
 class MexSrcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDistortion, Driver):
     """
-    Driver for a PDS3 Mars Express (Mex) High Resolution Stereo Camera (HRSC) - SRC image.
+    Driver for a PDS3 Mars Express (Mex) High Resolution Stereo Camera (HRSC) - Super Resolution 
+    Channel (SRC) image.
     """
 
     @property
@@ -654,9 +669,6 @@ class MexSrcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDistortion, 
     @property
     def focal2pixel_lines(self):
         """
-        Expects fikid to be defined. This must be the integer Naif id code of
-        the filter-sepcific instrument.
-
         NOTE: These values are pulled from ISIS iak kernels.
 
         Returns
@@ -670,9 +682,6 @@ class MexSrcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDistortion, 
     @property
     def focal2pixel_samples(self):
         """
-        Expects fikid to be defined. This must be the integer Naif id code of
-        the filter-sepcific instrument.
-
         NOTE: These values are pulled from ISIS iak kernels.
 
         Returns
@@ -702,8 +711,9 @@ class MexSrcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDistortion, 
         Returns the center detector sample.
 
         This is
-        different from ISIS's center sample because ISIS line scan sensors use
-        0.5 based detector samples.
+        different from ISIS's center sample because ISIS uses
+        0.5-based samples.
+usgscsm_isd = ale.load(label_file, props={'kernels': test_kernels}, formatter=formatter)
 
         Returns
         -------
