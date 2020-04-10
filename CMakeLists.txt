@@ -14,11 +14,26 @@ include(GNUInstallDirs)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(ALE_BUILD_LOAD ON CACHE BOOL "If the C++ Python load interface should be built.")
+option(ALE_BUILD_LOAD "If the C++ Python load interface should be built." ON)
+option(ALE_USE_EXTERNAL_JSON "If an external nlohmann JSON library should be used" OFF)
+option(ALE_USE_EXTERNAL_EIGEN "If an external EIGEN library should be used" OFF)
 
 # Third Party Dependencies
-find_package(Eigen3 3.3    REQUIRED NO_MODULE)
-find_package(nlohmann_json REQUIRED)
+if(ALE_USE_EXTERNAL_JSON)
+  find_package(nlohmann_json REQUIRED)
+else()
+  set(JSON_BuildTests OFF CACHE INTERNAL "")
+  add_subdirectory(json)
+endif()
+
+if(ALE_USE_EXTERNAL_EIGEN)
+  find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+else()
+  add_library (eigen INTERFACE)
+  add_library (Eigen3::Eigen ALIAS eigen)
+  target_include_directories (eigen INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/eigen)
+endif()
 
 if(ALE_BUILD_LOAD)
   # If there is an Anaconda environment activated, search that for Python first
@@ -31,7 +46,7 @@ if(ALE_BUILD_LOAD)
 endif()
 
 # Library setup
-set(ALE_BUILD_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/")
+set(ALE_BUILD_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/ale")
 set(ALE_INSTALL_INCLUDE_DIR "include/ale")
 set(ALE_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/InterpUtils.cpp
                   ${CMAKE_CURRENT_SOURCE_DIR}/src/Rotation.cpp
@@ -62,8 +77,9 @@ set_target_properties(ale PROPERTIES
 # Use generator expressions so that downstream projects can use this target
 target_include_directories(ale
                            PUBLIC
-                           $<BUILD_INTERFACE:${ALE_BUILD_INCLUDE_DIR}>
-                           $<INSTALL_INTERFACE:include>)
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                           $<INSTALL_INTERFACE:include>
+                           PRIVATE)
 
 target_link_libraries(ale PRIVATE ${ALE_PRIVATE_LINKS}
                           PUBLIC ${ALE_PUBLIC_LINKS})

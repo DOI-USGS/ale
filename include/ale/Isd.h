@@ -7,11 +7,10 @@
 
 #include <nlohmann/json.hpp>
 
-#include "Distortion.h"
-
-#include "Rotation.h"
-#include "States.h"
-#include "Orientations.h"
+#include "ale/Distortion.h"
+#include "ale/Rotation.h"
+#include "ale/States.h"
+#include "ale/Orientations.h"
 
 namespace ale {
 
