@@ -62,8 +62,6 @@ namespace ale {
 
     PositionInterpolation interpMethod;
 
-    Rotation const_rotation;
-
     States inst_pos;
     States sun_pos;
 
