@@ -29,6 +29,18 @@ class OrientationTest : public ::testing::Test {
     Orientations orientations;
 };
 
+class ConstOrientationTest : public OrientationTest{
+  protected:
+    void SetUp() override {
+      OrientationTest::SetUp();
+      constRotation = Rotation(0, 1, 0, 0);
+      constOrientations = Orientations(rotations, times, avs, constRotation);
+    }
+
+    Rotation constRotation;
+    Orientations constOrientations;
+};
+
 TEST_F(OrientationTest, ConstructorAccessors) {
   vector<Rotation> outputRotations = orientations.getRotations();
   vector<double> outputTimes = orientations.getTimes();
@@ -129,4 +141,44 @@ TEST_F(OrientationTest, OrientationMultiplication) {
     EXPECT_EQ(expectedQuats[i][2], quats[2]);
     EXPECT_EQ(expectedQuats[i][3], quats[3]);
   }
+}
+
+TEST_F(ConstOrientationTest, RotateAt) {
+  Vec3d rotatedX = constRotation(orientations.rotateVectorAt(0.0, Vec3d(1.0, 0.0, 0.0)));
+  Vec3d constRotatedX = constOrientations.rotateVectorAt(0.0, Vec3d(1.0, 0.0, 0.0));
+  EXPECT_NEAR(rotatedX.x, constRotatedX.x, 1e-10);
+  EXPECT_NEAR(rotatedX.y, constRotatedX.y, 1e-10);
+  EXPECT_NEAR(rotatedX.z, constRotatedX.z, 1e-10);
+  Vec3d rotatedY = constRotation(orientations.rotateVectorAt(0.0, Vec3d(0.0, 1.0, 0.0)));
+  Vec3d constRotatedY = constOrientations.rotateVectorAt(0.0, Vec3d(0.0, 1.0, 0.0));
+  EXPECT_NEAR(rotatedY.x, constRotatedY.x, 1e-10);
+  EXPECT_NEAR(rotatedY.y, constRotatedY.y, 1e-10);
+  EXPECT_NEAR(rotatedY.z, constRotatedY.z, 1e-10);
+  Vec3d rotatedZ = constRotation(orientations.rotateVectorAt(0.0, Vec3d(0.0, 0.0, 1.0)));
+  Vec3d constRotatedZ = constOrientations.rotateVectorAt(0.0, Vec3d(0.0, 0.0, 1.0));
+  EXPECT_NEAR(rotatedZ.x, constRotatedZ.x, 1e-10);
+  EXPECT_NEAR(rotatedZ.y, constRotatedZ.y, 1e-10);
+  EXPECT_NEAR(rotatedZ.z, constRotatedZ.z, 1e-10);
+}
+
+TEST_F(ConstOrientationTest, OrientationMultiplication) {
+  constOrientations *= orientations;
+  vector<Rotation> outputRotations = constOrientations.getRotations();
+  vector<vector<double>> expectedQuats = {
+    {-0.5, 0.5, 0.5, 0.5},
+    {-0.5,-0.5,-0.5,-0.5},
+    { 1.0, 0.0, 0.0, 0.0}
+  };
+  for (size_t i = 0; i < outputRotations.size(); i++) {
+    vector<double> quats = outputRotations[i].toQuaternion();
+    EXPECT_EQ(expectedQuats[i][0], quats[0]);
+    EXPECT_EQ(expectedQuats[i][1], quats[1]);
+    EXPECT_EQ(expectedQuats[i][2], quats[2]);
+    EXPECT_EQ(expectedQuats[i][3], quats[3]);
+  }
+  vector<double> constQuats = constOrientations.getConstantRotation().toQuaternion();
+  EXPECT_EQ(constQuats[0], 0);
+  EXPECT_EQ(constQuats[1], 1);
+  EXPECT_EQ(constQuats[2], 0);
+  EXPECT_EQ(constQuats[3], 0);
 }

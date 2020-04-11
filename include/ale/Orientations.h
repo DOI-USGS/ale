@@ -21,7 +21,6 @@ namespace ale {
       const std::vector<Rotation> &rotations,
       const std::vector<double> &times,
       const std::vector<Vec3d> &avs = std::vector<ale::Vec3d>(),
-      const int refFrame = 1,
       const Rotation &constRot = Rotation(1, 0, 0, 0),
       const std::vector<int> const_frames = std::vector<int>(),
       const std::vector<int> time_dependent_frames = std::vector<int>()
@@ -40,7 +39,6 @@ namespace ale {
     std::vector<double> getTimes() const;
     std::vector<int> getConstantFrames() const;
     std::vector<int> getTimeDependentFrames() const;
-    int getReferenceFrame() const;
     Rotation getConstantRotation() const;
 
     /**
@@ -89,7 +87,6 @@ namespace ale {
     std::vector<int> m_timeDepFrames;
     std::vector<int> m_constFrames;
     Rotation m_constRotation;
-    int m_refFrame;
   };
 }
 
