@@ -142,7 +142,9 @@ class Radar():
         : ndarray
           ephemeris times split based on image lines
         """
-        raise NotImplementedError
+        # 0.25 is the delta used by minirf, used as a default.
+        num_states = (self.ephemeris_stop_time - self.ephemeris_start_time)/0.25 + 1
+        return np.linspace(self.ephemeris_start_time,  self.ephemeris_stop_time, num_states)
 
     @property
     def wavelength(self):

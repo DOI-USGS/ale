@@ -84,17 +84,8 @@ def to_usgscsm(driver):
             "unit": "m"
         }
 
-    # line scan sensor model specifics
-    if isinstance(driver, LineScanner):
-        isd_data['name_model'] = 'USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL'
-        isd_data['interpolation_method'] = 'lagrange'
-
-        start_lines, start_times, scan_rates = driver.line_scan_rate
-        center_time = driver.center_ephemeris_time
-        isd_data['line_scan_rate'] = [[line, time, rate] for line, time, rate in zip(start_lines, start_times, scan_rates)]
-        isd_data['starting_ephemeris_time'] = driver.ephemeris_start_time
-        isd_data['center_ephemeris_time'] = center_time
-
+    # shared interpolation needed for LineScanner and Radar
+    if isinstance(driver, LineScanner) or isinstance(driver, Radar):
         interp_times = np.linspace(position_times[0],
                                    position_times[-1],
                                    int(driver.image_lines / 64))
@@ -128,6 +119,21 @@ def to_usgscsm(driver):
             'velocities' : interp_vel,
             'unit' : 'm'
         }
+        if len(interp_times) > 1:
+            isd_data['dt_ephemeris'] = (interp_times[-1] - interp_times[0]) / (len(interp_times) - 1)
+        else:
+            isd_data['dt_ephemeris'] = 0
+
+    # line scan sensor model specifics
+    if isinstance(driver, LineScanner):
+        isd_data['name_model'] = 'USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL'
+        isd_data['interpolation_method'] = 'lagrange'
+
+        start_lines, start_times, scan_rates = driver.line_scan_rate
+        center_time = driver.center_ephemeris_time
+        isd_data['line_scan_rate'] = [[line, time, rate] for line, time, rate in zip(start_lines, start_times, scan_rates)]
+        isd_data['starting_ephemeris_time'] = driver.ephemeris_start_time
+        isd_data['center_ephemeris_time'] = center_time
 
         rotation_interp = sensor_to_target.reinterpolate(interp_times)
         isd_data['sensor_orientation'] = {
@@ -135,10 +141,7 @@ def to_usgscsm(driver):
         }
 
         isd_data['t0_ephemeris'] = interp_times[0] - center_time
-        if len(interp_times) > 1:
-            isd_data['dt_ephemeris'] = (interp_times[-1] - interp_times[0]) / (len(interp_times) - 1)
-        else:
-            isd_data['dt_ephemeris'] = 0
+
         isd_data['t0_quaternion'] = isd_data['t0_ephemeris']
         isd_data['dt_quaternion'] = isd_data['dt_ephemeris']
 

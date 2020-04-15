@@ -583,7 +583,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         return range_coefficients_et
 
     @property
-    def ephemeris_time(self):
+    def ephemeris_start_time(self):
         """
         Returns the start and stop ephemeris times for the image. 
 
@@ -592,6 +592,19 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         : List
           [start time, stop time]
         """
-        newstart = spice.str2et(str(self.utc_start_time))
         newend = spice.str2et(str(self.utc_stop_time))
-        return [newstart, newend]
+        return spice.str2et(str(self.utc_start_time))
+
+    @property
+    def ephemeris_stop_time(self):
+        """
+        Returns the start and stop ephemeris times for the image. 
+
+        Returns
+        -------
+        : List
+          [start time, stop time]
+        """
+        return spice.str2et(str(self.utc_stop_time))
+
+
