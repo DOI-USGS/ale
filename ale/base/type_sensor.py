@@ -1,5 +1,4 @@
 import numpy as np
-import spiceypy as spice
 
 class LineScanner():
 
@@ -132,7 +131,7 @@ class Radar():
     def ephemeris_time(self):
         """
         Returns an array of times between the start/stop ephemeris times
-        based on 
+        based on the start/stop times with a timestep 0.25.
         Expects ephemeris start/stop times to be defined. These should be
         floating point numbers containing the start and stop times of the
         images.
@@ -174,7 +173,7 @@ class Radar():
     @property
     def scaled_pixel_width(self):
         """
-        Returns the pixel width scaled by #FIXME
+        Returns the scaled pixel width
 
         Returns
         -------

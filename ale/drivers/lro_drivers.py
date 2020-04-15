@@ -7,7 +7,6 @@ from glob import glob
 from ale.util import get_metakernels
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
-from ale.base.data_isis import IsisSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import LineScanner, Radar
@@ -507,7 +506,6 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
         return rotated_velocity[0]
 
 
-#class LroMiniRfIsisLabelIsisSpiceDriver(Radar, IsisSpice, IsisLabel, Driver):
 class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
     @property
     def instrument_id(self):
@@ -589,21 +587,20 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
 
         Returns
         -------
-        : List
-          [start time, stop time]
+        : float
+          start time
         """
-        newend = spice.str2et(str(self.utc_stop_time))
         return spice.str2et(str(self.utc_start_time))
 
     @property
     def ephemeris_stop_time(self):
         """
-        Returns the start and stop ephemeris times for the image. 
+        Returns the stop ephemeris times for the image. 
 
         Returns
         -------
-        : List
-          [start time, stop time]
+        : float
+          stop time
         """
         return spice.str2et(str(self.utc_stop_time))
 
