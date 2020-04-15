@@ -129,31 +129,6 @@ class Radar():
         return "USGS_ASTRO_SAR_MODEL"
 
     @property
-    def ephemeris_start_time(self):
-        """
-        Returns the start ephemeris time for the image
-
-        Returns
-        -------
-        : double
-          Start ephemeris time for the image
-        """
-        return [self.start_ephemeris_time]
-
-    @property
-    def ephemeris_stop_time(self):
-        """
-        Returns the ending ephemeris time for the image
-
-        Returns
-        -------
-        : double
-          Ephemeris stop time for an image
-        """
-        return self.stop_ephemeris_time
-
-    #FIXME
-    @property
     def ephemeris_time(self):
         newstart = spice.str2et(str(self.utc_start_time))
         newend = spice.str2et(str(self.utc_stop_time))
@@ -169,9 +144,7 @@ class Radar():
         : double
           Wavelength used to create an image in meters
         """
-
-#       r  frequency = (double) inst["Frequency"];
-#  wavelength = clight_c() / frequency / 1000.0;eturn self.wavelength
+        return self.wavelength
 
     @property
     def line_exposure_duration(self):
@@ -207,5 +180,5 @@ class Radar():
         : list
           Coefficients needed for range conversion
         """
-        return self.scaled_pixel_width
+        return self.range_conversion_coefficients
 
