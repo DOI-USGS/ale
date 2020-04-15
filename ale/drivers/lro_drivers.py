@@ -7,6 +7,7 @@ from glob import glob
 from ale.util import get_metakernels
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
+from ale.base.data_isis import IsisSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import LineScanner, Radar
@@ -452,7 +453,6 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
     def additional_preroll(self):
         """
         Returns the addition preroll defined in an IAK.
-LroMiniRfIsisLabelNaifSpiceDriver
          Returns
          -------
          : float
@@ -507,7 +507,22 @@ LroMiniRfIsisLabelNaifSpiceDriver
         return rotated_velocity[0]
 
 
+#class LroMiniRfIsisLabelIsisSpiceDriver(Radar, IsisSpice, IsisLabel, Driver):
 class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
+    @property
+    def instrument_id(self):
+        """
+        The short text name for the instrument
+
+        Returns an instrument id uniquely identifying the instrument. Used to acquire
+        instrument codes from Spice Lib bods2c routine.
+
+        Returns
+        -------
+        str
+          The short text name for the instrument
+        """
+        return super().instrument_id
 
     @property
     def wavelength(self):
@@ -537,6 +552,9 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         """
         return self.label['IsisCube']['Instrument']['ScaledPixelHeight']; 
 
+
+    # Default line_exposure_duration assumes that time is given in milliseconds and coverts
+    # in this case, the time is already given in seconds.
     @property
     def line_exposure_duration(self):
         """
@@ -559,5 +577,21 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         : List
           range conversion coefficients
         """
-        return self.label['IsisCube']['Instrument']['RangeCoefficientSet']; 
 
+        range_coefficients_utc = self.label['IsisCube']['Instrument']['RangeCoefficientSet']; 
+        range_coefficients_et = [[spice.str2et(elt[0])] + elt[1:] for elt in range_coefficients_utc] 
+        return range_coefficients_et
+
+    @property
+    def ephemeris_time(self):
+        """
+        Returns the start and stop ephemeris times for the image. 
+
+        Returns
+        -------
+        : List
+          [start time, stop time]
+        """
+        newstart = spice.str2et(str(self.utc_start_time))
+        newend = spice.str2et(str(self.utc_stop_time))
+        return [newstart, newend]

@@ -130,9 +130,19 @@ class Radar():
 
     @property
     def ephemeris_time(self):
-        newstart = spice.str2et(str(self.utc_start_time))
-        newend = spice.str2et(str(self.utc_stop_time))
-        return [newstart, newend]
+        """
+        Returns an array of times between the start/stop ephemeris times
+        based on 
+        Expects ephemeris start/stop times to be defined. These should be
+        floating point numbers containing the start and stop times of the
+        images.
+
+        Returns
+        -------
+        : ndarray
+          ephemeris times split based on image lines
+        """
+        raise NotImplementedError
 
     @property
     def wavelength(self):
@@ -144,7 +154,7 @@ class Radar():
         : double
           Wavelength used to create an image in meters
         """
-        return self.wavelength
+        raise NotImplementedError
 
     @property
     def line_exposure_duration(self):
@@ -156,7 +166,8 @@ class Radar():
         : double
           Exposure duration for a line
         """
-        return self.line_exposure_duration
+        raise NotImplmentedError
+       
 
     @property
     def scaled_pixel_width(self):
@@ -168,7 +179,7 @@ class Radar():
         : double
           Scaled pixel width
         """
-        return self.scaled_pixel_width
+        raise NotImplementedError
 
     @property
     def range_conversion_coefficients(self):
@@ -180,5 +191,5 @@ class Radar():
         : list
           Coefficients needed for range conversion
         """
-        return self.range_conversion_coefficients
+        raise NotImplementedError
 
