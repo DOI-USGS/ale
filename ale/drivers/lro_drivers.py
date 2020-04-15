@@ -9,7 +9,7 @@ from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
-from ale.base.type_sensor import LineScanner
+from ale.base.type_sensor import LineScanner, Radar
 
 
 class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver):
@@ -452,7 +452,7 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
     def additional_preroll(self):
         """
         Returns the addition preroll defined in an IAK.
-
+LroMiniRfIsisLabelNaifSpiceDriver
          Returns
          -------
          : float
@@ -505,3 +505,59 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
         rotation = frame_chain.compute_rotation(1, lro_bus_id)
         rotated_velocity = spice.mxv(rotation._rots.as_dcm()[0], velocity)
         return rotated_velocity[0]
+
+
+class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
+
+    @property
+    def wavelength(self):
+        """
+        Returns the wavelength in meters used for image acquistion. 
+
+        Returns
+        -------
+        : double
+          Wavelength in meters used to create an image
+        """
+
+        # Get float value of frequency in GHz
+        frequency = self.label['IsisCube']['Instrument']['Frequency'].value
+        wavelength = spice.clight() / frequency / 1000.0
+        return wavelength
+
+    @property
+    def scaled_pixel_width(self):
+        """
+        Returns the scaled pixel width
+
+        Returns
+        -------
+        : double
+          scaled pixel width
+        """
+        return self.label['IsisCube']['Instrument']['ScaledPixelHeight']; 
+
+    @property
+    def line_exposure_duration(self):
+        """
+        Line exposure duration in seconds. The sum of the burst and the delay for the return. 
+
+        Returns
+        -------
+        : double
+          scaled pixel width
+        """
+        return self.label['IsisCube']['Instrument']['LineExposureDuration']; 
+
+    @property
+    def range_conversion_coefficients(self):
+        """
+        Range conversion coefficients
+
+        Returns
+        -------
+        : List
+          range conversion coefficients
+        """
+        return self.label['IsisCube']['Instrument']['RangeCoefficientSet']; 
+

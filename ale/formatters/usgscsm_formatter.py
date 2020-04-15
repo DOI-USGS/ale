@@ -4,7 +4,7 @@ from scipy.interpolate import interp1d, BPoly
 
 from ale.transformation import FrameChain
 
-from ale.base.type_sensor import LineScanner, Framer
+from ale.base.type_sensor import LineScanner, Framer, Radar
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
 def to_usgscsm(driver):
@@ -23,7 +23,14 @@ def to_usgscsm(driver):
     """
     isd_data = {}
 
-    # exterior orientation
+
+    # general information
+    isd_data['image_lines'] = driver.image_lines
+    isd_data['image_samples'] = driver.image_samples
+    isd_data['name_platform'] = driver.platform_name
+    isd_data['name_sensor'] = driver.sensor_name
+
+    # shared exterior orientation
     body_radii = driver.target_body_radii
     isd_data['radii'] = {
         'semimajor' : body_radii[0],
@@ -36,46 +43,46 @@ def to_usgscsm(driver):
         'velocities' : velocities,
         'unit' : 'm'
     }
-    sun_positions, sun_velocities, _ = driver.sun_position
-    isd_data['sun_position'] = {
-        'positions' : sun_positions,
-        'velocities' : sun_velocities,
-        'unit' : 'm'
-    }
+    
+    # shared isd keywords for Framer and Linescanner
+    if isinstance(driver, LineScanner) or isinstance(driver, Framer):
+        # exterior orientation for just Framer and LineScanner
+        sun_positions, sun_velocities, _ = driver.sun_position
+        isd_data['sun_position'] = {
+            'positions' : sun_positions,
+            'velocities' : sun_velocities,
+            'unit' : 'm'
+        }
 
-    frame_chain = driver.frame_chain
-    sensor_to_target = frame_chain.compute_rotation(driver.sensor_frame_id, driver.target_frame_id)
-    quaternions = sensor_to_target.quats
-    isd_data['sensor_orientation'] = {
-        'quaternions' : quaternions
-    }
+        frame_chain = driver.frame_chain
+        sensor_to_target = frame_chain.compute_rotation(driver.sensor_frame_id, driver.target_frame_id)
+        quaternions = sensor_to_target.quats
+        isd_data['sensor_orientation'] = {
+            'quaternions' : quaternions
+        }
 
-    # interior orientation
-    isd_data['detector_sample_summing'] = driver.sample_summing
-    isd_data['detector_line_summing'] = driver.line_summing
-    isd_data['focal_length_model'] = {
-        'focal_length' : driver.focal_length
-    }
-    isd_data['detector_center'] = {
-        'line' : driver.detector_center_line,
-        'sample' : driver.detector_center_sample
-    }
-    isd_data['starting_detector_line'] = driver.detector_start_line
-    isd_data['starting_detector_sample'] = driver.detector_start_sample
-    isd_data['focal2pixel_lines'] = driver.focal2pixel_lines
-    isd_data['focal2pixel_samples'] = driver.focal2pixel_samples
-    isd_data['optical_distortion'] = driver.usgscsm_distortion_model
+        # interior orientation
+        isd_data['detector_sample_summing'] = driver.sample_summing
+        isd_data['detector_line_summing'] = driver.line_summing
+        isd_data['focal_length_model'] = {
+            'focal_length' : driver.focal_length
+        }
+        isd_data['detector_center'] = {
+            'line' : driver.detector_center_line,
+            'sample' : driver.detector_center_sample
+        }
+        isd_data['starting_detector_line'] = driver.detector_start_line
+        isd_data['starting_detector_sample'] = driver.detector_start_sample
+        isd_data['focal2pixel_lines'] = driver.focal2pixel_lines
+        isd_data['focal2pixel_samples'] = driver.focal2pixel_samples
+        isd_data['optical_distortion'] = driver.usgscsm_distortion_model
 
-    # general information
-    isd_data['image_lines'] = driver.image_lines
-    isd_data['image_samples'] = driver.image_samples
-    isd_data['name_platform'] = driver.platform_name
-    isd_data['name_sensor'] = driver.sensor_name
-    isd_data['reference_height'] = {
-        "maxheight": 1000,
-        "minheight": -1000,
-        "unit": "m"
-    }
+        # general information
+        isd_data['reference_height'] = {
+            "maxheight": 1000,
+            "minheight": -1000,
+            "unit": "m"
+        }
 
     # line scan sensor model specifics
     if isinstance(driver, LineScanner):
@@ -140,6 +147,16 @@ def to_usgscsm(driver):
     if isinstance(driver, Framer):
         isd_data['name_model'] = 'USGS_ASTRO_FRAME_SENSOR_MODEL'
         isd_data['center_ephemeris_time'] = driver.center_ephemeris_time
+
+    # radar sensor model specifics
+    if isinstance(driver, Radar):
+        isd_data['name_model'] = 'USGS_ASTRO_SAR_MODEL'
+        isd_data['starting_ephemeris_time'] = driver.ephemeris_time[0]
+        isd_data['ending_ephemeris_time'] = driver.ephemeris_time[1]
+        isd_data['wavelength'] = driver.wavelength
+        isd_data['line_exposure_duration'] = driver.line_exposure_duration
+        isd_data['scaled_pixel_width'] = driver.scaled_pixel_width
+        isd_data['range_conversion_coefficients'] = driver.range_conversion_coefficients
 
     # check that there is a valid sensor model name
     if 'name_model' not in isd_data:
