@@ -1,0 +1,405 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 2367
+      Lines   = 64576
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    MissionName               = "LUNAR RECONNAISSANCE ORBITER"
+    SpacecraftName            = "LUNAR RECONNAISSANCE ORBITER"
+    InstrumentHostId          = LRO
+    InstrumentName            = "MINI-RF LRO"
+    InstrumentId              = MRFLRO
+    TargetName                = MOON
+    StartTime                 = 2010-04-25T04:22:31.244874
+    StopTime                  = 2010-04-25T04:27:35.0375
+    SpacecraftClockStartCount = UNK
+    SpacecraftClockStopCount  = UNK
+    OrbitNumber               = 3821
+    IncidenceAngle            = 47.86735008 <deg>
+    InstrumentModeId          = ZOOM_S
+    InstrumentModeDesc        = SAR
+    LookDirection             = RIGHT
+    ScaledPixelHeight         = 7.500000000000
+    ScaledPixelWidth          = 7.500000000000
+    LineExposureDuration      = 0.004704421474
+    AzimuthResolution         = 15.752510
+    RangeResolution           = 32.991745
+    RangeCoefficientSet       = (("2010-04-25T04:22:31.285", 79942.380871,
+                                 6.921229E-01, 3.401937E-06, -2.399242E-11),
+                                 ("2010-04-25T04:22:53.665", 79942.379570,
+                                 6.907953E-01, 3.413779E-06, -2.404314E-11),
+                                 ("2010-04-25T04:23:08.713", 79942.378479,
+                                 6.899233E-01, 3.421423E-06, -2.407141E-11),
+                                 ("2010-04-25T04:23:23.761", 79942.378297,
+                                 6.890917E-01, 3.428773E-06, -2.410212E-11),
+                                 ("2010-04-25T04:23:38.810", 79942.377491,
+                                 6.882584E-01, 3.436150E-06, -2.413188E-11),
+                                 ("2010-04-25T04:23:53.858", 79942.375472,
+                                 6.874664E-01, 3.443100E-06, -2.415961E-11),
+                                 ("2010-04-25T04:24:08.906", 79942.375823,
+                                 6.866729E-01, 3.450098E-06, -2.418824E-11),
+                                 ("2010-04-25T04:24:23.955", 79942.375868,
+                                 6.859205E-01, 3.456725E-06, -2.421630E-11),
+                                 ("2010-04-25T04:24:39.003", 79942.373743,
+                                 6.851668E-01, 3.463351E-06, -2.424279E-11),
+                                 ("2010-04-25T04:24:54.051", 79942.375815,
+                                 6.844538E-01, 3.469680E-06, -2.426866E-11),
+                                 ("2010-04-25T04:25:09.099", 79942.373348,
+                                 6.837830E-01, 3.475549E-06, -2.429128E-11),
+                                 ("2010-04-25T04:25:24.148", 79942.373154,
+                                 6.831113E-01, 3.481415E-06, -2.431581E-11),
+                                 ("2010-04-25T04:25:39.196", 79942.374596,
+                                 6.824809E-01, 3.486939E-06, -2.433737E-11),
+                                 ("2010-04-25T04:25:54.244", 79942.372358,
+                                 6.818490E-01, 3.492526E-06, -2.435993E-11),
+                                 ("2010-04-25T04:26:09.292", 79942.373415,
+                                 6.812596E-01, 3.497654E-06, -2.437994E-11),
+                                 ("2010-04-25T04:26:24.341", 79942.372623,
+                                 6.807117E-01, 3.502473E-06, -2.439886E-11),
+                                 ("2010-04-25T04:26:39.389", 79942.370855,
+                                 6.801635E-01, 3.507223E-06, -2.441812E-11),
+                                 ("2010-04-25T04:26:54.437", 79942.371772,
+                                 6.796141E-01, 3.512016E-06, -2.443704E-11),
+                                 ("2010-04-25T04:27:09.485", 79942.370673,
+                                 6.791496E-01, 3.516075E-06, -2.445206E-11),
+                                 ("2010-04-25T04:27:31.854", 79942.371067,
+                                 6.784302E-01, 3.522331E-06, -2.447717E-11))
+    Frequency                 = 2379.9998768 <GHz>
+  End_Group
+
+  Group = Archive
+    DataSetId               = LRO-L-MRFLRO-4-CDR-V1.0
+    DataSetName             = "LRO MOON MINI-RF 4 CALIBRATED DATA RECORD V1.0"
+    ProducerId              = JHUAPL
+    ProducerFullName        = "MINI-RF POC TEAM"
+    ProducerInstitutionName = "JOHNS HOPKINS UNIVERSITY APPLIED PHYSICS
+                               LABORATORY"
+    ProductId               = LSZ_03821_1CD_XKU_16N196_V1
+    ProductVersionId        = 1.0
+    ProductCreationTime     = 2010-04-29T15:39:21
+    ReleaseId               = 0001
+    SoftwareName            = FOCUS
+    SoftwareVersionId       = 10.0.050
+  End_Group
+
+  Group = BandBin
+    FilterName = "H RECEIVE INTENSITY"
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -85700
+    LeapSecond                = $base/kernels/lsk/naif0009.tls
+    TargetAttitudeShape       = ($base/kernels/pck/pck00009.tpc,
+                                 $lro/kernels/pck/moon_080317.tf,
+                                 $lro/kernels/pck/moon_assoc_me.tf)
+    TargetPosition            = (Table,
+                                 $lro/kernels/tspk/moon_pa_de421_1900-2050.bpc,
+                                 $lro/kernels/tspk/de421.bsp)
+    InstrumentPointing        = (Table,
+                                 $lro/kernels/ck/moc42_2010115_2010116_v02.bc,
+                                 $lro/kernels/fk/lro_frames_2010277_v01.tf)
+    Instrument                = Null
+    SpacecraftClock           = $lro/kernels/sclk/lro_clkcor_2010292_v00.tsc
+    InstrumentPosition        = (Table, LOLA_spk/spkLOLA_100209_100503.bsp)
+    InstrumentAddendum        = $lro/kernels/iak/mrflroAddendum002.ti
+    ShapeModel                = Null
+    InstrumentPositionQuality = Unknown
+    InstrumentPointingQuality = Reconstructed
+    StartPadding              = 2.0 <seconds>
+    EndPadding                = 2.0 <seconds>
+    CameraVersion             = 1
+  End_Group
+
+  Group = ImageInfo
+    MaximumLatitude      = 24.224238 <deg>
+    MinimumLatitude      = 8.266014 <deg>
+    WesternmostLongitude = 195.964317 <deg>
+    EasternmostLongitude = 196.607373 <deg>
+    CenterLongitude      = -163.67628 <deg>
+    CenterLatitude       = 16.243414 <deg>
+    Minimum              = 0.000000000
+    Maximum              = 7.699049950
+    Mean                 = 0.401860886
+    StandardDeviation    = 0.024454923
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 628892136
+  Bytes               = 98624
+  Records             = 1541
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-85000, 1)
+  ConstantFrames      = (-85700, -85000)
+  ConstantRotation    = (1.0, 0.0, 0.0, 0.0, 0.67430238758372,
+                         0.73845534062588, 0.0, -0.73845534062588,
+                         0.67430238758372)
+  CkTableStartTime    = 325441415.42572
+  CkTableEndTime      = 325441723.22785
+  CkTableOriginalSize = 64577
+  Description         = "Created by spiceinit"
+  Kernels             = ($lro/kernels/ck/moc42_2010115_2010116_v02.bc,
+                         $lro/kernels/fk/lro_frames_2010277_v01.tf)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name        = InstrumentPosition
+  StartByte   = 628990760
+  Bytes       = 280
+  Records     = 5
+  ByteOrder   = Lsb
+  CacheType   = HermiteSpline
+  Description = "Created by spiceinit"
+  Kernels     = LOLA_spk/spkLOLA_100209_100503.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 628991040
+  Bytes               = 128
+  Records             = 2
+  ByteOrder           = Lsb
+  TimeDependentFrames = (31006, 1)
+  ConstantFrames      = (31001, 31007, 31006)
+  ConstantRotation    = (0.99999987325471, -3.29285422375571e-04,
+                         3.80869618671387e-04, 3.29286000210947e-04,
+                         0.99999994578431, -1.45444093783627e-06,
+                         -3.80869119096078e-04, 1.57985578682691e-06,
+                         0.99999992746811)
+  CkTableStartTime    = 325441415.42572
+  CkTableEndTime      = 325441723.22785
+  CkTableOriginalSize = 2
+  Description         = "Created by spiceinit"
+  Kernels             = ($lro/kernels/tspk/moon_pa_de421_1900-2050.bpc,
+                         $lro/kernels/tspk/de421.bsp,
+                         $base/kernels/pck/pck00009.tpc,
+                         $lro/kernels/pck/moon_080317.tf,
+                         $lro/kernels/pck/moon_assoc_me.tf)
+  SolarLongitude      = 106.55850890612
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name        = SunPosition
+  StartByte   = 628991168
+  Bytes       = 112
+  Records     = 2
+  ByteOrder   = Lsb
+  CacheType   = Linear
+  Description = "Created by spiceinit"
+  Kernels     = ($lro/kernels/tspk/moon_pa_de421_1900-2050.bpc,
+                 $lro/kernels/tspk/de421.bsp)
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 628991280
+  Bytes     = 1816
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 628883457
+  Bytes     = 7598
+End_Object
+End

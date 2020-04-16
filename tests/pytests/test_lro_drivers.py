@@ -10,14 +10,17 @@ import ale
 from ale import util
 from ale.drivers.lro_drivers import LroLrocPds3LabelNaifSpiceDriver
 from ale.drivers.lro_drivers import LroLrocIsisLabelNaifSpiceDriver
+from ale.drivers.lro_drivers import LroMiniRfIsisLabelNaifSpiceDriver
 from ale.transformation import TimeDependentRotation
 
 from conftest import get_image_label, get_isd, get_image_kernels, convert_kernels, compare_dicts
 
 image_dict = {
-    'M103595705LE': get_isd("lrolroc")
+    'M103595705LE': get_isd("lrolroc"),
+    '03821_16N196_S1': get_isd("lrominirf")
 }
 
+# LROC test kernels
 @pytest.fixture(scope="module")
 def test_kernels():
     updated_kernels = {}
@@ -30,15 +33,24 @@ def test_kernels():
         for kern in kern_list:
             os.remove(kern)
 
+# Test load of LROC labels
 @pytest.mark.parametrize("label_type", ['isis3'])
-@pytest.mark.parametrize("image", image_dict.keys())
+#@pytest.mark.parametrize("image", image_dict.keys()) Add this when when all are supported by ale isd.
+@pytest.mark.parametrize("image", ['M103595705LE'])
 def test_load(test_kernels, label_type, image):
     label_file = get_image_label(image, label_type)
     isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
-
     assert compare_dicts(isd_obj, image_dict[image]) == []
+
+# Test load of MiniRF labels
+def test_load_minirf(test_kernels):
+    label_file = get_image_label('03821_16N196_S1', 'isis3')
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels['03821_16N196_S1']}, formatter='usgscsm', verbose=True)
+    isd_obj = json.loads(isd_str)
+    print(json.dumps(isd_obj, indent=2))
+    assert compare_dicts(isd_obj, image_dict['03821_16N196_S1']) == []
 
 # ========= Test pdslabel and naifspice driver =========
 class test_pds_naif(unittest.TestCase):
@@ -216,3 +228,31 @@ class test_isis_naif(unittest.TestCase):
             np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, -1, 0])
             spacecraft_direction.return_value = 1
             np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, 1, 0])
+
+
+# ========= Test MiniRf isislabel and naifspice driver =========
+class test_miniRf(unittest.TestCase):
+    def setUp(self):
+        label = get_image_label('03821_16N196_S1', 'isis3')
+        self.driver = LroMiniRfIsisLabelNaifSpiceDriver(label)
+        
+    def test_wavelength(self):
+        np.testing.assert_almost_equal(self.driver.wavelength, 1.25963224167508e-01)
+
+    def test_scaled_pixel_width(self):
+        np.testing.assert_almost_equal(self.driver.scaled_pixel_width, 7.50)
+
+    def test_line_exposure_duration(self):
+        np.testing.assert_almost_equal(self.driver.line_exposure_duration, 4.70442147400000e-03)
+
+    def test_range_conversion_coefficients(self):
+        with patch('ale.drivers.lro_drivers.spice.str2et', return_value=12345) as str2et:
+          assert len(self.driver.range_conversion_coefficients) == 20
+
+    def test_ephmeris_start_time(self):
+        with patch('ale.drivers.lro_drivers.spice.str2et', return_value=12345) as str2et:
+          assert self.driver.ephemeris_start_time == 12345
+          
+    def test_ephmeris_stop_time(self):
+        with patch('ale.drivers.lro_drivers.spice.str2et', return_value=12345) as str2et:
+          assert self.driver.ephemeris_stop_time == 12345
