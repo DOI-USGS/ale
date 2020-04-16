@@ -112,3 +112,85 @@ class Framer():
           Ephemeris stop time for an image
         """
         return self.ephemeris_start_time + self.exposure_duration
+
+class Radar():
+    @property
+    def name_model(self):
+        """
+        Returns Key used to define the sensor type. Primarily
+        used for generating camera models.
+
+        Returns
+        -------
+        : str
+          USGS SAR (synthetic aperture radar) model
+        """
+        return "USGS_ASTRO_SAR_MODEL"
+
+    @property
+    def ephemeris_time(self):
+        """
+        Returns an array of times between the start/stop ephemeris times
+        based on the start/stop times with a timestep 0.25.
+        Expects ephemeris start/stop times to be defined. These should be
+        floating point numbers containing the start and stop times of the
+        images.
+
+        Returns
+        -------
+        : ndarray
+          ephemeris times split based on image lines
+        """
+        # 0.25 is the delta used by minirf, used as a default.
+        num_states = int((self.ephemeris_stop_time - self.ephemeris_start_time)/0.25) + 1
+        return np.linspace(self.ephemeris_start_time,  self.ephemeris_stop_time, num_states)
+
+    @property
+    def wavelength(self):
+        """
+        Returns the wavelength used for image acquistion. 
+
+        Returns
+        -------
+        : double
+          Wavelength used to create an image in meters
+        """
+        raise NotImplementedError
+
+    @property
+    def line_exposure_duration(self):
+        """
+        Returns the exposure duration for each line.
+
+        Returns
+        -------
+        : double
+          Exposure duration for a line
+        """
+        raise NotImplmentedError
+       
+
+    @property
+    def scaled_pixel_width(self):
+        """
+        Returns the scaled pixel width
+
+        Returns
+        -------
+        : double
+          Scaled pixel width
+        """
+        raise NotImplementedError
+
+    @property
+    def range_conversion_coefficients(self):
+        """
+        Returns the range conversion coefficients
+
+        Returns
+        -------
+        : list
+          Coefficients needed for range conversion
+        """
+        raise NotImplementedError
+

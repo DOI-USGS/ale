@@ -9,7 +9,7 @@ from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
-from ale.base.type_sensor import LineScanner
+from ale.base.type_sensor import LineScanner, Radar
 
 
 class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver):
@@ -452,7 +452,6 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
     def additional_preroll(self):
         """
         Returns the addition preroll defined in an IAK.
-
          Returns
          -------
          : float
@@ -505,3 +504,104 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
         rotation = frame_chain.compute_rotation(1, lro_bus_id)
         rotated_velocity = spice.mxv(rotation._rots.as_dcm()[0], velocity)
         return rotated_velocity[0]
+
+
+class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
+    @property
+    def instrument_id(self):
+        """
+        The short text name for the instrument
+
+        Returns an instrument id uniquely identifying the instrument. Used to acquire
+        instrument codes from Spice Lib bods2c routine.
+
+        Returns
+        -------
+        str
+          The short text name for the instrument
+        """
+        return super().instrument_id
+
+    @property
+    def wavelength(self):
+        """
+        Returns the wavelength in meters used for image acquistion. 
+
+        Returns
+        -------
+        : double
+          Wavelength in meters used to create an image
+        """
+
+        # Get float value of frequency in GHz
+        frequency = self.label['IsisCube']['Instrument']['Frequency'].value
+        wavelength = spice.clight() / frequency / 1000.0
+        return wavelength
+
+    @property
+    def scaled_pixel_width(self):
+        """
+        Returns the scaled pixel width
+
+        Returns
+        -------
+        : double
+          scaled pixel width
+        """
+        return self.label['IsisCube']['Instrument']['ScaledPixelHeight']; 
+
+
+    # Default line_exposure_duration assumes that time is given in milliseconds and coverts
+    # in this case, the time is already given in seconds.
+    @property
+    def line_exposure_duration(self):
+        """
+        Line exposure duration in seconds. The sum of the burst and the delay for the return. 
+
+        Returns
+        -------
+        : double
+          scaled pixel width
+        """
+        return self.label['IsisCube']['Instrument']['LineExposureDuration']; 
+
+    @property
+    def range_conversion_coefficients(self):
+        """
+        Range conversion coefficients
+
+        Returns
+        -------
+        : List
+          range conversion coefficients
+        """
+
+        range_coefficients_utc = self.label['IsisCube']['Instrument']['RangeCoefficientSet']; 
+        range_coefficients_et = [[spice.str2et(elt[0])] + elt[1:] for elt in range_coefficients_utc] 
+        return range_coefficients_et
+
+    @property
+    def ephemeris_start_time(self):
+        """
+        Returns the start and stop ephemeris times for the image. 
+
+        Returns
+        -------
+        : float
+          start time
+        """
+        return spice.str2et(str(self.utc_start_time))
+
+    @property
+    def ephemeris_stop_time(self):
+        """
+        Returns the stop ephemeris times for the image. 
+
+        Returns
+        -------
+        : float
+          stop time
+        """
+        return spice.str2et(str(self.utc_stop_time))
+
+

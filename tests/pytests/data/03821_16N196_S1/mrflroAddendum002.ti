@@ -1,0 +1,20 @@
+\begintext
+ Translation values were added here as placeholders; the actual 
+ translation values are calculated in the RadarGroundRangeMap class
+
+\begindata
+INS-85700_TRANSX = ( 0.0, 0.0, 1.0)
+INS-85700_TRANSY = ( 0.0, 1.0, 0.0)
+INS-85700_ITRANSS = ( 0.0, 0.0, 1.0)
+INS-85700_ITRANSL = ( 0.0, 1.0, 0.0)
+
+\begintext
+These are the parameters required for writing c-kernels.  Isis will
+create ck with the same frame endpoints as the mission ck.  For 
+the LRO spacecraft the ck frame is LRO_MINIRF (-85700), and the
+ck reference frame is J2000 (1).
+
+\begindata
+INS-85700_CK_FRAME_ID=-85700
+INS-85700_CK_REFERENCE_ID=1
+
