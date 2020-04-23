@@ -10105,7 +10105,25 @@
     ],
     "unit": "m"
   },
-  "name_model": "USGS_ASTRO_SAR_MODEL",
+ "sun_position": {
+    "positions": [
+      [
+        106362878979.21156,
+        106752639404.5255,
+        3800122792.5012856
+      ]
+    ],
+    "velocities": [
+      [
+        263427.2731009642,
+        -260832.3680061591,
+        -207.62866458328944
+      ]
+    ],
+    "unit": "m"
+  },
+  "name_model": "USGS_ASTRO_SAR_SENSOR_MODEL",
+  "t0_ephemeris": 325441417.4304223,
   "starting_ephemeris_time": 325441417.4304223,
   "ending_ephemeris_time": 325441721.22304827,
   "wavelength": 0.12596322416750805,
