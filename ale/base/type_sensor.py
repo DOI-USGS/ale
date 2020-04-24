@@ -190,7 +190,7 @@ class Radar():
         Returns
         -------
         : list
-          Times for the range conversion coefficients
+          Coefficients needed for range conversion
         """
         raise NotImplementedError
 
@@ -202,6 +202,6 @@ class Radar():
         Returns
         -------
         : list
-          Coefficients needed for range conversion
+          Times for the range conversion coefficients
         """
         raise NotImplementedError
