@@ -161,6 +161,7 @@ def to_usgscsm(driver):
         isd_data['wavelength'] = driver.wavelength
         isd_data['line_exposure_duration'] = driver.line_exposure_duration
         isd_data['scaled_pixel_width'] = driver.scaled_pixel_width
+        isd_data['range_conversion_times'] = driver.range_conversion_times
         isd_data['range_conversion_coefficients'] = driver.range_conversion_coefficients
 
     # check that there is a valid sensor model name
