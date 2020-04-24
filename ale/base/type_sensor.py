@@ -185,7 +185,7 @@ class Radar():
     @property
     def range_conversion_coefficients(self):
         """
-        Returns the times associated with the range conversion coefficients
+        Returns the range conversion coefficients
 
         Returns
         -------
@@ -197,7 +197,7 @@ class Radar():
     @property
     def range_conversion_times(self):
         """
-        Returns the range conversion coefficients
+        Returns the times associated with the range conversion coefficients
 
         Returns
         -------
