@@ -205,3 +205,15 @@ class Radar():
           Times for the range conversion coefficients
         """
         raise NotImplementedError
+
+    @property
+    def look_direction(self):
+        """
+        Direction of the look (left or right)
+
+        Returns
+        -------
+        : string
+          left or right
+        """
+        raise NotImplementedError
