@@ -163,6 +163,7 @@ def to_usgscsm(driver):
         isd_data['scaled_pixel_width'] = driver.scaled_pixel_width
         isd_data['range_conversion_times'] = driver.range_conversion_times
         isd_data['range_conversion_coefficients'] = driver.range_conversion_coefficients
+        isd_data['look_direction'] = driver.look_direction
 
     # check that there is a valid sensor model name
     if 'name_model' not in isd_data:

@@ -621,4 +621,14 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         """
         return spice.str2et(str(self.utc_stop_time))
 
+    @property
+    def look_direction(self):
+        """
+        Direction of the look (left or right)
 
+        Returns
+        -------
+        : string
+          left or right
+        """
+        return self.label['IsisCube']['Instrument']['LookDirection'].lower()
