@@ -44,16 +44,16 @@ def to_usgscsm(driver):
         'unit' : 'm'
     }
     
+    sun_positions, sun_velocities, _ = driver.sun_position
+    isd_data['sun_position'] = {
+        'positions' : sun_positions,
+        'velocities' : sun_velocities,
+        'unit' : 'm'
+    }
+
     # shared isd keywords for Framer and Linescanner
     if isinstance(driver, LineScanner) or isinstance(driver, Framer):
         # exterior orientation for just Framer and LineScanner
-        sun_positions, sun_velocities, _ = driver.sun_position
-        isd_data['sun_position'] = {
-            'positions' : sun_positions,
-            'velocities' : sun_velocities,
-            'unit' : 'm'
-        }
-
         frame_chain = driver.frame_chain
         sensor_to_target = frame_chain.compute_rotation(driver.sensor_frame_id, driver.target_frame_id)
         quaternions = sensor_to_target.quats
@@ -124,6 +124,8 @@ def to_usgscsm(driver):
         else:
             isd_data['dt_ephemeris'] = 0
 
+        isd_data['t0_ephemeris'] = interp_times[0]
+
     # line scan sensor model specifics
     if isinstance(driver, LineScanner):
         isd_data['name_model'] = 'USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL'
@@ -153,13 +155,15 @@ def to_usgscsm(driver):
 
     # radar sensor model specifics
     if isinstance(driver, Radar):
-        isd_data['name_model'] = 'USGS_ASTRO_SAR_MODEL'
+        isd_data['name_model'] = 'USGS_ASTRO_SAR_SENSOR_MODEL'
         isd_data['starting_ephemeris_time'] = driver.ephemeris_start_time
         isd_data['ending_ephemeris_time'] = driver.ephemeris_stop_time
         isd_data['wavelength'] = driver.wavelength
         isd_data['line_exposure_duration'] = driver.line_exposure_duration
         isd_data['scaled_pixel_width'] = driver.scaled_pixel_width
+        isd_data['range_conversion_times'] = driver.range_conversion_times
         isd_data['range_conversion_coefficients'] = driver.range_conversion_coefficients
+        isd_data['look_direction'] = driver.look_direction
 
     # check that there is a valid sensor model name
     if 'name_model' not in isd_data:

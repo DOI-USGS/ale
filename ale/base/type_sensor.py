@@ -194,3 +194,26 @@ class Radar():
         """
         raise NotImplementedError
 
+    @property
+    def range_conversion_times(self):
+        """
+        Returns the times associated with the range conversion coefficients
+
+        Returns
+        -------
+        : list
+          Times for the range conversion coefficients
+        """
+        raise NotImplementedError
+
+    @property
+    def look_direction(self):
+        """
+        Direction of the look (left or right)
+
+        Returns
+        -------
+        : string
+          left or right
+        """
+        raise NotImplementedError

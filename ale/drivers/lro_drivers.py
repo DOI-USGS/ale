@@ -563,7 +563,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         : double
           scaled pixel width
         """
-        return self.label['IsisCube']['Instrument']['LineExposureDuration']; 
+        return self.label['IsisCube']['Instrument']['LineExposureDuration']
 
     @property
     def range_conversion_coefficients(self):
@@ -576,9 +576,26 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
           range conversion coefficients
         """
 
-        range_coefficients_utc = self.label['IsisCube']['Instrument']['RangeCoefficientSet']; 
-        range_coefficients_et = [[spice.str2et(elt[0])] + elt[1:] for elt in range_coefficients_utc] 
+        range_coefficients_orig = self.label['IsisCube']['Instrument']['RangeCoefficientSet']
+
+        # The first elt of each list is time, which we handle separately in range_conversion_time
+        range_coefficients = [elt[1:] for elt in range_coefficients_orig] 
+        return range_coefficients
+
+    @property
+    def range_conversion_times(self):
+        """
+        Times, in et, associated with range conversion coefficients
+
+        Returns
+        -------
+        : List
+          times for range conversion coefficients
+        """
+        range_coefficients_utc = self.label['IsisCube']['Instrument']['RangeCoefficientSet']
+        range_coefficients_et = [spice.str2et(elt[0]) for elt in range_coefficients_utc]
         return range_coefficients_et
+
 
     @property
     def ephemeris_start_time(self):
@@ -604,4 +621,14 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         """
         return spice.str2et(str(self.utc_stop_time))
 
+    @property
+    def look_direction(self):
+        """
+        Direction of the look (left or right)
 
+        Returns
+        -------
+        : string
+          left or right
+        """
+        return self.label['IsisCube']['Instrument']['LookDirection'].lower()
