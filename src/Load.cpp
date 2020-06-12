@@ -66,7 +66,7 @@ namespace ale {
          first_run = !first_run;
          Py_Initialize();
      }
-
+    
      // Import the file as a Python module.
      PyObject *pModule = PyImport_Import(PyUnicode_FromString("ale"));
      if(!pModule) {
@@ -74,7 +74,7 @@ namespace ale {
      }
      // Create a dictionary for the contents of the module.
      PyObject *pDict = PyModule_GetDict(pModule);
-
+      
      // Get the add method from the dictionary.
      PyObject *pFunc = PyDict_GetItemString(pDict, "loads");
      if(!pFunc) {
@@ -84,44 +84,53 @@ namespace ale {
                            "This Usually indicates an error in the Ale Python Library."
                            "Check if Installed correctly and the function ale.loads exists.");
      }
+      
 
      // Create a Python tuple to hold the arguments to the method.
      PyObject *pArgs = PyTuple_New(3);
      if(!pArgs) {
        throw runtime_error(getPyTraceback());
      }
-
+      
      // Set the Python int as the first and second arguments to the method.
      PyObject *pStringFileName = PyUnicode_FromString(filename.c_str());
      PyTuple_SetItem(pArgs, 0, pStringFileName);
+     Py_INCREF(pStringFileName); // take ownership of reference
 
      PyObject *pStringProps = PyUnicode_FromString(props.c_str());
      PyTuple_SetItem(pArgs, 1, pStringProps);
-
+     Py_INCREF(pStringProps); // take ownership of reference
+     
      PyObject *pStringFormatter = PyUnicode_FromString(formatter.c_str());
      PyTuple_SetItem(pArgs, 2, pStringFormatter);
+     Py_INCREF(pStringFormatter); // take ownership of reference 
+    
 
      // Call the function with the arguments.
      PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
-
      if(!pResult) {
         throw invalid_argument("No Valid instrument found for label.");
      }
-
+    
      PyObject *pResultStr = PyObject_Str(pResult);
      PyObject *temp_bytes = PyUnicode_AsUTF8String(pResultStr); // Owned reference
-
+      
      if(!temp_bytes){
        throw invalid_argument(getPyTraceback());
      }
+     
      std::string cResult;
+     
      char *temp_str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
      cResult = temp_str; // copy into std::string
 
      Py_DECREF(pResultStr);
+
      Py_DECREF(pStringFileName);
      Py_DECREF(pStringProps);
      Py_DECREF(pStringFormatter);
+     
+     Py_DECREF(pArgs);
 
      return cResult;
  }
