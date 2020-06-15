@@ -7,7 +7,7 @@
 # Specify the required version of CMake.
 # cmake 3.10 required for ctest/gtest integration
 cmake_minimum_required(VERSION 3.10)
-project(ale VERSION 0.8.0 DESCRIPTION "Abstraction Library for Ephemerides ")
+project(ale VERSION 0.8.1 DESCRIPTION "Abstraction Library for Ephemerides ")
 
 # include what we need
 include(GNUInstallDirs)
