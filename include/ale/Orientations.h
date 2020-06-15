@@ -72,6 +72,12 @@ namespace ale {
     ) const;
 
     /**
+     * Add an additional constant multiplication.
+     * This is equivalent to left multiplication by a constant rotation
+     */
+    Orientations &addConstantRotation(const Rotation &addedConst);
+
+    /**
      * Multiply this orientation by another orientation
      */
     Orientations &operator*=(const Orientations &rhs);
@@ -94,6 +100,10 @@ namespace ale {
     std::vector<int> m_constFrames;
     Rotation m_constRotation;
   };
+
+  Orientations operator*(Orientations lhs, const Rotation &rhs);
+  Orientations operator*(const Rotation &lhs, Orientations rhs);
+  Orientations operator*(Orientations lhs, const Orientations &rhs);
 }
 
 #endif

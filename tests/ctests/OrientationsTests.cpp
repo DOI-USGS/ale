@@ -110,21 +110,47 @@ TEST_F(OrientationTest, RotateAt) {
 }
 
 TEST_F(OrientationTest, RotationMultiplication) {
-  Rotation rhs( 0.5, 0.5, 0.5, 0.5);
-  orientations *= rhs;
-  vector<Rotation> outputRotations = orientations.getRotations();
+  vector<Rotation> originalRotations = orientations.getRotations();
+  vector<double> originalConstQuats = orientations.getConstantRotation().toQuaternion();
+  Rotation constRot( 0.5, 0.5, 0.5, 0.5);
   vector<vector<double>> expectedQuats = {
     {-0.5, 0.5, 0.5, 0.5},
     {-1.0, 0.0, 0.0, 0.0},
     { 0.5, 0.5, 0.5, 0.5}
   };
-  for (size_t i = 0; i < outputRotations.size(); i++) {
-    vector<double> quats = outputRotations[i].toQuaternion();
+
+  Orientations rightMultiplied = orientations * constRot;
+  vector<Rotation> outputRightRotations = rightMultiplied.getRotations();
+  ASSERT_EQ(expectedQuats.size(), outputRightRotations.size());
+  for (size_t i = 0; i < outputRightRotations.size(); i++) {
+    vector<double> quats = outputRightRotations[i].toQuaternion();
     EXPECT_EQ(expectedQuats[i][0], quats[0]);
     EXPECT_EQ(expectedQuats[i][1], quats[1]);
     EXPECT_EQ(expectedQuats[i][2], quats[2]);
     EXPECT_EQ(expectedQuats[i][3], quats[3]);
   }
+  vector<double> outputRightConstQuats = rightMultiplied.getConstantRotation().toQuaternion();
+  EXPECT_EQ(originalConstQuats[0], outputRightConstQuats[0]);
+  EXPECT_EQ(originalConstQuats[1], outputRightConstQuats[1]);
+  EXPECT_EQ(originalConstQuats[2], outputRightConstQuats[2]);
+  EXPECT_EQ(originalConstQuats[3], outputRightConstQuats[3]);
+
+  Orientations leftMultiplied = constRot * orientations;
+  vector<Rotation> outputLeftRotations = leftMultiplied.getRotations();
+  ASSERT_EQ(originalRotations.size(), outputLeftRotations.size());
+  for (size_t i = 0; i < outputLeftRotations.size(); i++) {
+    vector<double> originalQuats = originalRotations[i].toQuaternion();
+    vector<double> quats = outputLeftRotations[i].toQuaternion();
+    EXPECT_EQ(originalQuats[0], quats[0]);
+    EXPECT_EQ(originalQuats[1], quats[1]);
+    EXPECT_EQ(originalQuats[2], quats[2]);
+    EXPECT_EQ(originalQuats[3], quats[3]);
+  }
+  vector<double> outputLeftConstQuats = leftMultiplied.getConstantRotation().toQuaternion();
+  EXPECT_EQ(0.5, outputLeftConstQuats[0]);
+  EXPECT_EQ(0.5, outputLeftConstQuats[1]);
+  EXPECT_EQ(0.5, outputLeftConstQuats[2]);
+  EXPECT_EQ(0.5, outputLeftConstQuats[3]);
 }
 
 TEST_F(OrientationTest, OrientationMultiplication) {
@@ -164,8 +190,8 @@ TEST_F(ConstOrientationTest, RotateAt) {
 }
 
 TEST_F(ConstOrientationTest, OrientationMultiplication) {
-  constOrientations *= orientations;
-  vector<Rotation> outputRotations = constOrientations.getRotations();
+  Orientations multOrientation = constOrientations * orientations;
+  vector<Rotation> outputRotations = multOrientation.getRotations();
   vector<vector<double>> expectedQuats = {
     {-0.5, 0.5, 0.5, 0.5},
     {-0.5,-0.5,-0.5,-0.5},
@@ -178,7 +204,7 @@ TEST_F(ConstOrientationTest, OrientationMultiplication) {
     EXPECT_EQ(expectedQuats[i][2], quats[2]);
     EXPECT_EQ(expectedQuats[i][3], quats[3]);
   }
-  vector<double> constQuats = constOrientations.getConstantRotation().toQuaternion();
+  vector<double> constQuats = multOrientation.getConstantRotation().toQuaternion();
   EXPECT_EQ(constQuats[0], 0);
   EXPECT_EQ(constQuats[1], 1);
   EXPECT_EQ(constQuats[2], 0);

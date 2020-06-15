@@ -102,6 +102,12 @@ namespace ale {
   }
 
 
+  Orientations &Orientations::addConstantRotation(const Rotation &addedConst) {
+    m_constRotation = addedConst * m_constRotation;
+    return *this;
+  }
+
+
   Orientations &Orientations::operator*=(const Orientations &rhs) {
     std::vector<double> mergedTimes = orderedVecMerge(m_times, rhs.m_times);
     std::vector<Rotation> mergedRotations;
@@ -184,5 +190,20 @@ namespace ale {
 
     return Orientations(newRotations, m_times, rotatedAvs, Rotation(1, 0, 0, 0),
                         std::vector<int>(), newTimeDepFrames);
+  }
+
+
+  Orientations operator*(Orientations lhs, const Rotation &rhs) {
+    return lhs *= rhs;
+  }
+
+
+  Orientations operator*(const Rotation &lhs, Orientations rhs) {
+    return rhs.addConstantRotation(lhs);
+  }
+
+
+  Orientations operator*(Orientations lhs, const Orientations &rhs) {
+    return lhs *= rhs;
   }
 }
