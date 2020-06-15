@@ -75,10 +75,16 @@ namespace ale {
      * Multiply this orientation by another orientation
      */
     Orientations &operator*=(const Orientations &rhs);
+
     /**
      * Multiply this orientation by a constant rotation
      */
     Orientations &operator*=(const Rotation &rhs);
+
+    /**
+     * Invert the orientations
+     */
+     Orientations inverse() const;
 
   private:
     std::vector<Rotation> m_rotations;

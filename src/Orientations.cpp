@@ -144,4 +144,45 @@ namespace ale {
 
     return *this;
   }
+
+
+  Orientations Orientations::inverse() const {
+    std::vector<Rotation> newRotations;
+    // The time dependent rotation is applied and the constant rotation is applied second,
+    // so we have to subsume the constant rotations into the time dependent rotations
+    // in the inverse.
+    Rotation constInverseRotation = m_constRotation.inverse();
+    for (size_t i = 0; i < m_rotations.size(); i++) {
+      newRotations.push_back(m_rotations[i].inverse() * constInverseRotation);
+    }
+
+    std::vector<Vec3d> rotatedAvs;
+    for (size_t i = 0; i < m_avs.size(); i++) {
+      Vec3d rotatedAv = (m_constRotation * m_rotations[i])(m_avs[i]);
+      rotatedAv.x *= -1.0;
+      rotatedAv.y *= -1.0;
+      rotatedAv.z *= -1.0;
+      rotatedAvs.push_back(rotatedAv);
+    }
+
+    // Because the constant rotation was subsumed by the time dependet rotations, everything
+    // is a time dependent rotation in the inverse.
+    std::vector<int> newTimeDepFrames;
+    std::vector<int>::const_reverse_iterator timeDepIt = m_timeDepFrames.crbegin();
+    for (; timeDepIt != m_timeDepFrames.crend(); timeDepIt++) {
+      newTimeDepFrames.push_back(*timeDepIt);
+    }
+    std::vector<int>::const_reverse_iterator constIt = m_constFrames.crbegin();
+    // Skip the last frame in the constant list because it's the first frame
+    // in the time dependent list
+    if (constIt != m_constFrames.crend()) {
+      constIt++;
+    }
+    for (; constIt != m_constFrames.rend(); constIt++) {
+      newTimeDepFrames.push_back(*constIt);
+    }
+
+    return Orientations(newRotations, m_times, rotatedAvs, Rotation(1, 0, 0, 0),
+                        std::vector<int>(), newTimeDepFrames);
+  }
 }
