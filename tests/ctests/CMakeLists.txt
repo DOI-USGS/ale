@@ -6,6 +6,7 @@ set (ALE_TEST_SOURCE ${CMAKE_SOURCE_DIR}/tests/ctests/IsdTests.cpp
                      ${CMAKE_SOURCE_DIR}/tests/ctests/RotationTests.cpp
                      ${CMAKE_SOURCE_DIR}/tests/ctests/StatesTests.cpp
                      ${CMAKE_SOURCE_DIR}/tests/ctests/TestInterpUtils.cpp
+                     ${CMAKE_SOURCE_DIR}/tests/ctests/VectorTests.cpp
                      ${CMAKE_SOURCE_DIR}/tests/ctests/TestMain.cpp)
 
 if(ALE_BUILD_LOAD)
