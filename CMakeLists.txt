@@ -53,13 +53,15 @@ set(ALE_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/InterpUtils.cpp
                   ${CMAKE_CURRENT_SOURCE_DIR}/src/Orientations.cpp
                   ${CMAKE_CURRENT_SOURCE_DIR}/src/States.cpp
                   ${CMAKE_CURRENT_SOURCE_DIR}/src/Isd.cpp
-                  ${CMAKE_CURRENT_SOURCE_DIR}/src/Util.cpp)
+                  ${CMAKE_CURRENT_SOURCE_DIR}/src/Util.cpp
+                  ${CMAKE_CURRENT_SOURCE_DIR}/src/Vectors.cpp)
 set(ALE_HEADER_FILES ${ALE_BUILD_INCLUDE_DIR}/InterpUtils.h
                      ${ALE_BUILD_INCLUDE_DIR}/Rotation.h
                      ${ALE_BUILD_INCLUDE_DIR}/Orientations.h
                      ${ALE_BUILD_INCLUDE_DIR}/States.h
                      ${ALE_BUILD_INCLUDE_DIR}/Isd.h
-                     ${ALE_BUILD_INCLUDE_DIR}/Util.h)
+                     ${ALE_BUILD_INCLUDE_DIR}/Util.h
+                     ${ALE_BUILD_INCLUDE_DIR}/Vectors.h)
 set(ALE_PRIVATE_LINKS Eigen3::Eigen)
 set(ALE_PUBLIC_LINKS nlohmann_json::nlohmann_json)
 
