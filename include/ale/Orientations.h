@@ -72,13 +72,33 @@ namespace ale {
     ) const;
 
     /**
+     * Add an additional constant multiplication.
+     * This is equivalent to left multiplication by a constant rotation
+     */
+    Orientations &addConstantRotation(const Rotation &addedConst);
+
+    /**
      * Multiply this orientation by another orientation
      */
     Orientations &operator*=(const Orientations &rhs);
+
     /**
      * Multiply this orientation by a constant rotation
      */
     Orientations &operator*=(const Rotation &rhs);
+
+    /**
+     * Invert the orientations.
+     * Note that inverting a set of orientations twice does not result in
+     * the original orientations. the constant rotation is applied after the
+     * time dependent rotation. This means in the inverse, the constant
+     * rotation is applied first and then the time dependent rotation.
+     * So, the inverted set of orientations is entirely time dependent.
+     * Then, the original constant rotations cannot be recovered when inverting
+     * again. The set of orientations will still operate the same way, but its
+     * internal state will not be the same.
+     */
+     Orientations inverse() const;
 
   private:
     std::vector<Rotation> m_rotations;
@@ -88,6 +108,10 @@ namespace ale {
     std::vector<int> m_constFrames;
     Rotation m_constRotation;
   };
+
+  Orientations operator*(Orientations lhs, const Rotation &rhs);
+  Orientations operator*(const Rotation &lhs, Orientations rhs);
+  Orientations operator*(Orientations lhs, const Orientations &rhs);
 }
 
 #endif
