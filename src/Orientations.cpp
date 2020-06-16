@@ -164,10 +164,7 @@ namespace ale {
 
     std::vector<Vec3d> rotatedAvs;
     for (size_t i = 0; i < m_avs.size(); i++) {
-      Vec3d rotatedAv = (m_constRotation * m_rotations[i])(m_avs[i]);
-      rotatedAv.x *= -1.0;
-      rotatedAv.y *= -1.0;
-      rotatedAv.z *= -1.0;
+      Vec3d rotatedAv = -1.0 * (m_constRotation * m_rotations[i])(m_avs[i]);
       rotatedAvs.push_back(rotatedAv);
     }
 
