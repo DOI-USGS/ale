@@ -2,6 +2,7 @@
 #define ALE_VECTORS_H
 
 #include <stdexcept>
+#include <vector>
 
 namespace ale {
   /** A 3D cartesian vector */
@@ -22,7 +23,35 @@ namespace ale {
 
     Vec3d(double x, double y, double z) : x(x), y(y), z(z) {};
     Vec3d() : x(0.0), y(0.0), z(0.0) {};
+    Vec3d &operator*=(double scalar) {
+      x *= scalar;
+      y *= scalar;
+      z *= scalar;
+      return *this;
+    };
+
+    Vec3d &operator+=(Vec3d addend) {
+      x += addend.x;
+      y += addend.y;
+      z += addend.z;
+      return *this;
+    };
+
+    Vec3d &operator-=(Vec3d addend) {
+      x -= addend.x;
+      y -= addend.y;
+      z -= addend.z;
+      return *this;
+    };
   };
+
+  Vec3d operator*(double scalar, Vec3d vec);
+
+  Vec3d operator*(Vec3d vec, double scalar);
+
+  Vec3d operator+(Vec3d leftVec, const Vec3d &rightVec);
+
+  Vec3d operator-(Vec3d leftVec, const Vec3d &rightVec);
 }
 
 #endif

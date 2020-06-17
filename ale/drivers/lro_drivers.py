@@ -153,6 +153,8 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
         The starting ephemeris time for LRO is computed by taking the
         LRO:SPACECRAFT_CLOCK_PREROLL_COUNT, as defined in the label, and
         adding offsets that were taken from an IAK.
+
+        Returns
         -------
         : double
           Starting ephemeris time of the image
@@ -374,6 +376,8 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
         The starting ephemeris time for LRO is computed by taking the
         LRO:SPACECRAFT_CLOCK_PREROLL_COUNT, as defined in the label, and
         adding offsets that were taken from an IAK.
+
+        Returns
         -------
         : double
           Starting ephemeris time of the image
@@ -525,7 +529,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
     @property
     def wavelength(self):
         """
-        Returns the wavelength in meters used for image acquistion. 
+        Returns the wavelength in meters used for image acquistion.
 
         Returns
         -------
@@ -548,7 +552,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         : double
           scaled pixel width
         """
-        return self.label['IsisCube']['Instrument']['ScaledPixelHeight']; 
+        return self.label['IsisCube']['Instrument']['ScaledPixelHeight'];
 
 
     # Default line_exposure_duration assumes that time is given in milliseconds and coverts
@@ -556,7 +560,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
     @property
     def line_exposure_duration(self):
         """
-        Line exposure duration in seconds. The sum of the burst and the delay for the return. 
+        Line exposure duration in seconds. The sum of the burst and the delay for the return.
 
         Returns
         -------
@@ -579,7 +583,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         range_coefficients_orig = self.label['IsisCube']['Instrument']['RangeCoefficientSet']
 
         # The first elt of each list is time, which we handle separately in range_conversion_time
-        range_coefficients = [elt[1:] for elt in range_coefficients_orig] 
+        range_coefficients = [elt[1:] for elt in range_coefficients_orig]
         return range_coefficients
 
     @property
@@ -600,7 +604,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
     @property
     def ephemeris_start_time(self):
         """
-        Returns the start and stop ephemeris times for the image. 
+        Returns the start and stop ephemeris times for the image.
 
         Returns
         -------
@@ -612,7 +616,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
     @property
     def ephemeris_stop_time(self):
         """
-        Returns the stop ephemeris times for the image. 
+        Returns the stop ephemeris times for the image.
 
         Returns
         -------

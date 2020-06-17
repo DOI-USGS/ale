@@ -1,7 +1,7 @@
 :mod:`util` --- General Utilities
 ============================================
 
-The :mod:`ale.drivers` module
+The :mod:`ale.util` module
 
 .. versionadded:: 0.1.0
 
