@@ -111,54 +111,66 @@ namespace ale {
 
 
   State States::getState(double time, PositionInterpolation interp) const {
-    int lowerBound = interpolationIndex(m_ephemTimes, time);
-    // try to copy the surrounding 8 points as that's the most possibly needed
-    int interpStart = std::max(0, lowerBound - 3);
-    int interpStop = std::min(lowerBound + 4, (int) m_ephemTimes.size() - 1);
+    if (m_ephemTimes.size() > 1) {
+      int lowerBound = interpolationIndex(m_ephemTimes, time); 
+      // try to copy the surrounding 8 points as that's the most possibly needed
+      int interpStart = std::max(0, lowerBound - 3);
+      int interpStop = std::min(lowerBound + 4, (int) m_ephemTimes.size() - 1);
 
-    State state;
-    std::vector<double> xs, ys, zs, vxs, vys, vzs, interpTimes;
+      State state;
+      std::vector<double> xs, ys, zs, vxs, vys, vzs, interpTimes;
 
-    for (int i = interpStart; i <= interpStop; i++) {
-      state = m_states[i];
-      interpTimes.push_back(m_ephemTimes[i]);
-      xs.push_back(state.position.x);
-      ys.push_back(state.position.y);
-      zs.push_back(state.position.z);
-      vxs.push_back(state.velocity.x);
-      vys.push_back(state.velocity.y);
-      vzs.push_back(state.velocity.z);
-    }
-
-    Vec3d position, velocity;
-
-    if ( interp == LINEAR || (interp == SPLINE && !hasVelocity())) {
-      position = {interpolate(xs,  interpTimes, time, interp, 0),
-                  interpolate(ys,  interpTimes, time, interp, 0),
-                  interpolate(zs,  interpTimes, time, interp, 0)};
-
-      velocity = {interpolate(xs, interpTimes, time, interp, 1),
-                  interpolate(ys, interpTimes, time, interp, 1),
-                  interpolate(zs, interpTimes, time, interp, 1)};
-    }
-    else if (interp == SPLINE && hasVelocity()){
-      // Do hermite spline if velocities are available
-      double baseTime = (interpTimes.front() + interpTimes.back()) / 2;
-
-      std::vector<double> scaledEphemTimes;
-      for(unsigned int i = 0; i < interpTimes.size(); i++) {
-        scaledEphemTimes.push_back(interpTimes[i] - baseTime);
+      for (int i = interpStart; i <= interpStop; i++) {
+        state = m_states[i];
+        interpTimes.push_back(m_ephemTimes[i]);
+        xs.push_back(state.position.x);
+        ys.push_back(state.position.y);
+        zs.push_back(state.position.z);
+        vxs.push_back(state.velocity.x);
+        vys.push_back(state.velocity.y);
+        vzs.push_back(state.velocity.z);
       }
-      double sTime = time - baseTime;
-      position.x = evaluateCubicHermite(sTime, vxs, scaledEphemTimes, xs);
-      position.y = evaluateCubicHermite(sTime, vys, scaledEphemTimes, ys);
-      position.z = evaluateCubicHermite(sTime, vzs, scaledEphemTimes, zs);
 
-      velocity.x = evaluateCubicHermiteFirstDeriv(sTime, vxs, scaledEphemTimes, xs);
-      velocity.y = evaluateCubicHermiteFirstDeriv(sTime, vys, scaledEphemTimes, ys);
-      velocity.z = evaluateCubicHermiteFirstDeriv(sTime, vzs, scaledEphemTimes, zs);
+      Vec3d position, velocity;
+
+      if ( interp == LINEAR || (interp == SPLINE && !hasVelocity())) {
+        position = {interpolate(xs,  interpTimes, time, interp, 0),
+                    interpolate(ys,  interpTimes, time, interp, 0),
+                    interpolate(zs,  interpTimes, time, interp, 0)};
+
+        velocity = {interpolate(xs, interpTimes, time, interp, 1),
+                    interpolate(ys, interpTimes, time, interp, 1),
+                    interpolate(zs, interpTimes, time, interp, 1)};
+      }
+      else if (interp == SPLINE && hasVelocity()){
+        // Do hermite spline if velocities are available
+        double baseTime = (interpTimes.front() + interpTimes.back()) / 2;
+
+        std::vector<double> scaledEphemTimes;
+        for(unsigned int i = 0; i < interpTimes.size(); i++) {
+          scaledEphemTimes.push_back(interpTimes[i] - baseTime);
+        }
+        double sTime = time - baseTime;
+        position.x = evaluateCubicHermite(sTime, vxs, scaledEphemTimes, xs);
+        position.y = evaluateCubicHermite(sTime, vys, scaledEphemTimes, ys);
+        position.z = evaluateCubicHermite(sTime, vzs, scaledEphemTimes, zs);
+
+        velocity.x = evaluateCubicHermiteFirstDeriv(sTime, vxs, scaledEphemTimes, xs);
+        velocity.y = evaluateCubicHermiteFirstDeriv(sTime, vys, scaledEphemTimes, ys);
+        velocity.z = evaluateCubicHermiteFirstDeriv(sTime, vzs, scaledEphemTimes, zs);
+      }
+      return State(position, velocity);
     }
-    return State(position, velocity);
+    else if (hasVelocity()) {
+      // Here we have: 1 state (1 time, 1 position, 1 velocity)
+      // x_f = x_i + v * (t_f - t-i)
+      Vec3d position = m_states[0].position + m_states[0].velocity*(time - m_ephemTimes[0]);
+      Vec3d velocity = m_states[0].velocity;
+      return State(position, velocity);
+    }
+    else { // Here we have: only 1 time and 1 state, so just return the only state.
+      return State(m_states[0]);
+    }
   }
 
 
