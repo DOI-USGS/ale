@@ -18,7 +18,6 @@ namespace ale {
                  int refFrame) :
     m_ephemTimes(ephemTimes), m_refFrame(refFrame) {
     // Construct State vector from position and velocity vectors
-
     if (positions.size() != ephemTimes.size()) {
       throw std::invalid_argument("Length of times must match number of positions");
     }
@@ -28,6 +27,19 @@ namespace ale {
     }
   }
 
+  States::States(const std::vector<double>& ephemTimes, const std::vector<std::vector<double>>& positions,
+                 int refFrame) :
+    m_ephemTimes(ephemTimes), m_refFrame(refFrame) {
+
+    // Construct State vector from position and velocity vectors
+    if (positions.size() != ephemTimes.size()) {
+      throw std::invalid_argument("Length of times must match number of positions");
+    }
+
+    for (Vec3d position : positions) {
+      m_states.push_back(State(position));
+    }
+  }
 
   States::States(const std::vector<double>& ephemTimes, const std::vector<Vec3d>& positions,
                  const std::vector<Vec3d>& velocities, int refFrame) :
