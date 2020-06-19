@@ -45,6 +45,9 @@ namespace ale {
       States(const std::vector<double>& ephemTimes, const std::vector<Vec3d>& positions,
              int refFrame=1);
 
+      States(const std::vector<double>& ephemTimes, const std::vector<std::vector<double>>& positions,
+             int refFrame=1);
+
       States(const std::vector<double>& ephemTimes, const std::vector<Vec3d>& positions,
              const std::vector<Vec3d>& velocities, int refFrame=1);
 

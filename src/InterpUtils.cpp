@@ -34,8 +34,8 @@ namespace ale {
   }
 
   int interpolationIndex(const std::vector<double> &times, double interpTime) {
-    if (times.size() < 2){
-      throw std::invalid_argument("There must be at least two times.");
+    if (times.empty()){
+      throw std::invalid_argument("There must be at least one time.");
     }
     auto nextTimeIt = std::upper_bound(times.begin(), times.end(), interpTime);
     if (nextTimeIt == times.end()) {
