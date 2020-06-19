@@ -75,7 +75,7 @@ namespace ale {
                                      double time, int order=8);
 
    /**
-    *@brief Interpolates the spacecrafts position along a path generated from a set of points,
+    *@brief Interpolates the spacecraft's position along a path generated from a set of points,
               times, and a time of observation
     *@param points A double vector of points
     *@param times A double vector of times
