@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <vector>
+#include <math.h>
 
 namespace ale {
   /** A 3D cartesian vector */
@@ -43,6 +44,10 @@ namespace ale {
       z -= addend.z;
       return *this;
     };
+
+    double norm() const {
+      return sqrt(x*x + y*y + z*z);
+    }
   };
 
   Vec3d operator*(double scalar, Vec3d vec);

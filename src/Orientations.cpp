@@ -13,8 +13,8 @@ namespace ale {
     const std::vector<int> time_dependent_frames
   ) :
     m_rotations(rotations), m_avs(avs), m_times(times), m_timeDepFrames(time_dependent_frames), m_constFrames(const_frames), m_constRotation(const_rot) {
-    if (m_rotations.size() < 2 || m_times.size() < 2) {
-      throw std::invalid_argument("There must be at least two rotations and times.");
+    if (m_rotations.size() < 1 || m_times.size() < 1) {
+      throw std::invalid_argument("There must be at least one rotation and time.");
     }
     if (m_rotations.size() != m_times.size()) {
       throw std::invalid_argument("The number of rotations and times must be the same.");
@@ -55,16 +55,36 @@ namespace ale {
     double time,
     RotationInterpolation interpType
   ) const {
-    int interpIndex = interpolationIndex(m_times, time);
-    double t = (time - m_times[interpIndex]) / (m_times[interpIndex + 1] - m_times[interpIndex]);
-    return m_constRotation * m_rotations[interpIndex].interpolate(m_rotations[interpIndex + 1], t, interpType);
+    Rotation interpRotation;
+    if (m_times.size() > 1) {
+      int interpIndex = interpolationIndex(m_times, time);
+      double t = (time - m_times[interpIndex]) / (m_times[interpIndex + 1] - m_times[interpIndex]);
+      interpRotation = m_constRotation * m_rotations[interpIndex].interpolate(m_rotations[interpIndex + 1], t, interpType);
+    }
+    else if (m_avs.empty()) {
+      interpRotation = m_constRotation * m_rotations.front();
+    }
+    else {
+      double t = time - m_times.front();
+      std::vector<double> axis = {m_avs.front().x, m_avs.front().y, m_avs.front().z};
+      double angle = t * m_avs.front().norm();
+      Rotation newRotation(axis, angle);
+      interpRotation = m_constRotation * newRotation * m_rotations.front();
+    }
+    return interpRotation;
   }
 
 
   Vec3d Orientations::interpolateAV(double time) const {
-    int interpIndex = interpolationIndex(m_times, time);
-    double t = (time - m_times[interpIndex]) / (m_times[interpIndex + 1] - m_times[interpIndex]);
-    Vec3d interpAv = Vec3d(linearInterpolate(m_avs[interpIndex], m_avs[interpIndex + 1], t));
+    Vec3d interpAv;
+    if (m_times.size() > 1) {
+      int interpIndex = interpolationIndex(m_times, time);
+      double t = (time - m_times[interpIndex]) / (m_times[interpIndex + 1] - m_times[interpIndex]);
+      interpAv = Vec3d(linearInterpolate(m_avs[interpIndex], m_avs[interpIndex + 1], t));
+    }
+    else {
+      interpAv = m_avs.front();
+    }
     return interpAv;
   }
 
@@ -119,9 +139,7 @@ namespace ale {
       mergedRotations.push_back(inverseConst*interpolate(time)*rhsRot);
       Vec3d combinedAv = rhsRot.inverse()(interpolateAV(time));
       Vec3d rhsAv = rhs.interpolateAV(time);
-      combinedAv.x += rhsAv.x;
-      combinedAv.y += rhsAv.y;
-      combinedAv.z += rhsAv.z;
+      combinedAv += rhsAv;
       mergedAvs.push_back(combinedAv);
     }
 
