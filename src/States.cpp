@@ -111,11 +111,6 @@ namespace ale {
 
 
   State States::getState(double time, PositionInterpolation interp) const {
-// consider adding "just return position if only one" in here. 
-//    std::cout << "Num of times is : " << m_ephemTimes.size() << std::endl; 
-//    if ( (m_ephemTimes.size() == 1) && (m_states.size() == 1) ) {
-//     }
-
     int lowerBound = interpolationIndex(m_ephemTimes, time);
     // try to copy the surrounding 8 points as that's the most possibly needed
     int interpStart = std::max(0, lowerBound - 3);
