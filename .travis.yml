@@ -43,6 +43,10 @@ install:
   - conda env create -n ale python=3.7.3
   - conda env update -f environment.yml -n ale
   - source activate ale
+  - |
+    if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+      install_name_tool -change @rpath/libiomp5.dylib @loader_path/libiomp5.dylib ${CONDA_PREFIX}/lib/libmkl_intel_thread.dylib;
+    fi
   - conda install pytest
 
 script:
