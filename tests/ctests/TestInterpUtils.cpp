@@ -245,6 +245,9 @@ TEST(InterpUtilsTest, interpolationIndex) {
   EXPECT_EQ(interpolationIndex({1, 3, 5, 6}, 4), 1);
   EXPECT_EQ(interpolationIndex({1, 3, 5, 6}, 0), 0);
   EXPECT_EQ(interpolationIndex({1, 3, 5, 6}, 8), 2);
+  EXPECT_EQ(interpolationIndex({1}, 8), 0);
+  EXPECT_EQ(interpolationIndex({1}, -2), 0);
+  ASSERT_THROW(interpolationIndex({}, 4), std::invalid_argument);
 }
 
 TEST(InterpUtilsTest, orderedVecMerge) {
