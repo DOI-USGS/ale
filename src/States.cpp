@@ -18,7 +18,6 @@ namespace ale {
                  int refFrame) :
     m_ephemTimes(ephemTimes), m_refFrame(refFrame) {
     // Construct State vector from position and velocity vectors
-
     if (positions.size() != ephemTimes.size()) {
       throw std::invalid_argument("Length of times must match number of positions");
     }
@@ -28,6 +27,19 @@ namespace ale {
     }
   }
 
+  States::States(const std::vector<double>& ephemTimes, const std::vector<std::vector<double>>& positions,
+                 int refFrame) :
+    m_ephemTimes(ephemTimes), m_refFrame(refFrame) {
+
+    // Construct State vector from position and velocity vectors
+    if (positions.size() != ephemTimes.size()) {
+      throw std::invalid_argument("Length of times must match number of positions");
+    }
+
+    for (Vec3d position : positions) {
+      m_states.push_back(State(position));
+    }
+  }
 
   States::States(const std::vector<double>& ephemTimes, const std::vector<Vec3d>& positions,
                  const std::vector<Vec3d>& velocities, int refFrame) :
@@ -99,6 +111,11 @@ namespace ale {
 
 
   State States::getState(double time, PositionInterpolation interp) const {
+// consider adding "just return position if only one" in here. 
+//    std::cout << "Num of times is : " << m_ephemTimes.size() << std::endl; 
+//    if ( (m_ephemTimes.size() == 1) && (m_states.size() == 1) ) {
+//     }
+
     int lowerBound = interpolationIndex(m_ephemTimes, time);
     // try to copy the surrounding 8 points as that's the most possibly needed
     int interpStart = std::max(0, lowerBound - 3);
