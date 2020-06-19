@@ -17,9 +17,10 @@ class OrientationTest : public ::testing::Test {
       times.push_back(0);
       times.push_back(2);
       times.push_back(4);
-      avs.push_back(Vec3d(2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI));
-      avs.push_back(Vec3d(2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI));
-      avs.push_back(Vec3d(2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI));
+      double avConstant = M_PI / (3.0 * sqrt(3.0));
+      avs.push_back(Vec3d(avConstant, avConstant, avConstant));
+      avs.push_back(Vec3d(avConstant, avConstant, avConstant));
+      avs.push_back(Vec3d(avConstant, avConstant, avConstant));
       orientations = Orientations(rotations, times, avs);
     }
 
@@ -41,6 +42,22 @@ class ConstOrientationTest : public OrientationTest{
 
     Rotation constRotation;
     Orientations constOrientations;
+};
+
+class SingleOrientationTest : public ::testing::Test{
+  protected:
+    void SetUp() override {
+      rotations.push_back(Rotation( 0.5, 0.5, 0.5, 0.5));
+      times.push_back(0);
+      double avConstant = M_PI / (3.0 * sqrt(3.0));
+      avs.push_back(Vec3d(avConstant, avConstant, avConstant));
+      orientations = Orientations(rotations, times, avs);
+    }
+
+    vector<Rotation> rotations;
+    vector<double> times;
+    vector<Vec3d> avs;
+    Orientations orientations;
 };
 
 TEST_F(OrientationTest, ConstructorAccessors) {
@@ -77,6 +94,24 @@ TEST_F(OrientationTest, Interpolate) {
   EXPECT_NEAR(quat[3], sin(M_PI * 3.0/8.0) * 1/sqrt(3.0), 1e-10);
 }
 
+TEST_F(OrientationTest, Extrapolate) {
+  Rotation afterRotation = orientations.interpolate(6);
+  vector<double> afterQuat = afterRotation.toQuaternion();
+  ASSERT_EQ(afterQuat.size(), 4);
+  EXPECT_NEAR(afterQuat[0], -0.5, 1e-10);
+  EXPECT_NEAR(afterQuat[1], -0.5, 1e-10);
+  EXPECT_NEAR(afterQuat[2], -0.5, 1e-10);
+  EXPECT_NEAR(afterQuat[3], -0.5, 1e-10);
+
+  Rotation beforeRotation = orientations.interpolate(-2);
+  vector<double> beforeQuat = beforeRotation.toQuaternion();
+  ASSERT_EQ(beforeQuat.size(), 4);
+  EXPECT_NEAR(beforeQuat[0], 1.0, 1e-10);
+  EXPECT_NEAR(beforeQuat[1], 0.0, 1e-10);
+  EXPECT_NEAR(beforeQuat[2], 0.0, 1e-10);
+  EXPECT_NEAR(beforeQuat[3], 0.0, 1e-10);
+}
+
 TEST_F(OrientationTest, InterpolateAtRotation) {
   Rotation interpRotation = orientations.interpolate(0.0);
   vector<double> quat = interpRotation.toQuaternion();
@@ -89,9 +124,9 @@ TEST_F(OrientationTest, InterpolateAtRotation) {
 
 TEST_F(OrientationTest, InterpolateAv) {
   Vec3d interpAv = orientations.interpolateAV(0.25);
-  EXPECT_NEAR(interpAv.x, 2.0 / 3.0 * M_PI, 1e-10);
-  EXPECT_NEAR(interpAv.y, 2.0 / 3.0 * M_PI, 1e-10);
-  EXPECT_NEAR(interpAv.z, 2.0 / 3.0 * M_PI, 1e-10);
+  EXPECT_NEAR(interpAv.x, M_PI / (3.0 * sqrt(3.0)), 1e-10);
+  EXPECT_NEAR(interpAv.y, M_PI / (3.0 * sqrt(3.0)), 1e-10);
+  EXPECT_NEAR(interpAv.z, M_PI / (3.0 * sqrt(3.0)), 1e-10);
 }
 
 TEST_F(OrientationTest, RotateAt) {
@@ -248,10 +283,11 @@ TEST_F(ConstOrientationTest, OrientationInverse) {
   }
 
   vector<Vec3d> newAvs = inverseOrientation.getAngularVelocities();
+  double avConstant = M_PI / (3.0 * sqrt(3.0));
   vector<Vec3d> expectedAvs = {
-    Vec3d(-2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI),
-    Vec3d(-2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI),
-    Vec3d(-2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI, 2.0 / 3.0 * M_PI)
+    Vec3d(-avConstant, avConstant, avConstant),
+    Vec3d(-avConstant, avConstant, avConstant),
+    Vec3d(-avConstant, avConstant, avConstant)
   };
   ASSERT_EQ(newAvs.size(), expectedAvs.size());
   EXPECT_EQ(newAvs[0].x, expectedAvs[0].x);
@@ -263,4 +299,14 @@ TEST_F(ConstOrientationTest, OrientationInverse) {
   EXPECT_EQ(newAvs[2].x, expectedAvs[2].x);
   EXPECT_EQ(newAvs[2].y, expectedAvs[2].y);
   EXPECT_EQ(newAvs[2].z, expectedAvs[2].z);
+}
+
+TEST_F(SingleOrientationTest, extrapolate) {
+    Rotation interpRotation = orientations.interpolate(2);
+    vector<double> quat = interpRotation.toQuaternion();
+    ASSERT_EQ(quat.size(), 4);
+    EXPECT_NEAR(quat[0], -0.5, 1e-10);
+    EXPECT_NEAR(quat[1], 0.5, 1e-10);
+    EXPECT_NEAR(quat[2], 0.5, 1e-10);
+    EXPECT_NEAR(quat[3], 0.5, 1e-10);
 }
