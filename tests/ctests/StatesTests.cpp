@@ -35,6 +35,23 @@ TEST(StatesTest, ConstructorPositionNoVelocity) {
   EXPECT_FALSE(noVelocityState.hasVelocity());
 }
 
+TEST(StatesTest, ConstructorPositionNoVelocityStdVector) {
+  std::vector<double> ephemTimes = {0.0, 1.0};
+  std::vector<double> position = {4.0, 1.0, 4.0};
+  std::vector<std::vector<double>> positions = {position, position};
+
+  States noVelocityState(ephemTimes, positions);
+  vector<State> states = noVelocityState.getStates();
+  EXPECT_EQ(states.size(), 2);
+  EXPECT_NEAR(states[0].position.x, 4.0, 1e-10);
+  EXPECT_NEAR(states[0].position.y, 1.0, 1e-10);
+  EXPECT_NEAR(states[0].position.z, 4.0, 1e-10);
+  EXPECT_NEAR(states[1].position.x, 4.0, 1e-10);
+  EXPECT_NEAR(states[1].position.y, 1.0, 1e-10);
+  EXPECT_NEAR(states[1].position.z, 4.0, 1e-10);
+  EXPECT_FALSE(noVelocityState.hasVelocity());
+}
+
 TEST(StatesTest, ConstructorPositionAndVelocity) {
   std::vector<double> ephemTimes = {0.0, 1.0, 2.0, 3.0};
   std::vector<Vec3d> positions = {
