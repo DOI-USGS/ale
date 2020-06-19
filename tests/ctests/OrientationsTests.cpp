@@ -60,6 +60,15 @@ class SingleOrientationTest : public ::testing::Test{
     Orientations orientations;
 };
 
+TEST(Orientations, BadConstructors) {
+  Rotation simpleRotation(1.0, 0.0, 0.0, 0.0);
+  EXPECT_THROW(Orientations({}, {}), invalid_argument);
+  EXPECT_THROW(Orientations({}, {0.0, 2.0, 4.0}), invalid_argument);
+  EXPECT_THROW(Orientations({simpleRotation, simpleRotation}, {}), invalid_argument);
+  EXPECT_THROW(Orientations({simpleRotation, simpleRotation}, {0.0, 2.0, 4.0}), invalid_argument);
+  EXPECT_THROW(Orientations({simpleRotation, simpleRotation}, {0.0, 2.0}, {Vec3d(1.0, 2.0, 3.0)}), invalid_argument);
+}
+
 TEST_F(OrientationTest, ConstructorAccessors) {
   vector<Rotation> outputRotations = orientations.getRotations();
   vector<double> outputTimes = orientations.getTimes();
