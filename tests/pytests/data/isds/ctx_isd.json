@@ -212,7 +212,7 @@
         "unit": "km"
     },
     "instrument_pointing": {
-        "reference_frame" : 1, 
+        "reference_frame" : 1,
         "time_dependent_frames": [
             -74000,
             -74900,
@@ -267,7 +267,7 @@
                 0.8549121108185723
             ]
         ],
-        "angular_velocity": [
+        "angular_velocities": [
             [
                 -0.0006409728984903079,
                 0.0005054077299115119,
@@ -319,7 +319,7 @@
         ]
     },
     "body_rotation": {
-        "reference_frame" : 1, 
+        "reference_frame" : 1,
         "time_dependent_frames": [
             10014,
             1
@@ -373,7 +373,7 @@
                 0.4449034055807993
             ]
         ],
-        "angular_velocity": [
+        "angular_velocities": [
             [
                 3.16238646979841e-05,
                 -2.880432898124293e-05,
@@ -407,7 +407,7 @@
         ]
     },
     "instrument_position": {
-        "reference_frame" : 1, 
+        "reference_frame" : 1,
         "spk_table_start_time": 297088762.24158406,
         "spk_table_end_time": 297088762.9923841,
         "spk_table_original_size": 6,
@@ -485,7 +485,7 @@
         ]
     },
     "sun_position": {
-        "reference_frame" : 1, 
+        "reference_frame" : 1,
         "spk_table_start_time": 297088762.61698407,
         "spk_table_end_time": 297088762.61698407,
         "spk_table_original_size": 1,
