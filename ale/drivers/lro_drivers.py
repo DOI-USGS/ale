@@ -168,11 +168,11 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
         Takes the exposure_duration defined in a parent class and adds
         offsets taken from an IAK.
 
-         Returns
-         -------
-         : float
-           Returns the exposure duration in seconds.
-         """
+        Returns
+        -------
+        : float
+          Returns the exposure duration in seconds.
+        """
         return super().exposure_duration * (1 + self.multiplicative_line_error) + self.additive_line_error
 
     @property
@@ -180,11 +180,11 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
         """
         Returns the multiplicative line error defined in an IAK.
 
-         Returns
-         -------
-         : float
-           Returns the multiplicative line error.
-         """
+        Returns
+        -------
+        : float
+          Returns the multiplicative line error.
+        """
         return 0.0045
 
     @property
@@ -192,11 +192,11 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
         """
         Returns the additive line error defined in an IAK.
 
-         Returns
-         -------
-         : float
-           Returns the additive line error.
-         """
+        Returns
+        -------
+        : float
+          Returns the additive line error.
+        """
         return 0.0
 
     @property
@@ -204,11 +204,11 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
         """
         Returns the constant time offset defined in an IAK.
 
-         Returns
-         -------
-         : float
-           Returns the constant time offset.
-         """
+        Returns
+        -------
+        : float
+          Returns the constant time offset.
+        """
         return 0.0
 
     @property
@@ -216,11 +216,11 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
         """
         Returns the addition preroll defined in an IAK.
 
-         Returns
-         -------
-         : float
-           Returns the additionl preroll.
-         """
+        Returns
+        -------
+        : float
+          Returns the additionl preroll.
+        """
         return 1024.0
 
     @property
@@ -421,11 +421,11 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
         """
         Returns the multiplicative line error defined in an IAK.
 
-         Returns
-         -------
-         : float
-           Returns the multiplicative line error.
-         """
+        Returns
+        -------
+        : float
+          Returns the multiplicative line error.
+        """
         return 0.0045
 
     @property
@@ -433,11 +433,11 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
         """
         Returns the additive line error defined in an IAK.
 
-         Returns
-         -------
-         : float
-           Returns the additive line error.
-         """
+        Returns
+        -------
+        : float
+          Returns the additive line error.
+        """
         return 0.0
 
     @property
@@ -445,22 +445,23 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
         """
         Returns the constant time offset defined in an IAK.
 
-         Returns
-         -------
-         : float
-           Returns the constant time offset.
-         """
+        Returns
+        -------
+        : float
+          Returns the constant time offset.
+        """
         return 0.0
 
     @property
     def additional_preroll(self):
         """
         Returns the addition preroll defined in an IAK.
-         Returns
-         -------
-         : float
-           Returns the additionl preroll.
-         """
+
+        Returns
+        -------
+        : float
+          Returns the additionl preroll.
+        """
         return 1024.0
 
     @property
