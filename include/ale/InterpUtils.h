@@ -24,6 +24,7 @@ namespace ale {
 
   /**
    * Linearly interpolate between two values.
+   *
    * @param x The first value.
    * @param y The second value.
    * @param t The distance to interpolate. 0 is x and 1 is y.
@@ -32,6 +33,7 @@ namespace ale {
 
   /**
    * Linearly interpolate between two vectors.
+   *
    * @param x The first vectors.
    * @param y The second vectors.
    * @param t The distance to interpolate. 0 is x and 1 is y.
@@ -42,6 +44,7 @@ namespace ale {
 
   /**
    * Compute the index of the first time to use when interpolating at a given time.
+   *
    * @param times The ordered vector of times to search. Must have at least 2 times.
    * @param interpTime The time to search for the interpolation index of.
    * @return int The index of the time that comes before interpTime. If there is
