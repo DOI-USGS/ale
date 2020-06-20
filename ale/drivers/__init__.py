@@ -61,6 +61,16 @@ def load(label, props={}, formatter='ale', verbose=False):
     ----------
     label : str
                String path to the given label file
+
+    props : dict
+            A dictionary of optional keywords/parameters for use in driver
+            loading
+
+    formatter : str
+                Formatted output to expect from the driver
+
+    verbose : bool
+              If True, displays error messages from driver loading
     """
     if isinstance(formatter, str):
         formatter = __formatters__[formatter]
