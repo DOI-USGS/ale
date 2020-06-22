@@ -10,6 +10,9 @@ configuration:
 
 install:
   - git submodule update --init --recursive
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda install conda-build anaconda-client
 
 before_build:
   - mkdir build
@@ -22,3 +25,9 @@ build_script:
 artifacts:
   - path: build\Release\ale.dll
     name: ale.dll
+  - path: build\Release\ale.def
+    name: ale.def
+
+on_success:
+- cd ../
+- conda build -q recipe/
