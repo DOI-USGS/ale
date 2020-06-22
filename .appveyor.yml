@@ -25,6 +25,7 @@ before_build:
 build_script:
   - cmake -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON -G "Visual Studio 15 2017 Win64" -DALE_BUILD_TESTS=OFF ..
   - cmake --build . --target ALL_BUILD --config Release
+  - dir /s
 
 artifacts:
   - path: build\Release\ale.dll
@@ -33,5 +34,6 @@ artifacts:
     name: ale.def
 
 on_success:
-- cd ../
-- conda build -c conda-forge recipe/
+  - call C:\\Miniconda36-x64\Scripts\activate.bat
+  - cd ../
+  - conda build -c conda-forge recipe/
