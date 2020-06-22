@@ -1,4 +1,4 @@
-:mod:`cassini_driver` --- Cassini Driver Classes
+:mod:`co_drivers` --- Cassini Driver Classes
 ================================================
 
 The :mod:`ale.drivers.co_drivers` module

@@ -1,5 +1,5 @@
 :mod:`base` --- Default Driver Classes
-============================================
+======================================
 
 The :mod:`ale.drivers.base` module
 

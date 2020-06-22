@@ -13,7 +13,7 @@ from ale.base.type_sensor import Framer
 
 class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
     """
-    Driver for reading New Horizons LORRI ISIS3 Labels. These are Labels that have been    
+    Driver for reading New Horizons LORRI ISIS3 Labels. These are Labels that have been
     ingested into ISIS from PDS EDR images but have not been spiceinit'd yet.
     """
     @property
@@ -22,6 +22,7 @@ class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Dri
         Returns an instrument id for uniquely identifying the instrument, but often
         also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
         the same ID the Spice expects in bods2c calls.
+        
         Returns
         -------
         : str
@@ -38,10 +39,10 @@ class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Dri
         """
         Overridden to grab the ikid from the Isis Cube since there is no way to
         obtain this value with a spice bods2c call. Isis sets this value during
-        ingestion, based on the original fits file. 
+        ingestion, based on the original fits file.
 
-        For LORRI, there are two options associated with different binning modes: 
-        1x1 binning: -98301 
+        For LORRI, there are two options associated with different binning modes:
+        1x1 binning: -98301
         4x4 binning: -98302
 
 
@@ -51,4 +52,3 @@ class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Dri
           Naif Integer ID code for the instrument
         """
         return self.label['IsisCube']['Kernels']['NaifFrameCode']
-

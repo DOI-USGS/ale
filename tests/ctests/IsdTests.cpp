@@ -764,10 +764,10 @@ TEST(Isd, BadLineScanRate) {
     FAIL() << "Expected an exception to be thrown";
   }
   catch(std::exception &e) {
-    ASSERT_EQ(std::string(e.what()), "Could not parse the integration start lines in the integration time table.");
+    ASSERT_EQ(std::string(e.what()), "Could not parse the line scan rate from the isd.");
   }
   catch(...) {
-    FAIL() << "Expected an Excpetion with message: \"Could not parse the integration start lines in the integration time table.\"";
+    FAIL() << "Expected an Excpetion with message: \"Could not parse the line scan rate from the isd.\"";
   }
 }
 

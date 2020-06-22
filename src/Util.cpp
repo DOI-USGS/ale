@@ -148,8 +148,7 @@ std::vector<std::vector<double>> getLineScanRate(json isd) {
       lines.push_back(scanRate.get<std::vector<double>>());
     }
   } catch (...) {
-    throw std::runtime_error("Could not parse the integration start lines in "
-                             "the integration time table.");
+    throw std::runtime_error("Could not parse the line scan rate from the isd.");
   }
   return lines;
 }

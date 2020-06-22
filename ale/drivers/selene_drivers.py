@@ -63,8 +63,11 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
 
         INSTRUMENT_ID = TC1/TC2
         SD = S/D short for single or double, which in turn means whether the
-             the label belongs to a mono or stereo image.
-        COMPRESS = D/T short for DCT or through, we assume image has been decompressed already
+        label belongs to a mono or stereo image.
+
+        COMPRESS = D/T short for DCT or through, we assume image has been
+        decompressed already
+
         SWATCH = swatch mode, different swatch modes have different FOVs
 
         Returns
@@ -394,41 +397,66 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         Starting sample varies from swath mode (either FULL, NOMINAL or HALF).
 
         From Kaguya IK kernel:
-
-                                                     End
-                                               Start Pixel
-        Sensor                                 Pixel (+dummy)  NAIF ID
-        -----------------------------------------------------------------
-        LISM_TC1                                  1  4096      -131351
-        LISM_TC2                                  1  4096      -131371
-        LISM_TC1_WDF  (Double DCT Full)           1  4096      -131352
-        LISM_TC1_WTF  (Double Through Full)       1  1600      -131353
-        LISM_TC1_SDF  (Single DCT Full)           1  4096      -131354
-        LISM_TC1_STF  (Single Through Full)       1  3208      -131355
-        LISM_TC1_WDN  (Double DCT Nominal)      297  3796(+4)  -131356
-        LISM_TC1_WTN  (Double Through Nominal)  297  1896      -131357
-        LISM_TC1_SDN  (Single DCT Nominal)      297  3796(+4)  -131358
-        LISM_TC1_STN  (Single Through Nominal)  297  3504      -131359
-        LISM_TC1_WDH  (Double DCT Half)        1172  2921(+2)  -131360
-        LISM_TC1_WTH  (Double Through Half)    1172  2771      -131361
-        LISM_TC1_SDH  (Single DCT Half)        1172  2921(+2)  -131362
-        LISM_TC1_STH  (Single Through Half)    1172  2923      -131363
-        LISM_TC1_SSH  (Single SP_support Half) 1172  2921      -131364
-
-        LISM_TC2_WDF  (Double DCT Full)           1  4096      -131372
-        LISM_TC2_WTF  (Double Through Full)       1  1600      -131373
-        LISM_TC2_SDF  (Single DCT Full)           1  4096      -131374
-        LISM_TC2_STF  (Single Through Full)       1  3208      -131375
-        LISM_TC2_WDN  (Double DCT Nominal)      297  3796(+4)  -131376
-        LISM_TC2_WTN  (Double Through Nominal)  297  1896      -131377
-        LISM_TC2_SDN  (Single DCT Nominal)      297  3796(+4)  -131378
-        LISM_TC2_STN  (Single Through Nominal)  297  3504      -131379
-        LISM_TC2_WDH  (Double DCT Half)        1172  2921(+2)  -131380
-        LISM_TC2_WTH  (Double Through Half)    1172  2771      -131381
-        LISM_TC2_SDH  (Single DCT Half)        1172  2921(+2)  -131382
-        LISM_TC2_STH  (Single Through Half)    1172  2923      -131383
-        LISM_TC2_SSH  (Single SP_support Half) 1172  2921      -131384
-
+        
+        +-----------------------------------------+--------------+----------------------+---------+
+        | Sensor                                  | Start Pixel  | End Pixel (+dummy)   | NAIF ID |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC1                                | 1            | 4096                 | -131351 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC2                                | 1            | 4096                 | -131371 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC1_WDF  (Double DCT Full)         | 1            | 4096                 | -131352 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC1_WTF  (Double Through Full)     | 1            | 1600                 | -131353 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC1_SDF  (Single DCT Full)         | 1            | 4096                 | -131354 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC1_STF  (Single Through Full)     | 1            | 3208                 | -131355 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC1_WDN  (Double DCT Nominal)      | 297          | 3796(+4)             | -131356 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC1_WTN  (Double Through Nominal)  | 297          | 1896                 | -131357 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC1_SDN  (Single DCT Nominal)      | 297          | 3796(+4)             | -131358 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC1_STN  (Single Through Nominal)  | 297          | 3504                 | -131359 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC1_WDH  (Double DCT Half)         | 1172         | 2921(+2)             | -131360 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC1_WTH  (Double Through Half)     | 1172         | 2771                 | -131361 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC1_SDH  (Single DCT Half)         | 1172         | 2921(+2)             | -131362 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC1_STH  (Single Through Half)     | 1172         | 2923                 | -131363 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC1_SSH  (Single SP_support Half)  | 1172         | 2921                 | -131364 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC2_WDF  (Double DCT Full)         | 1            | 4096                 | -131372 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC2_WTF  (Double Through Full)     | 1            | 1600                 | -131373 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC2_SDF  (Single DCT Full)         | 1            | 4096                 | -131374 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC2_STF  (Single Through Full)     | 1            | 3208                 | -131375 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC2_WDN  (Double DCT Nominal)      | 297          | 3796(+4)             | -131376 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC2_WTN  (Double Through Nominal)  | 297          | 1896                 | -131377 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC2_SDN  (Single DCT Nominal)      | 297          | 3796(+4)             | -131378 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC2_STN  (Single Through Nominal)  | 297          | 3504                 | -131379 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC2_WDH  (Double DCT Half)         | 1172         | 2921(+2)             | -131380 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC2_WTH  (Double Through Half)     | 1172         | 2771                 | -131381 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC2_SDH  (Single DCT Half)         | 1172         | 2921(+2)             | -131382 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC2_STH  (Single Through Half)     | 1172         | 2923                 | -131383 |
+        +-----------------------------------------+--------------+----------------------+---------+
+        | LISM_TC2_SSH  (Single SP_support Half)  | 1172         | 2921                 | -131384 |
+        +-----------------------------------------+--------------+----------------------+---------+
 
         Returns
         -------
@@ -822,5 +850,3 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
           ISIS sensor model version
         """
         return 1
-
-
