@@ -24,7 +24,7 @@ ale::Isd::Isd(std::string isd_file) {
     // Framers do not deal with line scan rates
     // This is assuming that we may be dealing with a framer rather than
     // a malformed ISD
-    line_scan_rate = {{}};
+    line_scan_rate = std::vector<std::vector<double>>();
   }
 
   detector_sample_summing = getSampleSumming(isd);
