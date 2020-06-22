@@ -23,15 +23,15 @@ before_build:
   - cd build
 
 build_script:
+  - python ..\setup.py install
   - cmake -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON -G "Visual Studio 15 2017 Win64" -DALE_BUILD_TESTS=OFF ..
   - cmake --build . --target ALL_BUILD --config Release
-  - dir /s
 
 artifacts:
   - path: build\Release\ale.dll
     name: ale.dll
-  - path: build\Release\ale.def
-    name: ale.def
+  - path: build\Release\ale.lib
+    name: ale.lib
 
 on_success:
   - call C:\\Miniconda36-x64\Scripts\activate.bat

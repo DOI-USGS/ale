@@ -31,9 +31,13 @@ requirements:
     - spiceypy >=2.3.0
     - pyyaml
 
-# Add the tests eventually
-# test:
-#
+test:
+  imports:
+    - ale
+  commands:
+    - conda inspect linkages -p $PREFIX $PKG_NAME  # [not win]
+    - test -e $PREFIX/lib/libusgscsm${SHLIB_EXT}  # [unix]
+    - if not exist %LIBRARY_BIN%\usgscsm.dll exit 1  # [win]
 
 # about:
 #   home:
