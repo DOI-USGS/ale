@@ -10,18 +10,13 @@ configuration:
 
 install:
   - git submodule update --init --recursive
-  - call C:\\Miniconda36-x64\Scripts\activate.bat
-  - conda config --set always_yes yes --set changeps1 no
-  - conda env create -n ale python=3.7.3
-  - conda env update -f environment.yml -n ale
-  - conda activate ale
 
 before_build:
   - mkdir build
   - cd build
 
 build_script:
-  - cmake -DWINDOWS_EXPORT_ALL_SYMBOLS=ON -DALE_BUILD_LOAD=OFF -G "Visual Studio 15 2017 Win64" -DBUILD_TESTS=OFF ..
+  - cmake -DWINDOWS_EXPORT_ALL_SYMBOLS=ON -DALE_BUILD_LOAD=OFF -DALE_USE_EXTERNAL_JSON=OFF -DALE_USE_EXTERNAL_EIGEN=OFF -G "Visual Studio 15 2017 Win64" -DBUILD_TESTS=OFF ..
   - cmake --build . --target ALL_BUILD --config Release
 
 artifacts:
