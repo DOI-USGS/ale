@@ -18,7 +18,14 @@ ale::Isd::Isd(std::string isd_file) {
   starting_ephemeris_time = getStartingTime(isd);
   center_ephemeris_time = getCenterTime(isd);
 
-  line_scan_rate = getLineScanRate(isd);
+  try {
+    line_scan_rate = getLineScanRate(isd);
+  } catch (...) {
+    // Framers do not deal with line scan rates
+    // This is assuming that we may be dealing with a framer rather than
+    // a malformed ISD
+    line_scan_rate = {{}};
+  }
 
   detector_sample_summing = getSampleSumming(isd);
   detector_line_summing = getLineSumming(isd);
