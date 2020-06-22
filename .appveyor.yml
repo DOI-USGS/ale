@@ -10,6 +10,7 @@ configuration:
 
 install:
   - git submodule update --init --recursive
+  - call C:\\Miniconda36-x64\Scripts\activate.bat
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda install conda-build anaconda-client
