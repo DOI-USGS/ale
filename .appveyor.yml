@@ -14,7 +14,7 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda env create -n ale python=3.7.3
   - conda env update -f environment.yml -n ale
-  - source activate ale
+  - conda activate ale
 
 before_build:
   - mkdir build
