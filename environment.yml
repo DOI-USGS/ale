@@ -13,9 +13,9 @@ dependencies:
   - numpy
   - openblas>=0.3.0
   - pvl
-  - python=3.7.1
+  - python
   - python-dateutil
   - scipy
-  - spiceypy=2.2.2
+  - spiceypy>=2.3.0
   - pyyaml
   - networkx

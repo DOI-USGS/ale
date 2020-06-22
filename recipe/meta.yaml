@@ -15,11 +15,21 @@ build:
 
 requirements:
   build:
-  - cmake>=3.10
-  - eigen
-  - nlohmann_json
+    - cmake>=3.10
+    - eigen
   host:
-  - nlohmann_json
+    - pip
+    - python
+    - nlohmann_json
+  run:
+    - networkx
+    - numpy
+    - pvl
+    - python
+    - python-dateutil
+    - scipy >=1.2.0
+    - spiceypy >=2.3.0
+    - pyyaml
 
 # Add the tests eventually
 # test:
