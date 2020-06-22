@@ -2,7 +2,6 @@ name: ale
 channels:
   - conda-forge
   - default
-  - usgs-astrogeology
 
 dependencies:
   - cmake>=3.10
@@ -11,7 +10,6 @@ dependencies:
   - jupyter
   - nlohmann_json
   - numpy
-  - openblas>=0.3.0
   - pvl
   - python
   - python-dateutil
