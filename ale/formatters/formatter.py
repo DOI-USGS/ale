@@ -96,7 +96,7 @@ def to_isd(driver):
     instrument_pointing['ck_table_original_size'] = len(time_dependent_rotation.times)
     instrument_pointing['ephemeris_times'] = time_dependent_rotation.times
     instrument_pointing['quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
-    instrument_pointing['angular_velocity'] = time_dependent_rotation.av
+    instrument_pointing['angular_velocities'] = time_dependent_rotation.av
 
     # reference frame should be the last frame in the chain
     instrument_pointing["reference_frame"] = instrument_pointing['time_dependent_frames'][-1]
@@ -121,7 +121,7 @@ def to_isd(driver):
         body_rotation['ck_table_original_size'] = len(time_dependent_rotation.times)
         body_rotation['ephemeris_times'] = time_dependent_rotation.times
         body_rotation['quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
-        body_rotation['angular_velocity'] = time_dependent_rotation.av
+        body_rotation['angular_velocities'] = time_dependent_rotation.av
 
     if source_frame != target_frame:
         # Reverse the frame order because ISIS orders frames as

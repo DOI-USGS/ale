@@ -167,7 +167,7 @@
         -0.8240749322251953
       ]
     ],
-    "angular_velocity": [
+    "angular_velocities": [
       [
         -2.0163095864499935e-05,
         2.0665280555081777e-08,
@@ -210,7 +210,7 @@
         0.6504211272382237
       ]
     ],
-    "angular_velocity": [
+    "angular_velocities": [
       [
         2.770977343153026e-05,
         -7.064167352871139e-05,
@@ -242,7 +242,7 @@
     ]
   },
   "sun_position": {
-    "reference_frame" : 1, 
+    "reference_frame" : 1,
     "spk_table_start_time": 488002614.62294483,
     "spk_table_end_time": 488002614.62294483,
     "spk_table_original_size": 1,
