@@ -31,4 +31,4 @@ artifacts:
 
 on_success:
 - cd ../
-- conda build -q recipe/
+- conda build -c conda-forge -q recipe/
