@@ -38,8 +38,7 @@ test:
     - conda inspect linkages -p $PREFIX $PKG_NAME  # [not win]
     - test -e $PREFIX/lib/libale${SHLIB_EXT}  # [unix]
     - if not exist %LIBRARY_BIN%\ale.dll exit 1  # [win]
-    - dir /s %PREFIX%\Library #[win]
-    - if not exist %LIBRARY_BIN%\ale.lib exit 1  # [win]
+    - if not exist %LIBRARY_LIB%\ale.lib exit 1  # [win]
 
 # about:
 #   home:
