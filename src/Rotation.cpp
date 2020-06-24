@@ -201,8 +201,7 @@ namespace ale {
   Vec3d Rotation::operator()(const Vec3d &vector) const {
     Eigen::Vector3d eigenVector(vector.x, vector.y, vector.z);
     Eigen::Vector3d rotatedVector = m_impl->quat._transformVector(eigenVector);
-    std::vector<double> tempVec = std::vector<double>(rotatedVector.data(), rotatedVector.data() + rotatedVector.size());
-    return Vec3d(tempVec);
+    return Vec3d(rotatedVector[0], rotatedVector[1], rotatedVector[2]);
   }
 
   State Rotation::operator()(
