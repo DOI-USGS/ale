@@ -149,7 +149,7 @@ namespace ale {
 
 
   std::vector<double> Rotation::toRotationMatrix() const {
-    // The matrix is stored in column-major, but we want to output in row semiMajor
+    // The matrix is stored in column major, but we want to output in row semiMajor
     // so take the transpose
     Eigen::Quaterniond::RotationMatrixType mat = m_impl->quat.toRotationMatrix().transpose();
     return std::vector<double>(mat.data(), mat.data() + mat.size());
