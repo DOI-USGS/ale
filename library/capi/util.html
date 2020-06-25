@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>utils — ALE Utility Functions &#8212; ALE 0.8.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="vectors — ALE Vector Classes &amp; Functions" href="vector.html" />
+    <link rel="prev" title="states — ALE States Classes &amp; Functions" href="state.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="utils-ale-utility-functions">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">utils</span></code> — ALE Utility Functions<a class="headerlink" href="#utils-ale-utility-functions" title="Permalink to this headline">¶</a></h1>
+<p>Used in <code class="docutils literal notranslate"><span class="pre">getDistortionModel</span></code> and <code class="docutils literal notranslate"><span class="pre">getDistortionCoeffs</span></code></p>
+<dl class="cpp enum">
+<dt id="_CPPv4N3ale14DistortionTypeE">
+<span id="_CPPv3N3ale14DistortionTypeE"></span><span id="_CPPv2N3ale14DistortionTypeE"></span><span class="target" id="namespaceale_1a895b3b3eb41c10706690ace239fca2f2"></span><em class="property">enum </em><code class="sig-prename descclassname"><a class="reference internal" href="index.html#_CPPv43ale" title="ale">ale</a><code class="sig-prename descclassname">::</code></code><code class="sig-name descname">DistortionType</code><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt id="_CPPv4N3ale14DistortionType10TRANSVERSEE">
+<span id="_CPPv3N3ale14DistortionType10TRANSVERSEE"></span><span id="_CPPv2N3ale14DistortionType10TRANSVERSEE"></span><span class="target" id="namespaceale_1a895b3b3eb41c10706690ace239fca2f2a7a685ad5764ea10d654034dc1f2e922e"></span><em class="property">enumerator </em><code class="sig-name descname">TRANSVERSE</code><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt id="_CPPv4N3ale14DistortionType6RADIALE">
+<span id="_CPPv3N3ale14DistortionType6RADIALE"></span><span id="_CPPv2N3ale14DistortionType6RADIALE"></span><span class="target" id="namespaceale_1a895b3b3eb41c10706690ace239fca2f2add7ba76808bbd9000cc9ab21c490fcaa"></span><em class="property">enumerator </em><code class="sig-name descname">RADIAL</code><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt id="_CPPv4N3ale14DistortionType10KAGUYALISME">
+<span id="_CPPv3N3ale14DistortionType10KAGUYALISME"></span><span id="_CPPv2N3ale14DistortionType10KAGUYALISME"></span><span class="target" id="namespaceale_1a895b3b3eb41c10706690ace239fca2f2aff101ed6f304e2110d1266600c12299b"></span><em class="property">enumerator </em><code class="sig-name descname">KAGUYALISM</code><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt id="_CPPv4N3ale14DistortionType6DAWNFCE">
+<span id="_CPPv3N3ale14DistortionType6DAWNFCE"></span><span id="_CPPv2N3ale14DistortionType6DAWNFCE"></span><span class="target" id="namespaceale_1a895b3b3eb41c10706690ace239fca2f2aa24fb21864f3624b4742b8df797887b4"></span><em class="property">enumerator </em><code class="sig-name descname">DAWNFC</code><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt id="_CPPv4N3ale14DistortionType10LROLROCNACE">
+<span id="_CPPv3N3ale14DistortionType10LROLROCNACE"></span><span id="_CPPv2N3ale14DistortionType10LROLROCNACE"></span><span class="target" id="namespaceale_1a895b3b3eb41c10706690ace239fca2f2af82ecfa54578e71b2f175a1391c6b705"></span><em class="property">enumerator </em><code class="sig-name descname">LROLROCNAC</code><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="cpp type">
+<dt id="_CPPv43ale">
+<span id="_CPPv33ale"></span><span id="_CPPv23ale"></span><span id="ale"></span><span class="target" id="namespaceale"></span><em class="property">namespace </em><code class="sig-name descname">ale</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="cpp function">
+<dt id="_CPPv4I0EN3ale12getJsonArrayENSt6vectorI1TEEN8nlohmann4jsonE">
+<span id="_CPPv3I0EN3ale12getJsonArrayEN8nlohmann4jsonE"></span><span id="_CPPv2I0EN3ale12getJsonArrayEN8nlohmann4jsonE"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br /><span class="target" id="namespaceale_1a8c705963623ee73dbcb06384e6b4da80"></span>std::vector&lt;<a class="reference internal" href="#_CPPv4I0EN3ale12getJsonArrayENSt6vectorI1TEEN8nlohmann4jsonE" title="ale::getJsonArray::T">T</a>&gt; <code class="sig-name descname">getJsonArray</code><span class="sig-paren">(</span>nlohmann::json <em>obj</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3ale12getJsonArrayENSt6vectorI1TEEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale22getInterpolationMethodEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale22getInterpolationMethodEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale22getInterpolationMethodEN8nlohmann4jsonE"></span><span id="ale::getInterpolationMethod__nlohmann::json"></span><span class="target" id="namespaceale_1a18a48620fda66275a487dce29dc83443"></span><a class="reference internal" href="interp_utils.html#_CPPv4N3ale21PositionInterpolationE" title="ale::PositionInterpolation">PositionInterpolation</a> <code class="sig-name descname">getInterpolationMethod</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale22getInterpolationMethodEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale12getMinHeightEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale12getMinHeightEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale12getMinHeightEN8nlohmann4jsonE"></span><span id="ale::getMinHeight__nlohmann::json"></span><span class="target" id="namespaceale_1acd9023be7d3656e8138fbd65c4dea79b"></span>double <code class="sig-name descname">getMinHeight</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale12getMinHeightEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale18getSensorModelNameEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale18getSensorModelNameEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale18getSensorModelNameEN8nlohmann4jsonE"></span><span id="ale::getSensorModelName__nlohmann::json"></span><span class="target" id="namespaceale_1a0fe6a33ddbe5715f42d58cc96426fde9"></span>std::string <code class="sig-name descname">getSensorModelName</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale18getSensorModelNameEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale10getImageIdEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale10getImageIdEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale10getImageIdEN8nlohmann4jsonE"></span><span id="ale::getImageId__nlohmann::json"></span><span class="target" id="namespaceale_1a431cee9072c400ceda174a5c63eba7f0"></span>std::string <code class="sig-name descname">getImageId</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale10getImageIdEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale13getSensorNameEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale13getSensorNameEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale13getSensorNameEN8nlohmann4jsonE"></span><span id="ale::getSensorName__nlohmann::json"></span><span class="target" id="namespaceale_1aaa4e3d1680e92e956fd1648a15c5a43e"></span>std::string <code class="sig-name descname">getSensorName</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale13getSensorNameEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale15getPlatformNameEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale15getPlatformNameEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale15getPlatformNameEN8nlohmann4jsonE"></span><span id="ale::getPlatformName__nlohmann::json"></span><span class="target" id="namespaceale_1a4d03b43d78d6fc9a81a9f4e4a5318d35"></span>std::string <code class="sig-name descname">getPlatformName</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale15getPlatformNameEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale10getLogFileEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale10getLogFileEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale10getLogFileEN8nlohmann4jsonE"></span><span id="ale::getLogFile__nlohmann::json"></span><span class="target" id="namespaceale_1a504116d2aa943a9139d45936f58b8734"></span>std::string <code class="sig-name descname">getLogFile</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale10getLogFileEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale20getIsisCameraVersionEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale20getIsisCameraVersionEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale20getIsisCameraVersionEN8nlohmann4jsonE"></span><span id="ale::getIsisCameraVersion__nlohmann::json"></span><span class="target" id="namespaceale_1ad5f07051841b145acf544c236460f03e"></span>std::string <code class="sig-name descname">getIsisCameraVersion</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale20getIsisCameraVersionEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale13getTotalLinesEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale13getTotalLinesEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale13getTotalLinesEN8nlohmann4jsonE"></span><span id="ale::getTotalLines__nlohmann::json"></span><span class="target" id="namespaceale_1a22c0aba8c87ac836449409a27a901575"></span>int <code class="sig-name descname">getTotalLines</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale13getTotalLinesEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale15getTotalSamplesEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale15getTotalSamplesEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale15getTotalSamplesEN8nlohmann4jsonE"></span><span id="ale::getTotalSamples__nlohmann::json"></span><span class="target" id="namespaceale_1a103ff6dc5ec5f5e2d984e2dcf079e303"></span>int <code class="sig-name descname">getTotalSamples</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale15getTotalSamplesEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale15getStartingTimeEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale15getStartingTimeEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale15getStartingTimeEN8nlohmann4jsonE"></span><span id="ale::getStartingTime__nlohmann::json"></span><span class="target" id="namespaceale_1afc83b1d5c3245ead2b4c58a143c0f41a"></span>double <code class="sig-name descname">getStartingTime</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale15getStartingTimeEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale13getCenterTimeEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale13getCenterTimeEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale13getCenterTimeEN8nlohmann4jsonE"></span><span id="ale::getCenterTime__nlohmann::json"></span><span class="target" id="namespaceale_1ac39ac8552e6e04957d8b37771a8ba932"></span>double <code class="sig-name descname">getCenterTime</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale13getCenterTimeEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale15getLineScanRateEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale15getLineScanRateEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale15getLineScanRateEN8nlohmann4jsonE"></span><span id="ale::getLineScanRate__nlohmann::json"></span><span class="target" id="namespaceale_1aed38dadfbb9e0dafe54ece1f67adfc16"></span>std::vector&lt;std::vector&lt;double&gt;&gt; <code class="sig-name descname">getLineScanRate</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale15getLineScanRateEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale16getSampleSummingEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale16getSampleSummingEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale16getSampleSummingEN8nlohmann4jsonE"></span><span id="ale::getSampleSumming__nlohmann::json"></span><span class="target" id="namespaceale_1a1d29d7d1842c26cce20e92a58183d57d"></span>int <code class="sig-name descname">getSampleSumming</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale16getSampleSummingEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale14getLineSummingEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale14getLineSummingEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale14getLineSummingEN8nlohmann4jsonE"></span><span id="ale::getLineSumming__nlohmann::json"></span><span class="target" id="namespaceale_1a072d117d8d613b221c85b4404fea7ebf"></span>int <code class="sig-name descname">getLineSumming</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale14getLineSummingEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale14getFocalLengthEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale14getFocalLengthEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale14getFocalLengthEN8nlohmann4jsonE"></span><span id="ale::getFocalLength__nlohmann::json"></span><span class="target" id="namespaceale_1a11be6a7938a455983409db5a50701eba"></span>double <code class="sig-name descname">getFocalLength</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale14getFocalLengthEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale25getFocalLengthUncertaintyEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale25getFocalLengthUncertaintyEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale25getFocalLengthUncertaintyEN8nlohmann4jsonE"></span><span id="ale::getFocalLengthUncertainty__nlohmann::json"></span><span class="target" id="namespaceale_1a5f6aae0a098d26faed722453fc2d541f"></span>double <code class="sig-name descname">getFocalLengthUncertainty</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale25getFocalLengthUncertaintyEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale19getFocal2PixelLinesEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale19getFocal2PixelLinesEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale19getFocal2PixelLinesEN8nlohmann4jsonE"></span><span id="ale::getFocal2PixelLines__nlohmann::json"></span><span class="target" id="namespaceale_1aa5f949663d03e037a270731988ffde8c"></span>std::vector&lt;double&gt; <code class="sig-name descname">getFocal2PixelLines</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale19getFocal2PixelLinesEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale21getFocal2PixelSamplesEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale21getFocal2PixelSamplesEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale21getFocal2PixelSamplesEN8nlohmann4jsonE"></span><span id="ale::getFocal2PixelSamples__nlohmann::json"></span><span class="target" id="namespaceale_1a62fe3ca81b36ce844e8ce81f2eca83cc"></span>std::vector&lt;double&gt; <code class="sig-name descname">getFocal2PixelSamples</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale21getFocal2PixelSamplesEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale21getDetectorCenterLineEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale21getDetectorCenterLineEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale21getDetectorCenterLineEN8nlohmann4jsonE"></span><span id="ale::getDetectorCenterLine__nlohmann::json"></span><span class="target" id="namespaceale_1abe2765b70d4af7e7b337655eacc54480"></span>double <code class="sig-name descname">getDetectorCenterLine</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale21getDetectorCenterLineEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale23getDetectorCenterSampleEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale23getDetectorCenterSampleEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale23getDetectorCenterSampleEN8nlohmann4jsonE"></span><span id="ale::getDetectorCenterSample__nlohmann::json"></span><span class="target" id="namespaceale_1aef93831f0bd6f5388efc66ac46bc5dcb"></span>double <code class="sig-name descname">getDetectorCenterSample</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale23getDetectorCenterSampleEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale23getDetectorStartingLineEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale23getDetectorStartingLineEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale23getDetectorStartingLineEN8nlohmann4jsonE"></span><span id="ale::getDetectorStartingLine__nlohmann::json"></span><span class="target" id="namespaceale_1a04ea35642c374ea715a3d13546759e67"></span>double <code class="sig-name descname">getDetectorStartingLine</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale23getDetectorStartingLineEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale25getDetectorStartingSampleEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale25getDetectorStartingSampleEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale25getDetectorStartingSampleEN8nlohmann4jsonE"></span><span id="ale::getDetectorStartingSample__nlohmann::json"></span><span class="target" id="namespaceale_1abdea3995c41420eb8bcc21ee102df099"></span>double <code class="sig-name descname">getDetectorStartingSample</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale25getDetectorStartingSampleEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale12getMaxHeightEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale12getMaxHeightEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale12getMaxHeightEN8nlohmann4jsonE"></span><span id="ale::getMaxHeight__nlohmann::json"></span><span class="target" id="namespaceale_1a7ac491d9bc845d6949540c1578619f26"></span>double <code class="sig-name descname">getMaxHeight</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale12getMaxHeightEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale18getSemiMajorRadiusEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale18getSemiMajorRadiusEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale18getSemiMajorRadiusEN8nlohmann4jsonE"></span><span id="ale::getSemiMajorRadius__nlohmann::json"></span><span class="target" id="namespaceale_1a179c1cf3db5db8901fa710ffb28ba2de"></span>double <code class="sig-name descname">getSemiMajorRadius</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale18getSemiMajorRadiusEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale18getSemiMinorRadiusEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale18getSemiMinorRadiusEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale18getSemiMinorRadiusEN8nlohmann4jsonE"></span><span id="ale::getSemiMinorRadius__nlohmann::json"></span><span class="target" id="namespaceale_1a034d8e5ecc81c78b9e895dc04bcf14a3"></span>double <code class="sig-name descname">getSemiMinorRadius</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale18getSemiMinorRadiusEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale18getDistortionModelEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale18getDistortionModelEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale18getDistortionModelEN8nlohmann4jsonE"></span><span id="ale::getDistortionModel__nlohmann::json"></span><span class="target" id="namespaceale_1a9a509eabfcd68e4b6fe53cf5c59d500d"></span><a class="reference internal" href="distortion.html#_CPPv4N3ale14DistortionTypeE" title="ale::DistortionType">DistortionType</a> <code class="sig-name descname">getDistortionModel</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale18getDistortionModelEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale19getDistortionCoeffsEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale19getDistortionCoeffsEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale19getDistortionCoeffsEN8nlohmann4jsonE"></span><span id="ale::getDistortionCoeffs__nlohmann::json"></span><span class="target" id="namespaceale_1a547a1a721b13fe4c0a6290373c12208e"></span>std::vector&lt;double&gt; <code class="sig-name descname">getDistortionCoeffs</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale19getDistortionCoeffsEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale18getJsonDoubleArrayEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale18getJsonDoubleArrayEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale18getJsonDoubleArrayEN8nlohmann4jsonE"></span><span id="ale::getJsonDoubleArray__nlohmann::json"></span><span class="target" id="namespaceale_1abca63271ca4d762ee22c49d53be24178"></span>std::vector&lt;double&gt; <code class="sig-name descname">getJsonDoubleArray</code><span class="sig-paren">(</span>nlohmann::json <em>obj</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale18getJsonDoubleArrayEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale17getJsonVec3dArrayEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale17getJsonVec3dArrayEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale17getJsonVec3dArrayEN8nlohmann4jsonE"></span><span id="ale::getJsonVec3dArray__nlohmann::json"></span><span class="target" id="namespaceale_1a0bb8508f429a491572020a0b00263c0c"></span>std::vector&lt;<a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a>&gt; <code class="sig-name descname">getJsonVec3dArray</code><span class="sig-paren">(</span>nlohmann::json <em>obj</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale17getJsonVec3dArrayEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale16getJsonQuatArrayEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale16getJsonQuatArrayEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale16getJsonQuatArrayEN8nlohmann4jsonE"></span><span id="ale::getJsonQuatArray__nlohmann::json"></span><span class="target" id="namespaceale_1a55158564c55a60a841b24ddf48c9fdf8"></span>std::vector&lt;<a class="reference internal" href="rotation.html#_CPPv4N3ale8RotationE" title="ale::Rotation">Rotation</a>&gt; <code class="sig-name descname">getJsonQuatArray</code><span class="sig-paren">(</span>nlohmann::json <em>obj</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale16getJsonQuatArrayEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale21getInstrumentPositionEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale21getInstrumentPositionEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale21getInstrumentPositionEN8nlohmann4jsonE"></span><span id="ale::getInstrumentPosition__nlohmann::json"></span><span class="target" id="namespaceale_1ad1f866ed2c0b6e03d0f4221cf24592e6"></span><a class="reference internal" href="state.html#_CPPv4N3ale6StatesE" title="ale::States">States</a> <code class="sig-name descname">getInstrumentPosition</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale21getInstrumentPositionEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale14getSunPositionEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale14getSunPositionEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale14getSunPositionEN8nlohmann4jsonE"></span><span id="ale::getSunPosition__nlohmann::json"></span><span class="target" id="namespaceale_1a4cff606cf659d427d7d56db9da2e0d19"></span><a class="reference internal" href="state.html#_CPPv4N3ale6StatesE" title="ale::States">States</a> <code class="sig-name descname">getSunPosition</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale14getSunPositionEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale15getBodyRotationEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale15getBodyRotationEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale15getBodyRotationEN8nlohmann4jsonE"></span><span id="ale::getBodyRotation__nlohmann::json"></span><span class="target" id="namespaceale_1a6aee97e4b6c1f1506508a117039a43b7"></span><a class="reference internal" href="orientation.html#_CPPv4N3ale12OrientationsE" title="ale::Orientations">Orientations</a> <code class="sig-name descname">getBodyRotation</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale15getBodyRotationEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale21getInstrumentPointingEN8nlohmann4jsonE">
+<span id="_CPPv3N3ale21getInstrumentPointingEN8nlohmann4jsonE"></span><span id="_CPPv2N3ale21getInstrumentPointingEN8nlohmann4jsonE"></span><span id="ale::getInstrumentPointing__nlohmann::json"></span><span class="target" id="namespaceale_1adbb49d01820a69ff9ceb1d77042496aa"></span><a class="reference internal" href="orientation.html#_CPPv4N3ale12OrientationsE" title="ale::Orientations">Orientations</a> <code class="sig-name descname">getInstrumentPointing</code><span class="sig-paren">(</span>nlohmann::json <em>isd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale21getInstrumentPointingEN8nlohmann4jsonE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Library Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="distortion.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distortion</span></code> — ALE Distortion Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interp_utils.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">interpolation</span></code> — ALE Interpolation Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="isd.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ISD</span></code> — ALE Image Support Data Class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="orientation.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">orientations</span></code> — ALE Orientation Classes &amp; Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rotation.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rotation</span></code> — ALE Rotation Classes &amp; Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="state.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">states</span></code> — ALE States Classes &amp; Functions</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">utils</span></code> — ALE Utility Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vector.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">vectors</span></code> — ALE Vector Classes &amp; Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../python/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Library Reference</a><ul>
+  <li><a href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a><ul>
+      <li>Previous: <a href="state.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">states</span></code> — ALE States Classes &amp; Functions</a></li>
+      <li>Next: <a href="vector.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">vectors</span></code> — ALE Vector Classes &amp; Functions</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;Public Domain.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/library/capi/util.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

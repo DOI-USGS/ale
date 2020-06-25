@@ -1,0 +1,756 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mex_drivers — Mars Express Driver Classes &#8212; ALE 0.8.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="mro_drivers — MRO Driver Classes" href="mro_driver.html" />
+    <link rel="prev" title="mess_drivers — MDIS Driver Classes" href="mess_driver.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="mex-drivers-mars-express-driver-classes">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">mex_drivers</span></code> — Mars Express Driver Classes<a class="headerlink" href="#mex-drivers-mars-express-driver-classes" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="#module-ale.drivers.mex_drivers" title="ale.drivers.mex_drivers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ale.drivers.mex_drivers</span></code></a> module</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.8.1.</span></p>
+</div>
+<span class="target" id="module-ale.drivers.mex_drivers"></span><dl class="py class">
+<dt id="ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver">
+<em class="property">class </em><code class="sig-prename descclassname">ale.drivers.mex_drivers.</code><code class="sig-name descname">MexHrscIsisLabelNaifSpiceDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">num_ephem</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">num_quats</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">props</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/drivers/mex_drivers.html#MexHrscIsisLabelNaifSpiceDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.type_sensor.LineScanner</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.label_isis.IsisLabel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.data_naif.NaifSpice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.type_distortion.RadialDistortion</span></code>, <a class="reference internal" href="base.html#ale.base.base.Driver" title="ale.base.base.Driver"><code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.base.Driver</span></code></a></p>
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.ephemeris_start_time">
+<em class="property">property </em><code class="sig-name descname">ephemeris_start_time</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.ephemeris_start_time" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>starting ephemeris time</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.ephemeris_stop_time">
+<em class="property">property </em><code class="sig-name descname">ephemeris_stop_time</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.ephemeris_stop_time" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>ephemeris stop time</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.fikid">
+<em class="property">property </em><code class="sig-name descname">fikid</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.fikid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Naif ID code of the filter dependent instrument codes.</p>
+<p>Expects filter_number to be defined. This should be an integer containing
+the filter number from the pds3 label.
+Expects ikid to be defined. This should be the integer Naif ID code for
+the instrument.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>Naif ID code used in calculating focal length</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.ikid">
+<em class="property">property </em><code class="sig-name descname">ikid</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.ikid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the Naif ID code for the HRSC head instrument</p>
+<p>This would be the Naif ID code for the base (or “head”) instrument.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>Naif ID used to for indentifying the instrument in Spice kernels</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.instrument_id">
+<em class="property">property </em><code class="sig-name descname">instrument_id</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.instrument_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the name of the instrument</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>Name of the instrument</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.line_scan_rate">
+<em class="property">property </em><code class="sig-name descname">line_scan_rate</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.line_scan_rate" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: tuple</dt><dd><p>list of lines, list of ephemeris times, and list of exposure
+times</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.sensor_model_version">
+<em class="property">property </em><code class="sig-name descname">sensor_model_version</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.sensor_model_version" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>ISIS sensor model version</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.sensor_name">
+<em class="property">property </em><code class="sig-name descname">sensor_name</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.sensor_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the name of the instrument. Need to over-ride isis_label because
+InstrumentName is not defined in the ISIS label for MEX HSRC cubes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>Name of the sensor</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.times_table">
+<em class="property">property </em><code class="sig-name descname">times_table</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver.times_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns EphermisTime, ExposureTime, and LinesStart informtation which was stored as
+binary information in the ISIS cube.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: dict</dt><dd><p>Dictionary with EphemerisTime, ExposureTime, and LineStart.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver">
+<em class="property">class </em><code class="sig-prename descclassname">ale.drivers.mex_drivers.</code><code class="sig-name descname">MexHrscPds3NaifSpiceDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">num_ephem</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">num_quats</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">props</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/drivers/mex_drivers.html#MexHrscPds3NaifSpiceDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.type_sensor.LineScanner</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.label_pds3.Pds3Label</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.data_naif.NaifSpice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.type_distortion.RadialDistortion</span></code>, <a class="reference internal" href="base.html#ale.base.base.Driver" title="ale.base.base.Driver"><code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.base.Driver</span></code></a></p>
+<p>Driver for a PDS3 Mars Express (Mex) High Resolution Stereo Camera (HRSC) images.</p>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>HRSC has 9 different filters. Each has it’s own instrument id, as well as
+the main/”HEAD” camera composing those filters. There is also another
+“SRC” instrument, making-up a total of 11 distinct sensors. It is very
+important to understand which code is needed when/where.</p></li>
+<li><p>HRSC is a variable line scanner, and so does not maintain one exposure
+duration, but rather differing exposure durations per line. This
+information is stored within the individual records in the image data
+itself, with the the first 8 bytes making up the double presicion
+ephemeris time that the line exposure was started, and the next 4 bytes
+making up the float containing that line’s exposure duration.</p></li>
+</ul>
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_ephemeris_times">
+<em class="property">property </em><code class="sig-name descname">binary_ephemeris_times</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_ephemeris_times" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the ephemeris times taken from the binary image data.</p>
+<p>For HRSC, the ephemeris times are imbedded in the binary data of the image.
+The ephemeris times start at the first byte of the line/records and are 8 bytes long.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: list</dt><dd><p>Ephemeris times</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_exposure_durations">
+<em class="property">property </em><code class="sig-name descname">binary_exposure_durations</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_exposure_durations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the exposure durations taken from the binary image data.</p>
+<p>For HRSC, the exposure durations are imbedded in the binary data of the image.
+The expsoure durations start at the 9th byte of the line/record and are 4 bytes long.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: list</dt><dd><p>Exposure durations</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_lines">
+<em class="property">property </em><code class="sig-name descname">binary_lines</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the lines of the binary image data.</p>
+<p>For example, the first entry would be the first line of the image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: list</dt><dd><p>Image lines</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.detector_center_line">
+<em class="property">property </em><code class="sig-name descname">detector_center_line</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.detector_center_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the center detector line.</p>
+<p>For HRSC, we are dealing with a single line, so center line will be 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>Detector line of the principal point</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.detector_center_sample">
+<em class="property">property </em><code class="sig-name descname">detector_center_sample</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.detector_center_sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the center detector sample.</p>
+<p>For HRSC, center sample is consistent regardless of filter. This is
+different from ISIS’s center sample because ISIS line scan sensors use
+0.5 based detector samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>Detector sample of the principal point</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.ephemeris_stop_time">
+<em class="property">property </em><code class="sig-name descname">ephemeris_stop_time</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.ephemeris_stop_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the ephemeris stop time.</p>
+<p>For HRSC, the ephemeris stop time is calculated from the binary image data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>Ephemeris stop time</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.fikid">
+<em class="property">property </em><code class="sig-name descname">fikid</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.fikid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Naif ID code of the filter dependent instrument codes.</p>
+<p>Expects filter_number to be defined. This should be an integer containing
+the filter number from the pds3 label.
+Expects ikid to be defined. This should be the integer Naid ID code for
+the instrument.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>Naif ID code used in calculating focal length</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.focal2pixel_lines">
+<em class="property">property </em><code class="sig-name descname">focal2pixel_lines</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.focal2pixel_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expects fikid to be defined. This must be the integer Naif id code of
+the filter-sepcific instrument.</p>
+<p>NOTE: These values are pulled from ISIS iak kernels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: list&lt;double&gt;</dt><dd><p>focal plane to detector lines</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.focal2pixel_samples">
+<em class="property">property </em><code class="sig-name descname">focal2pixel_samples</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.focal2pixel_samples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expects fikid to be defined. This must be the integer Naif id code of
+the filter-sepcific instrument.</p>
+<p>NOTE: These values are pulled from ISIS iak kernels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: list&lt;double&gt;</dt><dd><p>focal plane to detector samples</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.focal_length">
+<em class="property">property </em><code class="sig-name descname">focal_length</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.focal_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the focal length of the filter-specific sensor</p>
+<p>Expects fikid to be defined. This must be the integer Naif id code of
+the filter-specific instrument.</p>
+<p>NOTE: These values are pulled from ISIS iak kernels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>focal length</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.ikid">
+<em class="property">property </em><code class="sig-name descname">ikid</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.ikid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the Naif ID code for the HRSC head instrument</p>
+<p>This would be the Naif ID code for the base (or “head”) instrument.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>Naif ID used to for indentifying the instrument in Spice kernels</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.instrument_id">
+<em class="property">property </em><code class="sig-name descname">instrument_id</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.instrument_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the short name of the instrument</p>
+<p>MEX HRSC has nine different filters each with their own name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>Short name of the instrument</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.line_exposure_duration">
+<em class="property">property </em><code class="sig-name descname">line_exposure_duration</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.line_exposure_duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Line exposure duration returns the time between the exposures for
+subsequent lines.</p>
+<p>Since HRSC is a variable line scan camera, it does not make sense to
+have one exposure duration value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>Returns the line exposure duration in seconds from the PDS3 label.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.line_scan_rate">
+<em class="property">property </em><code class="sig-name descname">line_scan_rate</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.line_scan_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a 2D array of line scan rates.</p>
+<p>For HRSC, the ephemeris times and exposure durations are
+stored in the image data.</p>
+<p>In the image, every line has an entry. This method goes through
+and removes conescutive lines with the same exposure duration.
+There are also potentially missing lines in the image which this
+method accounts for.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: list</dt><dd><p>Line scan rates</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.odtk">
+<em class="property">property </em><code class="sig-name descname">odtk</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.odtk" title="Permalink to this definition">¶</a></dt>
+<dd><p>The coefficients for the distortion model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: list</dt><dd><p>Radial distortion coefficients. There is only one coefficient for LROC NAC l/r</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.pixel2focal_x">
+<em class="property">property </em><code class="sig-name descname">pixel2focal_x</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.pixel2focal_x" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expects fikid to be defined. This must be the integer Naif id code of
+the filter-specific instrument.</p>
+<p>NOTE: These values are pulled from ISIS iak kernels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: list&lt;double&gt;</dt><dd></dd>
+<dt>detector to focal plane x</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.pixel2focal_y">
+<em class="property">property </em><code class="sig-name descname">pixel2focal_y</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.pixel2focal_y" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expects fikid to be defined. This must be the integer Naif id code of
+the filter-specific instrument.</p>
+<p>NOTE: These values are pulled from ISIS iak kernels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: list&lt;double&gt;</dt><dd></dd>
+<dt>detector to focal plane y</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.read_image_data">
+<code class="sig-name descname">read_image_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/drivers/mex_drivers.html#MexHrscPds3NaifSpiceDriver.read_image_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.read_image_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads data off of image and stores in binary_exposure_durations, binary_lines,
+and binary_ephemeris_times.</p>
+<p>For HRSC, the exposure durations and ephemeris times are imbedded in the binary
+data of the image itself. Each line is stored in what is referred to as a
+“record” within the image. The label will have the size of each record,
+the number of records, and the number of records in the label, so the
+beginning of binary data can be calculated.</p>
+<p>For each line/record of the binary data, the first 8 bytes make up the
+double presicion value of the ephemeris time, with the next 4 bytes
+making up the float value of the line exposure duration for the
+associated line. NOTE: The prefix data is always LSB, regardless
+of the overall file format.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.sensor_model_version">
+<em class="property">property </em><code class="sig-name descname">sensor_model_version</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.sensor_model_version" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>ISIS sensor model version</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.spacecraft_name">
+<em class="property">property </em><code class="sig-name descname">spacecraft_name</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.spacecraft_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spacecraft name used in various SPICE calls to acquire
+ephemeris data. MEX HRSC img PDS3 labels do not the have SPACECRAFT_NAME
+keyword, so we override it here to use the label_pds3 property for
+instrument_host_id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>Spacecraft name</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver">
+<em class="property">class </em><code class="sig-prename descclassname">ale.drivers.mex_drivers.</code><code class="sig-name descname">MexSrcPds3NaifSpiceDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">num_ephem</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">num_quats</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">props</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/drivers/mex_drivers.html#MexSrcPds3NaifSpiceDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.type_sensor.Framer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.label_pds3.Pds3Label</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.data_naif.NaifSpice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.type_distortion.RadialDistortion</span></code>, <a class="reference internal" href="base.html#ale.base.base.Driver" title="ale.base.base.Driver"><code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.base.Driver</span></code></a></p>
+<p>Driver for a PDS3 Mars Express (Mex) High Resolution Stereo Camera (HRSC) - Super Resolution 
+Channel (SRC) image.</p>
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver.detector_center_line">
+<em class="property">property </em><code class="sig-name descname">detector_center_line</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver.detector_center_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the center detector line.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>Detector line of the principal point</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver.detector_center_sample">
+<em class="property">property </em><code class="sig-name descname">detector_center_sample</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver.detector_center_sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the center detector sample.</p>
+<p>This is
+different from ISIS’s center sample because ISIS uses
+0.5-based samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>Detector sample of the principal point</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver.focal2pixel_lines">
+<em class="property">property </em><code class="sig-name descname">focal2pixel_lines</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver.focal2pixel_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>NOTE: These values are pulled from ISIS iak kernels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: list&lt;double&gt;</dt><dd><p>focal plane to detector lines</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver.focal2pixel_samples">
+<em class="property">property </em><code class="sig-name descname">focal2pixel_samples</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver.focal2pixel_samples" title="Permalink to this definition">¶</a></dt>
+<dd><p>NOTE: These values are pulled from ISIS iak kernels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: list&lt;double&gt;</dt><dd><p>focal plane to detector samples</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver.ikid">
+<em class="property">property </em><code class="sig-name descname">ikid</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver.ikid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the Naif ID code for HRSC SRC.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>Naif ID used to for indentifying the instrument in Spice kernels</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver.instrument_id">
+<em class="property">property </em><code class="sig-name descname">instrument_id</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver.instrument_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the short name of the instrument</p>
+<p>MEX HRSC has nine different filters each with their own name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>Short name of the instrument</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver.odtk">
+<em class="property">property </em><code class="sig-name descname">odtk</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver.odtk" title="Permalink to this definition">¶</a></dt>
+<dd><p>The coefficients for the distortion model. No distortion model, so pass in all zeroes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: list</dt><dd><p>Radial distortion coefficients.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver.sensor_model_version">
+<em class="property">property </em><code class="sig-name descname">sensor_model_version</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver.sensor_model_version" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>ISIS sensor model version</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver.spacecraft_name">
+<em class="property">property </em><code class="sig-name descname">spacecraft_name</code><a class="headerlink" href="#ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver.spacecraft_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spacecraft name used in various SPICE calls to acquire
+ephemeris data. MEX HRSC img PDS3 labels do not the have SPACECRAFT_NAME
+keyword, so we override it here to use the label_pds3 property for
+instrument_host_id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>Spacecraft name</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Library Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../capi/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="base.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">base</span></code> — Default Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">co_drivers</span></code> — Cassini Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dawn_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">dawn_drivers</span></code> — Dawn Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hayabusa2_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">hayabusa2_drivers</span></code> — Hayabusa2 Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="isis_ideal_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">isis_ideal_drivers</span></code> — ISIS Ideal Camera Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="juno_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">juno_drivers</span></code> — Juno Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lro_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">lro_drivers</span></code> — LRO Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mess_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mess_drivers</span></code> — MDIS Driver Classes</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mex_drivers</span></code> — Mars Express Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mro_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mro_drivers</span></code> — MRO Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nh_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">nh_drivers</span></code> — New Horizons Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ody_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ody_drivers</span></code> — Odyssey Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="selene_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">selene_drivers</span></code> — Selene Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tgo_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tgo_drivers</span></code> — Trace Gas Oribiter Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="viking_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">viking_drivers</span></code> — Viking Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="voyager_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">voyager_drivers</span></code> — Voyager Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="util.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">util</span></code> — General Utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Library Reference</a><ul>
+  <li><a href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a><ul>
+      <li>Previous: <a href="mess_driver.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mess_drivers</span></code> — MDIS Driver Classes</a></li>
+      <li>Next: <a href="mro_driver.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mro_drivers</span></code> — MRO Driver Classes</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;Public Domain.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/library/python/mex_driver.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

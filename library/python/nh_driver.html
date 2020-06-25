@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nh_drivers — New Horizons Driver Classes &#8212; ALE 0.8.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ody_drivers — Odyssey Driver Classes" href="ody_driver.html" />
+    <link rel="prev" title="mro_drivers — MRO Driver Classes" href="mro_driver.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="nh-drivers-new-horizons-driver-classes">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">nh_drivers</span></code> — New Horizons Driver Classes<a class="headerlink" href="#nh-drivers-new-horizons-driver-classes" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="#module-ale.drivers.nh_drivers" title="ale.drivers.nh_drivers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ale.drivers.nh_drivers</span></code></a> module</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.8.1.</span></p>
+</div>
+<span class="target" id="module-ale.drivers.nh_drivers"></span><dl class="py class">
+<dt id="ale.drivers.nh_drivers.NewHorizonsLorriIsisLabelNaifSpiceDriver">
+<em class="property">class </em><code class="sig-prename descclassname">ale.drivers.nh_drivers.</code><code class="sig-name descname">NewHorizonsLorriIsisLabelNaifSpiceDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">num_ephem</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">num_quats</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">props</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/drivers/nh_drivers.html#NewHorizonsLorriIsisLabelNaifSpiceDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.drivers.nh_drivers.NewHorizonsLorriIsisLabelNaifSpiceDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.type_sensor.Framer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.label_isis.IsisLabel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.data_naif.NaifSpice</span></code>, <a class="reference internal" href="base.html#ale.base.base.Driver" title="ale.base.base.Driver"><code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.base.Driver</span></code></a></p>
+<p>Driver for reading New Horizons LORRI ISIS3 Labels. These are Labels that have been
+ingested into ISIS from PDS EDR images but have not been spiceinit’d yet.</p>
+<dl class="py method">
+<dt id="ale.drivers.nh_drivers.NewHorizonsLorriIsisLabelNaifSpiceDriver.ikid">
+<em class="property">property </em><code class="sig-name descname">ikid</code><a class="headerlink" href="#ale.drivers.nh_drivers.NewHorizonsLorriIsisLabelNaifSpiceDriver.ikid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overridden to grab the ikid from the Isis Cube since there is no way to
+obtain this value with a spice bods2c call. Isis sets this value during
+ingestion, based on the original fits file.</p>
+<p>For LORRI, there are two options associated with different binning modes:
+1x1 binning: -98301
+4x4 binning: -98302</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: integer</dt><dd><p>Naif Integer ID code for the instrument</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.nh_drivers.NewHorizonsLorriIsisLabelNaifSpiceDriver.instrument_id">
+<em class="property">property </em><code class="sig-name descname">instrument_id</code><a class="headerlink" href="#ale.drivers.nh_drivers.NewHorizonsLorriIsisLabelNaifSpiceDriver.instrument_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an instrument id for uniquely identifying the instrument, but often
+also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+the same ID the Spice expects in bods2c calls.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>instrument id</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Library Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../capi/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="base.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">base</span></code> — Default Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">co_drivers</span></code> — Cassini Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dawn_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">dawn_drivers</span></code> — Dawn Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hayabusa2_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">hayabusa2_drivers</span></code> — Hayabusa2 Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="isis_ideal_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">isis_ideal_drivers</span></code> — ISIS Ideal Camera Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="juno_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">juno_drivers</span></code> — Juno Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lro_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">lro_drivers</span></code> — LRO Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mess_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mess_drivers</span></code> — MDIS Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mex_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mex_drivers</span></code> — Mars Express Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mro_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mro_drivers</span></code> — MRO Driver Classes</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">nh_drivers</span></code> — New Horizons Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ody_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ody_drivers</span></code> — Odyssey Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="selene_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">selene_drivers</span></code> — Selene Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tgo_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tgo_drivers</span></code> — Trace Gas Oribiter Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="viking_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">viking_drivers</span></code> — Viking Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="voyager_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">voyager_drivers</span></code> — Voyager Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="util.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">util</span></code> — General Utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Library Reference</a><ul>
+  <li><a href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a><ul>
+      <li>Previous: <a href="mro_driver.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mro_drivers</span></code> — MRO Driver Classes</a></li>
+      <li>Next: <a href="ody_driver.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ody_drivers</span></code> — Odyssey Driver Classes</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;Public Domain.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/library/python/nh_driver.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

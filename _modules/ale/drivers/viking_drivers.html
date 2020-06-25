@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ale.drivers.viking_drivers &#8212; ALE 0.8.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for ale.drivers.viking_drivers</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">spiceypy</span> <span class="k">as</span> <span class="nn">spice</span>
+
+<span class="kn">import</span> <span class="nn">ale</span>
+<span class="kn">from</span> <span class="nn">ale.base.data_naif</span> <span class="kn">import</span> <span class="n">NaifSpice</span>
+<span class="kn">from</span> <span class="nn">ale.base.label_isis</span> <span class="kn">import</span> <span class="n">IsisLabel</span>
+<span class="kn">from</span> <span class="nn">ale.base.type_sensor</span> <span class="kn">import</span> <span class="n">Framer</span>
+<span class="kn">from</span> <span class="nn">ale.base.base</span> <span class="kn">import</span> <span class="n">Driver</span>
+
+<div class="viewcode-block" id="VikingIsisLabelNaifSpiceDriver"><a class="viewcode-back" href="../../../library/python/viking_driver.html#ale.drivers.viking_drivers.VikingIsisLabelNaifSpiceDriver">[docs]</a><span class="k">class</span> <span class="nc">VikingIsisLabelNaifSpiceDriver</span><span class="p">(</span><span class="n">Framer</span><span class="p">,</span> <span class="n">IsisLabel</span><span class="p">,</span> <span class="n">NaifSpice</span><span class="p">,</span> <span class="n">Driver</span><span class="p">):</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spacecraft_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overridden to work with spice calls.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          Name of the spacecraft.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name_lookup</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;VIKING_ORBITER_1&#39;</span><span class="p">:</span> <span class="s1">&#39;VIKING ORBITER 1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;VIKING_ORBITER_2&#39;</span><span class="p">:</span> <span class="s1">&#39;VIKING ORBITER 2&#39;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">name_lookup</span><span class="p">[</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">spacecraft_name</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">alt_ikid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Viking Orbiter 1 &amp; 2 each have an alternate naif id code as defined in the</span>
+<span class="sd">        SCLK kernels.</span>
+<span class="sd">        Expects spacecraft name to be defined.</span>
+<span class="sd">        Returns -27999 for vo1 and -30999 for vo2</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : integer</span>
+<span class="sd">        Alternate Naif Integer ID code for the instrument</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">alt_id_lookup</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;VIKING ORBITER 1&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">27999</span><span class="p">,</span>
+            <span class="s1">&#39;VIKING ORBITER 2&#39;</span><span class="p">:</span><span class="o">-</span><span class="mi">30999</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">alt_id_lookup</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">spacecraft_name</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ikid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overridden to grab the ikid from the Isis Cube since there is no way to</span>
+<span class="sd">        obtain this value with a spice bods2c call.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : integer</span>
+<span class="sd">          Naif Integer ID code for the instrument</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Kernels&#39;</span><span class="p">][</span><span class="s1">&#39;NaifFrameCode&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ephemeris_start_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overridden to use the alternate instrument ID. Also computes an offset to match</span>
+<span class="sd">        what is being done in ISIS code.</span>
+<span class="sd">        Expects spacecraft_clock_start_count to be defined.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          ephemeris start time of the image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ephemeris_start_time</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">scs2e</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alt_ikid</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spacecraft_clock_start_count</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exposure_duration</span> <span class="o">&lt;=</span> <span class="o">.</span><span class="mi">420</span><span class="p">:</span>
+            <span class="n">offset1</span> <span class="o">=</span> <span class="mf">7.0</span> <span class="o">/</span> <span class="mf">8.0</span> <span class="o">*</span> <span class="mf">4.48</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">offset1</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="mf">8.0</span> <span class="o">*</span> <span class="mf">4.48</span>
+        <span class="n">offset2</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">64.0</span> <span class="o">*</span> <span class="mf">4.48</span>
+
+        <span class="k">return</span> <span class="n">ephemeris_start_time</span> <span class="o">+</span> <span class="n">offset1</span> <span class="o">+</span> <span class="n">offset2</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../library/index.html">Library Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../drivers.html">ale.drivers</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;Public Domain.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

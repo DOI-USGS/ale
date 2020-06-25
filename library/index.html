@@ -1,21 +1,21 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Library Reference &#8212; ALE 0.1.0 documentation</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Reference &#8212; ALE 0.8.1 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="capi — All ALE functions" href="capi/index.html" />
+    <link rel="next" title="C — C Interface" href="capi/index.html" />
     <link rel="prev" title="Ephemeris Abstraction Library" href="../index.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -35,30 +35,46 @@
             
   <div class="section" id="library-reference">
 <h1>Library Reference<a class="headerlink" href="#library-reference" title="Permalink to this headline">¶</a></h1>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Release:</th><td class="field-body">0.1</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">Jan 28, 2019</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Release</dt>
+<dd class="field-odd"><p>0.8.1</p>
+</dd>
+<dt class="field-even">Date</dt>
+<dd class="field-even"><p>Jun 25, 2020</p>
+</dd>
+</dl>
 <hr class="docutils" />
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="capi/index.html"><code class="docutils literal notranslate"><span class="pre">capi</span></code> — All ALE functions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="capi/capi.html"><code class="docutils literal notranslate"><span class="pre">capi</span></code> — ALE C-API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="capi/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="capi/distortion.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distortion</span></code> — ALE Distortion Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/interp_utils.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">interpolation</span></code> — ALE Interpolation Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/isd.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ISD</span></code> — ALE Image Support Data Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/orientation.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">orientations</span></code> — ALE Orientation Classes &amp; Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/rotation.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rotation</span></code> — ALE Rotation Classes &amp; Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/state.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">states</span></code> — ALE States Classes &amp; Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/util.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">utils</span></code> — ALE Utility Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/vector.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">vectors</span></code> — ALE Vector Classes &amp; Functions</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="python/index.html"><code class="docutils literal notranslate"><span class="pre">python</span></code> — Input/Output Algorithms</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="python/base.html"><code class="docutils literal notranslate"><span class="pre">base</span></code> — Default Driver Classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="python/cassini_driver.html"><code class="docutils literal notranslate"><span class="pre">cassini_driver</span></code> — Cassini Driver Classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="python/lro_driver.html"><code class="docutils literal notranslate"><span class="pre">lro_driver</span></code> — LRO Driver Classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="python/mdis_driver.html"><code class="docutils literal notranslate"><span class="pre">mdis_driver</span></code> — MDIS Driver Classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="python/mro_driver.html"><code class="docutils literal notranslate"><span class="pre">mro_driver</span></code> — MRO Driver Classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="python/util.html"><code class="docutils literal notranslate"><span class="pre">util</span></code> — General Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="python/base.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">base</span></code> — Default Driver Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/co_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">co_drivers</span></code> — Cassini Driver Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/dawn_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">dawn_drivers</span></code> — Dawn Driver Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/hayabusa2_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">hayabusa2_drivers</span></code> — Hayabusa2 Driver Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/isis_ideal_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">isis_ideal_drivers</span></code> — ISIS Ideal Camera Driver Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/juno_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">juno_drivers</span></code> — Juno Driver Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/lro_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">lro_drivers</span></code> — LRO Driver Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/mess_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mess_drivers</span></code> — MDIS Driver Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/mex_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mex_drivers</span></code> — Mars Express Driver Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/mro_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mro_drivers</span></code> — MRO Driver Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/nh_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">nh_drivers</span></code> — New Horizons Driver Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/ody_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ody_drivers</span></code> — Odyssey Driver Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/selene_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">selene_drivers</span></code> — Selene Driver Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/tgo_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tgo_drivers</span></code> — Trace Gas Oribiter Driver Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/viking_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">viking_drivers</span></code> — Viking Driver Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/voyager_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">voyager_drivers</span></code> — Voyager Driver Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/util.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">util</span></code> — General Utilities</a></li>
 </ul>
 </li>
 </ul>
@@ -84,8 +100,8 @@
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Library Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="capi/index.html"><code class="docutils literal notranslate"><span class="pre">capi</span></code> — All ALE functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="python/index.html"><code class="docutils literal notranslate"><span class="pre">python</span></code> — Input/Output Algorithms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capi/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a></li>
 </ul>
 </li>
 </ul>
@@ -95,22 +111,20 @@
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
       <li>Previous: <a href="../index.html" title="previous chapter">Ephemeris Abstraction Library</a></li>
-      <li>Next: <a href="capi/index.html" title="next chapter"><code class="docutils literal notranslate"><span class="pre">capi</span></code> — All ALE functions</a></li>
+      <li>Next: <a href="capi/index.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a></li>
   </ul></li>
 </ul>
 </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -127,7 +141,7 @@
       &copy;Public Domain.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

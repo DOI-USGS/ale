@@ -1,0 +1,348 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rotation — ALE Rotation Classes &amp; Functions &#8212; ALE 0.8.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="states — ALE States Classes &amp; Functions" href="state.html" />
+    <link rel="prev" title="orientations — ALE Orientation Classes &amp; Functions" href="orientation.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="rotation-ale-rotation-classes-functions">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">rotation</span></code> — ALE Rotation Classes &amp; Functions<a class="headerlink" href="#rotation-ale-rotation-classes-functions" title="Permalink to this headline">¶</a></h1>
+<dl class="cpp type">
+<dt id="_CPPv43ale">
+<span id="_CPPv33ale"></span><span id="_CPPv23ale"></span><span id="ale"></span><span class="target" id="namespaceale"></span><em class="property">namespace </em><code class="sig-name descname">ale</code><br /></dt>
+<dd><dl class="cpp class">
+<dt id="_CPPv4N3ale8RotationE">
+<span id="_CPPv3N3ale8RotationE"></span><span id="_CPPv2N3ale8RotationE"></span><span id="ale::Rotation"></span><span class="target" id="classale_1_1Rotation"></span><em class="property">class </em><code class="sig-name descname">Rotation</code><a class="headerlink" href="#_CPPv4N3ale8RotationE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;Rotation.h&gt;</em><p>A generic 3D rotation. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="cpp function">
+<dt id="_CPPv4N3ale8Rotation8RotationEv">
+<span id="_CPPv3N3ale8Rotation8RotationEv"></span><span id="_CPPv2N3ale8Rotation8RotationEv"></span><span id="ale::Rotation::Rotation"></span><span class="target" id="classale_1_1Rotation_1ad990a8079db547f024881664cf58b97f"></span><code class="sig-name descname">Rotation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale8Rotation8RotationEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Construct a default identity rotation. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale8Rotation8RotationEdddd">
+<span id="_CPPv3N3ale8Rotation8RotationEdddd"></span><span id="_CPPv2N3ale8Rotation8RotationEdddd"></span><span id="ale::Rotation::Rotation__double.double.double.double"></span><span class="target" id="classale_1_1Rotation_1a09d4b696b618c657015460145099df39"></span><code class="sig-name descname">Rotation</code><span class="sig-paren">(</span>double <em>w</em>, double <em>x</em>, double <em>y</em>, double <em>z</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale8Rotation8RotationEdddd" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Construct a rotation from a quaternion</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">w</span></code>: The scalar component of the quaternion. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x</span></code>: The x value of the vector component of the quaternion. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">y</span></code>: The y value of the vector component of the quaternion. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">z</span></code>: The z value of the vector component of the quaternion. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale8Rotation8RotationERKNSt6vectorIdEE">
+<span id="_CPPv3N3ale8Rotation8RotationERKNSt6vectorIdEE"></span><span id="_CPPv2N3ale8Rotation8RotationERKNSt6vectorIdEE"></span><span id="ale::Rotation::Rotation__std::vector:double:CR"></span><span class="target" id="classale_1_1Rotation_1a13f9e602391b1d607afc47d624b8648c"></span><code class="sig-name descname">Rotation</code><span class="sig-paren">(</span><em class="property">const</em> std::vector&lt;double&gt; &amp;<em>matrix</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale8Rotation8RotationERKNSt6vectorIdEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Construct a rotation from a rotation matrix.</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">matrix</span></code>: The rotation matrix in row-major order. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale8Rotation8RotationERKNSt6vectorIdEERKNSt6vectorIiEE">
+<span id="_CPPv3N3ale8Rotation8RotationERKNSt6vectorIdEERKNSt6vectorIiEE"></span><span id="_CPPv2N3ale8Rotation8RotationERKNSt6vectorIdEERKNSt6vectorIiEE"></span><span id="ale::Rotation::Rotation__std::vector:double:CR.std::vector:i:CR"></span><span class="target" id="classale_1_1Rotation_1a988908baaa4aa5b289208907c90628c5"></span><code class="sig-name descname">Rotation</code><span class="sig-paren">(</span><em class="property">const</em> std::vector&lt;double&gt; &amp;<em>angles</em>, <em class="property">const</em> std::vector&lt;int&gt; &amp;<em>axes</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale8Rotation8RotationERKNSt6vectorIdEERKNSt6vectorIiEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Construct a rotation from a set of Euler angle rotations.</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">angles</span></code>: A vector of rotations about the axes. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">axes</span></code>: The vector of axes to rotate about, in order. 0 is X, 1 is Y, and 2 is Z. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale8Rotation8RotationERKNSt6vectorIdEEd">
+<span id="_CPPv3N3ale8Rotation8RotationERKNSt6vectorIdEEd"></span><span id="_CPPv2N3ale8Rotation8RotationERKNSt6vectorIdEEd"></span><span id="ale::Rotation::Rotation__std::vector:double:CR.double"></span><span class="target" id="classale_1_1Rotation_1a7bfddecf2679f33f303314894dc4fa0f"></span><code class="sig-name descname">Rotation</code><span class="sig-paren">(</span><em class="property">const</em> std::vector&lt;double&gt; &amp;<em>axis</em>, double <em>theta</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale8Rotation8RotationERKNSt6vectorIdEEd" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Construct a rotation from a rotation about an axis.</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">axis</span></code>: The axis of rotation. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">theta</span></code>: The rotation about the axis in radians. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale8RotationD0Ev">
+<span id="_CPPv3N3ale8RotationD0Ev"></span><span id="_CPPv2N3ale8RotationD0Ev"></span><span id="ale::Rotation::~Rotation"></span><span class="target" id="classale_1_1Rotation_1a8095d38be40de05e963823727645a06e"></span><code class="sig-name descname">~Rotation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale8RotationD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale8Rotation8RotationERR8Rotation">
+<span id="_CPPv3N3ale8Rotation8RotationERR8Rotation"></span><span id="_CPPv2N3ale8Rotation8RotationERR8Rotation"></span><span id="ale::Rotation::Rotation__RotationRR"></span><span class="target" id="classale_1_1Rotation_1a814dc0abce76ee6277538b7b1e006705"></span><code class="sig-name descname">Rotation</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3ale8Rotation8RotationERR8Rotation" title="ale::Rotation::Rotation">Rotation</a> &amp;&amp;<em>other</em><span class="sig-paren">)</span> <em class="property">noexcept</em><a class="headerlink" href="#_CPPv4N3ale8Rotation8RotationERR8Rotation" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale8RotationaSERR8Rotation">
+<span id="_CPPv3N3ale8RotationaSERR8Rotation"></span><span id="_CPPv2N3ale8RotationaSERR8Rotation"></span><span id="ale::Rotation::assign-operator__RotationRR"></span><span class="target" id="classale_1_1Rotation_1a481bd7d2b3f307e1684d3fc1fc4931e2"></span><a class="reference internal" href="#_CPPv4N3ale8RotationE" title="ale::Rotation">Rotation</a> &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3ale8RotationE" title="ale::Rotation">Rotation</a> &amp;&amp;<em>other</em><span class="sig-paren">)</span> <em class="property">noexcept</em><a class="headerlink" href="#_CPPv4N3ale8RotationaSERR8Rotation" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale8Rotation8RotationERK8Rotation">
+<span id="_CPPv3N3ale8Rotation8RotationERK8Rotation"></span><span id="_CPPv2N3ale8Rotation8RotationERK8Rotation"></span><span id="ale::Rotation::Rotation__RotationCR"></span><span class="target" id="classale_1_1Rotation_1abe2c2a9a16deff169757722df7bc2db2"></span><code class="sig-name descname">Rotation</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4N3ale8Rotation8RotationERK8Rotation" title="ale::Rotation::Rotation">Rotation</a> &amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale8Rotation8RotationERK8Rotation" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale8RotationaSERK8Rotation">
+<span id="_CPPv3N3ale8RotationaSERK8Rotation"></span><span id="_CPPv2N3ale8RotationaSERK8Rotation"></span><span id="ale::Rotation::assign-operator__RotationCR"></span><span class="target" id="classale_1_1Rotation_1af44f75b203c543f3ca0d12812327be4f"></span><a class="reference internal" href="#_CPPv4N3ale8RotationE" title="ale::Rotation">Rotation</a> &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4N3ale8RotationE" title="ale::Rotation">Rotation</a> &amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale8RotationaSERK8Rotation" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale8Rotation12toQuaternionEv">
+<span id="_CPPv3NK3ale8Rotation12toQuaternionEv"></span><span id="_CPPv2NK3ale8Rotation12toQuaternionEv"></span><span id="ale::Rotation::toQuaternionC"></span><span class="target" id="classale_1_1Rotation_1ac21641201b5b239294f6d43530353316"></span>std::vector&lt;double&gt; <code class="sig-name descname">toQuaternion</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale8Rotation12toQuaternionEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The rotation as a quaternion.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The rotation as a scalar-first quaternion (w, x, y, z). </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale8Rotation16toRotationMatrixEv">
+<span id="_CPPv3NK3ale8Rotation16toRotationMatrixEv"></span><span id="_CPPv2NK3ale8Rotation16toRotationMatrixEv"></span><span id="ale::Rotation::toRotationMatrixC"></span><span class="target" id="classale_1_1Rotation_1a3a129f066fa259e6cbebb68d729c0f90"></span>std::vector&lt;double&gt; <code class="sig-name descname">toRotationMatrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale8Rotation16toRotationMatrixEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The rotation as a rotation matrix.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The rotation as a rotation matrix in row-major order. </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale8Rotation21toStateRotationMatrixERK5Vec3d">
+<span id="_CPPv3NK3ale8Rotation21toStateRotationMatrixERK5Vec3d"></span><span id="_CPPv2NK3ale8Rotation21toStateRotationMatrixERK5Vec3d"></span><span id="ale::Rotation::toStateRotationMatrix__Vec3dCRC"></span><span class="target" id="classale_1_1Rotation_1a348abb57e370da3d6543dd39ec69665a"></span>std::vector&lt;double&gt; <code class="sig-name descname">toStateRotationMatrix</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a> &amp;<em>av</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale8Rotation21toStateRotationMatrixERK5Vec3d" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Create a state rotation matrix from the rotation and an angula velocity.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The state rotation matrix in row-major order. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">av</span></code>: The angular velocity vector.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale8Rotation7toEulerERKNSt6vectorIiEE">
+<span id="_CPPv3NK3ale8Rotation7toEulerERKNSt6vectorIiEE"></span><span id="_CPPv2NK3ale8Rotation7toEulerERKNSt6vectorIiEE"></span><span id="ale::Rotation::toEuler__std::vector:i:CRC"></span><span class="target" id="classale_1_1Rotation_1afe7489f9ef6235b71feb1006ab2fd906"></span>std::vector&lt;double&gt; <code class="sig-name descname">toEuler</code><span class="sig-paren">(</span><em class="property">const</em> std::vector&lt;int&gt; &amp;<em>axes</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale8Rotation7toEulerERKNSt6vectorIiEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The rotation as Euler angles.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The rotations about the axes in radians. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">axes</span></code>: The axis order. 0 is X, 1 is Y, and 2 is Z.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale8Rotation11toAxisAngleEv">
+<span id="_CPPv3NK3ale8Rotation11toAxisAngleEv"></span><span id="_CPPv2NK3ale8Rotation11toAxisAngleEv"></span><span id="ale::Rotation::toAxisAngleC"></span><span class="target" id="classale_1_1Rotation_1a8f9c925127457257c92047e92ff595e6"></span>std::pair&lt;std::vector&lt;double&gt;, double&gt; <code class="sig-name descname">toAxisAngle</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale8Rotation11toAxisAngleEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The rotation as a rotation about an axis.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>the axis of rotation and rotation in radians. </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale8RotationclERK5Vec3d">
+<span id="_CPPv3NK3ale8RotationclERK5Vec3d"></span><span id="_CPPv2NK3ale8RotationclERK5Vec3d"></span><span id="ale::Rotation::call-operator__Vec3dCRC"></span><span class="target" id="classale_1_1Rotation_1a7cad460b273a101d32be9d8ba31ba640"></span><a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a> <code class="sig-name descname">operator()</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a> &amp;<em>av</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale8RotationclERK5Vec3d" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Rotate a vector</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The rotated vector. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">vector</span></code>: The vector to rotate. Can be a 3 element position or 6 element state. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">av</span></code>: The angular velocity to use when rotating state vectors. Defaults to 0.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale8RotationclERK5StateRK5Vec3d">
+<span id="_CPPv3NK3ale8RotationclERK5StateRK5Vec3d"></span><span id="_CPPv2NK3ale8RotationclERK5StateRK5Vec3d"></span><span id="ale::Rotation::call-operator__StateCR.Vec3dCRC"></span><span class="target" id="classale_1_1Rotation_1a988c76300bbb1f889bc4a304c892b037"></span><a class="reference internal" href="state.html#_CPPv4N3ale5StateE" title="ale::State">State</a> <code class="sig-name descname">operator()</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="state.html#_CPPv4N3ale5StateE" title="ale::State">State</a> &amp;<em>state</em>, <em class="property">const</em> <a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a> &amp;<em>av</em> = <a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a>(0.0, 0.0, 0.0)<span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale8RotationclERK5StateRK5Vec3d" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale8Rotation7inverseEv">
+<span id="_CPPv3NK3ale8Rotation7inverseEv"></span><span id="_CPPv2NK3ale8Rotation7inverseEv"></span><span id="ale::Rotation::inverseC"></span><span class="target" id="classale_1_1Rotation_1aa0d9ad9f047b68f4f9f01e5734d3aa0b"></span><a class="reference internal" href="#_CPPv4N3ale8RotationE" title="ale::Rotation">Rotation</a> <code class="sig-name descname">inverse</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale8Rotation7inverseEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Get the inverse rotation. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale8RotationmlERK8Rotation">
+<span id="_CPPv3NK3ale8RotationmlERK8Rotation"></span><span id="_CPPv2NK3ale8RotationmlERK8Rotation"></span><span id="ale::Rotation::mul-operator__RotationCRC"></span><span class="target" id="classale_1_1Rotation_1a4c7056057736956e70ae5aac75bfd69e"></span><a class="reference internal" href="#_CPPv4N3ale8RotationE" title="ale::Rotation">Rotation</a> <code class="sig-name descname">operator*</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4N3ale8RotationE" title="ale::Rotation">Rotation</a> &amp;<em>rightRotation</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale8RotationmlERK8Rotation" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Chain this rotation with another rotation.</p>
+<p>Rotations are sequenced right to left. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale8Rotation11interpolateERK8Rotationd21RotationInterpolation">
+<span id="_CPPv3NK3ale8Rotation11interpolateERK8Rotationd21RotationInterpolation"></span><span id="_CPPv2NK3ale8Rotation11interpolateERK8Rotationd21RotationInterpolation"></span><span id="ale::Rotation::interpolate__RotationCR.double.RotationInterpolationC"></span><span class="target" id="classale_1_1Rotation_1a140a7573aceb2059e557d4146cade284"></span><a class="reference internal" href="#_CPPv4N3ale8RotationE" title="ale::Rotation">Rotation</a> <code class="sig-name descname">interpolate</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4N3ale8RotationE" title="ale::Rotation">Rotation</a> &amp;<em>nextRotation</em>, double <em>t</em>, <a class="reference internal" href="interp_utils.html#_CPPv4N3ale21RotationInterpolationE" title="ale::RotationInterpolation">RotationInterpolation</a> <em>interpType</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale8Rotation11interpolateERK8Rotationd21RotationInterpolation" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Interpolate between this rotation and another rotation.</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">t</span></code>: The distance to interpolate. 0 is this and 1 is the next rotation. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">interpType</span></code>: The type of rotation interpolation to use.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">The</span></code>: interpolated rotation. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="cpp var">
+<dt id="_CPPv4N3ale8Rotation6m_implE">
+<span id="_CPPv3N3ale8Rotation6m_implE"></span><span id="_CPPv2N3ale8Rotation6m_implE"></span><span id="ale::Rotation::m_impl__std::unique_ptr:Impl:"></span><span class="target" id="classale_1_1Rotation_1a4ee15a4a19623545583fd97b5825ca19"></span>std::unique_ptr&lt;Impl&gt; <code class="sig-name descname">m_impl</code><a class="headerlink" href="#_CPPv4N3ale8Rotation6m_implE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Library Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="distortion.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distortion</span></code> — ALE Distortion Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interp_utils.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">interpolation</span></code> — ALE Interpolation Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="isd.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ISD</span></code> — ALE Image Support Data Class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="orientation.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">orientations</span></code> — ALE Orientation Classes &amp; Functions</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rotation</span></code> — ALE Rotation Classes &amp; Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="state.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">states</span></code> — ALE States Classes &amp; Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="util.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">utils</span></code> — ALE Utility Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vector.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">vectors</span></code> — ALE Vector Classes &amp; Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../python/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Library Reference</a><ul>
+  <li><a href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a><ul>
+      <li>Previous: <a href="orientation.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">orientations</span></code> — ALE Orientation Classes &amp; Functions</a></li>
+      <li>Next: <a href="state.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">states</span></code> — ALE States Classes &amp; Functions</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;Public Domain.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/library/capi/rotation.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

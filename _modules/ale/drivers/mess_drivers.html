@@ -1,0 +1,548 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ale.drivers.mess_drivers &#8212; ALE 0.8.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for ale.drivers.mess_drivers</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">pvl</span>
+<span class="kn">import</span> <span class="nn">spiceypy</span> <span class="k">as</span> <span class="nn">spice</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">ale.base</span> <span class="kn">import</span> <span class="n">Driver</span>
+<span class="kn">from</span> <span class="nn">ale.base.data_naif</span> <span class="kn">import</span> <span class="n">NaifSpice</span>
+<span class="kn">from</span> <span class="nn">ale.base.label_pds3</span> <span class="kn">import</span> <span class="n">Pds3Label</span>
+<span class="kn">from</span> <span class="nn">ale.base.label_isis</span> <span class="kn">import</span> <span class="n">IsisLabel</span>
+<span class="kn">from</span> <span class="nn">ale.base.type_sensor</span> <span class="kn">import</span> <span class="n">Framer</span>
+<span class="kn">from</span> <span class="nn">ale.base.data_isis</span> <span class="kn">import</span> <span class="n">IsisSpice</span>
+
+<span class="n">ID_LOOKUP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;MDIS-WAC&#39;</span><span class="p">:</span> <span class="s1">&#39;MSGR_MDIS_WAC&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;MDIS-NAC&#39;</span><span class="p">:</span><span class="s1">&#39;MSGR_MDIS_NAC&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="MessengerMdisIsisLabelIsisSpiceDriver"><a class="viewcode-back" href="../../../library/python/mess_driver.html#ale.drivers.mess_drivers.MessengerMdisIsisLabelIsisSpiceDriver">[docs]</a><span class="k">class</span> <span class="nc">MessengerMdisIsisLabelIsisSpiceDriver</span><span class="p">(</span><span class="n">Framer</span><span class="p">,</span> <span class="n">IsisLabel</span><span class="p">,</span> <span class="n">IsisSpice</span><span class="p">,</span> <span class="n">Driver</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spacecraft_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Spacecraft name used in various SPICE calls to acquire</span>
+<span class="sd">        ephemeris data. Messenger MDIS img PDS3 labels do not the have a SPACECRAFT_NAME keyword,</span>
+<span class="sd">        so we override it here to find INSTRUMENT_HOST_NAME in the label.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          Spacecraft name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument_host_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fikid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Naif ID code used in calculating focal length</span>
+<span class="sd">        Expects filter_number to be defined. This should be an integer containing</span>
+<span class="sd">        the filter number from the pds3 label.</span>
+<span class="sd">        Expects ikid to be defined. This should be the integer Naid ID code for</span>
+<span class="sd">        the instrument.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          Naif ID code used in calculating focal length</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Framer</span><span class="p">):</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">filter_number</span>
+            <span class="k">if</span> <span class="n">fn</span> <span class="o">==</span> <span class="s1">&#39;N/A&#39;</span><span class="p">:</span>
+                <span class="n">fn</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ikid</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an instrument id for unquely identifying the instrument, but often</span>
+<span class="sd">        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they</span>
+<span class="sd">        the same ID the Spice expects in bods2c calls.</span>
+<span class="sd">        Expects instrument_id to be defined in the Pds3Label mixin. This should</span>
+<span class="sd">        be a string of the form MDIS-WAC or MDIS-NAC.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          instrument id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ID_LOOKUP</span><span class="p">[</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">instrument_id</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="MessengerMdisPds3NaifSpiceDriver"><a class="viewcode-back" href="../../../library/python/mess_driver.html#ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver">[docs]</a><span class="k">class</span> <span class="nc">MessengerMdisPds3NaifSpiceDriver</span><span class="p">(</span><span class="n">Framer</span><span class="p">,</span> <span class="n">Pds3Label</span><span class="p">,</span> <span class="n">NaifSpice</span><span class="p">,</span> <span class="n">Driver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Driver for reading MDIS PDS3 labels. Requires a Spice mixin to acquire addtional</span>
+<span class="sd">    ephemeris and instrument data located exclusively in spice kernels.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spacecraft_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Spacecraft name used in various SPICE calls to acquire</span>
+<span class="sd">        ephemeris data. Messenger MDIS img PDS3 labels do not the have a SPACECRAFT_NAME keyword,</span>
+<span class="sd">        so we override it here to find INSTRUMENT_HOST_NAME in the label.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          Spacecraft name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument_host_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fikid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Naif ID code used in calculating focal length</span>
+<span class="sd">        Expects filter_number to be defined. This should be an integer containing</span>
+<span class="sd">        the filter number from the pds3 label.</span>
+<span class="sd">        Expects ikid to be defined. This should be the integer Naid ID code for</span>
+<span class="sd">        the instrument.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          Naif ID code used in calculating focal length</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Framer</span><span class="p">):</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">filter_number</span>
+            <span class="k">if</span> <span class="n">fn</span> <span class="o">==</span> <span class="s1">&#39;N/A&#39;</span><span class="p">:</span>
+                <span class="n">fn</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ikid</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an instrument id for unquely identifying the instrument, but often</span>
+<span class="sd">        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they</span>
+<span class="sd">        the same ID the Spice expects in bods2c calls.</span>
+<span class="sd">        Expects instrument_id to be defined in the Pds3Label mixin. This should</span>
+<span class="sd">        be a string of the form MDIS-WAC or MDIS-NAC.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          instrument id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ID_LOOKUP</span><span class="p">[</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">instrument_id</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sampling_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the summing factor from the PDS3 label. For example a return value of 2</span>
+<span class="sd">        indicates that 2 lines and 2 samples (4 pixels) were summed and divided by 4</span>
+<span class="sd">        to produce the output pixel value.</span>
+
+<span class="sd">        NOTE: This is overwritten for the messenger driver as the value is stored in &quot;MESS:PIXELBIN&quot;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          Number of samples and lines combined from the original data to produce a single pixel in this image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pixel_bin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;MESS:PIXELBIN&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">pixel_bin</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">pixel_bin</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">pixel_bin</span> <span class="o">*</span> <span class="mi">2</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">focal_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes Focal Length from Kernels</span>
+
+<span class="sd">        MDIS has tempature dependant focal lengh and coefficients need to</span>
+<span class="sd">        be acquired from IK Spice kernels (coeff describe focal length as a</span>
+<span class="sd">        function of tempature). Focal plane temps are acquired from a PDS3 label.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : double</span>
+<span class="sd">          focal length in meters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">coeffs</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_FL_TEMP_COEFFS&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+
+        <span class="c1"># reverse coeffs, MDIS coeffs are listed a_0, a_1, a_2 ... a_n where</span>
+        <span class="c1"># numpy wants them a_n, a_n-1, a_n-2 ... a_0</span>
+        <span class="n">f_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">coeffs</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># eval at the focal_plane_temperature</span>
+        <span class="k">return</span> <span class="n">f_t</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;FOCAL_PLANE_TEMPERATURE&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_center_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns center detector sample acquired from Spice Kernels.</span>
+<span class="sd">        Expects ikid to be defined. This should be the integer Naid ID code for</span>
+<span class="sd">        the instrument.</span>
+
+<span class="sd">        NOTE: This value is defined in an ISIS iak as 512.5, but we subtract 0.5 from the</span>
+<span class="sd">        ISIS center sample because ISIS detector coordinates are 0.5 based.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          center detector sample</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">512</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_center_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns center detector line acquired from Spice Kernels.</span>
+<span class="sd">        Expects ikid to be defined. This should be the integer Naid ID code for</span>
+<span class="sd">        the instrument.</span>
+
+<span class="sd">        NOTE: This value is defined in an ISIS iak as 512.5, but we subtract 0.5 from the</span>
+<span class="sd">        ISIS center sample because ISIS detector coordinates are 0.5 based.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          center detector line</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">512</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sensor_model_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          ISIS sensor model version</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">2</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">usgscsm_distortion_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a dictionary containing the distortion model.</span>
+<span class="sd">        Expects odtx and odty are defined. These should be the optical distortion</span>
+<span class="sd">        x and y coefficients respectively.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : dict</span>
+<span class="sd">          radial distortion model</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;transverse&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;x&quot;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">odtx</span><span class="p">,</span>
+                <span class="s2">&quot;y&quot;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">odty</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pixel_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overriden because the MESSENGER IK uses PIXEL_PITCH and the units</span>
+<span class="sd">        are already millimeters</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float pixel size</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_PIXEL_PITCH&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MessengerMdisIsisLabelNaifSpiceDriver"><a class="viewcode-back" href="../../../library/python/mess_driver.html#ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver">[docs]</a><span class="k">class</span> <span class="nc">MessengerMdisIsisLabelNaifSpiceDriver</span><span class="p">(</span><span class="n">IsisLabel</span><span class="p">,</span> <span class="n">NaifSpice</span><span class="p">,</span> <span class="n">Framer</span><span class="p">,</span> <span class="n">Driver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Driver for reading MDIS ISIS3 Labels. These are Labels that have been ingested</span>
+<span class="sd">    into ISIS from PDS EDR images. Any SPCIE data attached by the spiceinit application</span>
+<span class="sd">    will be ignored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">platform_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the name of the platform containing the sensor. This is usually</span>
+<span class="sd">        the spacecraft name.</span>
+
+<span class="sd">        Messenger MDIS ISIS labels use upper camel case so this converts it to</span>
+<span class="sd">        all upper case.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          Spacecraft name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">platform_name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an instrument id for unquely identifying the instrument, but often</span>
+<span class="sd">        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they</span>
+<span class="sd">        the same ID the Spice expects in bods2c calls.</span>
+<span class="sd">        Expects instrument_id to be defined in the Pds3Label mixin. This should</span>
+<span class="sd">        be a string of the form MDIS-WAC or MDIS-NAC.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          instrument id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ID_LOOKUP</span><span class="p">[</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">instrument_id</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ephemeris_start_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the ephemeris_start_time of the image.</span>
+<span class="sd">        Expects spacecraft_clock_start_count to be defined. This should be a float</span>
+<span class="sd">        containing the start clock count of the spacecraft.</span>
+<span class="sd">        Expects spacecraft_id to be defined. This should be the integer Naif ID code</span>
+<span class="sd">        for the spacecraft.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          ephemeris start time of the image.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_ephemeris_start_time&#39;</span><span class="p">):</span>
+            <span class="n">sclock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spacecraft_clock_start_count</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_starting_ephemeris_time</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">scs2e</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spacecraft_id</span><span class="p">,</span> <span class="n">sclock</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_starting_ephemeris_time</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">usgscsm_distortion_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a dictionary containing the distortion model.</span>
+<span class="sd">        Expects odtx and odty are defined. These should be the optical distortion</span>
+<span class="sd">        x and y coefficients respectively.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : dict</span>
+<span class="sd">          radial distortion model</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;transverse&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;x&quot;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">odtx</span><span class="p">,</span>
+                <span class="s2">&quot;y&quot;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">odty</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fikid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Naif ID code used in calculating focal length</span>
+<span class="sd">        Expects filter_number to be defined. This should be an integer containing</span>
+<span class="sd">        the filter number from the pds3 label.</span>
+<span class="sd">        Expects ikid to be defined. This should be the integer Naid ID code for</span>
+<span class="sd">        the instrument.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          Naif ID code used in calculating focal length</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instrument_id</span> <span class="o">==</span> <span class="s1">&#39;MSGR_MDIS_WAC&#39;</span><span class="p">):</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;BandBin&#39;</span><span class="p">][</span><span class="s1">&#39;Number&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">fn</span> <span class="o">==</span> <span class="s1">&#39;N/A&#39;</span><span class="p">:</span>
+                <span class="n">fn</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ikid</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ikid</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">focal_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes Focal Length from Kernels</span>
+
+<span class="sd">        MDIS has tempature dependant focal lengh and coefficients need to</span>
+<span class="sd">        be acquired from IK Spice kernels (coeff describe focal length as a</span>
+<span class="sd">        function of tempature). Focal plane temps are acquired from a PDS3 label.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : double</span>
+<span class="sd">          focal length in meters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">coeffs</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_FL_TEMP_COEFFS&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+        <span class="c1"># reverse coeffs, MDIS coeffs are listed a_0, a_1, a_2 ... a_n where</span>
+        <span class="c1"># numpy wants them a_n, a_n-1, a_n-2 ... a_0</span>
+        <span class="n">f_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">coeffs</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># eval at the focal_plane_temperature</span>
+        <span class="k">return</span> <span class="n">f_t</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;FocalPlaneTemperature&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_center_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns center detector sample acquired from Spice Kernels</span>
+<span class="sd">        Expects ikid to be defined. This should be the integer Naid ID code for</span>
+<span class="sd">        the instrument.</span>
+
+<span class="sd">        We subtract 0.5 from the ISIS center sample because ISIS detector</span>
+<span class="sd">        coordinates are 0.5 based.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          detector center sample</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_CCD_CENTER&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="mf">0.5</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_center_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns center detector line acquired from Spice Kernels</span>
+<span class="sd">        Expects ikid to be defined. This should be the integer Naid ID code for</span>
+<span class="sd">        the instrument.</span>
+
+<span class="sd">        We subtract 0.5 from the ISIS center line because ISIS detector</span>
+<span class="sd">        coordinates are 0.5 based.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          detector center line</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_CCD_CENTER&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="mf">0.5</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sensor_model_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          ISIS sensor model version</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">2</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pixel_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overriden because the MESSENGER IK uses PIXEL_PITCH and the units</span>
+<span class="sd">        are already millimeters</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float pixel size</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_PIXEL_PITCH&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sampling_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the summing factor from the PDS3 label. For example a return value of 2</span>
+<span class="sd">        indicates that 2 lines and 2 samples (4 pixels) were summed and divided by 4</span>
+<span class="sd">        to produce the output pixel value.</span>
+
+<span class="sd">        NOTE: This is overwritten for the messenger driver as the value is stored in &quot;MESS:PIXELBIN&quot;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          Number of samples and lines combined from the original data to produce a single pixel in this image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pixel_bin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;PixelBinningMode&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">pixel_bin</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">pixel_bin</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">pixel_bin</span> <span class="o">*</span> <span class="mi">2</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../library/index.html">Library Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../drivers.html">ale.drivers</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;Public Domain.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

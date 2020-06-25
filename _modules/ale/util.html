@@ -1,18 +1,18 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>ale.util &#8212; ALE 0.1.0 documentation</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ale.util &#8212; ALE 0.8.1 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -33,14 +33,29 @@
             
   <h1>Source code for ale.util</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">glob</span> <span class="k">import</span> <span class="n">glob</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">filterfalse</span><span class="p">,</span> <span class="n">groupby</span>
-<span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">path</span>
 
-<span class="kn">from</span> <span class="nn">ale</span> <span class="k">import</span> <span class="n">config</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">filterfalse</span><span class="p">,</span> <span class="n">groupby</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
+<span class="kn">import</span> <span class="nn">pvl</span>
 
-<div class="viewcode-block" id="get_metakernels"><a class="viewcode-back" href="../../library/python/util.html#ale.util.get_metakernels">[docs]</a><span class="k">def</span> <span class="nf">get_metakernels</span><span class="p">(</span><span class="n">spice_dir</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">spice_root</span><span class="p">,</span> <span class="n">missions</span><span class="o">=</span><span class="nb">set</span><span class="p">(),</span> <span class="n">years</span><span class="o">=</span><span class="nb">set</span><span class="p">(),</span> <span class="n">versions</span><span class="o">=</span><span class="nb">set</span><span class="p">()):</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">from</span> <span class="nn">networkx.algorithms.shortest_paths.generic</span> <span class="kn">import</span> <span class="n">shortest_path</span>
+
+<span class="kn">import</span> <span class="nn">spiceypy</span> <span class="k">as</span> <span class="nn">spice</span>
+
+<span class="kn">from</span> <span class="nn">ale</span> <span class="kn">import</span> <span class="n">spice_root</span>
+
+<div class="viewcode-block" id="get_metakernels"><a class="viewcode-back" href="../../library/python/util.html#ale.util.get_metakernels">[docs]</a><span class="k">def</span> <span class="nf">get_metakernels</span><span class="p">(</span><span class="n">spice_dir</span><span class="o">=</span><span class="n">spice_root</span><span class="p">,</span> <span class="n">missions</span><span class="o">=</span><span class="nb">set</span><span class="p">(),</span> <span class="n">years</span><span class="o">=</span><span class="nb">set</span><span class="p">(),</span> <span class="n">versions</span><span class="o">=</span><span class="nb">set</span><span class="p">()):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Given a root directory, get any subdirectory containing metakernels,</span>
 <span class="sd">    assume spice directory structure.</span>
@@ -81,12 +96,13 @@
         <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">[]</span>
     <span class="p">}</span>
 
+    <span class="n">missions</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">missions</span><span class="p">]</span>
     <span class="n">mission_dirs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">,</span> <span class="n">glob</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">spice_dir</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))))</span>
 
     <span class="k">for</span> <span class="n">md</span> <span class="ow">in</span> <span class="n">mission_dirs</span><span class="p">:</span>
         <span class="c1"># Assuming spice root has the same name as the original on NAIF website&quot;</span>
-        <span class="n">mission</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">md</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">missions</span> <span class="ow">and</span> <span class="n">mission</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">missions</span><span class="p">:</span>
+        <span class="n">mission</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">md</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">missions</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">([</span><span class="n">m</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mission</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">missions</span><span class="p">]):</span>
             <span class="k">continue</span>
 
         <span class="n">metakernel_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mission&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="s1">&#39;path&#39;</span><span class="p">]</span>
@@ -94,11 +110,17 @@
         <span class="c1"># recursive glob to make metakernel search more robust to subtle directory structure differences</span>
         <span class="n">metakernel_paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">md</span><span class="p">,</span> <span class="s1">&#39;**&#39;</span><span class="p">,</span><span class="s1">&#39;*.tm&#39;</span><span class="p">),</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 
-        <span class="n">metakernels</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">metakernel_keys</span><span class="p">,</span> <span class="p">[</span><span class="n">mission</span><span class="p">]</span><span class="o">+</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">k</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">k</span><span class="p">]))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">metakernel_paths</span><span class="p">]</span>
+        <span class="n">metakernels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">metakernel_paths</span><span class="p">:</span>
+            <span class="n">components</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">k</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">components</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;N/A&#39;</span><span class="p">)</span>
+
+            <span class="n">metakernels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">metakernel_keys</span><span class="p">,</span> <span class="n">components</span><span class="p">)))</span>
 
         <span class="c1"># naive filter, do we really need anything else?</span>
         <span class="k">if</span> <span class="n">years</span><span class="p">:</span>
-            <span class="n">metakernels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">years</span><span class="p">,</span> <span class="n">metakernels</span><span class="p">))</span>
+            <span class="n">metakernels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">years</span> <span class="ow">or</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;N/A&#39;</span><span class="p">,</span> <span class="n">metakernels</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">versions</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">versions</span> <span class="o">==</span> <span class="s1">&#39;latest&#39;</span><span class="p">:</span>
                 <span class="n">latest</span> <span class="o">=</span> <span class="p">[]</span>
@@ -113,13 +135,762 @@
         <span class="n">avail</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">metakernels</span><span class="p">)</span>
 
     <span class="n">avail</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">avail</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">avail</span><span class="p">:</span>
-        <span class="n">avail</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;count&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s1">&#39;data&#39;</span> <span class="p">:</span> <span class="s1">&#39;ERROR: NONE OF </span><span class="si">{}</span><span class="s1"> ARE VALID MISSIONS&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">missions</span><span class="p">)</span>
-        <span class="p">}</span>
 
     <span class="k">return</span> <span class="n">avail</span></div>
+
+
+<span class="k">def</span> <span class="nf">find_latest_metakernel</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">year</span><span class="p">):</span>
+    <span class="n">metakernel</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">mks</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="s1">&#39;*.[Tt][Mm]&#39;</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mks</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No metakernels found in </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">mk</span> <span class="ow">in</span> <span class="n">mks</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">)</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">mk</span><span class="p">):</span>
+            <span class="n">metakernel</span> <span class="o">=</span> <span class="n">mk</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">metakernel</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No metakernels found in </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1"> for </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">metakernel</span>
+
+
+
+<span class="k">def</span> <span class="nf">dict_merge</span><span class="p">(</span><span class="n">dct</span><span class="p">,</span> <span class="n">merge_dct</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">merge_dct</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">in</span> <span class="n">dct</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dct</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">merge_dct</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">collections</span><span class="o">.</span><span class="n">Mapping</span><span class="p">)):</span>
+            <span class="n">dict_merge</span><span class="p">(</span><span class="n">dct</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">merge_dct</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dct</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">merge_dct</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">dct</span>
+
+
+<div class="viewcode-block" id="get_isis_preferences"><a class="viewcode-back" href="../../library/python/util.html#ale.util.get_isis_preferences">[docs]</a><span class="k">def</span> <span class="nf">get_isis_preferences</span><span class="p">(</span><span class="n">isis_preferences</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns ISIS Preference file as a pvl object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">argprefs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">isis_preferences</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">isis_preferences</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">argprefs</span> <span class="o">=</span> <span class="n">isis_preferences</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">argprefs</span> <span class="o">=</span> <span class="n">read_pvl</span><span class="p">(</span><span class="n">isis_preferences</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">homeprefs</span> <span class="o">=</span> <span class="n">read_pvl</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span> <span class="s1">&#39;.Isis&#39;</span><span class="p">,</span> <span class="s1">&#39;IsisPreferences&#39;</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">homeprefs</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">isisrootprefs_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;ISISROOT&quot;</span><span class="p">],</span> <span class="s1">&#39;IsisPreferences&#39;</span><span class="p">)</span>
+        <span class="n">isisroot</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;ISISROOT&#39;</span><span class="p">]</span>
+        <span class="n">isisrootprefs</span> <span class="o">=</span> <span class="n">read_pvl</span><span class="p">(</span><span class="n">isisrootprefs_path</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">isisrootprefs</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">finalprefs</span> <span class="o">=</span> <span class="n">dict_merge</span><span class="p">(</span><span class="n">dict_merge</span><span class="p">(</span><span class="n">isisrootprefs</span><span class="p">,</span> <span class="n">homeprefs</span><span class="p">),</span> <span class="n">argprefs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">finalprefs</span></div>
+
+
+<span class="k">def</span> <span class="nf">dict_to_lower</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span><span class="n">v</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="n">dict_to_lower</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+
+<span class="k">def</span> <span class="nf">expandvars</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">env_dict</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">case_sensative</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">user_dict</span> <span class="o">=</span> <span class="n">env_dict</span> <span class="k">if</span> <span class="n">case_sensative</span> <span class="k">else</span> <span class="n">dict_to_lower</span><span class="p">(</span><span class="n">env_dict</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">replace_var</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+        <span class="n">group0</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">case_sensative</span> <span class="k">else</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">group1</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">case_sensative</span> <span class="k">else</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">user_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="ow">or</span> <span class="n">group1</span><span class="p">,</span> <span class="n">group0</span> <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">default</span><span class="p">)</span>
+    <span class="n">reVar</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\$(\w+|\{([^}]*)\})&#39;</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">reVar</span><span class="p">,</span> <span class="n">replace_var</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="generate_kernels_from_cube"><a class="viewcode-back" href="../../library/python/util.html#ale.util.generate_kernels_from_cube">[docs]</a><span class="k">def</span> <span class="nf">generate_kernels_from_cube</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span>  <span class="n">expand</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">format_as</span><span class="o">=</span><span class="s1">&#39;list&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parses a cube label to obtain the kernels from the Kernels group.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cube : cube</span>
+<span class="sd">        Path to the cube to pull the kernels from.</span>
+<span class="sd">    expand : bool, optional</span>
+<span class="sd">        Whether or not to expand variables within kernel paths based on your IsisPreferences file.</span>
+<span class="sd">    format_as : str, optional {&#39;list&#39;, &#39;dict&#39;}</span>
+<span class="sd">        How to return the kernels: either as a one-demensional ordered list, or as a dictionary</span>
+<span class="sd">        of kernel lists.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    : list</span>
+<span class="sd">        One-dimensional ordered list of all kernels from the Kernels group in the cube.</span>
+<span class="sd">    : Dictionary</span>
+<span class="sd">        Dictionary of lists of kernels with the keys being the Keywords from the Kernels group of</span>
+<span class="sd">        cube itself, and the values being the values associated with that Keyword in the cube.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># enforce key order</span>
+    <span class="n">mk_paths</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span>
+        <span class="p">[</span><span class="s1">&#39;TargetPosition&#39;</span><span class="p">,</span> <span class="s1">&#39;InstrumentPosition&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;InstrumentPointing&#39;</span><span class="p">,</span> <span class="s1">&#39;Frame&#39;</span><span class="p">,</span> <span class="s1">&#39;TargetAttitudeShape&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;Instrument&#39;</span><span class="p">,</span> <span class="s1">&#39;InstrumentAddendum&#39;</span><span class="p">,</span> <span class="s1">&#39;LeapSecond&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;SpacecraftClock&#39;</span><span class="p">,</span> <span class="s1">&#39;Extra&#39;</span><span class="p">])</span>
+
+    <span class="c1"># just work with full path</span>
+    <span class="n">cube</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">cube</span><span class="p">)</span>
+    <span class="n">cubelabel</span> <span class="o">=</span> <span class="n">pvl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cube</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">kernel_group</span> <span class="o">=</span> <span class="n">cubelabel</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cubelabel</span><span class="si">}</span><span class="s1">, Could not find kernels group, input cube [</span><span class="si">{</span><span class="n">cube</span><span class="si">}</span><span class="s1">] may not be spiceinited&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">get_kernels_from_isis_pvl</span><span class="p">(</span><span class="n">kernel_group</span><span class="p">,</span> <span class="n">expand</span><span class="p">,</span> <span class="n">format_as</span><span class="p">)</span></div>
+
+<span class="k">def</span> <span class="nf">get_kernels_from_isis_pvl</span><span class="p">(</span><span class="n">kernel_group</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">format_as</span><span class="o">=</span><span class="s2">&quot;list&quot;</span><span class="p">):</span>
+    <span class="c1"># enforce key order</span>
+    <span class="n">mk_paths</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span>
+        <span class="p">[</span><span class="s1">&#39;TargetPosition&#39;</span><span class="p">,</span> <span class="s1">&#39;InstrumentPosition&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;InstrumentPointing&#39;</span><span class="p">,</span> <span class="s1">&#39;Frame&#39;</span><span class="p">,</span> <span class="s1">&#39;TargetAttitudeShape&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;Instrument&#39;</span><span class="p">,</span> <span class="s1">&#39;InstrumentAddendum&#39;</span><span class="p">,</span> <span class="s1">&#39;LeapSecond&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;SpacecraftClock&#39;</span><span class="p">,</span> <span class="s1">&#39;Extra&#39;</span><span class="p">])</span>
+
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kernel_group</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">kernel_group</span> <span class="o">=</span> <span class="n">pvl</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">kernel_group</span><span class="p">)</span>
+
+    <span class="n">kernel_group</span> <span class="o">=</span> <span class="n">kernel_group</span><span class="p">[</span><span class="s2">&quot;Kernels&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">load_table_data</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+        <span class="n">mk_paths</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">kernel_group</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mk_paths</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">mk_paths</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">mk_paths</span><span class="p">[</span><span class="n">key</span><span class="p">]]</span>
+        <span class="k">while</span> <span class="s1">&#39;Table&#39;</span> <span class="ow">in</span> <span class="n">mk_paths</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span> <span class="n">mk_paths</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;Table&#39;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="s1">&#39;Nadir&#39;</span> <span class="ow">in</span> <span class="n">mk_paths</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span> <span class="n">mk_paths</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;Nadir&#39;</span><span class="p">)</span>
+
+    <span class="n">load_table_data</span><span class="p">(</span><span class="s1">&#39;TargetPosition&#39;</span><span class="p">)</span>
+    <span class="n">load_table_data</span><span class="p">(</span><span class="s1">&#39;InstrumentPosition&#39;</span><span class="p">)</span>
+    <span class="n">load_table_data</span><span class="p">(</span><span class="s1">&#39;InstrumentPointing&#39;</span><span class="p">)</span>
+    <span class="n">load_table_data</span><span class="p">(</span><span class="s1">&#39;TargetAttitudeShape&#39;</span><span class="p">)</span>
+    <span class="c1"># the rest</span>
+    <span class="n">mk_paths</span><span class="p">[</span><span class="s1">&#39;Frame&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">kernel_group</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Frame&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]</span>
+    <span class="n">mk_paths</span><span class="p">[</span><span class="s1">&#39;Instrument&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">kernel_group</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Instrument&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]</span>
+    <span class="n">mk_paths</span><span class="p">[</span><span class="s1">&#39;InstrumentAddendum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">kernel_group</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;InstrumentAddendum&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]</span>
+    <span class="n">mk_paths</span><span class="p">[</span><span class="s1">&#39;SpacecraftClock&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">kernel_group</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SpacecraftClock&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]</span>
+    <span class="n">mk_paths</span><span class="p">[</span><span class="s1">&#39;LeapSecond&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">kernel_group</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;LeapSecond&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]</span>
+    <span class="n">mk_paths</span><span class="p">[</span><span class="s1">&#39;Clock&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">kernel_group</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Clock&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]</span>
+    <span class="n">mk_paths</span><span class="p">[</span><span class="s1">&#39;Extra&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">kernel_group</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Extra&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">format_as</span> <span class="o">==</span> <span class="s1">&#39;list&#39;</span><span class="p">):</span>
+        <span class="c1"># get kernels as 1-d string list</span>
+        <span class="n">kernels</span> <span class="o">=</span> <span class="p">[</span><span class="n">kernel</span> <span class="k">for</span> <span class="n">kernel</span> <span class="ow">in</span> <span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">mk_paths</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span> <span class="nb">str</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">expand</span><span class="p">:</span>
+            <span class="n">isisprefs</span> <span class="o">=</span> <span class="n">get_isis_preferences</span><span class="p">()</span>
+            <span class="n">kernels</span> <span class="o">=</span> <span class="p">[</span><span class="n">expandvars</span><span class="p">(</span><span class="n">expandvars</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">dict_to_lower</span><span class="p">(</span><span class="n">isisprefs</span><span class="p">[</span><span class="s1">&#39;DataDirectory&#39;</span><span class="p">])))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kernels</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">kernels</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">format_as</span> <span class="o">==</span> <span class="s1">&#39;dict&#39;</span><span class="p">):</span>
+        <span class="c1"># return created dict</span>
+        <span class="k">if</span> <span class="n">expand</span><span class="p">:</span>
+            <span class="n">isisprefs</span> <span class="o">=</span> <span class="n">get_isis_preferences</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">kern_list</span> <span class="ow">in</span> <span class="n">mk_paths</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">kern</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mk_paths</span><span class="p">[</span><span class="n">kern_list</span><span class="p">]):</span>
+                    <span class="k">if</span> <span class="n">kern</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">mk_paths</span><span class="p">[</span><span class="n">kern_list</span><span class="p">][</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">expandvars</span><span class="p">(</span><span class="n">expandvars</span><span class="p">(</span><span class="n">kern</span><span class="p">,</span> <span class="n">dict_to_lower</span><span class="p">(</span><span class="n">isisprefs</span><span class="p">[</span><span class="s1">&#39;DataDirectory&#39;</span><span class="p">])))</span>
+        <span class="k">return</span> <span class="n">mk_paths</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">format_as</span><span class="si">}</span><span class="s1"> is not a valid return format&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">write_metakernel_from_cube</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">mkpath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="c1"># add ISISPREF paths as path_symbols and path_values to avoid custom expand logic</span>
+    <span class="n">pvlprefs</span> <span class="o">=</span> <span class="n">get_isis_preferences</span><span class="p">()</span>
+
+    <span class="n">kernels</span> <span class="o">=</span> <span class="n">generate_kernels_from_cube</span><span class="p">(</span><span class="n">cube</span><span class="p">)</span>
+
+    <span class="c1"># make sure kernels are mk strings</span>
+    <span class="n">kernels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&#39;&quot;</span><span class="o">+</span><span class="n">k</span><span class="o">+</span><span class="s2">&quot;&#39;&quot;</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kernels</span><span class="p">]</span>
+
+    <span class="n">paths</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="n">pvlprefs</span><span class="p">[</span><span class="s1">&#39;DataDirectory&#39;</span><span class="p">])</span>
+    <span class="n">path_values</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&#39;&quot;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expandvars</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;&#39;&quot;</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+    <span class="n">path_symbols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&#39;&quot;</span><span class="o">+</span><span class="n">symbol</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">+</span><span class="s2">&quot;&#39;&quot;</span> <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">paths</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+
+    <span class="n">body</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+        <span class="s1">&#39;KPL/MK&#39;</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s1">&#39;Metakernel Generated from an ISIS cube: </span><span class="si">{</span><span class="n">cube</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">begindata&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;PATH_VALUES = (&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_values</span><span class="p">),</span>
+        <span class="s1">&#39;)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;PATH_SYMBOLS = (&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_symbols</span><span class="p">),</span>
+        <span class="s1">&#39;)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;KERNELS_TO_LOAD = (&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">kernels</span><span class="p">),</span>
+        <span class="s1">&#39;)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">begintext&#39;</span>
+    <span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">mkpath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">mkpath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">body</span>
+
+<div class="viewcode-block" id="get_ck_frames"><a class="viewcode-back" href="../../library/python/util.html#ale.util.get_ck_frames">[docs]</a><span class="k">def</span> <span class="nf">get_ck_frames</span><span class="p">(</span><span class="n">kernel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get all of the reference frames defined in a kernel.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    kernel : str</span>
+<span class="sd">             The path to the kernel</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ids : list</span>
+<span class="sd">          The set of reference frames IDs defined in the kernel</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ckbrief</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;ckbrief&quot;</span><span class="p">,</span> <span class="s2">&quot;-t </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kernel</span><span class="p">)],</span>
+                             <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^(-?[0-9]+)&#39;</span><span class="p">,</span> <span class="n">ckbrief</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">):</span>
+        <span class="n">ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
+    <span class="c1"># Sort the output list for testability</span>
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="create_spk_dependency_tree"><a class="viewcode-back" href="../../library/python/util.html#ale.util.create_spk_dependency_tree">[docs]</a><span class="k">def</span> <span class="nf">create_spk_dependency_tree</span><span class="p">(</span><span class="n">kernels</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    construct the dependency tree for the body states in a set of kernels.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    kernels : list</span>
+<span class="sd">              The list of kernels to evaluate the dependencies in. If two</span>
+<span class="sd">              kernels in this list contain the same information for the same</span>
+<span class="sd">              pair of bodies, then the later kernel in the list will be</span>
+<span class="sd">              identified in the kernel property for that edge in dep_tree.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dep_tree : nx.DiGraph</span>
+<span class="sd">               The dependency tree for the kernels. Nodes are bodies. There is</span>
+<span class="sd">               an edge from one node to another if the state of the body of the</span>
+<span class="sd">               source node is defined relative to the state of the body of the</span>
+<span class="sd">               destination node. The kernel edge property identifies what kernel</span>
+<span class="sd">               the information for the edge is defined in.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dep_tree</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">kernel</span> <span class="ow">in</span> <span class="n">kernels</span><span class="p">:</span>
+        <span class="n">brief</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;brief&quot;</span><span class="p">,</span> <span class="s2">&quot;-c </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kernel</span><span class="p">)],</span>
+                               <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                               <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                               <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">body</span><span class="p">,</span> <span class="n">rel_body</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\((.*)\).*w\.r\.t\..*\((.*)\)&#39;</span><span class="p">,</span> <span class="n">brief</span><span class="o">.</span><span class="n">stdout</span><span class="p">):</span>
+            <span class="n">dep_tree</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">body</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">rel_body</span><span class="p">),</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dep_tree</span></div>
+
+<div class="viewcode-block" id="spkmerge_config_string"><a class="viewcode-back" href="../../library/python/util.html#ale.util.spkmerge_config_string">[docs]</a><span class="k">def</span> <span class="nf">spkmerge_config_string</span><span class="p">(</span><span class="n">dep_tree</span><span class="p">,</span> <span class="n">output_spk</span><span class="p">,</span> <span class="n">bodies</span><span class="p">,</span> <span class="n">lsk</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create the contents of an spkmerge config file that will produce a spk that</span>
+<span class="sd">    completely defines the state of a list of bodies for a time range.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dep_tree : nx.DiGraph</span>
+<span class="sd">               Dependency tree from create_kernel_dependency_tree that contains</span>
+<span class="sd">               information about what the state of different bodies are relative</span>
+<span class="sd">               to and where that information is stored.</span>
+<span class="sd">    output_spk : str</span>
+<span class="sd">                 The path to the SPK that will be output by spkmerge</span>
+<span class="sd">    bodies : list</span>
+<span class="sd">             The list of body ID codes that need to be defined in the kernel</span>
+<span class="sd">             created by spkmerge</span>
+<span class="sd">    lsk : str</span>
+<span class="sd">          The absolute path to the leap second kernel to use</span>
+<span class="sd">    start : str</span>
+<span class="sd">            The UTC start time for the kernel created by spkmerge</span>
+<span class="sd">    stop : str</span>
+<span class="sd">           The UTC stop time for the kernel created by spkmerge</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">     : str</span>
+<span class="sd">       The contents of an spkmerge config file that will produce a kernel that</span>
+<span class="sd">       defines the state of the input bodies for the input time range.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">input_kernels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">all_bodies</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">bodies</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">body</span> <span class="ow">in</span> <span class="n">bodies</span><span class="p">:</span>
+        <span class="c1"># Everything is ultimately defined relative to</span>
+        <span class="c1"># SOLAR SYSTEM BARYCENTER (0) so find the path to it</span>
+        <span class="n">dep_path</span> <span class="o">=</span> <span class="n">shortest_path</span><span class="p">(</span><span class="n">dep_tree</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">all_bodies</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">dep_path</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dep_path</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">input_kernels</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dep_tree</span><span class="p">[</span><span class="n">dep_path</span><span class="p">[</span><span class="n">i</span><span class="p">]][</span><span class="n">dep_path</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]][</span><span class="s1">&#39;kernel&#39;</span><span class="p">])</span>
+    <span class="n">config</span> <span class="o">=</span>  <span class="sa">f</span><span class="s2">&quot;LEAPSECONDS_KERNEL     = </span><span class="si">{</span><span class="n">lsk</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">config</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;SPK_KERNEL             = </span><span class="si">{</span><span class="n">output_spk</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">config</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;   BODIES              = </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">all_bodies</span><span class="p">])</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">config</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;   BEGIN_TIME          = </span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">config</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;   END_TIME            = </span><span class="si">{</span><span class="n">stop</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">for</span> <span class="n">kernel</span> <span class="ow">in</span> <span class="n">input_kernels</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;   SOURCE_SPK_KERNEL   = </span><span class="si">{</span><span class="n">kernel</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">config</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;      INCLUDE_COMMENTS = no</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">config</span></div>
+
+<div class="viewcode-block" id="write_metakernel_from_kernel_list"><a class="viewcode-back" href="../../library/python/util.html#ale.util.write_metakernel_from_kernel_list">[docs]</a><span class="k">def</span> <span class="nf">write_metakernel_from_kernel_list</span><span class="p">(</span><span class="n">kernels</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    kernels : str</span>
+<span class="sd">              list of kernel paths</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    : str</span>
+<span class="sd">      Returns string representation of a Naif Metakernel file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">kernels</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kernels</span><span class="p">]</span>
+    <span class="n">common_prefix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">commonprefix</span><span class="p">(</span><span class="n">kernels</span><span class="p">)</span>
+
+    <span class="n">kernels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&#39;&quot;</span><span class="o">+</span><span class="s2">&quot;$PREFIX&quot;</span><span class="o">+</span><span class="n">k</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">common_prefix</span><span class="p">):]</span><span class="o">+</span><span class="s2">&quot;&#39;&quot;</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kernels</span><span class="p">]</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+            <span class="s1">&#39;KPL/MK&#39;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s1">&#39;Metakernel Generated from a kernel list by Ale&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">begindata&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;PATH_VALUES = (&#39;</span><span class="p">,</span>
+            <span class="s2">&quot;&#39;&quot;</span><span class="o">+</span><span class="n">common_prefix</span><span class="o">+</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;PATH_SYMBOLS = (&#39;</span><span class="p">,</span>
+            <span class="s2">&quot;&#39;PREFIX&#39;&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;KERNELS_TO_LOAD = (&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">kernels</span><span class="p">),</span>
+            <span class="s1">&#39;)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">begintext&#39;</span>
+        <span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">body</span></div>
+
+
+
+<div class="viewcode-block" id="duckpool"><a class="viewcode-back" href="../../library/python/util.html#ale.util.duckpool">[docs]</a><span class="k">def</span> <span class="nf">duckpool</span><span class="p">(</span><span class="n">naifvar</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Duck typing friendly version of spiceypy kernel pool functions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    naifvar : str</span>
+<span class="sd">              naif var string to query pool for</span>
+
+<span class="sd">    start : int</span>
+<span class="sd">            Index of first value</span>
+
+<span class="sd">    length : int</span>
+<span class="sd">             max number of values returned</span>
+
+<span class="sd">    default : obj</span>
+<span class="sd">              Default value to return if key is not found in kernel pool</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    : obj</span>
+<span class="sd">      Spice value returned from spiceypy if found, default value otherwise</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="p">[</span><span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">,</span> <span class="n">spice</span><span class="o">.</span><span class="n">gcpool</span><span class="p">,</span> <span class="n">spice</span><span class="o">.</span><span class="n">gipool</span><span class="p">]:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">naifvar</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span>  <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">val</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">continue</span>
+    <span class="k">return</span> <span class="n">default</span></div>
+
+
+<div class="viewcode-block" id="query_kernel_pool"><a class="viewcode-back" href="../../library/python/util.html#ale.util.query_kernel_pool">[docs]</a><span class="k">def</span> <span class="nf">query_kernel_pool</span><span class="p">(</span><span class="n">matchstr</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Collect multiple keywords from the naif kernel pool based on a</span>
+<span class="sd">    template string</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    matchstr : str</span>
+<span class="sd">               matchi_c formatted str</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    : dict</span>
+<span class="sd">      python dictionary of naif keywords in {keyword:value} format.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">svars</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">gnpool</span><span class="p">(</span><span class="n">matchstr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;kernel search for </span><span class="si">{</span><span class="n">matchstr</span><span class="si">}</span><span class="s2"> failed with </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">svars</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">svals</span> <span class="o">=</span> <span class="p">[</span><span class="n">duckpool</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">svars</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">svars</span><span class="p">,</span> <span class="n">svals</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="read_pvl"><a class="viewcode-back" href="../../library/python/util.html#ale.util.read_pvl">[docs]</a><span class="k">def</span> <span class="nf">read_pvl</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">use_jank</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Syntax sugar, used to load a pvl object file from path</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    path : str</span>
+<span class="sd">           Path to Pvl file</span>
+
+<span class="sd">    use_jank : bool</span>
+<span class="sd">               If true, uses faster but less reliable JBFPvlParser, else uses standard PVL parser.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">preftext</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;EndGroup&#39;</span><span class="p">,</span> <span class="s1">&#39;End_Group&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;EndObject&quot;</span><span class="p">,</span> <span class="s2">&quot;End_Object&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_jank</span><span class="p">:</span>
+            <span class="n">pvlprefs</span> <span class="o">=</span> <span class="n">JBFPvlParser</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pvlprefs</span> <span class="o">=</span> <span class="n">pvl</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">preftext</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pvlprefs</span></div>
+
+
+<div class="viewcode-block" id="get_isis_mission_translations"><a class="viewcode-back" href="../../library/python/util.html#ale.util.get_isis_mission_translations">[docs]</a><span class="k">def</span> <span class="nf">get_isis_mission_translations</span><span class="p">(</span><span class="n">isis3_data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Use ISIS translation files and return a lookup table.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    isis3_data : str</span>
+<span class="sd">                 path to $ISIS3DATA</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    : dict</span>
+<span class="sd">      Dictionary mapping label mission strings to ISIS3 mission strings</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mission_translation_file</span> <span class="o">=</span> <span class="n">read_pvl</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">isis3_data</span><span class="p">,</span> <span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="s2">&quot;translations&quot;</span><span class="p">,</span> <span class="s2">&quot;MissionName2DataDir.trn&quot;</span><span class="p">))</span>
+    <span class="c1"># For some reason this file takes the form [value, key] for mission name -&gt; data dir</span>
+    <span class="n">lookup</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">mission_translation_file</span><span class="p">[</span><span class="s2">&quot;MissionName&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s2">&quot;Translation&quot;</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lookup</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JBFPvlParser"><a class="viewcode-back" href="../../library/python/util.html#ale.util.JBFPvlParser">[docs]</a><span class="k">def</span> <span class="nf">JBFPvlParser</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Janky But Faster PVL Parser(TM)</span>
+
+<span class="sd">    Only really supports ISIS&#39;s Kernel DB files. This is because KernelDB files are sometimes very large for smithed kernels.</span>
+<span class="sd">    This should bring the parsing time for those DB files from minutes to seconds.</span>
+<span class="sd">    Still needs nested object/group support and it should be able to read most PVL files.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    lines : str</span>
+<span class="sd">          string body of PVL file.</span>
+
+<span class="sd">    Returns : PVLModule</span>
+<span class="sd">              object representing the parsed PVL</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">JBFKeywordParser</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+        <span class="n">keyword</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+
+        <span class="k">if</span> <span class="s2">&quot;(&quot;</span> <span class="ow">in</span> <span class="n">value</span> <span class="ow">and</span> <span class="s2">&quot;)&quot;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">keyword</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">value</span>
+
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">&quot;group = &quot;</span> <span class="ow">in</span> <span class="n">l</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="n">metadata</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;group_start&quot;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="s2">&quot;object = &quot;</span> <span class="ow">in</span> <span class="n">l</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="n">metadata</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;object_start&quot;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="s2">&quot;=&quot;</span> <span class="ow">in</span> <span class="n">l</span><span class="p">:</span>
+            <span class="n">metadata</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;keyword&quot;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="s2">&quot;end_group&quot;</span> <span class="ow">in</span> <span class="n">l</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">or</span> <span class="s2">&quot;endgroup&quot;</span> <span class="ow">in</span> <span class="n">l</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="n">metadata</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;group_end&quot;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="s2">&quot;end_object&quot;</span> <span class="ow">in</span> <span class="n">l</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">or</span> <span class="s2">&quot;endobject&quot;</span> <span class="ow">in</span> <span class="n">l</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="n">metadata</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;object_end&quot;</span><span class="p">])</span>
+
+    <span class="n">imeta</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">imeta</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">metadata</span><span class="p">):</span>
+        <span class="n">element_start_line</span><span class="p">,</span> <span class="n">element_type</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="n">imeta</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">element_type</span> <span class="o">==</span> <span class="s2">&quot;keyword&quot;</span><span class="p">:</span>
+            <span class="n">next_element_start</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="n">imeta</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">imeta</span><span class="o">+</span><span class="mi">1</span><span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">element_lines</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">element_start_line</span><span class="p">:</span><span class="n">next_element_start</span><span class="p">]</span>
+            <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">JBFKeywordParser</span><span class="p">(</span><span class="n">element_lines</span><span class="p">))</span>
+            <span class="n">imeta</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">element_type</span> <span class="o">==</span> <span class="s2">&quot;group_start&quot;</span><span class="p">:</span>
+            <span class="n">group_name</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">element_start_line</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+            <span class="n">next_meta</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span><span class="p">,</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="n">imeta</span><span class="p">:])</span> <span class="k">if</span> <span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;group_end&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">next_group_start</span> <span class="o">=</span> <span class="n">next_meta</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">group_lines</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">element_start_line</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">next_group_start</span><span class="p">]</span>
+            <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">group_name</span><span class="p">,</span> <span class="n">JBFPvlParser</span><span class="p">(</span><span class="n">group_lines</span><span class="p">)))</span>
+            <span class="n">imeta</span> <span class="o">+=</span> <span class="n">next_meta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">element_type</span> <span class="o">==</span> <span class="s2">&quot;object_start&quot;</span><span class="p">:</span>
+            <span class="c1"># duplicate code but whatever</span>
+            <span class="n">group_name</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">element_start_line</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+            <span class="n">next_meta</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span><span class="p">,</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="n">imeta</span><span class="p">:])</span> <span class="k">if</span> <span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;object_end&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">next_group_start</span> <span class="o">=</span> <span class="n">next_meta</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">group_lines</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">element_start_line</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">next_group_start</span><span class="p">]</span>
+            <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">group_name</span><span class="p">,</span> <span class="n">JBFPvlParser</span><span class="p">(</span><span class="n">group_lines</span><span class="p">)))</span>
+            <span class="n">imeta</span> <span class="o">+=</span> <span class="n">next_meta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">element_type</span> <span class="o">==</span> <span class="s2">&quot;object_end&quot;</span> <span class="ow">or</span> <span class="n">element_type</span> <span class="o">==</span> <span class="s2">&quot;group_end&quot;</span><span class="p">:</span>
+            <span class="n">imeta</span><span class="o">+=</span><span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">pvl</span><span class="o">.</span><span class="n">PVLModule</span><span class="p">(</span><span class="n">items</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="search_isis_db"><a class="viewcode-back" href="../../library/python/util.html#ale.util.search_isis_db">[docs]</a><span class="k">def</span> <span class="nf">search_isis_db</span><span class="p">(</span><span class="n">dbobj</span><span class="p">,</span> <span class="n">labelobj</span><span class="p">,</span> <span class="n">isis3_data</span><span class="o">=</span><span class="s2">&quot;/usgs/cpkgs/isis3/data/&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given an PVL obj of a KernelDB file and an Isis Label for a cube, find the best kernel</span>
+<span class="sd">    to attach to the cube.</span>
+
+<span class="sd">    The Logic here is a bit gross, but it matches ISIS&#39;s implementation very closely.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dbobj : PVLModule</span>
+<span class="sd">            ISIS3 KernelDB file as a loaded PVLModule</span>
+
+<span class="sd">    labelobj : PVLModule</span>
+<span class="sd">               Cube label as loaded PVLModule</span>
+
+<span class="sd">    isis3_data : str</span>
+<span class="sd">                 path to $ISIS3DATA</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    : dict</span>
+<span class="sd">      dictionary containing kernel list and optionally the kernel type if relevant.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dbobj</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="n">quality</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">e</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span>  <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s2">&quot;predicted&quot;</span><span class="p">,</span> <span class="s2">&quot;nadir&quot;</span><span class="p">,</span> <span class="s2">&quot;reconstructed&quot;</span><span class="p">,</span> <span class="s2">&quot;smithed&quot;</span><span class="p">]))</span>
+
+    <span class="n">utc_start_time</span> <span class="o">=</span> <span class="n">labelobj</span><span class="p">[</span><span class="s2">&quot;IsisCube&quot;</span><span class="p">][</span><span class="s2">&quot;Instrument&quot;</span><span class="p">][</span><span class="s2">&quot;StartTime&quot;</span><span class="p">]</span>
+    <span class="n">utc_stop_time</span> <span class="o">=</span> <span class="n">labelobj</span><span class="p">[</span><span class="s2">&quot;IsisCube&quot;</span><span class="p">][</span><span class="s2">&quot;Instrument&quot;</span><span class="p">][</span><span class="s2">&quot;StopTime&quot;</span><span class="p">]</span>
+
+    <span class="n">run_time</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">dependencies</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">kernels</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">typ</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">types</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># flag is set when a kernel is found matching the start time but not stop time</span>
+    <span class="c1"># and therefore a second pair needs to be found</span>
+    <span class="n">partial_match</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># Flag is set when kernels encapsulating the entire image time is found</span>
+    <span class="n">full_match</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">for</span> <span class="n">selection</span> <span class="ow">in</span> <span class="n">dbobj</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s2">&quot;Selection&quot;</span><span class="p">):</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s2">&quot;File&quot;</span><span class="p">)</span>
+
+        <span class="c1"># selection criteria</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s2">&quot;Match&quot;</span><span class="p">)</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s2">&quot;Time&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">files</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No File found in </span><span class="si">{</span><span class="n">selection</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="n">file</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">file</span>  <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">time</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">times</span><span class="p">):</span>
+            <span class="n">isis_time_format</span> <span class="o">=</span> <span class="s1">&#39;%Y %b </span><span class="si">%d</span><span class="s1"> %H:%M:%S.</span><span class="si">%f</span><span class="s1"> TDB&#39;</span>
+            <span class="n">other_isis_time_format</span> <span class="o">=</span>  <span class="s1">&#39;&quot;%Y %b </span><span class="si">%d</span><span class="s1"> %H:%M:%S.</span><span class="si">%f</span><span class="s1"> TDB&quot;&#39;</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">time</span> <span class="o">=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">isis_time_format</span><span class="p">),</span>
+                                   <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">time</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">isis_time_format</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">time</span> <span class="o">=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">other_isis_time_format</span><span class="p">),</span>
+                                   <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">time</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">other_isis_time_format</span><span class="p">))</span>
+
+            <span class="n">start_time_in_range</span> <span class="o">=</span> <span class="n">utc_start_time</span> <span class="o">&gt;=</span> <span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">utc_start_time</span> <span class="o">&lt;=</span> <span class="n">time</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">stop_time_in_range</span> <span class="o">=</span> <span class="n">utc_stop_time</span> <span class="o">&gt;=</span> <span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">utc_stop_time</span> <span class="o">&lt;=</span> <span class="n">time</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">times</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">stop_time_in_range</span><span class="p">,</span> <span class="n">stop_time_in_range</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">match</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">matches</span><span class="p">):</span>
+            <span class="n">matches</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">labelobj</span><span class="p">[</span><span class="s2">&quot;IsisCube&quot;</span><span class="p">][</span><span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()][</span><span class="n">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="n">match</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">matches</span> <span class="k">if</span> <span class="n">matches</span> <span class="k">else</span> <span class="p">[</span><span class="kc">True</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                    <span class="n">f</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">f</span><span class="p">])</span>
+
+                <span class="n">full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">isis3_data</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;$&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s2">&quot;{&quot;</span> <span class="ow">in</span> <span class="n">full_path</span><span class="p">:</span>
+                    <span class="n">start</span> <span class="o">=</span> <span class="n">full_path</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="p">)</span>
+                    <span class="n">stop</span> <span class="o">=</span> <span class="n">full_path</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">)</span>
+                    <span class="n">full_path</span> <span class="o">=</span> <span class="n">full_path</span><span class="p">[:</span><span class="n">start</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;?&quot;</span><span class="o">*</span><span class="p">(</span><span class="n">stop</span><span class="o">-</span><span class="n">start</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">full_path</span><span class="p">[</span><span class="n">stop</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="k">if</span> <span class="s1">&#39;?&#39;</span> <span class="ow">in</span> <span class="n">full_path</span><span class="p">:</span>
+                    <span class="n">full_path</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="n">full_path</span><span class="p">))[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">files</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_path</span>
+
+            <span class="k">if</span> <span class="n">times</span><span class="p">:</span>
+                <span class="n">have_start_match</span><span class="p">,</span> <span class="n">have_stop_match</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">times</span><span class="p">)))</span>
+                <span class="n">typ</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">typ</span> <span class="o">=</span> <span class="n">typ</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">if</span> <span class="n">typ</span> <span class="k">else</span> <span class="kc">None</span>
+
+                <span class="n">current_quality</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">quality</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">types</span> <span class="k">if</span> <span class="n">t</span><span class="p">])</span> <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">types</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span>
+
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">have_start_match</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">have_stop_match</span><span class="p">):</span>
+                    <span class="c1"># best case, the image is fully encapsulated in the kernel</span>
+                    <span class="n">full_match</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">if</span> <span class="n">quality</span><span class="p">[</span><span class="n">typ</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">current_quality</span><span class="p">:</span>
+                        <span class="n">kernels</span> <span class="o">=</span> <span class="n">files</span>
+                        <span class="n">types</span> <span class="o">=</span> <span class="p">[</span><span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]</span>
+                <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="n">have_start_match</span><span class="p">):</span>
+                    <span class="n">kernels</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+                    <span class="n">types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+                    <span class="n">partial_match</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="n">have_stop_match</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">partial_match</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">quality</span><span class="p">[</span><span class="n">typ</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">current_quality</span><span class="p">:</span>
+                            <span class="n">kernels</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+                            <span class="n">types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+                            <span class="n">full_match</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">full_match</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">kernels</span> <span class="o">=</span> <span class="n">files</span>
+                <span class="n">types</span> <span class="o">=</span> <span class="p">[</span><span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Type&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]</span>
+
+    <span class="k">if</span> <span class="n">partial_match</span><span class="p">:</span>
+        <span class="c1"># this can only be true if a kernel matching start time was founf</span>
+        <span class="c1"># but not the end time</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Could not find kernels encapsulating the full image time&quot;</span><span class="p">)</span>
+
+    <span class="n">kernels</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;kernels&quot;</span> <span class="p">:</span> <span class="n">kernels</span><span class="p">}</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">types</span><span class="p">):</span>
+        <span class="n">kernels</span><span class="p">[</span><span class="s2">&quot;types&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">types</span>
+    <span class="k">return</span> <span class="n">kernels</span></div>
+
+
+<div class="viewcode-block" id="find_kernels"><a class="viewcode-back" href="../../library/python/util.html#ale.util.find_kernels">[docs]</a><span class="k">def</span> <span class="nf">find_kernels</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">isis3_data</span><span class="o">=</span><span class="s2">&quot;/usgs/cpkgs/isis3/data/&quot;</span><span class="p">,</span> <span class="n">format_as</span><span class="o">=</span><span class="nb">dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find all kernels for a cube and return a json object with categorized kernels.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    cube : str</span>
+<span class="sd">           Path to an ISIS cube</span>
+
+<span class="sd">    isis3_data : str</span>
+<span class="sd">                path to $ISIS3DATA</span>
+
+<span class="sd">    format_as : obj</span>
+<span class="sd">                What type to return the kernels as, ISIS3-like dict/PVL or flat list</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    : obj</span>
+<span class="sd">      Container with kernels</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">remove_dups</span><span class="p">(</span><span class="n">listofElements</span><span class="p">):</span>
+        <span class="c1"># Create an empty list to store unique elements</span>
+        <span class="n">uniqueList</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Iterate over the original list and for each element</span>
+        <span class="c1"># add it to uniqueList, if its not already there.</span>
+        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">listofElements</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">elem</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">uniqueList</span><span class="p">:</span>
+                <span class="n">uniqueList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+
+        <span class="c1"># Return the list of unique elements</span>
+        <span class="k">return</span> <span class="n">uniqueList</span>
+
+    <span class="n">cube_label</span> <span class="o">=</span> <span class="n">pvl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cube</span><span class="p">)</span>
+    <span class="n">mission_lookup_table</span> <span class="o">=</span> <span class="n">get_isis_mission_translations</span><span class="p">(</span><span class="n">isis3_data</span><span class="p">)</span>
+
+    <span class="n">mission_dir</span> <span class="o">=</span> <span class="n">mission_lookup_table</span><span class="p">[</span><span class="n">cube_label</span><span class="p">[</span><span class="s2">&quot;IsisCube&quot;</span><span class="p">][</span><span class="s2">&quot;Instrument&quot;</span><span class="p">][</span><span class="s2">&quot;SpacecraftName&quot;</span><span class="p">]]</span>
+    <span class="n">mission_dir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">isis3_data</span><span class="p">,</span> <span class="n">mission_dir</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+
+    <span class="n">kernel_dir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mission_dir</span><span class="p">,</span> <span class="s2">&quot;kernels&quot;</span><span class="p">)</span>
+    <span class="n">base_kernel_dir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">isis3_data</span><span class="p">,</span> <span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="s2">&quot;kernels&quot;</span><span class="p">)</span>
+
+    <span class="n">kernel_types</span> <span class="o">=</span> <span class="p">[</span> <span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">kernel_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">kernel_dir</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span> <span class="p">]</span>
+    <span class="n">kernel_types</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">base_kernel_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_kernel_dir</span><span class="p">,</span> <span class="n">name</span><span class="p">)))</span>
+    <span class="n">kernel_types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kernel_types</span><span class="p">)</span>
+
+    <span class="n">db_files</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">kernel_types</span><span class="p">:</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">kernel_dir</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="s2">&quot;*.db&quot;</span><span class="p">)))</span>
+        <span class="n">base_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_kernel_dir</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="s2">&quot;*.db&quot;</span><span class="p">)))</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">it</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])]</span>
+        <span class="n">base_files</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">it</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="n">base_files</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])]</span>
+
+        <span class="k">for</span> <span class="n">instrument_dbs</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="n">db_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">read_pvl</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">instrument_dbs</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="kc">True</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">base_dbs</span> <span class="ow">in</span> <span class="n">base_files</span><span class="p">:</span>
+            <span class="n">db_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">read_pvl</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">base_dbs</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="kc">True</span><span class="p">))</span>
+
+
+    <span class="n">kernels</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">db_files</span><span class="p">:</span>
+        <span class="c1">#TODO: Error checking</span>
+        <span class="n">typ</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">kernel_search_results</span> <span class="o">=</span> <span class="n">search_isis_db</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">cube_label</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">kernel_search_results</span><span class="p">:</span>
+            <span class="n">kernels</span><span class="p">[</span><span class="n">typ</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">kernels</span><span class="p">[</span><span class="n">typ</span><span class="p">][</span><span class="s2">&quot;kernels&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">kernel_search_results</span><span class="p">[</span><span class="s2">&quot;kernels&quot;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">kernel_search_results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;types&quot;</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">])):</span>
+                    <span class="n">kernels</span><span class="p">[</span><span class="n">typ</span><span class="p">][</span><span class="s2">&quot;types&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">kernel_search_results</span><span class="p">[</span><span class="s2">&quot;types&quot;</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">kernels</span><span class="p">[</span><span class="n">typ</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">kernels</span><span class="p">[</span><span class="n">typ</span><span class="p">][</span><span class="s2">&quot;kernels&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kernel_search_results</span><span class="p">[</span><span class="s2">&quot;kernels&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">kernel_search_results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;types&quot;</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">])):</span>
+                    <span class="n">kernels</span><span class="p">[</span><span class="n">typ</span><span class="p">][</span><span class="s2">&quot;types&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kernel_search_results</span><span class="p">[</span><span class="s2">&quot;types&quot;</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">kernels</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+            <span class="n">kernels</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;kernels&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">remove_dups</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s2">&quot;kernels&quot;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">format_as</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">kernels</span>
+    <span class="k">elif</span> <span class="n">format_as</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="n">kernel_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span><span class="n">kernels</span> <span class="ow">in</span> <span class="n">kernels</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">kernels</span><span class="p">:</span>
+                <span class="n">kernel_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">kernels</span><span class="p">[</span><span class="s2">&quot;kernels&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">kernel_list</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">format_as</span><span class="si">}</span><span class="s2"> is not a valid format, returning as dict&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">kernels</span></div>
 </pre></div>
 
           </div>
@@ -152,17 +923,15 @@
 </ul>
 </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -179,7 +948,7 @@
       &copy;Public Domain.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

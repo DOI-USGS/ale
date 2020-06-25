@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>juno_drivers — Juno Driver Classes &#8212; ALE 0.8.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="lro_drivers — LRO Driver Classes" href="lro_driver.html" />
+    <link rel="prev" title="isis_ideal_drivers — ISIS Ideal Camera Driver Classes" href="isis_ideal_driver.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="juno-drivers-juno-driver-classes">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">juno_drivers</span></code> — Juno Driver Classes<a class="headerlink" href="#juno-drivers-juno-driver-classes" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="#module-ale.drivers.juno_drivers" title="ale.drivers.juno_drivers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ale.drivers.juno_drivers</span></code></a> module</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.8.1.</span></p>
+</div>
+<span class="target" id="module-ale.drivers.juno_drivers"></span><dl class="py class">
+<dt id="ale.drivers.juno_drivers.JunoJunoCamIsisLabelNaifSpiceDriver">
+<em class="property">class </em><code class="sig-prename descclassname">ale.drivers.juno_drivers.</code><code class="sig-name descname">JunoJunoCamIsisLabelNaifSpiceDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">num_ephem</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">num_quats</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">props</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/drivers/juno_drivers.html#JunoJunoCamIsisLabelNaifSpiceDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.drivers.juno_drivers.JunoJunoCamIsisLabelNaifSpiceDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.type_sensor.Framer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.label_isis.IsisLabel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.data_naif.NaifSpice</span></code>, <a class="reference internal" href="base.html#ale.base.base.Driver" title="ale.base.base.Driver"><code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.base.Driver</span></code></a></p>
+<p>Driver for reading Juno ISIS labels.</p>
+<dl class="py method">
+<dt id="ale.drivers.juno_drivers.JunoJunoCamIsisLabelNaifSpiceDriver.ephemeris_start_time">
+<em class="property">property </em><code class="sig-name descname">ephemeris_start_time</code><a class="headerlink" href="#ale.drivers.juno_drivers.JunoJunoCamIsisLabelNaifSpiceDriver.ephemeris_start_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Junos camera is split into stacked frames where an image is made
+of sets of RGBM chuncks. We need to account for these chuncks since
+ISIS produces some number of cubes N where N = M*4.
+Computation obtained from JunoCamera.cpp</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: double</dt><dd><p>Starting ephemeris time</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.juno_drivers.JunoJunoCamIsisLabelNaifSpiceDriver.instrument_id">
+<em class="property">property </em><code class="sig-name descname">instrument_id</code><a class="headerlink" href="#ale.drivers.juno_drivers.JunoJunoCamIsisLabelNaifSpiceDriver.instrument_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expects instrument_id to be defined in the IsisLabel mixin. This should be
+a string of the form ‘JNC’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>instrument id</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.juno_drivers.JunoJunoCamIsisLabelNaifSpiceDriver.naif_keywords">
+<em class="property">property </em><code class="sig-name descname">naif_keywords</code><a class="headerlink" href="#ale.drivers.juno_drivers.JunoJunoCamIsisLabelNaifSpiceDriver.naif_keywords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updated set of naif keywords containing the NaifIkCode for the specific
+Juno filter used when taking the image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: dict</dt><dd><p>Dictionary of keywords and values that ISIS creates and attaches to the label</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.juno_drivers.JunoJunoCamIsisLabelNaifSpiceDriver.sensor_model_version">
+<em class="property">property </em><code class="sig-name descname">sensor_model_version</code><a class="headerlink" href="#ale.drivers.juno_drivers.JunoJunoCamIsisLabelNaifSpiceDriver.sensor_model_version" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>ISIS sensor model version</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Library Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../capi/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="base.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">base</span></code> — Default Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">co_drivers</span></code> — Cassini Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dawn_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">dawn_drivers</span></code> — Dawn Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hayabusa2_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">hayabusa2_drivers</span></code> — Hayabusa2 Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="isis_ideal_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">isis_ideal_drivers</span></code> — ISIS Ideal Camera Driver Classes</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">juno_drivers</span></code> — Juno Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lro_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">lro_drivers</span></code> — LRO Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mess_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mess_drivers</span></code> — MDIS Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mex_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mex_drivers</span></code> — Mars Express Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mro_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mro_drivers</span></code> — MRO Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nh_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">nh_drivers</span></code> — New Horizons Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ody_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ody_drivers</span></code> — Odyssey Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="selene_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">selene_drivers</span></code> — Selene Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tgo_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tgo_drivers</span></code> — Trace Gas Oribiter Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="viking_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">viking_drivers</span></code> — Viking Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="voyager_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">voyager_drivers</span></code> — Voyager Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="util.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">util</span></code> — General Utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Library Reference</a><ul>
+  <li><a href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a><ul>
+      <li>Previous: <a href="isis_ideal_driver.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">isis_ideal_drivers</span></code> — ISIS Ideal Camera Driver Classes</a></li>
+      <li>Next: <a href="lro_driver.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">lro_drivers</span></code> — LRO Driver Classes</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;Public Domain.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/library/python/juno_driver.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

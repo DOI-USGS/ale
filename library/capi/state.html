@@ -1,0 +1,343 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>states — ALE States Classes &amp; Functions &#8212; ALE 0.8.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="utils — ALE Utility Functions" href="util.html" />
+    <link rel="prev" title="rotation — ALE Rotation Classes &amp; Functions" href="rotation.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="states-ale-states-classes-functions">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">states</span></code> — ALE States Classes &amp; Functions<a class="headerlink" href="#states-ale-states-classes-functions" title="Permalink to this headline">¶</a></h1>
+<dl class="cpp type">
+<dt id="_CPPv43ale">
+<span id="_CPPv33ale"></span><span id="_CPPv23ale"></span><span id="ale"></span><span class="target" id="namespaceale"></span><em class="property">namespace </em><code class="sig-name descname">ale</code><br /></dt>
+<dd><dl class="cpp struct">
+<dt id="_CPPv4N3ale5StateE">
+<span id="_CPPv3N3ale5StateE"></span><span id="_CPPv2N3ale5StateE"></span><span id="ale::State"></span><span class="target" id="structale_1_1State"></span><em class="property">struct </em><code class="sig-name descname">State</code><a class="headerlink" href="#_CPPv4N3ale5StateE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;States.h&gt;</em><p>A state vector with position and velocity </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="cpp function">
+<dt id="_CPPv4N3ale5State5StateERKNSt6vectorIdEE">
+<span id="_CPPv3N3ale5State5StateERKNSt6vectorIdEE"></span><span id="_CPPv2N3ale5State5StateERKNSt6vectorIdEE"></span><span id="ale::State::State__std::vector:double:CR"></span><span class="target" id="structale_1_1State_1a11a5594865ee0abbfd8f1ebc50a143eb"></span><code class="sig-name descname">State</code><span class="sig-paren">(</span><em class="property">const</em> std::vector&lt;double&gt; &amp;<em>vec</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale5State5StateERKNSt6vectorIdEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale5State5StateE5Vec3d">
+<span id="_CPPv3N3ale5State5StateE5Vec3d"></span><span id="_CPPv2N3ale5State5StateE5Vec3d"></span><span id="ale::State::State__Vec3d"></span><span class="target" id="structale_1_1State_1af100572898bf1bb55d0be8a4e2dea462"></span><code class="sig-name descname">State</code><span class="sig-paren">(</span><a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a> <em>position</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale5State5StateE5Vec3d" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale5State5StateE5Vec3d5Vec3d">
+<span id="_CPPv3N3ale5State5StateE5Vec3d5Vec3d"></span><span id="_CPPv2N3ale5State5StateE5Vec3d5Vec3d"></span><span id="ale::State::State__Vec3d.Vec3d"></span><span class="target" id="structale_1_1State_1a4280070caaa1ebef492b7bf2f770524a"></span><code class="sig-name descname">State</code><span class="sig-paren">(</span><a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a> <em>position</em>, <a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a> <em>velocity</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale5State5StateE5Vec3d5Vec3d" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale5State5StateEv">
+<span id="_CPPv3N3ale5State5StateEv"></span><span id="_CPPv2N3ale5State5StateEv"></span><span id="ale::State::State"></span><span class="target" id="structale_1_1State_1a4872c31811e1929ca1784e8e1acc9b81"></span><code class="sig-name descname">State</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale5State5StateEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale5State11hasVelocityEv">
+<span id="_CPPv3NK3ale5State11hasVelocityEv"></span><span id="_CPPv2NK3ale5State11hasVelocityEv"></span><span id="ale::State::hasVelocityC"></span><span class="target" id="structale_1_1State_1a236599faa05877c8ad48bfb6e35de3a8"></span>bool <code class="sig-name descname">hasVelocity</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale5State11hasVelocityEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="cpp var">
+<dt id="_CPPv4N3ale5State8positionE">
+<span id="_CPPv3N3ale5State8positionE"></span><span id="_CPPv2N3ale5State8positionE"></span><span id="ale::State::position__Vec3d"></span><span class="target" id="structale_1_1State_1ad59bcce469cc174f41b9c1cb32f788d2"></span><a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a> <code class="sig-name descname">position</code><a class="headerlink" href="#_CPPv4N3ale5State8positionE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt id="_CPPv4N3ale5State8velocityE">
+<span id="_CPPv3N3ale5State8velocityE"></span><span id="_CPPv2N3ale5State8velocityE"></span><span id="ale::State::velocity__Vec3d"></span><span class="target" id="structale_1_1State_1a802f7651190a5574646cf4262d28d8d5"></span><a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a> <code class="sig-name descname">velocity</code><a class="headerlink" href="#_CPPv4N3ale5State8velocityE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt id="_CPPv4N3ale6StatesE">
+<span id="_CPPv3N3ale6StatesE"></span><span id="_CPPv2N3ale6StatesE"></span><span id="ale::States"></span><span class="target" id="classale_1_1States"></span><em class="property">class </em><code class="sig-name descname">States</code><a class="headerlink" href="#_CPPv4N3ale6StatesE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;States.h&gt;</em><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="cpp function">
+<dt id="_CPPv4N3ale6States6StatesEv">
+<span id="_CPPv3N3ale6States6StatesEv"></span><span id="_CPPv2N3ale6States6StatesEv"></span><span id="ale::States::States"></span><span class="target" id="classale_1_1States_1abfb8de11852f7fcf62b2f47123e6bb8b"></span><code class="sig-name descname">States</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale6States6StatesEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale6States6StatesERKNSt6vectorIdEERKNSt6vectorI5Vec3dEEi">
+<span id="_CPPv3N3ale6States6StatesERKNSt6vectorIdEERKNSt6vectorI5Vec3dEEi"></span><span id="_CPPv2N3ale6States6StatesERKNSt6vectorIdEERKNSt6vectorI5Vec3dEEi"></span><span id="ale::States::States__std::vector:double:CR.std::vector:Vec3d:CR.i"></span><span class="target" id="classale_1_1States_1ab6558ec3696325633639732f21baa94b"></span><code class="sig-name descname">States</code><span class="sig-paren">(</span><em class="property">const</em> std::vector&lt;double&gt; &amp;<em>ephemTimes</em>, <em class="property">const</em> std::vector&lt;<a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a>&gt; &amp;<em>positions</em>, int <em>refFrame</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale6States6StatesERKNSt6vectorIdEERKNSt6vectorI5Vec3dEEi" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale6States6StatesERKNSt6vectorIdEERKNSt6vectorI5Vec3dEERKNSt6vectorI5Vec3dEEi">
+<span id="_CPPv3N3ale6States6StatesERKNSt6vectorIdEERKNSt6vectorI5Vec3dEERKNSt6vectorI5Vec3dEEi"></span><span id="_CPPv2N3ale6States6StatesERKNSt6vectorIdEERKNSt6vectorI5Vec3dEERKNSt6vectorI5Vec3dEEi"></span><span id="ale::States::States__std::vector:double:CR.std::vector:Vec3d:CR.std::vector:Vec3d:CR.i"></span><span class="target" id="classale_1_1States_1a649929d7f2d6cbc43d3ea5bb79f38543"></span><code class="sig-name descname">States</code><span class="sig-paren">(</span><em class="property">const</em> std::vector&lt;double&gt; &amp;<em>ephemTimes</em>, <em class="property">const</em> std::vector&lt;<a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a>&gt; &amp;<em>positions</em>, <em class="property">const</em> std::vector&lt;<a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a>&gt; &amp;<em>velocities</em>, int <em>refFrame</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale6States6StatesERKNSt6vectorIdEERKNSt6vectorI5Vec3dEERKNSt6vectorI5Vec3dEEi" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale6States6StatesERKNSt6vectorIdEERKNSt6vectorI5StateEEi">
+<span id="_CPPv3N3ale6States6StatesERKNSt6vectorIdEERKNSt6vectorI5StateEEi"></span><span id="_CPPv2N3ale6States6StatesERKNSt6vectorIdEERKNSt6vectorI5StateEEi"></span><span id="ale::States::States__std::vector:double:CR.std::vector:State:CR.i"></span><span class="target" id="classale_1_1States_1aa199f1a75988146debf23e92b7e0d690"></span><code class="sig-name descname">States</code><span class="sig-paren">(</span><em class="property">const</em> std::vector&lt;double&gt; &amp;<em>ephemTimes</em>, <em class="property">const</em> std::vector&lt;<a class="reference internal" href="#_CPPv4N3ale5StateE" title="ale::State">State</a>&gt; &amp;<em>states</em>, int <em>refFrame</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale6States6StatesERKNSt6vectorIdEERKNSt6vectorI5StateEEi" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale6StatesD0Ev">
+<span id="_CPPv3N3ale6StatesD0Ev"></span><span id="_CPPv2N3ale6StatesD0Ev"></span><span id="ale::States::~States"></span><span class="target" id="classale_1_1States_1a66fbc9688f3e4cd7c97614eb239fedfb"></span><code class="sig-name descname">~States</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale6StatesD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale6States9getStatesEv">
+<span id="_CPPv3NK3ale6States9getStatesEv"></span><span id="_CPPv2NK3ale6States9getStatesEv"></span><span id="ale::States::getStatesC"></span><span class="target" id="classale_1_1States_1a2e6b77cd359fddde122a5d58c68a8251"></span>std::vector&lt;<a class="reference internal" href="#_CPPv4N3ale5StateE" title="ale::State">State</a>&gt; <code class="sig-name descname">getStates</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale6States9getStatesEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale6States12getPositionsEv">
+<span id="_CPPv3NK3ale6States12getPositionsEv"></span><span id="_CPPv2NK3ale6States12getPositionsEv"></span><span id="ale::States::getPositionsC"></span><span class="target" id="classale_1_1States_1a077c7a38cd667ce8b1308411652f8c90"></span>std::vector&lt;<a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a>&gt; <code class="sig-name descname">getPositions</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale6States12getPositionsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns state vectors (6-element positions&amp;velocities) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale6States13getVelocitiesEv">
+<span id="_CPPv3NK3ale6States13getVelocitiesEv"></span><span id="_CPPv2NK3ale6States13getVelocitiesEv"></span><span id="ale::States::getVelocitiesC"></span><span class="target" id="classale_1_1States_1a826cc031bac1bbb8a88a8a7ac8f4d85c"></span>std::vector&lt;<a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a>&gt; <code class="sig-name descname">getVelocities</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale6States13getVelocitiesEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns the current positions. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale6States8getTimesEv">
+<span id="_CPPv3NK3ale6States8getTimesEv"></span><span id="_CPPv2NK3ale6States8getTimesEv"></span><span id="ale::States::getTimesC"></span><span class="target" id="classale_1_1States_1ae7c9cf0c8cc882798341e37a37b0e68f"></span>std::vector&lt;double&gt; <code class="sig-name descname">getTimes</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale6States8getTimesEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns the current velocities. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale6States17getReferenceFrameEv">
+<span id="_CPPv3NK3ale6States17getReferenceFrameEv"></span><span id="_CPPv2NK3ale6States17getReferenceFrameEv"></span><span id="ale::States::getReferenceFrameC"></span><span class="target" id="classale_1_1States_1a6c2d392d403c12133be77ac78f08be21"></span>int <code class="sig-name descname">getReferenceFrame</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale6States17getReferenceFrameEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns the current times. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale6States11hasVelocityEv">
+<span id="_CPPv3NK3ale6States11hasVelocityEv"></span><span id="_CPPv2NK3ale6States11hasVelocityEv"></span><span id="ale::States::hasVelocityC"></span><span class="target" id="classale_1_1States_1a6d833ef13e7599a9eb0513a2351442f2"></span>bool <code class="sig-name descname">hasVelocity</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale6States11hasVelocityEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns reference frame as NAIF ID. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale6States8getStateEd21PositionInterpolation">
+<span id="_CPPv3NK3ale6States8getStateEd21PositionInterpolation"></span><span id="_CPPv2NK3ale6States8getStateEd21PositionInterpolation"></span><span id="ale::States::getState__double.PositionInterpolationC"></span><span class="target" id="classale_1_1States_1a4faf98a5ddce4ae7a0cba347b2061b28"></span><a class="reference internal" href="#_CPPv4N3ale5StateE" title="ale::State">State</a> <code class="sig-name descname">getState</code><span class="sig-paren">(</span>double <em>time</em>, <a class="reference internal" href="interp_utils.html#_CPPv4N3ale21PositionInterpolationE" title="ale::PositionInterpolation">PositionInterpolation</a> <em>interp</em> = LINEAR<span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale6States8getStateEd21PositionInterpolation" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns true if any velocities have been provided. </p>
+<p>Returns a single state by interpolating state. If the Cache has been minimized, a cubic hermite is used to interpolate the position and velocity over the reduced cache. If not, a standard lagrange interpolation will be done.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><a class="reference internal" href="#structale_1_1State"><span class="std std-ref">State</span></a> </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">time</span></code>: Time to get a value at </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">interp</span></code>: Interpolation type to use. Will be ignored if cache is minimized.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale6States11getPositionEd21PositionInterpolation">
+<span id="_CPPv3NK3ale6States11getPositionEd21PositionInterpolation"></span><span id="_CPPv2NK3ale6States11getPositionEd21PositionInterpolation"></span><span id="ale::States::getPosition__double.PositionInterpolationC"></span><span class="target" id="classale_1_1States_1a92f97ec433e58d5169afcfbfe341561c"></span><a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a> <code class="sig-name descname">getPosition</code><span class="sig-paren">(</span>double <em>time</em>, <a class="reference internal" href="interp_utils.html#_CPPv4N3ale21PositionInterpolationE" title="ale::PositionInterpolation">PositionInterpolation</a> <em>interp</em> = LINEAR<span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale6States11getPositionEd21PositionInterpolation" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Gets a position at a single time. Operates the same way as <a class="reference internal" href="#classale_1_1States_1a4faf98a5ddce4ae7a0cba347b2061b28"><span class="std std-ref">getState()</span></a> </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK3ale6States11getVelocityEd21PositionInterpolation">
+<span id="_CPPv3NK3ale6States11getVelocityEd21PositionInterpolation"></span><span id="_CPPv2NK3ale6States11getVelocityEd21PositionInterpolation"></span><span id="ale::States::getVelocity__double.PositionInterpolationC"></span><span class="target" id="classale_1_1States_1add4a5c9c41e76f767bb901a80cb4fe2f"></span><a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a> <code class="sig-name descname">getVelocity</code><span class="sig-paren">(</span>double <em>time</em>, <a class="reference internal" href="interp_utils.html#_CPPv4N3ale21PositionInterpolationE" title="ale::PositionInterpolation">PositionInterpolation</a> <em>interp</em> = LINEAR<span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3ale6States11getVelocityEd21PositionInterpolation" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Gets a velocity at a single time. Operates the same way as <a class="reference internal" href="#classale_1_1States_1a4faf98a5ddce4ae7a0cba347b2061b28"><span class="std std-ref">getState()</span></a> </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale6States12getStartTimeEv">
+<span id="_CPPv3N3ale6States12getStartTimeEv"></span><span id="_CPPv2N3ale6States12getStartTimeEv"></span><span id="ale::States::getStartTime"></span><span class="target" id="classale_1_1States_1ac92ff573d104d65dc07ca953d87841de"></span>double <code class="sig-name descname">getStartTime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale6States12getStartTimeEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns the first ephemeris time </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale6States11getStopTimeEv">
+<span id="_CPPv3N3ale6States11getStopTimeEv"></span><span id="_CPPv2N3ale6States11getStopTimeEv"></span><span id="ale::States::getStopTime"></span><span class="target" id="classale_1_1States_1af954824a5c8198ad04d6a218f2fbe386"></span>double <code class="sig-name descname">getStopTime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale6States11getStopTimeEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns the last ephemeris time </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale6States13minimizeCacheEd">
+<span id="_CPPv3N3ale6States13minimizeCacheEd"></span><span id="_CPPv2N3ale6States13minimizeCacheEd"></span><span id="ale::States::minimizeCache__double"></span><span class="target" id="classale_1_1States_1a08fafd836ceec2ff524abafdca6a6f02"></span><a class="reference internal" href="#_CPPv4N3ale6StatesE" title="ale::States">States</a> <code class="sig-name descname">minimizeCache</code><span class="sig-paren">(</span>double <em>tolerance</em> = 0.01<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale6States13minimizeCacheEd" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Perform a cache reduction. After running this, <a class="reference internal" href="#classale_1_1States_1a2e6b77cd359fddde122a5d58c68a8251"><span class="std std-ref">getStates()</span></a>, <a class="reference internal" href="#classale_1_1States_1a077c7a38cd667ce8b1308411652f8c90"><span class="std std-ref">getPositions()</span></a>, and <a class="reference internal" href="#classale_1_1States_1a826cc031bac1bbb8a88a8a7ac8f4d85c"><span class="std std-ref">getVelocities()</span></a> will return vectors of reduced size, and <a class="reference internal" href="#classale_1_1States_1a4faf98a5ddce4ae7a0cba347b2061b28"><span class="std std-ref">getState()</span></a>, <a class="reference internal" href="#classale_1_1States_1a92f97ec433e58d5169afcfbfe341561c"><span class="std std-ref">getPosition()</span></a>, and <a class="reference internal" href="#classale_1_1States_1add4a5c9c41e76f767bb901a80cb4fe2f"><span class="std std-ref">getVelocity()</span></a> will returns values interpolated over the reduced cache using a cubic hermite spline</p>
+<p>Adapted from Isis::SpicePosition::reduceCache().</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tolerance</span></code>: Maximum error between hermite approximation and original value. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Functions</p>
+<dl class="cpp function">
+<dt id="_CPPv4N3ale6States14hermiteIndicesEdNSt6vectorIiEEdd">
+<span id="_CPPv3N3ale6States14hermiteIndicesEdNSt6vectorIiEEdd"></span><span id="_CPPv2N3ale6States14hermiteIndicesEdNSt6vectorIiEEdd"></span><span id="ale::States::hermiteIndices__double.std::vector:i:.double.double"></span><span class="target" id="classale_1_1States_1aea7c803a8f5962f299dbd953a0bcadbd"></span>std::vector&lt;int&gt; <code class="sig-name descname">hermiteIndices</code><span class="sig-paren">(</span>double <em>tolerance</em>, std::vector&lt;int&gt; <em>indexList</em>, double <em>baseTime</em>, double <em>timeScale</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale6States14hermiteIndicesEdNSt6vectorIiEEdd" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Calculates the points (indicies) which need to be kept for the hermite spline to interpolate between to mantain a maximum error of tolerance.</p>
+<p>Adapted from Isis::SpicePosition::HermiteIndices.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>std::vector&lt;int&gt; </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tolerance</span></code>: Maximum error between hermite approximation and original value. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">indexList</span></code>: The list of indicies that need to be kept. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">baseTime</span></code>: Scaled base time for fit </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">timeScale</span></code>: Time scale for fit.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="cpp var">
+<dt id="_CPPv4N3ale6States8m_statesE">
+<span id="_CPPv3N3ale6States8m_statesE"></span><span id="_CPPv2N3ale6States8m_statesE"></span><span id="ale::States::m_states__std::vector:State:"></span><span class="target" id="classale_1_1States_1a1b8b6dc2022432fb783b89219f049f8e"></span>std::vector&lt;<a class="reference internal" href="#_CPPv4N3ale5StateE" title="ale::State">State</a>&gt; <code class="sig-name descname">m_states</code><a class="headerlink" href="#_CPPv4N3ale6States8m_statesE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt id="_CPPv4N3ale6States12m_ephemTimesE">
+<span id="_CPPv3N3ale6States12m_ephemTimesE"></span><span id="_CPPv2N3ale6States12m_ephemTimesE"></span><span id="ale::States::m_ephemTimes__std::vector:double:"></span><span class="target" id="classale_1_1States_1a8ec53dbb63743fe45d538c4e81a0f60b"></span>std::vector&lt;double&gt; <code class="sig-name descname">m_ephemTimes</code><a class="headerlink" href="#_CPPv4N3ale6States12m_ephemTimesE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Represent as states internally to keep pos, vel together. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt id="_CPPv4N3ale6States10m_refFrameE">
+<span id="_CPPv3N3ale6States10m_refFrameE"></span><span id="_CPPv2N3ale6States10m_refFrameE"></span><span id="ale::States::m_refFrame__i"></span><span class="target" id="classale_1_1States_1adcf4eb676ad1f799c328e6aad80a88eb"></span>int <code class="sig-name descname">m_refFrame</code><a class="headerlink" href="#_CPPv4N3ale6States10m_refFrameE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Time in seconds. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Library Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="distortion.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distortion</span></code> — ALE Distortion Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interp_utils.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">interpolation</span></code> — ALE Interpolation Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="isd.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ISD</span></code> — ALE Image Support Data Class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="orientation.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">orientations</span></code> — ALE Orientation Classes &amp; Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rotation.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rotation</span></code> — ALE Rotation Classes &amp; Functions</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">states</span></code> — ALE States Classes &amp; Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="util.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">utils</span></code> — ALE Utility Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vector.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">vectors</span></code> — ALE Vector Classes &amp; Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../python/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Library Reference</a><ul>
+  <li><a href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a><ul>
+      <li>Previous: <a href="rotation.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rotation</span></code> — ALE Rotation Classes &amp; Functions</a></li>
+      <li>Next: <a href="util.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">utils</span></code> — ALE Utility Functions</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;Public Domain.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/library/capi/state.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

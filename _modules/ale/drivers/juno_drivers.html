@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ale.drivers.juno_drivers &#8212; ALE 0.8.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for ale.drivers.juno_drivers</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">ale</span> <span class="kn">import</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">ale.base.data_naif</span> <span class="kn">import</span> <span class="n">NaifSpice</span>
+<span class="kn">from</span> <span class="nn">ale.base.label_isis</span> <span class="kn">import</span> <span class="n">IsisLabel</span>
+<span class="kn">from</span> <span class="nn">ale.base.type_sensor</span> <span class="kn">import</span> <span class="n">Framer</span>
+<span class="kn">from</span> <span class="nn">ale.base.base</span> <span class="kn">import</span> <span class="n">Driver</span>
+
+<div class="viewcode-block" id="JunoJunoCamIsisLabelNaifSpiceDriver"><a class="viewcode-back" href="../../../library/python/juno_driver.html#ale.drivers.juno_drivers.JunoJunoCamIsisLabelNaifSpiceDriver">[docs]</a><span class="k">class</span> <span class="nc">JunoJunoCamIsisLabelNaifSpiceDriver</span><span class="p">(</span><span class="n">Framer</span><span class="p">,</span> <span class="n">IsisLabel</span><span class="p">,</span> <span class="n">NaifSpice</span><span class="p">,</span> <span class="n">Driver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Driver for reading Juno ISIS labels.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Expects instrument_id to be defined in the IsisLabel mixin. This should be</span>
+<span class="sd">        a string of the form &#39;JNC&#39;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          instrument id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">look_up</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;JNC&#39;</span><span class="p">:</span> <span class="s1">&#39;JUNO_JUNOCAM&#39;</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">look_up</span><span class="p">[</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">instrument_id</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ephemeris_start_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Junos camera is split into stacked frames where an image is made</span>
+<span class="sd">        of sets of RGBM chuncks. We need to account for these chuncks since</span>
+<span class="sd">        ISIS produces some number of cubes N where N = M*4.</span>
+<span class="sd">        Computation obtained from JunoCamera.cpp</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : double</span>
+<span class="sd">          Starting ephemeris time</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_ephemeris_start_time&#39;</span><span class="p">):</span>
+            <span class="n">initial_time</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">ephemeris_start_time</span>
+            <span class="n">frame_number</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;FrameNumber&#39;</span><span class="p">]</span>
+            <span class="n">inter_frame_delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;InterFrameDelay&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">start_time_bias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">naif_keywords</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;INS</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="si">}</span><span class="s1">_START_TIME_BIAS&#39;</span><span class="p">]</span>
+            <span class="n">inter_frame_delay_bias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">naif_keywords</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;INS</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="si">}</span><span class="s1">_INTERFRAME_DELTA&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ephemeris_start_time</span> <span class="o">=</span> <span class="n">initial_time</span> <span class="o">+</span> <span class="n">start_time_bias</span> <span class="o">+</span> <span class="p">(</span><span class="n">frame_number</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">inter_frame_delay</span> <span class="o">+</span> <span class="n">inter_frame_delay_bias</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ephemeris_start_time</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sensor_model_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          ISIS sensor model version</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">naif_keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updated set of naif keywords containing the NaifIkCode for the specific</span>
+<span class="sd">        Juno filter used when taking the image.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : dict</span>
+<span class="sd">          Dictionary of keywords and values that ISIS creates and attaches to the label</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filter_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;BandBin&#39;</span><span class="p">][</span><span class="s1">&#39;NaifIkCode&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">naif_keywords</span><span class="p">,</span> <span class="o">**</span><span class="n">util</span><span class="o">.</span><span class="n">query_kernel_pool</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;*</span><span class="si">{</span><span class="n">filter_code</span><span class="si">}</span><span class="s2">*&quot;</span><span class="p">)}</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../library/index.html">Library Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../drivers.html">ale.drivers</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;Public Domain.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

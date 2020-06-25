@@ -1,0 +1,836 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ale.drivers.mex_drivers &#8212; ALE 0.8.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for ale.drivers.mex_drivers</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">pvl</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">import</span> <span class="nn">spiceypy</span> <span class="k">as</span> <span class="nn">spice</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">ale.base</span> <span class="kn">import</span> <span class="n">Driver</span>
+<span class="kn">from</span> <span class="nn">ale.base.data_isis</span> <span class="kn">import</span> <span class="n">read_table_data</span>
+<span class="kn">from</span> <span class="nn">ale.base.data_isis</span> <span class="kn">import</span> <span class="n">parse_table</span>
+<span class="kn">from</span> <span class="nn">ale.base.data_naif</span> <span class="kn">import</span> <span class="n">NaifSpice</span>
+<span class="kn">from</span> <span class="nn">ale.base.label_pds3</span> <span class="kn">import</span> <span class="n">Pds3Label</span>
+<span class="kn">from</span> <span class="nn">ale.base.label_isis</span> <span class="kn">import</span> <span class="n">IsisLabel</span>
+<span class="kn">from</span> <span class="nn">ale.base.type_sensor</span> <span class="kn">import</span> <span class="n">LineScanner</span>
+<span class="kn">from</span> <span class="nn">ale.base.type_sensor</span> <span class="kn">import</span> <span class="n">Framer</span>
+<span class="kn">from</span> <span class="nn">ale.base.type_distortion</span> <span class="kn">import</span> <span class="n">RadialDistortion</span>
+
+<span class="n">FILTER_SPECIFIC_LOOKUP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># This table contains the filter specific information from the ISIS iak kernel. The format is as follows:</span>
+    <span class="c1">#</span>
+    <span class="c1"># fikid: [focal_length, ITRANSX, ITRANSY, ITRANSS, ITRANSL]</span>
+    <span class="o">-</span><span class="mi">41211</span><span class="p">:</span> <span class="p">[</span><span class="mf">174.80</span><span class="p">,</span>
+            <span class="p">[</span><span class="o">-</span><span class="mf">0.026155499841886</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.006999999957684</span><span class="p">,</span> <span class="mf">0.0000007696901985785</span><span class="p">],</span>
+            <span class="p">[</span><span class="o">-</span><span class="mf">59.9926971240526</span><span class="p">,</span> <span class="mf">0.0000007696901985785</span><span class="p">,</span> <span class="mf">0.006999999957684</span><span class="p">],</span>
+            <span class="p">[</span><span class="o">-</span><span class="mf">2.7941368739538</span><span class="p">,</span> <span class="o">-</span><span class="mf">142.857141993552</span><span class="p">,</span> <span class="mf">0.015707963236297</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">8570.3856624766</span><span class="p">,</span> <span class="mf">0.015707963236297</span><span class="p">,</span> <span class="mf">142.857141993552</span><span class="p">]],</span>
+    <span class="o">-</span><span class="mi">41212</span><span class="p">:</span> <span class="p">[</span><span class="mf">174.61</span><span class="p">,</span>
+            <span class="p">[</span><span class="o">-</span><span class="mf">0.049776299960244</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.006999999994409</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0000002797762790202</span><span class="p">],</span>
+            <span class="p">[</span><span class="o">-</span><span class="mf">49.7678019894611</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0000002797762790202</span><span class="p">,</span> <span class="mf">0.006999999994409</span><span class="p">],</span>
+            <span class="p">[</span><span class="o">-</span><span class="mf">7.39506020202098</span><span class="p">,</span> <span class="o">-</span><span class="mf">142.85714274304</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.005709719980004</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">7109.68570860705</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.005709719980004</span><span class="p">,</span> <span class="mf">142.85714274304</span><span class="p">]],</span>
+    <span class="o">-</span><span class="mi">41213</span><span class="p">:</span> <span class="p">[</span><span class="mf">174.74</span><span class="p">,</span>
+            <span class="p">[</span><span class="o">-</span><span class="mf">0.022301998711020</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.006999999595423</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.000002379930922169</span><span class="p">],</span>
+            <span class="p">[</span><span class="o">-</span><span class="mf">39.5483075824599</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.000002379930922169</span><span class="p">,</span> <span class="mf">0.006999999595423</span><span class="p">],</span>
+            <span class="p">[</span><span class="o">-</span><span class="mf">5.10686167529011</span><span class="p">,</span> <span class="o">-</span><span class="mf">142.857134600479</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.048570018819771</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">5649.75681632013</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.048570018819771</span><span class="p">,</span> <span class="mf">142.857134600479</span><span class="p">]],</span>
+    <span class="o">-</span><span class="mi">41214</span><span class="p">:</span> <span class="p">[</span><span class="mf">175.01</span><span class="p">,</span>
+            <span class="p">[</span><span class="mf">0.066552498797889</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.006999999873562</span><span class="p">,</span> <span class="mf">0.000001330464480785</span><span class="p">],</span>
+            <span class="p">[</span><span class="o">-</span><span class="mf">10.2417126493911</span><span class="p">,</span> <span class="mf">0.000001330464480785</span><span class="p">,</span> <span class="mf">0.006999999873562</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">9.78558608311961</span><span class="p">,</span> <span class="o">-</span><span class="mf">142.85714027677</span><span class="p">,</span> <span class="mf">0.027152336342545</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">1463.0999735726</span><span class="p">,</span> <span class="mf">0.027152336342545</span><span class="p">,</span> <span class="mf">142.85714027677</span><span class="p">]],</span>
+    <span class="o">-</span><span class="mi">41215</span><span class="p">:</span> <span class="p">[</span><span class="mf">175.01</span><span class="p">,</span>
+            <span class="p">[</span><span class="mf">0.033863199938965</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.006999999987383</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0000004202752836277</span><span class="p">],</span>
+            <span class="p">[</span><span class="o">-</span><span class="mf">0.005497966876288</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0000004202752836277</span><span class="p">,</span> <span class="mf">0.006999999987383</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">4.83755282624351</span><span class="p">,</span> <span class="o">-</span><span class="mf">142.857142599663</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.008577046604648</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">0.785714284298145</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.008577046604648</span><span class="p">,</span> <span class="mf">142.857142599663</span><span class="p">]],</span>
+    <span class="o">-</span><span class="mi">41216</span><span class="p">:</span> <span class="p">[</span><span class="mf">175.23</span><span class="p">,</span>
+            <span class="p">[</span><span class="mf">0.044402379964146</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.006999996841365</span><span class="p">,</span> <span class="mf">0.000006649877982807</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">10.212957818494</span><span class="p">,</span> <span class="mf">0.000006649877982807</span><span class="p">,</span> <span class="mf">0.006999996841365</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">4.95717543186894</span><span class="p">,</span> <span class="o">-</span><span class="mf">142.857078395208</span><span class="p">,</span> <span class="mf">0.135711795567498</span><span class="p">],</span>
+            <span class="p">[</span><span class="o">-</span><span class="mf">1458.99934165026</span><span class="p">,</span> <span class="mf">0.135711795567498</span><span class="p">,</span> <span class="mf">142.857078395208</span><span class="p">]],</span>
+    <span class="o">-</span><span class="mi">41217</span><span class="p">:</span> <span class="p">[</span><span class="mf">174.80</span><span class="p">,</span>
+            <span class="p">[</span><span class="mf">0.032494699283744</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.006999999845704</span><span class="p">,</span> <span class="mf">0.000001469741752306</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">39.5530931773118</span><span class="p">,</span> <span class="mf">0.000001469741752306</span><span class="p">,</span> <span class="mf">0.006999999845704</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">3.45571545912004</span><span class="p">,</span> <span class="o">-</span><span class="mf">142.857139708249</span><span class="p">,</span> <span class="mf">0.029994729638890</span><span class="p">],</span>
+            <span class="p">[</span><span class="o">-</span><span class="mf">5650.44273259436</span><span class="p">,</span> <span class="mf">0.029994729638890</span><span class="p">,</span> <span class="mf">142.857139708249</span><span class="p">]],</span>
+    <span class="o">-</span><span class="mi">41218</span><span class="p">:</span> <span class="p">[</span><span class="mf">174.82</span><span class="p">,</span>
+            <span class="p">[</span><span class="mf">0.016461898406507</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.006999999322408</span><span class="p">,</span> <span class="mf">0.000003079982431615</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">49.7917927568053</span><span class="p">,</span> <span class="mf">0.000003079982431615</span><span class="p">,</span> <span class="mf">0.006999999322408</span><span class="p">],</span>
+            <span class="p">[</span><span class="o">-</span><span class="mf">0.778052433438109</span><span class="p">,</span> <span class="o">-</span><span class="mf">142.857129028729</span><span class="p">,</span> <span class="mf">0.062856784318668</span><span class="p">],</span>
+            <span class="p">[</span><span class="o">-</span><span class="mf">7113.11359717265</span><span class="p">,</span> <span class="mf">0.062856784318668</span><span class="p">,</span> <span class="mf">142.857129028729</span><span class="p">]],</span>
+    <span class="o">-</span><span class="mi">41219</span><span class="p">:</span> <span class="p">[</span><span class="mf">174.87</span><span class="p">,</span>
+            <span class="p">[</span><span class="mf">0.024021897233075</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.006999999193716</span><span class="p">,</span> <span class="mf">0.000003359758681093</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">59.9868884703161</span><span class="p">,</span> <span class="mf">0.000003359758681093</span><span class="p">,</span> <span class="mf">0.006999999193716</span><span class="p">],</span>
+            <span class="p">[</span><span class="o">-</span><span class="mf">0.681392000547864</span><span class="p">,</span> <span class="o">-</span><span class="mf">142.857126402363</span><span class="p">,</span> <span class="mf">0.068566503695773</span><span class="p">],</span>
+            <span class="p">[</span><span class="o">-</span><span class="mf">8569.5561557859</span><span class="p">,</span> <span class="mf">0.068566503695773</span><span class="p">,</span> <span class="mf">142.857126402363</span><span class="p">]],</span>
+<span class="p">}</span>
+
+<div class="viewcode-block" id="MexHrscPds3NaifSpiceDriver"><a class="viewcode-back" href="../../../library/python/mex_driver.html#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver">[docs]</a><span class="k">class</span> <span class="nc">MexHrscPds3NaifSpiceDriver</span><span class="p">(</span><span class="n">LineScanner</span><span class="p">,</span> <span class="n">Pds3Label</span><span class="p">,</span> <span class="n">NaifSpice</span><span class="p">,</span> <span class="n">RadialDistortion</span><span class="p">,</span> <span class="n">Driver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Driver for a PDS3 Mars Express (Mex) High Resolution Stereo Camera (HRSC) images.</span>
+
+<span class="sd">    NOTES</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    * HRSC has 9 different filters. Each has it&#39;s own instrument id, as well as</span>
+<span class="sd">      the main/&quot;HEAD&quot; camera composing those filters. There is also another</span>
+<span class="sd">      &quot;SRC&quot; instrument, making-up a total of 11 distinct sensors. It is very</span>
+<span class="sd">      important to understand which code is needed when/where.</span>
+
+<span class="sd">    * HRSC is a variable line scanner, and so does not maintain one exposure</span>
+<span class="sd">      duration, but rather differing exposure durations per line. This</span>
+<span class="sd">      information is stored within the individual records in the image data</span>
+<span class="sd">      itself, with the the first 8 bytes making up the double presicion</span>
+<span class="sd">      ephemeris time that the line exposure was started, and the next 4 bytes</span>
+<span class="sd">      making up the float containing that line&#39;s exposure duration.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">odtk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The coefficients for the distortion model</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list</span>
+<span class="sd">          Radial distortion coefficients. There is only one coefficient for LROC NAC l/r</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ikid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the Naif ID code for the HRSC head instrument</span>
+
+<span class="sd">        This would be the Naif ID code for the base (or &quot;head&quot;) instrument.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          Naif ID used to for indentifying the instrument in Spice kernels</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">bods2c</span><span class="p">(</span><span class="s2">&quot;MEX_HRSC_HEAD&quot;</span><span class="p">)</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fikid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Naif ID code of the filter dependent instrument codes.</span>
+
+<span class="sd">        Expects filter_number to be defined. This should be an integer containing</span>
+<span class="sd">        the filter number from the pds3 label.</span>
+<span class="sd">        Expects ikid to be defined. This should be the integer Naid ID code for</span>
+<span class="sd">        the instrument.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          Naif ID code used in calculating focal length</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">bods2c</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instrument_id</span><span class="p">)</span>
+
+
+    <span class="c1"># TODO Since HRSC has different frames based on filters, need to check that</span>
+    <span class="c1"># this is returning the value needed for all calculations from the base</span>
+    <span class="c1"># class and therefor does not need to be reimplemented.</span>
+    <span class="c1"># @property</span>
+    <span class="c1"># def sensor_frame_id(self):</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     Returns the Naif ID code for the sensor reference frame</span>
+    <span class="c1">#</span>
+    <span class="c1">#</span>
+    <span class="c1">#     This is the frame of the HRSC instrument itself, and is not dependant on filter.</span>
+    <span class="c1">#</span>
+    <span class="c1">#     Returns</span>
+    <span class="c1">#     -------</span>
+    <span class="c1">#     : int</span>
+    <span class="c1">#       Naif ID code for the sensor frame</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     return -41210</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the short name of the instrument</span>
+
+<span class="sd">        MEX HRSC has nine different filters each with their own name.</span>
+
+<span class="sd">         Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          Short name of the instrument</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">instrument_id</span> <span class="o">!=</span> <span class="s2">&quot;HRSC&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s2">&quot;Instrument ID is wrong.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;DETECTOR_ID&#39;</span><span class="p">]</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spacecraft_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Spacecraft name used in various SPICE calls to acquire</span>
+<span class="sd">        ephemeris data. MEX HRSC img PDS3 labels do not the have SPACECRAFT_NAME</span>
+<span class="sd">        keyword, so we override it here to use the label_pds3 property for</span>
+<span class="sd">        instrument_host_id</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          Spacecraft name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument_host_id</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">focal_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the focal length of the filter-specific sensor</span>
+
+<span class="sd">        Expects fikid to be defined. This must be the integer Naif id code of</span>
+<span class="sd">        the filter-specific instrument.</span>
+
+<span class="sd">        NOTE: These values are pulled from ISIS iak kernels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          focal length</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">FILTER_SPECIFIC_LOOKUP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fikid</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">focal2pixel_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Expects fikid to be defined. This must be the integer Naif id code of</span>
+<span class="sd">        the filter-sepcific instrument.</span>
+
+<span class="sd">        NOTE: These values are pulled from ISIS iak kernels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list&lt;double&gt;</span>
+<span class="sd">          focal plane to detector lines</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">FILTER_SPECIFIC_LOOKUP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fikid</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">focal2pixel_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Expects fikid to be defined. This must be the integer Naif id code of</span>
+<span class="sd">        the filter-sepcific instrument.</span>
+
+<span class="sd">        NOTE: These values are pulled from ISIS iak kernels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list&lt;double&gt;</span>
+<span class="sd">          focal plane to detector samples</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">FILTER_SPECIFIC_LOOKUP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fikid</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pixel2focal_x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Expects fikid to be defined. This must be the integer Naif id code of</span>
+<span class="sd">        the filter-specific instrument.</span>
+
+<span class="sd">        NOTE: These values are pulled from ISIS iak kernels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list&lt;double&gt;</span>
+<span class="sd">        detector to focal plane x</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">FILTER_SPECIFIC_LOOKUP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fikid</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pixel2focal_y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Expects fikid to be defined. This must be the integer Naif id code of</span>
+<span class="sd">        the filter-specific instrument.</span>
+
+<span class="sd">        NOTE: These values are pulled from ISIS iak kernels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list&lt;double&gt;</span>
+<span class="sd">        detector to focal plane y</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">FILTER_SPECIFIC_LOOKUP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fikid</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_center_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the center detector line.</span>
+
+<span class="sd">        For HRSC, we are dealing with a single line, so center line will be 0.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          Detector line of the principal point</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_center_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the center detector sample.</span>
+
+<span class="sd">        For HRSC, center sample is consistent regardless of filter. This is</span>
+<span class="sd">        different from ISIS&#39;s center sample because ISIS line scan sensors use</span>
+<span class="sd">        0.5 based detector samples.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          Detector sample of the principal point</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">2592.0</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">line_scan_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a 2D array of line scan rates.</span>
+
+<span class="sd">        For HRSC, the ephemeris times and exposure durations are</span>
+<span class="sd">        stored in the image data.</span>
+
+<span class="sd">        In the image, every line has an entry. This method goes through</span>
+<span class="sd">        and removes conescutive lines with the same exposure duration.</span>
+<span class="sd">        There are also potentially missing lines in the image which this</span>
+<span class="sd">        method accounts for.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list</span>
+<span class="sd">          Line scan rates</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">relative_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_ephemeris_time</span> <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_ephemeris_times</span><span class="p">]</span>
+        <span class="n">start_lines</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">binary_lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">start_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">relative_times</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">exposure_durations</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">binary_exposure_durations</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">for</span> <span class="n">line</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">exposure_duration</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">binary_lines</span><span class="p">,</span> <span class="n">relative_times</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_exposure_durations</span><span class="p">):</span>
+            <span class="c1"># Check for lines missing from the PDS image</span>
+            <span class="c1">#</span>
+            <span class="c1"># If more exposures fit into the time since the last entry than</span>
+            <span class="c1"># there are lines since the last entry, then there are missing lines.</span>
+            <span class="c1">#</span>
+            <span class="c1"># If line are missing, add an extra entry for the line immediately</span>
+            <span class="c1"># following them.</span>
+            <span class="n">skipped_lines</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="p">(</span><span class="n">start_time</span> <span class="o">-</span> <span class="n">start_times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">exposure_durations</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">line</span> <span class="o">-</span> <span class="n">start_lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="p">)</span> <span class="c1"># add 0.5 to round up</span>
+            <span class="k">if</span> <span class="n">exposure_duration</span> <span class="o">!=</span> <span class="n">exposure_durations</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="n">skipped_lines</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">start_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="n">start_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_time</span><span class="p">)</span>
+                <span class="n">exposure_durations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exposure_duration</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">start_lines</span><span class="p">,</span> <span class="n">start_times</span><span class="p">,</span> <span class="n">exposure_durations</span><span class="p">)</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">binary_exposure_durations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the exposure durations taken from the binary image data.</span>
+
+<span class="sd">        For HRSC, the exposure durations are imbedded in the binary data of the image.</span>
+<span class="sd">        The expsoure durations start at the 9th byte of the line/record and are 4 bytes long.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list</span>
+<span class="sd">          Exposure durations</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_binary_exposure_durations&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_image_data</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_exposure_durations</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">binary_ephemeris_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the ephemeris times taken from the binary image data.</span>
+
+<span class="sd">        For HRSC, the ephemeris times are imbedded in the binary data of the image.</span>
+<span class="sd">        The ephemeris times start at the first byte of the line/records and are 8 bytes long.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list</span>
+<span class="sd">          Ephemeris times</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_binary_ephemeris_times&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_image_data</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_ephemeris_times</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">binary_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the lines of the binary image data.</span>
+
+<span class="sd">        For example, the first entry would be the first line of the image.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list</span>
+<span class="sd">          Image lines</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_binary_lines&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_image_data</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_lines</span>
+
+
+<div class="viewcode-block" id="MexHrscPds3NaifSpiceDriver.read_image_data"><a class="viewcode-back" href="../../../library/python/mex_driver.html#ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.read_image_data">[docs]</a>    <span class="k">def</span> <span class="nf">read_image_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads data off of image and stores in binary_exposure_durations, binary_lines,</span>
+<span class="sd">        and binary_ephemeris_times.</span>
+
+<span class="sd">        For HRSC, the exposure durations and ephemeris times are imbedded in the binary</span>
+<span class="sd">        data of the image itself. Each line is stored in what is referred to as a</span>
+<span class="sd">        &quot;record&quot; within the image. The label will have the size of each record,</span>
+<span class="sd">        the number of records, and the number of records in the label, so the</span>
+<span class="sd">        beginning of binary data can be calculated.</span>
+
+<span class="sd">        For each line/record of the binary data, the first 8 bytes make up the</span>
+<span class="sd">        double presicion value of the ephemeris time, with the next 4 bytes</span>
+<span class="sd">        making up the float value of the line exposure duration for the</span>
+<span class="sd">        associated line. NOTE: The prefix data is always LSB, regardless</span>
+<span class="sd">        of the overall file format.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">durations</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">image_file</span><span class="p">:</span>
+            <span class="n">bytes_per_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;RECORD_BYTES&#39;</span><span class="p">]</span>
+            <span class="n">num_records</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;FILE_RECORDS&#39;</span><span class="p">]</span>
+            <span class="n">img_start_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;^IMAGE&#39;</span><span class="p">]</span>
+            <span class="n">img_start_byte</span> <span class="o">=</span> <span class="n">bytes_per_record</span> <span class="o">*</span> <span class="p">(</span><span class="n">img_start_record</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># Offset by one for zero-based records</span>
+            <span class="n">num_img_records</span> <span class="o">=</span> <span class="n">num_records</span> <span class="o">-</span> <span class="n">img_start_record</span>
+            <span class="n">image_file</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">img_start_byte</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_img_records</span><span class="p">):</span>
+                <span class="n">record_bytes</span> <span class="o">=</span> <span class="n">image_file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">bytes_per_record</span><span class="p">)</span>
+                <span class="n">eph_time</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;d&#39;</span><span class="p">,</span> <span class="n">record_bytes</span><span class="p">[:</span><span class="mi">8</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">exp_dur</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;f&#39;</span><span class="p">,</span> <span class="n">record_bytes</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">12</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">1000</span>
+                <span class="c1"># Offset for zero-based corrections, and then offest for ISIS pixel definition</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="o">+</span><span class="mi">1</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span>
+                <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eph_time</span><span class="p">)</span>
+                <span class="n">durations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exp_dur</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_binary_exposure_durations</span> <span class="o">=</span> <span class="n">durations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_binary_lines</span> <span class="o">=</span> <span class="n">lines</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_binary_ephemeris_times</span> <span class="o">=</span> <span class="n">times</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ephemeris_stop_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the ephemeris stop time.</span>
+
+<span class="sd">        For HRSC, the ephemeris stop time is calculated from the binary image data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          Ephemeris stop time</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_ephemeris_times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_exposure_durations</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+
+    <span class="c1"># TODO We need to confirm that returning nothing here does not affect</span>
+    <span class="c1"># calculations elsewhere in code. Or is there possibly just a better way of</span>
+    <span class="c1"># doing this?</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">line_exposure_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Line exposure duration returns the time between the exposures for</span>
+<span class="sd">        subsequent lines.</span>
+
+<span class="sd">        Since HRSC is a variable line scan camera, it does not make sense to</span>
+<span class="sd">        have one exposure duration value.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          Returns the line exposure duration in seconds from the PDS3 label.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sensor_model_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          ISIS sensor model version</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="MexHrscIsisLabelNaifSpiceDriver"><a class="viewcode-back" href="../../../library/python/mex_driver.html#ale.drivers.mex_drivers.MexHrscIsisLabelNaifSpiceDriver">[docs]</a><span class="k">class</span> <span class="nc">MexHrscIsisLabelNaifSpiceDriver</span><span class="p">(</span><span class="n">LineScanner</span><span class="p">,</span> <span class="n">IsisLabel</span><span class="p">,</span> <span class="n">NaifSpice</span><span class="p">,</span> <span class="n">RadialDistortion</span><span class="p">,</span> <span class="n">Driver</span><span class="p">):</span>
+
+        <span class="nd">@property</span>
+        <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Returns the name of the instrument</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            : str</span>
+<span class="sd">              Name of the instrument</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">if</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">instrument_id</span> <span class="o">!=</span> <span class="s2">&quot;HRSC&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s2">&quot;Instrument ID is wrong.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Archive&#39;</span><span class="p">][</span><span class="s1">&#39;DetectorId&#39;</span><span class="p">]</span>
+
+
+        <span class="nd">@property</span>
+        <span class="k">def</span> <span class="nf">sensor_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Returns the name of the instrument. Need to over-ride isis_label because</span>
+<span class="sd">            InstrumentName is not defined in the ISIS label for MEX HSRC cubes.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            : str</span>
+<span class="sd">              Name of the sensor</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument_id</span>
+
+
+        <span class="nd">@property</span>
+        <span class="k">def</span> <span class="nf">sensor_model_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            : int</span>
+<span class="sd">              ISIS sensor model version</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="mi">1</span>
+
+        <span class="nd">@property</span>
+        <span class="k">def</span> <span class="nf">times_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Returns EphermisTime, ExposureTime, and LinesStart informtation which was stored as</span>
+<span class="sd">            binary information in the ISIS cube.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            : dict</span>
+<span class="sd">              Dictionary with EphemerisTime, ExposureTime, and LineStart.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">isis_bytes</span> <span class="o">=</span> <span class="n">read_table_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;Table&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">parse_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;Table&#39;</span><span class="p">],</span> <span class="n">isis_bytes</span><span class="p">)</span>
+
+        <span class="nd">@property</span>
+        <span class="k">def</span> <span class="nf">line_scan_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            : tuple</span>
+<span class="sd">              list of lines, list of ephemeris times, and list of exposure</span>
+<span class="sd">              times</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_table</span><span class="p">[</span><span class="s1">&#39;LineStart&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_table</span><span class="p">[</span><span class="s1">&#39;EphemerisTime&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_table</span><span class="p">[</span><span class="s1">&#39;ExposureTime&#39;</span><span class="p">]</span>
+
+        <span class="nd">@property</span>
+        <span class="k">def</span> <span class="nf">ephemeris_start_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            : float</span>
+<span class="sd">              starting ephemeris time</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_table</span><span class="p">[</span><span class="s1">&#39;EphemerisTime&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="nd">@property</span>
+        <span class="k">def</span> <span class="nf">ephemeris_stop_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            : float</span>
+<span class="sd">              ephemeris stop time</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">last_line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_table</span><span class="p">[</span><span class="s1">&#39;LineStart&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_table</span><span class="p">[</span><span class="s1">&#39;EphemerisTime&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">image_lines</span> <span class="o">-</span> <span class="n">last_line</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_table</span><span class="p">[</span><span class="s1">&#39;ExposureTime&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="nd">@property</span>
+        <span class="k">def</span> <span class="nf">ikid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Returns the Naif ID code for the HRSC head instrument</span>
+
+<span class="sd">            This would be the Naif ID code for the base (or &quot;head&quot;) instrument.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            : int</span>
+<span class="sd">              Naif ID used to for indentifying the instrument in Spice kernels</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">bods2c</span><span class="p">(</span><span class="s2">&quot;MEX_HRSC_HEAD&quot;</span><span class="p">)</span>
+
+
+        <span class="nd">@property</span>
+        <span class="k">def</span> <span class="nf">fikid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Naif ID code of the filter dependent instrument codes.</span>
+
+<span class="sd">            Expects filter_number to be defined. This should be an integer containing</span>
+<span class="sd">            the filter number from the pds3 label.</span>
+<span class="sd">            Expects ikid to be defined. This should be the integer Naif ID code for</span>
+<span class="sd">            the instrument.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            : int</span>
+<span class="sd">              Naif ID code used in calculating focal length</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">bods2c</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instrument_id</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MexSrcPds3NaifSpiceDriver"><a class="viewcode-back" href="../../../library/python/mex_driver.html#ale.drivers.mex_drivers.MexSrcPds3NaifSpiceDriver">[docs]</a><span class="k">class</span> <span class="nc">MexSrcPds3NaifSpiceDriver</span><span class="p">(</span><span class="n">Framer</span><span class="p">,</span> <span class="n">Pds3Label</span><span class="p">,</span> <span class="n">NaifSpice</span><span class="p">,</span> <span class="n">RadialDistortion</span><span class="p">,</span> <span class="n">Driver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Driver for a PDS3 Mars Express (Mex) High Resolution Stereo Camera (HRSC) - Super Resolution </span>
+<span class="sd">    Channel (SRC) image.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">odtk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The coefficients for the distortion model. No distortion model, so pass in all zeroes.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list</span>
+<span class="sd">          Radial distortion coefficients.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ikid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the Naif ID code for HRSC SRC. </span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          Naif ID used to for indentifying the instrument in Spice kernels</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">bods2c</span><span class="p">(</span><span class="s2">&quot;MEX_HRSC_SRC&quot;</span><span class="p">)</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the short name of the instrument</span>
+
+<span class="sd">        MEX HRSC has nine different filters each with their own name.</span>
+
+<span class="sd">         Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          Short name of the instrument</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">instrument_id</span> <span class="o">!=</span> <span class="s2">&quot;HRSC&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s2">&quot;Instrument ID is wrong.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;DETECTOR_ID&#39;</span><span class="p">]</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spacecraft_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Spacecraft name used in various SPICE calls to acquire</span>
+<span class="sd">        ephemeris data. MEX HRSC img PDS3 labels do not the have SPACECRAFT_NAME</span>
+<span class="sd">        keyword, so we override it here to use the label_pds3 property for</span>
+<span class="sd">        instrument_host_id</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          Spacecraft name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument_host_id</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">focal2pixel_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        NOTE: These values are pulled from ISIS iak kernels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list&lt;double&gt;</span>
+<span class="sd">          focal plane to detector lines</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">111.111111111111</span><span class="p">]</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">focal2pixel_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        NOTE: These values are pulled from ISIS iak kernels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list&lt;double&gt;</span>
+<span class="sd">          focal plane to detector samples</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">111.111111111111</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_center_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the center detector line.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          Detector line of the principal point</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">512.0</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_center_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the center detector sample.</span>
+
+<span class="sd">        This is</span>
+<span class="sd">        different from ISIS&#39;s center sample because ISIS uses</span>
+<span class="sd">        0.5-based samples.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          Detector sample of the principal point</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">512.0</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sensor_model_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          ISIS sensor model version</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../library/index.html">Library Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../drivers.html">ale.drivers</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;Public Domain.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>interpolation — ALE Interpolation Functions &#8212; ALE 0.8.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ISD — ALE Image Support Data Class" href="isd.html" />
+    <link rel="prev" title="distortion — ALE Distortion Functions" href="distortion.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="interpolation-ale-interpolation-functions">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">interpolation</span></code> — ALE Interpolation Functions<a class="headerlink" href="#interpolation-ale-interpolation-functions" title="Permalink to this headline">¶</a></h1>
+<dl class="cpp type">
+<dt id="_CPPv43ale">
+<span id="_CPPv33ale"></span><span id="_CPPv23ale"></span><span id="ale"></span><span class="target" id="namespaceale"></span><em class="property">namespace </em><code class="sig-name descname">ale</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Enums</p>
+<dl class="cpp enum">
+<dt id="_CPPv4N3ale21RotationInterpolationE">
+<span id="_CPPv3N3ale21RotationInterpolationE"></span><span id="_CPPv2N3ale21RotationInterpolationE"></span><span class="target" id="namespaceale_1af9a5546899eaeac91af3678cfd1f690a"></span><em class="property">enum </em><code class="sig-name descname">RotationInterpolation</code><a class="headerlink" href="#_CPPv4N3ale21RotationInterpolationE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt id="_CPPv4N3ale21RotationInterpolation5SLERPE">
+<span id="_CPPv3N3ale21RotationInterpolation5SLERPE"></span><span id="_CPPv2N3ale21RotationInterpolation5SLERPE"></span><span class="target" id="namespaceale_1af9a5546899eaeac91af3678cfd1f690aad7a95240ba1fb601b8ebea86d847de0d"></span><em class="property">enumerator </em><code class="sig-name descname">SLERP</code><a class="headerlink" href="#_CPPv4N3ale21RotationInterpolation5SLERPE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt id="_CPPv4N3ale21RotationInterpolation5NLERPE">
+<span id="_CPPv3N3ale21RotationInterpolation5NLERPE"></span><span id="_CPPv2N3ale21RotationInterpolation5NLERPE"></span><span class="target" id="namespaceale_1af9a5546899eaeac91af3678cfd1f690aa8baef5fc1913feb776b30c419443e018"></span><em class="property">enumerator </em><code class="sig-name descname">NLERP</code><a class="headerlink" href="#_CPPv4N3ale21RotationInterpolation5NLERPE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum">
+<dt id="_CPPv4N3ale21PositionInterpolationE">
+<span id="_CPPv3N3ale21PositionInterpolationE"></span><span id="_CPPv2N3ale21PositionInterpolationE"></span><span class="target" id="namespaceale_1af196fcfec62d63092754bb84e07596b3"></span><em class="property">enum </em><code class="sig-name descname">PositionInterpolation</code><a class="headerlink" href="#_CPPv4N3ale21PositionInterpolationE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Interpolation enum for defining different methods of interpolation. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt id="_CPPv4N3ale21PositionInterpolation6LINEARE">
+<span id="_CPPv3N3ale21PositionInterpolation6LINEARE"></span><span id="_CPPv2N3ale21PositionInterpolation6LINEARE"></span><span class="target" id="namespaceale_1af196fcfec62d63092754bb84e07596b3a61521173cb15358559367ff53b751267"></span><em class="property">enumerator </em><code class="sig-name descname">LINEAR</code> = 0<a class="headerlink" href="#_CPPv4N3ale21PositionInterpolation6LINEARE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Interpolate using linear interpolation. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt id="_CPPv4N3ale21PositionInterpolation6SPLINEE">
+<span id="_CPPv3N3ale21PositionInterpolation6SPLINEE"></span><span id="_CPPv2N3ale21PositionInterpolation6SPLINEE"></span><span class="target" id="namespaceale_1af196fcfec62d63092754bb84e07596b3a540e45c50d7d3c21cb873987057ccfab"></span><em class="property">enumerator </em><code class="sig-name descname">SPLINE</code> = 1<a class="headerlink" href="#_CPPv4N3ale21PositionInterpolation6SPLINEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Interpolate using a cubic spline. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt id="_CPPv4N3ale21PositionInterpolation8LAGRANGEE">
+<span id="_CPPv3N3ale21PositionInterpolation8LAGRANGEE"></span><span id="_CPPv2N3ale21PositionInterpolation8LAGRANGEE"></span><span class="target" id="namespaceale_1af196fcfec62d63092754bb84e07596b3ae0fb5385d25a7c30d73df277ba795fe2"></span><em class="property">enumerator </em><code class="sig-name descname">LAGRANGE</code> = 2<a class="headerlink" href="#_CPPv4N3ale21PositionInterpolation8LAGRANGEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Interpolate using Lagrange polynomials up to 8th order. </p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="cpp function">
+<dt id="_CPPv4N3ale17linearInterpolateEddd">
+<span id="_CPPv3N3ale17linearInterpolateEddd"></span><span id="_CPPv2N3ale17linearInterpolateEddd"></span><span id="ale::linearInterpolate__double.double.double"></span><span class="target" id="namespaceale_1aac0f0546759a743b2bc5249b58c5bdc4"></span>double <code class="sig-name descname">linearInterpolate</code><span class="sig-paren">(</span>double <em>x</em>, double <em>y</em>, double <em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale17linearInterpolateEddd" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Linearly interpolate between two values.</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">x</span></code>: The first value. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">y</span></code>: The second value. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">t</span></code>: The distance to interpolate. 0 is x and 1 is y. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale17linearInterpolateERKNSt6vectorIdEERKNSt6vectorIdEEd">
+<span id="_CPPv3N3ale17linearInterpolateERKNSt6vectorIdEERKNSt6vectorIdEEd"></span><span id="_CPPv2N3ale17linearInterpolateERKNSt6vectorIdEERKNSt6vectorIdEEd"></span><span id="ale::linearInterpolate__std::vector:double:CR.std::vector:double:CR.double"></span><span class="target" id="namespaceale_1a4f8f731b81542a99eb72f51e6a3fe11d"></span>std::vector&lt;double&gt; <code class="sig-name descname">linearInterpolate</code><span class="sig-paren">(</span><em class="property">const</em> std::vector&lt;double&gt; &amp;<em>x</em>, <em class="property">const</em> std::vector&lt;double&gt; &amp;<em>y</em>, double <em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale17linearInterpolateERKNSt6vectorIdEERKNSt6vectorIdEEd" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Linearly interpolate between two vectors.</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">x</span></code>: The first vectors. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">y</span></code>: The second vectors. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">t</span></code>: The distance to interpolate. 0 is x and 1 is y. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale17linearInterpolateERK5Vec3dRK5Vec3dd">
+<span id="_CPPv3N3ale17linearInterpolateERK5Vec3dRK5Vec3dd"></span><span id="_CPPv2N3ale17linearInterpolateERK5Vec3dRK5Vec3dd"></span><span id="ale::linearInterpolate__Vec3dCR.Vec3dCR.double"></span><span class="target" id="namespaceale_1a2f17ee4614191ece8091f5a315b1a118"></span><a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a> <code class="sig-name descname">linearInterpolate</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="vector.html#_CPPv4N3ale5Vec3dE" title="ale::Vec3d">Vec3d</a> &amp;<em>y</em>, double <em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale17linearInterpolateERK5Vec3dRK5Vec3dd" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale18interpolationIndexERKNSt6vectorIdEEd">
+<span id="_CPPv3N3ale18interpolationIndexERKNSt6vectorIdEEd"></span><span id="_CPPv2N3ale18interpolationIndexERKNSt6vectorIdEEd"></span><span id="ale::interpolationIndex__std::vector:double:CR.double"></span><span class="target" id="namespaceale_1a469918d8a7781e92a248db283ccd8d8d"></span>int <code class="sig-name descname">interpolationIndex</code><span class="sig-paren">(</span><em class="property">const</em> std::vector&lt;double&gt; &amp;<em>times</em>, double <em>interpTime</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale18interpolationIndexERKNSt6vectorIdEEd" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Compute the index of the first time to use when interpolating at a given time.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>int The index of the time that comes before interpTime. If there is no time that comes before interpTime, then returns 0. If all times come before interpTime, then returns the second to last index. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">times</span></code>: The ordered vector of times to search. Must have at least 2 times. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">interpTime</span></code>: The time to search for the interpolation index of. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale15orderedVecMergeERKNSt6vectorIdEERKNSt6vectorIdEE">
+<span id="_CPPv3N3ale15orderedVecMergeERKNSt6vectorIdEERKNSt6vectorIdEE"></span><span id="_CPPv2N3ale15orderedVecMergeERKNSt6vectorIdEERKNSt6vectorIdEE"></span><span id="ale::orderedVecMerge__std::vector:double:CR.std::vector:double:CR"></span><span class="target" id="namespaceale_1a4171bbb376dbbf9b1f10b4bea47845f2"></span>std::vector&lt;double&gt; <code class="sig-name descname">orderedVecMerge</code><span class="sig-paren">(</span><em class="property">const</em> std::vector&lt;double&gt; &amp;<em>x</em>, <em class="property">const</em> std::vector&lt;double&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale15orderedVecMergeERKNSt6vectorIdEERKNSt6vectorIdEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Merge, sort, and remove duplicates from two vectors </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale20evaluateCubicHermiteEKdRKNSt6vectorIdEERKNSt6vectorIdEERKNSt6vectorIdEE">
+<span id="_CPPv3N3ale20evaluateCubicHermiteEKdRKNSt6vectorIdEERKNSt6vectorIdEERKNSt6vectorIdEE"></span><span id="_CPPv2N3ale20evaluateCubicHermiteEKdRKNSt6vectorIdEERKNSt6vectorIdEERKNSt6vectorIdEE"></span><span id="ale::evaluateCubicHermite__doubleC.std::vector:double:CR.std::vector:double:CR.std::vector:double:CR"></span><span class="target" id="namespaceale_1a0a44730dbf6090e40d89d244fba3c83e"></span>double <code class="sig-name descname">evaluateCubicHermite</code><span class="sig-paren">(</span><em class="property">const</em> double <em>interpTime</em>, <em class="property">const</em> std::vector&lt;double&gt; &amp;<em>derivs</em>, <em class="property">const</em> std::vector&lt;double&gt; &amp;<em>x</em>, <em class="property">const</em> std::vector&lt;double&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale20evaluateCubicHermiteEKdRKNSt6vectorIdEERKNSt6vectorIdEERKNSt6vectorIdEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The following helper functions are used to calculate the reduced states cache and cubic hermite to interpolate over it. They were migrated, with minor modifications, from Isis::NumericalApproximation Evaluates a cubic hermite at time, interpTime, between the appropriate two points in x. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale30evaluateCubicHermiteFirstDerivEKdRKNSt6vectorIdEERKNSt6vectorIdEERKNSt6vectorIdEE">
+<span id="_CPPv3N3ale30evaluateCubicHermiteFirstDerivEKdRKNSt6vectorIdEERKNSt6vectorIdEERKNSt6vectorIdEE"></span><span id="_CPPv2N3ale30evaluateCubicHermiteFirstDerivEKdRKNSt6vectorIdEERKNSt6vectorIdEERKNSt6vectorIdEE"></span><span id="ale::evaluateCubicHermiteFirstDeriv__doubleC.std::vector:double:CR.std::vector:double:CR.std::vector:double:CR"></span><span class="target" id="namespaceale_1a050483355025ce9281e868434bcb0ffd"></span>double <code class="sig-name descname">evaluateCubicHermiteFirstDeriv</code><span class="sig-paren">(</span><em class="property">const</em> double <em>interpTime</em>, <em class="property">const</em> std::vector&lt;double&gt; &amp;<em>deriv</em>, <em class="property">const</em> std::vector&lt;double&gt; &amp;<em>times</em>, <em class="property">const</em> std::vector&lt;double&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale30evaluateCubicHermiteFirstDerivEKdRKNSt6vectorIdEERKNSt6vectorIdEERKNSt6vectorIdEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Evaluate velocities using a Cubic Hermite Spline at a time a, within some interval in x, </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale19lagrangeInterpolateERKNSt6vectorIdEERKNSt6vectorIdEEdi">
+<span id="_CPPv3N3ale19lagrangeInterpolateERKNSt6vectorIdEERKNSt6vectorIdEEdi"></span><span id="_CPPv2N3ale19lagrangeInterpolateERKNSt6vectorIdEERKNSt6vectorIdEEdi"></span><span id="ale::lagrangeInterpolate__std::vector:double:CR.std::vector:double:CR.double.i"></span><span class="target" id="namespaceale_1afca79b20d093872e0ad2ad2343b89f6d"></span>double <code class="sig-name descname">lagrangeInterpolate</code><span class="sig-paren">(</span><em class="property">const</em> std::vector&lt;double&gt; &amp;<em>times</em>, <em class="property">const</em> std::vector&lt;double&gt; &amp;<em>values</em>, double <em>time</em>, int <em>order</em> = 8<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale19lagrangeInterpolateERKNSt6vectorIdEERKNSt6vectorIdEEdi" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale29lagrangeInterpolateDerivativeERKNSt6vectorIdEERKNSt6vectorIdEEdi">
+<span id="_CPPv3N3ale29lagrangeInterpolateDerivativeERKNSt6vectorIdEERKNSt6vectorIdEEdi"></span><span id="_CPPv2N3ale29lagrangeInterpolateDerivativeERKNSt6vectorIdEERKNSt6vectorIdEEdi"></span><span id="ale::lagrangeInterpolateDerivative__std::vector:double:CR.std::vector:double:CR.double.i"></span><span class="target" id="namespaceale_1a168d6a0f77b1bf7c1c3ed5ffd03c267a"></span>double <code class="sig-name descname">lagrangeInterpolateDerivative</code><span class="sig-paren">(</span><em class="property">const</em> std::vector&lt;double&gt; &amp;<em>times</em>, <em class="property">const</em> std::vector&lt;double&gt; &amp;<em>values</em>, double <em>time</em>, int <em>order</em> = 8<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale29lagrangeInterpolateDerivativeERKNSt6vectorIdEERKNSt6vectorIdEEdi" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale11interpolateENSt6vectorIdEENSt6vectorIdEEd21PositionInterpolationi">
+<span id="_CPPv3N3ale11interpolateENSt6vectorIdEENSt6vectorIdEEd21PositionInterpolationi"></span><span id="_CPPv2N3ale11interpolateENSt6vectorIdEENSt6vectorIdEEd21PositionInterpolationi"></span><span id="ale::interpolate__std::vector:double:.std::vector:double:.double.PositionInterpolation.i"></span><span class="target" id="namespaceale_1a4e1b8d9ebb96eeb5bd9587f2e90e4e20"></span>double <code class="sig-name descname">interpolate</code><span class="sig-paren">(</span>std::vector&lt;double&gt; <em>points</em>, std::vector&lt;double&gt; <em>times</em>, double <em>time</em>, <a class="reference internal" href="#_CPPv4N3ale21PositionInterpolationE" title="ale::PositionInterpolation">PositionInterpolation</a> <em>interp</em>, int <em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale11interpolateENSt6vectorIdEENSt6vectorIdEEd21PositionInterpolationi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Interpolates the spacecrafts position along a path generated from a set of points, times, and a time of observation. </p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p></p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">points</span></code>: A double vector of points </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">times</span></code>: A double vector of times </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">time</span></code>: A double to use as the time of observation </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">interp</span></code>: An interpolation enum dictating what type of interpolation to use </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">d</span></code>: The order of the derivative to generate when interpolating (Currently supports 0, 1, and 2) </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Library Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="distortion.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distortion</span></code> — ALE Distortion Functions</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">interpolation</span></code> — ALE Interpolation Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="isd.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ISD</span></code> — ALE Image Support Data Class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="orientation.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">orientations</span></code> — ALE Orientation Classes &amp; Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rotation.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rotation</span></code> — ALE Rotation Classes &amp; Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="state.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">states</span></code> — ALE States Classes &amp; Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="util.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">utils</span></code> — ALE Utility Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vector.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">vectors</span></code> — ALE Vector Classes &amp; Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../python/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Library Reference</a><ul>
+  <li><a href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a><ul>
+      <li>Previous: <a href="distortion.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distortion</span></code> — ALE Distortion Functions</a></li>
+      <li>Next: <a href="isd.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ISD</span></code> — ALE Image Support Data Class</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;Public Domain.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/library/capi/interp_utils.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

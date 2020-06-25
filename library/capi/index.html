@@ -1,21 +1,21 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>capi — All ALE functions &#8212; ALE 0.1.0 documentation</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C — C Interface &#8212; ALE 0.8.1 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="capi — ALE C-API" href="capi.html" />
+    <link rel="next" title="distortion — ALE Distortion Functions" href="distortion.html" />
     <link rel="prev" title="Library Reference" href="../index.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
@@ -33,11 +33,62 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="capi-all-ale-functions">
-<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">capi</span></code> — All ALE functions<a class="headerlink" href="#capi-all-ale-functions" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="c-c-interface">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface<a class="headerlink" href="#c-c-interface" title="Permalink to this headline">¶</a></h1>
+<dl class="cpp type">
+<dt id="_CPPv43ale">
+<span id="_CPPv33ale"></span><span id="_CPPv23ale"></span><span id="ale"></span><span class="target" id="namespaceale"></span><em class="property">namespace </em><code class="sig-name descname">ale</code><a class="headerlink" href="#_CPPv43ale" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="cpp function">
+<dt id="_CPPv4N3ale5loadsENSt6stringENSt6stringENSt6stringEb">
+<span id="_CPPv3N3ale5loadsENSt6stringENSt6stringENSt6stringEb"></span><span id="_CPPv2N3ale5loadsENSt6stringENSt6stringENSt6stringEb"></span><span id="ale::loads__ss.ss.ss.b"></span><span class="target" id="namespaceale_1aa889e69c18b4777baf1e5b8479834852"></span>std::string <code class="sig-name descname">loads</code><span class="sig-paren">(</span>std::string <em>filename</em>, std::string <em>props</em> = &quot;&quot;, std::string <em>formatter</em> = &quot;usgscsm&quot;, bool <em>verbose</em> = true<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale5loadsENSt6stringENSt6stringENSt6stringEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Load all of the metadata for an image into an ISD string. This method calls the Python driver structure in ALE to load all of the metadata for an image into an ISD string. See the Python loads method for how this is implemented on the Python side.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>A string containing a JSON formatted ISD for the image. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">filename</span></code>: The filename of the image to load metadata for </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">props</span></code>: A JSON formatted properties string to pass to the Python drivers. Users can specify certain properties that the drivers will use. Currently kernels and nadir properties are allowed. See the data_naif driver mix-in for details. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">formatter</span></code>: A string specifying the format of the output ISD string. Currently supported formatters are isis, usgscsm, and ale. The isis and usgscsm formatters will be deprecated in the future. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">verbose</span></code>: A flag to output what the load function is attempting to do. If set to true, information about the drivers load attempts to use will be output to standard out.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N3ale4loadENSt6stringENSt6stringENSt6stringEb">
+<span id="_CPPv3N3ale4loadENSt6stringENSt6stringENSt6stringEb"></span><span id="_CPPv2N3ale4loadENSt6stringENSt6stringENSt6stringEb"></span><span id="ale::load__ss.ss.ss.b"></span><span class="target" id="namespaceale_1a8d1478b96e4d764e1efdbb166e734f2f"></span>nlohmann::json <code class="sig-name descname">load</code><span class="sig-paren">(</span>std::string <em>filename</em>, std::string <em>props</em> = &quot;&quot;, std::string <em>formatter</em> = &quot;usgscsm&quot;, bool <em>verbose</em> = true<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3ale4loadENSt6stringENSt6stringENSt6stringEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Load all of the metadata for an image into a JSON ISD. This method is a convenience wrapper around the loads method that parses the string output of loads into a JSON object.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>A string containing a JSON formatted ISD for the image. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">filename</span></code>: The filename of the image to load metadata for </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">props</span></code>: A JSON formatted properties string to pass to the Python drivers. Users can specify certain properties that the drivers will use. Currently kernels and nadir properties are allowed. See the data_naif driver mix-in for details. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">formatter</span></code>: A string specifying the format of the output ISD string. Currently supported formatters are isis, usgscsm, and ale. The isis and usgscsm formatters will be deprecated in the future. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">verbose</span></code>: A flag to output what the load function is attempting to do. If set to true, information about the drivers load attempts to use will be output to standard out.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="capi.html"><code class="docutils literal notranslate"><span class="pre">capi</span></code> — ALE C-API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="distortion.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distortion</span></code> — ALE Distortion Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interp_utils.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">interpolation</span></code> — ALE Interpolation Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="isd.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ISD</span></code> — ALE Image Support Data Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="orientation.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">orientations</span></code> — ALE Orientation Classes &amp; Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rotation.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rotation</span></code> — ALE Rotation Classes &amp; Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="state.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">states</span></code> — ALE States Classes &amp; Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">utils</span></code> — ALE Utility Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vector.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">vectors</span></code> — ALE Vector Classes &amp; Functions</a></li>
 </ul>
 </div>
 </div>
@@ -61,11 +112,18 @@
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Library Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">capi</span></code> — All ALE functions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="capi.html"><code class="docutils literal notranslate"><span class="pre">capi</span></code> — ALE C-API</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="distortion.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distortion</span></code> — ALE Distortion Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interp_utils.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">interpolation</span></code> — ALE Interpolation Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="isd.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ISD</span></code> — ALE Image Support Data Class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="orientation.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">orientations</span></code> — ALE Orientation Classes &amp; Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rotation.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rotation</span></code> — ALE Rotation Classes &amp; Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="state.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">states</span></code> — ALE States Classes &amp; Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="util.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">utils</span></code> — ALE Utility Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vector.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">vectors</span></code> — ALE Vector Classes &amp; Functions</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../python/index.html"><code class="docutils literal notranslate"><span class="pre">python</span></code> — Input/Output Algorithms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../python/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a></li>
 </ul>
 </li>
 </ul>
@@ -76,23 +134,21 @@
   <li><a href="../../index.html">Documentation overview</a><ul>
   <li><a href="../index.html">Library Reference</a><ul>
       <li>Previous: <a href="../index.html" title="previous chapter">Library Reference</a></li>
-      <li>Next: <a href="capi.html" title="next chapter"><code class="docutils literal notranslate"><span class="pre">capi</span></code> — ALE C-API</a></li>
+      <li>Next: <a href="distortion.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distortion</span></code> — ALE Distortion Functions</a></li>
   </ul></li>
   </ul></li>
 </ul>
 </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -109,7 +165,7 @@
       &copy;Public Domain.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

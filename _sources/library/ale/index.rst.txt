@@ -1,2 +1,7 @@
 ALE C API
 =========
+
+.. versionadded:: 0.1.0
+
+.. doxygenfile:: Load.h
+  :project: ale

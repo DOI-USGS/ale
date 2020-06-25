@@ -1,22 +1,22 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>mro_driver — MRO Driver Classes &#8212; ALE 0.1.0 documentation</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mro_drivers — MRO Driver Classes &#8212; ALE 0.8.1 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="util — General Utilities" href="util.html" />
-    <link rel="prev" title="mdis_driver — MDIS Driver Classes" href="mdis_driver.html" />
+    <link rel="next" title="nh_drivers — New Horizons Driver Classes" href="nh_driver.html" />
+    <link rel="prev" title="mex_drivers — Mars Express Driver Classes" href="mex_driver.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
@@ -33,70 +33,275 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="mro-driver-mro-driver-classes">
-<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">mro_driver</span></code> — MRO Driver Classes<a class="headerlink" href="#mro-driver-mro-driver-classes" title="Permalink to this headline">¶</a></h1>
-<p>The <a class="reference internal" href="#module-ale.drivers.mro_driver" title="ale.drivers.mro_driver"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ale.drivers.mro_driver</span></code></a> module</p>
+  <div class="section" id="mro-drivers-mro-driver-classes">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">mro_drivers</span></code> — MRO Driver Classes<a class="headerlink" href="#mro-drivers-mro-driver-classes" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="#module-ale.drivers.mro_drivers" title="ale.drivers.mro_drivers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ale.drivers.mro_drivers</span></code></a> module</p>
 <div class="versionadded">
-<p><span class="versionmodified">New in version 0.1.0.</span></p>
+<p><span class="versionmodified added">New in version 0.1.0.</span></p>
 </div>
-<span class="target" id="module-ale.drivers.mro_driver"></span><dl class="class">
-<dt id="ale.drivers.mro_driver.CtxPds3Driver">
-<em class="property">class </em><code class="descclassname">ale.drivers.mro_driver.</code><code class="descname">CtxPds3Driver</code><span class="sig-paren">(</span><em>file</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/drivers/mro_driver.html#CtxPds3Driver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.drivers.mro_driver.CtxPds3Driver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="base.html#ale.drivers.base.PDS3" title="ale.drivers.base.PDS3"><code class="xref py py-class docutils literal notranslate"><span class="pre">ale.drivers.base.PDS3</span></code></a>, <a class="reference internal" href="#ale.drivers.mro_driver.CtxSpice" title="ale.drivers.mro_driver.CtxSpice"><code class="xref py py-class docutils literal notranslate"><span class="pre">ale.drivers.mro_driver.CtxSpice</span></code></a></p>
-<p>Driver for reading CTX PDS3 labels. Requires a Spice mixin to acquire addtional
-ephemeris and instrument data located exclusively in spice kernels.</p>
-<dl class="attribute">
-<dt id="ale.drivers.mro_driver.CtxPds3Driver.instrument_id">
-<code class="descname">instrument_id</code><a class="headerlink" href="#ale.drivers.mro_driver.CtxPds3Driver.instrument_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an instrument id for unquely identifying the instrument, but often
+<span class="target" id="module-ale.drivers.mro_drivers"></span><dl class="py class">
+<dt id="ale.drivers.mro_drivers.MroCtxIsisLabelIsisSpiceDriver">
+<em class="property">class </em><code class="sig-prename descclassname">ale.drivers.mro_drivers.</code><code class="sig-name descname">MroCtxIsisLabelIsisSpiceDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">num_ephem</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">num_quats</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">props</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/drivers/mro_drivers.html#MroCtxIsisLabelIsisSpiceDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxIsisLabelIsisSpiceDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.type_sensor.LineScanner</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.label_isis.IsisLabel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.data_isis.IsisSpice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.type_distortion.RadialDistortion</span></code>, <a class="reference internal" href="base.html#ale.base.base.Driver" title="ale.base.base.Driver"><code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.base.Driver</span></code></a></p>
+<dl class="py method">
+<dt id="ale.drivers.mro_drivers.MroCtxIsisLabelIsisSpiceDriver.detector_center_sample">
+<em class="property">property </em><code class="sig-name descname">detector_center_sample</code><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxIsisLabelIsisSpiceDriver.detector_center_sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>The center of the CCD in detector pixels
+ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>float :</dt><dd><p>The center sample of the CCD</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mro_drivers.MroCtxIsisLabelIsisSpiceDriver.instrument_id">
+<em class="property">property </em><code class="sig-name descname">instrument_id</code><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxIsisLabelIsisSpiceDriver.instrument_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an instrument id for uniquely identifying the instrument, but often
 also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
 the same ID the Spice expects in bods2c calls.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>: str</strong></dt>
-<dd><p class="first last">instrument id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>instrument id</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="ale.drivers.mro_driver.CtxPds3Driver.spacecraft_name">
-<code class="descname">spacecraft_name</code><a class="headerlink" href="#ale.drivers.mro_driver.CtxPds3Driver.spacecraft_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Spacecraft name used in various Spice calls to acquire
-ephemeris data.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="ale.drivers.mro_driver.CtxSpice">
-<em class="property">class </em><code class="descclassname">ale.drivers.mro_driver.</code><code class="descname">CtxSpice</code><span class="sig-paren">(</span><em>file</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/drivers/mro_driver.html#CtxSpice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.drivers.mro_driver.CtxSpice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.drivers.base.Spice</span></code>, <a class="reference internal" href="base.html#ale.drivers.base.LineScanner" title="ale.drivers.base.LineScanner"><code class="xref py py-class docutils literal notranslate"><span class="pre">ale.drivers.base.LineScanner</span></code></a></p>
-<p>Spice mixins that defines MRO CTX specific snowflake Spice calls.</p>
-<dl class="attribute">
-<dt id="ale.drivers.mro_driver.CtxSpice.metakernel">
-<code class="descname">metakernel</code><a class="headerlink" href="#ale.drivers.mro_driver.CtxSpice.metakernel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns latest instrument metakernels</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>: string</strong></dt>
-<dd><p class="first last">Path to latest metakernel file</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mro_drivers.MroCtxIsisLabelIsisSpiceDriver.sensor_name">
+<em class="property">property </em><code class="sig-name descname">sensor_name</code><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxIsisLabelIsisSpiceDriver.sensor_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>ISIS doesn’t propergate this to the ingested cube label, so hard-code it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mro_drivers.MroCtxIsisLabelIsisSpiceDriver.spacecraft_id">
+<em class="property">property </em><code class="sig-name descname">spacecraft_id</code><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxIsisLabelIsisSpiceDriver.spacecraft_id" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>Naif ID code for the spacecraft</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="ale.drivers.mro_drivers.MroCtxIsisLabelNaifSpiceDriver">
+<em class="property">class </em><code class="sig-prename descclassname">ale.drivers.mro_drivers.</code><code class="sig-name descname">MroCtxIsisLabelNaifSpiceDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">num_ephem</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">num_quats</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">props</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/drivers/mro_drivers.html#MroCtxIsisLabelNaifSpiceDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxIsisLabelNaifSpiceDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.type_sensor.LineScanner</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.label_isis.IsisLabel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.data_naif.NaifSpice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.type_distortion.RadialDistortion</span></code>, <a class="reference internal" href="base.html#ale.base.base.Driver" title="ale.base.base.Driver"><code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.base.Driver</span></code></a></p>
+<p>Driver for reading CTX ISIS labels.</p>
+<dl class="py method">
+<dt id="ale.drivers.mro_drivers.MroCtxIsisLabelNaifSpiceDriver.detector_center_sample">
+<em class="property">property </em><code class="sig-name descname">detector_center_sample</code><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxIsisLabelNaifSpiceDriver.detector_center_sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>The center of the CCD in detector pixels
+ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>float :</dt><dd><p>The center sample of the CCD</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mro_drivers.MroCtxIsisLabelNaifSpiceDriver.detector_start_sample">
+<em class="property">property </em><code class="sig-name descname">detector_start_sample</code><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxIsisLabelNaifSpiceDriver.detector_start_sample" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>The starting detector sample of the image</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mro_drivers.MroCtxIsisLabelNaifSpiceDriver.ephemeris_start_time">
+<em class="property">property </em><code class="sig-name descname">ephemeris_start_time</code><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxIsisLabelNaifSpiceDriver.ephemeris_start_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the ephemeris start time of the image.
+Expects spacecraft_id to be defined. This should be the integer
+Naif ID code for the spacecraft.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>ephemeris start time of the image</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mro_drivers.MroCtxIsisLabelNaifSpiceDriver.ephemeris_stop_time">
+<em class="property">property </em><code class="sig-name descname">ephemeris_stop_time</code><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxIsisLabelNaifSpiceDriver.ephemeris_stop_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>ISIS doesn’t preserve the spacecraft stop count that we can use to get
+the ephemeris stop time of the image, so compute the epehemris stop time
+from the start time and the exposure duration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mro_drivers.MroCtxIsisLabelNaifSpiceDriver.instrument_id">
+<em class="property">property </em><code class="sig-name descname">instrument_id</code><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxIsisLabelNaifSpiceDriver.instrument_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an instrument id for uniquely identifying the instrument, but often
+also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+the same ID the Spice expects in bods2c calls.
+Expects instrument_id to be defined in the IsisLabel mixin. This should be
+a string of the form ‘CTX’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>instrument id</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mro_drivers.MroCtxIsisLabelNaifSpiceDriver.sensor_model_version">
+<em class="property">property </em><code class="sig-name descname">sensor_model_version</code><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxIsisLabelNaifSpiceDriver.sensor_model_version" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>ISIS sensor model version</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mro_drivers.MroCtxIsisLabelNaifSpiceDriver.sensor_name">
+<em class="property">property </em><code class="sig-name descname">sensor_name</code><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxIsisLabelNaifSpiceDriver.sensor_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>ISIS doesn’t propergate this to the ingested cube label, so hard-code it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mro_drivers.MroCtxIsisLabelNaifSpiceDriver.spacecraft_name">
+<em class="property">property </em><code class="sig-name descname">spacecraft_name</code><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxIsisLabelNaifSpiceDriver.spacecraft_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the spacecraft name used in various Spice calls to acquire
+ephemeris data.
+Expects the platform_name to be defined. This should be a string of
+the form ‘Mars_Reconnaissance_Orbiter’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>spacecraft name</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="ale.drivers.mro_drivers.MroCtxPds3LabelNaifSpiceDriver">
+<em class="property">class </em><code class="sig-prename descclassname">ale.drivers.mro_drivers.</code><code class="sig-name descname">MroCtxPds3LabelNaifSpiceDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">num_ephem</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">num_quats</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">props</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/drivers/mro_drivers.html#MroCtxPds3LabelNaifSpiceDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxPds3LabelNaifSpiceDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.type_sensor.LineScanner</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.label_pds3.Pds3Label</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.data_naif.NaifSpice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.type_distortion.RadialDistortion</span></code>, <a class="reference internal" href="base.html#ale.base.base.Driver" title="ale.base.base.Driver"><code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.base.Driver</span></code></a></p>
+<p>Driver for reading CTX PDS3 labels. Requires a Spice mixin to acquire addtional
+ephemeris and instrument data located exclusively in spice kernels.</p>
+<dl class="py method">
+<dt id="ale.drivers.mro_drivers.MroCtxPds3LabelNaifSpiceDriver.detector_center_sample">
+<em class="property">property </em><code class="sig-name descname">detector_center_sample</code><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxPds3LabelNaifSpiceDriver.detector_center_sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>The center of the CCD in detector pixels
+ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>float :</dt><dd><p>The center sample of the CCD</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mro_drivers.MroCtxPds3LabelNaifSpiceDriver.detector_start_sample">
+<em class="property">property </em><code class="sig-name descname">detector_start_sample</code><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxPds3LabelNaifSpiceDriver.detector_start_sample" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>Starting detector sample for the image</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mro_drivers.MroCtxPds3LabelNaifSpiceDriver.instrument_id">
+<em class="property">property </em><code class="sig-name descname">instrument_id</code><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxPds3LabelNaifSpiceDriver.instrument_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an instrument id for uniquely identifying the instrument, but often
+also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+the same ID the Spice expects in bods2c calls.
+Expects instrument_id to be defined in the Pds3Label mixin. This should
+be a string of the form ‘CONTEXT CAMERA’ or ‘CTX’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>instrument id</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mro_drivers.MroCtxPds3LabelNaifSpiceDriver.platform_name">
+<em class="property">property </em><code class="sig-name descname">platform_name</code><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxPds3LabelNaifSpiceDriver.platform_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the name of the platform which the instrument is mounted on</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>platform name</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mro_drivers.MroCtxPds3LabelNaifSpiceDriver.sensor_model_version">
+<em class="property">property </em><code class="sig-name descname">sensor_model_version</code><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxPds3LabelNaifSpiceDriver.sensor_model_version" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>ISIS sensor model version</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mro_drivers.MroCtxPds3LabelNaifSpiceDriver.spacecraft_name">
+<em class="property">property </em><code class="sig-name descname">spacecraft_name</code><a class="headerlink" href="#ale.drivers.mro_drivers.MroCtxPds3LabelNaifSpiceDriver.spacecraft_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the spacecraft name used in various Spice calls to acquire
+ephemeris data.
+Expects spacecraft_name to be defined. This should be a string of the form
+‘MARS_RECONNAISSANCE_ORBITER’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>spacecraft name</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -122,14 +327,25 @@ ephemeris data.</p>
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Library Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../capi/index.html"><code class="docutils literal notranslate"><span class="pre">capi</span></code> — All ALE functions</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="index.html"><code class="docutils literal notranslate"><span class="pre">python</span></code> — Input/Output Algorithms</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="base.html"><code class="docutils literal notranslate"><span class="pre">base</span></code> — Default Driver Classes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cassini_driver.html"><code class="docutils literal notranslate"><span class="pre">cassini_driver</span></code> — Cassini Driver Classes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lro_driver.html"><code class="docutils literal notranslate"><span class="pre">lro_driver</span></code> — LRO Driver Classes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="mdis_driver.html"><code class="docutils literal notranslate"><span class="pre">mdis_driver</span></code> — MDIS Driver Classes</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">mro_driver</span></code> — MRO Driver Classes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="util.html"><code class="docutils literal notranslate"><span class="pre">util</span></code> — General Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../capi/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="base.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">base</span></code> — Default Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">co_drivers</span></code> — Cassini Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dawn_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">dawn_drivers</span></code> — Dawn Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hayabusa2_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">hayabusa2_drivers</span></code> — Hayabusa2 Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="isis_ideal_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">isis_ideal_drivers</span></code> — ISIS Ideal Camera Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="juno_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">juno_drivers</span></code> — Juno Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lro_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">lro_drivers</span></code> — LRO Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mess_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mess_drivers</span></code> — MDIS Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mex_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mex_drivers</span></code> — Mars Express Driver Classes</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mro_drivers</span></code> — MRO Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nh_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">nh_drivers</span></code> — New Horizons Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ody_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ody_drivers</span></code> — Odyssey Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="selene_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">selene_drivers</span></code> — Selene Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tgo_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tgo_drivers</span></code> — Trace Gas Oribiter Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="viking_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">viking_drivers</span></code> — Viking Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="voyager_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">voyager_drivers</span></code> — Voyager Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="util.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">util</span></code> — General Utilities</a></li>
 </ul>
 </li>
 </ul>
@@ -141,26 +357,24 @@ ephemeris data.</p>
 <ul>
   <li><a href="../../index.html">Documentation overview</a><ul>
   <li><a href="../index.html">Library Reference</a><ul>
-  <li><a href="index.html"><code class="docutils literal notranslate"><span class="pre">python</span></code> — Input/Output Algorithms</a><ul>
-      <li>Previous: <a href="mdis_driver.html" title="previous chapter"><code class="docutils literal notranslate"><span class="pre">mdis_driver</span></code> — MDIS Driver Classes</a></li>
-      <li>Next: <a href="util.html" title="next chapter"><code class="docutils literal notranslate"><span class="pre">util</span></code> — General Utilities</a></li>
+  <li><a href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a><ul>
+      <li>Previous: <a href="mex_driver.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mex_drivers</span></code> — Mars Express Driver Classes</a></li>
+      <li>Next: <a href="nh_driver.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">nh_drivers</span></code> — New Horizons Driver Classes</a></li>
   </ul></li>
   </ul></li>
   </ul></li>
 </ul>
 </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -177,7 +391,7 @@ ephemeris data.</p>
       &copy;Public Domain.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

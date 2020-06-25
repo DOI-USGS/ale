@@ -1,0 +1,997 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>selene_drivers — Selene Driver Classes &#8212; ALE 0.8.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="tgo_drivers — Trace Gas Oribiter Driver Classes" href="tgo_driver.html" />
+    <link rel="prev" title="ody_drivers — Odyssey Driver Classes" href="ody_driver.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="selene-drivers-selene-driver-classes">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">selene_drivers</span></code> — Selene Driver Classes<a class="headerlink" href="#selene-drivers-selene-driver-classes" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="#module-ale.drivers.selene_drivers" title="ale.drivers.selene_drivers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ale.drivers.selene_drivers</span></code></a> module</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.8.1.</span></p>
+</div>
+<span class="target" id="module-ale.drivers.selene_drivers"></span><dl class="py class">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver">
+<em class="property">class </em><code class="sig-prename descclassname">ale.drivers.selene_drivers.</code><code class="sig-name descname">KaguyaMiPds3NaifSpiceDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">num_ephem</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">num_quats</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">props</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/drivers/selene_drivers.html#KaguyaMiPds3NaifSpiceDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.type_sensor.LineScanner</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.label_pds3.Pds3Label</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.data_naif.NaifSpice</span></code>, <a class="reference internal" href="base.html#ale.base.base.Driver" title="ale.base.base.Driver"><code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.base.Driver</span></code></a></p>
+<p>Driver for a PDS3 Kaguya Multiband Imager (Mi) images. Specifically level2b2 Vis and Nir images.</p>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Kaguaya has adjusted values for some of its keys, usually suffixed with <cite>CORRECTED_</cite>.
+These corrected values should always be preferred over the original values.</p></li>
+</ul>
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.base_band">
+<em class="property">property </em><code class="sig-name descname">base_band</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.base_band" title="Permalink to this definition">¶</a></dt>
+<dd><p>Which band the bands are registered to.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.boresight_x">
+<em class="property">property </em><code class="sig-name descname">boresight_x</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.boresight_x" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the x focal plane coordinate of the boresight.
+Expects ikid to be defined. This should be the NAIF integer ID for the
+sensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>Boresight focal plane x coordinate</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.boresight_y">
+<em class="property">property </em><code class="sig-name descname">boresight_y</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.boresight_y" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the y focal plane coordinate of the boresight.
+Expects ikid to be defined. This should be the NAIF integer ID for the
+sensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>Boresight focal plane x coordinate</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.detector_center_line">
+<em class="property">property </em><code class="sig-name descname">detector_center_line</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.detector_center_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the center detector line of the detector. Expects ikid to be
+defined. This should be the NAIF integer ID code for the sensor.</p>
+<p>We subtract 0.5 from the center line because as per the IK:
+Center of the first pixel is defined as “1.0”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>The detector line of the principle point</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.detector_center_sample">
+<em class="property">property </em><code class="sig-name descname">detector_center_sample</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.detector_center_sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the center detector sample of the detector. Expects ikid to be
+defined. This should be the NAIF integer ID code for the sensor.</p>
+<p>We subtract 0.5 from the center sample because as per the IK:
+Center of the first pixel is defined as “1.0”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>The detector sample of the principle point</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.ephemeris_start_time">
+<em class="property">property </em><code class="sig-name descname">ephemeris_start_time</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.ephemeris_start_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the ephemeris start time of the image. Expects spacecraft_id to
+be defined. This should be the integer naif ID code of the spacecraft.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>ephemeris start time of the image</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.focal2pixel_lines">
+<em class="property">property </em><code class="sig-name descname">focal2pixel_lines</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.focal2pixel_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculated using 1/pixel pitch
+Expects ikid to be defined. This should be the NAIF integer ID code
+for the sensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: list</dt><dd><p>focal plane to detector lines</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.focal2pixel_samples">
+<em class="property">property </em><code class="sig-name descname">focal2pixel_samples</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.focal2pixel_samples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculated using 1/pixel pitch
+Expects ikid to be defined. This should be the NAIF integer ID code
+for the sensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: list</dt><dd><p>focal plane to detector samples</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.focal_length">
+<em class="property">property </em><code class="sig-name descname">focal_length</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.focal_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns camera focal length
+Expects ikid to be defined. This should be the NAIF ID for the base band.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>Camera focal length</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.instrument_id">
+<em class="property">property </em><code class="sig-name descname">instrument_id</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.instrument_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Id takes the form of LISM_&lt;BASE_BAND&gt; where &lt;BASE_BAND&gt; is which band
+the bands were registered to.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>instrument id</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.line_exposure_duration">
+<em class="property">property </em><code class="sig-name descname">line_exposure_duration</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.line_exposure_duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns Line Exposure Duration</p>
+<p>Kaguya has an unintuitive key for this called CORRECTED_SAMPLING_INTERVAL.
+The original LINE_EXPOSURE_DURATION PDS3 keys is often incorrect and cannot
+be trusted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>Line exposure duration</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.sensor_frame_id">
+<em class="property">property </em><code class="sig-name descname">sensor_frame_id</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.sensor_frame_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the sensor frame id.  Depends on the instrument that was used to
+capture the image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>Sensor frame id</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.sensor_model_version">
+<em class="property">property </em><code class="sig-name descname">sensor_model_version</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.sensor_model_version" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>ISIS sensor model version</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.spacecraft_clock_start_count">
+<em class="property">property </em><code class="sig-name descname">spacecraft_clock_start_count</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.spacecraft_clock_start_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>The original SC_CLOCK_START_COUNT key is often incorrect and cannot be trusted.
+Therefore we get this information from CORRECTED_SC_CLOCK_START_COUNT</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>spacecraft clock start count in seconds</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.spacecraft_clock_stop_count">
+<em class="property">property </em><code class="sig-name descname">spacecraft_clock_stop_count</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.spacecraft_clock_stop_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>The original SC_CLOCK_STOP_COUNT key is often incorrect and cannot be trusted.
+Therefore we get this information from CORRECTED_SC_CLOCK_STOP_COUNT</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>spacecraft clock stop count in seconds</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.spacecraft_name">
+<em class="property">property </em><code class="sig-name descname">spacecraft_name</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.spacecraft_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns “MISSION_NAME” as a proxy for spacecraft_name.</p>
+<p>No NAIF code exists for the spacecraft name ‘SELENE-M.’  The NAIF code
+exists only for ‘SELENE’ or ‘KAGUYA’ – ‘SELENE’ is captured as
+‘MISSION_NAME’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>mission name</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.usgscsm_distortion_model">
+<em class="property">property </em><code class="sig-name descname">usgscsm_distortion_model</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.usgscsm_distortion_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kaguya uses a unique radial distortion model so we need to overwrite the
+method packing the distortion model into the ISD.</p>
+<p>from the IK:</p>
+<p>Line-of-sight vector of pixel no. n can be expressed as below.</p>
+<p>Distortion coefficients information:
+INS&lt;INSTID&gt;_DISTORTION_COEF_X  = ( a0, a1, a2, a3)
+INS&lt;INSTID&gt;_DISTORTION_COEF_Y  = ( b0, b1, b2, b3),</p>
+<p>Distance r from the center:
+r = - (n - INS&lt;INSTID&gt;_CENTER) * INS&lt;INSTID&gt;_PIXEL_SIZE.</p>
+<p>Line-of-sight vector v is calculated as
+v[X] = INS&lt;INSTID&gt;BORESIGHT[X] + a0 + a1*r + a2*r^2 + a3*r^3 ,
+v[Y] = INS&lt;INSTID&gt;BORESIGHT[Y] + r+a0 + a1*r +a2*r^2 + a3*r^3 ,
+v[Z] = INS&lt;INSTID&gt;BORESIGHT[Z]</p>
+<p>Expects odkx and odky to be defined. These should be a list of optical
+distortion x and y coefficients respectively.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: dict</dt><dd><p>radial distortion model</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.utc_start_time">
+<em class="property">property </em><code class="sig-name descname">utc_start_time</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.utc_start_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns corrected utc start time.</p>
+<p>If no corrected form is found, defaults to the form specified in parent class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>Start time of the image in UTC YYYY-MM-DDThh:mm:ss[.fff]</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.utc_stop_time">
+<em class="property">property </em><code class="sig-name descname">utc_stop_time</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaMiPds3NaifSpiceDriver.utc_stop_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns corrected utc start time.</p>
+<p>If no corrected form is found, defaults to the form specified in parent class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>Stop time of the image in UTC YYYY-MM-DDThh:mm:ss[.fff]</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver">
+<em class="property">class </em><code class="sig-prename descclassname">ale.drivers.selene_drivers.</code><code class="sig-name descname">KaguyaTcPds3NaifSpiceDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">num_ephem</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">num_quats</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">props</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/drivers/selene_drivers.html#KaguyaTcPds3NaifSpiceDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.type_sensor.LineScanner</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.label_pds3.Pds3Label</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.data_naif.NaifSpice</span></code>, <a class="reference internal" href="base.html#ale.base.base.Driver" title="ale.base.base.Driver"><code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.base.Driver</span></code></a></p>
+<p>Driver for a PDS3 Kaguya Terrain Camera (TC) images. Specifically level2b0 mono and stereo images.</p>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Kaguaya has adjusted values for some of its keys, usually suffixed with <cite>CORRECTED_</cite>.
+These corrected values should always be preffered over the original values.</p></li>
+<li><p>The Kaguya TC doesn’t use a generic Distortion Model, uses on unique to the TC.
+Therefore, methods normally in the Distortion classes are reimplemented here.</p></li>
+</ul>
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.boresight_x">
+<em class="property">property </em><code class="sig-name descname">boresight_x</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.boresight_x" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the x focal plane coordinate of the boresight.
+Expects ikid to be defined. This should be the NAIF integer ID for the
+sensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>Boresight focal plane x coordinate</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.boresight_y">
+<em class="property">property </em><code class="sig-name descname">boresight_y</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.boresight_y" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the y focal plane coordinate of the boresight.
+Expects ikid to be defined. This should be the NAIF integer ID for the
+sensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>Boresight focal plane x coordinate</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.detector_center_line">
+<em class="property">property </em><code class="sig-name descname">detector_center_line</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.detector_center_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the center detector line of the detector. Expects tc_id to be
+defined. This should be a string of the form LISM_TC1 or LISM_TC2.</p>
+<p>We subtract 0.5 from the center line because as per the IK:
+Center of the first pixel is defined as “1.0”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>The detector line of the principle point</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.detector_center_sample">
+<em class="property">property </em><code class="sig-name descname">detector_center_sample</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.detector_center_sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the center detector sample of the detector. Expects tc_id to be
+defined. This should be a string of the form LISM_TC1 or LISM_TC2.</p>
+<p>We subtract 0.5 from the center sample because as per the IK:
+Center of the first pixel is defined as “1.0”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>The detector sample of the principle point</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.detector_start_line">
+<em class="property">property </em><code class="sig-name descname">detector_start_line</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.detector_start_line" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>Zero based Detector line corresponding to the first image line</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.detector_start_sample">
+<em class="property">property </em><code class="sig-name descname">detector_start_sample</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.detector_start_sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns starting detector sample</p>
+<p>Starting sample varies from swath mode (either FULL, NOMINAL or HALF).</p>
+<p>From Kaguya IK kernel:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 48%" />
+<col style="width: 16%" />
+<col style="width: 26%" />
+<col style="width: 10%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Sensor</p></td>
+<td><p>Start Pixel</p></td>
+<td><p>End Pixel (+dummy)</p></td>
+<td><p>NAIF ID</p></td>
+</tr>
+<tr class="row-even"><td><p>LISM_TC1</p></td>
+<td><p>1</p></td>
+<td><p>4096</p></td>
+<td><p>-131351</p></td>
+</tr>
+<tr class="row-odd"><td><p>LISM_TC2</p></td>
+<td><p>1</p></td>
+<td><p>4096</p></td>
+<td><p>-131371</p></td>
+</tr>
+<tr class="row-even"><td><p>LISM_TC1_WDF  (Double DCT Full)</p></td>
+<td><p>1</p></td>
+<td><p>4096</p></td>
+<td><p>-131352</p></td>
+</tr>
+<tr class="row-odd"><td><p>LISM_TC1_WTF  (Double Through Full)</p></td>
+<td><p>1</p></td>
+<td><p>1600</p></td>
+<td><p>-131353</p></td>
+</tr>
+<tr class="row-even"><td><p>LISM_TC1_SDF  (Single DCT Full)</p></td>
+<td><p>1</p></td>
+<td><p>4096</p></td>
+<td><p>-131354</p></td>
+</tr>
+<tr class="row-odd"><td><p>LISM_TC1_STF  (Single Through Full)</p></td>
+<td><p>1</p></td>
+<td><p>3208</p></td>
+<td><p>-131355</p></td>
+</tr>
+<tr class="row-even"><td><p>LISM_TC1_WDN  (Double DCT Nominal)</p></td>
+<td><p>297</p></td>
+<td><p>3796(+4)</p></td>
+<td><p>-131356</p></td>
+</tr>
+<tr class="row-odd"><td><p>LISM_TC1_WTN  (Double Through Nominal)</p></td>
+<td><p>297</p></td>
+<td><p>1896</p></td>
+<td><p>-131357</p></td>
+</tr>
+<tr class="row-even"><td><p>LISM_TC1_SDN  (Single DCT Nominal)</p></td>
+<td><p>297</p></td>
+<td><p>3796(+4)</p></td>
+<td><p>-131358</p></td>
+</tr>
+<tr class="row-odd"><td><p>LISM_TC1_STN  (Single Through Nominal)</p></td>
+<td><p>297</p></td>
+<td><p>3504</p></td>
+<td><p>-131359</p></td>
+</tr>
+<tr class="row-even"><td><p>LISM_TC1_WDH  (Double DCT Half)</p></td>
+<td><p>1172</p></td>
+<td><p>2921(+2)</p></td>
+<td><p>-131360</p></td>
+</tr>
+<tr class="row-odd"><td><p>LISM_TC1_WTH  (Double Through Half)</p></td>
+<td><p>1172</p></td>
+<td><p>2771</p></td>
+<td><p>-131361</p></td>
+</tr>
+<tr class="row-even"><td><p>LISM_TC1_SDH  (Single DCT Half)</p></td>
+<td><p>1172</p></td>
+<td><p>2921(+2)</p></td>
+<td><p>-131362</p></td>
+</tr>
+<tr class="row-odd"><td><p>LISM_TC1_STH  (Single Through Half)</p></td>
+<td><p>1172</p></td>
+<td><p>2923</p></td>
+<td><p>-131363</p></td>
+</tr>
+<tr class="row-even"><td><p>LISM_TC1_SSH  (Single SP_support Half)</p></td>
+<td><p>1172</p></td>
+<td><p>2921</p></td>
+<td><p>-131364</p></td>
+</tr>
+<tr class="row-odd"><td><p>LISM_TC2_WDF  (Double DCT Full)</p></td>
+<td><p>1</p></td>
+<td><p>4096</p></td>
+<td><p>-131372</p></td>
+</tr>
+<tr class="row-even"><td><p>LISM_TC2_WTF  (Double Through Full)</p></td>
+<td><p>1</p></td>
+<td><p>1600</p></td>
+<td><p>-131373</p></td>
+</tr>
+<tr class="row-odd"><td><p>LISM_TC2_SDF  (Single DCT Full)</p></td>
+<td><p>1</p></td>
+<td><p>4096</p></td>
+<td><p>-131374</p></td>
+</tr>
+<tr class="row-even"><td><p>LISM_TC2_STF  (Single Through Full)</p></td>
+<td><p>1</p></td>
+<td><p>3208</p></td>
+<td><p>-131375</p></td>
+</tr>
+<tr class="row-odd"><td><p>LISM_TC2_WDN  (Double DCT Nominal)</p></td>
+<td><p>297</p></td>
+<td><p>3796(+4)</p></td>
+<td><p>-131376</p></td>
+</tr>
+<tr class="row-even"><td><p>LISM_TC2_WTN  (Double Through Nominal)</p></td>
+<td><p>297</p></td>
+<td><p>1896</p></td>
+<td><p>-131377</p></td>
+</tr>
+<tr class="row-odd"><td><p>LISM_TC2_SDN  (Single DCT Nominal)</p></td>
+<td><p>297</p></td>
+<td><p>3796(+4)</p></td>
+<td><p>-131378</p></td>
+</tr>
+<tr class="row-even"><td><p>LISM_TC2_STN  (Single Through Nominal)</p></td>
+<td><p>297</p></td>
+<td><p>3504</p></td>
+<td><p>-131379</p></td>
+</tr>
+<tr class="row-odd"><td><p>LISM_TC2_WDH  (Double DCT Half)</p></td>
+<td><p>1172</p></td>
+<td><p>2921(+2)</p></td>
+<td><p>-131380</p></td>
+</tr>
+<tr class="row-even"><td><p>LISM_TC2_WTH  (Double Through Half)</p></td>
+<td><p>1172</p></td>
+<td><p>2771</p></td>
+<td><p>-131381</p></td>
+</tr>
+<tr class="row-odd"><td><p>LISM_TC2_SDH  (Single DCT Half)</p></td>
+<td><p>1172</p></td>
+<td><p>2921(+2)</p></td>
+<td><p>-131382</p></td>
+</tr>
+<tr class="row-even"><td><p>LISM_TC2_STH  (Single Through Half)</p></td>
+<td><p>1172</p></td>
+<td><p>2923</p></td>
+<td><p>-131383</p></td>
+</tr>
+<tr class="row-odd"><td><p>LISM_TC2_SSH  (Single SP_support Half)</p></td>
+<td><p>1172</p></td>
+<td><p>2921</p></td>
+<td><p>-131384</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>Detector sample corresponding to the first image sample</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.ephemeris_start_time">
+<em class="property">property </em><code class="sig-name descname">ephemeris_start_time</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.ephemeris_start_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the ephemeris start time of the image. Expects spacecraft_id to
+be defined. This should be the integer naif ID code of the spacecraft.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>ephemeris start time of the image</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.exposure_duration">
+<em class="property">property </em><code class="sig-name descname">exposure_duration</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.exposure_duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns Line Exposure Duration</p>
+<p>Kaguya TC has an unintuitive key for this called CORRECTED_SAMPLING_INTERVAL.
+The original LINE_EXPOSURE_DURATION PDS3 keys is often incorrect and cannot
+be trusted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>Line exposure duration</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.focal2pixel_lines">
+<em class="property">property </em><code class="sig-name descname">focal2pixel_lines</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.focal2pixel_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculated using 1/pixel pitch
+Expects tc_id to be defined. This should be a string of the form
+LISM_TC1 or LISM_TC2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: list</dt><dd><p>focal plane to detector lines</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.focal2pixel_samples">
+<em class="property">property </em><code class="sig-name descname">focal2pixel_samples</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.focal2pixel_samples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculated using 1/pixel pitch
+Expects tc_id to be defined. This should be a string of the form
+LISM_TC1 or LISM_TC2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: list</dt><dd><p>focal plane to detector samples</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.focal_length">
+<em class="property">property </em><code class="sig-name descname">focal_length</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.focal_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns camera focal length
+Expects tc_id to be defined. This should be a string of the form
+LISM_TC1 or LISM_TC2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>Camera focal length</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.ikid">
+<em class="property">property </em><code class="sig-name descname">ikid</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.ikid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns ikid of LISM_TC1 or LISM_TC2, depending which camera was used
+for capturing the image.</p>
+<p>Some keys are stored in the IK kernel under a general ikid for TC1/TC2
+presumably because they are not affected by the addtional parameters encoded in
+the ikid returned by self.ikid. This method exists for those gdpool calls.</p>
+<p>Expects instrument_id to be defined in the Pds3Label mixin. This should be
+a string containing either TC1 or TC2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>ikid of LISM_TC1 or LISM_TC2</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.instrument_host_name">
+<em class="property">property </em><code class="sig-name descname">instrument_host_name</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.instrument_host_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the name of the instrument host.  Kaguya/SELENE labels do not have an
+explicit instrument host name in the pvl, so we use the spacecraft name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>Spacecraft name as a proxy for instrument host name.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.instrument_id">
+<em class="property">property </em><code class="sig-name descname">instrument_id</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.instrument_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Id takes the form of LISM_&lt;INSTRUMENT_ID&gt;_&lt;SD&gt;&lt;COMPRESS&gt;&lt;SWATH&gt; where</p>
+<p>INSTRUMENT_ID = TC1/TC2
+SD = S/D short for single or double, which in turn means whether the
+label belongs to a mono or stereo image.</p>
+<p>COMPRESS = D/T short for DCT or through, we assume image has been
+decompressed already</p>
+<p>SWATCH = swatch mode, different swatch modes have different FOVs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>instrument id</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.sensor_frame_id">
+<em class="property">property </em><code class="sig-name descname">sensor_frame_id</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.sensor_frame_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the sensor frame id.  Depends on the instrument that was used to
+capture the image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>Sensor frame id</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.sensor_model_version">
+<em class="property">property </em><code class="sig-name descname">sensor_model_version</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.sensor_model_version" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>ISIS sensor model version</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.spacecraft_clock_start_count">
+<em class="property">property </em><code class="sig-name descname">spacecraft_clock_start_count</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.spacecraft_clock_start_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>The original SC_CLOCK_START_COUNT key is often incorrect and cannot be trusted.
+Therefore we get this information from CORRECTED_SC_CLOCK_START_COUNT</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>spacecraft clock start count in seconds</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.spacecraft_clock_stop_count">
+<em class="property">property </em><code class="sig-name descname">spacecraft_clock_stop_count</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.spacecraft_clock_stop_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>The original SC_CLOCK_STOP_COUNT key is often incorrect and cannot be trusted.
+Therefore we get this information from CORRECTED_SC_CLOCK_STOP_COUNT</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>spacecraft clock stop count in seconds</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.spacecraft_direction">
+<em class="property">property </em><code class="sig-name descname">spacecraft_direction</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.spacecraft_direction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the moving direction of the spacecraft from the label, where -1 is moving
+as intended and 1 is moving inverted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>Moving direction of the spacecraft</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.spacecraft_name">
+<em class="property">property </em><code class="sig-name descname">spacecraft_name</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.spacecraft_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns “MISSION_NAME” as a proxy for spacecraft_name.</p>
+<p>No NAIF code exists for the spacecraft name ‘SELENE-M.’  The NAIF code
+exists only for ‘SELENE’ or ‘KAGUYA’ – ‘SELENE’ is captured as
+‘MISSION_NAME’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>mission name</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.usgscsm_distortion_model">
+<em class="property">property </em><code class="sig-name descname">usgscsm_distortion_model</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.usgscsm_distortion_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kaguya uses a unique radial distortion model so we need to overwrite the
+method packing the distortion model into the ISD.</p>
+<p>from the IK:</p>
+<p>Line-of-sight vector of pixel no. n can be expressed as below.</p>
+<p>Distortion coefficients information:
+INS&lt;INSTID&gt;_DISTORTION_COEF_X  = ( a0, a1, a2, a3)
+INS&lt;INSTID&gt;_DISTORTION_COEF_Y  = ( b0, b1, b2, b3),</p>
+<p>Distance r from the center:
+r = - (n - INS&lt;INSTID&gt;_CENTER) * INS&lt;INSTID&gt;_PIXEL_SIZE.</p>
+<p>Line-of-sight vector v is calculated as
+v[X] = INS&lt;INSTID&gt;BORESIGHT[X] + a0 + a1*r + a2*r^2 + a3*r^3 ,
+v[Y] = INS&lt;INSTID&gt;BORESIGHT[Y] + r+a0 + a1*r +a2*r^2 + a3*r^3 ,
+v[Z] = INS&lt;INSTID&gt;BORESIGHT[Z]</p>
+<p>Expects odkx and odky to be defined. These should be a list of optical
+distortion x and y coefficients respectively.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: dict</dt><dd><p>radial distortion model</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.utc_start_time">
+<em class="property">property </em><code class="sig-name descname">utc_start_time</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.utc_start_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns corrected utc start time.</p>
+<p>If no corrected form is found, defaults to the form specified in parent class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>Start time of the image in UTC YYYY-MM-DDThh:mm:ss[.fff]</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.utc_stop_time">
+<em class="property">property </em><code class="sig-name descname">utc_stop_time</code><a class="headerlink" href="#ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.utc_stop_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns corrected utc start time.</p>
+<p>If no corrected form is found, defaults to the form specified in parent class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>Stop time of the image in UTC YYYY-MM-DDThh:mm:ss[.fff]</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Library Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../capi/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="base.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">base</span></code> — Default Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">co_drivers</span></code> — Cassini Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dawn_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">dawn_drivers</span></code> — Dawn Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hayabusa2_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">hayabusa2_drivers</span></code> — Hayabusa2 Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="isis_ideal_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">isis_ideal_drivers</span></code> — ISIS Ideal Camera Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="juno_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">juno_drivers</span></code> — Juno Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lro_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">lro_drivers</span></code> — LRO Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mess_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mess_drivers</span></code> — MDIS Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mex_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mex_drivers</span></code> — Mars Express Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mro_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mro_drivers</span></code> — MRO Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nh_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">nh_drivers</span></code> — New Horizons Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ody_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ody_drivers</span></code> — Odyssey Driver Classes</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">selene_drivers</span></code> — Selene Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tgo_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tgo_drivers</span></code> — Trace Gas Oribiter Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="viking_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">viking_drivers</span></code> — Viking Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="voyager_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">voyager_drivers</span></code> — Voyager Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="util.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">util</span></code> — General Utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Library Reference</a><ul>
+  <li><a href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a><ul>
+      <li>Previous: <a href="ody_driver.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ody_drivers</span></code> — Odyssey Driver Classes</a></li>
+      <li>Next: <a href="tgo_driver.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tgo_drivers</span></code> — Trace Gas Oribiter Driver Classes</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;Public Domain.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/library/python/selene_driver.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

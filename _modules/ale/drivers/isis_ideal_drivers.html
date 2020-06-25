@@ -1,0 +1,308 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ale.drivers.isis_ideal_drivers &#8212; ALE 0.8.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for ale.drivers.isis_ideal_drivers</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">ale.base.data_isis</span> <span class="kn">import</span> <span class="n">IsisSpice</span>
+<span class="kn">from</span> <span class="nn">ale.base.label_isis</span> <span class="kn">import</span> <span class="n">IsisLabel</span>
+<span class="kn">from</span> <span class="nn">ale.base</span> <span class="kn">import</span> <span class="n">Driver</span>
+<span class="kn">from</span> <span class="nn">ale.base.type_sensor</span> <span class="kn">import</span> <span class="n">LineScanner</span>
+<span class="kn">from</span> <span class="nn">ale.base.type_distortion</span> <span class="kn">import</span> <span class="n">NoDistortion</span>
+
+
+<div class="viewcode-block" id="IdealLsIsisLabelIsisSpiceDriver"><a class="viewcode-back" href="../../../library/python/isis_ideal_driver.html#ale.drivers.isis_ideal_drivers.IdealLsIsisLabelIsisSpiceDriver">[docs]</a><span class="k">class</span> <span class="nc">IdealLsIsisLabelIsisSpiceDriver</span><span class="p">(</span><span class="n">LineScanner</span><span class="p">,</span> <span class="n">IsisSpice</span><span class="p">,</span> <span class="n">IsisLabel</span><span class="p">,</span> <span class="n">NoDistortion</span><span class="p">,</span> <span class="n">Driver</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sensor_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the name of the instrument</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          name of the instrument.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument_id</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">instrument_id</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">instrument_id</span>
+
+        <span class="k">if</span> <span class="n">instrument_id</span> <span class="o">!=</span> <span class="s2">&quot;IdealCamera&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Instrument ID is </span><span class="si">{</span><span class="n">instrument_id</span><span class="si">}</span><span class="s2"> when it should be </span><span class="se">\&quot;</span><span class="s2">IdealCamera</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">instrument_id</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ephemeris_start_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The image start time in ephemeris time.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float :</span>
+<span class="sd">            The image start ephemeris time</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Instrument&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;EphemerisTime&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ephemeris_stop_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the sum of the starting ephemeris time and the number of lines</span>
+<span class="sd">        times the exposure duration. Expects ephemeris start time, exposure duration</span>
+<span class="sd">        and image lines to be defined. These should be double precision numbers</span>
+<span class="sd">        containing the ephemeris start, exposure duration, and number of lines of</span>
+<span class="sd">        the image.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : double</span>
+<span class="sd">          Center ephemeris time for an image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">ephemeris_stop_time</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spacecraft_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the spacecraft name used in various Spice calls to acquire</span>
+<span class="sd">        ephemeris data.</span>
+<span class="sd">        Expects the platform_name to be defined. This should be a string of</span>
+<span class="sd">        the form &#39;Mars_Reconnaissance_Orbiter&#39;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          spacecraft name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">platform_name</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_start_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the starting detector line for the image.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          Starting detector line for the image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_start_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the starting detector sample for the image.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          Starting detector sample for the image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sensor_model_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the ISIS sensor model version.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          ISIS sensor model version</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="mi">1</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pixel2focal_x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns detector to focal plane x.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list&lt;double&gt;</span>
+<span class="sd">          detector to focal plane x</span>
+<span class="sd">       &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">naif_keywords</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;IDEAL_TRANSX&#39;</span><span class="p">)</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pixel2focal_y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns detector to focal plane y.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list&lt;double&gt;</span>
+<span class="sd">          detector to focal plane y</span>
+<span class="sd">       &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">naif_keywords</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;IDEAL_TRANSY&#39;</span><span class="p">)</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">focal2pixel_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns focal plane to detector lines.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list&lt;double&gt;</span>
+<span class="sd">          focal plane to detector lines</span>
+<span class="sd">       &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">naif_keywords</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;IDEAL_TRANSL&#39;</span><span class="p">)</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">focal2pixel_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns focal plane to detector samples.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list&lt;double&gt;</span>
+<span class="sd">          focal plane to detector samples</span>
+<span class="sd">       &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">naif_keywords</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;IDEAL_TRANSS&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">focal_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The focal length of the instrument</span>
+<span class="sd">        Expects naif_keywords to be defined. This should be a dict containing</span>
+<span class="sd">        Naif keyworkds from the label.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float :</span>
+<span class="sd">            The focal length in millimeters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">naif_keywords</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;IDEAL_FOCAL_LENGTH&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_center_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The center sample of the CCD in detector pixels</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float :</span>
+<span class="sd">            The center sample of the CCD</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;SampleDetectors&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_center_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The center line of the CCD in detector pixels</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float :</span>
+<span class="sd">            The center of line the CCD</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">0.0</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../library/index.html">Library Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../drivers.html">ale.drivers</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;Public Domain.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

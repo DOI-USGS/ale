@@ -1,0 +1,563 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mess_drivers — MDIS Driver Classes &#8212; ALE 0.8.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="mex_drivers — Mars Express Driver Classes" href="mex_driver.html" />
+    <link rel="prev" title="lro_drivers — LRO Driver Classes" href="lro_driver.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="mess-drivers-mdis-driver-classes">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">mess_drivers</span></code> — MDIS Driver Classes<a class="headerlink" href="#mess-drivers-mdis-driver-classes" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="#module-ale.drivers.mess_drivers" title="ale.drivers.mess_drivers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ale.drivers.mess_drivers</span></code></a> module</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.1.0.</span></p>
+</div>
+<span class="target" id="module-ale.drivers.mess_drivers"></span><dl class="py class">
+<dt id="ale.drivers.mess_drivers.MessengerMdisIsisLabelIsisSpiceDriver">
+<em class="property">class </em><code class="sig-prename descclassname">ale.drivers.mess_drivers.</code><code class="sig-name descname">MessengerMdisIsisLabelIsisSpiceDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">num_ephem</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">num_quats</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">props</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/drivers/mess_drivers.html#MessengerMdisIsisLabelIsisSpiceDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisIsisLabelIsisSpiceDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.type_sensor.Framer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.label_isis.IsisLabel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.data_isis.IsisSpice</span></code>, <a class="reference internal" href="base.html#ale.base.base.Driver" title="ale.base.base.Driver"><code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.base.Driver</span></code></a></p>
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisIsisLabelIsisSpiceDriver.fikid">
+<em class="property">property </em><code class="sig-name descname">fikid</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisIsisLabelIsisSpiceDriver.fikid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Naif ID code used in calculating focal length
+Expects filter_number to be defined. This should be an integer containing
+the filter number from the pds3 label.
+Expects ikid to be defined. This should be the integer Naid ID code for
+the instrument.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>Naif ID code used in calculating focal length</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisIsisLabelIsisSpiceDriver.instrument_id">
+<em class="property">property </em><code class="sig-name descname">instrument_id</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisIsisLabelIsisSpiceDriver.instrument_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an instrument id for unquely identifying the instrument, but often
+also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+the same ID the Spice expects in bods2c calls.
+Expects instrument_id to be defined in the Pds3Label mixin. This should
+be a string of the form MDIS-WAC or MDIS-NAC.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>instrument id</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisIsisLabelIsisSpiceDriver.spacecraft_name">
+<em class="property">property </em><code class="sig-name descname">spacecraft_name</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisIsisLabelIsisSpiceDriver.spacecraft_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spacecraft name used in various SPICE calls to acquire
+ephemeris data. Messenger MDIS img PDS3 labels do not the have a SPACECRAFT_NAME keyword,
+so we override it here to find INSTRUMENT_HOST_NAME in the label.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>Spacecraft name</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver">
+<em class="property">class </em><code class="sig-prename descclassname">ale.drivers.mess_drivers.</code><code class="sig-name descname">MessengerMdisIsisLabelNaifSpiceDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">num_ephem</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">num_quats</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">props</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/drivers/mess_drivers.html#MessengerMdisIsisLabelNaifSpiceDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.label_isis.IsisLabel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.data_naif.NaifSpice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.type_sensor.Framer</span></code>, <a class="reference internal" href="base.html#ale.base.base.Driver" title="ale.base.base.Driver"><code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.base.Driver</span></code></a></p>
+<p>Driver for reading MDIS ISIS3 Labels. These are Labels that have been ingested
+into ISIS from PDS EDR images. Any SPCIE data attached by the spiceinit application
+will be ignored.</p>
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.detector_center_line">
+<em class="property">property </em><code class="sig-name descname">detector_center_line</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.detector_center_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns center detector line acquired from Spice Kernels
+Expects ikid to be defined. This should be the integer Naid ID code for
+the instrument.</p>
+<p>We subtract 0.5 from the ISIS center line because ISIS detector
+coordinates are 0.5 based.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>detector center line</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.detector_center_sample">
+<em class="property">property </em><code class="sig-name descname">detector_center_sample</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.detector_center_sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns center detector sample acquired from Spice Kernels
+Expects ikid to be defined. This should be the integer Naid ID code for
+the instrument.</p>
+<p>We subtract 0.5 from the ISIS center sample because ISIS detector
+coordinates are 0.5 based.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>detector center sample</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.ephemeris_start_time">
+<em class="property">property </em><code class="sig-name descname">ephemeris_start_time</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.ephemeris_start_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the ephemeris_start_time of the image.
+Expects spacecraft_clock_start_count to be defined. This should be a float
+containing the start clock count of the spacecraft.
+Expects spacecraft_id to be defined. This should be the integer Naif ID code
+for the spacecraft.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>ephemeris start time of the image.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.fikid">
+<em class="property">property </em><code class="sig-name descname">fikid</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.fikid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Naif ID code used in calculating focal length
+Expects filter_number to be defined. This should be an integer containing
+the filter number from the pds3 label.
+Expects ikid to be defined. This should be the integer Naid ID code for
+the instrument.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>Naif ID code used in calculating focal length</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.focal_length">
+<em class="property">property </em><code class="sig-name descname">focal_length</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.focal_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes Focal Length from Kernels</p>
+<p>MDIS has tempature dependant focal lengh and coefficients need to
+be acquired from IK Spice kernels (coeff describe focal length as a
+function of tempature). Focal plane temps are acquired from a PDS3 label.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: double</dt><dd><p>focal length in meters</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.instrument_id">
+<em class="property">property </em><code class="sig-name descname">instrument_id</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.instrument_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an instrument id for unquely identifying the instrument, but often
+also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+the same ID the Spice expects in bods2c calls.
+Expects instrument_id to be defined in the Pds3Label mixin. This should
+be a string of the form MDIS-WAC or MDIS-NAC.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>instrument id</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.pixel_size">
+<em class="property">property </em><code class="sig-name descname">pixel_size</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.pixel_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overriden because the MESSENGER IK uses PIXEL_PITCH and the units
+are already millimeters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float pixel size</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.platform_name">
+<em class="property">property </em><code class="sig-name descname">platform_name</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.platform_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the name of the platform containing the sensor. This is usually
+the spacecraft name.</p>
+<p>Messenger MDIS ISIS labels use upper camel case so this converts it to
+all upper case.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>Spacecraft name</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.sampling_factor">
+<em class="property">property </em><code class="sig-name descname">sampling_factor</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.sampling_factor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the summing factor from the PDS3 label. For example a return value of 2
+indicates that 2 lines and 2 samples (4 pixels) were summed and divided by 4
+to produce the output pixel value.</p>
+<p>NOTE: This is overwritten for the messenger driver as the value is stored in “MESS:PIXELBIN”</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>Number of samples and lines combined from the original data to produce a single pixel in this image</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.sensor_model_version">
+<em class="property">property </em><code class="sig-name descname">sensor_model_version</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.sensor_model_version" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>ISIS sensor model version</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.usgscsm_distortion_model">
+<em class="property">property </em><code class="sig-name descname">usgscsm_distortion_model</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisIsisLabelNaifSpiceDriver.usgscsm_distortion_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary containing the distortion model.
+Expects odtx and odty are defined. These should be the optical distortion
+x and y coefficients respectively.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: dict</dt><dd><p>radial distortion model</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver">
+<em class="property">class </em><code class="sig-prename descclassname">ale.drivers.mess_drivers.</code><code class="sig-name descname">MessengerMdisPds3NaifSpiceDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">num_ephem</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">num_quats</span><span class="o">=</span><span class="default_value">909</span></em>, <em class="sig-param"><span class="n">props</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/drivers/mess_drivers.html#MessengerMdisPds3NaifSpiceDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.type_sensor.Framer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.label_pds3.Pds3Label</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.data_naif.NaifSpice</span></code>, <a class="reference internal" href="base.html#ale.base.base.Driver" title="ale.base.base.Driver"><code class="xref py py-class docutils literal notranslate"><span class="pre">ale.base.base.Driver</span></code></a></p>
+<p>Driver for reading MDIS PDS3 labels. Requires a Spice mixin to acquire addtional
+ephemeris and instrument data located exclusively in spice kernels.</p>
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.detector_center_line">
+<em class="property">property </em><code class="sig-name descname">detector_center_line</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.detector_center_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns center detector line acquired from Spice Kernels.
+Expects ikid to be defined. This should be the integer Naid ID code for
+the instrument.</p>
+<p>NOTE: This value is defined in an ISIS iak as 512.5, but we subtract 0.5 from the
+ISIS center sample because ISIS detector coordinates are 0.5 based.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>center detector line</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.detector_center_sample">
+<em class="property">property </em><code class="sig-name descname">detector_center_sample</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.detector_center_sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns center detector sample acquired from Spice Kernels.
+Expects ikid to be defined. This should be the integer Naid ID code for
+the instrument.</p>
+<p>NOTE: This value is defined in an ISIS iak as 512.5, but we subtract 0.5 from the
+ISIS center sample because ISIS detector coordinates are 0.5 based.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float</dt><dd><p>center detector sample</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.fikid">
+<em class="property">property </em><code class="sig-name descname">fikid</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.fikid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Naif ID code used in calculating focal length
+Expects filter_number to be defined. This should be an integer containing
+the filter number from the pds3 label.
+Expects ikid to be defined. This should be the integer Naid ID code for
+the instrument.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>Naif ID code used in calculating focal length</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.focal_length">
+<em class="property">property </em><code class="sig-name descname">focal_length</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.focal_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes Focal Length from Kernels</p>
+<p>MDIS has tempature dependant focal lengh and coefficients need to
+be acquired from IK Spice kernels (coeff describe focal length as a
+function of tempature). Focal plane temps are acquired from a PDS3 label.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: double</dt><dd><p>focal length in meters</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.instrument_id">
+<em class="property">property </em><code class="sig-name descname">instrument_id</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.instrument_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an instrument id for unquely identifying the instrument, but often
+also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+the same ID the Spice expects in bods2c calls.
+Expects instrument_id to be defined in the Pds3Label mixin. This should
+be a string of the form MDIS-WAC or MDIS-NAC.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>instrument id</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.pixel_size">
+<em class="property">property </em><code class="sig-name descname">pixel_size</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.pixel_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overriden because the MESSENGER IK uses PIXEL_PITCH and the units
+are already millimeters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: float pixel size</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.sampling_factor">
+<em class="property">property </em><code class="sig-name descname">sampling_factor</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.sampling_factor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the summing factor from the PDS3 label. For example a return value of 2
+indicates that 2 lines and 2 samples (4 pixels) were summed and divided by 4
+to produce the output pixel value.</p>
+<p>NOTE: This is overwritten for the messenger driver as the value is stored in “MESS:PIXELBIN”</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>Number of samples and lines combined from the original data to produce a single pixel in this image</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.sensor_model_version">
+<em class="property">property </em><code class="sig-name descname">sensor_model_version</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.sensor_model_version" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: int</dt><dd><p>ISIS sensor model version</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.spacecraft_name">
+<em class="property">property </em><code class="sig-name descname">spacecraft_name</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.spacecraft_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spacecraft name used in various SPICE calls to acquire
+ephemeris data. Messenger MDIS img PDS3 labels do not the have a SPACECRAFT_NAME keyword,
+so we override it here to find INSTRUMENT_HOST_NAME in the label.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: str</dt><dd><p>Spacecraft name</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.usgscsm_distortion_model">
+<em class="property">property </em><code class="sig-name descname">usgscsm_distortion_model</code><a class="headerlink" href="#ale.drivers.mess_drivers.MessengerMdisPds3NaifSpiceDriver.usgscsm_distortion_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary containing the distortion model.
+Expects odtx and odty are defined. These should be the optical distortion
+x and y coefficients respectively.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>: dict</dt><dd><p>radial distortion model</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Library Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../capi/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="base.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">base</span></code> — Default Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">co_drivers</span></code> — Cassini Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dawn_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">dawn_drivers</span></code> — Dawn Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hayabusa2_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">hayabusa2_drivers</span></code> — Hayabusa2 Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="isis_ideal_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">isis_ideal_drivers</span></code> — ISIS Ideal Camera Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="juno_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">juno_drivers</span></code> — Juno Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lro_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">lro_drivers</span></code> — LRO Driver Classes</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mess_drivers</span></code> — MDIS Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mex_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mex_drivers</span></code> — Mars Express Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mro_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mro_drivers</span></code> — MRO Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nh_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">nh_drivers</span></code> — New Horizons Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ody_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ody_drivers</span></code> — Odyssey Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="selene_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">selene_drivers</span></code> — Selene Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tgo_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tgo_drivers</span></code> — Trace Gas Oribiter Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="viking_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">viking_drivers</span></code> — Viking Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="voyager_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">voyager_drivers</span></code> — Voyager Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="util.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">util</span></code> — General Utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Library Reference</a><ul>
+  <li><a href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a><ul>
+      <li>Previous: <a href="lro_driver.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">lro_drivers</span></code> — LRO Driver Classes</a></li>
+      <li>Next: <a href="mex_driver.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mex_drivers</span></code> — Mars Express Driver Classes</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;Public Domain.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/library/python/mess_driver.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

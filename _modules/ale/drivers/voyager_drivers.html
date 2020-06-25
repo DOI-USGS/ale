@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ale.drivers.voyager_drivers &#8212; ALE 0.8.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for ale.drivers.voyager_drivers</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">spiceypy</span> <span class="k">as</span> <span class="nn">spice</span>
+
+<span class="kn">import</span> <span class="nn">ale</span>
+<span class="kn">from</span> <span class="nn">ale.base.data_naif</span> <span class="kn">import</span> <span class="n">NaifSpice</span>
+<span class="kn">from</span> <span class="nn">ale.base.label_isis</span> <span class="kn">import</span> <span class="n">IsisLabel</span>
+<span class="kn">from</span> <span class="nn">ale.base.type_sensor</span> <span class="kn">import</span> <span class="n">Framer</span>
+<span class="kn">from</span> <span class="nn">ale.base.base</span> <span class="kn">import</span> <span class="n">Driver</span>
+
+<div class="viewcode-block" id="VoyagerCameraIsisLabelNaifSpiceDriver"><a class="viewcode-back" href="../../../library/python/voyager_driver.html#ale.drivers.voyager_drivers.VoyagerCameraIsisLabelNaifSpiceDriver">[docs]</a><span class="k">class</span> <span class="nc">VoyagerCameraIsisLabelNaifSpiceDriver</span><span class="p">(</span><span class="n">Framer</span><span class="p">,</span> <span class="n">IsisLabel</span><span class="p">,</span> <span class="n">NaifSpice</span><span class="p">,</span> <span class="n">Driver</span><span class="p">):</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sc_lookup</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;VOYAGER_1&quot;</span> <span class="p">:</span> <span class="s2">&quot;VG1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;VOYAGER_2&quot;</span> <span class="p">:</span> <span class="s2">&quot;VG2&quot;</span>
+        <span class="p">}</span>
+        <span class="n">sensor_lookup</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;NARROW_ANGLE_CAMERA&quot;</span> <span class="p">:</span> <span class="s2">&quot;ISSNA&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;WIDE_ANGLE_CAMERA&quot;</span> <span class="p">:</span> <span class="s2">&quot;ISSWA&quot;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">sc_lookup</span><span class="p">[</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">spacecraft_name</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">sensor_lookup</span><span class="p">[</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">instrument_id</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sensor_model_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ikid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Kernels&#39;</span><span class="p">][</span><span class="s1">&#39;NaifFrameCode&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spacecraft_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">spacecraft_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;VOYAGER&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{name}</span><span class="s2"> for label is not a valid Voyager spacecraft name&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pixel_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_PIXEL_PITCH&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_center_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">499.5</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_center_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">499.5</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ephemeris_start_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">inital_time</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">utc2et</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">utc_start_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">())</span>
+        <span class="c1"># To get shutter end (close) time, subtract 2 seconds from the start time</span>
+        <span class="n">updated_time</span> <span class="o">=</span> <span class="n">inital_time</span> <span class="o">-</span> <span class="mi">2</span>
+        <span class="c1"># To get shutter start (open) time, take off the exposure duration from the end time.</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">updated_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">exposure_duration</span>
+        <span class="k">return</span> <span class="n">start_time</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ephemeris_stop_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ephemeris_start_time</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">exposure_duration</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../library/index.html">Library Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../drivers.html">ale.drivers</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;Public Domain.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

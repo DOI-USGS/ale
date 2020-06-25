@@ -1,21 +1,21 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>util — General Utilities &#8212; ALE 0.1.0 documentation</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>util — General Utilities &#8212; ALE 0.8.1 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="prev" title="mro_driver — MRO Driver Classes" href="mro_driver.html" />
+    <link rel="prev" title="voyager_drivers — Voyager Driver Classes" href="voyager_driver.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
@@ -34,36 +34,315 @@
             
   <div class="section" id="util-general-utilities">
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">util</span></code> — General Utilities<a class="headerlink" href="#util-general-utilities" title="Permalink to this headline">¶</a></h1>
-<p>The <code class="xref py py-mod docutils literal notranslate"><span class="pre">ale.drivers</span></code> module</p>
+<p>The <a class="reference internal" href="#module-ale.util" title="ale.util"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ale.util</span></code></a> module</p>
 <div class="versionadded">
-<span class="target" id="module-ale.util"><span class="versionmodified">New in version 0.1.0: </span></span><dl class="function">
+<span class="target" id="module-ale.util"><span class="versionmodified added">New in version 0.1.0: </span></span><dl class="py function">
+<dt id="ale.util.JBFPvlParser">
+<code class="sig-prename descclassname">ale.util.</code><code class="sig-name descname">JBFPvlParser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lines</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/util.html#JBFPvlParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.util.JBFPvlParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Janky But Faster PVL Parser(TM)</p>
+<p>Only really supports ISIS’s Kernel DB files. This is because KernelDB files are sometimes very large for smithed kernels.
+This should bring the parsing time for those DB files from minutes to seconds.
+Still needs nested object/group support and it should be able to read most PVL files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>lines</strong><span class="classifier">str</span></dt><dd><p>string body of PVL file.</p>
+</dd>
+<dt><strong>Returns</strong><span class="classifier">PVLModule</span></dt><dd><p>object representing the parsed PVL</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ale.util.create_spk_dependency_tree">
+<code class="sig-prename descclassname">ale.util.</code><code class="sig-name descname">create_spk_dependency_tree</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kernels</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/util.html#create_spk_dependency_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.util.create_spk_dependency_tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>construct the dependency tree for the body states in a set of kernels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>kernels</strong><span class="classifier">list</span></dt><dd><p>The list of kernels to evaluate the dependencies in. If two
+kernels in this list contain the same information for the same
+pair of bodies, then the later kernel in the list will be
+identified in the kernel property for that edge in dep_tree.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>dep_tree</strong><span class="classifier">nx.DiGraph</span></dt><dd><p>The dependency tree for the kernels. Nodes are bodies. There is
+an edge from one node to another if the state of the body of the
+source node is defined relative to the state of the body of the
+destination node. The kernel edge property identifies what kernel
+the information for the edge is defined in.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ale.util.duckpool">
+<code class="sig-prename descclassname">ale.util.</code><code class="sig-name descname">duckpool</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">naifvar</span></em>, <em class="sig-param"><span class="n">start</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">length</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/util.html#duckpool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.util.duckpool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Duck typing friendly version of spiceypy kernel pool functions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>naifvar</strong><span class="classifier">str</span></dt><dd><p>naif var string to query pool for</p>
+</dd>
+<dt><strong>start</strong><span class="classifier">int</span></dt><dd><p>Index of first value</p>
+</dd>
+<dt><strong>length</strong><span class="classifier">int</span></dt><dd><p>max number of values returned</p>
+</dd>
+<dt><strong>default</strong><span class="classifier">obj</span></dt><dd><p>Default value to return if key is not found in kernel pool</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>: obj</dt><dd><p>Spice value returned from spiceypy if found, default value otherwise</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ale.util.find_kernels">
+<code class="sig-prename descclassname">ale.util.</code><code class="sig-name descname">find_kernels</code><span class="sig-paren">(</span><em class="sig-param">cube</em>, <em class="sig-param">isis3_data='/usgs/cpkgs/isis3/data/'</em>, <em class="sig-param">format_as=&lt;class 'dict'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/util.html#find_kernels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.util.find_kernels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find all kernels for a cube and return a json object with categorized kernels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>cube</strong><span class="classifier">str</span></dt><dd><p>Path to an ISIS cube</p>
+</dd>
+<dt><strong>isis3_data</strong><span class="classifier">str</span></dt><dd><p>path to $ISIS3DATA</p>
+</dd>
+<dt><strong>format_as</strong><span class="classifier">obj</span></dt><dd><p>What type to return the kernels as, ISIS3-like dict/PVL or flat list</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>: obj</dt><dd><p>Container with kernels</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ale.util.generate_kernels_from_cube">
+<code class="sig-prename descclassname">ale.util.</code><code class="sig-name descname">generate_kernels_from_cube</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cube</span></em>, <em class="sig-param"><span class="n">expand</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">format_as</span><span class="o">=</span><span class="default_value">'list'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/util.html#generate_kernels_from_cube"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.util.generate_kernels_from_cube" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses a cube label to obtain the kernels from the Kernels group.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>cube</strong><span class="classifier">cube</span></dt><dd><p>Path to the cube to pull the kernels from.</p>
+</dd>
+<dt><strong>expand</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether or not to expand variables within kernel paths based on your IsisPreferences file.</p>
+</dd>
+<dt><strong>format_as</strong><span class="classifier">str, optional {‘list’, ‘dict’}</span></dt><dd><p>How to return the kernels: either as a one-demensional ordered list, or as a dictionary
+of kernel lists.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>: list</dt><dd><p>One-dimensional ordered list of all kernels from the Kernels group in the cube.</p>
+</dd>
+<dt>: Dictionary</dt><dd><p>Dictionary of lists of kernels with the keys being the Keywords from the Kernels group of
+cube itself, and the values being the values associated with that Keyword in the cube.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ale.util.get_ck_frames">
+<code class="sig-prename descclassname">ale.util.</code><code class="sig-name descname">get_ck_frames</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kernel</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/util.html#get_ck_frames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.util.get_ck_frames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all of the reference frames defined in a kernel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>kernel</strong><span class="classifier">str</span></dt><dd><p>The path to the kernel</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>ids</strong><span class="classifier">list</span></dt><dd><p>The set of reference frames IDs defined in the kernel</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ale.util.get_isis_mission_translations">
+<code class="sig-prename descclassname">ale.util.</code><code class="sig-name descname">get_isis_mission_translations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">isis3_data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/util.html#get_isis_mission_translations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.util.get_isis_mission_translations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use ISIS translation files and return a lookup table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>isis3_data</strong><span class="classifier">str</span></dt><dd><p>path to $ISIS3DATA</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>: dict</dt><dd><p>Dictionary mapping label mission strings to ISIS3 mission strings</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ale.util.get_isis_preferences">
+<code class="sig-prename descclassname">ale.util.</code><code class="sig-name descname">get_isis_preferences</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">isis_preferences</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/util.html#get_isis_preferences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.util.get_isis_preferences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns ISIS Preference file as a pvl object</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="ale.util.get_metakernels">
-<code class="descclassname">ale.util.</code><code class="descname">get_metakernels</code><span class="sig-paren">(</span><em>spice_dir='/data/spice/'</em>, <em>missions={}</em>, <em>years={}</em>, <em>versions={}</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/util.html#get_metakernels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.util.get_metakernels" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ale.util.</code><code class="sig-name descname">get_metakernels</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spice_dir</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">missions</span><span class="o">=</span><span class="default_value">set()</span></em>, <em class="sig-param"><span class="n">years</span><span class="o">=</span><span class="default_value">set()</span></em>, <em class="sig-param"><span class="n">versions</span><span class="o">=</span><span class="default_value">set()</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/util.html#get_metakernels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.util.get_metakernels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a root directory, get any subdirectory containing metakernels,
 assume spice directory structure.</p>
 <p>Mostly doing filtering here, might be worth using Pandas?</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>spice_dir</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first last">Path containing Spice directories downlaoded from NAIF’s website</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>spice_dir</strong><span class="classifier">str</span></dt><dd><p>Path containing Spice directories downlaoded from NAIF’s website</p>
 </dd>
-<dt><strong>missions</strong> <span class="classifier-delimiter">:</span> <span class="classifier">set, str</span></dt>
-<dd><p class="first last">Mission or set of missions to search for</p>
+<dt><strong>missions</strong><span class="classifier">set, str</span></dt><dd><p>Mission or set of missions to search for</p>
 </dd>
-<dt><strong>years</strong> <span class="classifier-delimiter">:</span> <span class="classifier">set, str, int</span></dt>
-<dd><p class="first last">year or set of years to search for</p>
+<dt><strong>years</strong><span class="classifier">set, str, int</span></dt><dd><p>year or set of years to search for</p>
 </dd>
-<dt><strong>versions</strong> <span class="classifier-delimiter">:</span> <span class="classifier">set, str</span></dt>
-<dd><p class="first last">version or set of versions to search for</p>
+<dt><strong>versions</strong><span class="classifier">set, str</span></dt><dd><p>version or set of versions to search for</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ale.util.query_kernel_pool">
+<code class="sig-prename descclassname">ale.util.</code><code class="sig-name descname">query_kernel_pool</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">matchstr</span><span class="o">=</span><span class="default_value">'*'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/util.html#query_kernel_pool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.util.query_kernel_pool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collect multiple keywords from the naif kernel pool based on a
+template string</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>matchstr</strong><span class="classifier">str</span></dt><dd><p>matchi_c formatted str</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>: dict</dt><dd><p>python dictionary of naif keywords in {keyword:value} format.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ale.util.read_pvl">
+<code class="sig-prename descclassname">ale.util.</code><code class="sig-name descname">read_pvl</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">use_jank</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/util.html#read_pvl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.util.read_pvl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Syntax sugar, used to load a pvl object file from path</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>path</strong><span class="classifier">str</span></dt><dd><p>Path to Pvl file</p>
+</dd>
+<dt><strong>use_jank</strong><span class="classifier">bool</span></dt><dd><p>If true, uses faster but less reliable JBFPvlParser, else uses standard PVL parser.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ale.util.search_isis_db">
+<code class="sig-prename descclassname">ale.util.</code><code class="sig-name descname">search_isis_db</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dbobj</span></em>, <em class="sig-param"><span class="n">labelobj</span></em>, <em class="sig-param"><span class="n">isis3_data</span><span class="o">=</span><span class="default_value">'/usgs/cpkgs/isis3/data/'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/util.html#search_isis_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.util.search_isis_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an PVL obj of a KernelDB file and an Isis Label for a cube, find the best kernel
+to attach to the cube.</p>
+<p>The Logic here is a bit gross, but it matches ISIS’s implementation very closely.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dbobj</strong><span class="classifier">PVLModule</span></dt><dd><p>ISIS3 KernelDB file as a loaded PVLModule</p>
+</dd>
+<dt><strong>labelobj</strong><span class="classifier">PVLModule</span></dt><dd><p>Cube label as loaded PVLModule</p>
+</dd>
+<dt><strong>isis3_data</strong><span class="classifier">str</span></dt><dd><p>path to $ISIS3DATA</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>: dict</dt><dd><p>dictionary containing kernel list and optionally the kernel type if relevant.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ale.util.spkmerge_config_string">
+<code class="sig-prename descclassname">ale.util.</code><code class="sig-name descname">spkmerge_config_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dep_tree</span></em>, <em class="sig-param"><span class="n">output_spk</span></em>, <em class="sig-param"><span class="n">bodies</span></em>, <em class="sig-param"><span class="n">lsk</span></em>, <em class="sig-param"><span class="n">start</span></em>, <em class="sig-param"><span class="n">stop</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/util.html#spkmerge_config_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.util.spkmerge_config_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the contents of an spkmerge config file that will produce a spk that
+completely defines the state of a list of bodies for a time range.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dep_tree</strong><span class="classifier">nx.DiGraph</span></dt><dd><p>Dependency tree from create_kernel_dependency_tree that contains
+information about what the state of different bodies are relative
+to and where that information is stored.</p>
+</dd>
+<dt><strong>output_spk</strong><span class="classifier">str</span></dt><dd><p>The path to the SPK that will be output by spkmerge</p>
+</dd>
+<dt><strong>bodies</strong><span class="classifier">list</span></dt><dd><p>The list of body ID codes that need to be defined in the kernel
+created by spkmerge</p>
+</dd>
+<dt><strong>lsk</strong><span class="classifier">str</span></dt><dd><p>The absolute path to the leap second kernel to use</p>
+</dd>
+<dt><strong>start</strong><span class="classifier">str</span></dt><dd><p>The UTC start time for the kernel created by spkmerge</p>
+</dd>
+<dt><strong>stop</strong><span class="classifier">str</span></dt><dd><p>The UTC stop time for the kernel created by spkmerge</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>: str</dt><dd><p>The contents of an spkmerge config file that will produce a kernel that
+defines the state of the input bodies for the input time range.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ale.util.write_metakernel_from_kernel_list">
+<code class="sig-prename descclassname">ale.util.</code><code class="sig-name descname">write_metakernel_from_kernel_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kernels</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ale/util.html#write_metakernel_from_kernel_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ale.util.write_metakernel_from_kernel_list" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>kernels</strong><span class="classifier">str</span></dt><dd><p>list of kernel paths</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>: str</dt><dd><p>Returns string representation of a Naif Metakernel file</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -88,14 +367,25 @@ assume spice directory structure.</p>
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Library Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../capi/index.html"><code class="docutils literal notranslate"><span class="pre">capi</span></code> — All ALE functions</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="index.html"><code class="docutils literal notranslate"><span class="pre">python</span></code> — Input/Output Algorithms</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="base.html"><code class="docutils literal notranslate"><span class="pre">base</span></code> — Default Driver Classes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cassini_driver.html"><code class="docutils literal notranslate"><span class="pre">cassini_driver</span></code> — Cassini Driver Classes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="lro_driver.html"><code class="docutils literal notranslate"><span class="pre">lro_driver</span></code> — LRO Driver Classes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="mdis_driver.html"><code class="docutils literal notranslate"><span class="pre">mdis_driver</span></code> — MDIS Driver Classes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="mro_driver.html"><code class="docutils literal notranslate"><span class="pre">mro_driver</span></code> — MRO Driver Classes</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">util</span></code> — General Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../capi/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="base.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">base</span></code> — Default Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">co_drivers</span></code> — Cassini Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dawn_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">dawn_drivers</span></code> — Dawn Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hayabusa2_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">hayabusa2_drivers</span></code> — Hayabusa2 Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="isis_ideal_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">isis_ideal_drivers</span></code> — ISIS Ideal Camera Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="juno_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">juno_drivers</span></code> — Juno Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lro_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">lro_drivers</span></code> — LRO Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mess_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mess_drivers</span></code> — MDIS Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mex_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mex_drivers</span></code> — Mars Express Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mro_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mro_drivers</span></code> — MRO Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nh_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">nh_drivers</span></code> — New Horizons Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ody_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ody_drivers</span></code> — Odyssey Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="selene_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">selene_drivers</span></code> — Selene Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tgo_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tgo_drivers</span></code> — Trace Gas Oribiter Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="viking_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">viking_drivers</span></code> — Viking Driver Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="voyager_driver.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">voyager_drivers</span></code> — Voyager Driver Classes</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">util</span></code> — General Utilities</a></li>
 </ul>
 </li>
 </ul>
@@ -107,25 +397,23 @@ assume spice directory structure.</p>
 <ul>
   <li><a href="../../index.html">Documentation overview</a><ul>
   <li><a href="../index.html">Library Reference</a><ul>
-  <li><a href="index.html"><code class="docutils literal notranslate"><span class="pre">python</span></code> — Input/Output Algorithms</a><ul>
-      <li>Previous: <a href="mro_driver.html" title="previous chapter"><code class="docutils literal notranslate"><span class="pre">mro_driver</span></code> — MRO Driver Classes</a></li>
+  <li><a href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a><ul>
+      <li>Previous: <a href="voyager_driver.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">voyager_drivers</span></code> — Voyager Driver Classes</a></li>
   </ul></li>
   </ul></li>
   </ul></li>
 </ul>
 </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -142,7 +430,7 @@ assume spice directory structure.</p>
       &copy;Public Domain.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

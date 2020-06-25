@@ -1,0 +1,742 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ale.drivers.lro_drivers &#8212; ALE 0.8.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for ale.drivers.lro_drivers</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pvl</span>
+<span class="kn">import</span> <span class="nn">spiceypy</span> <span class="k">as</span> <span class="nn">spice</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+
+<span class="kn">from</span> <span class="nn">ale.util</span> <span class="kn">import</span> <span class="n">get_metakernels</span>
+<span class="kn">from</span> <span class="nn">ale.base</span> <span class="kn">import</span> <span class="n">Driver</span>
+<span class="kn">from</span> <span class="nn">ale.base.data_naif</span> <span class="kn">import</span> <span class="n">NaifSpice</span>
+<span class="kn">from</span> <span class="nn">ale.base.label_pds3</span> <span class="kn">import</span> <span class="n">Pds3Label</span>
+<span class="kn">from</span> <span class="nn">ale.base.label_isis</span> <span class="kn">import</span> <span class="n">IsisLabel</span>
+<span class="kn">from</span> <span class="nn">ale.base.type_sensor</span> <span class="kn">import</span> <span class="n">LineScanner</span><span class="p">,</span> <span class="n">Radar</span>
+
+
+<div class="viewcode-block" id="LroLrocPds3LabelNaifSpiceDriver"><a class="viewcode-back" href="../../../library/python/lro_driver.html#ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver">[docs]</a><span class="k">class</span> <span class="nc">LroLrocPds3LabelNaifSpiceDriver</span><span class="p">(</span><span class="n">LineScanner</span><span class="p">,</span> <span class="n">NaifSpice</span><span class="p">,</span> <span class="n">Pds3Label</span><span class="p">,</span> <span class="n">Driver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Driver for reading LROC NACL, NACR (not WAC, it is a push frame) labels. Requires a Spice mixin to</span>
+<span class="sd">    acquire addtional ephemeris and instrument data located exclusively in SPICE kernels, A PDS3 label,</span>
+<span class="sd">    and the LineScanner and Driver bases.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The short text name for the instrument</span>
+
+<span class="sd">        Returns an instrument id uniquely identifying the instrument. Used to acquire</span>
+<span class="sd">        instrument codes from Spice Lib bods2c routine.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">          The short text name for the instrument</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">instrument</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">instrument_id</span>
+
+        <span class="n">frame_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FRAME_ID&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">instrument</span> <span class="o">==</span> <span class="s2">&quot;LROC&quot;</span> <span class="ow">and</span> <span class="n">frame_id</span> <span class="o">==</span> <span class="s2">&quot;LEFT&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;LRO_LROCNACL&quot;</span>
+        <span class="k">elif</span> <span class="n">instrument</span> <span class="o">==</span> <span class="s2">&quot;LROC&quot;</span> <span class="ow">and</span> <span class="n">frame_id</span> <span class="o">==</span> <span class="s2">&quot;RIGHT&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;LRO_LROCNACR&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spacecraft_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Spacecraft name used in various SPICE calls to acquire</span>
+<span class="sd">        ephemeris data. LROC NAC img PDS3 labels do not the have SPACECRAFT_NAME keyword, so we</span>
+<span class="sd">        override it here to use the label_pds3 property for instrument_host_id</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          Spacecraft name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument_host_id</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sensor_model_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns ISIS instrument sensor model version number</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          ISIS sensor model version</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">2</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">usgscsm_distortion_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The distortion model name with its coefficients</span>
+
+<span class="sd">        LRO LROC NAC does not use the default distortion model so we need to overwrite the</span>
+<span class="sd">        method packing the distortion model into the ISD.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : dict</span>
+<span class="sd">          Returns a dict with the model name : dict of the coefficients</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;lrolrocnac&quot;</span><span class="p">:</span>
+                <span class="p">{</span><span class="s2">&quot;coefficients&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">odtk</span><span class="p">}}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">odtk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The coefficients for the distortion model</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list</span>
+<span class="sd">          Radial distortion coefficients. There is only one coefficient for LROC NAC l/r</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_OD_K&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">light_time_correction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the type of light time correciton and abberation correction to</span>
+<span class="sd">        use in NAIF calls.</span>
+
+<span class="sd">        LROC is specifically set to not use light time correction because it is</span>
+<span class="sd">        so close to the surface of the moon that light time correction to the</span>
+<span class="sd">        center of the body is incorrect.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          The light time and abberation correction string for use in NAIF calls.</span>
+<span class="sd">          See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/abcorr.html</span>
+<span class="sd">          for the different options available.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;NONE&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_center_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The center of the CCD in detector pixels</span>
+<span class="sd">        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float :</span>
+<span class="sd">            The center sample of the CCD</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">detector_center_sample</span> <span class="o">-</span> <span class="mf">0.5</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">focal2pixel_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Expects ikid to be defined. This must be the integer Naif id code of</span>
+<span class="sd">        the instrument. For LROC NAC this is flipped depending on the spacecraft</span>
+<span class="sd">        direction.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list&lt;double&gt;</span>
+<span class="sd">          focal plane to detector lines</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">focal2pixel_lines</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_ITRANSL&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_factor</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spacecraft_direction</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">focal2pixel_lines</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">focal2pixel_lines</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ephemeris_start_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The starting ephemeris time for LRO is computed by taking the</span>
+<span class="sd">        LRO:SPACECRAFT_CLOCK_PREROLL_COUNT, as defined in the label, and</span>
+<span class="sd">        adding offsets that were taken from an IAK.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : double</span>
+<span class="sd">          Starting ephemeris time of the image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">scs2e</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spacecraft_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;LRO:SPACECRAFT_CLOCK_PREROLL_COUNT&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">start_time</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">constant_time_offset</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">additional_preroll</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">exposure_duration</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">exposure_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes the exposure_duration defined in a parent class and adds</span>
+<span class="sd">        offsets taken from an IAK.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          Returns the exposure duration in seconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">exposure_duration</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiplicative_line_error</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">additive_line_error</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">multiplicative_line_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the multiplicative line error defined in an IAK.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          Returns the multiplicative line error.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">0.0045</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">additive_line_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the additive line error defined in an IAK.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          Returns the additive line error.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">constant_time_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the constant time offset defined in an IAK.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          Returns the constant time offset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">additional_preroll</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the addition preroll defined in an IAK.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          Returns the additionl preroll.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">1024.0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mission_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;MISSION_NAME&#39;</span><span class="p">]</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sampling_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the summing factor from the PDS3 label that is defined by the CROSSTRACK_SUMMING.</span>
+<span class="sd">        For example a return value of 2 indicates that 2 lines and 2 samples (4 pixels)</span>
+<span class="sd">        were summed and divided by 4 to produce the output pixel value.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          Number of samples and lines combined from the original data to produce a single pixel in this image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">crosstrack_summing</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spacecraft_direction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the x axis of the first velocity vector relative to the</span>
+<span class="sd">        spacecraft. This indicates of the craft is moving forwards or backwards.</span>
+
+<span class="sd">        From LROC Frame Kernel: lro_frames_2014049_v01.tf</span>
+<span class="sd">        &quot;+X axis is in the direction of the velocity vector half the year. The</span>
+<span class="sd">        other half of the year, the +X axis is opposite the velocity vector&quot;</span>
+
+<span class="sd">        Hence we rotate the first velocity vector into the sensor reference</span>
+<span class="sd">        frame, but the X component of that vector is inverted compared to the</span>
+<span class="sd">        spacecraft so a +X indicates backwards and -X indicates forwards</span>
+
+<span class="sd">        The returned velocity is also slightly off from the spacecraft velocity</span>
+<span class="sd">        due to the sensor being attached to the craft with wax.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        direction : double</span>
+<span class="sd">                    X value of the first velocity relative to the sensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">frame_chain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame_chain</span>
+        <span class="n">lro_bus_id</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">bods2c</span><span class="p">(</span><span class="s1">&#39;LRO_SC_BUS&#39;</span><span class="p">)</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ephemeris_start_time</span>
+        <span class="n">state</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">spkezr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spacecraft_name</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="s1">&#39;J2000&#39;</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_name</span><span class="p">)</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">state</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">velocity</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+        <span class="n">rotation</span> <span class="o">=</span> <span class="n">frame_chain</span><span class="o">.</span><span class="n">compute_rotation</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">lro_bus_id</span><span class="p">)</span>
+        <span class="n">rotated_velocity</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">mxv</span><span class="p">(</span><span class="n">rotation</span><span class="o">.</span><span class="n">_rots</span><span class="o">.</span><span class="n">as_dcm</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="n">velocity</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rotated_velocity</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="LroLrocIsisLabelNaifSpiceDriver"><a class="viewcode-back" href="../../../library/python/lro_driver.html#ale.drivers.lro_drivers.LroLrocIsisLabelNaifSpiceDriver">[docs]</a><span class="k">class</span> <span class="nc">LroLrocIsisLabelNaifSpiceDriver</span><span class="p">(</span><span class="n">LineScanner</span><span class="p">,</span> <span class="n">NaifSpice</span><span class="p">,</span> <span class="n">IsisLabel</span><span class="p">,</span> <span class="n">Driver</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The short text name for the instrument</span>
+
+<span class="sd">        Returns an instrument id uniquely identifying the instrument. Used to acquire</span>
+<span class="sd">        instrument codes from Spice Lib bods2c routine.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">          The short text name for the instrument</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">id_lookup</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;NACL&quot;</span><span class="p">:</span> <span class="s2">&quot;LRO_LROCNACL&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;NACR&quot;</span><span class="p">:</span> <span class="s2">&quot;LRO_LROCNACR&quot;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">id_lookup</span><span class="p">[</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">instrument_id</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sensor_model_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns ISIS instrument sensor model version number</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          ISIS sensor model version</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">2</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">usgscsm_distortion_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The distortion model name with its coefficients</span>
+
+<span class="sd">        LRO LROC NAC does not use the default distortion model so we need to overwrite the</span>
+<span class="sd">        method packing the distortion model into the ISD.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : dict</span>
+<span class="sd">          Returns a dict with the model name : dict of the coefficients</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;lrolrocnac&quot;</span><span class="p">:</span>
+                <span class="p">{</span><span class="s2">&quot;coefficients&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">odtk</span><span class="p">}}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">odtk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The coefficients for the distortion model</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list</span>
+<span class="sd">          Radial distortion coefficients. There is only one coefficient for LROC NAC l/r</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_OD_K&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">light_time_correction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the type of light time correciton and abberation correction to</span>
+<span class="sd">        use in NAIF calls.</span>
+
+<span class="sd">        LROC is specifically set to not use light time correction because it is</span>
+<span class="sd">        so close to the surface of the moon that light time correction to the</span>
+<span class="sd">        center of the body is incorrect.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          The light time and abberation correction string for use in NAIF calls.</span>
+<span class="sd">          See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/abcorr.html</span>
+<span class="sd">          for the different options available.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;NONE&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_center_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The center of the CCD in detector pixels</span>
+<span class="sd">        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float :</span>
+<span class="sd">            The center sample of the CCD</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">detector_center_sample</span> <span class="o">-</span> <span class="mf">0.5</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ephemeris_start_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The starting ephemeris time for LRO is computed by taking the</span>
+<span class="sd">        LRO:SPACECRAFT_CLOCK_PREROLL_COUNT, as defined in the label, and</span>
+<span class="sd">        adding offsets that were taken from an IAK.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : double</span>
+<span class="sd">          Starting ephemeris time of the image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">scs2e</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spacecraft_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;SpacecraftClockPrerollCount&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">start_time</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">constant_time_offset</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">additional_preroll</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">exposure_duration</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">exposure_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes the exposure_duration defined in a parent class and adds</span>
+<span class="sd">        offsets taken from an IAK.</span>
+
+<span class="sd">         Returns</span>
+<span class="sd">         -------</span>
+<span class="sd">         : float</span>
+<span class="sd">           Returns the exposure duration in seconds.</span>
+<span class="sd">         &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">exposure_duration</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiplicative_line_error</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">additive_line_error</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">focal2pixel_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Expects ikid to be defined. This must be the integer Naif id code of</span>
+<span class="sd">        the instrument. For LROC NAC this is flipped depending on the spacecraft</span>
+<span class="sd">        direction.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : list&lt;double&gt;</span>
+<span class="sd">          focal plane to detector lines</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">focal2pixel_lines</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">spice</span><span class="o">.</span><span class="n">gdpool</span><span class="p">(</span><span class="s1">&#39;INS</span><span class="si">{}</span><span class="s1">_ITRANSL&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ikid</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_factor</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spacecraft_direction</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">focal2pixel_lines</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">focal2pixel_lines</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">multiplicative_line_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the multiplicative line error defined in an IAK.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          Returns the multiplicative line error.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">0.0045</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">additive_line_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the additive line error defined in an IAK.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          Returns the additive line error.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">constant_time_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the constant time offset defined in an IAK.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          Returns the constant time offset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">additional_preroll</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the addition preroll defined in an IAK.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          Returns the additionl preroll.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">1024.0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sampling_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the summing factor from the PDS3 label that is defined by the CROSSTRACK_SUMMING.</span>
+<span class="sd">        For example a return value of 2 indicates that 2 lines and 2 samples (4 pixels)</span>
+<span class="sd">        were summed and divided by 4 to produce the output pixel value.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          Number of samples and lines combined from the original data to produce a single pixel in this image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;SpatialSumming&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spacecraft_direction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the x axis of the first velocity vector relative to the</span>
+<span class="sd">        spacecraft. This indicates of the craft is moving forwards or backwards.</span>
+
+<span class="sd">        From LROC Frame Kernel: lro_frames_2014049_v01.tf</span>
+<span class="sd">        &quot;+X axis is in the direction of the velocity vector half the year. The</span>
+<span class="sd">        other half of the year, the +X axis is opposite the velocity vector&quot;</span>
+
+<span class="sd">        Hence we rotate the first velocity vector into the sensor reference</span>
+<span class="sd">        frame, but the X component of that vector is inverted compared to the</span>
+<span class="sd">        spacecraft so a +X indicates backwards and -X indicates forwards</span>
+
+<span class="sd">        The returned velocity is also slightly off from the spacecraft velocity</span>
+<span class="sd">        due to the sensor being attached to the craft with wax.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        direction : double</span>
+<span class="sd">                    X value of the first velocity relative to the sensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">frame_chain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame_chain</span>
+        <span class="n">lro_bus_id</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">bods2c</span><span class="p">(</span><span class="s1">&#39;LRO_SC_BUS&#39;</span><span class="p">)</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ephemeris_start_time</span>
+        <span class="n">state</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">spkezr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spacecraft_name</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="s1">&#39;J2000&#39;</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_name</span><span class="p">)</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">state</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">velocity</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+        <span class="n">rotation</span> <span class="o">=</span> <span class="n">frame_chain</span><span class="o">.</span><span class="n">compute_rotation</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">lro_bus_id</span><span class="p">)</span>
+        <span class="n">rotated_velocity</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">mxv</span><span class="p">(</span><span class="n">rotation</span><span class="o">.</span><span class="n">_rots</span><span class="o">.</span><span class="n">as_dcm</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="n">velocity</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rotated_velocity</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="LroMiniRfIsisLabelNaifSpiceDriver"><a class="viewcode-back" href="../../../library/python/lro_driver.html#ale.drivers.lro_drivers.LroMiniRfIsisLabelNaifSpiceDriver">[docs]</a><span class="k">class</span> <span class="nc">LroMiniRfIsisLabelNaifSpiceDriver</span><span class="p">(</span><span class="n">Radar</span><span class="p">,</span> <span class="n">NaifSpice</span><span class="p">,</span> <span class="n">IsisLabel</span><span class="p">,</span> <span class="n">Driver</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The short text name for the instrument</span>
+
+<span class="sd">        Returns an instrument id uniquely identifying the instrument. Used to acquire</span>
+<span class="sd">        instrument codes from Spice Lib bods2c routine.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">          The short text name for the instrument</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">instrument_id</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">wavelength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the wavelength in meters used for image acquistion.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : double</span>
+<span class="sd">          Wavelength in meters used to create an image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Get float value of frequency in GHz</span>
+        <span class="n">frequency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;Frequency&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">wavelength</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">clight</span><span class="p">()</span> <span class="o">/</span> <span class="n">frequency</span> <span class="o">/</span> <span class="mf">1000.0</span>
+        <span class="k">return</span> <span class="n">wavelength</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">scaled_pixel_width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the scaled pixel width</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : double</span>
+<span class="sd">          scaled pixel width</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;ScaledPixelHeight&#39;</span><span class="p">];</span>
+
+
+    <span class="c1"># Default line_exposure_duration assumes that time is given in milliseconds and coverts</span>
+    <span class="c1"># in this case, the time is already given in seconds.</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">line_exposure_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Line exposure duration in seconds. The sum of the burst and the delay for the return.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : double</span>
+<span class="sd">          scaled pixel width</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;LineExposureDuration&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">range_conversion_coefficients</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Range conversion coefficients</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : List</span>
+<span class="sd">          range conversion coefficients</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">range_coefficients_orig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;RangeCoefficientSet&#39;</span><span class="p">]</span>
+
+        <span class="c1"># The first elt of each list is time, which we handle separately in range_conversion_time</span>
+        <span class="n">range_coefficients</span> <span class="o">=</span> <span class="p">[</span><span class="n">elt</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">for</span> <span class="n">elt</span> <span class="ow">in</span> <span class="n">range_coefficients_orig</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">range_coefficients</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">range_conversion_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Times, in et, associated with range conversion coefficients</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : List</span>
+<span class="sd">          times for range conversion coefficients</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">range_coefficients_utc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;RangeCoefficientSet&#39;</span><span class="p">]</span>
+        <span class="n">range_coefficients_et</span> <span class="o">=</span> <span class="p">[</span><span class="n">spice</span><span class="o">.</span><span class="n">str2et</span><span class="p">(</span><span class="n">elt</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">elt</span> <span class="ow">in</span> <span class="n">range_coefficients_utc</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">range_coefficients_et</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ephemeris_start_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the start and stop ephemeris times for the image.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          start time</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">str2et</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">utc_start_time</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ephemeris_stop_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the stop ephemeris times for the image.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          stop time</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">str2et</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">utc_stop_time</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">look_direction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Direction of the look (left or right)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : string</span>
+<span class="sd">          left or right</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;LookDirection&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../library/index.html">Library Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../drivers.html">ale.drivers</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;Public Domain.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

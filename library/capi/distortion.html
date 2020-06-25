@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>distortion — ALE Distortion Functions &#8212; ALE 0.8.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="interpolation — ALE Interpolation Functions" href="interp_utils.html" />
+    <link rel="prev" title="C — C Interface" href="index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="distortion-ale-distortion-functions">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">distortion</span></code> — ALE Distortion Functions<a class="headerlink" href="#distortion-ale-distortion-functions" title="Permalink to this headline">¶</a></h1>
+<dl class="cpp type">
+<dt id="_CPPv43ale">
+<span id="_CPPv33ale"></span><span id="_CPPv23ale"></span><span id="ale"></span><span class="target" id="namespaceale"></span><em class="property">namespace </em><code class="sig-name descname">ale</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Enums</p>
+<dl class="cpp enum">
+<dt id="_CPPv4N3ale14DistortionTypeE">
+<span id="_CPPv3N3ale14DistortionTypeE"></span><span id="_CPPv2N3ale14DistortionTypeE"></span><span class="target" id="namespaceale_1a895b3b3eb41c10706690ace239fca2f2"></span><em class="property">enum </em><code class="sig-name descname">DistortionType</code><a class="headerlink" href="#_CPPv4N3ale14DistortionTypeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt id="_CPPv4N3ale14DistortionType10TRANSVERSEE">
+<span id="_CPPv3N3ale14DistortionType10TRANSVERSEE"></span><span id="_CPPv2N3ale14DistortionType10TRANSVERSEE"></span><span class="target" id="namespaceale_1a895b3b3eb41c10706690ace239fca2f2a7a685ad5764ea10d654034dc1f2e922e"></span><em class="property">enumerator </em><code class="sig-name descname">TRANSVERSE</code><a class="headerlink" href="#_CPPv4N3ale14DistortionType10TRANSVERSEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt id="_CPPv4N3ale14DistortionType6RADIALE">
+<span id="_CPPv3N3ale14DistortionType6RADIALE"></span><span id="_CPPv2N3ale14DistortionType6RADIALE"></span><span class="target" id="namespaceale_1a895b3b3eb41c10706690ace239fca2f2add7ba76808bbd9000cc9ab21c490fcaa"></span><em class="property">enumerator </em><code class="sig-name descname">RADIAL</code><a class="headerlink" href="#_CPPv4N3ale14DistortionType6RADIALE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt id="_CPPv4N3ale14DistortionType10KAGUYALISME">
+<span id="_CPPv3N3ale14DistortionType10KAGUYALISME"></span><span id="_CPPv2N3ale14DistortionType10KAGUYALISME"></span><span class="target" id="namespaceale_1a895b3b3eb41c10706690ace239fca2f2aff101ed6f304e2110d1266600c12299b"></span><em class="property">enumerator </em><code class="sig-name descname">KAGUYALISM</code><a class="headerlink" href="#_CPPv4N3ale14DistortionType10KAGUYALISME" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt id="_CPPv4N3ale14DistortionType6DAWNFCE">
+<span id="_CPPv3N3ale14DistortionType6DAWNFCE"></span><span id="_CPPv2N3ale14DistortionType6DAWNFCE"></span><span class="target" id="namespaceale_1a895b3b3eb41c10706690ace239fca2f2aa24fb21864f3624b4742b8df797887b4"></span><em class="property">enumerator </em><code class="sig-name descname">DAWNFC</code><a class="headerlink" href="#_CPPv4N3ale14DistortionType6DAWNFCE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt id="_CPPv4N3ale14DistortionType10LROLROCNACE">
+<span id="_CPPv3N3ale14DistortionType10LROLROCNACE"></span><span id="_CPPv2N3ale14DistortionType10LROLROCNACE"></span><span class="target" id="namespaceale_1a895b3b3eb41c10706690ace239fca2f2af82ecfa54578e71b2f175a1391c6b705"></span><em class="property">enumerator </em><code class="sig-name descname">LROLROCNAC</code><a class="headerlink" href="#_CPPv4N3ale14DistortionType10LROLROCNACE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Library Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distortion</span></code> — ALE Distortion Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interp_utils.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">interpolation</span></code> — ALE Interpolation Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="isd.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ISD</span></code> — ALE Image Support Data Class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="orientation.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">orientations</span></code> — ALE Orientation Classes &amp; Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rotation.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rotation</span></code> — ALE Rotation Classes &amp; Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="state.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">states</span></code> — ALE States Classes &amp; Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="util.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">utils</span></code> — ALE Utility Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vector.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">vectors</span></code> — ALE Vector Classes &amp; Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../python/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">python</span></code> — Driver Interfaces</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Library Reference</a><ul>
+  <li><a href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">C</span></code> — C Interface</a></li>
+      <li>Next: <a href="interp_utils.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">interpolation</span></code> — ALE Interpolation Functions</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;Public Domain.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/library/capi/distortion.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

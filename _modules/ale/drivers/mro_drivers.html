@@ -1,0 +1,360 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ale.drivers.mro_drivers &#8212; ALE 0.8.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for ale.drivers.mro_drivers</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">spiceypy</span> <span class="k">as</span> <span class="nn">spice</span>
+
+<span class="kn">from</span> <span class="nn">ale.base</span> <span class="kn">import</span> <span class="n">Driver</span>
+<span class="kn">from</span> <span class="nn">ale.base.data_naif</span> <span class="kn">import</span> <span class="n">NaifSpice</span>
+<span class="kn">from</span> <span class="nn">ale.base.data_isis</span> <span class="kn">import</span> <span class="n">IsisSpice</span>
+<span class="kn">from</span> <span class="nn">ale.base.label_pds3</span> <span class="kn">import</span> <span class="n">Pds3Label</span>
+<span class="kn">from</span> <span class="nn">ale.base.label_isis</span> <span class="kn">import</span> <span class="n">IsisLabel</span>
+<span class="kn">from</span> <span class="nn">ale.base.type_distortion</span> <span class="kn">import</span> <span class="n">RadialDistortion</span>
+<span class="kn">from</span> <span class="nn">ale.base.type_sensor</span> <span class="kn">import</span> <span class="n">LineScanner</span>
+
+
+<div class="viewcode-block" id="MroCtxIsisLabelIsisSpiceDriver"><a class="viewcode-back" href="../../../library/python/mro_driver.html#ale.drivers.mro_drivers.MroCtxIsisLabelIsisSpiceDriver">[docs]</a><span class="k">class</span> <span class="nc">MroCtxIsisLabelIsisSpiceDriver</span><span class="p">(</span><span class="n">LineScanner</span><span class="p">,</span> <span class="n">IsisLabel</span><span class="p">,</span> <span class="n">IsisSpice</span><span class="p">,</span> <span class="n">RadialDistortion</span><span class="p">,</span> <span class="n">Driver</span><span class="p">):</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an instrument id for uniquely identifying the instrument, but often</span>
+<span class="sd">        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they</span>
+<span class="sd">        the same ID the Spice expects in bods2c calls.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          instrument id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">id_lookup</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;CTX&quot;</span> <span class="p">:</span> <span class="s2">&quot;MRO_CTX&quot;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">id_lookup</span><span class="p">[</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">instrument_id</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spacecraft_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          Naif ID code for the spacecraft</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;-74&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sensor_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ISIS doesn&#39;t propergate this to the ingested cube label, so hard-code it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;CONTEXT CAMERA&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_center_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The center of the CCD in detector pixels</span>
+<span class="sd">        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float :</span>
+<span class="sd">            The center sample of the CCD</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">detector_center_sample</span> <span class="o">-</span> <span class="mf">0.5</span></div>
+
+<div class="viewcode-block" id="MroCtxIsisLabelNaifSpiceDriver"><a class="viewcode-back" href="../../../library/python/mro_driver.html#ale.drivers.mro_drivers.MroCtxIsisLabelNaifSpiceDriver">[docs]</a><span class="k">class</span> <span class="nc">MroCtxIsisLabelNaifSpiceDriver</span><span class="p">(</span><span class="n">LineScanner</span><span class="p">,</span> <span class="n">IsisLabel</span><span class="p">,</span> <span class="n">NaifSpice</span><span class="p">,</span> <span class="n">RadialDistortion</span><span class="p">,</span> <span class="n">Driver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Driver for reading CTX ISIS labels.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an instrument id for uniquely identifying the instrument, but often</span>
+<span class="sd">        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they</span>
+<span class="sd">        the same ID the Spice expects in bods2c calls.</span>
+<span class="sd">        Expects instrument_id to be defined in the IsisLabel mixin. This should be</span>
+<span class="sd">        a string of the form &#39;CTX&#39;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          instrument id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">id_lookup</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;CTX&quot;</span> <span class="p">:</span> <span class="s2">&quot;MRO_CTX&quot;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">id_lookup</span><span class="p">[</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">instrument_id</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sensor_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ISIS doesn&#39;t propergate this to the ingested cube label, so hard-code it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;CONTEXT CAMERA&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ephemeris_start_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the ephemeris start time of the image.</span>
+<span class="sd">        Expects spacecraft_id to be defined. This should be the integer</span>
+<span class="sd">        Naif ID code for the spacecraft.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : float</span>
+<span class="sd">          ephemeris start time of the image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_ephemeris_start_time&#39;</span><span class="p">):</span>
+            <span class="n">sclock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;SpacecraftClockCount&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ephemeris_start_time</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">scs2e</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spacecraft_id</span><span class="p">,</span> <span class="n">sclock</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ephemeris_start_time</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ephemeris_stop_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ISIS doesn&#39;t preserve the spacecraft stop count that we can use to get</span>
+<span class="sd">        the ephemeris stop time of the image, so compute the epehemris stop time</span>
+<span class="sd">        from the start time and the exposure duration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ephemeris_start_time</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">exposure_duration</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_lines</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spacecraft_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the spacecraft name used in various Spice calls to acquire</span>
+<span class="sd">        ephemeris data.</span>
+<span class="sd">        Expects the platform_name to be defined. This should be a string of</span>
+<span class="sd">        the form &#39;Mars_Reconnaissance_Orbiter&#39;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          spacecraft name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name_lookup</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;Mars_Reconnaissance_Orbiter&#39;</span><span class="p">:</span> <span class="s1">&#39;MRO&#39;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">name_lookup</span><span class="p">[</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">platform_name</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_start_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          The starting detector sample of the image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;IsisCube&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">][</span><span class="s1">&#39;SampleFirstPixel&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_center_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The center of the CCD in detector pixels</span>
+<span class="sd">        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float :</span>
+<span class="sd">            The center sample of the CCD</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">detector_center_sample</span> <span class="o">-</span> <span class="mf">0.5</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sensor_model_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          ISIS sensor model version</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="MroCtxPds3LabelNaifSpiceDriver"><a class="viewcode-back" href="../../../library/python/mro_driver.html#ale.drivers.mro_drivers.MroCtxPds3LabelNaifSpiceDriver">[docs]</a><span class="k">class</span> <span class="nc">MroCtxPds3LabelNaifSpiceDriver</span><span class="p">(</span><span class="n">LineScanner</span><span class="p">,</span> <span class="n">Pds3Label</span><span class="p">,</span> <span class="n">NaifSpice</span><span class="p">,</span> <span class="n">RadialDistortion</span><span class="p">,</span> <span class="n">Driver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Driver for reading CTX PDS3 labels. Requires a Spice mixin to acquire addtional</span>
+<span class="sd">    ephemeris and instrument data located exclusively in spice kernels.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">instrument_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an instrument id for uniquely identifying the instrument, but often</span>
+<span class="sd">        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they</span>
+<span class="sd">        the same ID the Spice expects in bods2c calls.</span>
+<span class="sd">        Expects instrument_id to be defined in the Pds3Label mixin. This should</span>
+<span class="sd">        be a string of the form &#39;CONTEXT CAMERA&#39; or &#39;CTX&#39;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          instrument id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">id_lookup</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;CONTEXT CAMERA&#39;</span><span class="p">:</span><span class="s1">&#39;MRO_CTX&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;CTX&#39;</span><span class="p">:</span><span class="s1">&#39;MRO_CTX&#39;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">id_lookup</span><span class="p">[</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">instrument_id</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spacecraft_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the spacecraft name used in various Spice calls to acquire</span>
+<span class="sd">        ephemeris data.</span>
+<span class="sd">        Expects spacecraft_name to be defined. This should be a string of the form</span>
+<span class="sd">        &#39;MARS_RECONNAISSANCE_ORBITER&#39;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          spacecraft name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name_lookup</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;MARS_RECONNAISSANCE_ORBITER&#39;</span><span class="p">:</span> <span class="s1">&#39;MRO&#39;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">name_lookup</span><span class="p">[</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">spacecraft_name</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_start_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          Starting detector sample for the image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SAMPLE_FIRST_PIXEL&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detector_center_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The center of the CCD in detector pixels</span>
+<span class="sd">        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float :</span>
+<span class="sd">            The center sample of the CCD</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">detector_center_sample</span> <span class="o">-</span> <span class="mf">0.5</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sensor_model_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : int</span>
+<span class="sd">          ISIS sensor model version</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">platform_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the name of the platform which the instrument is mounted on</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : str</span>
+<span class="sd">          platform name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;SPACECRAFT_NAME&#39;</span><span class="p">]</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">ALE</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../library/index.html">Library Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../drivers.html">ale.drivers</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;Public Domain.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
