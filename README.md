@@ -1,6 +1,9 @@
 # Abstraction Layer for Ephemerides (ALE)
 [![Build Status](https://travis-ci.org/USGS-Astrogeology/ale.svg?branch=master)](https://travis-ci.org/USGS-Astrogeology/ale)
 [![Coverage Status](https://coveralls.io/repos/github/USGS-Astrogeology/ale/badge.svg?branch=master)](https://coveralls.io/github/USGS-Astrogeology/ale?branch=master)
+[![Docs](https://img.shields.io/badge/Docs-latest-green.svg)](https://usgs-astrogeology.github.io/ale/)
+
+
 
 This library allows for the position, rotation, velocity and rotational velocity tracking of
 multiple bodies in space, especially in relation to one another. It makes extensive use of NAIF's
