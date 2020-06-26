@@ -57,7 +57,7 @@ DpuId                 = DPU-A
 PivotAngle            = -18.805847167969 <Degrees>
 Unlutted              = 1
 LutInversionTable     = $messenger/calibration/LUT_INVERT/MDISLUTINV_0.TAB
-# added to allow for testing
+/* added to allow for testing */
 LineExposureDuration  = 1000
 End_Group
 
