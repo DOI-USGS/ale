@@ -7,10 +7,16 @@ class IsisLabel():
         if not hasattr(self, "_label"):
             if isinstance(self._file, pvl.PVLModule):
                 self._label = self._file
+            custom_grammar = pvl.grammar.ISISGrammar()
+            # Needs to be done until you can actual pass this into the pvl grammar
+            # constructor
+            custom_reserved_characters = set(custom_grammar.reserved_characters)
+            custom_reserved_characters.remove('+')
+            custom_grammar.reserved_characters = custom_reserved_characters
             try:
-                self._label = pvl.loads(self._file)
+                self._label = pvl.loads(self._file, grammar=custom_grammar)
             except Exception:
-                self._label = pvl.load(self._file)
+                self._label = pvl.load(self._file, grammar=custom_grammar)
             except:
                 raise ValueError("{} is not a valid label".format(self._file))
         return self._label
