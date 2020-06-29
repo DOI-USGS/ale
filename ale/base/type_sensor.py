@@ -51,7 +51,7 @@ class LineScanner():
         : ndarray
           ephemeris times split based on image lines
         """
-        return np.linspace(self.ephemeris_start_time,  self.ephemeris_stop_time, max(2, int(self.image_lines / 64)))
+        return np.linspace(self.ephemeris_start_time,  self.ephemeris_stop_time, max(2, self.image_lines))
 
     @property
     def ephemeris_stop_time(self):
@@ -148,7 +148,7 @@ class Radar():
     @property
     def wavelength(self):
         """
-        Returns the wavelength used for image acquistion. 
+        Returns the wavelength used for image acquistion.
 
         Returns
         -------
@@ -168,7 +168,7 @@ class Radar():
           Exposure duration for a line
         """
         raise NotImplmentedError
-       
+
 
     @property
     def scaled_pixel_width(self):
