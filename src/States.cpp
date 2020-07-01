@@ -112,13 +112,15 @@ namespace ale {
 
   State States::getState(double time, PositionInterpolation interp) const {
 
-    // If time is in times, don't need to interpolate!
-    for (int i=0; i<m_ephemTimes.size(); i++){
-        if (m_ephemTimes[i] == time) {
-          return m_states[i];
-        }
-      }
 
+    // If time is in times, don't need to interpolate!
+    auto candidate_time = std::lower_bound(m_ephemTimes.begin(), m_ephemTimes.end(), time);
+
+    if (*candidate_time == time) {
+      int index = std::distance(m_ephemTimes.begin(), candidate_time);
+      return m_states[index];
+    }
+  
     if (m_ephemTimes.size() > 1) {
       int lowerBound = interpolationIndex(m_ephemTimes, time); 
       // try to copy the surrounding 8 points as that's the most possibly needed
