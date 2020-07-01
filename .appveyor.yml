@@ -1,0 +1,39 @@
+version: '0.8.1.{build}'
+
+image: Visual Studio 2017
+
+platform:
+  - x64
+
+configuration:
+  - Release
+
+install:
+  - git submodule update --init --recursive
+  - call C:\\Miniconda36-x64\Scripts\activate.bat
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda install conda-build anaconda-client
+  - conda env create -n ale python=3.7.3
+  - conda env update -f environment.yml -n ale
+  - conda activate ale
+
+before_build:
+  - mkdir build
+  - cd build
+
+build_script:
+  - python ..\setup.py install
+  - cmake -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON -G "Visual Studio 15 2017 Win64" -DALE_BUILD_TESTS=OFF ..
+  - cmake --build . --target ALL_BUILD --config Release
+
+artifacts:
+  - path: build\Release\ale.dll
+    name: ale.dll
+  - path: build\Release\ale.lib
+    name: ale.lib
+
+on_success:
+  - call C:\\Miniconda36-x64\Scripts\activate.bat
+  - cd ../
+  - conda build -c conda-forge recipe/

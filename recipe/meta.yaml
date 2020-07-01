@@ -1,4 +1,4 @@
-{% set version = "0.0" %}
+{% set version = "0.8.1" %}
 {% set git_branch = "master" %}
 {% set build_number = "0" %}
 
@@ -13,33 +13,32 @@ source:
 build:
   number: {{ build_number }}
 
-# A number of the requirements below will have two instances: one will include a specific version
-# pinning, while the other one will not. When building a version of ALE for use specifically within
-# ISIS, use the instances with the version pinned. For all other builds, use the unpinned instances.
-# (Confirm that every requirement has one and only one instance uncommented.)
-#
-# ISIS requires pinned versions for these dependencies to avoid conflicts with other dependencies.
-# Make sure to always confirm that version numbers in this file and version numbers in the
-# meta.yaml file within the ISIS3 repo match for each dependency before building this library
-# for use within ISIS, and always upload this special ISIS build with the "isis" tag.
 requirements:
   build:
-  - cmake>=3.10
-  - eigen
+    - cmake>=3.10
+    - eigen
+  host:
+    - pip
+    - python
+    - nlohmann_json
   run:
-  - eigen
-  - networkx
-  - numpy
-  - openblas
-  - python
-  - python-dateutil
-  - pvl
-  - pysis
-  - spiceypy
+    - networkx
+    - numpy
+    - pvl
+    - python
+    - python-dateutil
+    - scipy >=1.2.0
+    - spiceypy >=2.3.0
+    - pyyaml
 
-# Add the tests eventually
-# test:
-#
+test:
+  imports:
+    - ale
+  commands:
+    - conda inspect linkages -p $PREFIX $PKG_NAME  # [not win]
+    - test -e $PREFIX/lib/libale${SHLIB_EXT}  # [unix]
+    - if not exist %LIBRARY_BIN%\ale.dll exit 1  # [win]
+    - if not exist %LIBRARY_LIB%\ale.lib exit 1  # [win]
 
 # about:
 #   home:

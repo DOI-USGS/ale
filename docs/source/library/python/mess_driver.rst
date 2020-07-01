@@ -1,4 +1,4 @@
-:mod:`mdis_driver` --- MDIS Driver Classes
+:mod:`mess_drivers` --- MDIS Driver Classes
 ============================================
 
 The :mod:`ale.drivers.mess_drivers` module

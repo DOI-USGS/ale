@@ -64,17 +64,17 @@ namespace ale {
       int getReferenceFrame() const; //! Returns reference frame as NAIF ID
       bool hasVelocity() const; //! Returns true if any velocities have been provided
 
-    /**
-     * Returns a single state by interpolating state.
-     * If the Cache has been minimized, a cubic hermite is used to interpolate the
-     * position and velocity over the reduced cache.
-     * If not, a standard lagrange interpolation will be done.
-     *
-     * @param time Time to get a value at
-     * @param interp Interpolation type to use. Will be ignored if cache is minimized.
-     *
-     * @return State
-     */
+      /**
+       * Returns a single state by interpolating state.
+       * If the Cache has been minimized, a cubic hermite is used to interpolate the
+       * position and velocity over the reduced cache.
+       * If not, a standard lagrange interpolation will be done.
+       *
+       * @param time Time to get a value at
+       * @param interp Interpolation type to use. Will be ignored if cache is minimized.
+       *
+       * @return State
+       */
       State getState(double time, PositionInterpolation interp=LINEAR) const;
 
       /** Gets a position at a single time. Operates the same way as getState() **/
@@ -89,33 +89,33 @@ namespace ale {
       /** Returns the last ephemeris time **/
       double getStopTime();
 
-    /**
-     * Perform a cache reduction. After running this, getStates(), getPositions(),
-     * and getVelocities() will return vectors of reduced size, and getState(),
-     * getPosition(), and getVelocity() will
-     * returns values interpolated over the reduced cache using a cubic hermite spline
-     *
-     * Adapted from Isis::SpicePosition::reduceCache().
-     *
-     * @param tolerance Maximum error between hermite approximation and original value.
-     */
+      /**
+       * Perform a cache reduction. After running this, getStates(), getPositions(),
+       * and getVelocities() will return vectors of reduced size, and getState(),
+       * getPosition(), and getVelocity() will
+       * returns values interpolated over the reduced cache using a cubic hermite spline
+       *
+       * Adapted from Isis::SpicePosition::reduceCache().
+       *
+       * @param tolerance Maximum error between hermite approximation and original value.
+       */
       States minimizeCache(double tolerance=0.01);
 
     private:
 
-    /**
-     * Calculates the points (indicies) which need to be kept for the hermite spline to
-     * interpolate between to mantain a maximum error of tolerance.
-     *
-     * Adapted from Isis::SpicePosition::HermiteIndices.
-     *
-     * @param tolerance Maximum error between hermite approximation and original value.
-     * @param indexList The list of indicies that need to be kept.
-     * @param baseTime Scaled base time for fit
-     * @param timeScale Time scale for fit.
-     *
-     * @return std::vector<int>
-     */
+      /**
+       * Calculates the points (indicies) which need to be kept for the hermite spline to
+       * interpolate between to mantain a maximum error of tolerance.
+       *
+       * Adapted from Isis::SpicePosition::HermiteIndices.
+       *
+       * @param tolerance Maximum error between hermite approximation and original value.
+       * @param indexList The list of indicies that need to be kept.
+       * @param baseTime Scaled base time for fit
+       * @param timeScale Time scale for fit.
+       *
+       * @return std::vector<int>
+       */
       std::vector<int> hermiteIndices(double tolerance, std::vector <int> indexList,
                                       double baseTime, double timeScale);
       std::vector<State> m_states; //! Represent as states internally to keep pos, vel together

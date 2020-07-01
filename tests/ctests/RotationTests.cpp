@@ -30,9 +30,9 @@ TEST(RotationTest, QuaternionConstructor) {
 
 TEST(RotationTest, MatrixConstructor) {
   Rotation rotation(
-        {0.0, 0.0, 1.0,
-         1.0, 0.0, 0.0,
-         0.0, 1.0, 0.0});
+        {0.0, 1.0, 0.0,
+         0.0, 0.0, 1.0,
+         1.0, 0.0, 0.0});
   vector<double> quat = rotation.toQuaternion();
   ASSERT_EQ(quat.size(), 4);
   EXPECT_NEAR(quat[0], -0.5, 1e-10);
@@ -113,13 +113,13 @@ TEST(RotationTest, ToRotationMatrix) {
   vector<double> mat = rotation.toRotationMatrix();
   ASSERT_EQ(mat.size(), 9);
   EXPECT_NEAR(mat[0], 0.0, 1e-10);
-  EXPECT_NEAR(mat[1], 0.0, 1e-10);
-  EXPECT_NEAR(mat[2], 1.0, 1e-10);
-  EXPECT_NEAR(mat[3], 1.0, 1e-10);
+  EXPECT_NEAR(mat[1], 1.0, 1e-10);
+  EXPECT_NEAR(mat[2], 0.0, 1e-10);
+  EXPECT_NEAR(mat[3], 0.0, 1e-10);
   EXPECT_NEAR(mat[4], 0.0, 1e-10);
-  EXPECT_NEAR(mat[5], 0.0, 1e-10);
-  EXPECT_NEAR(mat[6], 0.0, 1e-10);
-  EXPECT_NEAR(mat[7], 1.0, 1e-10);
+  EXPECT_NEAR(mat[5], 1.0, 1e-10);
+  EXPECT_NEAR(mat[6], 1.0, 1e-10);
+  EXPECT_NEAR(mat[7], 0.0, 1e-10);
   EXPECT_NEAR(mat[8], 0.0, 1e-10);
 }
 
