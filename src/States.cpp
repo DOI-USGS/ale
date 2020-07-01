@@ -116,7 +116,7 @@ namespace ale {
     // If time is in times, don't need to interpolate!
     auto candidate_time = std::lower_bound(m_ephemTimes.begin(), m_ephemTimes.end(), time);
 
-    if (*candidate_time == time) {
+    if ( (candidate_time != m_ephemTimes.end()) && (*candidate_time == time) ) {
       int index = std::distance(m_ephemTimes.begin(), candidate_time);
       return m_states[index];
     }
