@@ -5,8 +5,8 @@
 # CMake initialization
 
 # Specify the required version of CMake.
-# cmake 3.10 required for ctest/gtest integration
-cmake_minimum_required(VERSION 3.10)
+# cmake 3.15 required for findPython virtualenv configuration
+cmake_minimum_required(VERSION 3.15)
 project(ale VERSION 0.8.2 DESCRIPTION "Abstraction Library for Ephemerides ")
 
 # include what we need
