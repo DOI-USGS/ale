@@ -5,9 +5,9 @@
 # CMake initialization
 
 # Specify the required version of CMake.
-# cmake 3.10 required for ctest/gtest integration
-cmake_minimum_required(VERSION 3.10)
-project(ale VERSION 0.8.1 DESCRIPTION "Abstraction Library for Ephemerides ")
+# cmake 3.15 required for findPython virtualenv configuration
+cmake_minimum_required(VERSION 3.15)
+project(ale VERSION 0.8.2 DESCRIPTION "Abstraction Library for Ephemerides ")
 
 # include what we need
 include(GNUInstallDirs)
@@ -15,8 +15,8 @@ include(GNUInstallDirs)
 set(CMAKE_CXX_STANDARD 11)
 
 option(ALE_BUILD_LOAD "If the C++ Python load interface should be built." ON)
-option(ALE_USE_EXTERNAL_JSON "If an external nlohmann JSON library should be used" OFF)
-option(ALE_USE_EXTERNAL_EIGEN "If an external EIGEN library should be used" OFF)
+option(ALE_USE_EXTERNAL_JSON "If an external nlohmann JSON library should be used" ON)
+option(ALE_USE_EXTERNAL_EIGEN "If an external EIGEN library should be used" ON)
 
 # Third Party Dependencies
 if(ALE_USE_EXTERNAL_JSON)
@@ -38,8 +38,10 @@ endif()
 if(ALE_BUILD_LOAD)
   # If there is an Anaconda environment activated, search that for Python first
   if(EXISTS $ENV{CONDA_PREFIX})
-    message("Searching $ENV{CONDA_PREFIX} for Python libraries")
-    set(Python_ROOT_DIR $ENV{CONDA_PREFIX})
+    message("Searching Anaconda environment at $ENV{CONDA_PREFIX} for Python libraries")
+    set(Python_FIND_VIRTUALENV FIRST)
+    set(Python_FIND_REGISTRY LAST)
+    set(Python_FIND_FRAMEWORK LAST)
     set(Python_FIND_STRATEGY LOCATION)
   endif()
   find_package(Python REQUIRED COMPONENTS Development)
