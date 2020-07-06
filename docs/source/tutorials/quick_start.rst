@@ -13,6 +13,8 @@ Once you have `Anaconda <https://www.anaconda.com/products/individual>`_ or
 `Miniconda <https://docs.conda.io/en/latest/miniconda.html>`_ installed install
 ALE from conda-forge by running
 
+.. code-block::
+
   conda install -c conda-forge ale
 
 It is highly recommended that you use
