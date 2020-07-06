@@ -2,14 +2,14 @@
 ALE Quick Start
 ===============
 
-This document provides a set of steps to get setup for generating Image Support
-Data (ISD).
+This document provides a set of steps to get setup for generating an Image Support
+Data (ISD) for an image.
 
 Installation
 ============
 
-The easiest way to setup ALE is using `Anaconda <https://www.anaconda.com/>`_.
-Once you have `Anaconda <https://www.anaconda.com/products/individual>`_ or
+The easiest way to setup ALE is using Anaconda. Once you have
+`Anaconda <https://www.anaconda.com/products/individual>`_ or
 `Miniconda <https://docs.conda.io/en/latest/miniconda.html>`_ installed install
 ALE from conda-forge by running
 
@@ -17,9 +17,10 @@ ALE from conda-forge by running
 
   conda install -c conda-forge ale
 
-It is highly recommended that you use
-`environments <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html>`_
-to manage the packages you install with Anaconda.
+.. note::
+  It is highly recommended that you use
+  `environments <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html>`_
+  to manage the packages you install with Anaconda.
 
 Data
 ====
@@ -49,7 +50,7 @@ you have the PDS kernel archives downloaded. An example structure would be
   * dawn-m_a-spice-6-v1.0
   * mess-e_v_h-spice-6-v1.0
 
-See :py:meth:`ale.base.NaifSpice.kernels` for more information about how to
+See :py:attr:`ale.base.data_naif.NaifSpice.kernels` for more information about how to
 specify NAIF SPICE kernels.
 
 Load/Loads

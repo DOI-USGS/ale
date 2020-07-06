@@ -1,6 +1,9 @@
 import pvl
 
 class Pds3Label():
+    """
+    Mix-in for parsing PDS3 PVL labels.
+    """
 
     @property
     def label(self):

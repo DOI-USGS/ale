@@ -8,11 +8,15 @@
 .. toctree::
 
   base
+  data_isis
+  data_naif
   co_driver
   dawn_driver
   hayabusa2_driver
   isis_ideal_driver
   juno_driver
+  label_isis
+  label_pds3
   lro_driver
   mess_driver
   mex_driver
