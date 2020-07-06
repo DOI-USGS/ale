@@ -77,7 +77,7 @@ namespace ale {
       std::vector<double> toRotationMatrix() const;
 
       /**
-       * Create a state rotation matrix from the rotation and an angula velocity.
+       * Create a state rotation matrix from the rotation and an angular velocity.
        *
        * @param av The angular velocity vector.
        *

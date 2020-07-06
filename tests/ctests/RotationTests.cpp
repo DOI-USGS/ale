@@ -28,6 +28,18 @@ TEST(RotationTest, QuaternionConstructor) {
   EXPECT_NEAR(quat[3], 0.0, 1e-10);
 }
 
+TEST(RotationTest, UnnormalizedQuaternion) {
+  Rotation rotation(1.0, 1.0, 0.0, 0.0);
+  vector<double> quat = rotation.toQuaternion();
+  ASSERT_EQ(quat.size(), 4);
+  // The constructor will normalize the quaternion. 
+  EXPECT_NEAR(quat[0], 1.0/sqrt(2), 1e-10);
+  EXPECT_NEAR(quat[1], 1.0/sqrt(2), 1e-10);
+  EXPECT_NEAR(quat[2], 0.0, 1e-10);
+  EXPECT_NEAR(quat[3], 0.0, 1e-10);
+}
+
+
 TEST(RotationTest, MatrixConstructor) {
   Rotation rotation(
         {0.0, 1.0, 0.0,
