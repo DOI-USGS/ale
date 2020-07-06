@@ -14,7 +14,7 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda install conda-build anaconda-client
-  - conda env create -n ale python=3.7.3
+  - conda env create -n ale
   - conda env update -f environment.yml -n ale
   - conda activate ale
 
@@ -24,7 +24,7 @@ before_build:
 
 build_script:
   - python ..\setup.py install
-  - cmake -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON -G "Visual Studio 15 2017 Win64" -DALE_BUILD_TESTS=OFF ..
+  - cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON -G "Visual Studio 15 2017 Win64" -DALE_BUILD_TESTS=OFF ..
   - cmake --build . --target ALL_BUILD --config Release
 
 artifacts:
