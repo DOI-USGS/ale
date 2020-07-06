@@ -51,27 +51,34 @@ namespace ale {
     return m_constRotation;
   }
 
-  Rotation Orientations::interpolate(
+  Rotation Orientations::interpolateTimeDep(
     double time,
     RotationInterpolation interpType
   ) const {
-    Rotation interpRotation;
+    Rotation timeDepRotation;
     if (m_times.size() > 1) {
       int interpIndex = interpolationIndex(m_times, time);
       double t = (time - m_times[interpIndex]) / (m_times[interpIndex + 1] - m_times[interpIndex]);
-      interpRotation = m_constRotation * m_rotations[interpIndex].interpolate(m_rotations[interpIndex + 1], t, interpType);
+      timeDepRotation = m_rotations[interpIndex].interpolate(m_rotations[interpIndex + 1], t, interpType);
     }
     else if (m_avs.empty()) {
-      interpRotation = m_constRotation * m_rotations.front();
+      timeDepRotation = m_rotations.front();
     }
     else {
       double t = time - m_times.front();
       std::vector<double> axis = {m_avs.front().x, m_avs.front().y, m_avs.front().z};
       double angle = t * m_avs.front().norm();
       Rotation newRotation(axis, angle);
-      interpRotation = m_constRotation * newRotation * m_rotations.front();
+      timeDepRotation = newRotation * m_rotations.front();
     }
-    return interpRotation;
+    return timeDepRotation;
+  }
+
+  Rotation Orientations::interpolate(
+    double time,
+    RotationInterpolation interpType
+  ) const {
+    return m_constRotation * interpolateTimeDep(time, interpType);
   }
 
 

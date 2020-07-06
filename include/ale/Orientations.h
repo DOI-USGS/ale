@@ -42,6 +42,14 @@ namespace ale {
     Rotation getConstantRotation() const;
 
     /**
+     * Get the time dependent component of the interpolated rotation at a specific time.
+     */
+    Rotation interpolateTimeDep(
+      double time,
+      RotationInterpolation interpType=SLERP
+    ) const;
+
+    /**
      * Get the interpolated rotation at a specific time.
      */
     Rotation interpolate(
