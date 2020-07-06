@@ -2,6 +2,7 @@
 ===================================
 
 .. autofunction:: ale.drivers.load
+.. autofunction:: ale.drivers.loads
 
 
 .. toctree::
