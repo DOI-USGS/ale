@@ -1,5 +1,5 @@
-:mod:`IsisLabel` --- ISIS Cube Label Mix-in
-============================================
+:mod:`Label Data` --- Label Data Mix-ins
+========================================
 
 The :mod:`ale.drivers.label_isis` module
 
