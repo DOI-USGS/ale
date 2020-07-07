@@ -1,7 +1,7 @@
 :mod:`Label Data` --- Label Data Mix-ins
 ========================================
 
-The :mod:`ale.drivers.label_isis` module
+Modules for accessing label data.
 
 .. versionadded:: 0.1.0
 
