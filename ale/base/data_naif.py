@@ -9,6 +9,10 @@ from ale.rotation import TimeDependentRotation
 from ale import util
 
 class NaifSpice():
+    """
+    Mix-in for reading data from NAIF SPICE Kernels.
+    """
+
     def __enter__(self):
         """
         Called when the context is created. This is used
@@ -29,6 +33,30 @@ class NaifSpice():
 
     @property
     def kernels(self):
+        """
+        Get the NAIF SPICE Kernels to furnish
+
+        There are two ways to specify which kernels a driver will use:
+
+        1. Passing the 'kernels' property into load(s) or at instantiation.
+           This can be either a straight iterable or a dictionary that specifies
+           the kernels in ISIS style ('TargetPosition', 'InstrumentPosition', etc).
+        2. Set the ALESPICEROOT environment variable. This variable should be
+           the path to a directory that contains directories whose naming
+           convention matches the PDS Kernel Archives format,
+           `shortMissionName-versionInfo`. The directory corresponding to the
+           driver's mission will be searched for the approriate meta kernel to
+           load.
+
+        See Also
+        --------
+        ale.util.get_kernels_from_isis_pvl : Function used to parse ISIS style dict
+        ale.util.get_metakernels : Function that searches ALESPICEROOT for meta kernels
+        ale.util.generate_kernels_from_cube : Helper function to get an ISIS style dict
+                                              from an ISIS cube that has been through
+                                              spiceinit
+
+        """
         if not hasattr(self, '_kernels'):
             if 'kernels' in self._props.keys():
                 try:
