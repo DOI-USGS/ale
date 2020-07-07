@@ -9,3 +9,10 @@ The :mod:`ale.drivers.label_isis` module
   :synopsis:
   :members:
   :show-inheritance:
+
+.. versionadded:: 0.1.0
+
+.. automodule:: ale.base.label_pds3
+  :synopsis:
+  :members:
+  :show-inheritance:
