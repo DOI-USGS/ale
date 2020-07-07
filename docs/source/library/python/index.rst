@@ -9,5 +9,7 @@
 
   base
   util
+  rotation
+  transformation
   mix_ins/index
   concrete_drivers/index
