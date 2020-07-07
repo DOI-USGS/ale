@@ -55,22 +55,37 @@ class AleJsonEncoder(json.JSONEncoder):
 
 def load(label, props={}, formatter='ale', verbose=False):
     """
-    Attempt to load a given label from all possible drivers
+    Attempt to load a given label from all possible drivers.
+
+    This function opens up the label file and attempts to produce an ISD in the
+    format specified using the supplied properties. Drivers are tried sequentially
+    until an ISD is successfully created. Drivers that use external ephemeris
+    data are tested before drivers that use attached epehemeris data.
 
     Parameters
     ----------
     label : str
-               String path to the given label file
+            String path to the given label file
 
     props : dict
             A dictionary of optional keywords/parameters for use in driver
-            loading
+            loading. Each driver specifies its own set of properties to use.
+            For example, Drivers that use the NaifSpice mix-in use the 'kernels'
+            property to specify an explicit set of kernels and load order.
 
-    formatter : str
-                Formatted output to expect from the driver
+    formatter : {'ale', 'isis', 'usgscsm'}
+                Output format for the ISD. As of 0.8.0, it is recommended that
+                the `ale` formatter is used. The `isis` and `usgscsm` formatters
+                are retrained for backwards compatability.
 
     verbose : bool
-              If True, displays error messages from driver loading
+              If True, displays debug output specifying which drivers were
+              attempted and why they failed.
+
+    Returns
+    -------
+    dict
+         The ISD as a dictionary
     """
     if isinstance(formatter, str):
         formatter = __formatters__[formatter]
@@ -99,5 +114,19 @@ def load(label, props={}, formatter='ale', verbose=False):
     raise Exception('No Such Driver for Label')
 
 def loads(label, props='', formatter='ale', verbose=False):
+    """
+    Attempt to load a given label from all possible drivers.
+
+    This function is the same as load, except it returns a JSON formatted string.
+
+    Returns
+    -------
+    str
+        The ISD as a JSON formatted string
+
+    See Also
+    --------
+    load
+    """
     res = load(label, props, formatter, verbose=verbose)
     return json.dumps(res, cls=AleJsonEncoder)
