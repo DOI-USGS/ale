@@ -2,7 +2,7 @@
 ALE Quick Start
 ===============
 
-This document provides a set of steps to get setup for generating an Image Support
+This document provides a set of steps to get setup for generating Image Support
 Data (ISD) for an image.
 
 Installation
@@ -37,11 +37,11 @@ cube file.
 
 
 If you are working with PDS3 images or ISIS cubes that do not have attached
-SPICE, then you will need to download the required NAIF SPICE Kernels for you
+SPICE, then you will need to download the required NAIF SPICE Kernels for your
 image. It is recommended that you use the metakernels provided in the
 `PDS kernel archives <https://naif.jpl.nasa.gov/naif/data_archived.html>`_.
 You can specify the path for ALE to search for metakernels via the
-``ALESPICEROOT`` environment variable. This should set to the directory where
+``ALESPICEROOT`` environment variable. This should be set to the directory where
 you have the PDS kernel archives downloaded. An example structure would be
 
 * $ALESPICEROOT

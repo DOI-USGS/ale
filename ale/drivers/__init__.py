@@ -58,7 +58,7 @@ def load(label, props={}, formatter='ale', verbose=False):
     Attempt to load a given label from all possible drivers.
 
     This function opens up the label file and attempts to produce an ISD in the
-    format specified using the supplied properties. Drivers are used sequentially
+    format specified using the supplied properties. Drivers are tried sequentially
     until an ISD is successfully created. Drivers that use external ephemeris
     data are tested before drivers that use attached epehemeris data.
 
@@ -71,7 +71,7 @@ def load(label, props={}, formatter='ale', verbose=False):
             A dictionary of optional keywords/parameters for use in driver
             loading. Each driver specifies its own set of properties to use.
             For example, Drivers that use the NaifSpice mix-in use the 'kernels'
-            property to specify an explicity set of kernels and load order.
+            property to specify an explicit set of kernels and load order.
 
     formatter : {'ale', 'isis', 'usgscsm'}
                 Output format for the ISD. As of 0.8.0, it is recommended that
