@@ -9,3 +9,4 @@ Ephemeris Abstraction Library
    :maxdepth: 3
 
    library/index
+   tutorials/index

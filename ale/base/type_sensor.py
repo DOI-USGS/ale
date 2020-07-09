@@ -1,6 +1,9 @@
 import numpy as np
 
 class LineScanner():
+    """
+    Mix-in for line scan sensors.
+    """
 
     @property
     def name_model(self):
@@ -70,6 +73,10 @@ class LineScanner():
         return self.ephemeris_start_time + (self.image_lines * self.exposure_duration)
 
 class Framer():
+    """
+    Mix-in for framing sensors.
+    """
+
     @property
     def name_model(self):
         """
@@ -114,6 +121,10 @@ class Framer():
         return self.ephemeris_start_time + self.exposure_duration
 
 class Radar():
+    """
+    Mix-in for synthetic aperture radar sensors.
+    """
+
     @property
     def name_model(self):
         """

@@ -111,6 +111,16 @@ namespace ale {
 
 
   State States::getState(double time, PositionInterpolation interp) const {
+
+
+    // If time is in times, don't need to interpolate!
+    auto candidate_time = std::lower_bound(m_ephemTimes.begin(), m_ephemTimes.end(), time);
+
+    if ( (candidate_time != m_ephemTimes.end()) && (*candidate_time == time) ) {
+      int index = std::distance(m_ephemTimes.begin(), candidate_time);
+      return m_states[index];
+    }
+  
     if (m_ephemTimes.size() > 1) {
       int lowerBound = interpolationIndex(m_ephemTimes, time); 
       // try to copy the surrounding 8 points as that's the most possibly needed
@@ -132,7 +142,6 @@ namespace ale {
       }
 
       Vec3d position, velocity;
-
       if ( interp == LINEAR || (interp == SPLINE && !hasVelocity())) {
         position = {interpolate(xs,  interpTimes, time, interp, 0),
                     interpolate(ys,  interpTimes, time, interp, 0),
@@ -145,7 +154,6 @@ namespace ale {
       else if (interp == SPLINE && hasVelocity()){
         // Do hermite spline if velocities are available
         double baseTime = (interpTimes.front() + interpTimes.back()) / 2;
-
         std::vector<double> scaledEphemTimes;
         for(unsigned int i = 0; i < interpTimes.size(); i++) {
           scaledEphemTimes.push_back(interpTimes[i] - baseTime);
@@ -169,7 +177,7 @@ namespace ale {
       return State(position, velocity);
     }
     else { // Here we have: only 1 time and 1 state, so just return the only state.
-      return State(m_states[0]);
+      return m_states[0];
     }
   }
 

@@ -26,9 +26,9 @@ copyright = 'Public Domain'
 author = 'USGS, Astrogeology Science Center'
 
 # The short X.Y.Z version
-version = '0.8.1'
+version = '0.8.2'
 # The full version, including alpha/beta/rc tags
-release = '0.8.1'
+release = '0.8.2'
 
 
 # -- General configuration ---------------------------------------------------
