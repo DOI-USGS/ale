@@ -7,6 +7,7 @@ import numpy as np
 from ale.formatters.isis_formatter import to_isis
 from ale.formatters.formatter import to_isd
 from ale.base.data_isis import IsisSpice
+from ale.drivers.tgo_drivers import TGOCassisIsisLabelNaifSpiceDriver
 
 import unittest
 from unittest.mock import patch
