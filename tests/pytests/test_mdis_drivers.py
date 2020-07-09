@@ -27,8 +27,7 @@ image_dict = {
 @pytest.mark.parametrize("image", image_dict.keys())
 def test_load(test_kernels, label_type, image):
     label_file = get_image_label(image, label_type)
-    print(test_kernels)
-    usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels}, verbose=True)
+    usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels})
     usgscsm_isd_obj = json.loads(usgscsm_isd_str)
     print(json.dumps(usgscsm_isd_obj, indent=2))
 
