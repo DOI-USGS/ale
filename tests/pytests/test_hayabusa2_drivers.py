@@ -24,10 +24,8 @@ def test_kernels():
 @pytest.mark.parametrize("label_type", ['isis3'])
 def test_hayabusa_load(test_kernels, label_type):
     label_file = get_image_label('hyb2_onc_20151203_084458_w2f_l2a', label_type)
-    usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels}, verbose=False)
-    isd_dict = json.loads(usgscsm_isd_str)
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels}, verbose=False)
+    isd_obj = json.loads(isd_str)
     compare_dict = get_isd('hayabusa2')
-
-    print(isd_dict)
-
-    assert compare_dicts(isd_dict, compare_dict) == []
+    print(json.dumps(isd_obj, indent=2))
+    assert compare_dicts(isd_obj, compare_dict) == []

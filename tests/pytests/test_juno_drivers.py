@@ -21,16 +21,14 @@ def test_kernels():
     for kern in binary_kernels:
         os.remove(kern)
 
-# @pytest.mark.xfail
 @pytest.mark.parametrize("label_type", ['isis3'])
 def test_mro_load(test_kernels, label_type):
     label_file = get_image_label('JNCR_2016240_01M06152_V01', label_type)
-    usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels})
-    usgscsm_isd_obj = json.loads(usgscsm_isd_str)
-    isis_compare_dict = get_isd('juno')
-    print(json.dumps(usgscsm_isd_obj, indent=2))
-
-    assert compare_dicts(usgscsm_isd_obj, isis_compare_dict) == []
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels})
+    isd_obj = json.loads(isd_str)
+    compare_dict = get_isd('juno')
+    print(json.dumps(isd_obj, indent=2))
+    assert compare_dicts(isd_obj, compare_dict) == []
 
 # ========= Test isislabel and naifspice driver =========
 class test_isis_naif(unittest.TestCase):

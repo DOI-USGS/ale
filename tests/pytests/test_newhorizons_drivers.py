@@ -27,8 +27,8 @@ def test_kernels(scope="module"):
 
 def test_newhorizons_load(test_kernels):
     label_file = get_image_label("lor_0034974380_0x630_sci_1", "isis")
-    usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels})
-    isd_dict = json.loads(usgscsm_isd_str)
-    isis_compare_dict = get_isd('newhorizons')
-
-    assert compare_dicts(isd_dict, isis_compare_dict) == []
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels})
+    isd_obj = json.loads(isd_str)
+    compare_dict = get_isd('newhorizons')
+    print(json.dumps(isd_obj, indent=2))
+    assert compare_dicts(isd_obj, compare_dict) == []
