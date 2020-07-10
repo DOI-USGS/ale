@@ -31,6 +31,7 @@ def test_kernels():
         for kern in kern_list:
             os.remove(kern)
 
+@pytest.mark.xfail
 @pytest.mark.parametrize("label_type", ['isis3'])
 @pytest.mark.parametrize("image", image_dict.keys())
 def test_load(test_kernels, label_type, image):

@@ -20,7 +20,7 @@ def test_kernels():
     for kern in binary_kernels:
         os.remove(kern)
 
-
+@pytest.mark.xfail
 @pytest.mark.parametrize("label_type", ['isis3'])
 def test_hayabusa_load(test_kernels, label_type):
     label_file = get_image_label('hyb2_onc_20151203_084458_w2f_l2a', label_type)
