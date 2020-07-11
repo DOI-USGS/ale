@@ -21,18 +21,17 @@ def test_kernels():
         os.remove(kern)
 
 image_dict = {
-    'EN1072174528M': get_isd("messmdis")}
+    'EN1072174528M': get_isd("messmdis")
+}
 
 @pytest.mark.parametrize("label_type", ["pds3", "isis3"])
 @pytest.mark.parametrize("image", image_dict.keys())
 def test_load(test_kernels, label_type, image):
     label_file = get_image_label(image, label_type)
-    print(test_kernels)
-    usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels}, verbose=True)
-    usgscsm_isd_obj = json.loads(usgscsm_isd_str)
-    print(json.dumps(usgscsm_isd_obj, indent=2))
-
-    assert compare_dicts(usgscsm_isd_obj, image_dict[image]) == []
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels})
+    isd_obj = json.loads(isd_str)
+    print(json.dumps(isd_obj, indent=2))
+    assert compare_dicts(isd_obj, image_dict[image]) == []
 
 # ========= Test Pds3 Label and NAIF Spice driver =========
 class test_pds3_naif(unittest.TestCase):

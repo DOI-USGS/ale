@@ -2,9 +2,10 @@ from ale import util
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
+from ale.base.type_distortion import NoDistortion
 from ale.base.base import Driver
 
-class JunoJunoCamIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
+class JunoJunoCamIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
     """
     Driver for reading Juno ISIS labels.
     """

@@ -1,0 +1,175 @@
+{
+  "isis_camera_version": 1,
+  "naif_keywords": {"BODY599_RADII": [71492.0, 71492.0, 66854.0],
+                   "BODY_FRAME_CODE": 10015,
+                   "BODY_CODE": 599,
+                   "INS-61500_ITRANSS": [0.0, 135.1351, 0.0],
+                   "INS-61500_DISTORTION_K1": -5.962420945566733e-08,
+                   "INS-61500_DISTORTION_K2": 2.738191004225615e-14,
+                   "FRAME_-61500_CLASS_ID": -61500.0,
+                   "INS-61500_BORESIGHT": [0.0, 0.0, 1.0],
+                   "TKFRAME_-61500_RELATIVE": "JUNO_JUNOCAM_CUBE",
+                   "INS-61500_BORESIGHT_SAMPLE": 814.21,
+                   "INS-61500_FOV_SHAPE": "POLYGON",
+                   "INS-61500_FILTER_OFFSET": 1.0,
+                   "INS-61500_SWAP_OBSERVER_TARGET": "TRUE",
+                   "INS-61500_LIGHTTIME_CORRECTION": "NONE",
+                   "INS-61500_FOV_BOUNDARY_CORNERS": [-0.47351727, -0.18862601,  0.86034971, -0.47852984, -0.11376363,
+        0.87067045, -0.47934991, -0.09577177,  0.87238262, -0.48125208],
+                   "INS-61500_PIXEL_PITCH": 0.0074,
+                   "INS-61500_FOV_FRAME": "JUNO_JUNOCAM",
+                   "TKFRAME_-61500_ANGLES": [0.69 , -0.469,  0.583],
+                   "FRAME_-61500_CENTER": -61.0,
+                   "FRAME_-61500_CLASS": 4.0,
+                   "FRAME_-61500_NAME": "JUNO_JUNOCAM",
+                   "INS-61500_LT_SURFACE_CORRECT": "FALSE",
+                   "TKFRAME_-61500_AXES": [3.0, 2.0, 1.0],
+                   "INS-61500_PIXEL_SIZE": 0.0074,
+                   "TKFRAME_-61500_SPEC": "ANGLES",
+                   "INS-61500_DISTORTION_X": 814.21,
+                   "INS-61500_DISTORTION_Y": 78.48,
+                   "INS-61500_BORESIGHT_LINE": 600.0,
+                   "INS-61500_FILTER_LINES": 1200.0,
+                   "INS-61500_INTERFRAME_DELTA": 0.001,
+                   "INS-61500_FILTER_NAME": "FULLCCD",
+                   "INS-61500_TRANSX": [0.0, 0.0074, 0.0],
+                   "INS-61500_TRANSY": [0.0, 0.0, 0.0074],
+                   "TKFRAME_-61500_UNITS": "DEGREES",
+                   "INS-61500_ITRANSL": [0.0,   0.0, 135.1351],
+                   "INS-61500_START_TIME_BIAS": 0.06188,
+                   "INS-61500_FOCAL_LENGTH": 10.95637,
+                   "INS-61500_FILTER_SAMPLES": 1648.0,
+                   "BODY599_PM": [284.95, 870.536, 0.0],
+                   "BODY599_LONG_AXIS": 0.0,
+                   "BODY599_NUT_PREC_DEC": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                   "BODY599_NUT_PREC_PM": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                   "BODY599_POLE_RA":  [ 2.68056595e+02, -6.49900000e-03,  0.00000000e+00],
+                   "BODY599_POLE_DEC":  [6.4495303e+01, 2.4130000e-03, 0.0000000e+00],
+                   "BODY599_NUT_PREC_RA":  [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                   "INS-61504_DISTORTION_K1": -5.962420945566733e-08,
+                   "INS-61504_DISTORTION_K2": 2.738191004225615e-14,
+                   "INS-61504_START_TIME_BIAS": 0.06188,
+                   "INS-61504_FOV_FRAME": "JUNO_JUNOCAM",
+                   "INS-61504_FILTER_OFFSET": 284.52,
+                   "INS-61504_FILTER_NAME": "METHANE",
+                   "INS-61504_FOV_BOUNDARY_CORNERS":  [-0.47351727, -0.18862601,  0.86034971, -0.47852984, -0.11376363,
+        0.87067045,  0.49067337, -0.11299511, 0.86398596, 0.48553839],
+                   "INS-61504_INTERFRAME_DELTA": 0.001,
+                   "INS-61504_FILTER_SAMPLES": 1648.0,
+                   "INS-61504_DISTORTION_X": 814.21,
+                   "INS-61504_DISTORTION_Y": 315.48,
+                   "INS-61504_PIXEL_SIZE": 0.0074,
+                   "INS-61504_FILTER_LINES": 128.0,
+                   "INS-61504_BORESIGHT":  [ 0.00854687, -0.16805056,  0.98574133],
+                   "INS-61504_FOCAL_LENGTH": 10.95637,
+                   "INS-61504_FOV_SHAPE": "RECTANGLE"
+  },
+  "detector_sample_summing": 1,
+  "detector_line_summing": 1,
+  "focal_length_model": {
+    "focal_length": 10.95637
+  },
+  "detector_center": {
+    "line": 600.0,
+    "sample": 814.21
+  },
+  "starting_detector_line": 0,
+  "starting_detector_sample": 0,
+  "focal2pixel_lines": [
+    0.0,
+    0.0,
+    135.1351
+  ],
+  "focal2pixel_samples": [
+    0.0,
+    135.1351,
+    0.0
+  ],
+  "optical_distortion": {
+    "radial": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "image_lines": 128,
+  "image_samples": 1648,
+  "name_platform": "JUNO",
+  "name_sensor": "JUNO EPO CAMERA",
+  "reference_height": {
+    "maxheight": 1000,
+    "minheight": -1000,
+    "unit": "m"
+  },
+  "name_model": "USGS_ASTRO_FRAME_SENSOR_MODEL",
+  "center_ephemeris_time": 525560475.1286545,
+  "radii": {
+    "semimajor": 71492.0,
+    "semiminor": 66854.0,
+    "unit": "km"
+  },
+  "instrument_pointing": {
+    "time_dependent_frames": [-61000, 1],
+    "ck_table_start_time": 525560475.1286545,
+    "ck_table_end_time": 525560475.1286545,
+    "ck_table_original_size": 1,
+    "ephemeris_times":  [5.25560475e+08],
+    "quaternions":  [
+      [-0.42623555, -0.55051779,  0.46456631, -0.5472034 ]
+    ],
+    "angular_velocities":  [
+      [ 0.204182  , -0.00811453, -0.00786116]
+    ],
+    "constant_frames": [-61500, -61505, -61000],
+    "constant_rotation":
+      [0.0022409695777088, -0.002220557600931,
+       -0.99999502357726, 0.012486301868467,
+       -0.99991951530675, 0.0022483714915059,
+       -0.99991953192294, -0.012491278263463,
+       -0.0022130626614382
+     ],
+     "reference_frame": 1
+   },
+  "body_rotation": {
+    "time_dependent_frames": [10015, 1],
+    "ck_table_start_time": 525560475.1286545,
+    "ck_table_end_time": 525560475.1286545,
+    "ck_table_original_size": 1,
+    "ephemeris_times": [5.25560475e+08],
+    "quaternions": [
+      [-0.89966963,  0.20059167, -0.09209383,  0.37666467]
+    ],
+    "angular_velocities": [
+      [-2.56683271e-06, -7.56713067e-05,  1.58718697e-04]
+    ],
+    "reference_frame": 1
+  },
+  "instrument_position": {
+    "spk_table_start_time": 525560475.1286545,
+    "spk_table_end_time": 525560475.1286545,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [525560475.1286545],
+    "positions": [
+      [-7197.04131196, -382913.71404775, 145608.88474678]
+    ],
+    "velocities": [
+      [0.39087306, 24.13639337, 2.15702628]
+    ],
+    "reference_frame": 1
+  },
+  "sun_position": {
+    "spk_table_start_time": 525560475.0262545,
+    "spk_table_end_time": 525560475.0262545,
+    "spk_table_original_size": 1,
+    "ephemeris_times":  [5.25560475e+08],
+    "positions": [
+      [814823700.57661,22018509.45354,-10399060.67075]
+    ],
+    "velocities": [
+      [-0.10070347311145,11.449085311077,4.9098525890309]
+    ],
+    "reference_frame": 1
+  }
+}
