@@ -1,14 +1,15 @@
 import spiceypy as spice
 
 import ale
+from ale.base.base import Driver
+from ale.base.type_distortion import NoDistortion
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import LineScanner
-from ale.base.base import Driver
 
 import pvl
 
-class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver):
+class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
     """
     Driver for Themis IR ISIS cube
     """
@@ -59,8 +60,24 @@ class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Dri
 
         return og_start_time + offset
 
+    @property
+    def focal_length(self):
+        return 202.059
 
-class OdyThemisVisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver):
+    @property
+    def detector_center_line(self):
+        return 0
+
+    @property
+    def detector_center_sample(self):
+        return 0
+    
+    @property
+    def sensor_name(self):
+        return self.label['IsisCube']['Instrument']['SpacecraftName']
+
+
+class OdyThemisVisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
     """"
     Driver for Themis VIS ISIS cube
     """
@@ -136,3 +153,19 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Dr
             # if no units are available, assume the exposure duration is given in milliseconds
             line_exposure_duration = line_exposure_duration * 0.001
         return line_exposure_duration
+
+    @property
+    def focal_length(self):
+        return 202.059
+
+    @property
+    def detector_center_line(self):
+        return 0
+
+    @property
+    def detector_center_sample(self):
+        return 0
+
+    @property
+    def sensor_name(self):
+        return self.label['IsisCube']['Instrument']['SpacecraftName']
