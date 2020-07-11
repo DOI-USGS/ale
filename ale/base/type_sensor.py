@@ -54,7 +54,7 @@ class LineScanner():
         : ndarray
           ephemeris times split based on image lines
         """
-        return np.linspace(self.ephemeris_start_time,  self.ephemeris_stop_time, max(2, int(self.image_lines / 64)))
+        return np.linspace(self.ephemeris_start_time,  self.ephemeris_stop_time, max(2, int(self.image_lines/64)))
 
     @property
     def ephemeris_stop_time(self):

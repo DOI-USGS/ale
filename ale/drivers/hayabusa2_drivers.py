@@ -4,9 +4,10 @@ import ale
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
+from ale.base.type_distortion import NoDistortion
 from ale.base.base import Driver
 
-class Hayabusa2ONCIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
+class Hayabusa2ONCIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
 
     @property
     def instrument_id(self):

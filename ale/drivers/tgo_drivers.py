@@ -10,8 +10,9 @@ from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
+from ale.base.type_distortion import NoDistortion
 
-class TGOCassisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
+class TGOCassisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
     """
     Driver for reading TGO Cassis ISIS3 Labels. These are Labels that have been ingested
     into ISIS from PDS EDR images but have not been spiceinit'd yet.
@@ -64,3 +65,7 @@ class TGOCassisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
           ISIS sensor model version
         """
         return 1
+
+    @property
+    def sensor_name(self):
+        return self.label['IsisCube']['Instrument']['SpacecraftName']
