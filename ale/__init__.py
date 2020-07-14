@@ -19,7 +19,6 @@ else:
 try:
     spice_root = os.environ['ALESPICEROOT']
 except:
-    warnings.warn('ALESPICEROOT environment variable not set, Spice Drivers will not function correctly')
     spice_root = None
 
 # bring ale stuff into main ale module

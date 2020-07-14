@@ -6,9 +6,8 @@ import ale
 
 def test_env_not_set(monkeypatch):
     monkeypatch.delenv('ALESPICEROOT', raising=False)
-    with pytest.warns(UserWarning, match='ALESPICEROOT environment variable not set'):
-        reload(ale)
-        assert not ale.spice_root
+    reload(ale)
+    assert not ale.spice_root
 
 def test_env_set(monkeypatch):
     monkeypatch.setenv('ALESPICEROOT', '/foo/bar')
