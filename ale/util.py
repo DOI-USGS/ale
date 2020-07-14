@@ -63,7 +63,7 @@ def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=
     }
 
     missions = [m.lower() for m in missions]
-    if spice_dir:
+    if spice_dir is not None:
         mission_dirs = list(filter(path.isdir, glob(path.join(spice_dir, '*'))))
     else:
         warnings.warn("Unable to search mission directories without" +
