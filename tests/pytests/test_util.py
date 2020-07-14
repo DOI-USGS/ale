@@ -1,5 +1,6 @@
 import os
 from os.path import join
+from importlib import reload
 import subprocess
 import networkx as nx
 
@@ -297,6 +298,20 @@ def test_get_metakernels(tmpdir, search_kwargs, expected):
     # we can't know the tmpdir at parameterization, append it here
     for r in expected['data']:
         r['path'] = str(tmpdir.join(r['path']))
+
+    assert search_result == expected
+
+@pytest.mark.parametrize('search_kwargs, expected',
+    [({'years':'2009', 'versions':'v01'}, {'count':0, 'data':[]})])
+def test_get_metakernels_no_alespiceroot(monkeypatch, search_kwargs, expected):
+    monkeypatch.delenv('ALESPICEROOT', raising=False)
+    reload(ale)
+    with pytest.warns(UserWarning, match="Unable to search mission directories without" +
+                                         "ALESPICEROOT being set. Defaulting to empty list"):
+        search_result =  ale.util.get_metakernels(**search_kwargs)
+    print(search_result)
+    monkeypatch.setenv('ALESPICEROOT', '/foo/bar')
+    reload(ale)
 
     assert search_result == expected
 
