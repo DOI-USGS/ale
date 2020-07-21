@@ -85,6 +85,3 @@ class test_cassini_pds3_naif(unittest.TestCase):
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
-
-    def test_sensor_frame_id(self):
-        assert self.driver.sensor_frame_id == 14082360
