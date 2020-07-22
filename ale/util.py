@@ -79,7 +79,7 @@ def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=
         metakernel_keys = ['mission', 'year', 'version', 'path']
 
         # recursive glob to make metakernel search more robust to subtle directory structure differences
-        metakernel_paths = sorted(glob(os.path.join(md, '**','*.tm'), recursive=True))
+        metakernel_paths = sorted(glob(os.path.join(md, '**','*.[Tt][Mm]'), recursive=True))
 
         metakernels = []
         for k in metakernel_paths:

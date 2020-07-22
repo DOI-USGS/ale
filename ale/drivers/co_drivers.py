@@ -77,7 +77,6 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         ("P120","UV3"):2002.71
     }
 
-
     wac_filter_to_focal_length = {
         ("B2","CL2"):200.85,
         ("B2","IRP90"):200.83,
@@ -291,11 +290,38 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         -------
         : int
           NAIF's Wac sensor frame ID, or ALE's Nac sensor frame ID
-
         """
         if self.instrument_id == "CASSINI_ISS_NAC":
           return 14082360
         elif self.instrument_id == "CASSINI_ISS_WAC":
           return 14082361
 
+    @property
+    def frame_chain(self):
+        """
+        Construct the initial frame chain using the original sensor_frame_id
+        obtained from the ikid. Then tack on the ISIS iak rotation.
 
+        Returns
+        -------
+        : Object
+          Custom Cassini ALE Frame Chain object for rotation computation and application
+        """
+        if not hasattr(self, '_frame_chain'):
+
+            try:
+                # Call frinfo to check if the ISIS iak has been loaded with the
+                # additional reference frame. Otherwise, Fail and add it manually
+                spice.frinfo(self.sensor_frame_id)
+                self._frame_chain = super().frame_chain
+            except spice.utils.exceptions.NotFoundError as e:
+                self._frame_chain = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
+                                                          target_frame=self.target_frame_id,
+                                                          center_ephemeris_time=self.center_ephemeris_time,
+                                                          ephemeris_times=self.ephemeris_time,)
+
+                rotation = ConstantRotation([[0, 0, 1, 0]], self.sensor_frame_id, self._original_naif_sensor_frame_id)
+
+                self._frame_chain.add_edge(rotation=rotation)
+
+        return self._frame_chain
