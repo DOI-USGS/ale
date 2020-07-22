@@ -7,7 +7,7 @@ Object = IsisCube
 
     Group = Dimensions
       Samples = 2367
-      Lines   = 64576
+      Lines   = 700
       Bands   = 1
     End_Group
 
