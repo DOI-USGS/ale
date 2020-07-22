@@ -5,7 +5,7 @@ import os
 import numpy as np
 from ale.drivers import co_drivers
 import unittest
-from unittest.mock import patch
+from unittest.mock import PropertyMock, patch
 import json
 from conftest import get_image_label, get_image_kernels, get_isd, convert_kernels, compare_dicts
 
@@ -88,3 +88,32 @@ class test_cassini_pds3_naif(unittest.TestCase):
 
     def test_sensor_frame_id(self):
         assert self.driver.sensor_frame_id == 14082360
+
+    @patch('ale.transformation.FrameChain.from_spice', return_value=ale.transformation.FrameChain())
+    def test_custom_frame_chain(self, from_spice):
+        with patch('ale.drivers.co_drivers.spice.bods2c', return_value=-12345) as bods2c, \
+             patch('ale.drivers.co_drivers.CassiniIssPds3LabelNaifSpiceDriver.target_frame_id', \
+                     new_callable=PropertyMock) as target_frame_id, \
+             patch('ale.drivers.co_drivers.CassiniIssPds3LabelNaifSpiceDriver.ephemeris_start_time', \
+                     new_callable=PropertyMock) as ephemeris_start_time:
+            ephemeris_start_time.return_value = .1
+            target_frame_id.return_value = -800
+            frame_chain = self.driver.frame_chain
+            assert len(frame_chain.nodes()) == 2
+            assert 14082360 in frame_chain.nodes()
+            assert -12345 in frame_chain.nodes()
+            from_spice.assert_called_with(center_ephemeris_time=2.4, ephemeris_times=[2.4], sensor_frame=-12345, target_frame=-800)
+
+    @patch('ale.transformation.FrameChain.from_spice', return_value=ale.transformation.FrameChain())
+    def test_custom_frame_chain_iak(self, from_spice):
+        with patch('ale.drivers.co_drivers.spice.bods2c', return_value=-12345) as bods2c, \
+             patch('ale.drivers.co_drivers.CassiniIssPds3LabelNaifSpiceDriver.target_frame_id', \
+                     new_callable=PropertyMock) as target_frame_id, \
+             patch('ale.drivers.co_drivers.CassiniIssPds3LabelNaifSpiceDriver.ephemeris_start_time', \
+                     new_callable=PropertyMock) as ephemeris_start_time, \
+             patch('ale.drivers.co_drivers.spice.frinfo', return_value=True) as frinfo:
+            ephemeris_start_time.return_value = .1
+            target_frame_id.return_value = -800
+            frame_chain = self.driver.frame_chain
+            assert len(frame_chain.nodes()) == 0
+            from_spice.assert_called_with(center_ephemeris_time=2.4, ephemeris_times=[2.4], nadir=False, sensor_frame=14082360, target_frame=-800)
