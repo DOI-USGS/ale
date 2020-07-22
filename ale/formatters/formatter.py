@@ -5,7 +5,7 @@ from scipy.interpolate import interp1d, BPoly
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
 from ale.transformation import FrameChain
-from ale.base.type_sensor import LineScanner, Framer
+from ale.base.type_sensor import LineScanner, Framer, Radar
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
 def to_isd(driver):
@@ -27,24 +27,6 @@ def to_isd(driver):
     meta_data = {}
 
     meta_data['isis_camera_version'] = driver.sensor_model_version
-
-    # interiror orientation
-    meta_data['naif_keywords'] = driver.naif_keywords
-    meta_data['detector_sample_summing'] = driver.sample_summing
-    meta_data['detector_line_summing'] = driver.line_summing
-    meta_data['focal_length_model'] = {
-        'focal_length' : driver.focal_length
-    }
-    meta_data['detector_center'] = {
-        'line' : driver.detector_center_line,
-        'sample' : driver.detector_center_sample
-    }
-
-    meta_data['starting_detector_line'] = driver.detector_start_line
-    meta_data['starting_detector_sample'] = driver.detector_start_sample
-    meta_data['focal2pixel_lines'] = driver.focal2pixel_lines
-    meta_data['focal2pixel_samples'] = driver.focal2pixel_samples
-    meta_data['optical_distortion'] = driver.usgscsm_distortion_model
 
     # general information
     meta_data['image_lines'] = driver.image_lines
@@ -73,10 +55,20 @@ def to_isd(driver):
         meta_data['name_model'] = 'USGS_ASTRO_FRAME_SENSOR_MODEL'
         meta_data['center_ephemeris_time'] = driver.center_ephemeris_time
 
-    frame_chain = driver.frame_chain
-    sensor_frame = driver.sensor_frame_id
-    target_frame = driver.target_frame_id
+    # SAR sensor model specifics
+    if isinstance(driver, Radar):
+        meta_data['name_model'] = 'USGS_ASTRO_SAR_SENSOR_MODEL'
+        meta_data['starting_ephemeris_time'] = driver.ephemeris_start_time
+        meta_data['ending_ephemeris_time'] = driver.ephemeris_stop_time
+        meta_data['center_ephemeris_time'] = driver.center_ephemeris_time
+        meta_data['wavelength'] = driver.wavelength
+        meta_data['line_exposure_duration'] = driver.line_exposure_duration
+        meta_data['scaled_pixel_width'] = driver.scaled_pixel_width
+        meta_data['range_conversion_times'] = driver.range_conversion_times
+        meta_data['range_conversion_coefficients'] = driver.range_conversion_coefficients
+        meta_data['look_direction'] = driver.look_direction
 
+    # Target body
     body_radii = driver.target_body_radii
     meta_data['radii'] = {
         'semimajor' : body_radii[0],
@@ -84,29 +76,8 @@ def to_isd(driver):
         'unit' : 'km'
     }
 
-    instrument_pointing = {}
-    source_frame, destination_frame, time_dependent_sensor_frame = frame_chain.last_time_dependent_frame_between(1, sensor_frame)
-
-    # Reverse the frame order because ISIS orders frames as
-    # (destination, intermediate, ..., intermediate, source)
-    instrument_pointing['time_dependent_frames'] = shortest_path(frame_chain, destination_frame, 1)
-    time_dependent_rotation = frame_chain.compute_rotation(1, destination_frame)
-    instrument_pointing['ck_table_start_time'] = time_dependent_rotation.times[0]
-    instrument_pointing['ck_table_end_time'] = time_dependent_rotation.times[-1]
-    instrument_pointing['ck_table_original_size'] = len(time_dependent_rotation.times)
-    instrument_pointing['ephemeris_times'] = time_dependent_rotation.times
-    instrument_pointing['quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
-    instrument_pointing['angular_velocities'] = time_dependent_rotation.av
-
-    # reference frame should be the last frame in the chain
-    instrument_pointing["reference_frame"] = instrument_pointing['time_dependent_frames'][-1]
-
-    # Reverse the frame order because ISIS orders frames as
-    # (destination, intermediate, ..., intermediate, source)
-    instrument_pointing['constant_frames'] = shortest_path(frame_chain, sensor_frame, destination_frame)
-    constant_rotation = frame_chain.compute_rotation(destination_frame, sensor_frame)
-    instrument_pointing['constant_rotation'] = constant_rotation.rotation_matrix().flatten()
-    meta_data['instrument_pointing'] = instrument_pointing
+    frame_chain = driver.frame_chain
+    target_frame = driver.target_frame_id
 
     body_rotation = {}
     source_frame, destination_frame, time_dependent_target_frame = frame_chain.last_time_dependent_frame_between(target_frame, 1)
@@ -133,6 +104,52 @@ def to_isd(driver):
     body_rotation["reference_frame"] = destination_frame
     meta_data['body_rotation'] = body_rotation
 
+    if isinstance(driver, LineScanner) or isinstance(driver, Framer):
+        # sensor orientation
+        sensor_frame = driver.sensor_frame_id
+
+        instrument_pointing = {}
+        source_frame, destination_frame, time_dependent_sensor_frame = frame_chain.last_time_dependent_frame_between(1, sensor_frame)
+
+        # Reverse the frame order because ISIS orders frames as
+        # (destination, intermediate, ..., intermediate, source)
+        instrument_pointing['time_dependent_frames'] = shortest_path(frame_chain, destination_frame, 1)
+        time_dependent_rotation = frame_chain.compute_rotation(1, destination_frame)
+        instrument_pointing['ck_table_start_time'] = time_dependent_rotation.times[0]
+        instrument_pointing['ck_table_end_time'] = time_dependent_rotation.times[-1]
+        instrument_pointing['ck_table_original_size'] = len(time_dependent_rotation.times)
+        instrument_pointing['ephemeris_times'] = time_dependent_rotation.times
+        instrument_pointing['quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
+        instrument_pointing['angular_velocities'] = time_dependent_rotation.av
+
+        # reference frame should be the last frame in the chain
+        instrument_pointing["reference_frame"] = instrument_pointing['time_dependent_frames'][-1]
+
+        # Reverse the frame order because ISIS orders frames as
+        # (destination, intermediate, ..., intermediate, source)
+        instrument_pointing['constant_frames'] = shortest_path(frame_chain, sensor_frame, destination_frame)
+        constant_rotation = frame_chain.compute_rotation(destination_frame, sensor_frame)
+        instrument_pointing['constant_rotation'] = constant_rotation.rotation_matrix().flatten()
+        meta_data['instrument_pointing'] = instrument_pointing
+
+        # interiror orientation
+        meta_data['naif_keywords'] = driver.naif_keywords
+        meta_data['detector_sample_summing'] = driver.sample_summing
+        meta_data['detector_line_summing'] = driver.line_summing
+        meta_data['focal_length_model'] = {
+            'focal_length' : driver.focal_length
+        }
+        meta_data['detector_center'] = {
+            'line' : driver.detector_center_line,
+            'sample' : driver.detector_center_sample
+        }
+
+        meta_data['starting_detector_line'] = driver.detector_start_line
+        meta_data['starting_detector_sample'] = driver.detector_start_sample
+        meta_data['focal2pixel_lines'] = driver.focal2pixel_lines
+        meta_data['focal2pixel_samples'] = driver.focal2pixel_samples
+        meta_data['optical_distortion'] = driver.usgscsm_distortion_model
+
     j2000_rotation = frame_chain.compute_rotation(target_frame, 1)
 
     instrument_position = {}
@@ -146,7 +163,7 @@ def to_isd(driver):
     positions = j2000_rotation.apply_at(positions, times)/1000
     instrument_position['positions'] = positions
     instrument_position['velocities'] = velocities
-    instrument_position["reference_frame"] = destination_frame
+    instrument_position["reference_frame"] = j2000_rotation.dest
 
     meta_data['instrument_position'] = instrument_position
 
@@ -161,7 +178,7 @@ def to_isd(driver):
     positions = j2000_rotation.apply_at(positions, times)/1000
     sun_position['positions'] = positions
     sun_position['velocities'] = velocities
-    sun_position["reference_frame"] = destination_frame
+    sun_position["reference_frame"] = j2000_rotation.dest
 
     meta_data['sun_position'] = sun_position
 
