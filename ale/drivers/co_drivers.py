@@ -269,7 +269,8 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         is the frame ID you want to default to for WAC. For NAC, this Frame ID
         sits between J2000 and an extra 180 rotation since NAC was mounted
         upside down.
-         Returns
+
+        Returns
         -------
         : int
           sensor frame code from NAIF's IK kernel
@@ -284,11 +285,12 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         kernel for Cassini. This is because NAC requires an extra rotation not
         in NAIF's Cassini kernels. Wac does not require an extra rotation so
         we simply return original sensor frame id for Wac.
-         Returns
+
+        Returns
         -------
         : int
           NAIF's Wac sensor frame ID, or ALE's Nac sensor frame ID
-         """
+        """
         if self.instrument_id == "CASSINI_ISS_NAC":
           return 14082360
         elif self.instrument_id == "CASSINI_ISS_WAC":
@@ -296,6 +298,15 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
 
     @property
     def frame_chain(self):
+        """
+        Construct the initial frame chain using the original sensor_frame_id
+        obtained from the ikid. Then tack on the ISIS iak rotation.
+
+        Returns
+        -------
+        : Object
+          Custom Cassini ALE Frame Chain object for rotation computation and application
+        """
         if not hasattr(self, '_frame_chain'):
             self._frame_chain = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
                                                       target_frame=self.target_frame_id,
