@@ -47,7 +47,8 @@ def test_load(test_kernels, label_type, image):
 # Test load of MiniRF labels
 def test_load_minirf(test_kernels):
     label_file = get_image_label('03821_16N196_S1', 'isis3')
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels['03821_16N196_S1']}, formatter='usgscsm', verbose=True)
+    # isd_str = ale.loads(label_file, props={'kernels': test_kernels['03821_16N196_S1']}, formatter='usgscsm', verbose=True)
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels['03821_16N196_S1']}, verbose=True)
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
     assert compare_dicts(isd_obj, image_dict['03821_16N196_S1']) == []
@@ -235,7 +236,7 @@ class test_miniRf(unittest.TestCase):
     def setUp(self):
         label = get_image_label('03821_16N196_S1', 'isis3')
         self.driver = LroMiniRfIsisLabelNaifSpiceDriver(label)
-        
+
     def test_wavelength(self):
         np.testing.assert_almost_equal(self.driver.wavelength, 1.25963224167508e-01)
 
@@ -252,7 +253,7 @@ class test_miniRf(unittest.TestCase):
     def test_ephmeris_start_time(self):
         with patch('ale.drivers.lro_drivers.spice.str2et', return_value=12345) as str2et:
           assert self.driver.ephemeris_start_time == 12345
-          
+
     def test_ephmeris_stop_time(self):
         with patch('ale.drivers.lro_drivers.spice.str2et', return_value=12345) as str2et:
           assert self.driver.ephemeris_stop_time == 12345
