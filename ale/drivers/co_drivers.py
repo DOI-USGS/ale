@@ -296,10 +296,14 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
 
     @property
     def frame_chain(self):
-        if not hasattr(self, '_cassini_frame_chain'):
-            self._cassini_frame_chain = super().frame_chain
+        if not hasattr(self, '_frame_chain'):
+            self._frame_chain = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
+                                                      target_frame=self.target_frame_id,
+                                                      center_ephemeris_time=self.center_ephemeris_time,
+                                                      ephemeris_times=self.ephemeris_time,)
 
             rotation = ConstantRotation([[0, 0, 1, 0]], self.sensor_frame_id, self._original_naif_sensor_frame_id)
 
-            self._cassini_frame_chain.add_edge(rotation=rotation)
-        return self._cassini_frame_chain
+            self._frame_chain.add_edge(rotation=rotation)
+
+        return self._frame_chain
