@@ -22,8 +22,7 @@ from ale.base.data_isis import IsisSpice
 from abc import ABC
 
 # Explicit list of disabled drivers
-__disabled_drivers__ = ["ody_drivers",
-                        "hayabusa2_drivers",
+__disabled_drivers__ = ["hayabusa2_drivers",
                         "juno_drivers",
                         "tgo_drivers"]
 
