@@ -4,6 +4,7 @@ import ale
 from ale.base.base import Driver
 from ale.base.type_distortion import NoDistortion
 from ale.base.data_naif import NaifSpice
+from ale.base.data_isis import IsisSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import LineScanner
 
