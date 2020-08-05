@@ -197,7 +197,7 @@ class OdyThemisIrIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoD
             7  : -0.012,
             8  : -0.039,
             9  : -0.045,
-            10 ;  0.0
+            10 :  0.0
         }
         return 160 - emp_offsets[self.original_band]
 
