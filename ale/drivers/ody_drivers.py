@@ -216,7 +216,7 @@ class OdyThemisIrIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoD
             9  :  0.025,
             10 : 0.0
         }
-        return 120 - self.detector_line + emp_offsets[self.original_band]
+        return 120.5 - self.detector_line + emp_offsets[self.original_band]
 
     @property
     def sensor_name(self):
