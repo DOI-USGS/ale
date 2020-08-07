@@ -176,7 +176,7 @@ class OdyThemisIrIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoD
                 offset = offset.value
         band_offset = self.detector_line * self.line_exposure_duration / self.line_summing
 
-        return og_start_time + offset# + band_offset
+        return og_start_time + offset + band_offset
 
     @property
     def focal_length(self):
@@ -216,7 +216,7 @@ class OdyThemisIrIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoD
             9  :  0.025,
             10 : 0.0
         }
-        return 120# - self.detector_line + emp_offsets[self.original_band]
+        return 120 - self.detector_line + emp_offsets[self.original_band]
 
     @property
     def sensor_name(self):
