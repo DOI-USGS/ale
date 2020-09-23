@@ -26,10 +26,10 @@ Object = IsisCube
     InstrumentId              = JNC
     TargetName                = JUPITER
 
-    # Start time for the entire observation, i.e. start time for FrameNumber 1.
+    /* Start time for the entire observation, i.e. start time for FrameNumber 1. */
     StartTime                 = 2016-08-27T09:00:04.129
 
-    # Start count for the entire observation, i.e. start count for FrameNumber 1.
+    /* Start count for the entire observation, i.e. start count for FrameNumber 1. */
     SpacecraftClockStartCount = 525560580:87
     ExposureDuration          = 204.800000 <ms>
     InterFrameDelay           = 0.378 <s>

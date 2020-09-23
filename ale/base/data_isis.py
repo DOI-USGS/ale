@@ -79,7 +79,7 @@ def parse_table(table_label, data):
             offset += data_sizes[field['Type']] * field['Size']
 
     # Parse the keywords from the label
-    results.update({key : value for key, value in table_label.items() if not isinstance(value, pvl._collections.PVLGroup)})
+    results.update({key : value for key, value in table_label.items() if not isinstance(value, pvl.collections.PVLGroup)})
 
     return results
 
