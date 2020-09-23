@@ -93,6 +93,19 @@ TEST_F(OrientationTest, ConstructorAccessors) {
   }
 }
 
+TEST_F(ConstOrientationTest, InterpolateTimeDep) {
+  Rotation interpRotation = constOrientations.interpolateTimeDep(0.25);
+  Rotation expectedRotation = orientations.interpolate(0.25);
+  vector<double> quat = interpRotation.toQuaternion();
+  vector<double> expectedQuat = expectedRotation.toQuaternion();
+  ASSERT_EQ(quat.size(), 4);
+  ASSERT_EQ(expectedQuat.size(), 4);
+  EXPECT_NEAR(quat[0], expectedQuat[0], 1e-10);
+  EXPECT_NEAR(quat[1], expectedQuat[1], 1e-10);
+  EXPECT_NEAR(quat[2], expectedQuat[2], 1e-10);
+  EXPECT_NEAR(quat[3], expectedQuat[3], 1e-10);
+}
+
 TEST_F(OrientationTest, Interpolate) {
   Rotation interpRotation = orientations.interpolate(0.25);
   vector<double> quat = interpRotation.toQuaternion();

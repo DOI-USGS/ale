@@ -1,6 +1,9 @@
 import pvl
 
 class IsisLabel():
+    """
+    Mix-in for parsing ISIS Cube labels.
+    """
 
     @property
     def label(self):

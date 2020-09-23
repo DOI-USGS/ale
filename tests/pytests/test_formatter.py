@@ -9,7 +9,7 @@ from ale.transformation import FrameChain
 from ale.base.data_naif import NaifSpice
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
-class TestDriver(Driver, NaifSpice):
+class DummyNaifSpiceDriver(Driver, NaifSpice):
     """
     Test Driver implementation with dummy values
     """
@@ -129,7 +129,7 @@ class TestDriver(Driver, NaifSpice):
         return 'Test Target'
 
 
-class TestLineScanner(LineScanner, TestDriver):
+class DummyLineScannerDriver(LineScanner, DummyNaifSpiceDriver):
     """
     Test class for overriding properties from the LineScanner class.
     """
@@ -172,10 +172,10 @@ class TestLineScanner(LineScanner, TestDriver):
 
 @pytest.fixture
 def driver():
-    return TestFramer('')
+    return DummyFramerDriver('')
 
 
-class TestFramer(Framer, TestDriver):
+class DummyFramerDriver(Framer, DummyNaifSpiceDriver):
     """
     Test class for overriding properties from the Framer class
     """
@@ -208,11 +208,11 @@ class TestFramer(Framer, TestDriver):
 
 @pytest.fixture
 def test_line_scan_driver():
-    return TestLineScanner("")
+    return DummyLineScannerDriver("")
 
 @pytest.fixture
 def test_frame_driver():
-    return TestFramer("")
+    return DummyFramerDriver("")
 
 def test_frame_name_model(test_frame_driver):
     isd = formatter.to_isd(test_frame_driver)

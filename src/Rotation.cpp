@@ -64,7 +64,8 @@ namespace ale {
         if (matrix.size() != 9) {
           throw std::invalid_argument("Rotation matrix must be 3 by 3.");
         }
-        quat = Eigen::Quaterniond(Eigen::Quaterniond::Matrix3(matrix.data()));
+        // The data is in row major order, so take the transpose to get column major order
+        quat = Eigen::Quaterniond(Eigen::Quaterniond::Matrix3(matrix.data()).transpose()).normalized();
       }
 
 
@@ -80,6 +81,7 @@ namespace ale {
         for (size_t i = 0; i < angles.size(); i++) {
           quat *= Eigen::Quaterniond(Eigen::AngleAxisd(angles[i], axis(axes[i])));
         }
+        quat = quat.normalized();
       }
 
 
@@ -88,7 +90,7 @@ namespace ale {
           throw std::invalid_argument("Rotation axis must have 3 elements.");
         }
         Eigen::Vector3d eigenAxis((double *) axis.data());
-        quat = Eigen::Quaterniond(Eigen::AngleAxisd(theta, eigenAxis.normalized()));
+        quat = Eigen::Quaterniond(Eigen::AngleAxisd(theta, eigenAxis.normalized())).normalized();
       }
 
 
@@ -148,7 +150,9 @@ namespace ale {
 
 
   std::vector<double> Rotation::toRotationMatrix() const {
-    Eigen::Quaterniond::RotationMatrixType mat = m_impl->quat.toRotationMatrix();
+    // The matrix is stored in column major, but we want to output in row semiMajor
+    // so take the transpose
+    Eigen::Quaterniond::RotationMatrixType mat = m_impl->quat.toRotationMatrix().transpose();
     return std::vector<double>(mat.data(), mat.data() + mat.size());
   }
 
@@ -198,8 +202,7 @@ namespace ale {
   Vec3d Rotation::operator()(const Vec3d &vector) const {
     Eigen::Vector3d eigenVector(vector.x, vector.y, vector.z);
     Eigen::Vector3d rotatedVector = m_impl->quat._transformVector(eigenVector);
-    std::vector<double> tempVec = std::vector<double>(rotatedVector.data(), rotatedVector.data() + rotatedVector.size());
-    return Vec3d(tempVec);
+    return Vec3d(rotatedVector[0], rotatedVector[1], rotatedVector[2]);
   }
 
   State Rotation::operator()(

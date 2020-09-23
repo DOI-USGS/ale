@@ -64,7 +64,12 @@ def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=
     }
 
     missions = [m.lower() for m in missions]
-    mission_dirs = list(filter(path.isdir, glob(path.join(spice_dir, '*'))))
+    if spice_dir is not None:
+        mission_dirs = list(filter(path.isdir, glob(path.join(spice_dir, '*'))))
+    else:
+        warnings.warn("Unable to search mission directories without" +
+                      "ALESPICEROOT being set. Defaulting to empty list")
+        mission_dirs = []
 
     for md in mission_dirs:
         # Assuming spice root has the same name as the original on NAIF website"
@@ -75,7 +80,7 @@ def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=
         metakernel_keys = ['mission', 'year', 'version', 'path']
 
         # recursive glob to make metakernel search more robust to subtle directory structure differences
-        metakernel_paths = sorted(glob(os.path.join(md, '**','*.tm'), recursive=True))
+        metakernel_paths = sorted(glob(os.path.join(md, '**','*.[Tt][Mm]'), recursive=True))
 
         metakernels = []
         for k in metakernel_paths:

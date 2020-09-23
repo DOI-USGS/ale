@@ -347,6 +347,31 @@ TEST(StatesTest, OneStateWithVelocity) {
   EXPECT_NEAR(result.velocity.z, -1.0, 1e-6);
 }
 
+TEST(StatesTest, NoInterpNeeded) {
+  std::vector<double> ephemTimes = {0.0, 1.0, 2.0};
+
+  std::vector<Vec3d> positions = {
+    Vec3d(5.0, 3.0, 0.0),
+    Vec3d(6.5, 4.0, 1.0),
+    Vec3d(15.0, 4.0, 5.0)};
+
+  std::vector<Vec3d> velocities = {
+    Vec3d(5.0, 3.0, 0.0),
+    Vec3d(7.0, 6.0, 1.0),
+    Vec3d(15.0, 4.0, 5.0)};
+
+
+  States testState(ephemTimes, positions, velocities);
+  State result = testState.getState(1.0);
+  EXPECT_NEAR(result.position.x, 6.5, 1e-5);
+  EXPECT_NEAR(result.position.y, 4.0, 1e-4);
+  EXPECT_NEAR(result.position.z, 1.0, 1e-5);
+  EXPECT_NEAR(result.velocity.x, 7.0, 1e-6);
+  EXPECT_NEAR(result.velocity.y, 6.0, 1e-6);
+  EXPECT_NEAR(result.velocity.z, 1.0, 1e-6);
+}
+
+
 // This test checks to see if the minimized cache looks identical to ISIS's minimized cache for
 // a Dawn IR image VIR_IR_1A_1_362681634_1 (located in dawnvir2isis's IR app test.)
 // Values were obtained by adding strategic couts to SpicePosition.cpp, running spiceinit, and
