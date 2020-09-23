@@ -1,7 +1,7 @@
 import pytest
 import os
 import numpy as np
-import datetime
+from datetime import datetime, timezone
 import spiceypy as spice
 from importlib import reload
 import json
@@ -56,10 +56,10 @@ class test_pds_naif(unittest.TestCase):
         assert self.driver.short_mission_name == 'selene'
 
     def test_utc_start_time(self):
-        assert self.driver.utc_start_time == datetime.datetime(2009, 4, 5, 20, 9, 53, 607478, tzinfo=datetime.timezone.utc)
+        assert self.driver.utc_start_time == datetime(2009, 4, 5, 20, 9, 53, 607478, timezone.utc)
 
     def test_utc_stop_time(self):
-        assert self.driver.utc_stop_time == datetime.datetime(2009, 4, 5, 20, 10, 23, 864978, tzinfo=datetime.timezone.utc)
+        assert self.driver.utc_stop_time == datetime(2009, 4, 5, 20, 10, 23, 864978, timezone.utc)
 
     def test_instrument_id(self):
         assert self.driver.instrument_id == 'LISM_TC1_STF'

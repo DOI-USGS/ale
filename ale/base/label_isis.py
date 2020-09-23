@@ -10,10 +10,11 @@ class IsisLabel():
         if not hasattr(self, "_label"):
             if isinstance(self._file, pvl.PVLModule):
                 self._label = self._file
+            grammar = pvl.grammar.ISISGrammar()
             try:
-                self._label = pvl.loads(self._file)
+                self._label = pvl.loads(self._file, grammar=grammar)
             except Exception:
-                self._label = pvl.load(self._file)
+                self._label = pvl.load(self._file, grammar=grammar)
             except:
                 raise ValueError("{} is not a valid label".format(self._file))
         return self._label
@@ -236,7 +237,7 @@ class IsisLabel():
         if 'ExposureDuration' in self.label['IsisCube']['Instrument']:
             exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration']
             # Check for units on the PVL keyword
-            if isinstance(exposure_duration, pvl._collections.Units):
+            if isinstance(exposure_duration, pvl.collections.Quantity):
                 units = exposure_duration.units
                 if "ms" in units.lower() or 'milliseconds' in units.lower():
                     exposure_duration = exposure_duration.value * 0.001
@@ -261,7 +262,7 @@ class IsisLabel():
           Line exposure duration in seconds
         """
         line_exposure_duration = self.label['IsisCube']['Instrument']['LineExposureDuration']
-        if isinstance(line_exposure_duration, pvl._collections.Units):
+        if isinstance(line_exposure_duration, pvl.collections.Quantity):
             units = line_exposure_duration.units
             if "ms" in units.lower():
                 line_exposure_duration = line_exposure_duration.value * 0.001

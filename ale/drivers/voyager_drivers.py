@@ -49,7 +49,7 @@ class VoyagerCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver
 
     @property
     def ephemeris_start_time(self):
-        inital_time = spice.utc2et(self.utc_start_time.isoformat())
+        inital_time = spice.utc2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
         # To get shutter end (close) time, subtract 2 seconds from the start time
         updated_time = inital_time - 2
         # To get shutter start (open) time, take off the exposure duration from the end time.
