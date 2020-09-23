@@ -40,37 +40,6 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         return "{}_FILTER_{}".format(ID_LOOKUP[instrument_id], filter_number)
 
     @property
-    def label(self):
-        """
-        Loads a PVL from from the _file attribute and
-        parses the binary table data.
-
-        Returns
-        -------
-        PVLModule :
-            Dict-like object with PVL keys
-        """
-        class PvlDecoder(pvl.decoder.PVLDecoder):
-            def unescape_next_char(self, stream):
-                esc = stream.read(1)
-                string = '\{}'.format(esc.decode('utf-8')).encode('utf-8')
-                return string
-
-        if not hasattr(self, "_label"):
-            if isinstance(self._file, pvl.PVLModule):
-                self._label = self._file
-            try:
-                self._label = pvl.loads(self._file, PvlDecoder)
-            except Exception:
-
-                # PvlDecoder class to ignore all escape sequences when getting
-                # the label
-                self._label = pvl.load(self._file, PvlDecoder)
-            except:
-                raise ValueError("{} is not a valid label".format(self._file))
-        return self._label
-
-    @property
     def spacecraft_name(self):
         """
         Spacecraft name used in various Spice calls to acquire

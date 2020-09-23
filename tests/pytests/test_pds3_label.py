@@ -1,7 +1,7 @@
 import pytest
 import pvl
 
-from datetime import datetime
+from datetime import datetime, timezone
 import ale
 from ale import base
 from ale.base.label_pds3 import Pds3Label
@@ -84,10 +84,10 @@ def test_instrument_host_name(test_image_label):
     assert test_image_label.instrument_host_name.lower() == 'mars reconnaissance orbiter'
 
 def test_utc_start_time(test_image_label):
-    assert test_image_label.utc_start_time == datetime(2006, 11, 1, 22, 45, 53, 570000)
+    assert test_image_label.utc_start_time == datetime(2006, 11, 1, 22, 45, 53, 570000, timezone.utc)
 
 def test_utc_stop_time(test_image_label):
-    assert test_image_label.utc_stop_time == datetime(2006, 11, 1, 23, 49, 50, 370000)
+    assert test_image_label.utc_stop_time == datetime(2006, 11, 1, 23, 49, 50, 370000, timezone.utc)
 
 def test_image_lines(test_image_label):
     assert test_image_label.image_lines == 2432

@@ -50,7 +50,7 @@ class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoD
     def ephemeris_start_time(self):
         og_start_time = super().ephemeris_start_time
         offset = self.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"]
-        if isinstance(offset, pvl._collections.Units):
+        if isinstance(offset, pvl.collections.Quantity):
             units = offset.units
             if "ms" in units.lower():
                 offset = offset.value * 0.001
@@ -121,7 +121,7 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, No
         og_start_time = super().ephemeris_start_time
 
         offset = self.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"]
-        if isinstance(offset, pvl._collections.Units):
+        if isinstance(offset, pvl.collections.Quantity):
             units = offset.units
             if "ms" in units.lower():
                 offset = offset.value * 0.001
@@ -142,7 +142,7 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, No
           Line exposure duration in seconds
         """
         line_exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration']
-        if isinstance(line_exposure_duration, pvl._collections.Units):
+        if isinstance(line_exposure_duration, pvl.collections.Quantity):
             units = line_exposure_duration.units
             if "ms" in units.lower():
                 line_exposure_duration = line_exposure_duration.value * 0.001

@@ -1,6 +1,6 @@
 import pytest
 import pvl
-from datetime import datetime
+from datetime import datetime, timezone
 
 import ale
 from ale import base
@@ -57,7 +57,7 @@ DpuId                 = DPU-A
 PivotAngle            = -18.805847167969 <Degrees>
 Unlutted              = 1
 LutInversionTable     = $messenger/calibration/LUT_INVERT/MDISLUTINV_0.TAB
-# added to allow for testing
+/* added to allow for testing */
 LineExposureDuration  = 1000
 End_Group
 
@@ -113,10 +113,10 @@ def test_spacecraft_clock_stop_count(test_cube_label):
     assert test_cube_label.spacecraft_clock_stop_count == "1/0089576657:990000"
 
 def test_utc_start_time(test_cube_label):
-    assert test_cube_label.utc_start_time == datetime(2007, 6, 6, 00, 22, 10, 751814)
+    assert test_cube_label.utc_start_time == datetime(2007, 6, 6, 00, 22, 10, 751814, timezone.utc)
 
 def test_utc_stop_time(test_cube_label):
-    assert test_cube_label.utc_stop_time == datetime(2007, 6, 6, 00, 22, 10, 768814)
+    assert test_cube_label.utc_stop_time == datetime(2007, 6, 6, 00, 22, 10, 768814, timezone.utc)
 
 def test_target_name(test_cube_label):
     assert test_cube_label.target_name.lower() == "venus"

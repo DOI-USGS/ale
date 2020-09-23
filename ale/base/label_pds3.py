@@ -12,7 +12,7 @@ class Pds3Label():
                 self._label = self._file
             else:
                 try:
-                    self._label = pvl.loads(self._file, strict=False)
+                    self._label = pvl.loads(self._file)
                 except Exception:
                     self._label = pvl.load(self._file)
                 except:
