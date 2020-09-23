@@ -11,6 +11,7 @@ import collections
 from collections import OrderedDict
 from itertools import chain
 from datetime import datetime
+import pytz
 
 import subprocess
 import re
@@ -697,12 +698,14 @@ def search_isis_db(dbobj, labelobj, isis3_data="/usgs/cpkgs/isis3/data/"):
             other_isis_time_format =  '"%Y %b %d %H:%M:%S.%f TDB"'
 
             try:
-                time = (datetime.strptime(time[0].strip(), isis_time_format),
-                                   datetime.strptime(time[1].strip(), isis_time_format))
-            except:
-                time = (datetime.strptime(time[0].strip(), other_isis_time_format),
-                                   datetime.strptime(time[1].strip(), other_isis_time_format))
+                time = [datetime.strptime(time[0].strip(), isis_time_format),
+                        datetime.strptime(time[1].strip(), isis_time_format)]
+            except Exception as e:
+                time = [datetime.strptime(time[0].strip(), other_isis_time_format),
+                        datetime.strptime(time[1].strip(), other_isis_time_format)]
 
+            time[0] = pytz.utc.localize(time[0])
+            time[1] = pytz.utc.localize(time[1])
             start_time_in_range = utc_start_time >= time[0] and utc_start_time <= time[1]
             stop_time_in_range = utc_stop_time >= time[0] and utc_stop_time <= time[1]
             times[i] = stop_time_in_range, stop_time_in_range

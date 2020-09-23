@@ -612,7 +612,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         : float
           start time
         """
-        return spice.str2et(str(self.utc_start_time))
+        return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
 
     @property
     def ephemeris_stop_time(self):
@@ -624,7 +624,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         : float
           stop time
         """
-        return spice.str2et(str(self.utc_stop_time))
+        return spice.str2et(self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
 
     @property
     def look_direction(self):

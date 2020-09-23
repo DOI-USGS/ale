@@ -49,7 +49,7 @@ class TGOCassisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
         : float
           ephemeris start time of the image.
         """
-        return spice.utc2et(str(self.label['IsisCube']['Instrument']['StartTime']))
+        return spice.utc2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
 
     @property
     def sensor_frame_id(self):
