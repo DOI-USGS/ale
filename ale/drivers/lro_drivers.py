@@ -9,8 +9,8 @@ from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
+from ale.base.data_isis import IsisSpice
 from ale.base.type_sensor import LineScanner, Radar
-
 
 class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver):
     """
@@ -655,3 +655,59 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
           Naif ID code for the sensor frame
         """
         return self.target_frame_id
+
+
+class LroLrocIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, Driver):
+    @property
+    def instrument_id(self):
+        """
+        The short text name for the instrument
+
+        Returns an instrument id uniquely identifying the instrument. Used to acquire
+        instrument codes from Spice Lib bods2c routine.
+
+        Returns
+        -------
+        str
+          The short text name for the instrument
+        """
+
+        instrument = super().instrument_id
+
+        frame_id = self.label.get("FRAME_ID")
+
+        if instrument == "LROC" and frame_id == "LEFT":
+            return "LRO_LROCNACL"
+        elif instrument == "LROC" and frame_id == "RIGHT":
+            return "LRO_LROCNACR"
+
+    @property
+    def spacecraft_name(self):
+        """
+        Spacecraft name used in various SPICE calls to acquire
+        ephemeris data. LROC NAC img PDS3 labels do not the have SPACECRAFT_NAME keyword, so we
+        override it here to use the label_pds3 property for instrument_host_id
+
+        Returns
+        -------
+        : str
+          Spacecraft name
+        """
+        return self.instrument_host_id
+
+    @property
+    def usgscsm_distortion_model(self):
+        """
+        The distortion model name with its coefficients
+
+        LRO LROC NAC does not use the default distortion model so we need to overwrite the
+        method packing the distortion model into the ISD.
+
+        Returns
+        -------
+        : dict
+          Returns a dict with the model name : dict of the coefficients
+        """
+
+        return {"lrolrocnac":
+                {"coefficients": self.odtk}}
