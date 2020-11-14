@@ -2,8 +2,10 @@ import spiceypy as spice
 
 import ale
 from ale.base.data_naif import NaifSpice
+from ale.base.data_isis import IsisSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
+from ale.base.type_distortion import NoDistortion
 from ale.base.base import Driver
 
 class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
@@ -80,3 +82,16 @@ class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
         offset2 = 1.0 / 64.0 * 4.48
 
         return ephemeris_start_time + offset1 + offset2
+
+class VikingIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistortion, Driver):
+    @property
+    def sensor_name(self):
+        """
+        Returns the name of the instrument
+
+        Returns
+        -------
+        : str
+          Name of the sensor
+        """
+        return self.label['IsisCube']['Instrument']['SpacecraftName']

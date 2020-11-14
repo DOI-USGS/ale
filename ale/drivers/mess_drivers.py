@@ -10,6 +10,7 @@ from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
+from ale.base.type_distortion import NoDistortion
 from ale.base.data_isis import IsisSpice
 
 ID_LOOKUP = {
@@ -18,7 +19,7 @@ ID_LOOKUP = {
 }
 
 
-class MessengerMdisIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, Driver):
+class MessengerMdisIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistortion, Driver):
     @property
     def spacecraft_name(self):
         """
@@ -72,8 +73,7 @@ class MessengerMdisIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, Driver
         return ID_LOOKUP[super().instrument_id]
 
 
-
-class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
+class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortion, Driver):
     """
     Driver for reading MDIS PDS3 labels. Requires a Spice mixin to acquire addtional
     ephemeris and instrument data located exclusively in spice kernels.
@@ -249,7 +249,7 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         return spice.gdpool('INS{}_PIXEL_PITCH'.format(self.ikid), 0, 1)
 
 
-class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, Driver):
+class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDistortion, Driver):
     """
     Driver for reading MDIS ISIS3 Labels. These are Labels that have been ingested
     into ISIS from PDS EDR images. Any SPCIE data attached by the spiceinit application
