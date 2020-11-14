@@ -7,8 +7,10 @@ import pvl
 import spiceypy as spice
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
+from ale.base.data_isis import IsisSpice
 from ale.base.label_pds3 import Pds3Label
-from ale.base.type_distortion import RadialDistortion
+from ale.base.label_isis import IsisLabel
+from ale.base.type_distortion import RadialDistortion, NoDistortion
 from ale.base.type_sensor import Framer
 
 from ale.rotation import ConstantRotation
@@ -325,3 +327,16 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
                 self._frame_chain.add_edge(rotation=rotation)
 
         return self._frame_chain
+
+class CassiniIssIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistortion, Driver):
+    @property
+    def sensor_name(self):
+        """
+        Returns the name of the instrument
+
+        Returns
+        -------
+        : str
+          Name of the sensor
+        """
+        return self.label['IsisCube']['Instrument']['SpacecraftName']
