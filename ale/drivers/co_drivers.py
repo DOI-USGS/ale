@@ -335,6 +335,23 @@ class CassiniIssIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistort
         "ISSWA" : "CASSINI_ISS_WAC"
     }
 
+    name_lookup = {
+        "ISSNA" : "Imaging Science Subsystem Narrow Angle Camera",
+        "ISSWA" : "Imaging Science Subsystem Wide Angle Camera"
+    }
+
+    @property
+    def instrument_id(self):
+        """
+        Returns the ID of the instrument
+
+        Returns
+        -------
+        : str
+          ID of the sensor
+        """
+        return self.id_lookup[super().instrument_id]
+
     @property
     def sensor_name(self):
         """
@@ -345,4 +362,19 @@ class CassiniIssIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistort
         : str
           Name of the sensor
         """
-        return self.id_lookup[super().instrument_id]
+        return self.name_lookup[super().instrument_id]
+
+    @property
+    def center_ephemeris_time(self):
+        """
+        Returns the middle exposure time for the image in ephemeris seconds.
+
+        This is overriden because the ISIS ISSNAC and ISSWAC sensor models use the
+        label utc times so the converted times are not available in the
+        NaifKeywords. Instead we get it from the tables.
+
+        Returns
+        -------
+        : float
+        """
+        return self.inst_position_table['SpkTableStartTime']
