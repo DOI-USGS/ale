@@ -94,4 +94,8 @@ class VikingIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistortion,
         : str
           Name of the sensor
         """
-        return self.label['IsisCube']['Instrument']['SpacecraftName']
+        name_lookup = {
+            'VISUAL_IMAGING_SUBSYSTEM_CAMERA_A' : 'VISUAL IMAGING SUBSYSTEM CAMERA A',
+            'VISUAL_IMAGING_SUBSYSTEM_CAMERA_B' : 'VISUAL IMAGING SUBSYSTEM CAMERA B'
+        }
+        return name_lookup[super().instrument_id]

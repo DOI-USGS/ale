@@ -329,6 +329,12 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         return self._frame_chain
 
 class CassiniIssIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistortion, Driver):
+
+    id_lookup = {
+        "ISSNA" : "CASSINI_ISS_NAC",
+        "ISSWA" : "CASSINI_ISS_WAC"
+    }
+
     @property
     def sensor_name(self):
         """
@@ -339,4 +345,4 @@ class CassiniIssIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistort
         : str
           Name of the sensor
         """
-        return self.label['IsisCube']['Instrument']['SpacecraftName']
+        return self.id_lookup[super().instrument_id]
