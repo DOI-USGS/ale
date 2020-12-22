@@ -11,7 +11,7 @@ class Driver():
             Reference to file path to be used by mixins for opening.
     """
 
-    def __init__(self, file, num_ephem=909, num_quats=909, props={}):
+    def __init__(self, file, num_ephem=909, num_quats=909, props={}, parsed_label=None):
         """
         Parameters
         ----------
@@ -30,6 +30,9 @@ class Driver():
         self._num_quaternions = num_quats
         self._num_ephem = num_ephem
         self._file = file
+
+        if parsed_label:
+            self._label = parsed_label
 
     @property
     def image_lines(self):
