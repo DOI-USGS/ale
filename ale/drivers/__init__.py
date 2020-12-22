@@ -107,7 +107,7 @@ def load(label, props={}, formatter='ale', verbose=False):
         if verbose:
             print(f'Trying {driver}')
         try:
-            res = driver(label, props=props)
+            res = driver(label, props=props, parsed_label=parsed_label)
             # get instrument_id to force early failure
             res.instrument_id
 
