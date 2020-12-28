@@ -96,12 +96,16 @@ def load(label, props={}, formatter='ale', verbose=False):
     try:
         # Try default grammar for pds3 label
         parsed_label = parse_label(label)
-    except ValueError:
+    except ValueError as e:
+        if verbose:
+            print(e)
         # If pds3 label fails, try isis grammar
         parsed_label = parse_label(label, pvl.grammar.ISISGrammar)
-    except:
-        # If both fail, raise the error to the calling function
-        raise
+    except Exception as e:
+        if verbose:
+            print(e)
+        # If both fail, then don't parse the label, and just pass the driver a file.
+        parsed_label = None
 
     for driver in drivers:
         if verbose:
@@ -142,12 +146,28 @@ def loads(label, props='', formatter='ale', verbose=False):
     return json.dumps(res, cls=AleJsonEncoder)
 
 
-def parse_label(label, grammar=None):
+def parse_label(label, grammar=pvl.grammar.PVLGrammar):
+    """
+    Attempt to parse a PVL label.
+
+    Returns
+    -------
+    str
+        The label as a pvl string or pvl file.
+
+    grammar
+        The pvl grammar with which to parse the label. If None, default to PVLGrammar
+
+    See Also
+    --------
+    load
+    loads
+    """
     try:
         parsed_label = pvl.loads(label, grammar=grammar)
     except Exception:
         parsed_label = pvl.load(label, grammar=grammar)
     except:
-        raise ValueError("{} is not a valid label".format(label))
+        raise ValueError("{} is not a valid label for grammar {}".format(label, grammar.__name__))
 
     return parsed_label
