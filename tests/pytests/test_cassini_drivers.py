@@ -10,7 +10,6 @@ import json
 from conftest import get_image_label, get_image_kernels, get_isd, convert_kernels, compare_dicts
 
 from ale.drivers.co_drivers import CassiniIssPds3LabelNaifSpiceDriver
-from conftest import get_image_kernels, convert_kernels, get_image_label
 
 @pytest.fixture()
 def test_kernels(scope="module", autouse=True):
