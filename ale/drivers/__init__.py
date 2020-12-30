@@ -93,11 +93,25 @@ def load(label, props={}, formatter='ale', verbose=False):
     drivers = chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.isclass(x) and "_driver" in x.__module__) for dmod in __driver_modules__)
     drivers = sort_drivers([d[1] for d in drivers])
 
+    try:
+        # Try default grammar for pds3 label
+        parsed_label = parse_label(label)
+    except ValueError as e:
+        if verbose:
+            print(e)
+        # If pds3 label fails, try isis grammar
+        parsed_label = parse_label(label, pvl.grammar.ISISGrammar)
+    except Exception as e:
+        if verbose:
+            print(e)
+        # If both fail, then don't parse the label, and just pass the driver a file.
+        parsed_label = None
+
     for driver in drivers:
         if verbose:
             print(f'Trying {driver}')
         try:
-            res = driver(label, props=props)
+            res = driver(label, props=props, parsed_label=parsed_label)
             # get instrument_id to force early failure
             res.instrument_id
 
@@ -130,3 +144,36 @@ def loads(label, props='', formatter='ale', verbose=False):
     """
     res = load(label, props, formatter, verbose=verbose)
     return json.dumps(res, cls=AleJsonEncoder)
+
+
+def parse_label(label, grammar=pvl.grammar.PVLGrammar):
+    """
+    Attempt to parse a PVL label.
+
+    Parameters
+    ----------
+    label
+        The label as a pvl string or pvl file.
+
+    grammar
+        The pvl grammar with which to parse the label. If None, default to PVLGrammar
+
+
+    Returns
+    -------
+    pvl.collections.PVLModule
+        The PVL label deserialized to a Python object
+
+    See Also
+    --------
+    load
+    loads
+    """
+    try:
+        parsed_label = pvl.loads(label, grammar=grammar)
+    except Exception:
+        parsed_label = pvl.load(label, grammar=grammar)
+    except:
+        raise ValueError("{} is not a valid label for grammar {}".format(label, grammar.__name__))
+
+    return parsed_label
