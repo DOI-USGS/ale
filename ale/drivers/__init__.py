@@ -150,13 +150,19 @@ def parse_label(label, grammar=pvl.grammar.PVLGrammar):
     """
     Attempt to parse a PVL label.
 
-    Returns
-    -------
-    str
+    Parameters
+    ----------
+    label
         The label as a pvl string or pvl file.
 
     grammar
         The pvl grammar with which to parse the label. If None, default to PVLGrammar
+
+
+    Returns
+    -------
+    pvl.collections.PVLModule
+        The PVL label deserialized to a Python object
 
     See Also
     --------
