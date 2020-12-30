@@ -1,4 +1,4 @@
-{% set version = "0.8.1" %}
+{% set version = "0.8.5" %}
 {% set git_branch = "master" %}
 {% set build_number = "0" %}
 
