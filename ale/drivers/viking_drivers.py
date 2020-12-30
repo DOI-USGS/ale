@@ -8,7 +8,53 @@ from ale.base.type_sensor import Framer
 from ale.base.type_distortion import NoDistortion
 from ale.base.base import Driver
 
+sensor_name_lookup = {
+    "VISUAL_IMAGING_SUBSYSTEM_CAMERA_A" : "Visual Imaging Subsystem Camera A",
+    "VISUAL_IMAGING_SUBSYSTEM_CAMERA_B" : "Visual Imaging Subsystem Camera B"
+}
+
+spacecraft_name_lookup = {
+    'VIKING_ORBITER_1': 'VIKING ORBITER 1',
+    'VIKING_ORBITER_2': 'VIKING ORBITER 2'
+}
+
+alt_id_lookup = {
+    'VIKING ORBITER 1': -27999,
+    'VIKING ORBITER 2':-30999
+}
+
 class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
+
+
+
+    @property
+    def instrument_id(self):
+        """
+        Overriden to check that the instrument ID is correct
+
+        Returns
+        -------
+        : str
+          The name of the sensor
+        """
+        instrument_id = super().instrument_id
+
+        if(instrument_id not in sensor_name_lookup):
+            raise Exception (f'Instrument ID [{instrument_id}] is wrong.')
+
+        return instrument_id
+
+    @property
+    def sensor_name(self):
+        """
+        Returns the name of the instrument
+
+        Returns
+        -------
+        : str
+          Name of the sensor
+        """
+        return sensor_name_lookup[super().instrument_id]
 
     @property
     def spacecraft_name(self):
@@ -20,12 +66,7 @@ class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
         : str
           Name of the spacecraft.
         """
-        name_lookup = {
-            'VIKING_ORBITER_1': 'VIKING ORBITER 1',
-            'VIKING_ORBITER_2': 'VIKING ORBITER 2'
-        }
-
-        return name_lookup[super().spacecraft_name]
+        return spacecraft_name_lookup[super().spacecraft_name]
 
     @property
     def alt_ikid(self):
@@ -40,11 +81,6 @@ class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
         : integer
         Alternate Naif Integer ID code for the instrument
         """
-
-        alt_id_lookup = {
-            'VIKING ORBITER 1': -27999,
-            'VIKING ORBITER 2':-30999
-        }
 
         return alt_id_lookup[self.spacecraft_name]
 
@@ -84,6 +120,24 @@ class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
         return ephemeris_start_time + offset1 + offset2
 
 class VikingIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistortion, Driver):
+
+    @property
+    def instrument_id(self):
+        """
+        Overriden to check that the instrument ID is correct
+
+        Returns
+        -------
+        : str
+          The name of the sensor
+        """
+        instrument_id = super().instrument_id
+
+        if(instrument_id not in sensor_name_lookup):
+            raise Exception (f'Instrument ID [{instrument_id}] is wrong.')
+
+        return instrument_id
+
     @property
     def sensor_name(self):
         """
@@ -94,4 +148,16 @@ class VikingIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistortion,
         : str
           Name of the sensor
         """
-        return self.label['IsisCube']['Instrument']['SpacecraftName']
+        return sensor_name_lookup[super().instrument_id]
+
+    @property
+    def spacecraft_name(self):
+        """
+        Overridden to work with spice calls.
+
+        Returns
+        -------
+        : str
+          Name of the spacecraft.
+        """
+        return spacecraft_name_lookup[super().spacecraft_name]
