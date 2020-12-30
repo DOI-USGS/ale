@@ -1,16 +1,16 @@
 import pytest
 import ale
 import os
+import pvl
 
 import numpy as np
 from ale.drivers import co_drivers
 import unittest
 from unittest.mock import PropertyMock, patch
 import json
-from conftest import get_image_label, get_image_kernels, get_isd, convert_kernels, compare_dicts
+from conftest import get_image_label, get_image_kernels, get_isd, convert_kernels, compare_dicts, get_table_data
 
 from ale.drivers.co_drivers import CassiniIssPds3LabelNaifSpiceDriver
-from conftest import get_image_kernels, convert_kernels, get_image_label
 
 @pytest.fixture()
 def test_kernels(scope="module", autouse=True):
@@ -20,11 +20,24 @@ def test_kernels(scope="module", autouse=True):
     for kern in binary_kernels:
         os.remove(kern)
 
-def test_load(test_kernels):
+def test_load_pds(test_kernels):
     label_file = get_image_label("N1702360370_1")
     compare_dict = get_isd("cassiniiss")
 
     isd_str = ale.loads(label_file, props={'kernels': test_kernels})
+    isd_obj = json.loads(isd_str)
+    print(json.dumps(isd_obj, indent=2))
+    assert compare_dicts(isd_obj, compare_dict) == []
+
+def test_load_isis():
+    label_file = get_image_label("N1702360370_1", label_type="isis3")
+    compare_dict = get_isd("cassiniiss_isis")
+
+    def read_detatched_table(table_label, cube):
+        return get_table_data("N1702360370_1", table_label["Name"])
+
+    with patch('ale.base.data_isis.read_table_data', side_effect=read_detatched_table):
+        isd_str = ale.loads(label_file)
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
     assert compare_dicts(isd_obj, compare_dict) == []

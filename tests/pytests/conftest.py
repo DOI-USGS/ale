@@ -4,8 +4,11 @@ import re
 import warnings
 import numpy as np
 import json
+import pvl
 
 import ale
+
+from ale.base.data_isis import read_table_data
 
 from glob import glob
 
@@ -94,6 +97,21 @@ def get_image_label(image, label_type='pds3'):
         raise Exception(f'Could not find label file for {image}')
 
     return label_file[0]
+
+def get_table_data(image, table_name):
+    if not isinstance(image, str):
+        try:
+            image = str(image)
+        except:
+            raise KeyError('Cannot coerce requested image name to string')
+
+    table_file = glob(os.path.join(data_root, '*',f'{image}_{table_name}.tbl'))
+    if not table_file:
+        raise Exception(f'Could not find {table_name} table file for {image}')
+
+    table_label = pvl.load(table_file[0])
+    return read_table_data(table_label["Table"], table_file[0])
+
 
 def get_isd(instrument):
     if not isinstance(instrument, str):
