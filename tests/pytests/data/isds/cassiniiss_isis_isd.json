@@ -1,0 +1,201 @@
+{
+  "isis_camera_version": 1,
+  "image_lines": 1024,
+  "image_samples": 1024,
+  "name_platform": "Cassini-Huygens",
+  "name_sensor": "Imaging Science Subsystem Narrow Angle Camera",
+  "reference_height": {
+    "maxheight": 1000,
+    "minheight": -1000,
+    "unit": "m"
+  },
+  "name_model": "USGS_ASTRO_FRAME_SENSOR_MODEL",
+  "center_ephemeris_time": 376938208.25635,
+  "radii": {
+    "semimajor": 256.6,
+    "semiminor": 248.3,
+    "unit": "km"
+  },
+  "body_rotation": {
+    "time_dependent_frames": [
+      10040,
+      1
+    ],
+    "ck_table_start_time": 376938208.25635386,
+    "ck_table_end_time": 376938208.25635386,
+    "ck_table_original_size": 1,
+    "ephemeris_times": [
+      376938208.25635386
+    ],
+    "quaternions": [
+      [
+        0.4972617451295224,
+        -0.018842274857752542,
+        -0.05328962355712633,
+        -0.8657574380448987
+      ]
+    ],
+    "angular_velocities": [
+      [
+        4.544323197605576e-06,
+        3.902625629848406e-06,
+        5.2734222166983134e-05
+      ]
+    ],
+    "reference_frame": 1
+  },
+  "instrument_pointing": {
+    "time_dependent_frames": [
+      -82000,
+      1
+    ],
+    "ck_table_start_time": 376938208.25635386,
+    "ck_table_end_time": 376938208.25635386,
+    "ck_table_original_size": 1,
+    "ephemeris_times": [
+      376938208.25635386
+    ],
+    "quaternions": [
+      [
+        0.7145950771077332,
+        -0.21489011402790192,
+        -0.4418416741274442,
+        0.4979478383030953
+      ]
+    ],
+    "angular_velocities": [
+      [
+        -0.000757278786092557,
+        -0.0003503954137480032,
+        -0.000106338121706134
+      ]
+    ],
+    "reference_frame": 1,
+    "constant_frames": [
+      14082360,
+      -82000
+    ],
+    "constant_rotation": [
+      -0.0014870197280309472,
+      -0.00017182872562249152,
+      0.9999988796229811,
+      -0.9999987285211891,
+      -0.0005757037366557749,
+      -0.0014871184258896664,
+      0.0005759586213145429,
+      -0.999999819520032,
+      -0.00017097242433200543
+    ]
+  },
+  "naif_keywords": {
+    "BODY_CODE": 602,
+    "BODY602_RADII": [
+      256.6,
+      251.4,
+      248.3
+    ],
+    "BODY_FRAME_CODE": 10040,
+    "INS-82360_CL1_UV3_FOCAL_LENGTH": 2003.09,
+    "INS-82360_PIXEL_PITCH": 0.012,
+    "INS_-82360_FRAME_ID": 14082360,
+    "INS-82360_TRANSX": [
+      0.0,
+      0.012,
+      0.0
+    ],
+    "INS-82360_TRANSY": [
+      0.0,
+      0.0,
+      0.012
+    ],
+    "INS-82360_ITRANSS": [
+      0.0,
+      83.333333333333,
+      0.0
+    ],
+    "INS-82360_ITRANSL": [
+      0.0,
+      0.0,
+      83.333333333333
+    ],
+    "INS-82360_BORESIGHT_LINE": 512.5,
+    "INS-82360_BORESIGHT_SAMPLE": 512.5,
+    "INS-82360_K1": 8e-06
+  },
+  "detector_sample_summing": 1,
+  "detector_line_summing": 1,
+  "focal_length_model": {
+    "focal_length": null
+  },
+  "detector_center": {
+    "line": 512.5,
+    "sample": 512.5
+  },
+  "starting_detector_line": 0,
+  "starting_detector_sample": 0,
+  "focal2pixel_lines": [
+    0.0,
+    0.0,
+    83.333333333333
+  ],
+  "focal2pixel_samples": [
+    0.0,
+    83.333333333333,
+    0.0
+  ],
+  "optical_distortion": {
+    "radial": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "instrument_position": {
+    "spk_table_start_time": 376938208.25635386,
+    "spk_table_end_time": 376938208.25635386,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
+      376938208.25635386
+    ],
+    "positions": [
+      [
+        21962.31325652874,
+        10152.071521618314,
+        -3286.8494024992624
+      ]
+    ],
+    "velocities": [
+      [
+        5.4555677148391,
+        -3.302818436967495,
+        -0.20369613220714297
+      ]
+    ],
+    "reference_frame": 1
+  },
+  "sun_position": {
+    "spk_table_start_time": 376938208.25635386,
+    "spk_table_end_time": 376938208.25635386,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
+      376938208.25635386
+    ],
+    "positions": [
+      [
+        1342712164.8315928,
+        521645737.4508392,
+        157522069.42042258
+      ]
+    ],
+    "velocities": [
+      [
+        -15.573465467758476,
+        5.743806619852782,
+        4.859438874986023
+      ]
+    ],
+    "reference_frame": 1
+  }
+}

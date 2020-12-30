@@ -17,98 +17,104 @@ from ale.rotation import ConstantRotation
 from ale.transformation import FrameChain
 from scipy.spatial.transform import Rotation
 
+id_lookup = {
+    "ISSNA" : "CASSINI_ISS_NAC",
+    "ISSWA" : "CASSINI_ISS_WAC"
+}
+
+name_lookup = {
+    "ISSNA" : "Imaging Science Subsystem Narrow Angle Camera",
+    "ISSWA" : "Imaging Science Subsystem Wide Angle Camera"
+}
+
+nac_filter_to_focal_length = {
+    ("P0","BL2"):2002.19,
+    ("P0","CB1"):2002.30,
+    ("P0","GRN"):2002.38,
+    ("P0","IR1"):2002.35,
+    ("P0","MT1"):2002.40,
+    ("P0","UV3"):2002.71,
+    ("P60","BL2"):2002.13,
+    ("P60","CB1"):2002.18,
+    ("P60","GRN"):2002.28,
+    ("P60","IR1"):2002.36,
+    ("P60","MT1"):2002.34,
+    ("P60","UV3"):2002.51,
+    ("RED","GRN"):2002.61,
+    ("RED","IR1"):2002.48,
+    ("UV1","CL2"):2003.03,
+    ("UV2","CL2"):2002.91,
+    ("UV2","UV3"):2002.90,
+    ("RED","CL2"):2002.69,
+    ("CL1","IR3"):2002.65,
+    ("CL1","BL2"):2002.37,
+    ("CL1","CB1"):2002.66,
+    ("CL1","CB2"):2002.66,
+    ("CL1","CB3"):2002.68,
+    ("CL1","MT1"):2002.88,
+    ("CL1","MT2"):2002.91,
+    ("CL1","MT3"):2002.87,
+    ("CL1","UV3"):2003.09,
+    ("HAL","CL2"):2002.94,
+    ("IR2","CL2"):2002.71,
+    ("IR2","IR1"):2002.56,
+    ("IR2","IR3"):2002.55,
+    ("IR4","CL2"):2002.89,
+    ("IR4","IR3"):2002.81,
+    ("BL1","CL2"):2002.79,
+    ("CL1","CL2"):2002.88,
+    ("CL1","GRN"):2002.75,
+    ("CL1","IR1"):2002.74,
+    ("IRP0","CB2"):2002.48,
+    ("IRP0","CB3"):2002.74,
+    ("IRP0","IR1"):2002.60,
+    ("IRP0","IR3"):2002.48,
+    ("IRP0","MT2"):2002.72,
+    ("IRP0","MT3"):2002.72,
+    ("P120","BL2"):2002.11,
+    ("P120","CB1"):002.28,
+    ("P120","GRN"):2002.38,
+    ("P120","IR1"):2002.39,
+    ("P120","MT1"):2002.54,
+    ("P120","UV3"):2002.71
+}
+
+wac_filter_to_focal_length = {
+    ("B2","CL2"):200.85,
+    ("B2","IRP90"):200.83,
+    ("B2","IRP0"):200.82,
+    ("B3","CL2"):201.22,
+    ("B3","IRP90"):201.12,
+    ("B3","IRP0"):201.11,
+    ("L1","BL1"):200.86,
+    ("L1","CL2"):200.77,
+    ("L1","GRN"):200.71,
+    ("L1","HAL"):200.74,
+    ("L1","IR1"):200.80,
+    ("L1","RED"):200.74,
+    ("L1","VIO"):201.09,
+    ("R2","CL2"):200.97,
+    ("R2","IR"):200.95,
+    ("R2","IRP90"):200.95,
+    ("R3","CL2"):201.04,
+    ("R3","IRP90"):201.03,
+    ("R3","IRP0"):201.04,
+    ("R4","CL2"):201.22,
+    ("R4","IRP90"):201.16,
+    ("R4","IRP0"):201.15,
+    ("T2","CL2"):200.82,
+    ("T2","IRP0"):200.81,
+    ("T2","IRP90"):200.82,
+    ("T3","CL2"):201.04,
+    ("T3","IRP0"):201.06,
+    ("T3","IRP90"):201.07
+}
 
 class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDistortion, Driver):
     """
     Cassini mixin class for defining Spice calls.
     """
-    id_lookup = {
-        "ISSNA" : "CASSINI_ISS_NAC",
-        "ISSWA" : "CASSINI_ISS_WAC"
-    }
 
-    nac_filter_to_focal_length = {
-        ("P0","BL2"):2002.19,
-        ("P0","CB1"):2002.30,
-        ("P0","GRN"):2002.38,
-        ("P0","IR1"):2002.35,
-        ("P0","MT1"):2002.40,
-        ("P0","UV3"):2002.71,
-        ("P60","BL2"):2002.13,
-        ("P60","CB1"):2002.18,
-        ("P60","GRN"):2002.28,
-        ("P60","IR1"):2002.36,
-        ("P60","MT1"):2002.34,
-        ("P60","UV3"):2002.51,
-        ("RED","GRN"):2002.61,
-        ("RED","IR1"):2002.48,
-        ("UV1","CL2"):2003.03,
-        ("UV2","CL2"):2002.91,
-        ("UV2","UV3"):2002.90,
-        ("RED","CL2"):2002.69,
-        ("CL1","IR3"):2002.65,
-        ("CL1","BL2"):2002.37,
-        ("CL1","CB1"):2002.66,
-        ("CL1","CB2"):2002.66,
-        ("CL1","CB3"):2002.68,
-        ("CL1","MT1"):2002.88,
-        ("CL1","MT2"):2002.91,
-        ("CL1","MT3"):2002.87,
-        ("CL1","UV3"):2003.09,
-        ("HAL","CL2"):2002.94,
-        ("IR2","CL2"):2002.71,
-        ("IR2","IR1"):2002.56,
-        ("IR2","IR3"):2002.55,
-        ("IR4","CL2"):2002.89,
-        ("IR4","IR3"):2002.81,
-        ("BL1","CL2"):2002.79,
-        ("CL1","CL2"):2002.88,
-        ("CL1","GRN"):2002.75,
-        ("CL1","IR1"):2002.74,
-        ("IRP0","CB2"):2002.48,
-        ("IRP0","CB3"):2002.74,
-        ("IRP0","IR1"):2002.60,
-        ("IRP0","IR3"):2002.48,
-        ("IRP0","MT2"):2002.72,
-        ("IRP0","MT3"):2002.72,
-        ("P120","BL2"):2002.11,
-        ("P120","CB1"):002.28,
-        ("P120","GRN"):2002.38,
-        ("P120","IR1"):2002.39,
-        ("P120","MT1"):2002.54,
-        ("P120","UV3"):2002.71
-    }
-
-    wac_filter_to_focal_length = {
-        ("B2","CL2"):200.85,
-        ("B2","IRP90"):200.83,
-        ("B2","IRP0"):200.82,
-        ("B3","CL2"):201.22,
-        ("B3","IRP90"):201.12,
-        ("B3","IRP0"):201.11,
-        ("L1","BL1"):200.86,
-        ("L1","CL2"):200.77,
-        ("L1","GRN"):200.71,
-        ("L1","HAL"):200.74,
-        ("L1","IR1"):200.80,
-        ("L1","RED"):200.74,
-        ("L1","VIO"):201.09,
-        ("R2","CL2"):200.97,
-        ("R2","IR"):200.95,
-        ("R2","IRP90"):200.95,
-        ("R3","CL2"):201.04,
-        ("R3","IRP90"):201.03,
-        ("R3","IRP0"):201.04,
-        ("R4","CL2"):201.22,
-        ("R4","IRP90"):201.16,
-        ("R4","IRP0"):201.15,
-        ("T2","CL2"):200.82,
-        ("T2","IRP0"):200.81,
-        ("T2","IRP90"):200.82,
-        ("T3","CL2"):201.04,
-        ("T3","IRP0"):201.06,
-        ("T3","IRP90"):201.07
-    }
 
     @property
     def instrument_id(self):
@@ -124,7 +130,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         : str
           instrument id
         """
-        return self.id_lookup[super().instrument_id]
+        return id_lookup[super().instrument_id]
 
     @property
     def focal_epsilon(self):
@@ -259,10 +265,10 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         filters = tuple(self.label['FILTER_NAME'])
 
         if self.instrument_id == "CASSINI_ISS_NAC":
-          return self.nac_filter_to_focal_length.get(filters, default_focal_len)
+          return nac_filter_to_focal_length.get(filters, default_focal_len)
 
         elif self.instrument_id == "CASSINI_ISS_WAC":
-          return self.wac_filter_to_focal_length.get(filters, default_focal_len)
+          return wac_filter_to_focal_length.get(filters, default_focal_len)
 
     @property
     def _original_naif_sensor_frame_id(self):
@@ -329,6 +335,19 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         return self._frame_chain
 
 class CassiniIssIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistortion, Driver):
+
+    @property
+    def instrument_id(self):
+        """
+        Returns the ID of the instrument
+
+        Returns
+        -------
+        : str
+          ID of the sensor
+        """
+        return id_lookup[super().instrument_id]
+
     @property
     def sensor_name(self):
         """
@@ -339,4 +358,19 @@ class CassiniIssIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistort
         : str
           Name of the sensor
         """
-        return self.label['IsisCube']['Instrument']['SpacecraftName']
+        return name_lookup[super().instrument_id]
+
+    @property
+    def center_ephemeris_time(self):
+        """
+        Returns the middle exposure time for the image in ephemeris seconds.
+
+        This is overriden because the ISIS ISSNAC and ISSWAC sensor models use the
+        label utc times so the converted times are not available in the
+        NaifKeywords. Instead we get it from the tables.
+
+        Returns
+        -------
+        : float
+        """
+        return self.inst_position_table['SpkTableStartTime']

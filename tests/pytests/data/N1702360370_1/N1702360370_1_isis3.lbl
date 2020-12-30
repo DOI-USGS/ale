@@ -1,0 +1,388 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 1024
+    TileLines   = 1024
+
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 1024
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = SignedWord
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName          = Cassini-Huygens
+    InstrumentId            = ISSNA
+    TargetName              = Enceladus
+    StartTime               = 2011-346T05:02:19.773
+    StopTime                = 2011-346T05:02:24.373
+    ExposureDuration        = 4600.0 <Milliseconds>
+    AntibloomingStateFlag   = Off
+
+    # BiasStripMean value converted back to 12 bit.
+    BiasStripMean           = 21.550879
+    CompressionRatio        = 2.203063
+    CompressionType         = Lossless
+    DataConversionType      = Table
+    DelayedReadoutFlag      = No
+    FlightSoftwareVersionId = 1.4
+    GainModeId              = 29 <ElectronsPerDN>
+    GainState               = 2
+    ImageTime               = 2011-346T05:02:24.373
+    InstrumentDataRate      = 182.783997 <KilobitsPerSecond>
+    OpticsTemperature       = (0.627499, 1.905708 <DegreesCelcius>)
+    ReadoutCycleIndex       = 6
+    ShutterModeId           = NacOnly
+    ShutterStateId          = Enabled
+    SummingMode             = 1
+    InstrumentModeId        = Full
+    SpacecraftClockCount    = 1/1702360365.220
+    ReadoutOrder            = 0
+  End_Group
+
+  Group = Archive
+    DataSetId     = CO-S-ISSNA/ISSWA-2-EDR-V1.0
+    ImageNumber   = 1702360370
+    ObservationId = ISS_158EN_ENCEL001_PRIME
+    ProductId     = 1_N1702360370.120
+  End_Group
+
+  Group = BandBin
+    FilterName   = CL1/UV3
+    OriginalBand = 1
+    Center       = 342.868
+    Width        = 68.904
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -82360
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = ($base/kernels/pck/pck00009.tpc,
+                                 $cassini/kernels/pck/cpck15Dec2017.tpc)
+    TargetPosition            = (Table, $base/kernels/spk/de430.bsp,
+                                 $base/kernels/spk/sat425.bsp)
+    InstrumentPointing        = (Table, $cassini/kernels/ck/11344_11349ra.bc,
+                                 $cassini/kernels/fk/cas_v40.tf)
+    Instrument                = Null
+    SpacecraftClock           = $cassini/kernels/sclk/cas00172.tsc
+    InstrumentPosition        = (Table,
+                                 $cassini/kernels/spk/200128RU_SCPSE_11337_113-
+                                 57.bsp)
+    InstrumentAddendum        = $cassini/kernels/iak/IssNAAddendum004.ti
+    ShapeModel                = Null
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
+    Source                    = isis
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name        = "ISS Prefix Pixels"
+  StartByte   = 2163131
+  Bytes       = 24576
+  Records     = 1024
+  ByteOrder   = Lsb
+  Association = Lines
+
+  Group = Field
+    Name = OverclockPixels
+    Type = Double
+    Size = 3
+  End_Group
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 2192270
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-82000, 1)
+  ConstantFrames      = (14082360, -82360, -82000)
+  ConstantRotation    = (-0.0014870197280319, -1.71828725624524e-04,
+                         0.99999887962298, -0.99999872852119,
+                         -5.75703736655754e-04, -0.0014871184258906,
+                         5.75958621314492e-04, -0.99999981952003,
+                         -1.70972424334032e-04)
+  CkTableStartTime    = 376938208.25635
+  CkTableEndTime      = 376938208.25635
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = ($cassini/kernels/ck/11344_11349ra.bc,
+                         $cassini/kernels/fk/cas_v40.tf)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 2192334
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 376938208.25635
+  SpkTableEndTime      = 376938208.25635
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = $cassini/kernels/spk/200128RU_SCPSE_11337_11357.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 2192390
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (10040, 1)
+  CkTableStartTime    = 376938208.25635
+  CkTableEndTime      = 376938208.25635
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 2
+  PoleRa              = (40.66, -0.036, 0.0)
+  PoleDec             = (83.52, -0.004, 0.0)
+  PrimeMeridian       = (6.32, 262.7318996, 0.0)
+  Description         = "Created by spiceinit"
+  Kernels             = ($base/kernels/spk/de430.bsp,
+                         $base/kernels/spk/sat425.bsp,
+                         $base/kernels/pck/pck00009.tpc,
+                         $cassini/kernels/pck/cpck15Dec2017.tpc)
+  SolarLongitude      = 18.419628138988
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 2192454
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 376938208.25635
+  SpkTableEndTime      = 376938208.25635
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = ($base/kernels/spk/de430.bsp,
+                          $base/kernels/spk/sat425.bsp)
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 2192510
+  Bytes     = 1334
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 2187707
+  Bytes     = 4563
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE                      = 602
+  BODY602_RADII                  = (256.6, 251.4, 248.3)
+  BODY_FRAME_CODE                = 10040
+  INS-82360_CL1_UV3_FOCAL_LENGTH = 2003.09
+  INS-82360_PIXEL_PITCH          = 0.012
+  INS_-82360_FRAME_ID            = 14082360
+  INS-82360_TRANSX               = (0.0, 0.012, 0.0)
+  INS-82360_TRANSY               = (0.0, 0.0, 0.012)
+  INS-82360_ITRANSS              = (0.0, 83.333333333333, 0.0)
+  INS-82360_ITRANSL              = (0.0, 0.0, 83.333333333333)
+  INS-82360_BORESIGHT_LINE       = 512.5
+  INS-82360_BORESIGHT_SAMPLE     = 512.5
+  INS-82360_K1                   = 8.0e-06
+End_Object
+End
