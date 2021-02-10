@@ -32,7 +32,7 @@ class ConstantRotation:
         --------
         scipy.spatial.transform.Rotation.from_dcm
         """
-        rot = Rotation.from_dcm(mat)
+        rot = Rotation.from_matrix(mat)
         return ConstantRotation(rot.as_quat(), source, dest)
 
     def __init__(self, quat, source, dest):
@@ -82,7 +82,7 @@ class ConstantRotation:
         """
         The rotation matrix representation of the constant rotation
         """
-        return self._rot.as_dcm()
+        return self._rot.as_matrix()
 
     def inverse(self):
         """
@@ -370,7 +370,7 @@ class TimeDependentRotation:
             skew = np.array([[0, -avs[indx, 2], avs[indx, 1]],
                              [avs[indx, 2], 0, -avs[indx, 0]],
                              [-avs[indx, 1], avs[indx, 0], 0]])
-            rot_deriv = np.dot(skew, rots[indx].as_dcm().T).T
+            rot_deriv = np.dot(skew, rots[indx].as_matrix().T).T
             rotated_vel[indx] = rots[indx].apply(vec_vel[indx])
             rotated_vel[indx] += np.dot(rot_deriv, vec_pos[indx])
 

@@ -512,7 +512,7 @@
 #     test_cube._body_orientation_table['Rotations'] = [[1.0/np.sqrt(2), 1.0/np.sqrt(2), 0, 0]]
 #     #Overwrite the instrument pointing, which is (0, 1, 2, 3) at this point
 #     test_cube._inst_pointing_table["Rotations"] = [[1.0/np.sqrt(2), 0, 1.0/np.sqrt(2), 0]]
-#     print('inverse body rotation', test_cube._body_j2k2bf_rotation.inv().as_dcm())
+#     print('inverse body rotation', test_cube._body_j2k2bf_rotation.inv().as_matrix())
 #     np.testing.assert_almost_equal(test_cube._sensor_orientation, np.asarray([1/2, -1/2, -1/2, -1/2]))
 #
 # def test_body_orientation(test_cube):
