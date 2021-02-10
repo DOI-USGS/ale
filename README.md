@@ -9,6 +9,17 @@ This library allows for the position, rotation, velocity and rotational velocity
 multiple bodies in space, especially in relation to one another. It makes extensive use of NAIF's
 SPICE data for such calculations.
 
+## Using ALE to generate ISDs
+
+To generate an ISD for an image, use the load(s) function. Pass the path to your image/label file and ALE will attempt to find a suitable driver and return an ISD. You can use load to generate the ISD as a dictionary or loads to generate the ISD as a JSON encoded string.
+
+```
+isd_dict = load(path_to_label)
+isd_string = loads(path_to_label)
+```
+
+You can get more verbose output from load(s) by passing verbose=True. If you are having difficulty generating an ISD enable the verbose flag to view the actual errors encountered in drivers.
+
 ## Setting up dependencies with conda (RECOMMENDED)
 
 Install conda (either [Anaconda](https://www.anaconda.com/download/#linux) or
@@ -16,8 +27,7 @@ Install conda (either [Anaconda](https://www.anaconda.com/download/#linux) or
 instructions may be found [here](https://conda.io/docs/user-guide/install/index.html).
 
 ### Creating an isolated conda environment
-(TODO This command will need to be updated)
-Run the following commands to create a self-contained dev environment for ale (type `y` to confirm creation):
+Run the following commands to create a self-contained dev environment for ALE (type `y` to confirm creation):
 ```bash
 conda env create -n ale -f environment.yml
 ```
@@ -25,12 +35,11 @@ conda env create -n ale -f environment.yml
 
 ### Activating the environment
 After creating the `ale` environment, we need to activate it. The activation command depends on your shell.
-* **bash**: `source activate ale`
 * **tcsh**: `conda activate ale`
 > *You can add these to the end of your $HOME/.bashrc or $HOME/.cshrc if you want the `ale` environment to be active in every new terminal.*
 
 ## Building ALE
-After you've set up and activated your conda environment, you may then build ale. Inside
+After you've set up and activated your conda environment, you may then build ALE. Inside
 of a cloned fork of the repository, follow these steps:
 
 ```bash
@@ -47,11 +56,29 @@ running the following command will retrieve the gtest submodule manually:
 git submodule update --init --recursive
 ```
 
+## Adding ALE as a dependency
+
+You can add ALE as a dependency of your CMake based C++ project by linking the exported CMake target, `ale::ale`.
+
+For example:
+
+```
+add_library(my_library some_source.cpp)
+find_package(ale REQUIRED)
+target_link_libraries(my_library ale::ale)
+```
+
 ## Running Tests
 
-To run ctests to test c++ part of ale, run:
+To test the c++ part of ALE, run:
 
 ```
 ctest
 ```
 from the build directory. 
+
+To test the python part of ALE, run:
+
+```
+pytest tests/pytests
+```
