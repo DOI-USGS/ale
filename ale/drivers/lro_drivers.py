@@ -271,7 +271,7 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
         position = state[:3]
         velocity = state[3:]
         rotation = frame_chain.compute_rotation(1, lro_bus_id)
-        rotated_velocity = spice.mxv(rotation._rots.as_dcm()[0], velocity)
+        rotated_velocity = spice.mxv(rotation._rots.as_matrix()[0], velocity)
         return rotated_velocity[0]
 
 
@@ -507,7 +507,7 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
         position = state[:3]
         velocity = state[3:]
         rotation = frame_chain.compute_rotation(1, lro_bus_id)
-        rotated_velocity = spice.mxv(rotation._rots.as_dcm()[0], velocity)
+        rotated_velocity = spice.mxv(rotation._rots.as_matrix()[0], velocity)
         return rotated_velocity[0]
 
 

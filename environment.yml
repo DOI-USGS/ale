@@ -14,7 +14,7 @@ dependencies:
   - pytz
   - python
   - python-dateutil
-  - scipy
+  - scipy>=1.4.0
   - spiceypy>=2.3.0
   - pyyaml
   - networkx
