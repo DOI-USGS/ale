@@ -30,6 +30,16 @@ class OrientationTest : public ::testing::Test {
     Orientations orientations;
 };
 
+class NoAVOrientationTest : public OrientationTest{
+  protected:
+    void SetUp() override {
+      OrientationTest::SetUp();
+      noAvOrientations = Orientations(rotations, times);
+    }
+
+    Orientations noAvOrientations;
+};
+
 class ConstOrientationTest : public OrientationTest{
   protected:
     void SetUp() override {
@@ -151,6 +161,10 @@ TEST_F(OrientationTest, InterpolateAv) {
   EXPECT_NEAR(interpAv.z, M_PI / (3.0 * sqrt(3.0)), 1e-10);
 }
 
+TEST_F(NoAVOrientationTest, InterpolateAv) {
+  EXPECT_ANY_THROW(noAvOrientations.interpolateAV(0.25));
+}
+
 TEST_F(OrientationTest, RotateAt) {
   Vec3d rotatedX = orientations.rotateVectorAt(0.0, Vec3d(1.0, 0.0, 0.0));
   EXPECT_NEAR(rotatedX.x, 0.0, 1e-10);
@@ -266,6 +280,35 @@ TEST_F(ConstOrientationTest, OrientationMultiplication) {
   EXPECT_EQ(constQuats[1], 1);
   EXPECT_EQ(constQuats[2], 0);
   EXPECT_EQ(constQuats[3], 0);
+
+  const vector<Vec3d> &originalAVs = orientations.getAngularVelocities();
+  const vector<Vec3d> &avs = multOrientation.getAngularVelocities();
+  ASSERT_EQ(originalAVs.size(), avs.size());
+  for (size_t i = 0; i < avs.size(); i++) {
+    // We are chaining the same rotation with itself so the angular velocities
+    // should just double
+    EXPECT_EQ(2 * originalAVs[i].x, avs[i].x);
+    EXPECT_EQ(2 * originalAVs[i].y, avs[i].y);
+    EXPECT_EQ(2 * originalAVs[i].z, avs[i].z);
+  }
+}
+
+TEST_F(NoAVOrientationTest, MultiplicationNoAV) {
+  Orientations multOrientation = noAvOrientations * orientations;
+  Orientations multAVOrientation = orientations * orientations;
+  vector<Rotation> outputRotations = multOrientation.getRotations();
+  vector<Rotation> outputAVRotations = multAVOrientation.getRotations();
+  ASSERT_EQ(outputRotations.size(), outputAVRotations.size());
+  for (size_t i = 0; i < outputRotations.size(); i++) {
+    vector<double> quats = outputRotations[i].toQuaternion();
+    vector<double> aVQuats = outputAVRotations[i].toQuaternion();
+    EXPECT_EQ(aVQuats[0], quats[0]);
+    EXPECT_EQ(aVQuats[1], quats[1]);
+    EXPECT_EQ(aVQuats[2], quats[2]);
+    EXPECT_EQ(aVQuats[3], quats[3]);
+  }
+
+  EXPECT_TRUE(multOrientation.getAngularVelocities().empty());
 }
 
 TEST_F(ConstOrientationTest, OrientationInverse) {
