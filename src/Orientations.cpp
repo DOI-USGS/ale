@@ -84,7 +84,10 @@ namespace ale {
 
   Vec3d Orientations::interpolateAV(double time) const {
     Vec3d interpAv;
-    if (m_times.size() > 1) {
+    if (m_avs.empty()) {
+      throw std::invalid_argument("Cannot interpolate angular velocities for an orientation without them.");
+    }
+    else if (m_avs.size() > 1) {
       int interpIndex = interpolationIndex(m_times, time);
       double t = (time - m_times[interpIndex]) / (m_times[interpIndex + 1] - m_times[interpIndex]);
       interpAv = Vec3d(linearInterpolate(m_avs[interpIndex], m_avs[interpIndex + 1], t));
@@ -144,10 +147,12 @@ namespace ale {
       Rotation inverseConst = m_constRotation.inverse();
       Rotation rhsRot = rhs.interpolate(time);
       mergedRotations.push_back(inverseConst*interpolate(time)*rhsRot);
-      Vec3d combinedAv = rhsRot.inverse()(interpolateAV(time));
-      Vec3d rhsAv = rhs.interpolateAV(time);
-      combinedAv += rhsAv;
-      mergedAvs.push_back(combinedAv);
+      if (!getAngularVelocities().empty() && !rhs.getAngularVelocities().empty()) {
+        Vec3d combinedAv = rhsRot.inverse()(interpolateAV(time));
+        Vec3d rhsAv = rhs.interpolateAV(time);
+        combinedAv += rhsAv;
+        mergedAvs.push_back(combinedAv);
+      }
     }
 
     m_times = mergedTimes;
