@@ -1,5 +1,5 @@
 #############################
-Ephemeris Abstraction Library
+Abstraction Layer for Ephemerides (ALE)
 #############################
 
 :Release: |version|
