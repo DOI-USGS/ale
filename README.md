@@ -1,7 +1,7 @@
 # Abstraction Layer for Ephemerides (ALE)
 [![Build Status](https://travis-ci.org/USGS-Astrogeology/ale.svg?branch=master)](https://travis-ci.org/USGS-Astrogeology/ale)
 [![Coverage Status](https://coveralls.io/repos/github/USGS-Astrogeology/ale/badge.svg?branch=master)](https://coveralls.io/github/USGS-Astrogeology/ale?branch=master)
-[![Docs](https://img.shields.io/badge/Docs-latest-green.svg)](https://usgs-astrogeology.github.io/ale/)
+[![Docs](https://readthedocs.org/projects/ale/badge/?version=latest)](https://ale.readthedocs.io/en/latest/?badge=latest)
 
 
 
