@@ -10,9 +10,10 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+import subprocess
+sys.path.insert(0, os.path.abspath('../ale'))
 
 
 # -- Project information -----------------------------------------------------
@@ -30,7 +31,7 @@ release = 'ale.__version__'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc']
+extensions = ['sphinx.ext.autodoc', 'breathe']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -57,9 +58,13 @@ html_theme = 'alabaster'
 html_static_path = ['_static']
 
 # -- Run Doxygen for C++ API --------------------------------------------------
-import subprocess, os
 
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
 if read_the_docs_build:
     subprocess.call('doxygen', shell=True)
+    
+# -- Breathe Configuration ----------------------------------------------------
+
+breathe_projects = { "ALE": "doxyxml/" }
+breathe_default_project = "ALE"
