@@ -93,6 +93,8 @@ def load(label, props={}, formatter='ale', verbose=False):
     drivers = chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.isclass(x) and "_driver" in x.__module__) for dmod in __driver_modules__)
     drivers = sort_drivers([d[1] for d in drivers])
 
+    if verbose:
+        print("Attempting to pre-parse label file")
     try:
         # Try default grammar for pds3 label
         parsed_label = parse_label(label)
@@ -100,12 +102,18 @@ def load(label, props={}, formatter='ale', verbose=False):
         if verbose:
             print(e)
         # If pds3 label fails, try isis grammar
-        parsed_label = parse_label(label, pvl.grammar.ISISGrammar)
+        parsed_label = parse_label(label, pvl.grammar.ISISGrammar())
     except Exception as e:
         if verbose:
             print(e)
         # If both fail, then don't parse the label, and just pass the driver a file.
         parsed_label = None
+
+    if verbose:
+        if parsed_label:
+            print("Successfully pre-parsed label file")
+        else:
+            print("Failed to pre-parse label file. Individual drivers will try again.")
 
     for driver in drivers:
         if verbose:
@@ -146,7 +154,7 @@ def loads(label, props='', formatter='ale', verbose=False):
     return json.dumps(res, cls=AleJsonEncoder)
 
 
-def parse_label(label, grammar=pvl.grammar.PVLGrammar):
+def parse_label(label, grammar=pvl.grammar.PVLGrammar()):
     """
     Attempt to parse a PVL label.
 
