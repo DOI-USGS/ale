@@ -19,3 +19,4 @@ dependencies:
   - pyyaml
   - pytest
   - networkx
+  - breathe
