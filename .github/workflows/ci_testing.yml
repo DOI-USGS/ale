@@ -41,10 +41,13 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          cmake -DCMAKE_BUILD_TYPE=RELEASE ..
+          cmake -DCMAKE_BUILD_TYPE=RELEASE -DCOVERAGE=ON ..
           cmake --build .
       - name: Test C++ Package
         run: |
           cd build
           ctest -VV
-
+      - name: Coverage
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
