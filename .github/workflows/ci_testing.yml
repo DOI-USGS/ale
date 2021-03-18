@@ -22,8 +22,6 @@ jobs:
       - name: Check build environment
         run: |
           conda list
-          which cmake
-          cmake --versions
       - name: Install Python Package
         run: |
           python setup.py install
