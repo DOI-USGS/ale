@@ -36,7 +36,7 @@ jobs:
           python setup.py install
       - name: Test Python Package
         run: |
-           pytest tests/pytests -vv
+           pytest --cov-report=xml --cov=ale tests/pytests -vv
       - name: Build C++ Package
         run: |
           mkdir -p build
