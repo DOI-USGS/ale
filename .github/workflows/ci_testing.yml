@@ -1,0 +1,33 @@
+name: Pull-Request-CI
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  Continuous-Integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: "latest"
+          activate-environment: ale
+          environment-file: environment.yml
+      - name: Install Python Package
+        run: |
+          python setup.py install
+      - name: Test Python Package
+        run: |
+           pytest tests/pytests -vv
+      - name: Build C++ Package
+        run: |
+          mkdir -p build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=RELEASE ..
+          cmake --build .
+      - name: Test C++ Package
+        run: |
+          ctest -VV
+
