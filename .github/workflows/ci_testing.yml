@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  Continuous-Integration:
+  Build-and-Test:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -38,5 +38,6 @@ jobs:
           cmake --build .
       - name: Test C++ Package
         run: |
+          cd build
           ctest -VV
 
