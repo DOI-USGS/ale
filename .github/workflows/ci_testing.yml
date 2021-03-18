@@ -15,6 +15,11 @@ jobs:
           miniconda-version: "latest"
           activate-environment: ale
           environment-file: environment.yml
+      - name: Check build environment
+        run: |
+          conda list
+          which cmake
+          cmake --versions
       - name: Install Python Package
         run: |
           python setup.py install
