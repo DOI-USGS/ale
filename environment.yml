@@ -18,3 +18,4 @@ dependencies:
   - spiceypy>=2.3.0
   - pyyaml
   - networkx
+  - breathe
