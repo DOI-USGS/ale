@@ -573,7 +573,7 @@ class LroLrocIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, Driver)
         : list
           Radial distortion coefficients. There is only one coefficient for LROC NAC l/r
         """
-        return self.naif_keywords.get('INS{}_OD_K'.format(self.ikid), None)
+        return [self.naif_keywords.get('INS{}_OD_K'.format(self.ikid), None)]
 
     @property
     def detector_center_sample(self):
