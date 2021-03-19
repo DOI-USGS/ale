@@ -18,5 +18,6 @@ dependencies:
   - spiceypy>=2.3.0
   - pyyaml
   - pytest
+  - pytest-cov
   - networkx
   - breathe
