@@ -40,6 +40,13 @@ jobs:
       - name: Test Python Package
         run: |
            pytest --cov-report=xml --cov=ale tests/pytests -vv
+      - name: Upload Python Coverage
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+          verbose: true
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9'
       - name: Build C++ Package
         run: |
           mkdir -p build
@@ -50,7 +57,7 @@ jobs:
         run: |
           cd build
           ctest -VV
-      - name: Upload Coverage
+      - name: Upload C++ Coverage
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
