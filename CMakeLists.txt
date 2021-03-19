@@ -44,7 +44,7 @@ if(ALE_BUILD_LOAD)
     set(Python_FIND_FRAMEWORK LAST)
     set(Python_FIND_STRATEGY LOCATION)
   endif()
-  find_package(Python REQUIRED COMPONENTS Development.Embed)
+  find_package(Python REQUIRED COMPONENTS Development)
 endif()
 
 # Library setup
