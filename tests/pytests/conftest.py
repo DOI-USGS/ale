@@ -5,12 +5,12 @@ import warnings
 import numpy as np
 import json
 import pvl
+from glob import glob
+from pathlib import Path
 
 import ale
 
 from ale.base.data_isis import read_table_data
-
-from glob import glob
 
 class SimpleSpice():
     def scs2e(self, *args):
@@ -73,8 +73,7 @@ def compare_dicts(ldict, rdict):
                 differences.append(f'Values of key {key} are not equal {item} : {rdict[key]}.')
     return differences
 
-ale_root = os.path.split(ale.__file__)[0]
-data_root = os.path.join(ale_root, '../tests/pytests/data')
+data_root = os.path.join(Path(__file__).parent.absolute(), 'data')
 dirs = next(os.walk(data_root, topdown=True))[1]
 dirs = [d for d in dirs if not d.startswith('.')]
 image_2_data = {}
