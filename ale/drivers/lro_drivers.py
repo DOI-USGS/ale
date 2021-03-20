@@ -1,4 +1,5 @@
 import os
+import re
 import numpy as np
 import pvl
 import spiceypy as spice
@@ -7,6 +8,7 @@ from glob import glob
 from ale.util import get_metakernels
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
+from ale.base.data_isis import IsisSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import LineScanner, Radar
@@ -508,6 +510,198 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
         velocity = state[3:]
         rotation = frame_chain.compute_rotation(1, lro_bus_id)
         rotated_velocity = spice.mxv(rotation._rots.as_matrix()[0], velocity)
+        return rotated_velocity[0]
+
+
+class LroLrocIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, Driver):
+    @property
+    def instrument_id(self):
+        """
+        The short text name for the instrument
+
+        Returns an instrument id uniquely identifying the instrument. Used to acquire
+        instrument codes from Spice Lib bods2c routine.
+
+        Returns
+        -------
+        str
+          The short text name for the instrument
+        """
+        id_lookup = {
+            "NACL": "LRO_LROCNACL",
+            "NACR": "LRO_LROCNACR"
+        }
+
+        return id_lookup[super().instrument_id]
+
+    @property
+    def sensor_model_version(self):
+        """
+        Returns ISIS instrument sensor model version number
+
+        Returns
+        -------
+        : int
+          ISIS sensor model version
+        """
+        return 2
+
+    @property
+    def usgscsm_distortion_model(self):
+        """
+        The distortion model name with its coefficients
+
+        LRO LROC NAC does not use the default distortion model so we need to overwrite the
+        method packing the distortion model into the ISD.
+
+        Returns
+        -------
+        : dict
+          Returns a dict with the model name : dict of the coefficients
+        """
+
+        return {"lrolrocnac":
+                {"coefficients": self.odtk}}
+
+    @property
+    def odtk(self):
+        """
+        The coefficients for the distortion model
+
+        Returns
+        -------
+        : list
+          Radial distortion coefficients. There is only one coefficient for LROC NAC l/r
+        """
+        return [self.naif_keywords.get('INS{}_OD_K'.format(self.ikid), None)]
+
+    @property
+    def detector_center_sample(self):
+        """
+        The center of the CCD in detector pixels
+        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.
+
+        Returns
+        -------
+        float :
+            The center sample of the CCD
+        """
+        return super().detector_center_sample - 0.5
+
+    @property
+    def ephemeris_start_time(self):
+        """
+        The starting ephemeris time for LRO is computed by taking the
+        LRO:SPACECRAFT_CLOCK_PREROLL_COUNT, as defined in the label, and
+        adding offsets that were taken from an IAK.
+
+        Returns
+        -------
+        : double
+          Starting ephemeris time of the image
+        """
+        return super().ephemeris_start_time + self.constant_time_offset + self.additional_preroll * self.exposure_duration
+
+    @property
+    def exposure_duration(self):
+        """
+        Takes the exposure_duration defined in a parent class and adds
+        offsets taken from an IAK.
+
+         Returns
+         -------
+         : float
+           Returns the exposure duration in seconds.
+         """
+        return super().exposure_duration * (1 + self.multiplicative_line_error) + self.additive_line_error
+
+    @property
+    def multiplicative_line_error(self):
+        """
+        Returns the multiplicative line error defined in an IAK.
+
+        Returns
+        -------
+        : float
+          Returns the multiplicative line error.
+        """
+        return 0.0045
+
+    @property
+    def additive_line_error(self):
+        """
+        Returns the additive line error defined in an IAK.
+
+        Returns
+        -------
+        : float
+          Returns the additive line error.
+        """
+        return 0.0
+
+    @property
+    def constant_time_offset(self):
+        """
+        Returns the constant time offset defined in an IAK.
+
+        Returns
+        -------
+        : float
+          Returns the constant time offset.
+        """
+        return 0.0
+
+    @property
+    def additional_preroll(self):
+        """
+        Returns the addition preroll defined in an IAK.
+
+        Returns
+        -------
+        : float
+          Returns the additionl preroll.
+        """
+        return 1024.0
+
+    @property
+    def sampling_factor(self):
+        """
+        Returns the summing factor from the PDS3 label that is defined by the CROSSTRACK_SUMMING.
+        For example a return value of 2 indicates that 2 lines and 2 samples (4 pixels)
+        were summed and divided by 4 to produce the output pixel value.
+
+        Returns
+        -------
+        : int
+          Number of samples and lines combined from the original data to produce a single pixel in this image
+        """
+        return self.label['IsisCube']['Instrument']['SpatialSumming']
+
+    @property
+    def spacecraft_direction(self):
+        """
+        Returns the x axis of the first velocity vector relative to the
+        spacecraft. This indicates if the craft is moving forwards or backwards.
+
+        From LROC Frame Kernel: lro_frames_2014049_v01.tf
+        "+X axis is in the direction of the velocity vector half the year. The
+        other half of the year, the +X axis is opposite the velocity vector"
+
+        The returned velocity is also slightly off from the spacecraft velocity
+        due to the sensor being attached to the craft with wax.
+
+        Returns
+        -------
+        direction : double
+                    X value of the first velocity relative to the spacecraft bus
+        """
+        _, velocities, _ = self.sensor_position
+        rotation = self.frame_chain.compute_rotation(1, self.sensor_frame_id)
+        rotated_velocity = rotation.apply_at(velocities[0], self.ephemeris_start_time)
+        # We need the spacecraft bus X velocity which is parallel to the left
+        # NAC X velocity and opposite the right NAC velocity.
+        if (self.instrument_id == 'LRO_LROCNACR'):
+          return -rotated_velocity[0]
         return rotated_velocity[0]
 
 
