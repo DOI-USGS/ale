@@ -97,6 +97,20 @@ def get_image_label(image, label_type='pds3'):
 
     return label_file[0]
 
+def get_image(image):
+    if not isinstance(image, str):
+        try:
+            image = str(image)
+        except:
+            raise KeyError('Cannot coerce requested image name to string')
+
+    label_file = glob(os.path.join(data_root, '*',f'{image}.cub'))
+    if not label_file:
+        raise Exception(f'Could not find label file for {image}')
+
+    return label_file[0]
+
+
 def get_table_data(image, table_name):
     if not isinstance(image, str):
         try:
@@ -178,7 +192,7 @@ def convert_kernels(kernels):
             path = os.path.join(data_root, kernel)
             path = os.path.relpath(path)
             bin_output = subprocess.run(['tobin', path],
-                                        capture_output=True, check=True)
+                                        check=True)
             matches = re.search(r'To: (.*\.b\w*)', str(bin_output.stdout))
             if not matches:
                 warnings.warn('Failed to convert transfer kernel, ' + kernel + ', skipping...')
