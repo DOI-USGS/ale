@@ -98,16 +98,19 @@ def load(label, props={}, formatter='ale', verbose=False):
     try:
         # Try default grammar for pds3 label
         parsed_label = parse_label(label)
-    except ValueError as e:
-        if verbose:
-            print(e)
-        # If pds3 label fails, try isis grammar
-        parsed_label = parse_label(label, pvl.grammar.ISISGrammar())
     except Exception as e:
         if verbose:
+            print("First parse attempt failed with")
             print(e)
-        # If both fail, then don't parse the label, and just pass the driver a file.
-        parsed_label = None
+        # If pds3 label fails, try isis grammar
+        try:
+            parsed_label = parse_label(label, pvl.grammar.ISISGrammar())
+        except Exception as e:
+            if verbose:
+                print("Second parse attempt failed with")
+                print(e)
+            # If both fail, then don't parse the label, and just pass the driver a file.
+            parsed_label = None
 
     if verbose:
         if parsed_label:

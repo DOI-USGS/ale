@@ -154,23 +154,23 @@ class FrameChain(nx.DiGraph):
                 print(e)
                 break
 
-            if frame_type is 1 or frame_type is 2:
+            if frame_type == 1 or frame_type == 2:
                 frame_code = 1
 
-            elif frame_type is 3:
+            elif frame_type == 3:
                 try:
                     matrix, frame_code = spice.ckfrot(frame_type_id, ephemeris_time)
                 except:
                     raise Exception(f"The ck rotation from frame {frame_codes[-1]} can not \
                                       be found due to no pointing available at requested time \
                                       or a problem with the frame")
-            elif frame_type is 4:
+            elif frame_type == 4:
                 try:
                     matrix, frame_code = spice.tkfram(frame_type_id)
                 except:
                     raise Exception(f"The tk rotation from frame {frame_codes[-1]} can not \
                                       be found")
-            elif frame_type is 5:
+            elif frame_type == 5:
                 matrix, frame_code = spice.zzdynrot(frame_type_id, center, ephemeris_time)
 
             else:
