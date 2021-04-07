@@ -192,7 +192,7 @@ def convert_kernels(kernels):
             path = os.path.join(data_root, kernel)
             path = os.path.relpath(path)
             bin_output = subprocess.run(['tobin', path],
-                                        check=True)
+                                        capture_output=True, check=True)
             matches = re.search(r'To: (.*\.b\w*)', str(bin_output.stdout))
             if not matches:
                 warnings.warn('Failed to convert transfer kernel, ' + kernel + ', skipping...')
