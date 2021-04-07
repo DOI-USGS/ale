@@ -97,6 +97,20 @@ def get_image_label(image, label_type='pds3'):
 
     return label_file[0]
 
+def get_image(image):
+    if not isinstance(image, str):
+        try:
+            image = str(image)
+        except:
+            raise KeyError('Cannot coerce requested image name to string')
+
+    label_file = glob(os.path.join(data_root, '*',f'{image}.cub'))
+    if not label_file:
+        raise Exception(f'Could not find label file for {image}')
+
+    return label_file[0]
+
+
 def get_table_data(image, table_name):
     if not isinstance(image, str):
         try:
