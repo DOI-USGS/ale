@@ -7,7 +7,7 @@ import json
 import unittest
 from unittest.mock import patch
 
-from conftest import get_image_label, get_isd, get_image_kernels, convert_kernels, compare_dicts
+from conftest import get_image, get_image_label, get_isd, get_image_kernels, convert_kernels, compare_dicts
 import ale
 from ale.drivers.mess_drivers import MessengerMdisPds3NaifSpiceDriver
 from ale.drivers.mess_drivers import MessengerMdisIsisLabelNaifSpiceDriver
@@ -24,14 +24,21 @@ image_dict = {
     'EN1072174528M': get_isd("messmdis")
 }
 
-@pytest.mark.parametrize("label_type", ["pds3", "isis3"])
+@pytest.mark.parametrize("label_type, kernel_type", [("pds3", "naif"), ("isis3", "naif"), ("isis3", "isis")])
 @pytest.mark.parametrize("image", image_dict.keys())
-def test_load(test_kernels, label_type, image):
-    label_file = get_image_label(image, label_type)
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels})
+def test_load(test_kernels, label_type, image, kernel_type):
+    if(kernel_type == "naif"):
+        label_file = get_image_label(image, label_type)
+        isd_str = ale.loads(label_file, props={'kernels': test_kernels})
+        compare_isd = image_dict[image]
+    else: 
+        label_file = get_image(image)
+        isd_str = ale.loads(label_file)
+        compare_isd = get_isd("messmdis_isis")
+
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
-    assert compare_dicts(isd_obj, image_dict[image]) == []
+    assert compare_dicts(isd_obj, compare_isd) == []
 
 # ========= Test Pds3 Label and NAIF Spice driver =========
 class test_pds3_naif(unittest.TestCase):

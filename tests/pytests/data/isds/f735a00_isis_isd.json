@@ -1,0 +1,197 @@
+{
+  "isis_camera_version": 1,
+  "image_lines": 1,
+  "image_samples": 1,
+  "name_platform": "VIKING_ORBITER_1",
+  "name_sensor": "Visual Imaging Subsystem Camera B",
+  "reference_height": {
+    "maxheight": 1000,
+    "minheight": -1000,
+    "unit": "m"
+  },
+  "name_model": "USGS_ASTRO_FRAME_SENSOR_MODEL",
+  "center_ephemeris_time": -679343593.9801607,
+  "radii": {
+    "semimajor": 3396.19,
+    "semiminor": 3376.2,
+    "unit": "km"
+  },
+  "body_rotation": {
+    "time_dependent_frames": [
+      10014,
+      1
+    ],
+    "ck_table_start_time": -679343589.9906603,
+    "ck_table_end_time": -679343589.9906603,
+    "ck_table_original_size": 1,
+    "ephemeris_times": [
+      -679343589.9906603
+    ],
+    "quaternions": [
+      [
+        0.7279379541666973,
+        -0.013628253415821318,
+        -0.3178432935273664,
+        0.6073682954782164
+      ]
+    ],
+    "angular_velocities": [
+      [
+        3.1626612474513304e-05,
+        -2.8773694182310614e-05,
+        5.653419651581804e-05
+      ]
+    ],
+    "reference_frame": 1
+  },
+  "instrument_pointing": {
+    "time_dependent_frames": [
+      -27000,
+      1
+    ],
+    "ck_table_start_time": -679343589.9906603,
+    "ck_table_end_time": -679343589.9906603,
+    "ck_table_original_size": 1,
+    "ephemeris_times": [
+      -679343589.9906603
+    ],
+    "quaternions": [
+      [
+        0.02763106988558369,
+        -0.04284465301523839,
+        0.6355011820954897,
+        0.7704148929247262
+      ]
+    ],
+    "angular_velocities": [
+      [
+        0.0,
+        0.0,
+        -0.0
+      ]
+    ],
+    "reference_frame": 1,
+    "constant_frames": [
+      -27002,
+      -27000
+    ],
+    "constant_rotation": [
+      -0.0003979349968896706,
+      0.9999292841798486,
+      -0.011885633652183106,
+      -0.9999997648597387,
+      -0.00040454501685083244,
+      -0.0005537362156469968,
+      -0.000558505331602465,
+      0.011885410506372852,
+      0.9999292100388355
+    ]
+  },
+  "naif_keywords": {
+    "BODY_CODE": 499,
+    "BODY499_RADII": [
+      3396.19,
+      3396.19,
+      3376.2
+    ],
+    "BODY_FRAME_CODE": 10014,
+    "CLOCK_ET_-27999_40031801_COMPUTED": "0dce01f5fa3ec4c1",
+    "INS-27002_TRANSX": [
+      0.0,
+      0.011764705882353,
+      0.0
+    ],
+    "INS-27002_TRANSY": [
+      0.0,
+      0.0,
+      0.011764705882353
+    ],
+    "INS-27002_ITRANSS": [
+      0.0,
+      85.0,
+      0.0
+    ],
+    "INS-27002_ITRANSL": [
+      0.0,
+      0.0,
+      85.0
+    ]
+  },
+  "detector_sample_summing": 1,
+  "detector_line_summing": 1,
+  "focal_length_model": {
+    "focal_length": null
+  },
+  "detector_center": {
+    "line": null,
+    "sample": null
+  },
+  "starting_detector_line": 0,
+  "starting_detector_sample": 0,
+  "focal2pixel_lines": [
+    0.0,
+    0.0,
+    85.0
+  ],
+  "focal2pixel_samples": [
+    0.0,
+    85.0,
+    0.0
+  ],
+  "optical_distortion": {
+    "radial": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "instrument_position": {
+    "spk_table_start_time": -679343589.9906603,
+    "spk_table_end_time": -679343589.9906603,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
+      -679343589.9906603
+    ],
+    "positions": [
+      [
+        3804.7657059701364,
+        -29029.379045590795,
+        -8152.7028148086265
+      ]
+    ],
+    "velocities": [
+      [
+        0.6188706522395173,
+        -0.5486691847137256,
+        -0.037514399215278556
+      ]
+    ],
+    "reference_frame": 1
+  },
+  "sun_position": {
+    "spk_table_start_time": -679343589.9906603,
+    "spk_table_end_time": -679343589.9906603,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
+      -679343589.9906603
+    ],
+    "positions": [
+      [
+        242154815.26714912,
+        36901072.5575427,
+        10366793.725074254
+      ]
+    ],
+    "velocities": [
+      [
+        -4.665390762839467,
+        19.836822435667738,
+        9.224682056888007
+      ]
+    ],
+    "reference_frame": 1
+  }
+}
+

@@ -1,0 +1,197 @@
+{
+  "isis_camera_version": 1,
+  "image_lines": 1,
+  "image_samples": 1,
+  "name_platform": "VIKING_ORBITER_2",
+  "name_sensor": "Visual Imaging Subsystem Camera A",
+  "reference_height": {
+    "maxheight": 1000,
+    "minheight": -1000,
+    "unit": "m"
+  },
+  "name_model": "USGS_ASTRO_FRAME_SENSOR_MODEL",
+  "center_ephemeris_time": -738066658.5690649,
+  "radii": {
+    "semimajor": 3396.19,
+    "semiminor": 3376.2,
+    "unit": "km"
+  },
+  "body_rotation": {
+    "time_dependent_frames": [
+      10014,
+      1
+    ],
+    "ck_table_start_time": -738066654.5790088,
+    "ck_table_end_time": -738066654.5790088,
+    "ck_table_original_size": 1,
+    "ephemeris_times": [
+      -738066654.5790088
+    ],
+    "quaternions": [
+      [
+        0.5350228751912852,
+        -0.31507831776487744,
+        0.043929225721799116,
+        -0.7826534353236997
+      ]
+    ],
+    "angular_velocities": [
+      [
+        3.162677682982312e-05,
+        -2.8771851894035362e-05,
+        5.6535042187501485e-05
+      ]
+    ],
+    "reference_frame": 1
+  },
+  "instrument_pointing": {
+    "time_dependent_frames": [
+      -30000,
+      1
+    ],
+    "ck_table_start_time": -738066654.5790088,
+    "ck_table_end_time": -738066654.5790088,
+    "ck_table_original_size": 1,
+    "ephemeris_times": [
+      -738066654.5790088
+    ],
+    "quaternions": [
+      [
+        0.24875871307312372,
+        -0.2978849241869555,
+        0.6523780929602432,
+        0.6509888619921939
+      ]
+    ],
+    "angular_velocities": [
+      [
+        0.0,
+        0.0,
+        -0.0
+      ]
+    ],
+    "reference_frame": 1,
+    "constant_frames": [
+      -30001,
+      -30000
+    ],
+    "constant_rotation": [
+      0.0020823332006454365,
+      0.9999275340581658,
+      0.0118570873656937,
+      -0.9999977494676081,
+      0.002087002280867556,
+      -0.0003814199773553009,
+      -0.00040613810577405565,
+      -0.01185626643745227,
+      0.9999296295229998
+    ]
+  },
+  "naif_keywords": {
+    "BODY_CODE": 499,
+    "BODY499_RADII": [
+      3396.19,
+      3396.19,
+      3376.2
+    ],
+    "BODY_FRAME_CODE": 10014,
+    "CLOCK_ET_-30999_46570746_COMPUTED": "31034b7100ffc5c1",
+    "INS-30001_TRANSX": [
+      0.0,
+      0.011764705882353,
+      0.0
+    ],
+    "INS-30001_TRANSY": [
+      0.0,
+      0.0,
+      0.011764705882353
+    ],
+    "INS-30001_ITRANSS": [
+      0.0,
+      85.0,
+      0.0
+    ],
+    "INS-30001_ITRANSL": [
+      0.0,
+      0.0,
+      85.0
+    ]
+  },
+  "detector_sample_summing": 1,
+  "detector_line_summing": 1,
+  "focal_length_model": {
+    "focal_length": null
+  },
+  "detector_center": {
+    "line": null,
+    "sample": null
+  },
+  "starting_detector_line": 0,
+  "starting_detector_sample": 0,
+  "focal2pixel_lines": [
+    0.0,
+    0.0,
+    85.0
+  ],
+  "focal2pixel_samples": [
+    0.0,
+    85.0,
+    0.0
+  ],
+  "optical_distortion": {
+    "radial": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "instrument_position": {
+    "spk_table_start_time": -738066654.5790088,
+    "spk_table_end_time": -738066654.5790088,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
+      -738066654.5790088
+    ],
+    "positions": [
+      [
+        4553.932729011682,
+        -1511.8974073077934,
+        1092.1996085889182
+      ]
+    ],
+    "velocities": [
+      [
+        -0.24727917113305767,
+        2.402881593579281,
+        3.099986419080442
+      ]
+    ],
+    "reference_frame": 1
+  },
+  "sun_position": {
+    "spk_table_start_time": -738066654.5790088,
+    "spk_table_end_time": -738066654.5790088,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
+      -738066654.5790088
+    ],
+    "positions": [
+      [
+        238736005.86525938,
+        49393960.380246796,
+        16187072.69585331
+      ]
+    ],
+    "velocities": [
+      [
+        -6.045240171409677,
+        19.59211614996381,
+        9.149865035004915
+      ]
+    ],
+    "reference_frame": 1
+  }
+}
+
