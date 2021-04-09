@@ -7,7 +7,7 @@ import json
 
 import unittest
 from unittest.mock import patch
-from conftest import get_image_label, get_image_kernels, convert_kernels, compare_dicts
+from conftest import get_image, get_isd, get_image_label, get_image_kernels, convert_kernels, compare_dicts
 
 import ale
 from ale.drivers.viking_drivers import VikingIsisLabelNaifSpiceDriver
@@ -262,14 +262,22 @@ def test_kernels():
         for kern in kern_list:
             os.remove(kern)
 
-@pytest.mark.parametrize("label_type", ['isis3'])
+@pytest.mark.parametrize("label_type, kernel_type", [('isis3', 'naif'), ('isis3', 'isis')])
 @pytest.mark.parametrize("formatter", ['isis'])
 @pytest.mark.parametrize("image", image_dict.keys())
-def test_viking1_load(test_kernels, label_type, formatter, image):
-    label_file = get_image_label(image, label_type)
-    isis_isd = ale.load(label_file, props={'kernels': test_kernels[image]}, formatter=formatter)
+def test_viking1_load(test_kernels, label_type, formatter, image, kernel_type):
+    if kernel_type == "naif":
+        label_file = get_image_label(image, label_type)
+        isis_isd = ale.loads(label_file, props={'kernels': test_kernels[image]}, formatter=formatter)
+        compare_dict = image_dict[image][formatter]
+    else: 
+        label_file = get_image(image)
+        isis_isd = ale.loads(label_file, verbose=True)
+        isd_name = image+'_isis'
+        compare_dict = get_isd(isd_name)
+
     print(isis_isd)
-    assert compare_dicts(isis_isd, image_dict[image][formatter]) == []
+    assert compare_dicts(json.loads(isis_isd), compare_dict) == []
 
 # ========= Test isislabel and naifspice driver =========
 class test_isis_naif(unittest.TestCase):
