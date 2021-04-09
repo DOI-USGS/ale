@@ -10,7 +10,7 @@ import spiceypy as spice
 import ale
 from ale.drivers.mro_drivers import MroCtxPds3LabelNaifSpiceDriver, MroCtxIsisLabelNaifSpiceDriver, MroCtxIsisLabelIsisSpiceDriver
 
-from conftest import get_image_kernels, get_isd, convert_kernels, get_image_label, compare_dicts
+from conftest import get_image, get_image_kernels, get_isd, convert_kernels, get_image_label, compare_dicts
 
 #@pytest.fixture
 # def ctx_isf
@@ -23,15 +23,21 @@ def test_kernels():
     for kern in binary_kernels:
         os.remove(kern)
 
-@pytest.mark.parametrize("label_type", ['pds3', 'isis3'])
-def test_mro_load(test_kernels, label_type):
+@pytest.mark.parametrize("label_type, kernel_type", [('pds3', 'naif'), ('isis3', 'naif'), ('isis3', 'isis')])
+def test_mro_load(test_kernels, label_type, kernel_type):
     label_file = get_image_label('B10_013341_1010_XN_79S172W', label_type)
 
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels})
+    if label_type == 'isis3' and kernel_type == 'isis': 
+        label_file = get_image('B10_013341_1010_XN_79S172W')
+        isd_str = ale.loads(label_file)
+        compare_isd = get_isd('ctx_isis')
+    else: 
+        isd_str = ale.loads(label_file, props={'kernels': test_kernels})
+        compare_isd = get_isd('ctx')
+
     isd_obj = json.loads(isd_str)
 
-    compare_isd = get_isd('ctx')
-    if label_type == 'isis3':
+    if label_type == 'isis3' and kernel_type == 'naif':
         compare_isd['image_samples'] = 5000
 
     assert compare_dicts(isd_obj, compare_isd) == []
