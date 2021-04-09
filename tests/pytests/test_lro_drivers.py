@@ -13,7 +13,7 @@ from ale.drivers.lro_drivers import LroLrocIsisLabelNaifSpiceDriver
 from ale.drivers.lro_drivers import LroMiniRfIsisLabelNaifSpiceDriver
 from ale.transformation import TimeDependentRotation
 
-from conftest import get_image_label, get_isd, get_image_kernels, convert_kernels, compare_dicts
+from conftest import get_image, get_image_label, get_isd, get_image_kernels, convert_kernels, compare_dicts
 
 image_dict = {
     'M103595705LE': get_isd("lrolroc"),
@@ -34,15 +34,22 @@ def test_kernels():
             os.remove(kern)
 
 # Test load of LROC labels
-@pytest.mark.parametrize("label_type", ['isis3'])
+@pytest.mark.parametrize("label_type, kernel_type", [('isis3', 'naif'), ('isis3', 'isis')])
 #@pytest.mark.parametrize("image", image_dict.keys()) Add this when when all are supported by ale isd.
 @pytest.mark.parametrize("image", ['M103595705LE'])
-def test_load(test_kernels, label_type, image):
-    label_file = get_image_label(image, label_type)
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
+def test_load(test_kernels, label_type, image, kernel_type):
+    if kernel_type == 'naif':
+        label_file = get_image_label(image, label_type)
+        isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
+        compare_isd = image_dict[image]
+    else: 
+        label_file = get_image(image)
+        isd_str = ale.loads(label_file);
+        compare_isd = get_isd('lro_isis')
+
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
-    assert compare_dicts(isd_obj, image_dict[image]) == []
+    assert compare_dicts(isd_obj, compare_isd) == []
 
 # Test load of MiniRF labels
 def test_load_minirf(test_kernels):
