@@ -252,16 +252,15 @@ image_dict = {
 
 @pytest.fixture(scope="module")
 def test_kernels():
-    print("Skipping")
-#    updated_kernels = {}
-#    binary_kernels = {}
-#    for image in image_dict.keys():
-#        kernels = get_image_kernels(image)
-#        updated_kernels[image], binary_kernels[image] = convert_kernels(kernels)
-#    yield updated_kernels
-#    for kern_list in binary_kernels.values():
-#        for kern in kern_list:
-#            os.remove(kern)
+    updated_kernels = {}
+    binary_kernels = {}
+    for image in image_dict.keys():
+        kernels = get_image_kernels(image)
+        updated_kernels[image], binary_kernels[image] = convert_kernels(kernels)
+    yield updated_kernels
+    for kern_list in binary_kernels.values():
+        for kern in kern_list:
+            os.remove(kern)
 
 @pytest.mark.parametrize("label_type, kernel_type", [('isis3', 'naif'), ('isis3', 'isis')])
 @pytest.mark.parametrize("formatter", ['isis'])
@@ -273,9 +272,9 @@ def test_viking1_load(test_kernels, label_type, formatter, image, kernel_type):
         compare_dict = image_dict[image][formatter]
     else: 
         label_file = get_image(image)
-        isis_isd = ale.loads(label_file)
-        print(json.dumps(json.loads(isis_isd), indent=2))
-        compare_dict = get_isd('viking_isis')
+        isis_isd = ale.loads(label_file, verbose=True)
+        isd_name = image+'_isis'
+        compare_dict = get_isd(isd_name)
 
     print(isis_isd)
     assert compare_dicts(json.loads(isis_isd), compare_dict) == []
