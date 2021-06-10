@@ -2,4 +2,4 @@
 ====================================================
 
 .. doxygenfile:: InterpUtils.h
-   :project: ale
+   :project: ALE
