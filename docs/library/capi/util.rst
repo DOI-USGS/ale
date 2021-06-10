@@ -4,7 +4,7 @@
 Used in ``getDistortionModel`` and ``getDistortionCoeffs``
 
 .. doxygenenum:: DistortionType
-   :project: ale
+   :project: ALE
 
 .. doxygenfile:: Util.h
-   :project: ale
+   :project: ALE

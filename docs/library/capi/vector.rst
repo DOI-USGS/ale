@@ -2,4 +2,4 @@
 ===========================================================
 
 .. doxygenfile:: Vectors.h
-   :project: ale
+   :project: ALE
