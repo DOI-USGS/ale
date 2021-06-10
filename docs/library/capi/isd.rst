@@ -2,4 +2,4 @@
 ===========================================
 
 .. doxygenfile:: Isd.h
-   :project: ale
+   :project: ALE

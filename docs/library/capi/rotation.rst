@@ -2,4 +2,4 @@
 ======================================================
 
 .. doxygenfile:: Rotation.h
-   :project: ale
+   :project: ALE

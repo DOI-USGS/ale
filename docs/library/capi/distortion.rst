@@ -2,4 +2,4 @@
 ==============================================
 
 .. doxygenfile:: Distortion.h
-   :project: ale
+   :project: ALE

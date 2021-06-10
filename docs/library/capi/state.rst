@@ -2,4 +2,4 @@
 ====================================================
 
 .. doxygenfile:: States.h
-   :project: ale
+   :project: ALE

@@ -2,4 +2,4 @@
 ===========================================================
 
 .. doxygenfile:: Orientations.h
-   :project: ale
+   :project: ALE

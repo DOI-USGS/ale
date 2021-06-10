@@ -2,7 +2,7 @@
 ========================
 
 .. doxygenfile:: Load.h
-  :project: ale
+  :project: ALE
 
 .. toctree::
 
