@@ -41,28 +41,44 @@ namespace ale {
   class States {
     public:
       // Constructors
+      /**
+       * Creates an empty States object
+       */
       States();
+
+      /**
+       * Creates a States object from a set of times and positions
+       */
       States(const std::vector<double>& ephemTimes, const std::vector<Vec3d>& positions,
              int refFrame=1);
 
+      /**
+       * Creates a States object from a set of times and positions
+       */
       States(const std::vector<double>& ephemTimes, const std::vector<std::vector<double>>& positions,
              int refFrame=1);
 
+      /**
+       * Creates a States object from a set of times, positions, and velocities
+       */
       States(const std::vector<double>& ephemTimes, const std::vector<Vec3d>& positions,
              const std::vector<Vec3d>& velocities, int refFrame=1);
 
+      /**
+       * Creates a States object from a set of times, states
+       */
       States(const std::vector<double>& ephemTimes, const std::vector<State>& states,
              int refFrame=1);
 
       ~States();
 
       // Getters
-      std::vector<State> getStates() const; //! Returns state vectors (6-element positions&velocities)
-      std::vector<Vec3d> getPositions() const; //! Returns the current positions
-      std::vector<Vec3d> getVelocities() const; //! Returns the current velocities
-      std::vector<double> getTimes() const; //! Returns the current times
-      int getReferenceFrame() const; //! Returns reference frame as NAIF ID
-      bool hasVelocity() const; //! Returns true if any velocities have been provided
+      std::vector<State> getStates() const; //!< Returns state vectors (6-element positions&velocities)
+      std::vector<Vec3d> getPositions() const; //!< Returns the current positions
+      std::vector<Vec3d> getVelocities() const; //!< Returns the current velocities
+      std::vector<double> getTimes() const; //!< Returns the current times
+      int getReferenceFrame() const; //!< Returns reference frame as NAIF ID
+      bool hasVelocity() const; //!< Returns true if any velocities have been provided
 
       /**
        * Returns a single state by interpolating state.

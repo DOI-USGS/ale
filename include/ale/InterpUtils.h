@@ -40,6 +40,13 @@ namespace ale {
    */
   std::vector<double> linearInterpolate(const std::vector<double> &x, const std::vector<double> &y, double t);
 
+  /**
+   * Linearly interpolate between two 3D vectors.
+   *
+   * @param x The first vectors.
+   * @param y The second vectors.
+   * @param t The distance to interpolate. 0 is x and 1 is y.
+   */
   Vec3d linearInterpolate(const Vec3d &x, const Vec3d &y, double t);
 
   /**
@@ -59,21 +66,41 @@ namespace ale {
    */
    std::vector<double> orderedVecMerge(const std::vector<double> &x, const std::vector<double> &y);
 
-
-   /** The following helper functions are used to calculate the reduced states cache and cubic hermite
-   to interpolate over it. They were migrated, with minor modifications, from
-   Isis::NumericalApproximation **/
-
-   /** Evaluates a cubic hermite at time, interpTime, between the appropriate two points in x. **/
+   /**
+    * Evaluates a cubic hermite at time, interpTime, between the appropriate two points in x.
+    *
+    * migrated from Isis::NumericalApproximation
+    */
    double evaluateCubicHermite(const double interpTime, const std::vector<double>& derivs,
                             const std::vector<double>& x, const std::vector<double>& y);
 
-   /** Evaluate velocities using a Cubic Hermite Spline at a time a, within some interval in x, **/
+   /**
+    * Evaluate velocities using a Cubic Hermite Spline at a time a, within some interval in x.
+    *
+    * migrated from Isis::NumericalApproximation
+    */
    double evaluateCubicHermiteFirstDeriv(const double interpTime, const std::vector<double>& deriv,
                                      const std::vector<double>& times, const std::vector<double>& y);
 
+   /**
+    * Interpolate a set of values using lagrange polynomials.
+    *
+    * @param times The vector of times to interpolate over
+    * @param values The vector of values to interpolate between
+    * @param time The time to interpolate at
+    * @param order The order of the lagrange polynomials to use
+    */
    double lagrangeInterpolate(const std::vector<double>& times, const std::vector<double>& values,
                            double time, int order=8);
+
+   /**
+    * Interpolate the first derivative of a set of values using lagrange polynomials.
+    *
+    * @param times The vector of times to interpolate over
+    * @param values The vector of values to interpolate between
+    * @param time The time to interpolate at
+    * @param order The order of the lagrange polynomials to use
+    */
    double lagrangeInterpolateDerivative(const std::vector<double>& times, const std::vector<double>& values,
                                      double time, int order=8);
 

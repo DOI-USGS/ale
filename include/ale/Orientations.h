@@ -32,13 +32,28 @@ namespace ale {
     ~Orientations() {};
 
     /**
-     * Const accessor methods
+     * Get the vector of time dependent rotations
      */
     std::vector<Rotation> getRotations() const;
+    /**
+     * Get the vector of angular velocities
+     */
     std::vector<ale::Vec3d> getAngularVelocities() const;
+    /**
+     * Get the vector of times
+     */
     std::vector<double> getTimes() const;
+    /**
+     * Get the frames that the constant rotation rotates through
+     */
     std::vector<int> getConstantFrames() const;
+    /**
+     * Get the frames that the time dependent rotations rotate through
+     */
     std::vector<int> getTimeDependentFrames() const;
+    /**
+     * Get the constant rotation
+     */
     Rotation getConstantRotation() const;
 
     /**
@@ -117,8 +132,22 @@ namespace ale {
     Rotation m_constRotation;
   };
 
+  /**
+   * Apply a constant rotation after an Orientation
+   */
   Orientations operator*(Orientations lhs, const Rotation &rhs);
+
+  /**
+   * Apply a constant rotation before an Orientation
+   */
   Orientations operator*(const Rotation &lhs, Orientations rhs);
+
+  /**
+   * Apply two Orientations in a row
+   *
+   * @param lhs The second orientation to apply
+   * @param rhs The first orientation to apply
+   */
   Orientations operator*(Orientations lhs, const Orientations &rhs);
 }
 
