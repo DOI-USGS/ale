@@ -138,7 +138,7 @@ def load(label, props={}, formatter='ale', verbose=False):
                 traceback.print_exc()
     raise Exception('No Such Driver for Label')
 
-def loads(label, props='', formatter='ale', verbose=False):
+def loads(label, props='', formatter='ale', indent = 2, verbose=False):
     """
     Attempt to load a given label from all possible drivers.
 
@@ -154,8 +154,7 @@ def loads(label, props='', formatter='ale', verbose=False):
     load
     """
     res = load(label, props, formatter, verbose=verbose)
-    return json.dumps(res, cls=AleJsonEncoder)
-
+    return json.dumps(res, indent=indent, cls=AleJsonEncoder)
 
 def parse_label(label, grammar=pvl.grammar.PVLGrammar()):
     """
