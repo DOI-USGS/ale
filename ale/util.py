@@ -154,7 +154,6 @@ def get_isis_preferences(isis_preferences=None):
 
     try:
         isisrootprefs_path = os.path.join(os.environ["ISISROOT"], 'IsisPreferences')
-        isisroot = os.environ['ISISROOT']
         isisrootprefs = read_pvl(isisrootprefs_path)
     except (FileNotFoundError, KeyError) as e:
         isisrootprefs = {}
@@ -259,6 +258,10 @@ def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
         kernels = [kernel for kernel in chain.from_iterable(mk_paths.values()) if isinstance(kernel, str)]
         if expand:
             isisprefs = get_isis_preferences()
+            
+            if not "DataDirectory" in isisprefs:
+              warnings.warn("No IsisPreferences file found, is your ISISROOT env var set?")
+
             kernels = [expandvars(expandvars(k, dict_to_lower(isisprefs['DataDirectory']))) for k in kernels]
         return kernels
     elif (format_as == 'dict'):
