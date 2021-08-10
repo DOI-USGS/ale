@@ -481,7 +481,36 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         """
         return 1
 
+
 class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDistortion, Driver):
+  
+  @property
+  def instrument_id(self):
+      """
+      Returns the name of the instrument
+
+      Returns
+      -------
+      : str
+        Name of the instrument
+      """
+      if(super().instrument_id != "HRSC"):
+          raise Exception ("Instrument ID is wrong.")
+      return self.label['IsisCube']['Archive']['DetectorId']
+
+
+  @property
+  def sensor_name(self):
+      """
+      Returns the name of the instrument. Need to over-ride isis_label because
+      InstrumentName is not defined in the ISIS label for MEX HSRC cubes.
+
+      Returns
+      -------
+      : str
+        Name of the sensor
+      """
+      return self.instrument_id
 
   @property
   def detector_center_line(self):
@@ -513,36 +542,6 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
       Detector sample of the principal point
     """
     return 2592.0
-
-
-  @property
-  def instrument_id(self):
-      """
-      Returns the name of the instrument
-
-      Returns
-      -------
-      : str
-        Name of the instrument
-      """
-      if(super().instrument_id != "HRSC"):
-          raise Exception ("Instrument ID is wrong.")
-      return self.label['IsisCube']['Archive']['DetectorId']
-
-
-  @property
-  def sensor_name(self):
-      """
-      Returns the name of the instrument. Need to over-ride isis_label because
-      InstrumentName is not defined in the ISIS label for MEX HSRC cubes.
-
-      Returns
-      -------
-      : str
-        Name of the sensor
-      """
-      return self.instrument_id
-
 
   @property
   def sensor_model_version(self):
