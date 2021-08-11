@@ -481,125 +481,180 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         """
         return 1
 
+
 class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDistortion, Driver):
+  
+  @property
+  def instrument_id(self):
+      """
+      Returns the name of the instrument
 
-        @property
-        def instrument_id(self):
-            """
-            Returns the name of the instrument
-
-            Returns
-            -------
-            : str
-              Name of the instrument
-            """
-            if(super().instrument_id != "HRSC"):
-                raise Exception ("Instrument ID is wrong.")
-            return self.label['IsisCube']['Archive']['DetectorId']
-
-
-        @property
-        def sensor_name(self):
-            """
-            Returns the name of the instrument. Need to over-ride isis_label because
-            InstrumentName is not defined in the ISIS label for MEX HSRC cubes.
-
-            Returns
-            -------
-            : str
-              Name of the sensor
-            """
-            return self.instrument_id
+      Returns
+      -------
+      : str
+        Name of the instrument
+      """
+      if(super().instrument_id != "HRSC"):
+          raise Exception ("Instrument ID is wrong.")
+      return self.label['IsisCube']['Archive']['DetectorId']
 
 
-        @property
-        def sensor_model_version(self):
-            """
-            Returns
-            -------
-            : int
-              ISIS sensor model version
-            """
-            return 1
+  @property
+  def sensor_name(self):
+      """
+      Returns the name of the instrument. Need to over-ride isis_label because
+      InstrumentName is not defined in the ISIS label for MEX HSRC cubes.
 
-        @property
-        def times_table(self):
-            """
-            Returns EphermisTime, ExposureTime, and LinesStart informtation which was stored as
-            binary information in the ISIS cube.
+      Returns
+      -------
+      : str
+        Name of the sensor
+      """
+      return self.instrument_id
 
-            Returns
-            -------
-            : dict
-              Dictionary with EphemerisTime, ExposureTime, and LineStart.
-            """
-            isis_bytes = read_table_data(self.label['Table'], self._file)
-            return parse_table(self.label['Table'], isis_bytes)
+  @property
+  def detector_center_line(self):
+    """
+    Returns the center detector line.
 
-        @property
-        def line_scan_rate(self):
-            """
-            Returns
-            -------
-            : tuple
-              list of lines, list of ephemeris times, and list of exposure
-              times
-            """
-            return self.times_table['LineStart'], self.times_table['EphemerisTime'], self.times_table['ExposureTime']
+    For HRSC, we are dealing with a single line, so center line will be 0.
 
-        @property
-        def ephemeris_start_time(self):
-            """
-            Returns
-            -------
-            : float
-              starting ephemeris time
-            """
-            return self.times_table['EphemerisTime'][0]
-
-        @property
-        def ephemeris_stop_time(self):
-            """
-            Returns
-            -------
-            : float
-              ephemeris stop time
-            """
-            last_line = self.times_table['LineStart'][-1]
-            return self.times_table['EphemerisTime'][-1] + ((self.image_lines - last_line + 1) * self.times_table['ExposureTime'][-1])
-
-        @property
-        def ikid(self):
-            """
-            Returns the Naif ID code for the HRSC head instrument
-
-            This would be the Naif ID code for the base (or "head") instrument.
-
-            Returns
-            -------
-            : int
-              Naif ID used to for indentifying the instrument in Spice kernels
-            """
-            return spice.bods2c("MEX_HRSC_HEAD")
+    Returns
+    -------
+    : float
+      Detector line of the principal point
+    """
+    return 0.0
 
 
-        @property
-        def fikid(self):
-            """
-            Naif ID code of the filter dependent instrument codes.
+  @property
+  def detector_center_sample(self):
+    """
+    Returns the center detector sample.
 
-            Expects filter_number to be defined. This should be an integer containing
-            the filter number from the pds3 label.
-            Expects ikid to be defined. This should be the integer Naif ID code for
-            the instrument.
+    For HRSC, center sample is consistent regardless of filter. This is
+    different from ISIS's center sample because ISIS line scan sensors use
+    0.5 based detector samples.
 
-            Returns
-            -------
-            : int
-              Naif ID code used in calculating focal length
-            """
-            return spice.bods2c(self.instrument_id)
+    Returns
+    -------
+    : float
+      Detector sample of the principal point
+    """
+    return 2592.0
 
+  @property
+  def sensor_model_version(self):
+      """
+      Returns
+      -------
+      : int
+        ISIS sensor model version
+      """
+      return 1
+
+  @property
+  def times_table(self):
+      """
+      Returns EphermisTime, ExposureTime, and LinesStart informtation which was stored as
+      binary information in the ISIS cube.
+
+      Returns
+      -------
+      : dict
+        Dictionary with EphemerisTime, ExposureTime, and LineStart.
+      """
+      isis_bytes = read_table_data(self.label['Table'], self._file)
+      return parse_table(self.label['Table'], isis_bytes)
+
+  @property
+  def line_scan_rate(self):
+      """
+      Returns
+      -------
+      : tuple
+        list of lines, list of ephemeris times, and list of exposure
+        times
+      """
+      return self.times_table['LineStart'], self.times_table['EphemerisTime'], self.times_table['ExposureTime']
+
+  @property
+  def ephemeris_start_time(self):
+      """
+      Returns
+      -------
+      : float
+        starting ephemeris time
+      """
+      return self.times_table['EphemerisTime'][0]
+
+  @property
+  def ephemeris_stop_time(self):
+      """
+      Returns
+      -------
+      : float
+        ephemeris stop time
+      """
+      last_line = self.times_table['LineStart'][-1]
+      return self.times_table['EphemerisTime'][-1] + ((self.image_lines - last_line + 1) * self.times_table['ExposureTime'][-1])
+
+  @property
+  def ikid(self):
+      """
+      Returns the Naif ID code for the HRSC head instrument
+
+      This would be the Naif ID code for the base (or "head") instrument.
+
+      Returns
+      -------
+      : int
+        Naif ID used to for indentifying the instrument in Spice kernels
+      """
+      return spice.bods2c("MEX_HRSC_HEAD")
+
+
+  @property
+  def fikid(self):
+      """
+      Naif ID code of the filter dependent instrument codes.
+
+      Expects filter_number to be defined. This should be an integer containing
+      the filter number from the pds3 label.
+      Expects ikid to be defined. This should be the integer Naif ID code for
+      the instrument.
+
+      Returns
+      -------
+      : int
+        Naif ID code used in calculating focal length
+      """
+      return spice.bods2c(self.instrument_id)
+
+  @property
+  def focal2pixel_lines(self):
+      """
+      NOTE: These values are pulled from ISIS iak kernels.
+
+      Returns
+      -------
+      : list<double>
+        focal plane to detector lines
+      """
+      return [0.0, 0.0, 111.111111111111]
+
+
+  @property
+  def focal2pixel_samples(self):
+      """
+      NOTE: These values are pulled from ISIS iak kernels.
+
+      Returns
+      -------
+      : list<double>
+        focal plane to detector samples
+      """
+      return [0.0, 111.111111111111, 0.0]
 
 class MexSrcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDistortion, Driver):
     """
