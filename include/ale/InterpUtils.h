@@ -7,21 +7,21 @@
 
 namespace ale {
 
-  // Interpolation enum for defining different methods of interpolating rotations
+  /// Interpolation enum for defining different methods of interpolating rotations
   enum RotationInterpolation {
-    // Spherical linear interpolation
+    /// Spherical linear interpolation
     SLERP,
-    // Normalized linear interpolation
+    /// Normalized linear interpolation
     NLERP
   };
 
-  // Interpolation enum for defining different methods of interpolating in R
+  /// Interpolation enum for defining different methods of interpolating in R
   enum PositionInterpolation {
-    // Interpolate using linear interpolation
+    /// Interpolate using linear interpolation
     LINEAR = 0,
-    // Interpolate using a cubic spline
+    /// Interpolate using a cubic spline
     SPLINE = 1,
-    // Interpolate using Lagrange polynomials up to 8th order
+    /// Interpolate using Lagrange polynomials up to 8th order
     LAGRANGE = 2,
   };
 
