@@ -16,7 +16,7 @@ namespace ale {
     Vec3d position;
     Vec3d velocity;
 
-    // Accepts a {x, y, z, vx, vy, vz} vector
+    // Creates a state from a {x, y, z, vx, vy, vz} vector
     State(const std::vector<double>& vec) {
       if (vec.size() != 6) {
         throw std::invalid_argument("Input vector must have 6 entries.");
@@ -25,14 +25,20 @@ namespace ale {
       velocity = {vec[3], vec[4], vec[5]};
     };
 
+    // Creates a state with only a position
     State(Vec3d position) : position(position) {
       velocity = {std::numeric_limits<double>::quiet_NaN(),
                   std::numeric_limits<double>::quiet_NaN(),
                   std::numeric_limits<double>::quiet_NaN()};
     };
+
+    // Creates a state with a position and velocity
     State(Vec3d position, Vec3d velocity) : position(position), velocity(velocity) {};
+
+    // Creates an un-initialized state
     State() {};
 
+    // If the velocity for the state has been initialized
     bool hasVelocity() const {
       return !(std::isnan(velocity.x) || std::isnan(velocity.y) || std::isnan(velocity.z));
     }
@@ -89,7 +95,7 @@ namespace ale {
        * @param time Time to get a value at
        * @param interp Interpolation type to use. Will be ignored if cache is minimized.
        *
-       * @return State
+       * @return The interpolated state
        */
       State getState(double time, PositionInterpolation interp=LINEAR) const;
 
@@ -114,6 +120,8 @@ namespace ale {
        * Adapted from Isis::SpicePosition::reduceCache().
        *
        * @param tolerance Maximum error between hermite approximation and original value.
+       *
+       * @return A new set of states that has been downsized.
        */
       States minimizeCache(double tolerance=0.01);
 
@@ -130,13 +138,13 @@ namespace ale {
        * @param baseTime Scaled base time for fit
        * @param timeScale Time scale for fit.
        *
-       * @return std::vector<int>
+       * @return The indices that should be kept to downsize the set of States
        */
       std::vector<int> hermiteIndices(double tolerance, std::vector <int> indexList,
                                       double baseTime, double timeScale);
-      std::vector<State> m_states; //! Represent as states internally to keep pos, vel together
-      std::vector<double> m_ephemTimes; //! Time in seconds
-      int m_refFrame;  //! Naif IDs for reference frames
+      std::vector<State> m_states; //!< The internal states cache
+      std::vector<double> m_ephemTimes; //!< The times for the states cache
+      int m_refFrame;  //!< Naif ID for the reference frame the states are in
     };
 }
 
