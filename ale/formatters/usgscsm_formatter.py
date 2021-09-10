@@ -157,6 +157,7 @@ def to_usgscsm(driver):
     if isinstance(driver, Radar):
         isd_data['name_model'] = 'USGS_ASTRO_SAR_SENSOR_MODEL'
         isd_data['starting_ephemeris_time'] = driver.ephemeris_start_time
+        isd_data['center_ephemeris_time'] = driver.center_ephemeris_time
         isd_data['ending_ephemeris_time'] = driver.ephemeris_stop_time
         isd_data['wavelength'] = driver.wavelength
         isd_data['line_exposure_duration'] = driver.line_exposure_duration
