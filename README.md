@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/ALE_Logo.svg" alt="ALE" width=200> 
+</p>
+
 # Abstraction Layer for Ephemerides (ALE)
 [![Build Status](https://travis-ci.org/USGS-Astrogeology/ale.svg?branch=master)](https://travis-ci.org/USGS-Astrogeology/ale)
 [![Coverage Status](https://coveralls.io/repos/github/USGS-Astrogeology/ale/badge.svg?branch=master)](https://coveralls.io/github/USGS-Astrogeology/ale?branch=master)
