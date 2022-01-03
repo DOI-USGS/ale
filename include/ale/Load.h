@@ -26,7 +26,7 @@ namespace ale {
    *
    * @returns A string containing a JSON formatted ISD for the image.
    */
-  std::string loads(std::string filename, std::string props="", std::string formatter="usgscsm", bool verbose=true);
+  std::string loads(std::string filename, std::string props="", std::string formatter="usgscsm", int indent = 2, bool verbose=true);
 
   /**
    * Load all of the metadata for an image into a JSON ISD.

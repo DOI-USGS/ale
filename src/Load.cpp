@@ -12,7 +12,7 @@ using json = nlohmann::json;
 using namespace std;
 
 namespace ale {
- std::string getPyTraceback() {
+  std::string getPyTraceback() {
     PyObject* err = PyErr_Occurred();
     if (err != NULL) {
         PyObject *ptype, *pvalue, *ptraceback;
@@ -57,86 +57,100 @@ namespace ale {
 
     // no traceback to return
     return "";
- }
+  }
 
- std::string loads(std::string filename, std::string props, std::string formatter, bool verbose) {
-     static bool first_run = true;
-     if(first_run) {
-         // Initialize the Python interpreter but only once.
-         first_run = !first_run;
-         Py_Initialize();
-     }
-    
-     // Import the file as a Python module.
-     PyObject *pModule = PyImport_Import(PyUnicode_FromString("ale"));
-     if(!pModule) {
-       throw runtime_error("Failed to import ale. Make sure the ale python library is correctly installed.");
-     }
-     // Create a dictionary for the contents of the module.
-     PyObject *pDict = PyModule_GetDict(pModule);
-      
-     // Get the add method from the dictionary.
-     PyObject *pFunc = PyDict_GetItemString(pDict, "loads");
-     if(!pFunc) {
-       // import errors do not set a PyError flag, need to use a custom
-       // error message instead.
-       throw runtime_error("Failed to import ale.loads function from Python."
-                           "This Usually indicates an error in the Ale Python Library."
-                           "Check if Installed correctly and the function ale.loads exists.");
-     }
-      
+  std::string loads(std::string filename, std::string props, std::string formatter, int indent, bool verbose) {
+    static bool first_run = true;
 
-     // Create a Python tuple to hold the arguments to the method.
-     PyObject *pArgs = PyTuple_New(3);
-     if(!pArgs) {
-       throw runtime_error(getPyTraceback());
-     }
-      
-     // Set the Python int as the first and second arguments to the method.
-     PyObject *pStringFileName = PyUnicode_FromString(filename.c_str());
-     PyTuple_SetItem(pArgs, 0, pStringFileName);
-     Py_INCREF(pStringFileName); // take ownership of reference
+    if(first_run) {
+       // Initialize the Python interpreter but only once.
+       first_run = !first_run;
+       Py_Initialize();
+    }
 
-     PyObject *pStringProps = PyUnicode_FromString(props.c_str());
-     PyTuple_SetItem(pArgs, 1, pStringProps);
-     Py_INCREF(pStringProps); // take ownership of reference
-     
-     PyObject *pStringFormatter = PyUnicode_FromString(formatter.c_str());
-     PyTuple_SetItem(pArgs, 2, pStringFormatter);
-     Py_INCREF(pStringFormatter); // take ownership of reference 
-    
+    // Import the file as a Python module.
+    PyObject *pModule = PyImport_Import(PyUnicode_FromString("ale"));
+    if(!pModule) {
+      throw runtime_error("Failed to import ale. Make sure the ale python library is correctly installed.");
+    }
+    // Create a dictionary for the contents of the module.
+    PyObject *pDict = PyModule_GetDict(pModule);
 
-     // Call the function with the arguments.
-     PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
-     if(!pResult) {
-        throw invalid_argument("No Valid instrument found for label.");
-     }
-    
-     PyObject *pResultStr = PyObject_Str(pResult);
-     PyObject *temp_bytes = PyUnicode_AsUTF8String(pResultStr); // Owned reference
-      
-     if(!temp_bytes){
-       throw invalid_argument(getPyTraceback());
-     }
-     
-     std::string cResult;
-     
-     char *temp_str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
-     cResult = temp_str; // copy into std::string
+    // Get the add method from the dictionary.
+    PyObject *pFunc = PyDict_GetItemString(pDict, "loads");
+    if(!pFunc) {
+      // import errors do not set a PyError flag, need to use a custom
+      // error message instead.
+      throw runtime_error("Failed to import ale.loads function from Python."
+                         "This Usually indicates an error in the Ale Python Library."
+                         "Check if Installed correctly and the function ale.loads exists.");
+    }
 
-     Py_DECREF(pResultStr);
 
-     Py_DECREF(pStringFileName);
-     Py_DECREF(pStringProps);
-     Py_DECREF(pStringFormatter);
-     
-     Py_DECREF(pArgs);
+    // Create a Python tuple to hold the arguments to the method.
+    PyObject *pArgs = PyTuple_New(5);
+    if(!pArgs) {
+      throw runtime_error(getPyTraceback());
+    }
 
-     return cResult;
- }
+    // Set the Python int as the first and second arguments to the method.
+    PyObject *pStringFileName = PyUnicode_FromString(filename.c_str());
+    PyTuple_SetItem(pArgs, 0, pStringFileName);
+    Py_INCREF(pStringFileName); // take ownership of reference
 
- json load(std::string filename, std::string props, std::string formatter, bool verbose) {
-   std::string jsonstr = loads(filename, props, formatter, verbose);
-   return json::parse(jsonstr);
- }
+    PyObject *pStringProps = PyUnicode_FromString(props.c_str());
+    PyTuple_SetItem(pArgs, 1, pStringProps);
+    Py_INCREF(pStringProps); // take ownership of reference
+
+    PyObject *pStringFormatter = PyUnicode_FromString(formatter.c_str());
+    PyTuple_SetItem(pArgs, 2, pStringFormatter);
+    Py_INCREF(pStringFormatter); // take ownership of reference
+
+    PyObject *pIntIndent = PyLong_FromLong((long) indent);
+    PyTuple_SetItem(pArgs, 3, pIntIndent);
+    Py_INCREF(pIntIndent); // take ownership of reference
+
+    PyObject *pBoolVerbose = Py_False;
+    if (!verbose) {
+      pBoolVerbose = Py_True;
+    }
+    PyTuple_SetItem(pArgs, 4, pBoolVerbose);
+    Py_INCREF(pBoolVerbose); // take ownership of reference
+
+
+    // Call the function with the arguments.
+    PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
+    if(!pResult) {
+      throw invalid_argument("No Valid instrument found for label.");
+    }
+
+    PyObject *pResultStr = PyObject_Str(pResult);
+    PyObject *temp_bytes = PyUnicode_AsUTF8String(pResultStr); // Owned reference
+
+    if(!temp_bytes){
+      throw invalid_argument(getPyTraceback());
+    }
+
+    std::string cResult;
+
+    char *temp_str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
+    cResult = temp_str; // copy into std::string
+
+    Py_DECREF(pResultStr);
+
+    Py_DECREF(pStringFileName);
+    Py_DECREF(pStringProps);
+    Py_DECREF(pStringFormatter);
+    Py_DECREF(pIntIndent);
+    Py_DECREF(pBoolVerbose);
+
+    Py_DECREF(pArgs);
+
+    return cResult;
+  }
+
+  json load(std::string filename, std::string props, std::string formatter, bool verbose) {
+    std::string jsonstr = loads(filename, props, formatter, verbose);
+    return json::parse(jsonstr);
+  }
 }
