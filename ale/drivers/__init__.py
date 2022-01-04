@@ -144,6 +144,14 @@ def loads(label, props='', formatter='ale', indent = 2, verbose=False):
 
     This function is the same as load, except it returns a JSON formatted string.
 
+    See load for shared parameter documentation.
+    
+    Parameters
+    ----------
+    indent : int
+             The number of spaces to indent each nested component of the JSON string.
+             See json.dumps.
+
     Returns
     -------
     str
