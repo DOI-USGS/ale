@@ -12,17 +12,27 @@ from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
 from ale.base.type_distortion import RadialDistortion, NoDistortion
 from ale.base.type_sensor import Framer
+from ale.base.type_sensor import LineScanner
 
 from ale.rotation import ConstantRotation
 from ale.transformation import FrameChain
 from scipy.spatial.transform import Rotation
 
-id_lookup = {
+vims_id_lookup = {
+    "VIMS_VIS" : "CASSINI_VIMS_V",
+    "VIMS_IR" : "CASSINI_VIMS_IR"
+}
+
+vims_name_lookup = {
+    "VIMS" : "Visible and Infrared Mapping Spectrometer",
+}
+
+iss_id_lookup = {
     "ISSNA" : "CASSINI_ISS_NAC",
     "ISSWA" : "CASSINI_ISS_WAC"
 }
 
-name_lookup = {
+iss_name_lookup = {
     "ISSNA" : "Imaging Science Subsystem Narrow Angle Camera",
     "ISSWA" : "Imaging Science Subsystem Wide Angle Camera"
 }
@@ -292,6 +302,206 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
     @property
     def sensor_model_version(self):
         return 1
+
+class CassiniVimsIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
+
+    @property
+    def vims_channel(self):
+        if not hasattr(self, '_vims_channel'):
+            self._vims_channel = self.label['IsisCube']["Instrument"]["Channel"]
+        return self._vims_channel
+
+    @property
+    def instrument_id(self):
+        """
+        Returns an instrument id for uniquely identifying the instrument, but often
+        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+        the same ID the Spice expects in bods2c calls.
+        Expects instrument_id to be defined in the IsisLabel mixin. This should be
+        a string of the form 'CTX'
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
+        return vims_id_lookup[super().instrument_id + "_" + self.vims_channel]
+
+    @property
+    def sensor_name(self):
+        """
+        ISIS doesn't propergate this to the ingested cube label, so hard-code it.
+        """
+        return vims_name_lookup[super().instrument_id]
+
+    @property
+    def spacecraft_name(self):
+        """
+        Returns the spacecraft name used in various Spice calls to acquire
+        ephemeris data.
+        Expects the platform_name to be defined. This should be a string of
+        the form 'Mars_Reconnaissance_Orbiter'
+
+        Returns
+        -------
+        : str
+          spacecraft name
+        """
+        return spacecraft_name_lookup[super().platform_name]
+
+    @property
+    def exposure_duration(self):
+        """
+        The exposure duration of the image, in seconds
+
+        Returns
+        -------
+        : float
+          Exposure duration in seconds
+        """
+        if 'ExposureDuration' in self.label['IsisCube']['Instrument']:
+            exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration']
+
+            for i in exposure_duration:
+                if i.units == "VIS":
+                    exposure_duration = i
+
+            exposure_duration = exposure_duration.value * 0.001
+            return exposure_duration
+        else:
+            return self.line_exposure_duration
+
+    @property
+    def focal_length(self):
+        """
+        Hardcoded value taken from ISIS
+        """
+        if not hasattr(self, '_focal_length'):
+            if self.vims_channel == "VIS":
+                self._focal_length = 143.0
+            else:
+                self._focal_length = 426.0
+        return self._focal_length
+
+    @property
+    def detector_center_line(self):
+        return 0
+
+    @property
+    def detector_center_sample(self):
+        return 0
+
+    def compute_vims_time(self, line, sample, number_of_samples, mode="VIS"):
+        instrument_group = self.label["IsisCube"]["Instrument"]
+        time = str(instrument_group["NativeStartTime"])
+        int_time, decimal_time = str(time).split(".")
+
+        ephemeris_time = spice.scs2e(self.spacecraft_id, int_time)
+        ephemeris_time += float(decimal_time) / 15959.0
+
+        ir_exp = float(instrument_group["ExposureDuration"][0]) * 1.01725 / 1000.0;
+        vis_exp = float(instrument_group["ExposureDuration"][1]) / 1000.0
+
+        interline_delay = (float(instrument_group["InterlineDelayDuration"]) * 1.01725) / 1000.0
+
+        swath_width = instrument_group["SwathWidth"];
+
+        if mode == "VIS":
+            ephemeris_time = (float(ephemeris_time) + (((ir_exp * swath_width) - vis_exp) / 2.0)) + ((line + 0.5) * vis_exp)
+        elif mode == "IR":
+            ephemeris_time = float(ephemeris_time) + (line * number_of_samples * ir_exp) + (line * interline_delay) + ((sample + 0.5) * ir_exp)
+
+        return ephemeris_time
+
+    @property
+    def ephemeris_start_time(self):
+        instrument_group = self.label["IsisCube"]["Instrument"]
+        return self.compute_vims_time(0 - 0.5, 0 - 0.5, self.image_samples, mode=self.vims_channel)
+
+    @property
+    def ephemeris_stop_time(self):
+        instrument_group = self.label["IsisCube"]["Instrument"]
+        return self.compute_vims_time((self.image_lines - 1) + 0.5, (self.image_samples - 1) + 0.5, self.image_samples, mode=self.vims_channel)
+
+    @property
+    def sensor_model_version(self):
+        """
+        Returns instrument model version
+        Returns
+        -------
+        : int
+          ISIS sensor model version
+        """
+        try:
+            return super().sensor_model_version
+        except:
+            return 1
+
+
+class CassiniVimsIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoDistortion, Driver):
+
+    @property
+    def instrument_id(self):
+        """
+        Returns an instrument id for uniquely identifying the instrument, but often
+        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+        the same ID the Spice expects in bods2c calls.
+        Expects instrument_id to be defined in the IsisLabel mixin. This should be
+        a string of the form 'CTX'
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
+
+        image_type = self.label['IsisCube']["Instrument"]["Channel"]
+        return vims_id_lookup[super().instrument_id + "_" + image_type]
+
+    @property
+    def sensor_name(self):
+        """
+        ISIS doesn't propergate this to the ingested cube label, so hard-code it.
+        """
+        return "Visible and Infrared Mapping Spectrometer"
+
+    @property
+    def spacecraft_name(self):
+        """
+        Returns the spacecraft name used in various Spice calls to acquire
+        ephemeris data.
+        Expects the platform_name to be defined. This should be a string of
+        the form 'Mars_Reconnaissance_Orbiter'
+
+        Returns
+        -------
+        : str
+          spacecraft name
+        """
+        return spacecraft_name_lookup[super().platform_name]
+
+    @property
+    def exposure_duration(self):
+        """
+        The exposure duration of the image, in seconds
+
+        Returns
+        -------
+        : float
+          Exposure duration in seconds
+        """
+        if 'ExposureDuration' in self.label['IsisCube']['Instrument']:
+            exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration']
+
+            for i in exposure_duration:
+                if i.units == "VIS":
+                    exposure_duration = i
+
+            exposure_duration = exposure_duration.value * 0.001
+            return exposure_duration
+        else:
+            return self.line_exposure_duration
+
 
 class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDistortion, Driver):
     """
