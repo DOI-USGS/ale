@@ -5,7 +5,7 @@ import pvl
 import spiceypy as spice
 from glob import glob
 
-from ale.util import get_metakernels
+from ale.util import get_metakernels, query_kernel_pool
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
@@ -13,8 +13,7 @@ from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import LineScanner, Radar
 
-
-class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver):
+class LroLrocNacPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver):
     """
     Driver for reading LROC NACL, NACR (not WAC, it is a push frame) labels. Requires a Spice mixin to
     acquire addtional ephemeris and instrument data located exclusively in SPICE kernels, A PDS3 label,
@@ -278,7 +277,7 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
 
 
 
-class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver):
+class LroLrocNacIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver):
     @property
     def instrument_id(self):
         """
@@ -513,7 +512,7 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
         return rotated_velocity[0]
 
 
-class LroLrocIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, Driver):
+class LroLrocNacIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, Driver):
     @property
     def instrument_id(self):
         """
@@ -849,3 +848,136 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
           Naif ID code for the sensor frame
         """
         return self.target_frame_id
+
+
+class LroLrocWacIsisLabelNaifSpice(LineScanner, IsisLabel, NaifSpice, Driver):
+    """
+    Driver for Lunar Reconnaissance Orbiter WAC ISIS cube
+    """
+    @property
+    def instrument_id(self):
+        """
+        Returns an instrument id for uniquely identifying the instrument, but often
+        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+        expect the same ID the Spice expects in bods2c calls.
+        Expects instrument_id to be defined in the IsisLabel mixin. This should be
+        a string of the form 'WAC-UV' or 'WAC-VIS'
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
+        id_lookup = {
+        "WAC-UV" : "LRO_LROCWAC_UV",
+        "WAC-VIS" : "LRO_LROCWAC_VIS"
+        }
+        return id_lookup[super().instrument_id]
+
+    @property
+    def sensor_model_version(self):
+        return 3
+
+
+    @property
+    def ephemeris_start_time(self):
+        """
+        Returns the ephemeris start time of the image.
+        Expects spacecraft_id to be defined. This should be the integer
+        Naif ID code for the spacecraft.
+
+        Returns
+        -------
+        : float
+          ephemeris start time of the image
+        """
+        if not hasattr(self, '_ephemeris_start_time'):
+            sclock = self.label['IsisCube']['Instrument']['SpacecraftClockStartCount']
+            self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
+        return self._ephemeris_start_time
+
+
+
+    @property
+    def detector_center_line(self):
+        """
+        The center of the CCD in detector pixels
+        ISIS uses 0.5 based CCD lines, so we need to convert to 0 based.
+
+        Returns
+        -------
+        float :
+            The center line of the CCD
+        """
+        return super().detector_center_line - 0.5
+
+
+    @property
+    def detector_center_sample(self):
+        """
+        The center of the CCD in detector pixels
+        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.
+
+        Returns
+        -------
+        float :
+            The center sample of the CCD
+        """
+        return super().detector_center_sample - 0.5
+
+
+    @property
+    def sensor_name(self):
+        return self.label['IsisCube']['Instrument']['SpacecraftName']
+
+
+    @property
+    def odtk(self):
+        """
+        The coefficients for the distortion model
+
+        Returns
+        -------
+        : list
+          Radial distortion coefficients. There is only one coefficient for LROC NAC l/r
+        """
+        return spice.gdpool('INS{}_OD_K'.format(self.ikid), 0, 2).tolist()
+
+
+    @property
+    def usgscsm_distortion_model(self):
+        """
+        The distortion model name with its coefficients
+
+        LRO LROC NAC does not use the default distortion model so we need to overwrite the
+        method packing the distortion model into the ISD.
+
+        Returns
+        -------
+        : dict
+          Returns a dict with the model name : dict of the coefficients
+        """
+
+        return {"lrolrocwac":
+                {"coefficients": self.odtk}}
+
+
+    @property
+    def naif_keywords(self):
+        """
+        Updated set of naif keywords containing the NaifIkCode for the specific
+        WAC filter used when taking the image.
+
+        Returns
+        -------
+        : dict
+          Dictionary of keywords and values that ISIS creates and attaches to the label
+        """
+        _naifKeywords = {**super().naif_keywords,
+                         **query_kernel_pool("*_FOCAL_LENGTH"),
+                         **query_kernel_pool("*_BORESIGHT_SAMPLE"),
+                         **query_kernel_pool("*_BORESIGHT_LINE"),
+                         **query_kernel_pool("*_TRANS*"),
+                         **query_kernel_pool("*_ITRANS*"),
+                         **query_kernel_pool("*_OD_K")}
+        return _naifKeywords
