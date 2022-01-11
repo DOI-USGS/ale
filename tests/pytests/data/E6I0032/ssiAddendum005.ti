@@ -1,0 +1,58 @@
+# The cover on and cover off focal length and K1 values were gotten from the
+# paper: "The Direction of the North Pole and the Control Network of Astreoid
+# 951 Gaspra" Icarus 107, 18-22 (1994).
+#
+# See emails between Brent Archinal, Jeff Anderson, Steven Koechle, Randy Kirk,
+# Stuart Sides, Tammy Becker, Tracey Sucharski, and Debbie Cook on 04 Feb 2009
+# for non rounded numbers.
+#
+# Before these changes ISIS3 used the NOCOVER variables all the time
+
+\begindata
+INS-77001_PLATFORM_ID = -77001
+
+INS-77001_SPK_TIME_BIAS = 0.0
+INS-77001_CK_TIME_BIAS  = 0.0
+INS-77001_CK_TIME_TOLERANCE = 0
+INS-77001_FOCAL_LENGTH_COVER = 1499.957
+INS-77001_FOCAL_LENGTH = 1500.46655964
+INS-77001_PIXEL_PITCH = 0.01524
+INS-77001_BORESIGHT_SAMPLE = 400
+INS-77001_BORESIGHT_LINE = 400
+INS-77001_K1_COVER = -.000032280038653
+INS-77001_K1 = -.000024976983626
+INS-77001_FRAME_LINES = 800.0
+INS-77001_FRAME_SAMPLES = 800.0
+
+INS-77001_TRANSX=(0.0 0.01524 0.0)
+INS-77001_TRANSY=(0.0 0.0 0.01524)
+
+INS-77001_ITRANSS=(0.0 65.6167979 0.0)
+INS-77001_ITRANSL=(0.0 0.0 65.6167979)
+
+FRAME_GLL_SSI_PLATFORM   = -77001
+FRAME_-77001_NAME        = 'GLL_SSI_PLATFORM'
+FRAME_-77001_CLASS       = 3
+FRAME_-77001_CLASS_ID    = -77001
+FRAME_-77001_CENTER      = -77
+CK_-77001_SCLK           = -77
+CK_-77001_SPK            = -77
+
+\begintext
+These are the parameters required for writing c-kernels.  Isis will
+create ck with the same frame endpoints as the mission ck.  For 
+the Galileo spacecraft the ck frame is GLL_SSI_PLATFORM (-77001), and the
+ck reference frame is J2000 (1).
+
+\begindata
+INS-77001_CK_FRAME_ID=-40000
+INS-77001_CK_REFERENCE_ID=1
+
+\begintext
+We need the mapping for the frame name and the frame code. This is traditionally
+provided by the ik kernel but Galilieo ssi has none, so we define the parallel
+name and code array here
+
+\begindata
+NAIF_BODY_NAME += ( 'GLL_SSI_PLATFORM' )
+NAIF_BODY_CODE += ( -77001 )
