@@ -22,7 +22,7 @@ class GalileoSsiIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
         also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
         the same ID the Spice expects in bods2c calls.
         Expects instrument_id to be defined in the IsisLabel mixin. This should be
-        a string of the form 'CTX'
+        a string of the form 'SOLID STATE IMAGING SYSTEM'
 
         Returns
         -------
@@ -33,10 +33,14 @@ class GalileoSsiIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
 
     @property
     def sensor_name(self):
+        """
+        """
         return self.label["IsisCube"]["Instrument"]["InstrumentId"]
 
     @property
     def odtk(self):
+        """
+        """
         removeCoverDate = datetime.datetime.strptime("1994/04/01 00:00:00", "%Y/%m/%d %H:%M:%S");
         # Remove any timezine info from the original start time
         start_time_as_date = self.label["IsisCube"]["Instrument"]["StartTime"].replace(tzinfo=None)
@@ -50,6 +54,8 @@ class GalileoSsiIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
 
     @property
     def naif_keywords(self):
+        """
+        """
         key = "INS" + str(self.ikid) + "_FOCAL_LENGTH_COVER";
         return {**super().naif_keywords, key: spice.gdpool(key, 0, 1)}
 
