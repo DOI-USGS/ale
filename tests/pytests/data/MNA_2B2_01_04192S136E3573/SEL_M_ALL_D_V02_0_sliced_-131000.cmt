@@ -1,0 +1,4 @@
+This CK is for testing with the image: /users/arsanders/pds/kaguya_mi/MNA_2B2_01_04192S136E3573.cub
+
+This CK was generated using the following command: {}
+/users/arsanders/repos/ale/ckslicer -LSK /Volumes/pkgs/isis3/isis_data/base/kernels/lsk/naif0012.tls -SCLK /Users/arsanders/pds/SEL_M_V01.TSC -INPUTCK /Volumes/pkgs/isis3/isis_data/kaguya/kernels/ck/SEL_M_ALL_D_V02.BC -OUTPUTCK /users/arsanders/pds/kaguya_mi/out/SEL_M_ALL_D_V02_0_sliced_-131000.BC -ID -131000 -TIMETYPE SCLK -START 1/0905630513 -STOP 1/0905630530
