@@ -559,6 +559,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         base_band = band_map[self.label.get("BASE_BAND")]
         return base_band
 
+    
     @property
     def instrument_id(self):
         """
@@ -1163,3 +1164,16 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver
         """
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0]
         return [0, 1/pixel_size, 0]
+
+
+    def spacecraft_direction(self):
+        """
+        Gets the moving direction of the spacecraft from the label, where -1 is moving
+        as intended and 1 is moving inverted.
+
+        Returns
+        -------
+        : int
+          Moving direction of the spacecraft
+        """
+        return int(self.label['SatelliteMovingDirection'])

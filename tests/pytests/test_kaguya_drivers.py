@@ -13,11 +13,11 @@ from conftest import get_isd, get_image_label, get_image_kernels, convert_kernel
 
 import ale
 
-from ale.drivers.selene_drivers import KaguyaTcPds3NaifSpiceDriver
+from ale.drivers.selene_drivers import KaguyaTcPds3NaifSpiceDriver, KaguyaMiIsisLabelNaifSpiceDriver
 
 image_dict = {
     'TC1S2B0_01_06691S820E0465' : get_isd("kaguyatc"),
-    'MVA_2B2_01_02329N002E0302' : get_isd("kaguyami")
+    'MNA_2B2_01_04192S136E3573' : get_isd("kaguyami")
 }
 
 
@@ -33,9 +33,13 @@ def test_kernels():
         for kern in kern_list:
             os.remove(kern)
 
-@pytest.mark.parametrize("label_type", ['pds3'])
-@pytest.mark.parametrize("image", image_dict.keys())
+@pytest.mark.xfail()
+@pytest.mark.parametrize("label_type", ['pds3', 'isis3'])
 def test_kaguya_load(test_kernels, label_type, image):
+    if label_type == 'pds3':
+        image = 'TC1S2B0_01_06691S820E0465'
+    else:
+        image = 'MNA_2B2_01_04192S136E3573'
     label_file = get_image_label(image, label_type)
 
     isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
@@ -123,3 +127,67 @@ class test_pds_naif(unittest.TestCase):
 
     def test_spacecraft_direction(self):
         assert self.driver.spacecraft_direction == 1
+
+# ========= Test kaguyami isis3label and naifspice driver =========
+class test_kaguyami_isis3_naif(unittest.TestCase):
+
+    def setUp(self):
+        label = get_image_label("MNA_2B2_01_04192S136E3573", "isis3")
+        self.driver = KaguyaMiIsisLabelNaifSpiceDriver(label)
+
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == 'LISM_MI-NIR1'
+
+    def test_sensor_frame_id(self):
+        with patch('ale.drivers.selene_drivers.spice.namfrm', return_value=12345) as namfrm:
+            assert self.driver.sensor_frame_id == 12345
+            namfrm.assert_called_with('LISM_MI_N_HEAD')
+
+    def test_ikid(self):
+        with patch('ale.drivers.selene_drivers.spice.bods2c', return_value=12345) as bods2c:
+            assert self.driver.ikid == 12345
+            bods2c.assert_called_with('LISM_MI-NIR1')
+
+    def test_spacecraft_name(self):
+        assert self.driver.spacecraft_name == 'KAGUYA'
+
+    def test_spacecraft_clock_start_count(self):
+        assert self.driver.spacecraft_clock_start_count ==  905631021.135959
+
+    def test_spacecraft_clock_stop_count(self):
+        assert self.driver.spacecraft_clock_stop_count == 905631033.576935
+
+    def test_ephemeris_start_time(self):
+        with patch('ale.drivers.selene_drivers.spice.sct2e', return_value=12345) as sct2e, \
+             patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.ephemeris_start_time == 12345
+            sct2e.assert_called_with(-12345, 905631021.135959)
+
+    def test_detector_center_line(self):
+        with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=np.array([54321, 12345])) as gdpool, \
+             patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.detector_center_line == 12344.5
+            gdpool.assert_called_with('INS-12345_CENTER', 0, 2)
+
+    def test_detector_center_sample(self):
+        with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=np.array([54321, 12345])) as gdpool, \
+             patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.detector_center_sample == 54320.5
+            gdpool.assert_called_with('INS-12345_CENTER', 0, 2)
+
+    def test_focal2pixel_samples(self):
+        with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=np.array([2])) as gdpool, \
+             patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.focal2pixel_samples == [0, 0, -1/2]
+            gdpool.assert_called_with('INS-12345_PIXEL_SIZE', 0, 1)
+
+    def test_focal2pixel_lines(self):
+        with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=np.array([2])) as gdpool, \
+             patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c, \
+             patch('ale.drivers.selene_drivers.KaguyaTcPds3NaifSpiceDriver.spacecraft_direction', \
+             new_callable=PropertyMock) as spacecraft_direction:
+            spacecraft_direction.return_value = 1
+            assert self.driver.focal2pixel_lines == [0, 1/2, 0]
+            spacecraft_direction.return_value = -1
+            assert self.driver.focal2pixel_lines == [0, 1/2, 0]
+            gdpool.assert_called_with('INS-12345_PIXEL_SIZE', 0, 1)
