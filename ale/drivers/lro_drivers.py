@@ -850,7 +850,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         return self.target_frame_id
 
 
-class LroLrocWacIsisLabelNaifSpice(LineScanner, IsisLabel, NaifSpice, Driver):
+class LroLrocWacIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver):
     """
     Driver for Lunar Reconnaissance Orbiter WAC ISIS cube
     """
