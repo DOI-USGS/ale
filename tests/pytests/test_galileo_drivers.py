@@ -60,7 +60,7 @@ class test_galileossi_isis3_naif(unittest.TestCase):
 
     def test_ephemeris_stop_time(self):
         with patch('ale.base.data_naif.spice.str2et', return_value=12345) as str2et:
-            assert self.driver.ephemeris_stop_time == 12345
+            assert self.driver.ephemeris_stop_time == 12345.19583
             str2et.assert_called_with('1997-02-19 21:07:27.314000')
 
     def test_sensor_model_version(self):

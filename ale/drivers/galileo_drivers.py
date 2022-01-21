@@ -34,12 +34,25 @@ class GalileoSsiIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
     @property
     def sensor_name(self):
         """
+        Returns the name of the instrument
+
+        Returns
+        -------
+        : str
+          Name of the sensor
         """
         return self.label["IsisCube"]["Instrument"]["InstrumentId"]
 
     @property
     def odtk(self):
         """
+        The coefficients for the radial distortion model
+        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+
+        Returns
+        -------
+        : list
+          Radial distortion coefficients
         """
         removeCoverDate = datetime.datetime.strptime("1994/04/01 00:00:00", "%Y/%m/%d %H:%M:%S");
         # Remove any timezine info from the original start time
@@ -55,6 +68,12 @@ class GalileoSsiIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
     @property
     def naif_keywords(self):
         """
+        Adds the focal length cover keyword to the already populated naif keywords
+
+        Returns
+        -------
+        : dict
+          Dictionary of keywords and values that ISIS creates and attaches to the label
         """
         key = "INS" + str(self.ikid) + "_FOCAL_LENGTH_COVER";
         return {**super().naif_keywords, key: spice.gdpool(key, 0, 1)}
@@ -72,16 +91,17 @@ class GalileoSsiIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
         return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
 
     @property
-    def ephemeris_stop_time(self):
+    def center_ephemeris_time(self):
         """
-        Returns the stop ephemeris times for the image.
+        Returns the starting ephemeris time as the ssi framers center is the
+        start.
 
         Returns
         -------
-        : float
-          stop time
+        : double
+          Center ephemeris time for an image
         """
-        return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
+        return self.ephemeris_start_time
 
     @property
     def sensor_model_version(self):
