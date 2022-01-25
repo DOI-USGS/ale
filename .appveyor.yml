@@ -1,6 +1,6 @@
 version: '0.8.6.{build}'
 
-image: Visual Studio 2017
+image: Visual Studio 2019
 
 platform:
   - x64
@@ -10,7 +10,7 @@ configuration:
 
 install:
   - git submodule update --init --recursive
-  - call C:\\Miniconda36-x64\Scripts\activate.bat
+  - call C:\\Miniconda38-x64\Scripts\activate.bat
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda install conda-build anaconda-client
@@ -24,7 +24,7 @@ before_build:
 
 build_script:
   - python ..\setup.py install
-  - cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON -G "Visual Studio 15 2017 Win64" -DALE_BUILD_TESTS=OFF ..
+  - cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON -G "Visual Studio 16 2019" -A x64 -DALE_BUILD_TESTS=OFF ..
   - cmake --build . --target ALL_BUILD --config Release
 
 artifacts:
