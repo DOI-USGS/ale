@@ -49,6 +49,12 @@ def main():
         help="Display information as program runs."
     )
     parser.add_argument(
+        '--version',
+        action='version',
+        version=f"ale version {ale.__version__}",
+        help="Shows ale version number."
+    )
+    parser.add_argument(
         "input",
         nargs="+",
         help="Path to image or label file (or multiple)."
