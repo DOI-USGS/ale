@@ -397,7 +397,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         Starting sample varies from swath mode (either FULL, NOMINAL or HALF).
 
         From Kaguya IK kernel:
-        
+
         +-----------------------------------------+--------------+----------------------+---------+
         | Sensor                                  | Start Pixel  | End Pixel (+dummy)   | NAIF ID |
         +-----------------------------------------+--------------+----------------------+---------+
@@ -494,7 +494,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         : int
           ISIS sensor model version
         """
-        return 1
+        return 2
 
 
 class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
