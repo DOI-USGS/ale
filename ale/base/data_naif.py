@@ -397,7 +397,7 @@ class NaifSpice():
                                                              'SSB')
                     state = ssb_tar_state - ssb_obs_state
                     matrix = spice.sxform("J2000", self.reference_frame, time)
-                    state = spice.mxvg(matrix, state, 6, 6);
+                    state = spice.mxvg(matrix, state)
                 else:
                     state, _ = spice.spkezr(target,
                                             time,

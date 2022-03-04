@@ -29,7 +29,7 @@ requirements:
     - python-dateutil
     - pytz
     - scipy >=1.4.0
-    - spiceypy >=2.3.0
+    - spiceypy >=4.0.1
     - pyyaml
 
 test:
