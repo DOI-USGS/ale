@@ -16,13 +16,13 @@
       ]
     },
 
-    "homepageURL": "https://ale.readthedocs.io/en/latest/?badge=latest",
-    "downloadURL": "https://github.com/USGS-Astrogeology/ale/archive/master.zip",
+    "homepageURL": "https://github.com/USGS-Astrogeology/ale/releases/tag/0.8.7",
+    "downloadURL": "https://github.com/USGS-Astrogeology/ale/archive/refs/tags/0.8.7.zip",
     "disclaimerURL": "https://github.com/USGS-Astrogeology/ale/blob/master/LICENSE.md",
-    "repositoryURL": "https://github.com/USGS-Astrogeology/ale.git",
+    "repositoryURL": "https://github.com/USGS-Astrogeology/ale",
     "vcs": "git",
 
-    "laborHours": 160,
+    "laborHours": 40,
 
     "tags": [
       "Planetary",
