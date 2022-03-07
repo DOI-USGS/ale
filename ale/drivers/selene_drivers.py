@@ -559,7 +559,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         base_band = band_map[self.label.get("BASE_BAND")]
         return base_band
 
-    
+
     @property
     def instrument_id(self):
         """
@@ -859,6 +859,11 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver
     def base_band(self):
         """
         Which band the bands are registered to.
+
+        Returns
+        -------
+        base_band : str
+            The base band of the instrument
         """
         band_map = {
             "MV1" : "MI-VIS1",
@@ -978,7 +983,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver
     def detector_center_line(self):
         """
         Returns the center detector line of the detector. Expects tc_id to be
-        defined. This should be a string of the form LISM_TC1 or LISM_TC2.
+        defined. This should be a string of the form LISM_MI1 or LISM_MI2.
 
         We subtract 0.5 from the center line because as per the IK:
         Center of the first pixel is defined as "1.0".
@@ -994,7 +999,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver
     def detector_center_sample(self):
         """
         Returns the center detector sample of the detector. Expects tc_id to be
-        defined. This should be a string of the form LISM_TC1 or LISM_TC2.
+        defined. This should be a string of the form LISM_MI1 or LISM_MI2.
 
         We subtract 0.5 from the center sample because as per the IK:
         Center of the first pixel is defined as "1.0".
@@ -1012,7 +1017,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver
         """
         Returns the x coefficients of the optical distortion model.
         Expects tc_id to be defined. This should be a string of the form
-        LISM_TC1 or LISM_TC2.
+        LISM_MI1 or LISM_MI2.
 
         Returns
         -------
@@ -1027,7 +1032,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver
         """
         Returns the y coefficients of the optical distortion model.
         Expects tc_id to be defined. This should be a string of the form
-        LISM_TC1 or LISM_TC2.
+        LISM_MI1 or LISM_MI2.
 
         Returns
         -------
