@@ -1,0 +1,447 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 320
+    TileLines   = 320
+
+    Group = Dimensions
+      Samples = 320
+      Lines   = 320
+      Bands   = 4
+    End_Group
+
+    Group = Pixels
+      Type       = SignedWord
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 0.013
+    End_Group
+  End_Object
+
+  Group = Instrument
+    MissionName                  = SELENE
+    SpacecraftName               = KAGUYA
+    InstrumentName               = "Multiband Imager Near Infrared"
+    InstrumentId                 = MI-NIR
+    TargetName                   = MOON
+    ObservationModeId            = NORMAL
+    SensorDescription            = "MI is a multiband push-broom imaging
+                                    camera consisting of VIS(V) and NIR(N)
+                                    sensors (each has nadir-directed optics of
+                                    f number 65 mm and F ratio 3.7). Detector
+                                    pixel sizes in micron are 13(V) and 40(N)."
+    SensorDescription2           = "Physical band arrangement [from satellite
+                                    -x to +x] are VIS1>VIS2>VIS5>VIS4>VIS3 and
+                                    NIR3>NIR4>NIR1>NIR2. Parallax between
+                                    nearest band sets [degree] are 2.7 for VIS
+                                    and 2.6 for NIR. Sampling time [msec] are
+                                    13 for VIS and 39 for NIR."
+    MissionPhaseName             = Nominal
+    RevolutionNumber             = 4192
+    StripSequenceNumber          = 3
+    SceneSequenceNumber          = 54
+    UpperLeftDaytimeFlag         = Day
+    UpperRightDaytimeFlag        = Day
+    LowerLeftDaytimeFlag         = Day
+    LowerRightDaytimeFlag        = Day
+    DetectorStatus               = (TC1:OFF, TC2:OFF, MV:ON, MN:ON, SP:ON)
+    ExposureModeId               = MIDDLE
+    LineExposureDuration         = 13.214800 <msec>
+    SpacecraftClockStartCount    = 905631021.1320 <sec>
+    SpacecraftClockStopCount     = 905631033.5740 <sec>
+    CorrectedScClockStartCount   = 905631021.135959 <sec>
+    CorrectedScClockStopCount    = 905631033.576935 <sec>
+    StartTimeRaw                 = 2008-09-16T20:10:30.476297
+    StopTimeRaw                  = 2008-09-16T20:10:42.918297
+    StartTime                    = 2008-09-16T20:10:30.480257
+    StopTime                     = 2008-09-16T20:10:42.921232
+    LineSamplingInterval         = 39.000000 <msec>
+    CorrectedSamplingInterval    = 38.999922 <msec>
+    UpperLeftLatitude            = -13.956282 <deg>
+    UpperLeftLongitude           = 357.667916 <deg>
+    UpperRightLatitude           = -13.964236 <deg>
+    UpperRightLongitude          = 356.865687 <deg>
+    LowerLeftLatitude            = -13.335394 <deg>
+    LowerLeftLongitude           = 357.658763 <deg>
+    LowerRightLatitude           = -13.343486 <deg>
+    LowerRightLongitude          = 356.858241 <deg>
+    LocationFlag                 = A
+    RollCant                     = NO
+    SceneCenterLatitude          = -13.649174 <deg>
+    SceneCenterLongitude         = 357.261545 <deg>
+    IncidenceAngle               = 23.386 <deg>
+    EmissionAngle                = 1.891 <deg>
+    PhaseAngle                   = 22.528 <deg>
+    SolarAzimuthAngle            = 301.306 <deg>
+    FocalPlaneTemperature        = 17.73 <degC>
+    TelescopeTemperature         = 17.99 <degC>
+    SatelliteMovingDirection     = +1
+    FirstSampledLinePosition     = UPPERMOST
+    FirstDetectorElementPosition = LEFT
+    AAxisRadius                  = 1737.400 <km>
+    BAxisRadius                  = 1737.400 <km>
+    CAxisRadius                  = 1737.400 <km>
+    DefectPixelPosition          = (N/A, N/A, N/A, N/A)
+    SpacecraftAltitude           = 119.948 <km>
+    SpacecraftGroundSpeed        = 1.512 <km/sec>
+  End_Group
+
+  Group = Archive
+    ProductId               = MNA_2B2_01_04192S136E3573
+    FileName                = MNA_2B2_01_04192S136E3573.img
+    SoftwareName            = RGC_TC_MI
+    SoftwareVersion         = 2.6.1
+    ProcessVersionId        = L2B
+    ProductCreationTime     = 2009-12-03T22:18:16Z
+    ProgramStartTime        = 2009-12-03T17:36:44Z
+    ProducerId              = LISM
+    ProductSetId            = MI-NIR_Level2B2
+    ProductVersionId        = 01
+    RegisteredProduct       = Y
+    Level2AFileName         = MN12A0_02NM04192_003_0054.img
+    SpiceMetakernelFileName = RGC_INF_TCv301IK_MIv104IK_SPv104IK_RISE100g_de4-
+                              21_091007.mk
+    DataSetId               = MI-NIR_Level2B
+  End_Group
+
+  Group = BandBin
+    FilterName = (MN1, MN2, MN3, MN4)
+    Center     = (1000.0, 1049.0, 1248.0, 1548.0) <nm>
+    Width      = (27.0, 28.0, 33.0, 48.0) <nm>
+    BaseBand   = MN1
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -131341
+    NaifCkCode                = -131340
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = ($base/kernels/pck/pck00009.tpc,
+                                 $kaguya/kernels/pck/moon_080317.tf,
+                                 $kaguya/kernels/pck/moon_assoc_me.tf)
+    TargetPosition            = (Table,
+                                 $kaguya/kernels/tspk/moon_pa_de421_1900-2050.-
+                                 bpc, $kaguya/kernels/tspk/de421.bsp)
+    InstrumentPointing        = (Table, $kaguya/kernels/ck/SEL_M_ALL_D_V02.BC)
+    Instrument                = $kaguya/kernels/ik/SEL_MI_V01.TI
+    SpacecraftClock           = $kaguya/kernels/sclk/SEL_M_V01.TSC
+    InstrumentPosition        = (Table,
+                                 $kaguya/kernels/spk/SEL_M_071020_090610_SGMH_-
+                                 02.BSP)
+    InstrumentAddendum        = $kaguya/kernels/iak/mi_vis_adendum_v01.ti
+    ShapeModel                = $base/dems/ldem_128ppd_Mar2011_clon180_radius-
+                                _pad.cub
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
+    Source                    = ale
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 892516
+  Bytes               = 320
+  Records             = 5
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-131000, 1)
+  ConstantFrames      = (-131340, -131320, -131000)
+  ConstantRotation    = (0.99999966936312, -5.77666821335052e-04,
+                         5.7234141103279e-04, 5.77156075798428e-04,
+                         0.99999943548589, 8.92142792387077e-04,
+                         -5.72856449229044e-04, -8.9181216708896e-04,
+                         0.99999943825312)
+  CkTableStartTime    = 274867895.68995
+  CkTableEndTime      = 274867908.13093
+  CkTableOriginalSize = 5
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = $kaguya/kernels/ck/SEL_M_ALL_D_V02.BC
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 892836
+  Bytes                = 168
+  Records              = 3
+  ByteOrder            = Lsb
+  CacheType            = HermiteSpline
+  SpkTableStartTime    = 274867895.68995
+  SpkTableEndTime      = 274867908.13093
+  SpkTableOriginalSize = 5.0
+  Description          = "Created by spiceinit"
+  Kernels              = $kaguya/kernels/spk/SEL_M_071020_090610_SGMH_02.BSP
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 893004
+  Bytes               = 320
+  Records             = 5
+  ByteOrder           = Lsb
+  TimeDependentFrames = (31006, 1)
+  ConstantFrames      = (31001, 31007, 31006)
+  ConstantRotation    = (0.99999987325471, -3.29285422375571e-04,
+                         3.80869618671388e-04, 3.29286000210947e-04,
+                         0.99999994578431, -1.45444093783627e-06,
+                         -3.80869119096078e-04, 1.57985578682691e-06,
+                         0.99999992746811)
+  CkTableStartTime    = 274867895.68995
+  CkTableEndTime      = 274867908.13093
+  CkTableOriginalSize = 5
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = ($kaguya/kernels/tspk/moon_pa_de421_1900-2050.bpc,
+                         $kaguya/kernels/tspk/de421.bsp,
+                         $base/kernels/pck/pck00009.tpc,
+                         $kaguya/kernels/pck/moon_080317.tf,
+                         $kaguya/kernels/pck/moon_assoc_me.tf)
+  SolarLongitude      = 215.20781187145
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 893324
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 274867901.91044
+  SpkTableEndTime      = 274867901.91044
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = ($kaguya/kernels/tspk/moon_pa_de421_1900-2050.bpc,
+                          $kaguya/kernels/tspk/de421.bsp)
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 893380
+  Bytes     = 1488
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 885343
+  Bytes     = 7173
+End_Object
+
+Object = NaifKeywords
+  BODY301_LONG_AXIS               = 0
+  BODY301_NUT_PREC_DEC            = (1.5419, 0.0239, -0.0278, 0.0068, 0,
+                                     -0.0029, 0.0009, 0, 0, 0.0008)
+  BODY301_NUT_PREC_PM             = (3.561, 0.1208, -0.0642, 0.0158, 0.0252,
+                                     -0.0066, -0.0047, -0.0046, 0.0028, 0.0052)
+  BODY301_NUT_PREC_RA             = (-3.8787, -0.1204, 0.07, -0.0172, 0,
+                                     0.0072, 0, 0, 0, -0.0052)
+  BODY301_PM                      = (38.3213, 13.1764, -1.4e-12)
+  BODY301_POLE_DEC                = (66.5392, 0.013, 0)
+  BODY301_POLE_RA                 = (269.995, 0.0031, 0)
+  BODY301_RADII                   = (1737.4, 1737.4, 1737.4)
+  BODY_CODE                       = 301
+  BODY_FRAME_CODE                 = 10020
+  INS-131341_BORESIGHT            = (-1.5114, -0.0084, 64.9)
+  INS-131341_CENTER               = (160, 1)
+  INS-131341_DISTORTION_COEF_X    = (-0.00090474, -0.002439, -2.5248e-05,
+                                     2.8753e-05)
+  INS-131341_DISTORTION_COEF_Y    = (-0.00017747, 0.0024504, 0.00010338,
+                                     -4.728e-05)
+  INS-131341_FOCAL_LENGTH         = 64.9
+  INS-131341_FOV_BOUNDARY_CORNERS = (-1.4914, 6.3716, 64.9, -1.5314, 6.3716,
+                                     64.9, -1.5314, -6.4284, 64.9, -1.4914)
+  INS-131341_FOV_FRAME            = LISM_MI_N_HEAD
+  INS-131341_FOV_SHAPE            = RECTANGLE
+  INS-131341_F_NUMBER             = 3.7
+  INS-131341_ITRANSL              = (0, -25, 0)
+  INS-131341_ITRANSS              = (0, 0, -25)
+  INS-131341_PIXEL_LINES          = 240
+  INS-131341_PIXEL_SAMPLES        = 320
+  INS-131341_PIXEL_SIZE           = 0.04
+  INS-131341_TRANSX               = (0, 0, 0)
+  INS-131341_TRANSY               = (0, -0.04, 0)
+End_Object
+End
