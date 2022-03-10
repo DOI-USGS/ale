@@ -16,6 +16,7 @@ from ale.base.type_sensor import LineScanner
 
 from ale.rotation import ConstantRotation
 from ale.transformation import FrameChain
+from ale.util import query_kernel_pool
 from scipy.spatial.transform import Rotation
 
 vims_id_lookup = {
@@ -35,6 +36,10 @@ iss_id_lookup = {
 iss_name_lookup = {
     "ISSNA" : "Imaging Science Subsystem Narrow Angle Camera",
     "ISSWA" : "Imaging Science Subsystem Wide Angle Camera"
+}
+
+spacecraft_name_lookup = {
+    'Cassini-Huygens': 'Cassini'
 }
 
 nac_filter_to_focal_length = {
@@ -164,10 +169,7 @@ class CassiniVimsIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoD
         : str
           spacecraft name
         """
-        name_lookup = {
-            'Cassini-Huygens': 'Cassini'
-        }
-        return name_lookup[super().platform_name]
+        return spacecraft_name_lookup[super().platform_name]
 
     @property
     def exposure_duration(self):
@@ -196,7 +198,12 @@ class CassiniVimsIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoD
         """
         Hardcoded value taken from ISIS
         """
-        return 143.0
+        if not hasattr(self, '_focal_length'):
+            if self.vims_channel == "VIS":
+                self._focal_length = 143.0
+            else:
+                self._focal_length = 426.0
+        return self._focal_length
 
     @property
     def detector_center_line(self):
@@ -206,8 +213,9 @@ class CassiniVimsIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoD
     def detector_center_sample(self):
         return 0
 
-    def compute_vims_time(self, time, line, sample, number_of_samples, mode="VIS"):
+    def compute_vims_time(self, line, sample, number_of_samples, mode="VIS"):
         instrument_group = self.label["IsisCube"]["Instrument"]
+        time = str(instrument_group["NativeStartTime"])
         int_time, decimal_time = str(time).split(".")
 
         ephemeris_time = spice.scs2e(self.spacecraft_id, int_time)
@@ -230,14 +238,27 @@ class CassiniVimsIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoD
     @property
     def ephemeris_start_time(self):
         instrument_group = self.label["IsisCube"]["Instrument"]
-        start_time = str(instrument_group["NativeStartTime"])
-        return self.compute_vims_time(start_time, 0 - 0.5, 0 - 0.5, self.image_samples, mode=self.vims_channel) - 2
+        return self.compute_vims_time(0 - 0.5, 0 - 0.5, self.image_samples, mode=self.vims_channel)
 
     @property
     def ephemeris_stop_time(self):
         instrument_group = self.label["IsisCube"]["Instrument"]
-        stop_time = str(instrument_group["NativeStartTime"])
-        return self.compute_vims_time(stop_time, self.image_lines - 0.5, self.image_samples - 0.5, self.image_samples, mode=self.vims_channel) + 2
+        return self.compute_vims_time((self.image_lines - 1) + 0.5, (self.image_samples - 1) + 0.5, self.image_samples, mode=self.vims_channel)
+
+    @property
+    def sensor_model_version(self):
+        """
+        Returns instrument model version
+        Returns
+        -------
+        : int
+          ISIS sensor model version
+        """
+        try:
+            return super().sensor_model_version
+        except:
+            return 1
+
 
 class CassiniVimsIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoDistortion, Driver):
 
@@ -255,11 +276,9 @@ class CassiniVimsIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoD
         : str
           instrument id
         """
-        id_lookup = {
-        "VIMS_VIS" : "CASSINI_VIMS_V"
-        }
+
         image_type = self.label['IsisCube']["Instrument"]["Channel"]
-        return id_lookup[super().instrument_id + "_" + image_type]
+        return vims_id_lookup[super().instrument_id + "_" + image_type]
 
     @property
     def sensor_name(self):
@@ -281,10 +300,7 @@ class CassiniVimsIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoD
         : str
           spacecraft name
         """
-        name_lookup = {
-            'Cassini-Huygens': 'Cassini'
-        }
-        return name_lookup[super().platform_name]
+        return spacecraft_name_lookup[super().platform_name]
 
     @property
     def exposure_duration(self):
@@ -328,7 +344,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         : str
           instrument id
         """
-        return id_lookup[super().instrument_id]
+        return iss_id_lookup[super().instrument_id]
 
     @property
     def focal_epsilon(self):
@@ -544,7 +560,7 @@ class CassiniIssIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistort
         : str
           ID of the sensor
         """
-        return id_lookup[super().instrument_id]
+        return iss_id_lookup[super().instrument_id]
 
     @property
     def sensor_name(self):
@@ -556,7 +572,7 @@ class CassiniIssIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistort
         : str
           Name of the sensor
         """
-        return name_lookup[super().instrument_id]
+        return iss_name_lookup[super().instrument_id]
 
     @property
     def center_ephemeris_time(self):
