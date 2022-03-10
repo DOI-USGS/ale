@@ -16,6 +16,7 @@ from ale.base.type_sensor import LineScanner
 
 from ale.rotation import ConstantRotation
 from ale.transformation import FrameChain
+from ale.util import query_kernel_pool
 from scipy.spatial.transform import Rotation
 
 vims_id_lookup = {
@@ -35,6 +36,10 @@ iss_id_lookup = {
 iss_name_lookup = {
     "ISSNA" : "Imaging Science Subsystem Narrow Angle Camera",
     "ISSWA" : "Imaging Science Subsystem Wide Angle Camera"
+}
+
+spacecraft_name_lookup = {
+    'Cassini-Huygens': 'Cassini'
 }
 
 nac_filter_to_focal_length = {
@@ -523,7 +528,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         : str
           instrument id
         """
-        return id_lookup[super().instrument_id]
+        return iss_id_lookup[super().instrument_id]
 
     @property
     def focal_epsilon(self):
@@ -740,7 +745,7 @@ class CassiniIssIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistort
         : str
           ID of the sensor
         """
-        return id_lookup[super().instrument_id]
+        return iss_id_lookup[super().instrument_id]
 
     @property
     def sensor_name(self):
@@ -752,7 +757,7 @@ class CassiniIssIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistort
         : str
           Name of the sensor
         """
-        return name_lookup[super().instrument_id]
+        return iss_name_lookup[super().instrument_id]
 
     @property
     def center_ephemeris_time(self):
