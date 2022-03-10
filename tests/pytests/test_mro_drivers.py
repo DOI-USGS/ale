@@ -12,8 +12,6 @@ from ale.drivers.mro_drivers import MroCtxPds3LabelNaifSpiceDriver, MroCtxIsisLa
 
 from conftest import get_image, get_image_kernels, get_isd, convert_kernels, get_image_label, compare_dicts
 
-#@pytest.fixture
-# def ctx_isf
 
 @pytest.fixture(scope='module')
 def test_kernels():
@@ -23,15 +21,16 @@ def test_kernels():
     for kern in binary_kernels:
         os.remove(kern)
 
+# Test load of CTX labels
 @pytest.mark.parametrize("label_type, kernel_type", [('pds3', 'naif'), ('isis3', 'naif'), ('isis3', 'isis')])
-def test_mro_load(test_kernels, label_type, kernel_type):
+def test_load_ctx(test_kernels, label_type, kernel_type):
     label_file = get_image_label('B10_013341_1010_XN_79S172W', label_type)
 
-    if label_type == 'isis3' and kernel_type == 'isis': 
+    if label_type == 'isis3' and kernel_type == 'isis':
         label_file = get_image('B10_013341_1010_XN_79S172W')
         isd_str = ale.loads(label_file)
         compare_isd = get_isd('ctx_isis')
-    else: 
+    else:
         isd_str = ale.loads(label_file, props={'kernels': test_kernels})
         compare_isd = get_isd('ctx')
 
@@ -39,6 +38,15 @@ def test_mro_load(test_kernels, label_type, kernel_type):
 
     if label_type == 'isis3' and kernel_type == 'naif':
         compare_isd['image_samples'] = 5000
+
+    assert compare_dicts(isd_obj, compare_isd) == []
+
+# Test load of Crism labels
+def test_load_crism(test_kernels):
+    label_file = get_image_label('FRT00003B73_01_IF156S_TRR2', 'isis3')
+    isd_str = ale.loads(label_file)
+    isd_obj = json.loads(isd_str)
+    compare_isd = get_isd('crism')
 
     assert compare_dicts(isd_obj, compare_isd) == []
 
