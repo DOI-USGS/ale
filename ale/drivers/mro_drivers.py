@@ -255,3 +255,79 @@ class MroCtxPds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDi
           platform name
         """
         return self.label['SPACECRAFT_NAME']
+
+class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDistortion, Driver):
+    """
+    Driver for reading Crism ISIS labels.
+    """
+
+    @property
+    def instrument_id(self):
+        inst_id = super().instrument_id
+
+        if inst_id not in ["CRISM"]:
+            raise Exception(f"{inst_id} is not a valid CRISM instrument name.")
+
+        return inst_id
+
+    @property
+    def sensor_name(self):
+        return self.instrument_id
+
+    @property
+    def ephemeris_start_time(self):
+        """
+        Returns the starting ephemeris time of the image. Expects spacecraft_id to
+        be defined. This must be the integer Naif Id code for the spacecraft. Expects
+        spacecraft_clock_start_count to be defined. This must be a string
+        containing the start clock count of the spacecraft
+
+        Returns
+        -------
+        : double
+          Starting ephemeris time of the image
+        """
+        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_start_count)
+
+    @property
+    def ephemeris_stop_time(self):
+        """
+        Returns the ephemeris stop time of the image. Expects spacecraft_id to
+        be defined. This must be the integer Naif Id code for the spacecraft.
+        Expects spacecraft_clock_stop_count to be defined. This must be a string
+        containing the stop clock count of the spacecraft
+
+        Returns
+        -------
+        : double
+          Ephemeris stop time of the image
+        """
+        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_stop_count)
+
+    @property
+    def spacecraft_name(self):
+        """
+        Returns the spacecraft name used in various Spice calls to acquire
+        ephemeris data.
+        Expects the platform_name to be defined. This should be a string of
+        the form 'Mars_Reconnaissance_Orbiter'
+
+        Returns
+        -------
+        : str
+          spacecraft name
+        """
+        name_lookup = {
+            'Mars_Reconnaissance_Orbiter': 'MRO'
+        }
+        return name_lookup[super().platform_name]
+
+    @property
+    def sensor_model_version(self):
+        """
+        Returns
+        -------
+        : int
+          ISIS sensor model version
+        """
+        return 1
