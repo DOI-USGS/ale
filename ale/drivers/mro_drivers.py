@@ -263,12 +263,22 @@ class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radial
 
     @property
     def instrument_id(self):
-        inst_id = super().instrument_id
+        """
+        Returns an instrument id for uniquely identifying the instrument, but often
+        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+        the same ID the Spice expects in bods2c calls.
+        Expects instrument_id to be defined in the IsisLabel mixin. This should be
+        a string of the form 'CRISM'
 
-        if inst_id not in ["CRISM"]:
-            raise Exception(f"{inst_id} is not a valid CRISM instrument name.")
-
-        return inst_id
+        Returns
+        -------
+        : str
+          instrument id
+        """
+        id_lookup = {
+        "CRISM" : "MRO_CRISM"
+        }
+        return id_lookup[super().instrument_id]
 
     @property
     def sensor_name(self):
@@ -310,7 +320,7 @@ class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radial
         Returns the spacecraft name used in various Spice calls to acquire
         ephemeris data.
         Expects the platform_name to be defined. This should be a string of
-        the form 'Mars_Reconnaissance_Orbiter'
+        the form 'MARS RECONNAISSANCE ORBITER'
 
         Returns
         -------
@@ -318,7 +328,7 @@ class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radial
           spacecraft name
         """
         name_lookup = {
-            'Mars_Reconnaissance_Orbiter': 'MRO'
+            'MARS RECONNAISSANCE ORBITER': 'MRO'
         }
         return name_lookup[super().platform_name]
 
