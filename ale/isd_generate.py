@@ -25,6 +25,14 @@ logger = logging.getLogger(__name__)
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
+        "-k", "--kernel",
+        type=Path,
+        help="Typically this is an optional metakernel file, care should be "
+             "taken by the user that it is applicable to all of the input "
+             "files.  It can also be a single ISIS cube, which is sometimes "
+             "needed if the input file is a label file."
+    )
+    parser.add_argument(
         "--max_workers",
         default=None,
         type=int,
@@ -68,9 +76,17 @@ def main():
     logging.basicConfig(format="%(message)s", level=log_level)
     logger.setLevel(log_level)
 
+    if args.kernel is None:
+        k = None
+    else:
+        try:
+            k = ale.util.generate_kernels_from_cube(args.kernel, expand=True)
+        except KeyError:
+            k = [args.kernel, ]
+
     if len(args.input) == 1:
         try:
-            file_to_isd(args.input[0], args.out, log_level=log_level)
+            file_to_isd(args.input[0], args.out, kernels=k, log_level=log_level)
         except Exception as err:
             # Seriously, this just throws a generic Exception?
             sys.exit(f"File {args.input[0]}: {err}")
@@ -80,7 +96,7 @@ def main():
         ) as executor:
             futures = {
                 executor.submit(
-                    file_to_isd, f, **{"log_level": log_level}
+                    file_to_isd, f, **{"kernels": k, "log_level": log_level}
                 ): f for f in args.input
             }
             for f in concurrent.futures.as_completed(futures):
@@ -94,7 +110,17 @@ def main():
                     logger.error(f"File {futures[f]}: {err}")
 
 
-def file_to_isd(file: os.PathLike, out=None, log_level=logging.WARNING):
+def file_to_isd(
+    file: os.PathLike,
+    out: os.PathLike = None,
+    kernels: list = None,
+    log_level=logging.WARNING
+):
+    """
+    Returns nothing, but acts as a thin wrapper to take the *file* and generate
+    an ISD at *out* (if given, defaults to replacing the extension on *file*
+    with .json), optionally using the passed *kernels*.
+    """
     # Yes, it is aggravating to have to pass the log_level into the function.
     # If this weren't trying to be fancy with multiprocessing, it wouldn't
     # be needed, and if this program were more complex, you'd build different
@@ -103,7 +129,7 @@ def file_to_isd(file: os.PathLike, out=None, log_level=logging.WARNING):
     if out is None:
         isd_file = Path(file).with_suffix(".json")
     else:
-        isd_file = out
+        isd_file = Path(out)
 
     # These two lines might seem redundant, but they are the only
     # way to guarantee that when file_to_isd() is spun up in its own
@@ -112,7 +138,10 @@ def file_to_isd(file: os.PathLike, out=None, log_level=logging.WARNING):
     logger.setLevel(log_level)
 
     logger.info(f"Reading: {file}")
-    usgscsm_str = ale.loads(file)
+    if kernels is not None:
+        usgscsm_str = ale.loads(file, props={'kernels': kernels})
+    else:
+        usgscsm_str = ale.loads(file)
 
     logger.info(f"Writing: {isd_file}")
     isd_file.write_text(usgscsm_str)
