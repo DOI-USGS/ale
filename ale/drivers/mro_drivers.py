@@ -7,6 +7,7 @@ from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
 from ale.base.type_distortion import RadialDistortion
 from ale.base.type_sensor import LineScanner
+from ale.base.type_distortion import NoDistortion
 
 
 class MroCtxIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, RadialDistortion, Driver):
@@ -256,7 +257,7 @@ class MroCtxPds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDi
         """
         return self.label['SPACECRAFT_NAME']
 
-class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDistortion, Driver):
+class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
     """
     Driver for reading Crism ISIS labels.
     """
@@ -276,19 +277,15 @@ class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radial
           instrument id
         """
         id_lookup = {
-        "CRISM" : "MRO_CRISM"
+        "CRISM" : "MRO_CRISM_VNIR"
         }
         return id_lookup[super().instrument_id]
-
-    @property
-    def sensor_name(self):
-        return self.instrument_id
 
     @property
     def ephemeris_start_time(self):
         """
         Returns the starting ephemeris time of the image. Expects spacecraft_id to
-        be defined. This must be the integer Naif Id code for the spacecraft. Expects
+        be defined. NAIF code -74999 was obtained from ISIS Crism camera model. Expects
         spacecraft_clock_start_count to be defined. This must be a string
         containing the start clock count of the spacecraft
 
@@ -297,13 +294,13 @@ class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radial
         : double
           Starting ephemeris time of the image
         """
-        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_start_count)
+        return spice.scs2e(-74999, self.spacecraft_clock_start_count)
 
     @property
     def ephemeris_stop_time(self):
         """
         Returns the ephemeris stop time of the image. Expects spacecraft_id to
-        be defined. This must be the integer Naif Id code for the spacecraft.
+        be defined. NAIF code -74999 was obtained from ISIS Crism camera model.
         Expects spacecraft_clock_stop_count to be defined. This must be a string
         containing the stop clock count of the spacecraft
 
@@ -312,7 +309,7 @@ class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radial
         : double
           Ephemeris stop time of the image
         """
-        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_stop_count)
+        return spice.scs2e(-74999, self.spacecraft_clock_stop_count)
 
     @property
     def spacecraft_name(self):
@@ -333,6 +330,18 @@ class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radial
         return name_lookup[super().platform_name]
 
     @property
+    def sensor_name(self):
+        """
+        Returns the name of the instrument
+
+        Returns
+        -------
+        : str
+          name of the instrument.
+        """
+        return self.instrument_id
+
+    @property
     def sensor_model_version(self):
         """
         Returns
@@ -341,3 +350,16 @@ class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radial
           ISIS sensor model version
         """
         return 1
+
+    @property
+    def line_exposure_duration(self):
+        """
+        Line exposure duration calculated by the ephemeris time divided by the
+        number of lines.
+
+        Returns
+        -------
+        : float
+          Returns the line exposure duration in seconds.
+        """
+        return (self.ephemeris_stop_time - self.ephemeris_start_time) / self.image_lines
