@@ -7,6 +7,7 @@ from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
 from ale.base.type_distortion import RadialDistortion, NoDistortion
 from ale.base.type_sensor import LineScanner
+from ale.base.type_distortion import NoDistortion
 
 from ale import util
 
