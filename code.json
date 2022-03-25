@@ -2,7 +2,7 @@
   {
     "name": "ale",
     "organization": "U.S. Geological Survey",
-    "description": "GitHub respository for the Abstraction Layer for Ephemerides package",
+    "description": "GitHub repository for the Abstraction Layer for Ephemerides package",
     "version": "0.8.7",
     "status": "Production",
 

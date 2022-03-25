@@ -110,7 +110,7 @@ class MroCtxIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDi
     def ephemeris_stop_time(self):
         """
         ISIS doesn't preserve the spacecraft stop count that we can use to get
-        the ephemeris stop time of the image, so compute the epehemris stop time
+        the ephemeris stop time of the image, so compute the ephemeris stop time
         from the start time and the exposure duration.
         """
         return self.ephemeris_start_time + self.exposure_duration * self.image_lines
@@ -168,7 +168,7 @@ class MroCtxIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDi
 
 class MroCtxPds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistortion, Driver):
     """
-    Driver for reading CTX PDS3 labels. Requires a Spice mixin to acquire addtional
+    Driver for reading CTX PDS3 labels. Requires a Spice mixin to acquire additional
     ephemeris and instrument data located exclusively in spice kernels.
     """
 

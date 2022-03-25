@@ -163,9 +163,9 @@ class Pds3Label():
     @property
     def target_name(self):
         """
-        Returns a target name unquely identifying what an observation was capturing.
+        Returns a target name uniquely identifying what an observation was capturing.
         This is most often a body name (e.g., Mars, Moon, Europa). This value is often
-        use to acquire Ephermis data from SPICE files; therefore it should be the same
+        use to acquire Ephemeris data from SPICE files; therefore it should be the same
         name spicelib expects in bodvrd calls.
 
         Returns

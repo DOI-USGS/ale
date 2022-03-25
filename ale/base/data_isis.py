@@ -290,7 +290,7 @@ class IsisSpice():
         The hex encoded image start time computed from the
         spacecraft clock count
         Expects naif_keywords to be defined. This should be a dict containing
-        Naif keyworkds from the label.
+        Naif keywords from the label.
 
         Returns
         -------
@@ -403,7 +403,7 @@ class IsisSpice():
         The line component of the affine transformation
         from focal plane coordinates to centered ccd pixels
         Expects naif_keywords to be defined. This should be a dict containing
-        Naif keyworkds from the label.
+        Naif keywords from the label.
         Expects ikid to be defined. This should be the integer Naif ID code
         for the instrument.
 
@@ -421,7 +421,7 @@ class IsisSpice():
         The sample component of the affine transformation
         from focal plane coordinates to centered ccd pixels
         Expects naif_keywords to be defined. This should be a dict containing
-        Naif keyworkds from the label.
+        Naif keywords from the label.
         Expects ikid to be defined. This should be the integer Naif ID code
         for the instrument.
 
@@ -464,7 +464,7 @@ class IsisSpice():
         """
         The focal length of the instrument
         Expects naif_keywords to be defined. This should be a dict containing
-        Naif keyworkds from the label.
+        Naif keywords from the label.
         Expects ikid to be defined. This should be the integer Naif ID code
         for the instrument.
 
@@ -480,7 +480,7 @@ class IsisSpice():
         """
         The triaxial radii of the target body
         Expects naif_keywords to be defined. This should be a dict containing
-        Naif keyworkds from the label.
+        Naif keywords from the label.
 
         Returns
         -------

@@ -28,7 +28,7 @@ class JunoJunoCamIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistor
     def ephemeris_start_time(self):
         """
         Junos camera is split into stacked frames where an image is made
-        of sets of RGBM chuncks. We need to account for these chuncks since
+        of sets of RGBM chunks. We need to account for these chunks since
         ISIS produces some number of cubes N where N = M*4.
         Computation obtained from JunoCamera.cpp
 

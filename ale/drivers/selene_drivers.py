@@ -17,8 +17,8 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
     NOTES
     -----
 
-    * Kaguaya has adjusted values for some of its keys, usually suffixed with `CORRECTED_`.
-      These corrected values should always be preffered over the original values.
+    * Kaguya has adjusted values for some of its keys, usually suffixed with `CORRECTED_`.
+      These corrected values should always be preferred over the original values.
 
     * The Kaguya TC doesn't use a generic Distortion Model, uses on unique to the TC.
       Therefore, methods normally in the Distortion classes are reimplemented here.
@@ -119,7 +119,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         for capturing the image.
 
         Some keys are stored in the IK kernel under a general ikid for TC1/TC2
-        presumably because they are not affected by the addtional parameters encoded in
+        presumably because they are not affected by the additional parameters encoded in
         the ikid returned by self.ikid. This method exists for those gdpool calls.
 
         Expects instrument_id to be defined in the Pds3Label mixin. This should be
@@ -328,7 +328,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         """
         # It's a list, but only sometimes.
         # seems to depend on whether you are using the original zipped archives or
-        # if its downloaded from Jaxa's image search:
+        # if its downloaded from JAXA's image search:
         # (https://darts.isas.jaxa.jp/planet/pdap/selene/product_search.html#)
         try:
             return self.label['CORRECTED_SAMPLING_INTERVAL'][0].value * 0.001 # Scale to seconds
@@ -782,7 +782,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         """
         # It's a list, but only sometimes.
         # seems to depend on whether you are using the original zipped archives or
-        # if its downloaded from Jaxa's image search:
+        # if its downloaded from JAXA's image search:
         # (https://darts.isas.jaxa.jp/planet/pdap/selene/product_search.html#)
         try:
             return self.label['CORRECTED_SAMPLING_INTERVAL'][0].value * 0.001 # Scale to seconds
@@ -1130,7 +1130,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver
         """
         # It's a list, but only sometimes.
         # seems to depend on whether you are using the original zipped archives or
-        # if its downloaded from Jaxa's image search:
+        # if its downloaded from JAXA's image search:
         # (https://darts.isas.jaxa.jp/planet/pdap/selene/product_search.html#)
         try:
             return self.label['IsisCube']['Instrument']['CorrectedSamplingInterval'][0].value * 0.001 # Scale to seconds
