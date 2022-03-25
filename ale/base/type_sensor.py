@@ -159,7 +159,7 @@ class Radar():
     @property
     def wavelength(self):
         """
-        Returns the wavelength used for image acquistion.
+        Returns the wavelength used for image acquisition.
 
         Returns
         -------
@@ -178,7 +178,7 @@ class Radar():
         : double
           Exposure duration for a line
         """
-        raise NotImplmentedError
+        raise NotImplementedError
 
 
     @property

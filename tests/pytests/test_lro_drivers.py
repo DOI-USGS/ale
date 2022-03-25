@@ -44,7 +44,7 @@ def test_load(test_kernels, label_type, image, kernel_type):
         compare_isd = image_dict[image]
     else: 
         label_file = get_image(image)
-        isd_str = ale.loads(label_file);
+        isd_str = ale.loads(label_file)
         compare_isd = get_isd('lro_isis')
 
     isd_obj = json.loads(isd_str)

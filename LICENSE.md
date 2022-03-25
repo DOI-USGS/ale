@@ -21,7 +21,7 @@ text)](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
 ### No Copyright
 
-The authors have associated their contributions to the ISIS project
+The authors have associated their contributions to the ALE project
 with this deed, and have dedicated the work to the public domain
 by waiving all of their rights to the work worldwide under copyright
 law, including all related and neighboring rights, to the extent

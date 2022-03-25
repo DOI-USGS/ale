@@ -60,7 +60,7 @@ def load(label, props={}, formatter='ale', verbose=False):
     This function opens up the label file and attempts to produce an ISD in the
     format specified using the supplied properties. Drivers are tried sequentially
     until an ISD is successfully created. Drivers that use external ephemeris
-    data are tested before drivers that use attached epehemeris data.
+    data are tested before drivers that use attached ephemeris data.
 
     Parameters
     ----------

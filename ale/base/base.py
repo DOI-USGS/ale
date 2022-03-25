@@ -251,7 +251,7 @@ class Driver():
         -------
         : list
           3 element list containing affine transformation coefficient.
-          The elements are as follows: constant, x coefficent, y coeffecient
+          The elements are as follows: constant, x coefficient, y coefficient
         """
         raise NotImplementedError
 
@@ -262,7 +262,7 @@ class Driver():
         -------
         : list
           3 element list containing affine transformation coefficients.
-          The elements are as follows: constant, x coefficent, y coeffecient
+          The elements are as follows: constant, x coefficient, y coefficient
         """
         raise NotImplementedError
 
@@ -272,7 +272,7 @@ class Driver():
         Returns
         -------
         : list
-          3 element list containing coefficience for the pixels to focal plane
+          3 element list containing coefficients for the pixels to focal plane
           transformation. The elements are as follows: constant, sample, line
         """
         raise NotImplementedError
@@ -283,7 +283,7 @@ class Driver():
         Returns
         -------
         : : list
-          3 element list containing coefficience for the pixels to focal plane
+          3 element list containing coefficients for the pixels to focal plane
           transformation. The elements are as follows: constant, sample, line
         """
         raise NotImplementedError

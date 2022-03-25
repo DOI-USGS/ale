@@ -45,7 +45,7 @@ class NaifSpice():
            the path to a directory that contains directories whose naming
            convention matches the PDS Kernel Archives format,
            `shortMissionName-versionInfo`. The directory corresponding to the
-           driver's mission will be searched for the approriate meta kernel to
+           driver's mission will be searched for the appropriate meta kernel to
            load.
 
         See Also
@@ -78,7 +78,7 @@ class NaifSpice():
     @property
     def light_time_correction(self):
         """
-        Returns the type of light time correciton and abberation correction to
+        Returns the type of light time correction and abberation correction to
         use in NAIF calls. Expects ikid to be defined. This must be the integer
         Naif id code of the instrument.
 
@@ -147,7 +147,7 @@ class NaifSpice():
         Returns
         -------
         : int
-          Naif ID used to for indentifying the instrument in Spice kernels
+          Naif ID used to for identifying the instrument in Spice kernels
         """
         return spice.bods2c(self.instrument_id)
 
@@ -169,7 +169,7 @@ class NaifSpice():
     def target_id(self):
         """
         Returns the Naif ID code for the target body
-        Expects target_name to be defined. This must be a string containig the name
+        Expects target_name to be defined. This must be a string containing the name
         of the target body.
 
         Returns
@@ -317,7 +317,7 @@ class NaifSpice():
         Returns a tuple with information detailing the sun position at the time
         of the image. Expects center_ephemeris_time to be defined. This must be
         a floating point number containing the average of the start and end ephemeris time.
-        Expects reference frame to be defined. This must be a sring containing the name of
+        Expects reference frame to be defined. This must be a string containing the name of
         the target reference frame. Expects target_name to be defined. This must be
         a string containing the name of the target body.
 
@@ -350,7 +350,7 @@ class NaifSpice():
         of the image. Expects ephemeris_time to be defined. This must be a floating point number
         containing the ephemeris time. Expects spacecraft_name to be defined. This must be a
         string containing the name of the spacecraft containing the sensor. Expects
-        reference_frame to be defined. This must be a sring containing the name of
+        reference_frame to be defined. This must be a string containing the name of
         the target reference frame. Expects target_name to be defined. This must be
         a string containing the name of the target body.
 

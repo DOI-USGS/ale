@@ -113,7 +113,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         Returns
         -------
         : int
-          Naif ID used to for indentifying the instrument in Spice kernels
+          Naif ID used to for identifying the instrument in Spice kernels
         """
         return spice.bods2c("MEX_HRSC_HEAD")
 
@@ -125,7 +125,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
 
         Expects filter_number to be defined. This should be an integer containing
         the filter number from the pds3 label.
-        Expects ikid to be defined. This should be the integer Naid ID code for
+        Expects ikid to be defined. This should be the integer Naif ID code for
         the instrument.
 
         Returns
@@ -210,7 +210,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
     def focal2pixel_lines(self):
         """
         Expects fikid to be defined. This must be the integer Naif id code of
-        the filter-sepcific instrument.
+        the filter-specific instrument.
 
         NOTE: These values are pulled from ISIS iak kernels.
 
@@ -226,7 +226,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
     def focal2pixel_samples(self):
         """
         Expects fikid to be defined. This must be the integer Naif id code of
-        the filter-sepcific instrument.
+        the filter-specific instrument.
 
         NOTE: These values are pulled from ISIS iak kernels.
 
@@ -311,7 +311,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         stored in the image data.
 
         In the image, every line has an entry. This method goes through
-        and removes conescutive lines with the same exposure duration.
+        and removes consecutive lines with the same exposure duration.
         There are also potentially missing lines in the image which this
         method accounts for.
 
@@ -346,7 +346,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         Returns the exposure durations taken from the binary image data.
 
         For HRSC, the exposure durations are imbedded in the binary data of the image.
-        The expsoure durations start at the 9th byte of the line/record and are 4 bytes long.
+        The exposure durations start at the 9th byte of the line/record and are 4 bytes long.
 
         Returns
         -------
@@ -556,7 +556,7 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
   @property
   def times_table(self):
       """
-      Returns EphermisTime, ExposureTime, and LinesStart informtation which was stored as
+      Returns EphemerisTime, ExposureTime, and LinesStart informtation which was stored as
       binary information in the ISIS cube.
 
       Returns
@@ -609,7 +609,7 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
       Returns
       -------
       : int
-        Naif ID used to for indentifying the instrument in Spice kernels
+        Naif ID used to for identifying the instrument in Spice kernels
       """
       return spice.bods2c("MEX_HRSC_HEAD")
 
@@ -683,7 +683,7 @@ class MexSrcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDistortion, 
         Returns
         -------
         : int
-          Naif ID used to for indentifying the instrument in Spice kernels
+          Naif ID used to for identifying the instrument in Spice kernels
         """
         return spice.bods2c("MEX_HRSC_SRC")
 

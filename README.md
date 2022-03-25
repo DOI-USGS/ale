@@ -54,7 +54,7 @@ make
 ```
 
 Keep in mind that you will need to clone the repository with the `--recursive` flag in order to
-retrieve the gtest submodule for testing. If you have already cloned without the `--recusive` flag,
+retrieve the gtest submodule for testing. If you have already cloned without the `--recursive` flag,
 running the following command will retrieve the gtest submodule manually:
 ```bash
 git submodule update --init --recursive

@@ -83,7 +83,7 @@ def test_load_mes_with_no_metakernels(tmpdir, monkeypatch, mess_kernels):
     label_file = get_image_label('EN1072174528M')
     tmpdir.mkdir('mes')
 
-    # intentially make an mk file with wrong year
+    # intentionally make an mk file with wrong year
     with open(tmpdir.join('mes', 'mes_2016_v1.tm'), 'w+') as mk_file:
         mk_str = util.write_metakernel_from_kernel_list(updated_kernels)
         print(mk_str)
