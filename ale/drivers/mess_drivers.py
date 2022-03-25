@@ -40,7 +40,7 @@ class MessengerMdisIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDist
         Naif ID code used in calculating focal length
         Expects filter_number to be defined. This should be an integer containing
         the filter number from the pds3 label.
-        Expects ikid to be defined. This should be the integer Naid ID code for
+        Expects ikid to be defined. This should be the integer Naif ID code for
         the instrument.
 
         Returns
@@ -59,7 +59,7 @@ class MessengerMdisIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDist
     @property
     def instrument_id(self):
         """
-        Returns an instrument id for unquely identifying the instrument, but often
+        Returns an instrument id for uniquely identifying the instrument, but often
         also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
         the same ID the Spice expects in bods2c calls.
         Expects instrument_id to be defined in the Pds3Label mixin. This should
@@ -75,7 +75,7 @@ class MessengerMdisIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDist
 
 class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortion, Driver):
     """
-    Driver for reading MDIS PDS3 labels. Requires a Spice mixin to acquire addtional
+    Driver for reading MDIS PDS3 labels. Requires a Spice mixin to acquire additional
     ephemeris and instrument data located exclusively in spice kernels.
     """
 
@@ -99,7 +99,7 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortio
         Naif ID code used in calculating focal length
         Expects filter_number to be defined. This should be an integer containing
         the filter number from the pds3 label.
-        Expects ikid to be defined. This should be the integer Naid ID code for
+        Expects ikid to be defined. This should be the integer Naif ID code for
         the instrument.
 
         Returns
@@ -118,7 +118,7 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortio
     @property
     def instrument_id(self):
         """
-        Returns an instrument id for unquely identifying the instrument, but often
+        Returns an instrument id for uniquely identifying the instrument, but often
         also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
         the same ID the Spice expects in bods2c calls.
         Expects instrument_id to be defined in the Pds3Label mixin. This should
@@ -155,9 +155,9 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortio
         """
         Computes Focal Length from Kernels
 
-        MDIS has tempature dependant focal lengh and coefficients need to
+        MDIS has temperature dependant focal length and coefficients need to
         be acquired from IK Spice kernels (coeff describe focal length as a
-        function of tempature). Focal plane temps are acquired from a PDS3 label.
+        function of temperature). Focal plane temps are acquired from a PDS3 label.
 
         Returns
         -------
@@ -177,7 +177,7 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortio
     def detector_center_sample(self):
         """
         Returns center detector sample acquired from Spice Kernels.
-        Expects ikid to be defined. This should be the integer Naid ID code for
+        Expects ikid to be defined. This should be the integer Naif ID code for
         the instrument.
 
         NOTE: This value is defined in an ISIS iak as 512.5, but we subtract 0.5 from the
@@ -194,7 +194,7 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortio
     def detector_center_line(self):
         """
         Returns center detector line acquired from Spice Kernels.
-        Expects ikid to be defined. This should be the integer Naid ID code for
+        Expects ikid to be defined. This should be the integer Naif ID code for
         the instrument.
 
         NOTE: This value is defined in an ISIS iak as 512.5, but we subtract 0.5 from the
@@ -252,7 +252,7 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortio
 class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDistortion, Driver):
     """
     Driver for reading MDIS ISIS3 Labels. These are Labels that have been ingested
-    into ISIS from PDS EDR images. Any SPCIE data attached by the spiceinit application
+    into ISIS from PDS EDR images. Any SPICE data attached by the spiceinit application
     will be ignored.
     """
     @property
@@ -331,7 +331,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
         Naif ID code used in calculating focal length
         Expects filter_number to be defined. This should be an integer containing
         the filter number from the pds3 label.
-        Expects ikid to be defined. This should be the integer Naid ID code for
+        Expects ikid to be defined. This should be the integer Naif ID code for
         the instrument.
 
         Returns
@@ -351,9 +351,9 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
         """
         Computes Focal Length from Kernels
 
-        MDIS has tempature dependant focal lengh and coefficients need to
+        MDIS has temperature dependant focal length and coefficients need to
         be acquired from IK Spice kernels (coeff describe focal length as a
-        function of tempature). Focal plane temps are acquired from a PDS3 label.
+        function of temperature). Focal plane temps are acquired from a PDS3 label.
 
         Returns
         -------
@@ -372,7 +372,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
     def detector_center_sample(self):
         """
         Returns center detector sample acquired from Spice Kernels
-        Expects ikid to be defined. This should be the integer Naid ID code for
+        Expects ikid to be defined. This should be the integer Naif ID code for
         the instrument.
 
         We subtract 0.5 from the ISIS center sample because ISIS detector
@@ -390,7 +390,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
     def detector_center_line(self):
         """
         Returns center detector line acquired from Spice Kernels
-        Expects ikid to be defined. This should be the integer Naid ID code for
+        Expects ikid to be defined. This should be the integer Naif ID code for
         the instrument.
 
         We subtract 0.5 from the ISIS center line because ISIS detector
@@ -416,7 +416,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
     @property
     def pixel_size(self):
         """
-        Overriden because the MESSENGER IK uses PIXEL_PITCH and the units
+        Overridden because the MESSENGER IK uses PIXEL_PITCH and the units
         are already millimeters
 
         Returns

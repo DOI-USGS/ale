@@ -30,7 +30,7 @@ class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
     @property
     def instrument_id(self):
         """
-        Overriden to check that the instrument ID is correct
+        Overridden to check that the instrument ID is correct
 
         Returns
         -------

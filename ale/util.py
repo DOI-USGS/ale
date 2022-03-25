@@ -32,7 +32,7 @@ def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=
     Parameters
     ----------
     spice_dir : str
-                Path containing Spice directories downlaoded from NAIF's website
+                Path containing Spice directories downloaded from NAIF's website
 
     missions : set, str
                Mission or set of missions to search for
@@ -167,12 +167,12 @@ def dict_to_lower(d):
     return {k.lower():v if not isinstance(v, dict) else dict_to_lower(v) for k,v in d.items()}
 
 
-def expandvars(path, env_dict=os.environ, default=None, case_sensative=True):
-    user_dict = env_dict if case_sensative else dict_to_lower(env_dict)
+def expandvars(path, env_dict=os.environ, default=None, case_sensitive=True):
+    user_dict = env_dict if case_sensitive else dict_to_lower(env_dict)
 
     def replace_var(m):
-        group0 = m.group(0) if case_sensative else m.group(0).lower()
-        group1 = m.group(1) if case_sensative else m.group(1).lower()
+        group0 = m.group(0) if case_sensitive else m.group(0).lower()
+        group1 = m.group(1) if case_sensitive else m.group(1).lower()
 
         return user_dict.get(m.group(2) or group1, group0 if default is None else default)
     reVar = r'\$(\w+|\{([^}]*)\})'
@@ -190,7 +190,7 @@ def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
     expand : bool, optional
         Whether or not to expand variables within kernel paths based on your IsisPreferences file.
     format_as : str, optional {'list', 'dict'}
-        How to return the kernels: either as a one-demensional ordered list, or as a dictionary
+        How to return the kernels: either as a one-dimensional ordered list, or as a dictionary
         of kernel lists.
 
     Returns

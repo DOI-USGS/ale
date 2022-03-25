@@ -17,7 +17,7 @@ from ale.base.type_sensor import LineScanner, Radar
 class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver):
     """
     Driver for reading LROC NACL, NACR (not WAC, it is a push frame) labels. Requires a Spice mixin to
-    acquire addtional ephemeris and instrument data located exclusively in SPICE kernels, A PDS3 label,
+    acquire additional ephemeris and instrument data located exclusively in SPICE kernels, A PDS3 label,
     and the LineScanner and Driver bases.
     """
 
@@ -102,7 +102,7 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
     @property
     def light_time_correction(self):
         """
-        Returns the type of light time correciton and abberation correction to
+        Returns the type of light time correction and abberation correction to
         use in NAIF calls.
 
         LROC is specifically set to not use light time correction because it is
@@ -221,7 +221,7 @@ class LroLrocPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver)
         Returns
         -------
         : float
-          Returns the additionl preroll.
+          Returns the additional preroll.
         """
         return 1024.0
 
@@ -343,7 +343,7 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
     @property
     def light_time_correction(self):
         """
-        Returns the type of light time correciton and abberation correction to
+        Returns the type of light time correction and abberation correction to
         use in NAIF calls.
 
         LROC is specifically set to not use light time correction because it is
@@ -462,7 +462,7 @@ class LroLrocIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver)
         Returns
         -------
         : float
-          Returns the additionl preroll.
+          Returns the additional preroll.
         """
         return 1024.0
 
@@ -659,7 +659,7 @@ class LroLrocIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, Driver)
         Returns
         -------
         : float
-          Returns the additionl preroll.
+          Returns the additional preroll.
         """
         return 1024.0
 
@@ -728,7 +728,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
     @property
     def wavelength(self):
         """
-        Returns the wavelength in meters used for image acquistion.
+        Returns the wavelength in meters used for image acquisition.
 
         Returns
         -------

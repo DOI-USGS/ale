@@ -171,7 +171,7 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
         """
         The focal length of the instrument
         Expects naif_keywords to be defined. This should be a dict containing
-        Naif keyworkds from the label.
+        Naif keywords from the label.
 
         Returns
         -------

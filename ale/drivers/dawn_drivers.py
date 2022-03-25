@@ -58,10 +58,10 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
     @property
     def target_name(self):
         """
-        Returns an target name for unquely identifying the instrument, but often
-        piped into Spice Kernels to acquire Ephermis data from Spice. Therefore they
+        Returns an target name for uniquely identifying the instrument, but often
+        piped into Spice Kernels to acquire Ephemeris data from Spice. Therefore they
         the same ID the Spice expects in bodvrd calls. In this case, vesta images
-        have a number infront of them like "4 VESTA" which needs to be simplified
+        have a number in front of them like "4 VESTA" which needs to be simplified
         to "VESTA" for spice. Expects target_name to be defined in the Pds3Label mixin.
         This should be a string containing the name of the target body.
 
@@ -168,7 +168,7 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
     def detector_center_sample(self):
         """
         Returns center detector sample acquired from Spice Kernels.
-        Expects ikid to be defined. This should be the integer Naid ID code for
+        Expects ikid to be defined. This should be the integer Naif ID code for
         the instrument.
 
         We have to add 0.5 to the CCD Center because the Dawn IK defines the
@@ -186,7 +186,7 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
     def detector_center_line(self):
         """
         Returns center detector line acquired from Spice Kernels.
-        Expects ikid to be defined. This should be the integer Naid ID code for
+        Expects ikid to be defined. This should be the integer Naif ID code for
         the instrument.
 
         We have to add 0.5 to the CCD Center because the Dawn IK defines the

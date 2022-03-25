@@ -72,7 +72,7 @@ nac_filter_to_focal_length = {
     ("IRP0","MT2"):2002.72,
     ("IRP0","MT3"):2002.72,
     ("P120","BL2"):2002.11,
-    ("P120","CB1"):002.28,
+    ("P120","CB1"):2002.28,
     ("P120","GRN"):2002.38,
     ("P120","IR1"):2002.39,
     ("P120","MT1"):2002.54,
@@ -119,7 +119,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
     @property
     def instrument_id(self):
         """
-        Returns an instrument id for unquely identifying the instrument, but often
+        Returns an instrument id for uniquely identifying the instrument, but often
         also used to be piped into Spice Kernels to acquire instrument kernel (IK) NAIF IDs.
         Therefore they use the same NAIF ID asin bods2c calls. Expects instrument_id to be
         defined from a mixin class. This should return a string containing either 'ISSNA' or
@@ -213,7 +213,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
     # number, so the order doesn't matter
     def detector_center_line(self):
         """
-        Dectector center based on ISIS's corrected values.
+        Detector center based on ISIS's corrected values.
 
         Returns
         -------
@@ -227,7 +227,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
     # number, so the order doesn't matter
     def detector_center_sample(self):
         """
-        Dectector center based on ISIS's corrected values.
+        Detector center based on ISIS's corrected values.
 
         Returns
         -------
@@ -253,7 +253,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         """
         NAC uses multiple filter pairs, each filter combination has a different focal length.
         NAIF's Cassini kernels do not contain focal lengths for NAC filters and
-        so we aquired updated NAC filter data from ISIS's IAK kernel.
+        so we acquired updated NAC filter data from ISIS's IAK kernel.
 
         """
         # default focal defined by IK kernel
@@ -365,7 +365,7 @@ class CassiniIssIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistort
         """
         Returns the middle exposure time for the image in ephemeris seconds.
 
-        This is overriden because the ISIS ISSNAC and ISSWAC sensor models use the
+        This is overridden because the ISIS ISSNAC and ISSWAC sensor models use the
         label utc times so the converted times are not available in the
         NaifKeywords. Instead we get it from the tables.
 
