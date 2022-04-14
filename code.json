@@ -18,7 +18,7 @@
 
     "homepageURL": "https://github.com/USGS-Astrogeology/ale/releases/tag/0.8.7",
     "downloadURL": "https://github.com/USGS-Astrogeology/ale/archive/refs/tags/0.8.7.zip",
-    "disclaimerURL": "https://github.com/USGS-Astrogeology/ale/blob/master/LICENSE.md",
+    "disclaimerURL": "https://github.com/USGS-Astrogeology/ale/blob/master/DISCLAIMER.md",
     "repositoryURL": "https://github.com/USGS-Astrogeology/ale",
     "vcs": "git",
 
