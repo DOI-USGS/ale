@@ -1,0 +1,4 @@
+This CK is for testing with the image: /users/arsanders/pds/wac0000a1c4.uv.even.cub
+
+This CK was generated using the following command: {}
+/Users/arsanders/repos/ale/ckslicer -LSK /Volumes/pkgs/isis3/isis_data/base/kernels/lsk/naif0012.tls -SCLK /Volumes/pkgs/isis3/isis_data/lro/kernels/sclk/lro_clkcor_2021363_v00.tsc -INPUTCK /Volumes/pkgs/isis3/isis_data/lro/kernels/ck/lrolc_2009243_2009274_v05.bc -OUTPUTCK /users/arsanders/pds/out/lrolc_2009243_2009274_v05_1_sliced_-85620.bc -ID -85620 -TIMETYPE SCLK -START 1/0274692464.15073 -STOP 1/0274692490.15073
