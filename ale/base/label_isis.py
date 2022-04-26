@@ -274,3 +274,8 @@ class IsisLabel():
             # if no units are available, assume the exposure duration is given in milliseconds
             line_exposure_duration = line_exposure_duration * 0.001
         return line_exposure_duration
+
+
+    @property
+    def interframe_delay(self):
+        return self.label['IsisCube']['Instrument']['InterframeDelay'].value

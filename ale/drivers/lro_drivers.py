@@ -11,7 +11,7 @@ from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
-from ale.base.type_sensor import LineScanner, Radar
+from ale.base.type_sensor import LineScanner, Radar, PushFrame
 
 class LroLrocNacPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver):
     """
@@ -850,10 +850,8 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         return self.target_frame_id
 
 
-class LroLrocWacIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver):
-    """
-    Driver for Lunar Reconnaissance Orbiter WAC ISIS cube
-    """
+
+class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, Driver):
     @property
     def instrument_id(self):
         """
@@ -874,9 +872,89 @@ class LroLrocWacIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driv
         }
         return id_lookup[super().instrument_id]
 
+
+    @property
+    def sensor_name(self):
+        return self.instrument_id
+
+
     @property
     def sensor_model_version(self):
-        return 3
+        """
+        Returns ISIS instrument sensor model version number
+
+        Returns
+        -------
+        : int
+          ISIS sensor model version
+        """
+        return 2
+
+
+    @property
+    def usgscsm_distortion_model(self):
+        """
+        The distortion model name with its coefficients
+
+        LRO LROC NAC does not use the default distortion model so we need to overwrite the
+        method packing the distortion model into the ISD.
+
+        Returns
+        -------
+        : dict
+          Returns a dict with the model name : dict of the coefficients
+        """
+
+        return {"lrolrocnac":
+                {"coefficients": self.odtk}}
+
+    @property
+    def odtk(self):
+        """
+        The coefficients for the distortion model
+
+        Returns
+        -------
+        : list
+          Radial distortion coefficients. There is only one coefficient for LROC NAC l/r
+        """
+        return [self.naif_keywords.get('INS{}_OD_K'.format(self.ikid), None)]
+
+
+    @property
+    def framelet_height(self):
+        if self.instrument_id == "LRO_LROCWAC_UV":
+            return 16
+        elif self.instrument_id == "LRO_LROCWAC_VIS":
+            return 14
+
+class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Driver):
+    """
+    Driver for Lunar Reconnaissance Orbiter WAC ISIS cube
+    """
+    @property
+    def instrument_id(self):
+        """
+        Returns an instrument id for uniquely identifying the instrument, but often
+        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+        expect the same ID the Spice expects in bods2c calls.
+        Expects instrument_id to be defined in the IsisLabel mixin. This should be
+        a string of the form 'WAC-UV' or 'WAC-VIS'
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
+        id_lookup = {
+            "WAC-UV" : "LRO_LROCWAC_UV",
+            "WAC-VIS" : "LRO_LROCWAC_VIS"
+        }
+        return id_lookup[super().instrument_id]
+
+    @property
+    def sensor_model_version(self):
+        return 2
 
 
     @property
@@ -895,7 +973,6 @@ class LroLrocWacIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driv
             sclock = self.label['IsisCube']['Instrument']['SpacecraftClockStartCount']
             self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
         return self._ephemeris_start_time
-
 
 
     @property
@@ -939,9 +1016,9 @@ class LroLrocWacIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driv
         Returns
         -------
         : list
-          Radial distortion coefficients. There is only one coefficient for LROC NAC l/r
+          Radial distortion coefficients.
         """
-        return spice.gdpool('INS{}_OD_K'.format(self.ikid), 0, 2).tolist()
+        return spice.gdpool('INS{}_OD_K'.format(self.ikid), 0, 3).tolist()
 
 
     @property
@@ -981,3 +1058,28 @@ class LroLrocWacIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driv
                          **query_kernel_pool("*_ITRANS*"),
                          **query_kernel_pool("*_OD_K")}
         return _naifKeywords
+
+
+    @property
+    def framelets_flipped(self):
+        return self.label['IsisCube']['Instrument']['SpacecraftName'] == "Yes"
+
+
+    @property
+    def sampling_factor(self):
+        if self.instrument_id == "LRO_LROCWAC_UV":
+            return 4
+        elif self.instrument_id == "LRO_LROCWAC_VIS":
+            return 1
+
+    @property
+    def num_frames(self):
+        return self.image_lines // (self.framelet_height // self.sampling_factor)
+
+
+    @property
+    def framelet_height(self):
+        if self.instrument_id == "LRO_LROCWAC_UV":
+            return 16
+        elif self.instrument_id == "LRO_LROCWAC_VIS":
+            return 14
