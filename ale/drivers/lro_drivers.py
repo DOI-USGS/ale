@@ -875,7 +875,7 @@ class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, Driver
 
     @property
     def sensor_name(self):
-        return self.instrument_id
+        return self.label['IsisCube']['Instrument']['SpacecraftName']
 
 
     @property
@@ -1071,6 +1071,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Driver
             return 4
         elif self.instrument_id == "LRO_LROCWAC_VIS":
             return 1
+
 
     @property
     def num_frames(self):
