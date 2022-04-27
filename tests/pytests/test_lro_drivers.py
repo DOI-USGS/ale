@@ -11,6 +11,7 @@ from ale import util
 from ale.drivers.lro_drivers import LroLrocNacPds3LabelNaifSpiceDriver
 from ale.drivers.lro_drivers import LroLrocNacIsisLabelNaifSpiceDriver
 from ale.drivers.lro_drivers import LroLrocWacIsisLabelNaifSpiceDriver
+from ale.drivers.lro_drivers import LroLrocWacIsisLabelIsisSpiceDriver
 from ale.drivers.lro_drivers import LroMiniRfIsisLabelNaifSpiceDriver
 from ale.transformation import TimeDependentRotation
 
@@ -268,50 +269,103 @@ class test_miniRf(unittest.TestCase):
           assert self.driver.ephemeris_stop_time == 12345
 
 
-
-
 # ========= Test WAC isislabel and naifspice driver =========
 class test_wac_isis_naif(unittest.TestCase):
 
-  def setUp(self):
-      label = get_image_label('wac0000a1c4.uv.even', 'isis3')
-      self.driver = LroLrocWacIsisLabelNaifSpiceDriver(label)
+    def setUp(self):
+        label = get_image_label('wac0000a1c4.uv.even', 'isis3')
+        self.driver = LroLrocWacIsisLabelNaifSpiceDriver(label)
 
-  def test_short_mission_name(self):
-      assert self.driver.short_mission_name == 'lro'
 
-  def test_intrument_id(self):
-      assert self.driver.instrument_id == 'LRO_LROCWAC_UV'
+    def test_short_mission_name(self):
+        assert self.driver.short_mission_name == 'lro'
 
-  def test_usgscsm_distortion_model(self):
-      with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool, \
-           patch('ale.drivers.lro_drivers.spice.bods2c', return_value=-12345) as bods2c:
-          distortion_model = self.driver.usgscsm_distortion_model
-          assert distortion_model['lrolrocwac']['coefficients'] == [1.0]
-          gdpool.assert_called_with('INS-12345_OD_K', 0, 2)
-          bods2c.assert_called_with('LRO_LROCWAC_UV')
 
-  def test_odtk(self):
-      with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool, \
-           patch('ale.drivers.lro_drivers.spice.bods2c', return_value=-12345) as bods2c:
-           assert self.driver.odtk == [1.0]
-           gdpool.assert_called_with('INS-12345_OD_K', 0, 2)
-           bods2c.assert_called_with('LRO_LROCWAC_UV')
+    def test_intrument_id(self):
+        assert self.driver.instrument_id == 'LRO_LROCWAC_UV'
 
-  def test_light_time_correction(self):
-      assert self.driver.light_time_correction == 'LT+S'
 
-  def test_detector_center_sample(self):
-      with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool, \
-           patch('ale.drivers.lro_drivers.spice.bods2c', return_value=-12345) as bods2c:
-          assert self.driver.detector_center_sample == 0.5
-          gdpool.assert_called_with('INS-12345_BORESIGHT_SAMPLE', 0, 1)
-          bods2c.assert_called_with('LRO_LROCWAC_UV')
+    def test_ephemeris_start_time(self):
+        with patch('ale.drivers.lro_drivers.spice.scs2e', return_value=321) as scs2e:
+            np.testing.assert_almost_equal(self.driver.ephemeris_start_time, 321)
+            scs2e.assert_called_with(-85, '1/274692469:15073')
 
-  def test_exposure_duration(self):
-      np.testing.assert_almost_equal(self.driver.exposure_duration, 0.04)
 
-  def test_ephemeris_start_time(self):
-      with patch('ale.drivers.lro_drivers.spice.scs2e', return_value=321) as scs2e:
-          np.testing.assert_almost_equal(self.driver.ephemeris_start_time, 321)
-          scs2e.assert_called_with(-85, '1/274692469:15073')
+    def test_detector_center_sample(self):
+        with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool, \
+             patch('ale.drivers.lro_drivers.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.detector_center_sample == 0.5
+            gdpool.assert_called_with('INS-12345_BORESIGHT_SAMPLE', 0, 1)
+            bods2c.assert_called_with('LRO_LROCWAC_UV')
+
+
+    def test_detector_center_line(self):
+        with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool, \
+             patch('ale.drivers.lro_drivers.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.detector_center_line == 0.5
+            gdpool.assert_called_with('INS-12345_BORESIGHT_LINE', 0, 1)
+            bods2c.assert_called_with('LRO_LROCWAC_UV')
+
+
+    def test_usgscsm_distortion_model(self):
+        with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool, \
+             patch('ale.drivers.lro_drivers.spice.bods2c', return_value=-12345) as bods2c:
+            distortion_model = self.driver.usgscsm_distortion_model
+            assert distortion_model['lrolrocwac']['coefficients'] == [1.0]
+            gdpool.assert_called_with('INS-12345_OD_K', 0, 3)
+            bods2c.assert_called_with('LRO_LROCWAC_UV')
+
+
+    def test_odtk(self):
+        with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool, \
+             patch('ale.drivers.lro_drivers.spice.bods2c', return_value=-12345) as bods2c:
+             assert self.driver.odtk == [1.0]
+             gdpool.assert_called_with('INS-12345_OD_K', 0, 3)
+             bods2c.assert_called_with('LRO_LROCWAC_UV')
+
+
+    def test_light_time_correction(self):
+        assert self.driver.light_time_correction == 'LT+S'
+
+
+    def test_exposure_duration(self):
+        np.testing.assert_almost_equal(self.driver.exposure_duration, 0.04)
+
+
+    def test_sensor_name(self):
+        assert self.driver.sensor_name == "LUNAR RECONNAISSANCE ORBITER"
+
+
+    def test_framelets_flipped(self):
+        assert self.driver.framelets_flipped == False
+
+
+    def test_sampling_factor(self):
+        assert self.driver.sampling_factor == 4
+
+
+    def test_num_frames(self):
+        assert self.driver.num_frames == 260
+
+
+    def test_framelet_height(self):
+        assert self.driver.framelet_height == 16
+
+# ========= Test WAC isislabel and isis spice driver =========
+class test_wac_isis_isis(unittest.TestCase):
+
+    def setUp(self):
+        label = get_image_label('wac0000a1c4.uv.even', 'isis3')
+        self.driver = LroLrocWacIsisLabelIsisSpiceDriver(label)
+
+    def test_short_mission_name(self):
+        assert self.driver.short_mission_name == 'lro'
+
+    def test_intrument_id(self):
+        assert self.driver.instrument_id == 'LRO_LROCWAC_UV'
+
+    def test_exposure_duration(self):
+        np.testing.assert_almost_equal(self.driver.exposure_duration, 0.04)
+
+    def test_usgscsm_distortion_model(self):
+        assert self.driver.usgscsm_distortion_model == {'lrolrocnac': {'coefficients': [[-0.024, -0.0007]]}}
