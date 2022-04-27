@@ -106,7 +106,7 @@ class PushFrame():
           ephemeris times split based on image lines
         """
 
-        return np.arange(self.ephemeris_start_time + (.5 * self.exposure_duration), self.ephemeris_stop_time, self.interframe_delay/1000)
+        return np.arange(self.ephemeris_start_time + (.5 * self.exposure_duration), self.ephemeris_stop_time + self.interframe_delay, self.interframe_delay)
 
 
     @property
@@ -143,7 +143,7 @@ class PushFrame():
         : double
           Center ephemeris time for an image
         """
-        return self.ephemeris_start_time + (self.interframe_delay/1000) * (self.num_frames - 1) + self.exposure_duration
+        return self.ephemeris_start_time + (self.interframe_delay) * (self.num_frames - 1) + self.exposure_duration
 
 
 
