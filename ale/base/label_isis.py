@@ -295,7 +295,7 @@ class IsisLabel():
                 # if not milliseconds, the units are probably seconds
                 interframe_delay = interframe_delay.value
         else:
-            # if no units are available, assume the exposure duration is given in milliseconds
+            # if no units are available, assume the interframe delay is given in milliseconds
             interframe_delay = interframe_delay * 0.001
 
         return interframe_delay

@@ -311,7 +311,7 @@ class test_wac_isis_naif(unittest.TestCase):
         with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool, \
              patch('ale.drivers.lro_drivers.spice.bods2c', return_value=-12345) as bods2c:
             distortion_model = self.driver.usgscsm_distortion_model
-            assert distortion_model['lrolrocwac']['coefficients'] == [1.0]
+            assert distortion_model['radial']['coefficients'] == [1.0]
             gdpool.assert_called_with('INS-12345_OD_K', 0, 3)
             bods2c.assert_called_with('LRO_LROCWAC_UV')
 
@@ -368,4 +368,4 @@ class test_wac_isis_isis(unittest.TestCase):
         np.testing.assert_almost_equal(self.driver.exposure_duration, 0.04)
 
     def test_usgscsm_distortion_model(self):
-        assert self.driver.usgscsm_distortion_model == {'lrolrocnac': {'coefficients': [[-0.024, -0.0007]]}}
+        assert self.driver.usgscsm_distortion_model == {'radial': {'coefficients': [[-0.024, -0.0007]]}}

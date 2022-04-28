@@ -12,6 +12,7 @@ from ale.base.data_isis import IsisSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import LineScanner, Radar, PushFrame
+from ale.base.type_distortion import RadialDistortion
 
 class LroLrocNacPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driver):
     """
@@ -851,7 +852,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
 
 
 
-class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, Driver):
+class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, RadialDistortion, Driver):
     @property
     def instrument_id(self):
         """
@@ -892,23 +893,6 @@ class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, Driver
 
 
     @property
-    def usgscsm_distortion_model(self):
-        """
-        The distortion model name with its coefficients
-
-        LRO LROC NAC does not use the default distortion model so we need to overwrite the
-        method packing the distortion model into the ISD.
-
-        Returns
-        -------
-        : dict
-          Returns a dict with the model name : dict of the coefficients
-        """
-
-        return {"lrolrocnac":
-                {"coefficients": self.odtk}}
-
-    @property
     def odtk(self):
         """
         The coefficients for the distortion model
@@ -916,7 +900,7 @@ class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, Driver
         Returns
         -------
         : list
-          Radial distortion coefficients. There is only one coefficient for LROC NAC l/r
+          Radial distortion coefficients.
         """
         return [self.naif_keywords.get('INS{}_OD_K'.format(self.ikid), None)]
 
@@ -928,7 +912,7 @@ class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, Driver
         elif self.instrument_id == "LRO_LROCWAC_VIS":
             return 14
 
-class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Driver):
+class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, RadialDistortion, Driver):
     """
     Driver for Lunar Reconnaissance Orbiter WAC ISIS cube
     """
@@ -1019,24 +1003,6 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Driver
           Radial distortion coefficients.
         """
         return spice.gdpool('INS{}_OD_K'.format(self.ikid), 0, 3).tolist()
-
-
-    @property
-    def usgscsm_distortion_model(self):
-        """
-        The distortion model name with its coefficients
-
-        LRO LROC NAC does not use the default distortion model so we need to overwrite the
-        method packing the distortion model into the ISD.
-
-        Returns
-        -------
-        : dict
-          Returns a dict with the model name : dict of the coefficients
-        """
-
-        return {"lrolrocwac":
-                {"coefficients": self.odtk}}
 
 
     @property
