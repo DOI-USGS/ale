@@ -72,6 +72,81 @@ class LineScanner():
         """
         return self.ephemeris_start_time + (self.image_lines * self.exposure_duration)
 
+
+class PushFrame():
+
+    @property
+    def name_model(self):
+        """
+        Returns Key used to define the sensor type. Primarily
+        used for generating camera models.
+
+        Returns
+        -------
+        : str
+          USGS Frame model
+        """
+        return "USGS_ASTRO_PUSH_FRAME_SENSOR_MODEL"
+
+
+    @property
+    def ephemeris_time(self):
+        """
+        Returns an array of times between the start/stop ephemeris times
+        based on the number of lines in the image.
+        Expects ephemeris start/stop times to be defined. These should be
+        floating point numbers containing the start and stop times of the
+        images.
+        Expects image_lines to be defined. This should be an integer containing
+        the number of lines in the image.
+
+        Returns
+        -------
+        : ndarray
+          ephemeris times split based on image lines
+        """
+
+        return np.arange(self.ephemeris_start_time + (.5 * self.exposure_duration), self.ephemeris_stop_time + self.interframe_delay, self.interframe_delay)
+
+
+    @property
+    def framelet_height(self):
+        return 1
+
+
+    @property
+    def framelet_order_reversed(self):
+        return False
+
+
+    @property
+    def framelets_flipped(self):
+        return False
+
+
+    @property
+    def num_frames(self):
+        return int(self.image_lines // self.framelet_height)
+
+
+    @property
+    def ephemeris_stop_time(self):
+        """
+        Returns the sum of the starting ephemeris time and the number of lines
+        times the exposure duration. Expects ephemeris start time, exposure duration
+        and image lines to be defined. These should be double precision numbers
+        containing the ephemeris start, exposure duration and number of lines of
+        the image.
+
+        Returns
+        -------
+        : double
+          Center ephemeris time for an image
+        """
+        return self.ephemeris_start_time + (self.interframe_delay) * (self.num_frames - 1) + self.exposure_duration
+
+
+
 class Framer():
     """
     Mix-in for framing sensors.

@@ -5,7 +5,7 @@ from scipy.interpolate import interp1d, BPoly
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
 from ale.transformation import FrameChain
-from ale.base.type_sensor import LineScanner, Framer, Radar
+from ale.base.type_sensor import LineScanner, Framer, Radar, PushFrame
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
 def to_isd(driver):
@@ -54,6 +54,17 @@ def to_isd(driver):
     if isinstance(driver, Framer):
         meta_data['name_model'] = 'USGS_ASTRO_FRAME_SENSOR_MODEL'
         meta_data['center_ephemeris_time'] = driver.center_ephemeris_time
+
+    if isinstance(driver, PushFrame):
+        meta_data['name_model'] = 'USGS_ASTRO_PUSH_FRAME_SENSOR_MODEL'
+        meta_data['starting_ephemeris_time'] = driver.ephemeris_start_time
+        meta_data['ending_ephemeris_time'] = driver.ephemeris_stop_time
+        meta_data['center_ephemeris_time'] = driver.center_ephemeris_time
+        meta_data['exposure_duration'] = driver.exposure_duration
+        meta_data['interframe_delay'] = driver.interframe_delay
+        meta_data['framelet_order_reversed'] = driver.framelet_order_reversed
+        meta_data['framelets_flipped'] = driver.framelets_flipped
+        meta_data['framelet_height'] = driver.framelet_height
 
     # SAR sensor model specifics
     if isinstance(driver, Radar):
@@ -104,7 +115,7 @@ def to_isd(driver):
     body_rotation["reference_frame"] = destination_frame
     meta_data['body_rotation'] = body_rotation
 
-    if isinstance(driver, LineScanner) or isinstance(driver, Framer):
+    if isinstance(driver, LineScanner) or isinstance(driver, Framer) or isinstance(driver, PushFrame):
         # sensor orientation
         sensor_frame = driver.sensor_frame_id
 

@@ -191,13 +191,16 @@ def convert_kernels(kernels):
             # Get the full path to the kernel then truncate it to the relative path
             path = os.path.join(data_root, kernel)
             path = os.path.relpath(path)
-            bin_output = subprocess.run(['tobin', path],
-                                        capture_output=True, check=True)
-            matches = re.search(r'To: (.*\.b\w*)', str(bin_output.stdout))
-            if not matches:
-                warnings.warn('Failed to convert transfer kernel, ' + kernel + ', skipping...')
-            else:
-                kernel = matches.group(1)
-                binary_kernels.append(kernel)
+            try:
+                bin_output = subprocess.run(['tobin', path],
+                                            capture_output=True, check=True)
+                matches = re.search(r'To: (.*\.b\w*)', str(bin_output.stdout))
+                if not matches:
+                    warnings.warn('Failed to convert transfer kernel, ' + kernel + ', skipping...')
+                else:
+                    kernel = matches.group(1)
+                    binary_kernels.append(kernel)
+            except:
+                warnings.warn(f"Unable to convert {path} to binary kernel")
         updated_kernels.append(kernel)
     return updated_kernels, binary_kernels
