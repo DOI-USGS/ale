@@ -8,8 +8,10 @@ import json
 
 import ale
 from ale import util
-from ale.drivers.lro_drivers import LroLrocPds3LabelNaifSpiceDriver
-from ale.drivers.lro_drivers import LroLrocIsisLabelNaifSpiceDriver
+from ale.drivers.lro_drivers import LroLrocNacPds3LabelNaifSpiceDriver
+from ale.drivers.lro_drivers import LroLrocNacIsisLabelNaifSpiceDriver
+from ale.drivers.lro_drivers import LroLrocWacIsisLabelNaifSpiceDriver
+from ale.drivers.lro_drivers import LroLrocWacIsisLabelIsisSpiceDriver
 from ale.drivers.lro_drivers import LroMiniRfIsisLabelNaifSpiceDriver
 from ale.transformation import TimeDependentRotation
 
@@ -17,7 +19,8 @@ from conftest import get_image, get_image_label, get_isd, get_image_kernels, con
 
 image_dict = {
     'M103595705LE': get_isd("lrolroc"),
-    '03821_16N196_S1': get_isd("lrominirf")
+    '03821_16N196_S1': get_isd("lrominirf"),
+    'wac0000a1c4.uv.even': get_isd('lrolrocwac')
 }
 
 # LROC test kernels
@@ -42,7 +45,7 @@ def test_load(test_kernels, label_type, image, kernel_type):
         label_file = get_image_label(image, label_type)
         isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
         compare_isd = image_dict[image]
-    else: 
+    else:
         label_file = get_image(image)
         isd_str = ale.loads(label_file)
         compare_isd = get_isd('lro_isis')
@@ -65,7 +68,7 @@ class test_pds_naif(unittest.TestCase):
 
     def setUp(self):
         label = get_image_label('M103595705LE', 'pds3')
-        self.driver = LroLrocPds3LabelNaifSpiceDriver(label)
+        self.driver = LroLrocNacPds3LabelNaifSpiceDriver(label)
 
     def test_short_mission_name(self):
         assert self.driver.short_mission_name=='lro'
@@ -91,7 +94,7 @@ class test_pds_naif(unittest.TestCase):
             gdpool.assert_called_with('INS-12345_OD_K', 0, 1)
 
     def test_usgscsm_distortion_model(self):
-        with patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.odtk', \
+        with patch('ale.drivers.lro_drivers.LroLrocNacPds3LabelNaifSpiceDriver.odtk', \
                    new_callable=PropertyMock) as odtk:
             odtk.return_value = [1.0]
             distortion_model = self.driver.usgscsm_distortion_model
@@ -99,9 +102,9 @@ class test_pds_naif(unittest.TestCase):
 
     def test_ephemeris_start_time(self):
         with patch('ale.drivers.lro_drivers.spice.scs2e', return_value=5) as scs2e, \
-             patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.exposure_duration', \
+             patch('ale.drivers.lro_drivers.LroLrocNacPds3LabelNaifSpiceDriver.exposure_duration', \
                    new_callable=PropertyMock) as exposure_duration, \
-             patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.spacecraft_id', \
+             patch('ale.drivers.lro_drivers.LroLrocNacPds3LabelNaifSpiceDriver.spacecraft_id', \
                    new_callable=PropertyMock) as spacecraft_id:
             exposure_duration.return_value = 0.1
             spacecraft_id.return_value = 1234
@@ -118,9 +121,9 @@ class test_pds_naif(unittest.TestCase):
     @patch('ale.transformation.FrameChain.from_spice', return_value=ale.transformation.FrameChain())
     @patch('ale.transformation.FrameChain.compute_rotation', return_value=TimeDependentRotation([[0, 0, 1, 0]], [0], 0, 0))
     def test_spacecraft_direction(self, compute_rotation, from_spice, frame_chain):
-        with patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.target_frame_id', \
+        with patch('ale.drivers.lro_drivers.LroLrocNacPds3LabelNaifSpiceDriver.target_frame_id', \
              new_callable=PropertyMock) as target_frame_id, \
-             patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.ephemeris_start_time', \
+             patch('ale.drivers.lro_drivers.LroLrocNacPds3LabelNaifSpiceDriver.ephemeris_start_time', \
              new_callable=PropertyMock) as ephemeris_start_time, \
              patch('ale.drivers.lro_drivers.spice.bods2c', return_value=-12345) as bods2c, \
              patch('ale.drivers.lro_drivers.spice.spkezr', return_value=[[1, 1, 1, 1, 1, 1], 0]) as spkezr, \
@@ -135,9 +138,9 @@ class test_pds_naif(unittest.TestCase):
 
     def test_focal2pixel_lines(self):
         with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=[0, 1, 0]) as gdpool, \
-             patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.ikid', \
+             patch('ale.drivers.lro_drivers.LroLrocNacPds3LabelNaifSpiceDriver.ikid', \
              new_callable=PropertyMock) as ikid, \
-             patch('ale.drivers.lro_drivers.LroLrocPds3LabelNaifSpiceDriver.spacecraft_direction', \
+             patch('ale.drivers.lro_drivers.LroLrocNacPds3LabelNaifSpiceDriver.spacecraft_direction', \
              new_callable=PropertyMock) as spacecraft_direction:
             spacecraft_direction.return_value = -1
             np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, -1, 0])
@@ -150,7 +153,7 @@ class test_isis_naif(unittest.TestCase):
 
     def setUp(self):
         label = get_image_label('M103595705LE', 'isis3')
-        self.driver = LroLrocIsisLabelNaifSpiceDriver(label)
+        self.driver = LroLrocNacIsisLabelNaifSpiceDriver(label)
 
     def test_short_mission_name(self):
         assert self.driver.short_mission_name == 'lro'
@@ -210,9 +213,9 @@ class test_isis_naif(unittest.TestCase):
     @patch('ale.transformation.FrameChain.from_spice', return_value=ale.transformation.FrameChain())
     @patch('ale.transformation.FrameChain.compute_rotation', return_value=TimeDependentRotation([[0, 0, 1, 0]], [0], 0, 0))
     def test_spacecraft_direction(self, compute_rotation, from_spice, frame_chain):
-        with patch('ale.drivers.lro_drivers.LroLrocIsisLabelNaifSpiceDriver.target_frame_id', \
+        with patch('ale.drivers.lro_drivers.LroLrocNacIsisLabelNaifSpiceDriver.target_frame_id', \
              new_callable=PropertyMock) as target_frame_id, \
-             patch('ale.drivers.lro_drivers.LroLrocIsisLabelNaifSpiceDriver.ephemeris_start_time', \
+             patch('ale.drivers.lro_drivers.LroLrocNacIsisLabelNaifSpiceDriver.ephemeris_start_time', \
              new_callable=PropertyMock) as ephemeris_start_time, \
              patch('ale.drivers.lro_drivers.spice.cidfrm', return_value=[-12345]) as cidfrm, \
              patch('ale.drivers.lro_drivers.spice.scs2e', return_value=0) as scs2e, \
@@ -228,9 +231,9 @@ class test_isis_naif(unittest.TestCase):
 
     def test_focal2pixel_lines(self):
         with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=[0, 1, 0]) as gdpool, \
-             patch('ale.drivers.lro_drivers.LroLrocIsisLabelNaifSpiceDriver.ikid', \
+             patch('ale.drivers.lro_drivers.LroLrocNacIsisLabelNaifSpiceDriver.ikid', \
              new_callable=PropertyMock) as ikid, \
-             patch('ale.drivers.lro_drivers.LroLrocIsisLabelNaifSpiceDriver.spacecraft_direction', \
+             patch('ale.drivers.lro_drivers.LroLrocNacIsisLabelNaifSpiceDriver.spacecraft_direction', \
              new_callable=PropertyMock) as spacecraft_direction:
             spacecraft_direction.return_value = -1
             np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, -1, 0])
@@ -264,3 +267,105 @@ class test_miniRf(unittest.TestCase):
     def test_ephmeris_stop_time(self):
         with patch('ale.drivers.lro_drivers.spice.str2et', return_value=12345) as str2et:
           assert self.driver.ephemeris_stop_time == 12345
+
+
+# ========= Test WAC isislabel and naifspice driver =========
+class test_wac_isis_naif(unittest.TestCase):
+
+    def setUp(self):
+        label = get_image_label('wac0000a1c4.uv.even', 'isis3')
+        self.driver = LroLrocWacIsisLabelNaifSpiceDriver(label)
+
+
+    def test_short_mission_name(self):
+        assert self.driver.short_mission_name == 'lro'
+
+
+    def test_intrument_id(self):
+        assert self.driver.instrument_id == 'LRO_LROCWAC_UV'
+
+
+    def test_ephemeris_start_time(self):
+        with patch('ale.drivers.lro_drivers.spice.scs2e', return_value=321) as scs2e:
+            np.testing.assert_almost_equal(self.driver.ephemeris_start_time, 321)
+            scs2e.assert_called_with(-85, '1/274692469:15073')
+
+
+    def test_detector_center_sample(self):
+        with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool, \
+             patch('ale.drivers.lro_drivers.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.detector_center_sample == 0.5
+            gdpool.assert_called_with('INS-12345_BORESIGHT_SAMPLE', 0, 1)
+            bods2c.assert_called_with('LRO_LROCWAC_UV')
+
+
+    def test_detector_center_line(self):
+        with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool, \
+             patch('ale.drivers.lro_drivers.spice.bods2c', return_value=-12345) as bods2c:
+            assert self.driver.detector_center_line == 0.5
+            gdpool.assert_called_with('INS-12345_BORESIGHT_LINE', 0, 1)
+            bods2c.assert_called_with('LRO_LROCWAC_UV')
+
+
+    def test_usgscsm_distortion_model(self):
+        with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool, \
+             patch('ale.drivers.lro_drivers.spice.bods2c', return_value=-12345) as bods2c:
+            distortion_model = self.driver.usgscsm_distortion_model
+            assert distortion_model['radial']['coefficients'] == [1.0]
+            gdpool.assert_called_with('INS-12345_OD_K', 0, 3)
+            bods2c.assert_called_with('LRO_LROCWAC_UV')
+
+
+    def test_odtk(self):
+        with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool, \
+             patch('ale.drivers.lro_drivers.spice.bods2c', return_value=-12345) as bods2c:
+             assert self.driver.odtk == [1.0]
+             gdpool.assert_called_with('INS-12345_OD_K', 0, 3)
+             bods2c.assert_called_with('LRO_LROCWAC_UV')
+
+
+    def test_light_time_correction(self):
+        assert self.driver.light_time_correction == 'LT+S'
+
+
+    def test_exposure_duration(self):
+        np.testing.assert_almost_equal(self.driver.exposure_duration, 0.04)
+
+
+    def test_sensor_name(self):
+        assert self.driver.sensor_name == "LUNAR RECONNAISSANCE ORBITER"
+
+
+    def test_framelets_flipped(self):
+        assert self.driver.framelets_flipped == False
+
+
+    def test_sampling_factor(self):
+        assert self.driver.sampling_factor == 4
+
+
+    def test_num_frames(self):
+        assert self.driver.num_frames == 260
+
+
+    def test_framelet_height(self):
+        assert self.driver.framelet_height == 16
+
+# ========= Test WAC isislabel and isis spice driver =========
+class test_wac_isis_isis(unittest.TestCase):
+
+    def setUp(self):
+        label = get_image_label('wac0000a1c4.uv.even', 'isis3')
+        self.driver = LroLrocWacIsisLabelIsisSpiceDriver(label)
+
+    def test_short_mission_name(self):
+        assert self.driver.short_mission_name == 'lro'
+
+    def test_intrument_id(self):
+        assert self.driver.instrument_id == 'LRO_LROCWAC_UV'
+
+    def test_exposure_duration(self):
+        np.testing.assert_almost_equal(self.driver.exposure_duration, 0.04)
+
+    def test_usgscsm_distortion_model(self):
+        assert self.driver.usgscsm_distortion_model == {'radial': {'coefficients': [[-0.024, -0.0007]]}}
