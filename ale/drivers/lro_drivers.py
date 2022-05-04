@@ -893,6 +893,44 @@ class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, Radial
 
 
     @property
+    def filter_number(self):
+        """
+        Return the filter number from the cub label
+
+        Returns
+        -------
+        : int
+          The filter number
+        """
+        try:
+            return self.label['IsisCube']['BandBin']['FilterNumber'][0]
+        except:
+            return self.label['IsisCube']['BandBin']['FilterNumber']
+
+
+    @property
+    def fikid(self):
+        """
+        Naif ID code of the filter dependent instrument codes.
+
+        Expects ikid to be defined. This should be the integer Naif ID code for
+        the instrument.
+
+        Returns
+        -------
+        : int
+          Naif ID code used in calculating focal length
+        """
+        if self.instrument_id == "LRO_LROCWAC_UV":
+            base = -85640
+        elif self.instrument_id == "LRO_LROCWAC_VIS":
+            base = -85630
+
+        fikid = base - self.filter_number
+        return fikid
+
+
+    @property
     def odtk(self):
         """
         The coefficients for the distortion model
@@ -902,7 +940,9 @@ class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, Radial
         : list
           Radial distortion coefficients.
         """
-        return [self.naif_keywords.get('INS{}_OD_K'.format(self.ikid), None)]
+        coeffs = self.naif_keywords.get('INS{}_OD_K'.format(self.fikid), None)
+        coeffs = [x * -1 for x in coeffs]
+        return coeffs
 
 
     @property
@@ -989,6 +1029,12 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
 
     @property
     def sensor_name(self):
+        """
+        Returns
+        -------
+        : String
+          The name of the spacecraft
+        """
         return self.label['IsisCube']['Instrument']['SpacecraftName']
 
 
@@ -1002,7 +1048,9 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : list
           Radial distortion coefficients.
         """
-        return spice.gdpool('INS{}_OD_K'.format(self.ikid), 0, 3).tolist()
+        coeffs = spice.gdpool('INS{}_OD_K'.format(self.fikid), 0, 3).tolist()
+        coeffs = [x * -1 for x in coeffs]
+        return coeffs
 
 
     @property
@@ -1028,7 +1076,13 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
 
     @property
     def framelets_flipped(self):
-        return self.label['IsisCube']['Instrument']['SpacecraftName'] == "Yes"
+        """
+        Returns
+        -------
+        : boolean
+          True if framelets are flipped, else false
+        """
+        return self.label['IsisCube']['Instrument']['DataFlipped'] == "Yes"
 
 
     @property
@@ -1041,12 +1095,111 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
 
     @property
     def num_frames(self):
+        """
+        Number of frames in the image
+
+        Returns
+        -------
+        : int
+          Number of frames in the image
+        """
         return self.image_lines // (self.framelet_height // self.sampling_factor)
 
 
     @property
     def framelet_height(self):
+        """
+        Return the number of lines in a framelet.
+
+        Returns
+        -------
+        : int
+          The number of lines in a framelet
+        """
         if self.instrument_id == "LRO_LROCWAC_UV":
             return 16
         elif self.instrument_id == "LRO_LROCWAC_VIS":
             return 14
+
+
+    @property
+    def filter_number(self):
+        """
+        Return the filter number from the cub label
+
+        Returns
+        -------
+        : int
+          The filter number
+        """
+        try:
+            return self.label['IsisCube']['BandBin']['FilterNumber'][0]
+        except:
+            return self.label['IsisCube']['BandBin']['FilterNumber']
+
+
+    @property
+    def fikid(self):
+        """
+        Naif ID code of the filter dependent instrument codes.
+
+        Expects ikid to be defined. This should be the integer Naif ID code for
+        the instrument.
+
+        Returns
+        -------
+        : int
+          Naif ID code used in calculating focal length
+        """
+        if self.instrument_id == "LRO_LROCWAC_UV":
+            base = -85640
+        elif self.instrument_id == "LRO_LROCWAC_VIS":
+            base = -85630
+
+        fikid = base - self.filter_number
+        return fikid
+
+
+    @property
+    def pixel2focal_x(self):
+        """
+        Expects fikid to be defined. This must be the integer Naif id code of the filter
+
+        Returns
+        -------
+        : list<double>
+        detector to focal plane x
+        """
+        return list(spice.gdpool('INS{}_TRANSX'.format(self.fikid), 0, 3))
+
+
+    @property
+    def pixel2focal_y(self):
+        """
+        Expects fikid to be defined. This must be the integer Naif id code of the filter
+
+        Returns
+        -------
+        : list<double>
+        detector to focal plane y
+        """
+        return list(spice.gdpool('INS{}_TRANSY'.format(self.fikid), 0, 3))
+
+
+    @property
+    def detector_start_line(self):
+        """
+        Filter-specific starting line
+
+        Returns
+        -------
+        : int
+          Zero based Detector line corresponding to the first image line
+        """
+        offset = list(spice.gdpool('INS{}_FILTER_OFFSET'.format(self.fikid), 0, 3))
+        try:
+            # If multiple items are present, use the first one
+            offset = offset[0]
+        except (IndexError, TypeError):
+            pass
+        return super().detector_start_line + offset
