@@ -303,7 +303,7 @@ class test_wac_isis_naif(unittest.TestCase):
 
     def test_odtk(self):
         with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool:
-             assert self.driver.odtk == [1.0]
+             assert self.driver.odtk == [-1.0]
              gdpool.assert_called_with('INS-85641_OD_K', 0, 3)
 
     def test_light_time_correction(self):
@@ -365,7 +365,7 @@ class test_wac_isis_isis(unittest.TestCase):
         np.testing.assert_almost_equal(self.driver.exposure_duration, 0.04)
 
     def test_usgscsm_distortion_model(self):
-        assert self.driver.usgscsm_distortion_model == {'radial': {'coefficients': [[0.0258246, 4.66139e-05, 0.000144651]]}}
+        assert self.driver.usgscsm_distortion_model == {'radial': {'coefficients': [-0.0258246, -4.66139e-05, -0.000144651]}}
 
     def test_filter_number(self):
         assert self.driver.filter_number == 1
@@ -374,4 +374,4 @@ class test_wac_isis_isis(unittest.TestCase):
         assert self.driver.fikid == -85641
 
     def test_odtk(self):
-        assert self.driver.odtk == [[0.0258246, 4.66139e-05, 0.000144651]]
+        assert self.driver.odtk == [-0.0258246, -4.66139e-05, -0.000144651]

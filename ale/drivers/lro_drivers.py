@@ -940,7 +940,9 @@ class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, Radial
         : list
           Radial distortion coefficients.
         """
-        return [self.naif_keywords.get('INS{}_OD_K'.format(self.fikid), None)]
+        coeffs = self.naif_keywords.get('INS{}_OD_K'.format(self.fikid), None)
+        coeffs = [x * -1 for x in coeffs]
+        return coeffs
 
 
     @property
@@ -1046,7 +1048,9 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : list
           Radial distortion coefficients.
         """
-        return spice.gdpool('INS{}_OD_K'.format(self.fikid), 0, 3).tolist()
+        coeffs = spice.gdpool('INS{}_OD_K'.format(self.fikid), 0, 3).tolist()
+        coeffs = [x * -1 for x in coeffs]
+        return coeffs
 
 
     @property
@@ -1078,7 +1082,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : boolean
           True if framelets are flipped, else false
         """
-        return self.label['IsisCube']['Instrument']['SpacecraftName'] == "Yes"
+        return self.label['IsisCube']['Instrument']['DataFlipped'] == "Yes"
 
 
     @property
