@@ -9,6 +9,10 @@ import pvl
 
 import collections
 from collections import OrderedDict
+try:
+    from collections.abc import Mapping
+except ImportError:
+    from collections import Mapping
 from itertools import chain
 from datetime import datetime
 import pytz
@@ -128,7 +132,7 @@ def find_latest_metakernel(path, year):
 def dict_merge(dct, merge_dct):
     for k, v in merge_dct.items():
         if (k in dct and isinstance(dct[k], dict)
-                and isinstance(merge_dct[k], collections.Mapping)):
+                and isinstance(merge_dct[k], Mapping)):
             dict_merge(dct[k], merge_dct[k])
         else:
             dct[k] = merge_dct[k]
@@ -258,7 +262,7 @@ def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
         kernels = [kernel for kernel in chain.from_iterable(mk_paths.values()) if isinstance(kernel, str)]
         if expand:
             isisprefs = get_isis_preferences()
-            
+
             if not "DataDirectory" in isisprefs:
               warnings.warn("No IsisPreferences file found, is your ISISROOT env var set?")
 
