@@ -952,6 +952,76 @@ class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, Radial
         elif self.instrument_id == "LRO_LROCWAC_VIS":
             return 14
 
+
+    @property
+    def pixel2focal_x(self):
+        """
+        Expects fikid to be defined. This must be the integer Naif id code of the filter
+
+        Returns
+        -------
+        : list<double>
+        detector to focal plane x
+        """
+        return self.naif_keywords.get('INS{}_TRANSX'.format(self.fikid), None)
+
+
+    @property
+    def pixel2focal_y(self):
+        """
+        Expects fikid to be defined. This must be the integer Naif id code of the filter
+
+        Returns
+        -------
+        : list<double>
+        detector to focal plane y
+        """
+        return self.naif_keywords.get('INS{}_TRANSY'.format(self.fikid), None)
+
+    @property
+    def focal_length(self):
+        """
+        The focal length of the instrument
+        Expects naif_keywords to be defined. This should be a dict containing
+        Naif keywords from the label.
+        Expects fikid to be defined. This should be the integer Naif ID code
+        for the filter.
+
+        Returns
+        -------
+        float :
+            The focal length in millimeters
+        """
+        return self.naif_keywords.get('INS{}_FOCAL_LENGTH'.format(self.fikid), None)
+
+    @property
+    def detector_center_sample(self):
+        """
+        The center of the CCD in detector pixels
+        Expects fikid to be defined. This should be the integer Naif ID code
+        for the filter.
+
+        Returns
+        -------
+        list :
+            The center of the CCD formatted as line, sample
+        """
+        return self.naif_keywords.get('INS{}_BORESIGHT_SAMPLE'.format(self.fikid), None)
+
+    @property
+    def detector_center_line(self):
+        """
+        The center of the CCD in detector pixels
+        Expects fikid to be defined. This should be the integer Naif ID code
+        for the filter.
+
+        Returns
+        -------
+        list :
+            The center of the CCD formatted as line, sample
+        """
+        return self.naif_keywords.get('INS{}_BORESIGHT_LINE'.format(self.fikid), None)
+
 class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, RadialDistortion, Driver):
     """
     Driver for Lunar Reconnaissance Orbiter WAC ISIS cube
@@ -997,34 +1067,6 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
             sclock = self.label['IsisCube']['Instrument']['SpacecraftClockStartCount']
             self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
         return self._ephemeris_start_time
-
-
-    @property
-    def detector_center_line(self):
-        """
-        The center of the CCD in detector pixels
-        ISIS uses 0.5 based CCD lines, so we need to convert to 0 based.
-
-        Returns
-        -------
-        float :
-            The center line of the CCD
-        """
-        return super().detector_center_line - 0.5
-
-
-    @property
-    def detector_center_sample(self):
-        """
-        The center of the CCD in detector pixels
-        ISIS uses 0.5 based CCD samples, so we need to convert to 0 based.
-
-        Returns
-        -------
-        float :
-            The center sample of the CCD
-        """
-        return super().detector_center_sample - 0.5
 
 
     @property
@@ -1203,3 +1245,43 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         except (IndexError, TypeError):
             pass
         return super().detector_start_line + offset
+
+    @property
+    def focal_length(self):
+        """
+        Returns the focal length of the sensor
+        Expects fikid to be defined. This must be the integer Naif id code of
+        the filter.
+
+        Returns
+        -------
+        : float
+          focal length
+        """
+        return float(spice.gdpool('INS{}_FOCAL_LENGTH'.format(self.fikid), 0, 1)[0])
+
+    @property
+    def detector_center_sample(self):
+        """
+        Returns the center detector sample. Expects ikid to be defined. This should
+        be an integer containing the Naif Id code of the instrument.
+
+        Returns
+        -------
+        : float
+          Detector sample of the principal point
+        """
+        return float(spice.gdpool('INS{}_BORESIGHT_SAMPLE'.format(self.fikid), 0, 1)[0]) - 0.5
+
+    @property
+    def detector_center_line(self):
+        """
+        Returns the center detector line. Expects ikid to be defined. This should
+        be an integer containing the Naif Id code of the instrument.
+
+        Returns
+        -------
+        : float
+          Detector line of the principal point
+        """
+        return float(spice.gdpool('INS{}_BORESIGHT_LINE'.format(self.fikid), 0, 1)[0]) - 0.5

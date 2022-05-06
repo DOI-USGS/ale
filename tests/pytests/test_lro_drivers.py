@@ -288,18 +288,14 @@ class test_wac_isis_naif(unittest.TestCase):
             scs2e.assert_called_with(-85, '1/274692469:15073')
 
     def test_detector_center_sample(self):
-        with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool, \
-             patch('ale.drivers.lro_drivers.spice.bods2c', return_value=-12345) as bods2c:
+        with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool:
             assert self.driver.detector_center_sample == 0.5
-            gdpool.assert_called_with('INS-12345_BORESIGHT_SAMPLE', 0, 1)
-            bods2c.assert_called_with('LRO_LROCWAC_UV')
+            gdpool.assert_called_with('INS-85641_BORESIGHT_SAMPLE', 0, 1)
 
     def test_detector_center_line(self):
-        with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool, \
-             patch('ale.drivers.lro_drivers.spice.bods2c', return_value=-12345) as bods2c:
+        with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool:
             assert self.driver.detector_center_line == 0.5
-            gdpool.assert_called_with('INS-12345_BORESIGHT_LINE', 0, 1)
-            bods2c.assert_called_with('LRO_LROCWAC_UV')
+            gdpool.assert_called_with('INS-85641_BORESIGHT_LINE', 0, 1)
 
     def test_odtk(self):
         with patch('ale.drivers.lro_drivers.spice.gdpool', return_value=np.array([1.0])) as gdpool:
