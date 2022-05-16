@@ -1221,7 +1221,8 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         if self.instrument_id == "LRO_LROCWAC_UV":
             base = -85640
         elif self.instrument_id == "LRO_LROCWAC_VIS":
-            base = -85630
+            # Offset by 2 because the first 2 filters are UV
+            base = -85628
 
         fikid = base - self.filter_number
         return fikid
@@ -1251,6 +1252,30 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         detector to focal plane y
         """
         return list(spice.gdpool('INS{}_TRANSY'.format(self.fikid), 0, 3))
+
+    @property
+    def focal2pixel_lines(self):
+        """
+        Expects fikid to be defined. This must be the integer Naif id code of the filter
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector lines
+        """
+        return list(spice.gdpool('INS{}_ITRANSL'.format(self.fikid), 0, 3))
+
+    @property
+    def focal2pixel_samples(self):
+        """
+        Expects fikid to be defined. This must be the integer Naif id code of the filter
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector samples
+        """
+        return list(spice.gdpool('INS{}_ITRANSS'.format(self.fikid), 0, 3))
 
 
     @property
