@@ -26,8 +26,9 @@ def test_load_pds(test_kernels):
 
     isd_str = ale.loads(label_file, props={'kernels': test_kernels})
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
+    # print(json.dumps(isd_obj, indent=2))
     assert compare_dicts(isd_obj, compare_dict) == []
+    assert False
 
 def test_load_isis():
     label_file = get_image_label("N1702360370_1", label_type="isis3")
@@ -41,6 +42,17 @@ def test_load_isis():
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
     assert compare_dicts(isd_obj, compare_dict) == []
+
+def test_load_isis_naif(test_kernels):
+    label_file = get_image_label("N1702360370_1", label_type="isis3")
+    compare_dict = get_isd("cassiniiss")
+
+    isd_str = ale.loads(label_file, props={"kernels": test_kernels})
+    isd_obj = json.loads(isd_str)
+    print(json.dumps(isd_obj, indent=2))
+    x = compare_dicts(isd_obj, compare_dict)
+    print(x)
+    assert x == []
 
 # ========= Test cassini pds3label and naifspice driver =========
 class test_cassini_pds3_naif(unittest.TestCase):
