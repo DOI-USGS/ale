@@ -1188,6 +1188,19 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         elif self.instrument_id == "LRO_LROCWAC_VIS":
             return 14
 
+    @property
+    def num_lines_overlap(self):
+        """
+        Returns
+        -------
+        : int
+          How many many lines of a framelet overlap with neighboring framelets.
+        """
+        try:
+            return self.label['IsisCube']['Instrument']['NumLinesOverlap']
+        except:
+            # May be missing, and then the default is 0
+            return 0
 
     @property
     def filter_number(self):
