@@ -128,6 +128,16 @@ class PushFrame():
     def num_frames(self):
         return int(self.image_lines // self.framelet_height)
 
+    @property
+    def num_lines_overlap(self):
+        """
+        Returns
+        -------
+        : int
+          For PushFrame sensors, returns how many many lines of a framelet
+          overlap with neighboring framelets.
+        """
+        return 0
 
     @property
     def ephemeris_stop_time(self):

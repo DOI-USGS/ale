@@ -65,6 +65,7 @@ def to_isd(driver):
         meta_data['framelet_order_reversed'] = driver.framelet_order_reversed
         meta_data['framelets_flipped'] = driver.framelets_flipped
         meta_data['framelet_height'] = driver.framelet_height
+        meta_data['num_lines_overlap'] = driver.num_lines_overlap
 
     # SAR sensor model specifics
     if isinstance(driver, Radar):
