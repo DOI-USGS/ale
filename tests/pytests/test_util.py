@@ -152,7 +152,7 @@ def test_find_kernels(cube_kernels, tmpdir):
 
     print(pvl.load(str(cube_file)))
     kernels = util.find_kernels(str(cube_file), str(tmpdir))
-    assert kernels == {'Pointing': {'kernels': ['/usgs/cpkgs/isis3/data/MRO/fake'], 'types': ['Reconstructed']}, 'instrument': {'kernels': ['/usgs/cpkgs/isis3/data/fake/not/a/real/file']}}
+    assert kernels == {'Pointing': {'kernels': [str(tmpdir / 'MRO/fake')], 'types': ['Reconstructed']}, 'instrument': {'kernels': [str(tmpdir / 'fake/not/a/real/file')]}}
 
 
 def test_kernel_from_cube_list(cube_kernels):

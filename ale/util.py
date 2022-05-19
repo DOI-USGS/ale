@@ -540,14 +540,14 @@ def read_pvl(path, use_jank=False):
     return pvlprefs
 
 
-def get_isis_mission_translations(isis3_data):
+def get_isis_mission_translations(isis_data):
     """
     Use ISIS translation files and return a lookup table.
 
     Parameters
     ----------
 
-    isis3_data : str
+    isis_data : str
                  path to $ISIS3DATA
 
     Returns
@@ -557,7 +557,7 @@ def get_isis_mission_translations(isis3_data):
       Dictionary mapping label mission strings to ISIS3 mission strings
 
     """
-    mission_translation_file = read_pvl(os.path.join(isis3_data, "base", "translations", "MissionName2DataDir.trn"))
+    mission_translation_file = read_pvl(os.path.join(isis_data, "base", "translations", "MissionName2DataDir.trn"))
     # For some reason this file takes the form [value, key] for mission name -> data dir
     lookup = [l[::-1] for l in mission_translation_file["MissionName"].getlist("Translation")]
     return dict(lookup)
@@ -647,7 +647,7 @@ def JBFPvlParser(lines):
     return pvl.PVLModule(items)
 
 
-def search_isis_db(dbobj, labelobj, isis3_data="/usgs/cpkgs/isis3/data/"):
+def search_isis_db(dbobj, labelobj, isis_data):
     """
     Given an PVL obj of a KernelDB file and an Isis Label for a cube, find the best kernel
     to attach to the cube.
@@ -663,8 +663,8 @@ def search_isis_db(dbobj, labelobj, isis3_data="/usgs/cpkgs/isis3/data/"):
     labelobj : PVLModule
                Cube label as loaded PVLModule
 
-    isis3_data : str
-                 path to $ISIS3DATA
+    isis_data : str
+                 path to $ISISDATA
 
     Returns
     -------
@@ -730,7 +730,7 @@ def search_isis_db(dbobj, labelobj, isis3_data="/usgs/cpkgs/isis3/data/"):
                 if isinstance(f, tuple):
                     f = os.path.join(*[e.strip() for e in f])
 
-                full_path = os.path.join(isis3_data, f).replace("$", "").replace("\"", "")
+                full_path = os.path.join(isis_data, f).replace("$", "").replace("\"", "")
                 if "{" in full_path:
                     start = full_path.find("{")
                     stop = full_path.find("}")
@@ -768,7 +768,7 @@ def search_isis_db(dbobj, labelobj, isis3_data="/usgs/cpkgs/isis3/data/"):
                 types = [selection.get("Type", None)]
 
     if partial_match:
-        # this can only be true if a kernel matching start time was founf
+        # this can only be true if a kernel matching start time was found
         # but not the end time
         raise Exception("Could not find kernels encapsulating the full image time")
 
@@ -778,7 +778,7 @@ def search_isis_db(dbobj, labelobj, isis3_data="/usgs/cpkgs/isis3/data/"):
     return kernels
 
 
-def find_kernels(cube, isis3_data="/usgs/cpkgs/isis3/data/", format_as=dict):
+def find_kernels(cube, isis_data, format_as=dict):
     """
     Find all kernels for a cube and return a json object with categorized kernels.
 
@@ -788,8 +788,8 @@ def find_kernels(cube, isis3_data="/usgs/cpkgs/isis3/data/", format_as=dict):
     cube : str
            Path to an ISIS cube
 
-    isis3_data : str
-                path to $ISIS3DATA
+    isis_data : str
+                path to $ISISDATA
 
     format_as : obj
                 What type to return the kernels as, ISIS3-like dict/PVL or flat list
@@ -813,13 +813,13 @@ def find_kernels(cube, isis3_data="/usgs/cpkgs/isis3/data/", format_as=dict):
         return uniqueList
 
     cube_label = pvl.load(cube)
-    mission_lookup_table = get_isis_mission_translations(isis3_data)
+    mission_lookup_table = get_isis_mission_translations(isis_data)
 
     mission_dir = mission_lookup_table[cube_label["IsisCube"]["Instrument"]["SpacecraftName"]]
-    mission_dir = path.join(isis3_data, mission_dir.lower())
+    mission_dir = path.join(isis_data, mission_dir.lower())
 
     kernel_dir = path.join(mission_dir, "kernels")
-    base_kernel_dir = path.join(isis3_data, "base", "kernels")
+    base_kernel_dir = path.join(isis_data, "base", "kernels")
 
     kernel_types = [ name for name in os.listdir(kernel_dir) if os.path.isdir(os.path.join(kernel_dir, name)) ]
     kernel_types.extend(name for name in os.listdir(base_kernel_dir) if os.path.isdir(os.path.join(base_kernel_dir, name)))
@@ -842,7 +842,7 @@ def find_kernels(cube, isis3_data="/usgs/cpkgs/isis3/data/", format_as=dict):
     for f in db_files:
         #TODO: Error checking
         typ = f[0][0]
-        kernel_search_results = search_isis_db(f[0][1], cube_label)
+        kernel_search_results = search_isis_db(f[0][1], cube_label, isis_data)
 
         if not kernel_search_results:
             kernels[typ] = None
