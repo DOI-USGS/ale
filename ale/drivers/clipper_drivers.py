@@ -6,7 +6,17 @@ from ale.base.type_distortion import NoDistortion
 
 # HARD CODED VALUES
 # These values are hard coded from the SIS. As the kernels mature, they will
-# eventually be available in the IK
+# eventually be available in the IK.
+
+EIS_FOCAL_LENGTHS = {
+    "EUROPAM_EIS_WAC" : 46.25,
+    "EUROPAM_EIS_NAC" : 1002.7
+}
+
+# According to diagrams in the SIS, increasing lines are +Y and increasing samples are -X
+# Focal to detector transforms assume 0.014 mm pixel pitch.
+EIS_ITRANSL = [0.0, 0.0, 1.0 / 0.014]
+EIS_ITRANSS = [0.0, -1.0 / 0.014, 0.0]
 
 EIS_NAC_FILTER_CODES = {
     "CLEAR" : -159121,
@@ -26,11 +36,6 @@ EIS_WAC_FILTER_CODES = {
     "RED" : -159148,
     "IR1" : -159149,
     "1MU" : -159150
-}
-
-EIS_FOCAL_LENGTHS = {
-    "EUROPAM_EIS_WAC" : 46.25,
-    "EUROPAM_EIS_NAC" : 1002.7
 }
 
 # The CMOS can read any line in each region, so for now just take the top line
@@ -272,3 +277,33 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
           focal length
         """
         return EIS_FOCAL_LENGTHS[self.instrument_id]
+
+    @property
+    def focal2pixel_lines(self):
+        """
+        The transformation from focal plan coordinates to detector lines.
+        To transform the coordinate (x,y) to detector lines do the following:
+
+        lines = focal2pixel_lines[0] + x * focal2pixel_lines[1] + y * focal2pixel_lines[2]
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector lines transform
+        """
+        return EIS_ITRANSL
+
+    @property
+    def focal2pixel_samples(self):
+        """
+        The transformation from focal plan coordinates to detector samples.
+        To transform the coordinate (x,y) to detector samples do the following:
+
+        samples = focal2pixel_samples[0] + x * focal2pixel_samples[1] + y * focal2pixel_samples[2]
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector samples transform
+        """
+        return EIS_ITRANSS
