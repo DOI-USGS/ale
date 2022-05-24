@@ -4,7 +4,7 @@ from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import LineScanner, Framer
 from ale.base.type_distortion import NoDistortion
 
-# HARD CODED VALUES
+############################## HARD CODED VALUES ###############################
 # These values are hard coded from the SIS. As the kernels mature, they will
 # eventually be available in the IK.
 
