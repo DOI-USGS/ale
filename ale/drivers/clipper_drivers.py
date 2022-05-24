@@ -4,6 +4,10 @@ from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import LineScanner, Framer
 from ale.base.type_distortion import NoDistortion
 
+# HARD CODED VALUES
+# These values are hard coded from the SIS. As the kernels mature, they will
+# eventually be available in the IK
+
 EIS_NAC_FILTER_CODES = {
     "CLEAR" : -159121,
     "NUV" : -159125,
@@ -22,6 +26,11 @@ EIS_WAC_FILTER_CODES = {
     "RED" : -159148,
     "IR1" : -159149,
     "1MU" : -159150
+}
+
+EIS_FOCAL_LENGTHS = {
+    "EUROPAM_EIS_WAC" : 46.25,
+    "EUROPAM_EIS_NAC" : 1002.7
 }
 
 # The CMOS can read any line in each region, so for now just take the top line
@@ -145,6 +154,19 @@ class ClipperEISWACFCIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDi
         """
         return EIS_FILTER_START_SAMPLES[self.filter_name]
 
+    @property
+    def focal_length(self):
+        """
+        The focal length in millimeters
+
+        Returns
+        -------
+        : float
+          focal length
+        """
+        return EIS_FOCAL_LENGTHS[self.instrument_id]
+
+
 class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
     @property
     def instrument_id(self):
@@ -238,3 +260,15 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
           Zero based Detector sample corresponding to the first image sample
         """
         return EIS_FILTER_START_SAMPLES[self.filter_name]
+
+    @property
+    def focal_length(self):
+        """
+        The focal length in millimeters
+
+        Returns
+        -------
+        : float
+          focal length
+        """
+        return EIS_FOCAL_LENGTHS[self.instrument_id]
