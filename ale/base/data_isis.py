@@ -62,7 +62,7 @@ def parse_table(table_label, data):
                     'Real'    : 'f'}
 
     # Parse the binary data
-    fields = table_label.getlist('Field')
+    fields = table_label.getall('Field')
     results = {field['Name']:[] for field in fields}
     offset = 0
     for record in range(table_label['Records']):
@@ -200,7 +200,7 @@ class IsisSpice():
           Instrument pointing table
         """
         if not hasattr(self, "_inst_pointing_table"):
-            for table in self.label.getlist('Table'):
+            for table in self.label.getall('Table'):
                 if table['Name'] == 'InstrumentPointing':
                     binary_data = read_table_data(table, self._file)
                     self._inst_pointing_table = parse_table(table, binary_data)
@@ -220,7 +220,7 @@ class IsisSpice():
           Body orientation table
         """
         if not hasattr(self, "_body_orientation_table"):
-            for table in self.label.getlist('Table'):
+            for table in self.label.getall('Table'):
                 if table['Name'] == 'BodyRotation':
                     binary_data = read_table_data(table, self._file)
                     self._body_orientation_table = parse_table(table, binary_data)
@@ -240,7 +240,7 @@ class IsisSpice():
           Instrument position table
         """
         if not hasattr(self, "_inst_position_table"):
-            for table in self.label.getlist('Table'):
+            for table in self.label.getall('Table'):
                 if table['Name'] == 'InstrumentPosition':
                     binary_data = read_table_data(table, self._file)
                     self._inst_position_table = parse_table(table, binary_data)
@@ -260,7 +260,7 @@ class IsisSpice():
           Sun position table
         """
         if not hasattr(self, "_sun_position_table"):
-            for table in self.label.getlist('Table'):
+            for table in self.label.getall('Table'):
                 if table['Name'] == 'SunPosition':
                     binary_data = read_table_data(table, self._file)
                     self._sun_position_table = parse_table(table, binary_data)
