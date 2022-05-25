@@ -129,6 +129,19 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
         return id_lookup[super().instrument_id]
 
     @property
+    def spacecraft_name(self):
+        """
+        Spacecraft name used in various Spice calls to acquire
+        ephemeris data.
+
+        Returns
+        -------
+        : str
+          Name of the spacecraft
+        """
+        return 'CASSINI'
+
+    @property
     def sensor_name(self):
         """
         Returns the name of the instrument
@@ -139,6 +152,32 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
           Name of the sensor
         """
         return name_lookup[super().instrument_id]
+
+    @property
+    def ephemeris_start_time(self):
+        """
+        Returns the start and stop ephemeris times for the image.
+
+        Returns
+        -------
+        : float
+          start time
+        """
+        return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))[0]
+
+    @property
+    def center_ephemeris_time(self):
+        """
+        Returns the starting ephemeris time as the ssi framers center is the
+        start.
+
+        Returns
+        -------
+        : double
+          Center ephemeris time for an image
+        """
+        center_time = self.ephemeris_start_time + (self.exposure_duration / 2.0)
+        return center_time
 
     @property
     def odtk(self):
@@ -162,61 +201,26 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
             return [0, float('-8e-6'), 0]
 
     @property
-    # FOV_CENTER_PIXEL doesn't specify which coordinate is sample or line, but they are the same
-    # number, so the order doesn't matter
-    def detector_center_line(self):
-        """
-        Dectector center based on ISIS's corrected values.
-
-        Returns
-        -------
-        : int
-          The detector line of the principle point
-        """
-        return 512
-
-    @property
-    # FOV_CENTER_PIXEL doesn't specify which coordinate is sample or line, but they are the same
-    # number, so the order doesn't matter
-    def detector_center_sample(self):
-        """
-        Dectector center based on ISIS's corrected values.
-
-        Returns
-        -------
-        : int
-          The detector sample of the principle point
-        """
-        return 512
-
-    @property
     def focal_length(self):
         """
-        The focal length of the instrument
-        Expects naif_keywords to be defined. This should be a dict containing
-        Naif keyworkds from the label.
-        Expects ikid to be defined. This should be the integer Naif ID code
-        for the instrument.
+        NAC uses multiple filter pairs, each filter combination has a different focal length.
+        NAIF's Cassini kernels do not contain focal lengths for NAC filters and
+        so we aquired updated NAC filter data from ISIS's IAK kernel.
 
-        Returns
-        -------
-        float :
-            The focal length in millimeters
         """
-        filters = self.label["IsisCube"]["BandBin"]['FilterName'].split("/")
-        return self.naif_keywords.get('INS{}_{}_{}_FOCAL_LENGTH'.format(self.ikid, filters[0], filters[1]), None)
+        # default focal defined by IAK kernel
+        try:
+            default_focal_len = super(CassiniIssPds3LabelNaifSpiceDriver, self).focal_length
+        except:
+            default_focal_len = float(spice.gdpool('INS{}_DEFAULT_FOCAL_LENGTH'.format(self.ikid), 0, 2)[0])
 
-    @property
-    def ephemeris_start_time(self):
-        """
-        Returns the start and stop ephemeris times for the image.
+        filters = tuple(self.label["IsisCube"]["BandBin"]['FilterName'].split("/"))
 
-        Returns
-        -------
-        : float
-          start time
-        """
-        return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
+        if self.instrument_id == "CASSINI_ISS_NAC":
+            return nac_filter_to_focal_length.get(filters, default_focal_len)
+
+        elif self.instrument_id == "CASSINI_ISS_WAC":
+            return wac_filter_to_focal_length.get(filters, default_focal_len)
 
     @property
     def _original_naif_sensor_frame_id(self):
@@ -268,7 +272,7 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
             try:
                 # Call frinfo to check if the ISIS iak has been loaded with the
                 # additional reference frame. Otherwise, Fail and add it manually
-                spice.frinfo(self.sensor_frame_id)
+                _ = spice.frinfo(self.sensor_frame_id)
                 self._frame_chain = super().frame_chain
             except spice.utils.exceptions.NotFoundError as e:
                 self._frame_chain = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
@@ -281,35 +285,6 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
                 self._frame_chain.add_edge(rotation=rotation)
 
         return self._frame_chain
-
-    @property
-    def spacecraft_name(self):
-        """
-        Spacecraft name used in various Spice calls to acquire
-        ephemeris data.
-
-        Returns
-        -------
-        : str
-          Name of the spacecraft
-        """
-        return 'CASSINI'
-
-    @property
-    def platform_name(self):
-        """
-        Returns the full name of the instrument host
-
-          Returns
-        -------
-        : str
-          Full name of the instrument host
-        """
-        return "CASSINI ORBITER"
-
-    @property
-    def sensor_name(self):
-        return "IMAGING SCIENCE SUBSYSTEM - NARROW ANGLE"
 
     @property
     def sensor_model_version(self):
