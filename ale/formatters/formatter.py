@@ -122,7 +122,6 @@ def to_isd(driver):
 
         instrument_pointing = {}
         source_frame, destination_frame, time_dependent_sensor_frame = frame_chain.last_time_dependent_frame_between(1, sensor_frame)
-        print(source_frame, destination_frame, time_dependent_target_frame)
 
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
