@@ -161,22 +161,22 @@ class FrameChain(nx.DiGraph):
                 try:
                     matrix, frame_code = spice.ckfrot(frame_type_id, ephemeris_time)
                 except:
-                    raise Exception(f"The ck rotation from frame {frame_codes[-1]} can not \
-                                      be found due to no pointing available at requested time \
-                                      or a problem with the frame")
+                    raise Exception(f"The ck rotation from frame {frame_codes[-1]} can not " +
+                                    f"be found due to no pointing available at requested time {ephemeris_time} " +
+                                     "or a problem with the frame")
             elif frame_type == 4:
                 try:
                     matrix, frame_code = spice.tkfram(frame_type_id)
                 except:
-                    raise Exception(f"The tk rotation from frame {frame_codes[-1]} can not \
-                                      be found")
+                    raise Exception(f"The tk rotation from frame {frame_codes[-1]} can not " +
+                                     "be found")
             elif frame_type == 5:
                 matrix, frame_code = spice.zzdynrot(frame_type_id, center, ephemeris_time)
 
             else:
-                raise Exception(f"The frame {frame_codes[-1]} has a type {frame_type_id} \
-                                  not supported by your version of Naif Spicelib. \
-                                  You need to update.")
+                raise Exception(f"The frame {frame_codes[-1]} has a type {frame_type_id} " +
+                                  "not supported by your version of Naif Spicelib. " +
+                                  "You need to update.")
 
             frame_codes.append(frame_code)
             frame_types.append(frame_type)
