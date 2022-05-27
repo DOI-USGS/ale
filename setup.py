@@ -25,5 +25,10 @@ setup(
     long_description="""\
     An Abstraction library for reading, writing and computing ephemeris data
     """,
-    package_data={'': ['config.yml']}
+    package_data={'': ['config.yml']},
+    entry_points={
+        "console_scripts": [
+            "isd_generate=ale.isd_generate:main"
+        ],
+    },
 )
