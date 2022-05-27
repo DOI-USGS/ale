@@ -209,18 +209,20 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
 
         """
         # default focal defined by IAK kernel
-        try:
-            default_focal_len = super(CassiniIssPds3LabelNaifSpiceDriver, self).focal_length
-        except:
-            default_focal_len = float(spice.gdpool('INS{}_DEFAULT_FOCAL_LENGTH'.format(self.ikid), 0, 2)[0])
+        if not hasattr(self, "_focal_length"):
+            try:
+                default_focal_len = super(CassiniIssPds3LabelNaifSpiceDriver, self).focal_length
+            except:
+                default_focal_len = float(spice.gdpool('INS{}_DEFAULT_FOCAL_LENGTH'.format(self.ikid), 0, 2)[0])
 
-        filters = tuple(self.label["IsisCube"]["BandBin"]['FilterName'].split("/"))
+            filters = tuple(self.label["IsisCube"]["BandBin"]['FilterName'].split("/"))
 
-        if self.instrument_id == "CASSINI_ISS_NAC":
-            return nac_filter_to_focal_length.get(filters, default_focal_len)
+            if self.instrument_id == "CASSINI_ISS_NAC":
+                self._focal_length = nac_filter_to_focal_length.get(filters, default_focal_len)
 
-        elif self.instrument_id == "CASSINI_ISS_WAC":
-            return wac_filter_to_focal_length.get(filters, default_focal_len)
+            elif self.instrument_id == "CASSINI_ISS_WAC":
+                self._focal_length = wac_filter_to_focal_length.get(filters, default_focal_len)
+        return self._focal_length
 
     @property
     def _original_naif_sensor_frame_id(self):
