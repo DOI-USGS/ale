@@ -695,13 +695,17 @@ def search_isis_db(dbobj, labelobj, isis_data):
 
     for selection in dbobj.getall("Selection"):
         files = selection.getall("File")
-
-        # selection criteria
-        matches = selection.getall("Match")
-        times = selection.getall("Time")
-
         if not files:
             raise Exception(f"No File found in {selection}")
+
+        # selection criteria
+        matches = []
+        if "Match" in selection:
+            matches = selection.getall("Match")
+
+        times = []
+        if "Time" in selection:
+            times = selection.getall("Time")
 
         files = [path.join(*file) if isinstance(file, list) else file  for file in files]
 
