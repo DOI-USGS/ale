@@ -152,11 +152,7 @@ def test_find_kernels(cube_kernels, tmpdir):
 
     print(pvl.load(str(cube_file)))
     kernels = util.find_kernels(str(cube_file), str(tmpdir))
-<<<<<<< HEAD
     assert kernels == {'Pointing': {'kernels': [str(tmpdir / 'MRO/fake')], 'types': ['Reconstructed']}, 'instrument': {'kernels': [str(tmpdir / 'fake/not/a/real/file')]}}
-=======
-    assert kernels == {'Pointing': {'kernels': ['/usgs/cpkgs/isis3/data/MRO/fake'], 'types': ['Reconstructed']}, 'instrument': {'kernels': ['/usgs/cpkgs/isis3/data/fake/not/a/real/file']}}
->>>>>>> f552325 (Added cassini vims vis/ir drivers)
 
 
 def test_kernel_from_cube_list(cube_kernels):
@@ -281,17 +277,10 @@ def test_get_prefrences_malformed_files(monkeypatch, tmpdir, filename):
         util.get_isis_preferences(tmpdir.join(filename))
 
 
-<<<<<<< HEAD
 @pytest.mark.parametrize('string,expected,case_sensitive', [('$bar/baz', '/bar/baz', False), ('$bar/$foo/baz', '/bar//foo/baz', True), ('$BAR/$FOO/baz', '/bar//foo/baz', False)])
 def test_expand_vars(string, expected, case_sensitive):
     user_vars = {'foo': '/foo', 'bar': '/bar'}
     result = util.expandvars(string, env_dict=user_vars, case_sensitive=case_sensitive)
-=======
-@pytest.mark.parametrize('string,expected,case_sensative', [('$bar/baz', '/bar/baz', False), ('$bar/$foo/baz', '/bar//foo/baz', True), ('$BAR/$FOO/baz', '/bar//foo/baz', False)])
-def test_expand_vars(string, expected, case_sensative):
-    user_vars = {'foo': '/foo', 'bar': '/bar'}
-    result = util.expandvars(string, env_dict=user_vars, case_sensative=case_sensative)
->>>>>>> f552325 (Added cassini vims vis/ir drivers)
     assert result == expected
 
 
