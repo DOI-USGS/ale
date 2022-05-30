@@ -9,13 +9,10 @@ import pvl
 
 import collections
 from collections import OrderedDict
-<<<<<<< HEAD
 try:
     from collections.abc import Mapping
 except ImportError:
     from collections import Mapping
-=======
->>>>>>> 362cbe4 (Initial crism driver.)
 from itertools import chain
 from datetime import datetime
 import pytz
@@ -40,11 +37,7 @@ def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=
     Parameters
     ----------
     spice_dir : str
-<<<<<<< HEAD
                 Path containing Spice directories downloaded from NAIF's website
-=======
-                Path containing Spice directories downlaoded from NAIF's website
->>>>>>> 362cbe4 (Initial crism driver.)
 
     missions : set, str
                Mission or set of missions to search for
@@ -140,11 +133,7 @@ def find_latest_metakernel(path, year):
 def dict_merge(dct, merge_dct):
     for k, v in merge_dct.items():
         if (k in dct and isinstance(dct[k], dict)
-<<<<<<< HEAD
                 and isinstance(merge_dct[k], Mapping)):
-=======
-                and isinstance(merge_dct[k], collections.Mapping)):
->>>>>>> 362cbe4 (Initial crism driver.)
             dict_merge(dct[k], merge_dct[k])
         else:
             dct[k] = merge_dct[k]
@@ -183,21 +172,12 @@ def dict_to_lower(d):
     return {k.lower():v if not isinstance(v, dict) else dict_to_lower(v) for k,v in d.items()}
 
 
-<<<<<<< HEAD
 def expandvars(path, env_dict=os.environ, default=None, case_sensitive=True):
     user_dict = env_dict if case_sensitive else dict_to_lower(env_dict)
 
     def replace_var(m):
         group0 = m.group(0) if case_sensitive else m.group(0).lower()
         group1 = m.group(1) if case_sensitive else m.group(1).lower()
-=======
-def expandvars(path, env_dict=os.environ, default=None, case_sensative=True):
-    user_dict = env_dict if case_sensative else dict_to_lower(env_dict)
-
-    def replace_var(m):
-        group0 = m.group(0) if case_sensative else m.group(0).lower()
-        group1 = m.group(1) if case_sensative else m.group(1).lower()
->>>>>>> 362cbe4 (Initial crism driver.)
 
         return user_dict.get(m.group(2) or group1, group0 if default is None else default)
     reVar = r'\$(\w+|\{([^}]*)\})'
@@ -215,11 +195,7 @@ def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
     expand : bool, optional
         Whether or not to expand variables within kernel paths based on your IsisPreferences file.
     format_as : str, optional {'list', 'dict'}
-<<<<<<< HEAD
         How to return the kernels: either as a one-dimensional ordered list, or as a dictionary
-=======
-        How to return the kernels: either as a one-demensional ordered list, or as a dictionary
->>>>>>> 362cbe4 (Initial crism driver.)
         of kernel lists.
 
     Returns
@@ -296,11 +272,6 @@ def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
                 kernels.extend(kernel)
         if expand:
             isisprefs = get_isis_preferences()
-<<<<<<< HEAD
-
-=======
-            
->>>>>>> 362cbe4 (Initial crism driver.)
             if not "DataDirectory" in isisprefs:
               warnings.warn("No IsisPreferences file found, is your ISISROOT env var set?")
 
@@ -584,22 +555,14 @@ def read_pvl(path, use_jank=False):
     return pvlprefs
 
 
-<<<<<<< HEAD
 def get_isis_mission_translations(isis_data):
-=======
-def get_isis_mission_translations(isis3_data):
->>>>>>> 362cbe4 (Initial crism driver.)
     """
     Use ISIS translation files and return a lookup table.
 
     Parameters
     ----------
 
-<<<<<<< HEAD
     isis_data : str
-=======
-    isis3_data : str
->>>>>>> 362cbe4 (Initial crism driver.)
                  path to $ISIS3DATA
 
     Returns
@@ -609,11 +572,7 @@ def get_isis_mission_translations(isis3_data):
       Dictionary mapping label mission strings to ISIS3 mission strings
 
     """
-<<<<<<< HEAD
     mission_translation_file = read_pvl(os.path.join(isis_data, "base", "translations", "MissionName2DataDir.trn"))
-=======
-    mission_translation_file = read_pvl(os.path.join(isis3_data, "base", "translations", "MissionName2DataDir.trn"))
->>>>>>> 362cbe4 (Initial crism driver.)
     # For some reason this file takes the form [value, key] for mission name -> data dir
     lookup = [l[::-1] for l in mission_translation_file["MissionName"].getall("Translation")]
     return dict(lookup)
@@ -703,11 +662,7 @@ def JBFPvlParser(lines):
     return pvl.PVLModule(items)
 
 
-<<<<<<< HEAD
 def search_isis_db(dbobj, labelobj, isis_data):
-=======
-def search_isis_db(dbobj, labelobj, isis3_data="/usgs/cpkgs/isis3/data/"):
->>>>>>> 362cbe4 (Initial crism driver.)
     """
     Given an PVL obj of a KernelDB file and an Isis Label for a cube, find the best kernel
     to attach to the cube.
@@ -723,13 +678,8 @@ def search_isis_db(dbobj, labelobj, isis3_data="/usgs/cpkgs/isis3/data/"):
     labelobj : PVLModule
                Cube label as loaded PVLModule
 
-<<<<<<< HEAD
     isis_data : str
                  path to $ISISDATA
-=======
-    isis3_data : str
-                 path to $ISIS3DATA
->>>>>>> 362cbe4 (Initial crism driver.)
 
     Returns
     -------
@@ -799,11 +749,7 @@ def search_isis_db(dbobj, labelobj, isis3_data="/usgs/cpkgs/isis3/data/"):
                 if isinstance(f, tuple):
                     f = os.path.join(*[e.strip() for e in f])
 
-<<<<<<< HEAD
                 full_path = os.path.join(isis_data, f).replace("$", "").replace("\"", "")
-=======
-                full_path = os.path.join(isis3_data, f).replace("$", "").replace("\"", "")
->>>>>>> 362cbe4 (Initial crism driver.)
                 if "{" in full_path:
                     start = full_path.find("{")
                     stop = full_path.find("}")
@@ -841,11 +787,7 @@ def search_isis_db(dbobj, labelobj, isis3_data="/usgs/cpkgs/isis3/data/"):
                 types = [selection.get("Type", None)]
 
     if partial_match:
-<<<<<<< HEAD
         # this can only be true if a kernel matching start time was found
-=======
-        # this can only be true if a kernel matching start time was founf
->>>>>>> 362cbe4 (Initial crism driver.)
         # but not the end time
         raise Exception("Could not find kernels encapsulating the full image time")
 
@@ -855,11 +797,7 @@ def search_isis_db(dbobj, labelobj, isis3_data="/usgs/cpkgs/isis3/data/"):
     return kernels
 
 
-<<<<<<< HEAD
 def find_kernels(cube, isis_data, format_as=dict):
-=======
-def find_kernels(cube, isis3_data="/usgs/cpkgs/isis3/data/", format_as=dict):
->>>>>>> 362cbe4 (Initial crism driver.)
     """
     Find all kernels for a cube and return a json object with categorized kernels.
 
@@ -869,13 +807,8 @@ def find_kernels(cube, isis3_data="/usgs/cpkgs/isis3/data/", format_as=dict):
     cube : str
            Path to an ISIS cube
 
-<<<<<<< HEAD
     isis_data : str
                 path to $ISISDATA
-=======
-    isis3_data : str
-                path to $ISIS3DATA
->>>>>>> 362cbe4 (Initial crism driver.)
 
     format_as : obj
                 What type to return the kernels as, ISIS3-like dict/PVL or flat list
@@ -899,7 +832,6 @@ def find_kernels(cube, isis3_data="/usgs/cpkgs/isis3/data/", format_as=dict):
         return uniqueList
 
     cube_label = pvl.load(cube)
-<<<<<<< HEAD
     mission_lookup_table = get_isis_mission_translations(isis_data)
 
     mission_dir = mission_lookup_table[cube_label["IsisCube"]["Instrument"]["SpacecraftName"]]
@@ -907,15 +839,6 @@ def find_kernels(cube, isis3_data="/usgs/cpkgs/isis3/data/", format_as=dict):
 
     kernel_dir = path.join(mission_dir, "kernels")
     base_kernel_dir = path.join(isis_data, "base", "kernels")
-=======
-    mission_lookup_table = get_isis_mission_translations(isis3_data)
-
-    mission_dir = mission_lookup_table[cube_label["IsisCube"]["Instrument"]["SpacecraftName"]]
-    mission_dir = path.join(isis3_data, mission_dir.lower())
-
-    kernel_dir = path.join(mission_dir, "kernels")
-    base_kernel_dir = path.join(isis3_data, "base", "kernels")
->>>>>>> 362cbe4 (Initial crism driver.)
 
     kernel_types = [ name for name in os.listdir(kernel_dir) if os.path.isdir(os.path.join(kernel_dir, name)) ]
     kernel_types.extend(name for name in os.listdir(base_kernel_dir) if os.path.isdir(os.path.join(base_kernel_dir, name)))
@@ -938,11 +861,7 @@ def find_kernels(cube, isis3_data="/usgs/cpkgs/isis3/data/", format_as=dict):
     for f in db_files:
         #TODO: Error checking
         typ = f[0][0]
-<<<<<<< HEAD
         kernel_search_results = search_isis_db(f[0][1], cube_label, isis_data)
-=======
-        kernel_search_results = search_isis_db(f[0][1], cube_label)
->>>>>>> 362cbe4 (Initial crism driver.)
 
         if not kernel_search_results:
             kernels[typ] = None
