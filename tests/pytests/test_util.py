@@ -277,17 +277,10 @@ def test_get_prefrences_malformed_files(monkeypatch, tmpdir, filename):
         util.get_isis_preferences(tmpdir.join(filename))
 
 
-<<<<<<< HEAD
 @pytest.mark.parametrize('string,expected,case_sensitive', [('$bar/baz', '/bar/baz', False), ('$bar/$foo/baz', '/bar//foo/baz', True), ('$BAR/$FOO/baz', '/bar//foo/baz', False)])
 def test_expand_vars(string, expected, case_sensitive):
     user_vars = {'foo': '/foo', 'bar': '/bar'}
     result = util.expandvars(string, env_dict=user_vars, case_sensitive=case_sensitive)
-=======
-@pytest.mark.parametrize('string,expected,case_sensative', [('$bar/baz', '/bar/baz', False), ('$bar/$foo/baz', '/bar//foo/baz', True), ('$BAR/$FOO/baz', '/bar//foo/baz', False)])
-def test_expand_vars(string, expected, case_sensative):
-    user_vars = {'foo': '/foo', 'bar': '/bar'}
-    result = util.expandvars(string, env_dict=user_vars, case_sensative=case_sensative)
->>>>>>> 362cbe4 (Initial crism driver.)
     assert result == expected
 
 
