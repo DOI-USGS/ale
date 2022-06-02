@@ -1,4 +1,5 @@
 import spiceypy as spice
+from pyspiceql import pyspiceql
 import numpy as np
 import scipy.constants
 
@@ -19,7 +20,7 @@ class NaifSpice():
         to get the kernels furnished.
         """
         if self.kernels:
-            [spice.furnsh(k) for k in self.kernels]
+            [pyspiceql.KernelPool.getInstance().load(k) for k in self.kernels]
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -29,7 +30,7 @@ class NaifSpice():
         kernels can be unloaded.
         """
         if self.kernels:
-            [spice.unload(k) for k in self.kernels]
+            [pyspiceql.KernelPool.getInstance().unload(k) for k in self.kernels]
 
     @property
     def kernels(self):
@@ -93,10 +94,12 @@ class NaifSpice():
           See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/abcorr.html
           for the different options available.
         """
-        try:
-            return spice.gcpool('INS{}_LIGHTTIME_CORRECTION'.format(self.ikid), 0, 1)[0]
-        except:
-            return 'LT+S'
+        if not hasattr(self, "_light_time_correction"):
+            try:
+                self._light_time_correction = pyspiceql.getKernelStringValue('INS{}_LIGHTTIME_CORRECTION'.format(self.ikid))[0]
+            except:
+                self._light_time_correction = 'LT+S'
+        return self._light_time_correction
 
     @property
     def odtx(self):
@@ -109,7 +112,9 @@ class NaifSpice():
         : list
           Optical distortion x coefficients
         """
-        return spice.gdpool('INS{}_OD_T_X'.format(self.ikid),0, 10).tolist()
+        if not hasattr(self, "_odtx"):
+            self._odtx = pyspiceql.getKernelVectorValue('INS{}_OD_T_X'.format(self.ikid)).toList()
+        return self._odtx
 
     @property
     def odty(self):
@@ -122,7 +127,9 @@ class NaifSpice():
         : list
           Optical distortion y coefficients
         """
-        return spice.gdpool('INS{}_OD_T_Y'.format(self.ikid), 0, 10).tolist()
+        if not hasattr(self, "_odty"):
+            self._odty = pyspiceql.getKernelVectorValue('INS{}_OD_T_Y'.format(self.ikid)).toList()
+        return self._odty
 
     @property
     def odtk(self):
@@ -135,7 +142,9 @@ class NaifSpice():
         : list
           Radial distortion coefficients
         """
-        return spice.gdpool('INS{}_OD_K'.format(self.ikid),0, 3).tolist()
+        if not hasattr(self, "_odtk"):
+            self._odtk = pyspiceql.getKernelVectorValue('INS{}_OD_K'.format(self.ikid)).toList()
+        return self._odtk
 
     @property
     def ikid(self):
@@ -149,7 +158,9 @@ class NaifSpice():
         : int
           Naif ID used to for identifying the instrument in Spice kernels
         """
-        return spice.bods2c(self.instrument_id)
+        if not hasattr(self, "_ikid"):
+            self._ikid = pyspiceql.Kernel_translateFrame(self.instrument_id)
+        return self._ikid
 
     @property
     def spacecraft_id(self):
@@ -163,7 +174,9 @@ class NaifSpice():
         : int
           Naif ID code for the spacecraft
         """
-        return spice.bods2c(self.spacecraft_name)
+        if not hasattr(self, "_spacecraft_id"):
+            self._spacecraft_id = pyspiceql.Kernel_translateFrame(self.spacecraft_name)
+        return self._spacecraft_id
 
     @property
     def target_id(self):
@@ -177,7 +190,9 @@ class NaifSpice():
         : int
           Naif ID code for the target body
         """
-        return spice.bods2c(self.target_name)
+        if not hasattr(self, "_target_id"):
+            self._target_id = pyspiceql.Kernel_translateFrame(self.target_name)
+        return self._target_id
 
     @property
     def target_frame_id(self):
@@ -191,8 +206,10 @@ class NaifSpice():
         : int
           Naif ID code for the target frame
         """
-        frame_info = spice.cidfrm(self.target_id)
-        return frame_info[0]
+        if not hasattr(self, "_target_frame_id"):
+            frame_info = spice.cidfrm(self.target_id)
+            self._target_frame_id = frame_info[0]
+        return self._target_frame_id
 
     @property
     def sensor_frame_id(self):
@@ -205,7 +222,9 @@ class NaifSpice():
         : int
           Naif ID code for the sensor frame
         """
-        return self.ikid
+        if not hasattr(self, "_sensor_frame_id"):
+            self._sensor_frame_id = self.ikid
+        return self._sensor_frame_id
 
     @property
     def focal2pixel_lines(self):
@@ -217,7 +236,9 @@ class NaifSpice():
         : list<double>
           focal plane to detector lines
         """
-        return list(spice.gdpool('INS{}_ITRANSL'.format(self.ikid), 0, 3))
+        if not hasattr(self, "_focal2pixel_lines"):
+            self._focal2pixel_lines = list(pyspiceql.getKernelVectorValue('INS{}_ITRANSL'.format(self.ikid)))
+        return self._focal2pixel_lines
 
     @property
     def focal2pixel_samples(self):
@@ -229,7 +250,9 @@ class NaifSpice():
         : list<double>
           focal plane to detector samples
         """
-        return list(spice.gdpool('INS{}_ITRANSS'.format(self.ikid), 0, 3))
+        if not hasattr(self, "_focal2pixel_lines"):
+            self._focal2pixel_samples = list(pyspiceql.getKernelVectorValue('INS{}_ITRANSS'.format(self.ikid)))
+        return self._focal2pixel_samples
 
     @property
     def pixel2focal_x(self):
@@ -241,7 +264,9 @@ class NaifSpice():
         : list<double>
         detector to focal plane x
         """
-        return list(spice.gdpool('INS{}_TRANSX'.format(self.ikid), 0, 3))
+        if not hasattr(self, "_pixel2focal_x"):
+            self._pixel2focal_x = list(pyspiceql.getKernelVectorValue('INS{}_ITRANSX'.format(self.ikid)))
+        return self._pixel2focal_x
 
     @property
     def pixel2focal_y(self):
@@ -253,7 +278,9 @@ class NaifSpice():
         : list<double>
         detector to focal plane y
         """
-        return list(spice.gdpool('INS{}_TRANSY'.format(self.ikid), 0, 3))
+        if not hasattr(self, "_pixel2focal_x"):
+            self._pixel2focal_y = list(pyspiceql.getKernelVectorValue('INS{}_ITRANSY'.format(self.ikid)))
+        return self._pixel2focal_y
 
     @property
     def focal_length(self):
@@ -266,7 +293,9 @@ class NaifSpice():
         : float
           focal length
         """
-        return float(spice.gdpool('INS{}_FOCAL_LENGTH'.format(self.ikid), 0, 1)[0])
+        if not hasattr(self, "_focal_length"):
+            self._focal_length = float(pyspiceql.getKernelStringValue('INS{}_FOCAL_LENGTH'.format(self.ikid))[0])
+        return self._focal_length
 
     @property
     def pixel_size(self):
@@ -277,7 +306,9 @@ class NaifSpice():
         -------
         : float pixel size
         """
-        return spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
+        if not hasattr(self, "_pixel_size"):
+            self._pixel_size = pyspiceql.getKernelStringValue('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
+        return self._pixel_size
 
     @property
     def target_body_radii(self):
@@ -291,8 +322,9 @@ class NaifSpice():
         : list<double>
           Radius of all three axis of the target body
         """
-        rad = spice.bodvrd(self.target_name, 'RADII', 3)
-        return rad[1]
+        if not hasattr(self, "_target_body_radii"):
+            self._target_body_radii = spice.bodvrd(self.target_name, 'RADII', 3)[1]
+        return self._target_body_radii
 
     @property
     def reference_frame(self):
@@ -328,24 +360,27 @@ class NaifSpice():
         : (sun_positions, sun_velocities)
           a tuple containing a list of sun positions, a list of sun velocities
         """
-        times = self.ephemeris_time
-        if len(times) > 1:
-            times = [times[0], times[-1]]
-        positions = []
-        velocities = []
+        if not hasattr(self, "_sun_position"):
+            times = [self.center_ephemeris_time]
+            if len(times) > 1:
+                times = [times[0], times[-1]]
+            positions = []
+            velocities = []
 
-        for time in times:
-            sun_state, _ = spice.spkezr("SUN",
-                                         time,
-                                         self.reference_frame,
-                                         'LT+S',
-                                         self.target_name)
-            positions.append(sun_state[:3])
-            velocities.append(sun_state[3:6])
-        positions = 1000 * np.asarray(positions)
-        velocities = 1000 * np.asarray(velocities)
+            for time in times:
+                sun_lt_state = pyspiceql.getTargetState(time,
+                                                        self.target_name,
+                                                        self.spacecraft_name,
+                                                        'J2000',
+                                                        self.light_time_correction)
+                sun_state = sun_lt_state.starg
+                positions.append(sun_state[:3])
+                velocities.append(sun_state[3:6])
+            positions = 1000 * np.asarray(positions)
+            velocities = 1000 * np.asarray(velocities)
 
-        return positions, velocities, times
+            self._sun_position = positions, velocities, times
+        return self._sun_position
 
     @property
     def sensor_position(self):
@@ -380,45 +415,55 @@ class NaifSpice():
                 # location of the target. For more information, see:
                 # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
                 if self.correct_lt_to_surface and self.light_time_correction.upper() == 'LT+S':
-                    obs_tar_state, obs_tar_lt = spice.spkezr(target,
-                                                             time,
-                                                             'J2000',
-                                                             self.light_time_correction,
-                                                             observer)
+                    obs_tar = pyspiceql.getTargetState(time,
+                                                       target,
+                                                       observer,
+                                                       'J2000',
+                                                       self.light_time_correction)
+                    obs_tar_state = obs_tar.starg
+                    obs_tar_lt = obs_tar.lt
+
                     # ssb to spacecraft
-                    ssb_obs_state, ssb_obs_lt = spice.spkezr(observer,
-                                                             time,
-                                                             'J2000',
-                                                             'NONE',
-                                                             'SSB')
+                    ssb_obs = pyspiceql.getTargetState(time,
+                                                       target,
+                                                       'SSB',
+                                                       'J2000',
+                                                       "NONE")
+                    ssb_obs_state = ssb_obs.starg
+                    ssb_obs_lt = ssb_obs.lt
 
                     radius_lt = (self.target_body_radii[2] + self.target_body_radii[0]) / 2 / (scipy.constants.c/1000.0)
                     adjusted_time = time - obs_tar_lt + radius_lt
-                    ssb_tar_state, ssb_tar_lt = spice.spkezr(target,
-                                                             adjusted_time,
-                                                             'J2000',
-                                                             'NONE',
-                                                             'SSB')
+
+                    ssb_tar = pyspiceql.getTargetState(adjusted_time,
+                                                       target,
+                                                       'SSB',
+                                                       'J2000',
+                                                       "NONE")
+                    ssb_tar_state = ssb_tar.starg
+                    ssb_tar_lt = ssb_tar.lt
                     state = ssb_tar_state - ssb_obs_state
+
                     matrix = spice.sxform("J2000", self.reference_frame, time)
                     state = spice.mxvg(matrix, state)
                 else:
-                    state, _ = spice.spkezr(target,
-                                            time,
-                                            self.reference_frame,
-                                            self.light_time_correction,
-                                            observer)
+                    state = pyspiceql.getTargetState(time,
+                                                     target,
+                                                     observer,
+                                                     self.reference_frame,
+                                                     self.light_time_correction)
 
                 if self.swap_observer_target:
-                    pos.append(-state[:3])
-                    vel.append(-state[3:])
+                    pos.append(-state.starg[:3])
+                    vel.append(-state.starg[3:])
                 else:
-                    pos.append(state[:3])
-                    vel.append(state[3:])
+                    pos.append(state.starg[:3])
+                    vel.append(state.starg[3:])
+
 
             # By default, SPICE works in km, so convert to m
-            self._position = [p * 1000 for p in pos]
-            self._velocity = [v * 1000 for v in vel]
+            self._position = 1000 * np.asarray(pos)
+            self._velocity = 1000 * np.asarray(vel)
         return self._position, self._velocity, self.ephemeris_time
 
     @property
@@ -447,7 +492,7 @@ class NaifSpice():
                 velocity_axis = 2
                 # Get the default line translation with no potential flipping
                 # from the driver
-                trans_x = np.array(list(spice.gdpool('INS{}_ITRANSL'.format(self.ikid), 0, 3)))
+                trans_x = np.array(self.focal2pixel_lines)
 
                 if (trans_x[0] < trans_x[1]):
                     velocity_axis = 1
@@ -492,7 +537,9 @@ class NaifSpice():
         : double
           Starting ephemeris time of the image
         """
-        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_start_count)
+        if not hasattr(self, "_ephemeris_start_time"):
+            self._ephemeris_start_time = pyspiceql.sclkToEt(str(self.spacecraft_name), self.spacecraft_clock_start_count)
+        return self._ephemeris_start_time
 
     @property
     def ephemeris_stop_time(self):
@@ -507,7 +554,9 @@ class NaifSpice():
         : double
           Ephemeris stop time of the image
         """
-        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_stop_count)
+        if not hasattr(self, "_ephemeris_stop_time"):
+            self._ephemeris_stop_time = pyspiceql.sclkToEt(self.spacecraft_name, self.spacecraft_clock_stop_count)
+        return self._ephemeris_stop_time
 
     @property
     def detector_center_sample(self):
@@ -520,7 +569,9 @@ class NaifSpice():
         : float
           Detector sample of the principal point
         """
-        return float(spice.gdpool('INS{}_BORESIGHT_SAMPLE'.format(self.ikid), 0, 1)[0])
+        if not hasattr(self, "_detector_center_sample"):
+            self._detector_center_sample = float(pyspiceql.getKernelStringValue('INS{}_BORESIGHT_SAMPLE'.format(self.ikid))[0])
+        return self._detector_center_sample
 
     @property
     def detector_center_line(self):
@@ -533,8 +584,9 @@ class NaifSpice():
         : float
           Detector line of the principal point
         """
-        return float(spice.gdpool('INS{}_BORESIGHT_LINE'.format(self.ikid), 0, 1)[0])
-
+        if not hasattr(self, "_detector_center_line"):
+            self._detector_center_line = float(pyspiceql.getKernelStringValue('INS{}_BORESIGHT_LINE'.format(self.ikid))[0])
+        return self._detector_center_line
 
     @property
     def swap_observer_target(self):
@@ -547,11 +599,13 @@ class NaifSpice():
         Expects ikid to be defined. This should be an integer containing the
         Naif Id code of the instrument.
         """
-        try:
-            swap = spice.gcpool('INS{}_SWAP_OBSERVER_TARGET'.format(self.ikid), 0, 1)[0]
-            return swap.upper() == "TRUE"
-        except:
-            return False
+        if not hasattr(self, "_swap_observer_target"):
+            try:
+                swap = pyspiceql.getKernelStringValue('INS{}_SWAP_OBSERVER_TARGET'.format(self.ikid))[0]
+                self._swap_observer_target = swap.upper() == "TRUE"
+            except:
+                self._swap_observer_target = False
+        return self._swap_observer_target
 
     @property
     def correct_lt_to_surface(self):
@@ -563,11 +617,13 @@ class NaifSpice():
         Expects ikid to be defined. This should be an integer containing the
         Naif Id code of the instrument.
         """
-        try:
-            surface_correct = spice.gcpool('INS{}_LT_SURFACE_CORRECT'.format(self.ikid), 0, 1)[0]
-            return surface_correct.upper() == "TRUE"
-        except:
-            return False
+        if not hasattr(self, "_correct_lt_to_surface"):
+            try:
+                surface_correct = pyspiceql.getKernelStringValue('INS{}_LT_SURFACE_CORRECT'.format(self.ikid))[0]
+                self._correct_lt_to_surface = surface_correct.upper() == "TRUE"
+            except:
+                self._correct_lt_to_surface = False
+        return self._correct_lt_to_surface
 
     @property
     def naif_keywords(self):

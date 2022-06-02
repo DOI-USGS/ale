@@ -1,5 +1,3 @@
-import spiceypy as spice
-
 import ale
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
@@ -7,6 +5,7 @@ from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
 from ale.base.type_distortion import NoDistortion
 from ale.base.base import Driver
+from pyspiceql import pyspiceql
 
 sensor_name_lookup = {
     "VISUAL_IMAGING_SUBSYSTEM_CAMERA_A" : "Visual Imaging Subsystem Camera A",
@@ -109,7 +108,7 @@ class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
         : float
           ephemeris start time of the image
         """
-        ephemeris_start_time = spice.scs2e(self.alt_ikid, str(self.spacecraft_clock_start_count))
+        ephemeris_start_time = pyspiceql.sclkToEt(self.alt_ikid, str(self.spacecraft_clock_start_count))
 
         if self.exposure_duration <= .420:
             offset1 = 7.0 / 8.0 * 4.48

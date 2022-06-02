@@ -5,6 +5,7 @@ import numpy as np
 
 import pvl
 import spiceypy as spice
+from pyspiceql import pyspiceql
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
@@ -326,7 +327,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         : float
           focal epsilon
         """
-        return float(spice.gdpool('INS{}_FL_UNCERTAINTY'.format(self.ikid), 0, 1)[0])
+        return float(pyspiceql.getKernelVectorValue('INS{}_FL_UNCERTAINTY'.format(self.ikid))[0])
 
     @property
     def spacecraft_name(self):
@@ -353,7 +354,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
           focal plane to detector samples
         """
         # Microns to mm
-        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
+        pixel_size = float(pyspiceql.getKernelVectorValue('INS{}_PIXEL_SIZE'.format(self.ikid))[0]) * .001
         return [0.0, 1/pixel_size, 0.0]
 
     @property
@@ -367,7 +368,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         : list<double>
           focal plane to detector lines
         """
-        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
+        pixel_size = float(pyspiceql.getKernelVectorValue('INS{}_PIXEL_SIZE'.format(self.ikid))[0]) * .001
         return [0.0, 0.0, 1/pixel_size]
 
     @property
@@ -443,7 +444,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         try:
             default_focal_len = super(CassiniIssPds3LabelNaifSpiceDriver, self).focal_length
         except:
-            default_focal_len = float(spice.gdpool('INS{}_FOV_CENTER_PIXEL'.format(self.ikid), 0, 2)[0])
+            default_focal_len = float(pyspiceql.getKernelVectorValue('INS{}_FOV_CENTER_PIXEL'.format(self.ikid))[0])
 
         filters = tuple(self.label['FILTER_NAME'])
 

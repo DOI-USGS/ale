@@ -5,6 +5,7 @@ import pvl
 import spiceypy as spice
 from glob import glob
 
+from pyspiceql import pyspiceql
 from ale.util import get_metakernels, query_kernel_pool
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
@@ -97,7 +98,7 @@ class LroLrocNacPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driv
         : list
           Radial distortion coefficients. There is only one coefficient for LROC NAC l/r
         """
-        return spice.gdpool('INS{}_OD_K'.format(self.ikid), 0, 1).tolist()
+        return pyspiceql.getKernelVectorValue('INS{}_OD_K'.format(self.ikid)).tolist()
 
     @property
     def light_time_correction(self):
@@ -143,7 +144,7 @@ class LroLrocNacPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driv
         : list<double>
           focal plane to detector lines
         """
-        focal2pixel_lines = np.array(list(spice.gdpool('INS{}_ITRANSL'.format(self.ikid), 0, 3))) / self.sampling_factor
+        focal2pixel_lines = np.array(list(pyspiceql.getKernelVectorValue('INS{}_ITRANSL'.format(self.ikid)))) / self.sampling_factor
         if self.spacecraft_direction < 0:
             return -focal2pixel_lines
         else:
@@ -161,7 +162,7 @@ class LroLrocNacPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driv
         : double
           Starting ephemeris time of the image
         """
-        start_time = spice.scs2e(self.spacecraft_id, self.label['LRO:SPACECRAFT_CLOCK_PREROLL_COUNT'])
+        start_time = pyspiceql.sclkToEt(self.spacecraft_id, self.label['LRO:SPACECRAFT_CLOCK_PREROLL_COUNT'])
         return start_time + self.constant_time_offset + self.additional_preroll * self.exposure_duration
 
     @property
@@ -267,9 +268,10 @@ class LroLrocNacPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driv
                     X value of the first velocity relative to the sensor
         """
         frame_chain = self.frame_chain
-        lro_bus_id = spice.bods2c('LRO_SC_BUS')
+        lro_bus_id = pyspiceql.Kernel_translateFrame('LRO_SC_BUS')
         time = self.ephemeris_start_time
-        state, _ = spice.spkezr(self.spacecraft_name, time, 'J2000', 'None', self.target_name)
+        lt_state = pyspiceql.getTargetState(time, self.target_name, self.spacecraft_name, 'J2000', 'None')
+        state = lt_state.starg
         position = state[:3]
         velocity = state[3:]
         rotation = frame_chain.compute_rotation(1, lro_bus_id)
@@ -338,7 +340,7 @@ class LroLrocNacIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driv
         : list
           Radial distortion coefficients. There is only one coefficient for LROC NAC l/r
         """
-        return spice.gdpool('INS{}_OD_K'.format(self.ikid), 0, 1).tolist()
+        return pyspiceql.getKernelVectorValue('INS{}_OD_K'.format(self.ikid)).tolist()
 
     @property
     def light_time_correction(self):
@@ -384,7 +386,7 @@ class LroLrocNacIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driv
         : double
           Starting ephemeris time of the image
         """
-        start_time = spice.scs2e(self.spacecraft_id, self.label['IsisCube']['Instrument']['SpacecraftClockPrerollCount'])
+        start_time = pyspiceql.sclkToEt(self.spacecraft_id, self.label['IsisCube']['Instrument']['SpacecraftClockPrerollCount'])
         return start_time + self.constant_time_offset + self.additional_preroll * self.exposure_duration
 
     @property
@@ -412,7 +414,7 @@ class LroLrocNacIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driv
         : list<double>
           focal plane to detector lines
         """
-        focal2pixel_lines = np.array(list(spice.gdpool('INS{}_ITRANSL'.format(self.ikid), 0, 3))) / self.sampling_factor
+        focal2pixel_lines = np.array(list(pyspiceql.getKernelVectorValue('INS{}_ITRANSL'.format(self.ikid)))) / self.sampling_factor
         if self.spacecraft_direction < 0:
             return -focal2pixel_lines
         else:
@@ -503,9 +505,10 @@ class LroLrocNacIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driv
                     X value of the first velocity relative to the sensor
         """
         frame_chain = self.frame_chain
-        lro_bus_id = spice.bods2c('LRO_SC_BUS')
+        lro_bus_id = pyspiceql.Kernel_translateFrame('LRO_SC_BUS')
         time = self.ephemeris_start_time
-        state, _ = spice.spkezr(self.spacecraft_name, time, 'J2000', 'None', self.target_name)
+        lt_state = pyspiceql.getTargetState(time, self.target_name, self.spacecraft_name, 'J2000', 'None')
+        state = lt_state.starg
         position = state[:3]
         velocity = state[3:]
         rotation = frame_chain.compute_rotation(1, lro_bus_id)
@@ -742,7 +745,8 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
 
         # Get float value of frequency in GHz
         frequency = self.label['IsisCube']['Instrument']['Frequency'].value
-        wavelength = spice.clight() / frequency / 1000.0
+        #wavelength = spice.clight() / frequency / 1000.0
+        wavelength = 299792.458 / frequency / 1000.0
         return wavelength
 
     @property
@@ -800,7 +804,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
           times for range conversion coefficients
         """
         range_coefficients_utc = self.label['IsisCube']['Instrument']['RangeCoefficientSet']
-        range_coefficients_et = [spice.str2et(elt[0]) for elt in range_coefficients_utc]
+        range_coefficients_et = [pyspiceql.utcToEt(elt[0]) for elt in range_coefficients_utc]
         return range_coefficients_et
 
 
@@ -814,7 +818,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         : float
           start time
         """
-        return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")) - self.line_exposure_duration
+        return pyspiceql.utcToEt(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
 
     @property
     def ephemeris_stop_time(self):
@@ -969,7 +973,7 @@ class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, Radial
         ans = self.naif_keywords.get(key, None)
         if ans is None:
             raise Exception('Could not parse the distortion model coefficients using key: ' + key)
-        
+
         ans = [x * -1 for x in ans]
         return ans
 
@@ -1032,7 +1036,7 @@ class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, Radial
         if ans is None:
             raise Exception('Could not parse the focal length using key: ' + key)
         return ans
-    
+
     @property
     def detector_center_sample(self):
         """
@@ -1112,7 +1116,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         """
         if not hasattr(self, '_ephemeris_start_time'):
             sclock = self.label['IsisCube']['Instrument']['SpacecraftClockStartCount']
-            self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
+            self._ephemeris_start_time = pyspiceql.sclkToEt(self.spacecraft_id, sclock)
         return self._ephemeris_start_time
 
 
@@ -1137,7 +1141,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : list
           Radial distortion coefficients.
         """
-        coeffs = spice.gdpool('INS{}_OD_K'.format(self.fikid), 0, 3).tolist()
+        coeffs = pyspiceql.getKernelVectorValue('INS{}_OD_K'.format(self.fikid)).tolist()
         coeffs = [x * -1 for x in coeffs]
         return coeffs
 
@@ -1273,7 +1277,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : list<double>
         detector to focal plane x
         """
-        return list(spice.gdpool('INS{}_TRANSX'.format(self.fikid), 0, 3))
+        return list(pyspiceql.getKernelVectorValue('INS{}_TRANSX'.format(self.fikid)))
 
 
     @property
@@ -1286,7 +1290,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : list<double>
         detector to focal plane y
         """
-        return list(spice.gdpool('INS{}_TRANSY'.format(self.fikid), 0, 3))
+        return list(pyspiceql.getKernelVectorValue('INS{}_TRANSY'.format(self.fikid)))
 
     @property
     def focal2pixel_lines(self):
@@ -1298,7 +1302,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : list<double>
           focal plane to detector lines
         """
-        return list(spice.gdpool('INS{}_ITRANSL'.format(self.fikid), 0, 3))
+        return list(pyspiceql.getKernelVectorValue('INS{}_ITRANSL'.format(self.fikid)))
 
     @property
     def focal2pixel_samples(self):
@@ -1310,7 +1314,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : list<double>
           focal plane to detector samples
         """
-        return list(spice.gdpool('INS{}_ITRANSS'.format(self.fikid), 0, 3))
+        return list(pyspiceql.getKernelVectorValue('INS{}_ITRANSS'.format(self.fikid)))
 
 
     @property
@@ -1323,7 +1327,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : int
           Zero based Detector line corresponding to the first image line
         """
-        offset = list(spice.gdpool('INS{}_FILTER_OFFSET'.format(self.fikid), 0, 3))
+        offset = list(pyspiceql.getKernelVectorValue('INS{}_FILTER_OFFSET'.format(self.fikid)))
         try:
             # If multiple items are present, use the first one
             offset = offset[0]
@@ -1343,7 +1347,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : float
           focal length
         """
-        return float(spice.gdpool('INS{}_FOCAL_LENGTH'.format(self.fikid), 0, 1)[0])
+        return float(pyspiceql.getKernelVectorValue('INS{}_FOCAL_LENGTH'.format(self.fikid))[0])
 
     @property
     def detector_center_sample(self):
@@ -1356,7 +1360,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : float
           Detector sample of the principal point
         """
-        return float(spice.gdpool('INS{}_BORESIGHT_SAMPLE'.format(self.fikid), 0, 1)[0]) - 0.5
+        return float(pyspiceql.getKernelVectorValue('INS{}_BORESIGHT_SAMPLE'.format(self.fikid))[0]) - 0.5
 
     @property
     def detector_center_line(self):
@@ -1369,4 +1373,4 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : float
           Detector line of the principal point
         """
-        return float(spice.gdpool('INS{}_BORESIGHT_LINE'.format(self.fikid), 0, 1)[0]) - 0.5
+        return float(pyspiceql.getKernelVectorValue('INS{}_BORESIGHT_LINE'.format(self.fikid))[0]) - 0.5

@@ -5,6 +5,7 @@ import pvl
 import spiceypy as spice
 import numpy as np
 
+from pyspiceql import pyspiceql
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
@@ -164,7 +165,7 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortio
         : double
           focal length in meters
         """
-        coeffs = spice.gdpool('INS{}_FL_TEMP_COEFFS'.format(self.fikid), 0, 6)
+        coeffs = pyspiceql.getKernelVectorValue('INS{}_FL_TEMP_COEFFS'.format(self.fikid))
 
         # reverse coeffs, MDIS coeffs are listed a_0, a_1, a_2 ... a_n where
         # numpy wants them a_n, a_n-1, a_n-2 ... a_0
@@ -246,7 +247,7 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortio
         -------
         : float pixel size
         """
-        return spice.gdpool('INS{}_PIXEL_PITCH'.format(self.ikid), 0, 1)
+        return pyspiceql.getKernelStringValue('INS{}_PIXEL_PITCH'.format(self.ikid))
 
 
 class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDistortion, Driver):
@@ -303,7 +304,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
         """
         if not hasattr(self, '_ephemeris_start_time'):
             sclock = self.spacecraft_clock_start_count
-            self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
+            self._starting_ephemeris_time = pyspiceql.sclkToEt(self.spacecraft_id, sclock)
         return self._starting_ephemeris_time
 
     @property
@@ -360,7 +361,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
         : double
           focal length in meters
         """
-        coeffs = spice.gdpool('INS{}_FL_TEMP_COEFFS'.format(self.fikid), 0, 6)
+        coeffs = pyspiceql.getKernelVectorValue('INS{}_FL_TEMP_COEFFS'.format(self.fikid))
         # reverse coeffs, MDIS coeffs are listed a_0, a_1, a_2 ... a_n where
         # numpy wants them a_n, a_n-1, a_n-2 ... a_0
         f_t = np.poly1d(coeffs[::-1])
@@ -383,7 +384,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
         : float
           detector center sample
         """
-        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 3)[0]) - 0.5
+        return float(pyspiceql.getKernelVectorValue('INS{}_CCD_CENTER'.format(self.ikid)[0])) - 0.5
 
 
     @property
@@ -401,7 +402,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
         : float
           detector center line
         """
-        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 3)[1]) - 0.5
+        return float(pyspiceql.getKernelVectorValue('INS{}_CCD_CENTER'.format(self.ikid)[1])) - 0.5
 
     @property
     def sensor_model_version(self):
@@ -423,7 +424,7 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
         -------
         : float pixel size
         """
-        return spice.gdpool('INS{}_PIXEL_PITCH'.format(self.ikid), 0, 1)
+        return pyspiceql.getKernelStringValue('INS{}_PIXEL_PITCH'.format(self.ikid))
 
     @property
     def sampling_factor(self):

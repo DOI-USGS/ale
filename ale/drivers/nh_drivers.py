@@ -4,6 +4,7 @@ import pvl
 
 from ale import util
 
+from pyspiceql import pyspiceql
 from ale.base import Driver
 from ale.base.type_distortion import NoDistortion, LegendreDistortion
 from ale.base.data_naif import NaifSpice
@@ -67,7 +68,7 @@ class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoD
         list :
             The center of the CCD formatted as line, sample
         """
-        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0])
+        return float(pyspiceql.getKernelVectorValue('INS{}_BORESIGHT'.format(self.ikid))[0])
 
     @property
     def detector_center_sample(self):
@@ -81,7 +82,7 @@ class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoD
         list :
             The center of the CCD formatted as line, sample
         """
-        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
+        return float(pyspiceql.getKernelVectorValue('INS{}_BORESIGHT'.format(self.ikid))[1])
 
     @property
     def sensor_name(self):
