@@ -3,9 +3,9 @@ import os
 
 import struct
 import pvl
-import spiceypy as spice
 import numpy as np
 
+from pyspiceql import pyspiceql
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
@@ -50,7 +50,7 @@ class TGOCassisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistorti
         : float
           ephemeris start time of the image.
         """
-        return spice.utc2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
+        return pyspiceql.utc2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")))
 
     @property
     def sensor_frame_id(self):

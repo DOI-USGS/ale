@@ -8,6 +8,7 @@ import struct
 import spiceypy as spice
 import warnings
 
+from pyspiceql import pyspiceql
 from ale.base import Driver
 from ale.base.data_isis import read_table_data
 from ale.base.data_isis import parse_table
@@ -115,7 +116,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         : int
           Naif ID used to for identifying the instrument in Spice kernels
         """
-        return spice.bods2c("MEX_HRSC_HEAD")
+        return pyspiceql.Kernel_translateFrame("MEX_HRSC_HEAD")
 
 
     @property
@@ -133,7 +134,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         : int
           Naif ID code used in calculating focal length
         """
-        return spice.bods2c(self.instrument_id)
+        return pyspiceql.Kernel_translateFrame(self.instrument_id)
 
 
     # TODO Since HRSC has different frames based on filters, need to check that
@@ -483,7 +484,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
 
 
 class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDistortion, Driver):
-  
+
   @property
   def instrument_id(self):
       """
@@ -611,7 +612,7 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
       : int
         Naif ID used to for identifying the instrument in Spice kernels
       """
-      return spice.bods2c("MEX_HRSC_HEAD")
+      return pyspiceql.Kernel_translateFrame("MEX_HRSC_HEAD")
 
 
   @property
@@ -629,7 +630,7 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
       : int
         Naif ID code used in calculating focal length
       """
-      return spice.bods2c(self.instrument_id)
+      return pyspiceql.Kernel_translateFrame(self.instrument_id)
 
   @property
   def focal2pixel_lines(self):
@@ -658,7 +659,7 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
 
 class MexSrcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDistortion, Driver):
     """
-    Driver for a PDS3 Mars Express (Mex) High Resolution Stereo Camera (HRSC) - Super Resolution 
+    Driver for a PDS3 Mars Express (Mex) High Resolution Stereo Camera (HRSC) - Super Resolution
     Channel (SRC) image.
     """
 
@@ -678,14 +679,14 @@ class MexSrcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDistortion, 
     @property
     def ikid(self):
         """
-        Returns the Naif ID code for HRSC SRC. 
+        Returns the Naif ID code for HRSC SRC.
 
         Returns
         -------
         : int
           Naif ID used to for identifying the instrument in Spice kernels
         """
-        return spice.bods2c("MEX_HRSC_SRC")
+        return pyspiceql.Kernel_translateFrame("MEX_HRSC_HEAD")
 
 
     @property

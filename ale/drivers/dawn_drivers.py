@@ -1,5 +1,4 @@
 import pvl
-import spiceypy as spice
 import os
 
 from glob import glob
@@ -9,6 +8,7 @@ from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.type_sensor import Framer
+from pyspiceql import pyspiceql
 
 ID_LOOKUP = {
     "FC1" : "DAWN_FC1",
@@ -83,7 +83,7 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         """
         if not hasattr(self, '_ephemeris_start_time'):
             sclock = self.spacecraft_clock_start_count
-            self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
+            self._ephemeris_start_time = pyspiceql.sclkToEt(self.spacecraft_id, sclock)
             self._ephemeris_start_time += 193.0 / 1000.0
         return self._ephemeris_start_time
 
@@ -118,7 +118,7 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         : list
           Radial distortion coefficients
         """
-        return spice.gdpool('INS{}_RAD_DIST_COEFF'.format(self.ikid),0, 1).tolist()
+        return pyspiceql.getKernelVectorValue('INS{}_RAD_DIST_COEFF'.format(self.ikid)).tolist()
 
     # TODO: Update focal2pixel samples and lines to reflect the rectangular
     #       nature of dawn pixels
@@ -134,7 +134,7 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
           focal plane to detector samples
         """
         # Microns to mm
-        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
+        pixel_size = float(pyspiceql.getKernelVectorValue('INS{}_PIXEL_SIZE'.format(self.ikid))[0]) * .001
         return [0.0, 1/pixel_size, 0.0]
 
     @property
@@ -149,7 +149,7 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
           focal plane to detector lines
         """
         # Microns to mm
-        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
+        pixel_size = float(pyspiceql.getKernelVectorValue('INS{}_PIXEL_SIZE'.format(self.ikid))[0]) * .001
         return [0.0, 0.0, 1/pixel_size]
 
     @property
@@ -180,7 +180,7 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         : float
           center detector sample
         """
-        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[0]) + 0.5
+        return float(pyspiceql.getKernelVectorValue('INS{}_CCD_CENTER'.format(self.ikid))[0]) + 0.5
 
     @property
     def detector_center_line(self):
@@ -198,4 +198,4 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         : float
           center detector line
         """
-        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[1]) + 0.5
+        return float(pyspiceql.getKernelVectorValue('INS{}_CCD_CENTER'.format(self.ikid))[1]) + 0.5

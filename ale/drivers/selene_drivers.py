@@ -1,4 +1,5 @@
 import spiceypy as spice
+from pyspiceql import pyspiceql
 
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
@@ -243,9 +244,9 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           ikid of LISM_TC1 or LISM_TC2
         """
         if not hasattr(self, "_ikid"):
-          self._ikid = spice.bods2c("LISM_{}".format(super().instrument_id))
+          return pyspiceql.Kernel_translateFrame("LISM_{}".format(super().instrument_id))
         return self._ikid
-
+        
     @property
     def spacecraft_name(self):
         """
@@ -300,7 +301,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           ephemeris start time of the image
         """
         if not hasattr(self, "_ephemeris_start_time"):
-          self._ephemeris_start_time = spice.sct2e(self.spacecraft_id, self.spacecraft_clock_start_count)
+          return pyspiceql.sclkToEt(self.spacecraft_id, self.spacecraft_clock_start_count)
         return self._ephemeris_start_time
 
     @property
@@ -317,7 +318,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           focal plane to detector samples
         """
         if not hasattr(self, "_focal2pixel_samples"):
-          pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0]
+          pixel_size = pyspiceql.getKernelVectorValue('INS{}_PIXEL_SIZE'.format(self.ikid)[0])
           self._focal2pixel_samples = [0, 0, -1/pixel_size]
         return self._focal2pixel_samples
 
@@ -335,7 +336,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           focal plane to detector lines
         """
         if not hasattr(self, "_focal2pixel_lines"):
-          pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0]
+          pixel_size = pyspiceql.getKernelVectorValue('INS{}_PIXEL_SIZE'.format(self.ikid)[0])
           self._focal2pixel_lines = [0, 1/pixel_size, 0]
         return self._focal2pixel_lines
 
@@ -352,7 +353,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           Optical distortion x coefficients
         """
         if not hasattr(self, "__odkx"):
-          self.__odkx = spice.gdpool('INS{}_DISTORTION_COEF_X'.format(self.ikid),0, 4).tolist()
+          self.__odkx = pyspiceql.getKernelVectorValue('INS{}_DISTORTION_COEF_X'.format(self.ikid)).tolist()
         return self.__odkx
 
     @property
@@ -368,7 +369,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           Optical distortion y coefficients
         """
         if not hasattr(self, "__odky"):
-          self.__odky = spice.gdpool('INS{}_DISTORTION_COEF_Y'.format(self.ikid), 0, 4).tolist()
+          self.__odky = pyspiceql.getKernelVectorValue('INS{}_DISTORTION_COEF_Y'.format(self.ikid)).tolist()
         return self.__odky
 
     @property
@@ -384,7 +385,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           Boresight focal plane x coordinate
         """
         if not hasattr(self, "_boresight_x"):
-          self._boresight_x = spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 1)[0]
+          self._boresight_x = pyspiceql.getKernelVectorValue('INS{}_BORESIGHT'.format(self.ikid))[0]
         return self._boresight_x
 
     @property
@@ -400,7 +401,11 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           Boresight focal plane x coordinate
         """
         if not hasattr(self, "_boresight_y"):
-          self._boresight_y = spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 1, 1)[0]
+          # TODO is this the right way to access this value?
+          # original:
+          #   return spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 1, 1)[0]
+
+          self._boresight_y = pyspiceql.getKernelVectorValue('INS{}_BORESIGHT'.format(self.ikid))[1]
         return self._boresight_y
 
     @property
@@ -425,6 +430,46 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
             return self.label['CORRECTED_SAMPLING_INTERVAL'][0].value * 0.001 # Scale to seconds
         except:
             return self.label['CORRECTED_SAMPLING_INTERVAL'].value * 0.001  # Scale to seconds
+
+    @property
+    def usgscsm_distortion_model(self):
+        """
+        Kaguya uses a unique radial distortion model so we need to overwrite the
+        method packing the distortion model into the ISD.
+
+        from the IK:
+
+        Line-of-sight vector of pixel no. n can be expressed as below.
+
+        Distortion coefficients information:
+        INS<INSTID>_DISTORTION_COEF_X  = ( a0, a1, a2, a3)
+        INS<INSTID>_DISTORTION_COEF_Y  = ( b0, b1, b2, b3),
+
+        Distance r from the center:
+        r = - (n - INS<INSTID>_CENTER) * INS<INSTID>_PIXEL_SIZE.
+
+        Line-of-sight vector v is calculated as
+        v[X] = INS<INSTID>BORESIGHT[X] + a0 + a1*r + a2*r^2 + a3*r^3 ,
+        v[Y] = INS<INSTID>BORESIGHT[Y] + r+a0 + a1*r +a2*r^2 + a3*r^3 ,
+        v[Z] = INS<INSTID>BORESIGHT[Z]
+
+        Expects odkx and odky to be defined. These should be a list of optical
+        distortion x and y coefficients respectively.
+
+        Returns
+        -------
+        : dict
+          radial distortion model
+
+        """
+        return {
+            "kaguyalism": {
+                "x" : self._odkx,
+                "y" : self._odky,
+                "boresight_x" : self.boresight_x,
+                "boresight_y" : self.boresight_y
+            }
+        }
 
     @property
     def detector_start_sample(self):
@@ -930,7 +975,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           ephemeris start time of the image
         """
         if not hasattr(self, "_ephemeris_start_time"):
-          self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, self.spacecraft_clock_start_count)
+          self._ephemeris_start_time = pyspiceql.sclkToEt(self.spacecraft_id, self.spacecraft_clock_start_count)
         return self._ephemeris_start_time
 
     @property
@@ -948,7 +993,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           The detector line of the principle point
         """
         if not hasattr(self, "_detector_center_line"):
-          self._detector_center_line = spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[1] - 0.5
+          self._detector_center_line = pyspiceql.getKernelVectorValue('INS{}_CENTER'.format(self.ikid))[1] - 0.5
         return self._detector_center_line
 
     @property
@@ -966,7 +1011,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           The detector sample of the principle point
         """
         if not hasattr(self, "_detector_center_sample"):
-          self._detector_center_sample = spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[0] - 0.5
+          self._detector_center_sample = pyspiceql.getKernelVectorValue('INS{}_CENTER'.format(self.ikid))[0] - 0.5
         return self._detector_center_sample
 
     @property
@@ -983,7 +1028,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           focal plane to detector samples
         """
         if not hasattr(self, "_focal2pixel_samples"):
-          pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0]
+          pixel_size = pyspiceql.getKernelVectorValue('INS{}_PIXEL_SIZE'.format(self.ikid))[0]
           self._focal2pixel_samples = [0, 0, -1/pixel_size]
         return self._focal2pixel_samples
 
@@ -1001,7 +1046,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           focal plane to detector lines
         """
         if not hasattr(self, "_focal2pixel_lines"):
-          pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0]
+          pixel_size = pyspiceql.getKernelVectorValue('INS{}_PIXEL_SIZE'.format(self.ikid))[0]
           self._focal2pixel_lines = [0, 1/pixel_size, 0]
         return self._focal2pixel_lines
 
@@ -1018,7 +1063,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           Optical distortion x coefficients
         """
         if not hasattr(self, "__odkx"):
-          self.__odkx = spice.gdpool('INS{}_DISTORTION_COEF_X'.format(self.ikid),0, 4).tolist()
+          self.__odkx = pyspiceql.getKernelVectorValue('INS{}_DISTORTION_COEF_X'.format(self.ikid),0, 4).tolist()
         return self.__odkx
 
     @property
@@ -1034,7 +1079,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           Optical distortion y coefficients
         """
         if not hasattr(self, "__odky"):
-          self.__odky = spice.gdpool('INS{}_DISTORTION_COEF_Y'.format(self.ikid), 0, 4).tolist()
+          self.__odky = pyspiceql.getKernelVectorValue('INS{}_DISTORTION_COEF_Y'.format(self.ikid),0, 4).tolist()
         return self.__odky
 
     @property
@@ -1050,7 +1095,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           Boresight focal plane x coordinate
         """
         if not hasattr(self, "_boresight_x"):
-          self._boresight_x = spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 1)[0]
+          self._boresight_x = pyspiceql.getKernelVectorValue('INS{}_BORESIGHT'.format(self.ikid))[0]
         return self._boresight_x
 
     @property
@@ -1066,7 +1111,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           Boresight focal plane x coordinate
         """
         if not hasattr(self, "_boresight_y"):
-          self._boresight_y = spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 1, 1)[0]
+          self._boresight_y = pyspiceql.getKernelVectorValue('INS{}_BORESIGHT'.format(self.ikid))[1]
         return self._boresight_y
 
     @property
@@ -1091,6 +1136,46 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
             return self.label['CORRECTED_SAMPLING_INTERVAL'][0].value * 0.001 # Scale to seconds
         except:
             return self.label['CORRECTED_SAMPLING_INTERVAL'].value * 0.001  # Scale to seconds
+
+    @property
+    def usgscsm_distortion_model(self):
+        """
+        Kaguya uses a unique radial distortion model so we need to overwrite the
+        method packing the distortion model into the ISD.
+
+        from the IK:
+
+        Line-of-sight vector of pixel no. n can be expressed as below.
+
+        Distortion coefficients information:
+        INS<INSTID>_DISTORTION_COEF_X  = ( a0, a1, a2, a3)
+        INS<INSTID>_DISTORTION_COEF_Y  = ( b0, b1, b2, b3),
+
+        Distance r from the center:
+        r = - (n - INS<INSTID>_CENTER) * INS<INSTID>_PIXEL_SIZE.
+
+        Line-of-sight vector v is calculated as
+        v[X] = INS<INSTID>BORESIGHT[X] + a0 + a1*r + a2*r^2 + a3*r^3 ,
+        v[Y] = INS<INSTID>BORESIGHT[Y] + r+a0 + a1*r +a2*r^2 + a3*r^3 ,
+        v[Z] = INS<INSTID>BORESIGHT[Z]
+
+        Expects odkx and odky to be defined. These should be a list of optical
+        distortion x and y coefficients respectively.
+
+        Returns
+        -------
+        : dict
+          radial distortion model
+
+        """
+        return {
+            "kaguyalism": {
+                "x" : self._odkx,
+                "y" : self._odky,
+                "boresight_x" : self.boresight_x,
+                "boresight_y" : self.boresight_y
+            }
+        }
 
     @property
     def sensor_model_version(self):
@@ -1192,7 +1277,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
           ephemeris start time of the image
         """
         if not hasattr(self, "_ephemeris_start_time"):
-          self._ephemeris_start_time = spice.sct2e(self.spacecraft_id, self.spacecraft_clock_start_count)
+          self._ephemeris_start_time = pyspiceql.sclkToEt(self.spacecraft_id, self.spacecraft_clock_start_count)
         return self._ephemeris_start_time
 
     @property
@@ -1207,7 +1292,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
           ephemeris start time of the image
         """
         if not hasattr(self, "_ephemeris_stop_time"):
-          self._ephemeris_stop_time = spice.sct2e(self.spacecraft_id, self.spacecraft_clock_stop_count)
+          self._ephemeris_stop_time = pyspiceql.sclkToEt(self.spacecraft_id, self.spacecraft_clock_stop_count)
         return self._ephemeris_stop_time
 
     @property
@@ -1242,7 +1327,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
           The detector line of the principle point
         """
         if not hasattr(self, "_detector_center_line"):
-          self._detector_center_line = spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[1] - 0.5
+          self._detector_center_line = pyspiceql.getKernelVectorValue('INS{}_CENTER'.format(self.ikid))[1] - 0.5
         return self._detector_center_line
 
     @property
@@ -1260,7 +1345,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
           The detector sample of the principle point
         """
         if not hasattr(self, "_detector_center_sample"):
-          self._detector_center_sample = spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[0] - 0.5
+          self._detector_center_sample = pyspiceql.getKernelVectorValue('INS{}_CENTER'.format(self.ikid))[0] - 0.5
         return self._detector_center_sample
 
     @property
@@ -1276,7 +1361,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
           Optical distortion x coefficients
         """
         if not hasattr(self, "__odkx"):
-          self.__odkx = spice.gdpool('INS{}_DISTORTION_COEF_X'.format(self.ikid),0, 4).tolist()
+          self.__odkx = pyspiceql.getKernelVectorValue('INS{}_DISTORTION_COEF_X'.format(self.ikid)).tolist()
         return self.__odkx
 
     @property
@@ -1292,7 +1377,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
           Optical distortion y coefficients
         """
         if not hasattr(self, "__odky"):
-          self.__odky = spice.gdpool('INS{}_DISTORTION_COEF_Y'.format(self.ikid), 0, 4).tolist()
+          self.__odky = pyspiceql.getKernelVectorValue('INS{}_DISTORTION_COEF_Y'.format(self.ikid), 0, 4).tolist()
         return self.__odky
 
     @property
@@ -1308,7 +1393,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
           Boresight focal plane x coordinate
         """
         if not hasattr(self, "_boresight_x"):
-          self._boresight_x = spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 1)[0]
+          self._boresight_x = pyspiceql.getKernelVectorValue('INS{}_BORESIGHT'.format(self.ikid))[0]
         return self._boresight_x
 
     @property
@@ -1324,8 +1409,49 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
           Boresight focal plane x coordinate
         """
         if not hasattr(self, "_boresight_y"):
-          self._boresight_y = spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 1, 1)[0]
+          self._boresight_y = pyspiceql.getKernelVectorValue('INS{}_BORESIGHT'.format(self.ikid))[1]
         return self._boresight_y
+
+    @property
+    def usgscsm_distortion_model(self):
+        """
+        Kaguya uses a unique radial distortion model so we need to overwrite the
+        method packing the distortion model into the ISD.
+
+        from the IK:
+
+        Line-of-sight vector of pixel no. n can be expressed as below.
+
+        Distortion coefficients information:
+        INS<INSTID>_DISTORTION_COEF_X  = ( a0, a1, a2, a3)
+        INS<INSTID>_DISTORTION_COEF_Y  = ( b0, b1, b2, b3),
+
+        Distance r from the center:
+        r = - (n - INS<INSTID>_CENTER) * INS<INSTID>_PIXEL_SIZE.
+
+        Line-of-sight vector v is calculated as
+        v[X] = INS<INSTID>BORESIGHT[X] + a0 + a1*r + a2*r^2 + a3*r^3 ,
+        v[Y] = INS<INSTID>BORESIGHT[Y] + r+a0 + a1*r +a2*r^2 + a3*r^3 ,
+        v[Z] = INS<INSTID>BORESIGHT[Z]
+
+        Expects odkx and odky to be defined. These should be a list of optical
+        distortion x and y coefficients respectively.
+
+        Returns
+        -------
+        : dict
+          radial distortion model
+
+        """
+        return {
+            "kaguyalism": {
+                "x" : self._odkx,
+                "y" : self._odky,
+                "boresight_x" : self.boresight_x,
+                "boresight_y" : self.boresight_y
+            }
+        }
+
 
     @property
     def line_exposure_duration(self):
@@ -1364,7 +1490,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
           focal plane to detector samples
         """
         if not hasattr(self, "_focal2pixel_samples"):
-          pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0]
+          pixel_size = pyspiceql.getKernelVectorValue('INS{}_PIXEL_SIZE'.format(self.ikid))[0]
           self._focal2pixel_samples = [0, 0, -1/pixel_size]
         return self._focal2pixel_samples
 
@@ -1382,6 +1508,6 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
           focal plane to detector lines
         """
         if not hasattr(self, "_focal2pixel_lines"):
-          pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0]
+          pixel_size = pyspiceql.getKernelVectorValue('INS{}_PIXEL_SIZE'.format(self.ikid))[0]
           self._focal2pixel_lines = [0, 1/pixel_size, 0]
         return self._focal2pixel_lines
