@@ -125,7 +125,7 @@
   "detector_sample_summing": 1,
   "detector_line_summing": 1,
   "focal_length_model": {
-    "focal_length": null
+    "focal_length": 2003.09
   },
   "detector_center": {
     "line": 512.5,

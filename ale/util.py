@@ -559,7 +559,7 @@ def get_isis_mission_translations(isis_data):
     """
     mission_translation_file = read_pvl(os.path.join(isis_data, "base", "translations", "MissionName2DataDir.trn"))
     # For some reason this file takes the form [value, key] for mission name -> data dir
-    lookup = [l[::-1] for l in mission_translation_file["MissionName"].getlist("Translation")]
+    lookup = [l[::-1] for l in mission_translation_file["MissionName"].getall("Translation")]
     return dict(lookup)
 
 
@@ -693,15 +693,19 @@ def search_isis_db(dbobj, labelobj, isis_data):
     # Flag is set when kernels encapsulating the entire image time is found
     full_match = False
 
-    for selection in dbobj.getlist("Selection"):
-        files = selection.getlist("File")
-
-        # selection criteria
-        matches = selection.getlist("Match")
-        times = selection.getlist("Time")
-
+    for selection in dbobj.getall("Selection"):
+        files = selection.getall("File")
         if not files:
             raise Exception(f"No File found in {selection}")
+
+        # selection criteria
+        matches = []
+        if "Match" in selection:
+            matches = selection.getall("Match")
+
+        times = []
+        if "Time" in selection:
+            times = selection.getall("Time")
 
         files = [path.join(*file) if isinstance(file, list) else file  for file in files]
 
