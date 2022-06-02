@@ -86,7 +86,7 @@ class GalileoSsiIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
         : float
           start time
         """
-        return pyspiceql.utc2et(self.utc_start_time)
+        return pyspiceql.utc2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
 
     @property
     def center_ephemeris_time(self):
