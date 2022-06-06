@@ -11,6 +11,7 @@ from ale.base.type_distortion import NoDistortion
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
+from ale.base.type_sensor import LineScanner
 
 class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
     """
@@ -65,3 +66,112 @@ class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoD
     @property
     def sensor_name(self):
         return self.label['IsisCube']['Instrument']['SpacecraftName']
+
+
+class NewHorizonsLeisaIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
+    """
+    Driver for reading New Horizons LEISA ISIS3 Labels.
+    """
+
+    @property
+    def ikid(self):
+        """
+        ISIS updated the frame code from -98201 to -98901 in an iak. This is due
+        to ISIS requiring the +Z or -Z axis to be along the boresight of
+        the telescope. So we rotate the -98201 axes by 90deg about +Y
+
+        Returns
+        -------
+        : int
+          Naif ID used to for identifying the instrument in Spice kernels
+        """
+        return (-98901)
+
+    @property
+    def ephemeris_start_time(self):
+        """
+        Returns the ephemeris start time of the image.
+        Expects spacecraft_id to be defined. This should be the integer
+        Naif ID code for the spacecraft.
+
+        Returns
+        -------
+        : float
+          ephemeris start time of the image
+        """
+        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_start_count)
+
+    @property
+    def ephemeris_stop_time(self):
+        """
+        ISIS doesn't preserve the spacecraft stop count that we can use to get
+        the ephemeris stop time of the image, so compute the ephemeris stop time
+        from the start time and the exposure duration.
+        """
+        return self.ephemeris_start_time + self.exposure_duration * self.image_lines
+
+    @property
+    def spacecraft_name(self):
+        """
+        Returns the spacecraft name used in various Spice calls to acquire
+        ephemeris data.
+        Expects the platform_name to be defined. This should be a string of
+        the form 'NEW HORIZONS'
+
+        Returns
+        -------
+        : str
+          spacecraft name
+        """
+        name_lookup = {
+            'NEW HORIZONS': 'NH'
+        }
+        return name_lookup[super().platform_name]
+
+    @property
+    def detector_center_line(self):
+        """
+        Returns the center detector line. Expects ikid to be defined. This should
+        be an integer containing the Naif Id code of the instrument.
+
+        Returns
+        -------
+        : float
+          Detector line of the principal point
+        """
+        return float(spice.gdpool('INS-98201_BORESIGHT', 0, 3)[0])
+
+    @property
+    def detector_center_sample(self):
+        """
+        Returns the center detector sample. Expects ikid to be defined. This should
+        be an integer containing the Naif Id code of the instrument.
+
+        Returns
+        -------
+        : float
+          Detector sample of the principal point
+        """
+        return float(spice.gdpool('INS-98201_BORESIGHT', 0, 3)[1])
+
+    @property
+    def sensor_name(self):
+        """
+        Returns the name of the instrument
+
+        Returns
+        -------
+        : str
+          name of the instrument.
+        """
+        return self.instrument_id
+
+    @property
+    def sensor_model_version(self):
+        """
+        Returns
+        -------
+        : int
+          ISIS sensor model version
+        """
+        return 1
