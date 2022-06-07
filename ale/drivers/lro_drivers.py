@@ -1090,7 +1090,6 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         """
         if not hasattr(self, '_ephemeris_start_time'):
             sclock = self.label['IsisCube']['Instrument']['SpacecraftClockStartCount']
-            print(f'MiniRF SCLOCK: {sclock}')
             self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
         return self._ephemeris_start_time
 
