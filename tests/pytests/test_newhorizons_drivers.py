@@ -14,21 +14,33 @@ from unittest.mock import patch
 
 from conftest import get_image_label, get_image_kernels, convert_kernels, compare_dicts
 
-from ale.drivers.nh_drivers import NewHorizonsLorriIsisLabelNaifSpiceDriver
+from ale.drivers.nh_drivers import NewHorizonsLorriIsisLabelNaifSpiceDriver, NewHorizonsLeisaIsisLabelNaifSpiceDriver
 from conftest import get_image_kernels, convert_kernels, get_image_label, get_isd
+
+image_dict = {
+    # 'lor_0034974380_0x630_sci_1': get_isd("nhlorri"),
+    'lsb_0034933739_0x53c_sci_1': get_isd("nhleisa")
+}
+
 
 @pytest.fixture()
 def test_kernels(scope="module"):
-    kernels = get_image_kernels("lor_0034974380_0x630_sci_1")
-    updated_kernels, binary_kernels = convert_kernels(kernels)
+    updated_kernels = {}
+    binary_kernels = {}
+    for image in image_dict.keys():
+        kernels = get_image_kernels(image)
+        updated_kernels[image], binary_kernels[image] = convert_kernels(kernels)
     yield updated_kernels
-    for kern in binary_kernels:
-        os.remove(kern)
+    for kern_list in binary_kernels.values():
+        for kern in kern_list:
+            os.remove(kern)
 
-def test_newhorizons_load(test_kernels):
-    label_file = get_image_label("lor_0034974380_0x630_sci_1", "isis")
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels})
+# Test load of newhorizons labels
+@pytest.mark.parametrize("image", image_dict.keys())
+def test_nh_load(test_kernels, image):
+    label_file = get_image_label(image, 'isis')
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]}, verbose=True)
+    compare_isd = image_dict[image]
     isd_obj = json.loads(isd_str)
-    compare_dict = get_isd('nhlorri')
     print(json.dumps(isd_obj, indent=2))
-    assert compare_dicts(isd_obj, compare_dict) == []
+    assert compare_dicts(isd_obj, compare_isd) == []

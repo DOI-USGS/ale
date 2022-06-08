@@ -74,6 +74,23 @@ class NewHorizonsLeisaIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
     """
 
     @property
+    def instrument_id(self):
+        """
+        Returns an instrument id for uniquely identifying the instrument, but often
+        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+        the same ID the Spice expects in bods2c calls.
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
+        id_lookup = {
+            "LEISA" : "NH_RALPH_LEISA"
+        }
+        return id_lookup[super().instrument_id]
+
+    @property
     def ikid(self):
         """
         ISIS updated the frame code from -98201 to -98901 in an iak. This is due
@@ -85,7 +102,8 @@ class NewHorizonsLeisaIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         : int
           Naif ID used to for identifying the instrument in Spice kernels
         """
-        return (-98901)
+        return self.label['IsisCube']['Kernels']['NaifFrameCode']
+
 
     @property
     def ephemeris_start_time(self):
@@ -111,24 +129,6 @@ class NewHorizonsLeisaIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         return self.ephemeris_start_time + self.exposure_duration * self.image_lines
 
     @property
-    def spacecraft_name(self):
-        """
-        Returns the spacecraft name used in various Spice calls to acquire
-        ephemeris data.
-        Expects the platform_name to be defined. This should be a string of
-        the form 'NEW HORIZONS'
-
-        Returns
-        -------
-        : str
-          spacecraft name
-        """
-        name_lookup = {
-            'NEW HORIZONS': 'NH'
-        }
-        return name_lookup[super().platform_name]
-
-    @property
     def detector_center_line(self):
         """
         Returns the center detector line. Expects ikid to be defined. This should
@@ -139,7 +139,7 @@ class NewHorizonsLeisaIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         : float
           Detector line of the principal point
         """
-        return float(spice.gdpool('INS-98201_BORESIGHT', 0, 3)[0])
+        return 0
 
     @property
     def detector_center_sample(self):
@@ -152,19 +152,7 @@ class NewHorizonsLeisaIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         : float
           Detector sample of the principal point
         """
-        return float(spice.gdpool('INS-98201_BORESIGHT', 0, 3)[1])
-
-    @property
-    def sensor_name(self):
-        """
-        Returns the name of the instrument
-
-        Returns
-        -------
-        : str
-          name of the instrument.
-        """
-        return self.instrument_id
+        return 0
 
     @property
     def sensor_model_version(self):

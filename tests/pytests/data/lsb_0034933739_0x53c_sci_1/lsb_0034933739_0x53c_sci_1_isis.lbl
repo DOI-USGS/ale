@@ -3,12 +3,12 @@ Object = IsisCube
     StartByte   = 65537
     Format      = Tile
     TileSamples = 256
-    TileLines   = 3
+    TileLines   = 128
 
     Group = Dimensions
       Samples = 256
-      Lines   = 3
-      Bands   = 25
+      Lines   = 1354
+      Bands   = 256
     End_Group
 
     Group = Pixels
@@ -22,17 +22,17 @@ Object = IsisCube
   Group = Instrument
     SpacecraftName            = "NEW HORIZONS"
     InstrumentId              = LEISA
-    TargetName                = EUROPA
-    SpacecraftClockStartCount = 1/0034931099:00000
-    ExposureDuration          = 0.676
-    StartTime                 = 2007-02-28T01:13:01.3882781
-    StopTime                  = 2007-02-28T01:17:12.388278
-    FrameRate                 = 1.47929 <Hz>
+    TargetName                = Jupiter
+    SpacecraftClockStartCount = 1/0034933739:00000
+    ExposureDuration          = 0.349
+    StartTime                 = 2007-02-28T01:57:01.3882862
+    StopTime                  = 2007-02-28T02:04:53.3882861
+    FrameRate                 = 2.86533 <Hz>
   End_Group
 
   Group = Archive
-    MidObservationTime  = 225897372.0736388 <s past J2000>
-    ObservationDuration = 251.0
+    MidObservationTime  = 225900122.5736474 <s past J2000>
+    ObservationDuration = 472.0
     Detector            = LEISA
     ScanType            = LEISA
   End_Group
@@ -173,9 +173,9 @@ End_Object
 
 Object = Table
   Name                = InstrumentPointing
-  StartByte           = 162487
-  Bytes               = 256
-  Records             = 4
+  StartByte           = 369183874
+  Bytes               = 30336
+  Records             = 474
   ByteOrder           = Lsb
   TimeDependentFrames = (-98000, 1)
   ConstantFrames      = (-98901, -98201, -98000)
@@ -183,9 +183,9 @@ Object = Table
                          0.99999134035732, 0.018161770046999, 0.9998281559786,
                          -0.0037159953166252, -0.99983343059644,
                          0.018154902163918, -0.0018736566329701)
-  CkTableStartTime    = 225897246.57364
-  CkTableEndTime      = 225897248.60164
-  CkTableOriginalSize = 4
+  CkTableStartTime    = 225899886.57365
+  CkTableEndTime      = 225900359.11965
+  CkTableOriginalSize = 1355
   FrameTypeCode       = 3
   Description         = "Created by spiceinit"
   Kernels             = ($newhorizons/kernels/ck/merged_nhpc_2007_v006.bc,
@@ -243,14 +243,14 @@ End_Object
 
 Object = Table
   Name                 = InstrumentPosition
-  StartByte            = 162743
+  StartByte            = 369214210
   Bytes                = 168
   Records              = 3
   ByteOrder            = Lsb
   CacheType            = HermiteSpline
-  SpkTableStartTime    = 225897246.57364
-  SpkTableEndTime      = 225897248.60164
-  SpkTableOriginalSize = 4.0
+  SpkTableStartTime    = 225899886.57365
+  SpkTableEndTime      = 225900359.11965
+  SpkTableOriginalSize = 1355.0
   Description          = "Created by spiceinit"
   Kernels              = $newhorizons/kernels/spk/nh_recon_e2j_v1.bsp
 
@@ -299,24 +299,24 @@ End_Object
 
 Object = Table
   Name                = BodyRotation
-  StartByte           = 162911
+  StartByte           = 369214378
   Bytes               = 128
   Records             = 2
   ByteOrder           = Lsb
-  TimeDependentFrames = (10024, 1)
-  CkTableStartTime    = 225897246.57364
-  CkTableEndTime      = 225897248.60164
+  TimeDependentFrames = (10015, 1)
+  CkTableStartTime    = 225899886.57365
+  CkTableEndTime      = 225900359.11965
   CkTableOriginalSize = 2
   FrameTypeCode       = 2
-  PoleRa              = (268.08, -0.009, 0.0)
-  PoleDec             = (64.51, 0.003, 0.0)
-  PrimeMeridian       = (36.022, 101.3747235, 0.0)
-  PoleRaNutPrec       = (0.0, 0.0, 0.0, 1.086, 0.06, 0.015, 0.009, 0.0, 0.0,
-                         0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-  PoleDecNutPrec      = (0.0, 0.0, 0.0, 0.468, 0.026, 0.007, 0.002, 0.0, 0.0,
-                         0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-  PmNutPrec           = (0.0, 0.0, 0.0, -0.98, -0.054, -0.014, -0.008, 0.0,
-                         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+  PoleRa              = (268.056595, -0.006499, 0.0)
+  PoleDec             = (64.495303, 0.002413, 0.0)
+  PrimeMeridian       = (284.95, 870.536, 0.0)
+  PoleRaNutPrec       = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                         1.17e-04, 9.38e-04, 0.001432, 3.0e-05, 0.00215)
+  PoleDecNutPrec      = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                         5.0e-05, 4.04e-04, 6.17e-04, -1.3e-05, 9.26e-04)
+  PmNutPrec           = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                         0.0, 0.0, 0.0, 0.0, 0.0)
   SysNutPrec0         = (73.32, 24.62, 283.9, 355.8, 119.9, 229.8, 352.25,
                          113.35, 146.64, 49.24, 99.360714, 175.895369,
                          300.323162, 114.012305, 49.511251)
@@ -329,7 +329,7 @@ Object = Table
                          $newhorizons/kernels/pck/pck00010.tpc,
                          $newhorizons/kernels/pck/nh_stars_kbo_centaur_v002.tp-
                          c, $newhorizons/kernels/pck/nh_pcnh_006.tpc)
-  SolarLongitude      = 248.31350038592
+  SolarLongitude      = 289.8540190271
 
   Group = Field
     Name = J2000Q0
@@ -382,13 +382,13 @@ End_Object
 
 Object = Table
   Name                 = SunPosition
-  StartByte            = 163039
+  StartByte            = 369214506
   Bytes                = 112
   Records              = 2
   ByteOrder            = Lsb
   CacheType            = Linear
-  SpkTableStartTime    = 225897246.57364
-  SpkTableEndTime      = 225897248.60164
+  SpkTableStartTime    = 225899886.57365
+  SpkTableEndTime      = 225900359.11965
   SpkTableOriginalSize = 2.0
   Description          = "Created by spiceinit"
   Kernels              = ($newhorizons/kernels/tspk/de413.bsp,
@@ -439,23 +439,23 @@ End_Object
 
 Object = History
   Name      = IsisCube
-  StartByte = 163151
-  Bytes     = 1577
+  StartByte = 369424880
+  Bytes     = 378631
 End_Object
 
 Object = OriginalLabel
   Name      = IsisCube
-  StartByte = 142959
-  Bytes     = 19528
+  StartByte = 369164763
+  Bytes     = 19111
 End_Object
 
 Object = NaifKeywords
-  BODY_CODE                                = 502
-  BODY502_RADII                            = (1562.6, 1560.3, 1559.5)
-  BODY_FRAME_CODE                          = 10024
+  BODY_CODE                                = 599
+  BODY599_RADII                            = (71492.0, 71492.0, 66854.0)
+  BODY_FRAME_CODE                          = 10015
   INS-98901_FOCAL_LENGTH                   = 644.486
   INS-98901_PIXEL_PITCH                    = 0.04
-  CLOCK_ET_-98_1/0034931099:00000_COMPUTED = fcb3253dd6edaa41
+  CLOCK_ET_-98_1/0034933739:00000_COMPUTED = 1cb525ddeaedaa41
   INS-98901_TRANSX                         = (0.0, 0.04, 0.0)
   INS-98901_TRANSY                         = (0.04, 0.0, 0.04)
   INS-98901_ITRANSS                        = (0.0, 25.0, 0.0)
