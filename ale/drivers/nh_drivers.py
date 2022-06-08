@@ -155,6 +155,19 @@ class NewHorizonsLeisaIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         return 0
 
     @property
+    def sensor_name(self):
+      """
+      Returns the name of the instrument. Need to over-ride isis_label because
+      InstrumentName is not defined in the ISIS label for NH Leisa cubes.
+
+      Returns
+      -------
+      : str
+        Name of the sensor
+      """
+      return self.instrument_id
+
+    @property
     def sensor_model_version(self):
         """
         Returns
