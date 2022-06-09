@@ -352,7 +352,7 @@ class ClipperEISNACFCIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDi
         : string
           The name of the filter
         """
-        return self.label['IsisCube']['BandBin']['FilterName'].value
+        return self.label['IsisCube']['BandBin']['FilterName']
 
     @property
     def detector_center_sample(self):
