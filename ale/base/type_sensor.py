@@ -313,3 +313,50 @@ class Radar():
           left or right
         """
         raise NotImplementedError
+
+
+class RollingShutter():
+    """
+    Mix-in for sensors with a rolling shutter.
+    Specifically those with rolling shutter jitter.
+    """
+
+    @property
+    def sample_jitter_coeffs(self):
+        """
+        Polynomial coefficients for the sample jitter.
+        The highest order coefficient comes first.
+        There is no constant coefficient, assumed 0.
+
+        Returns
+        -------
+        : array
+        """
+        raise NotImplementedError
+
+    @property
+    def line_jitter_coeffs(self):
+        """
+        Polynomial coefficients for the line jitter.
+        The highest order coefficient comes first.
+        There is no constant coefficient, assumed 0.
+
+        Returns
+        -------
+        : array
+        """
+        raise NotImplementedError
+
+    @property
+    def line_times(self):
+        """
+        Line exposure times for the image.
+        Generally this will be normalized to [-1, 1] so that the jitter coefficients
+        are well conditioned, but it is not necessarily required as long as the
+        jitter coefficients are consistent.
+
+        Returns
+        -------
+        : array
+        """
+        raise NotImplementedError
