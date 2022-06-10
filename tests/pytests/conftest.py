@@ -60,8 +60,13 @@ def compare_dicts(ldict, rdict):
         elif isinstance(item, np.ndarray) or isinstance(item, list):
             if len(item) != len(rdict[key]):
                 differences.append(f'Array sizes of key {key} are not equal {item} : {rdict[key]}.')
-            elif not np.allclose(item, rdict[key]):
-                differences.append(f'Array values of key {key} are not almost equal {item} : {rdict[key]}.')
+            else:
+                if isinstance(item[0], int) or isinstance(item[0], float):
+                    if not np.allclose(item, rdict[key]):
+                        differences.append(f'Array values of key {key} are not almost equal {item} : {rdict[key]}.')
+                elif isinstance(item[0], str):
+                    if not (np.array(item) == np.array(rdict[key])).all():
+                        differences.append(f'Array values of key {key} are not equal {item} : {rdict[key]}.')
         elif isinstance(item, str):
             if item.lower() != rdict[key].lower():
                 differences.append(f'Values of key {key} are not equal {item} : {rdict[key]}.')
