@@ -59,10 +59,10 @@ class test_EIS_WAC_PB_isis_naif(unittest.TestCase):
         assert self.driver.instrument_id == "EUROPAM_EIS_WAC"
 
     def test_fikid(self):
-        assert self.driver.fikid == -159141
+        assert self.driver.fikid == -159146
 
     def test_filter_name(self):
-        assert self.driver.filter_name == "CLEAR"
+        assert self.driver.filter_name == "BLU"
 
     def test_detector_center_sample(self):
         assert self.driver.detector_center_sample == 2048
@@ -71,10 +71,10 @@ class test_EIS_WAC_PB_isis_naif(unittest.TestCase):
         assert self.driver.detector_center_line == 1024
 
     def test_detector_start_line(self):
-        assert self.driver.detector_start_line == 580
+        assert self.driver.detector_start_line == 351
 
     def test_detector_start_sample(self):
-        assert self.driver.detector_start_sample == 132
+        assert self.driver.detector_start_sample == 32
 
     def test_focal_length(self):
         assert self.driver.focal_length == 46.25
@@ -148,17 +148,17 @@ class test_EIS_NAC_FC_isis_naif(unittest.TestCase):
 class test_EIS_NAC_PB_isis_naif(unittest.TestCase):
 
     def setUp(self):
-        label = get_image_label("eis_nac_fc", "isis3")
+        label = get_image_label("eis_nac_pb", "isis3")
         self.driver = ClipperEISNACPBIsisLabelNaifSpiceDriver(label)
 
     def test_instrument_id(self):
         assert self.driver.instrument_id == "EUROPAM_EIS_NAC"
 
     def test_fikid(self):
-        assert self.driver.fikid == -159121
+        assert self.driver.fikid == -159125
 
     def test_filter_name(self):
-        assert self.driver.filter_name == "CLEAR"
+        assert self.driver.filter_name == "NUV"
 
     def test_detector_center_sample(self):
         assert self.driver.detector_center_sample == 2048
@@ -167,10 +167,10 @@ class test_EIS_NAC_PB_isis_naif(unittest.TestCase):
         assert self.driver.detector_center_line == 1024
 
     def test_detector_start_line(self):
-        assert self.driver.detector_start_line == 580
+        assert self.driver.detector_start_line == 415
 
     def test_detector_start_sample(self):
-        assert self.driver.detector_start_sample == 132
+        assert self.driver.detector_start_sample == 32
 
     def test_focal_length(self):
         assert self.driver.focal_length == 1002.7

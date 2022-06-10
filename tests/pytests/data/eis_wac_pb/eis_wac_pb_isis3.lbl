@@ -28,9 +28,9 @@ Object = IsisCube
     End_Group
 
     Group = BandBin
-        FilterName = CLEAR
-        Center     = 712.5 <nm>
-        Width      = 675 <nm>
+        FilterName = BLU
+        Center     = 427.5 <nm>
+        Width      = 95 <nm>
     End_Group
 
     Group = Kernels
