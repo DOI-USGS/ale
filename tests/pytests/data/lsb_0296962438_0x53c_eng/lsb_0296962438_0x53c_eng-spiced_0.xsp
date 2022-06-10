@@ -5,8 +5,8 @@ DAFETF NAIF DAF ENCODED TRANSFER FILE
 'SPKMERGE                                                    '
 BEGIN_ARRAY 1 78
 'PLUXXX                                  '
-'1D14F2CB12CEC4^8'
-'1D14F311BC060F^8'
+'1D14F27612CEC4^8'
+'1D14F5039B4171^8'
 '3E7'
 '9'
 '1'
@@ -93,8 +93,8 @@ BEGIN_ARRAY 1 78
 END_ARRAY 1 78
 BEGIN_ARRAY 2 24
 'DE-0433LE-0433                          '
-'1D14F2CB12CEC4^8'
-'1D14F311BC060F^8'
+'1D14F27612CEC4^8'
+'1D14F5039B4171^8'
 '9'
 '0'
 '1'
@@ -127,8 +127,8 @@ BEGIN_ARRAY 2 24
 END_ARRAY 2 24
 BEGIN_ARRAY 3 39
 'DE-0433LE-0433                          '
-'1D14F2CB12CEC4^8'
-'1D14F311BC060F^8'
+'1D14F27612CEC4^8'
+'1D14F5039B4171^8'
 'A'
 '0'
 '1'
@@ -176,8 +176,8 @@ BEGIN_ARRAY 3 39
 END_ARRAY 3 39
 BEGIN_ARRAY 4 73
 'pvshort.nio                             '
-'1D14F2CB12CEC4^8'
-'1D14F311BC060F^8'
+'1D14F27612CEC4^8'
+'1D14F5039B4171^8'
 '-62'
 '9'
 '1'
@@ -259,20 +259,20 @@ BEGIN_ARRAY 4 73
 END_ARRAY 4 73
 TOTAL_ARRAYS 4
  ~NAIF/SPC BEGIN COMMENTS~
-; /Users/astamile/testData/ale/leisa/lsb_0296962438_0x53c_eng/lsb_0296962438_0x53c_eng-spiced_0.bsp LOG FILE
+; /ale/leisa/lsb_0296962438_0x53c_eng/lsb_0296962438_0x53c_eng-spiced_0.bsp LOG FILE
 
-; Created 2022-06-10/14:10:02.00.
+; Created 2022-06-10/14:57:03.00.
 ;
 ; BEGIN SPKMERGE COMMANDS
 
 LEAPSECONDS_KERNEL = /Volumes/pkgs/isis3/isis_data/base/kernels/lsk/naif0012.tls
 
-SPK_KERNEL = /Users/astamile/testData/ale/leisa/lsb_0296962438_0x53c_eng/lsb_0296962438_0x53c_eng-spiced_0.bsp
-SOURCE_SPK_KERNEL = /Volumes/pkgs/isis3/isis_data/newhorizons/kernels/spk/nh_recon_pluto_od122_v01.bsp
+SPK_KERNEL = /ale/leisa/lsb_0296962438_0x53c_eng/lsb_0296962438_0x53c_eng-spiced_0.bsp
+SOURCE_SPK_KERNEL = isis3/isis_data/newhorizons/kernels/spk/nh_recon_pluto_od122_v01.bsp
     INCLUDE_COMMENTS = NO
     BODIES           = 999, 9, 10, -98
-    BEGIN_TIME       = 2015 JUN 18 15:07:51.889
-    END_TIME         = 2015 JUN 18 15:09:02.550
+    BEGIN_TIME       = 2015 JUN 18 15:06:26.889
+    END_TIME         = 2015 JUN 18 15:17:20.422
 
 ; END SPKMERGE COMMANDS
  ~NAIF/SPC END COMMENTS~

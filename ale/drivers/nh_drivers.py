@@ -176,3 +176,14 @@ class NewHorizonsLeisaIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
           ISIS sensor model version
         """
         return 1
+
+    def exposure_duration(self):
+        """
+        The exposure duration of the image, in seconds
+
+        Returns
+        -------
+        : float
+          Exposure duration in seconds
+        """
+        return self.label['IsisCube']['Instrument']['ExposureDuration']
