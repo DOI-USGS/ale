@@ -93,16 +93,16 @@ class NewHorizonsLeisaIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
     @property
     def ikid(self):
         """
-        ISIS updated the frame code from -98201 to -98901 in an iak. This is due
-        to ISIS requiring the +Z or -Z axis to be along the boresight of
-        the telescope. So we rotate the -98201 axes by 90deg about +Y
+        Overridden to grab the ikid from the Isis Cube since there is no way to
+        obtain this value with a spice bods2c call. Isis sets this value during
+        ingestion, based on the original fits file.
 
         Returns
         -------
         : int
           Naif ID used to for identifying the instrument in Spice kernels
         """
-        return self.label['IsisCube']['Kernels']['NaifFrameCode']
+        return self.label['IsisCube']['Kernels']['NaifFrameCode'][0]
 
 
     @property

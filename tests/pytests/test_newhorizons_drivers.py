@@ -18,8 +18,8 @@ from ale.drivers.nh_drivers import NewHorizonsLorriIsisLabelNaifSpiceDriver, New
 from conftest import get_image_kernels, convert_kernels, get_image_label, get_isd
 
 image_dict = {
-    # 'lor_0034974380_0x630_sci_1': get_isd("nhlorri"),
-    'lsb_0034933739_0x53c_sci_1': get_isd("nhleisa")
+    'lor_0034974380_0x630_sci_1': get_isd("nhlorri"),
+    'lsb_0296962438_0x53c_eng': get_isd("nhleisa")
 }
 
 
