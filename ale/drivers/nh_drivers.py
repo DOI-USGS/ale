@@ -156,16 +156,16 @@ class NewHorizonsLeisaIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
 
     @property
     def sensor_name(self):
-      """
-      Returns the name of the instrument. Need to over-ride isis_label because
-      InstrumentName is not defined in the ISIS label for NH Leisa cubes.
+        """
+        Returns the name of the instrument. Need to over-ride isis_label because
+        InstrumentName is not defined in the ISIS label for NH Leisa cubes.
 
-      Returns
-      -------
-      : str
+        Returns
+        -------
+        : str
         Name of the sensor
-      """
-      return self.instrument_id
+        """
+        return self.instrument_id
 
     @property
     def sensor_model_version(self):
@@ -177,6 +177,7 @@ class NewHorizonsLeisaIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         """
         return 1
 
+    @property
     def exposure_duration(self):
         """
         The exposure duration of the image, in seconds
@@ -186,4 +187,4 @@ class NewHorizonsLeisaIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         : float
           Exposure duration in seconds
         """
-        return self.label['IsisCube']['Instrument']['ExposureDuration']
+        return self.label['IsisCube']['Instrument']['ExposureDuration'].value
