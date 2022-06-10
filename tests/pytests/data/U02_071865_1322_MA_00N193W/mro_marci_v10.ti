@@ -1,0 +1,825 @@
+KPL/IK
+
+MARCI Instrument kernel
+===========================================================================
+
+   This instrument kernel (I-kernel) contains MRO Mars Color Imager
+   (MARCI) optics, detector, and field-of-view parameters.
+
+
+Version and Date
+--------------------------------------------------------
+
+   Version 1.0 -- November 29, 2007 -- Boris Semenov, NAIF/JPL
+
+      Initial version.
+
+
+References
+--------------------------------------------------------
+
+   1. ``Kernel Pool Required Reading''
+
+   2. ``C-kernel Required Reading''
+
+   3. MRO Frames Definition Kernel (FK), latest version.
+
+   4. MARCI Description, MSSS Web Site,
+      http://www.msss.com/mro/marci/description.html
+
+   5. E-mail from Joe Fahle, MSSS, regarding the MARCI camera model,
+      September 6, 2007.
+
+   6. Malin, M. C., et al. Mars Color Imager (MARCI) on the Mars
+      Climate Orbiter, JGR, Vol 106, 2001-08-25; included as
+      marci_1999je001145.pdf in MRO-M-MARCI-2-EDR-L0-V1.0 data set
+
+   7. MARCI Standard EDR Data Product SIS; included as marcisis.pdf in
+      MRO-M-MARCI-2-EDR-L0-V1.0 data set
+
+
+Implementation Notes
+--------------------------------------------------------
+
+   Applications that need SPICE I-kernel data must ``load'' the I-kernel
+   file, normally during program initialization.
+
+   Loading the kernel using the SPICELIB routine FURNSH causes the data
+   items and their associated values present in the kernel to become
+   associated with a data structure called the ``kernel pool''. The
+   application program may then obtain the value(s) for any IK data
+   item using the SPICELIB routines GDPOOL, GIPOOL, GCPOOL. Routine
+   GETFOV may be used if the file contains instrument field-of-view
+   (FOV) specification. See [1] for details.
+
+   This file was created with, and can be updated with a text editor or
+   word processor.
+
+
+Conventions for Specifying Data
+--------------------------------------------------------
+
+   Data items are specified using ``keyword=value'' assignments [1].
+   All keywords referencing values in this I-kernel start with the
+   characters `INS' followed by the NAIF MRO instrument ID code,
+   constructed using the spacecraft ID number (-74) followed by the
+   NAIF three digit ID number for one of the MARCI's cameras (410 or
+   420) or individual spectral bands (411-415, 421-422). These IDs are
+   defined in [3] as follows:
+
+               Instrument name                ID
+               --------------------         -------
+               MRO_MARCI                    -74400
+               MRO_MARCI_VIS                -74410
+               MRO_MARCI_VIS_BLUE           -74411
+               MRO_MARCI_VIS_GREEN          -74412
+               MRO_MARCI_VIS_ORANGE         -74413
+               MRO_MARCI_VIS_RED            -74414
+               MRO_MARCI_VIS_NIR            -74415
+               MRO_MARCI_UV                 -74420
+               MRO_MARCI_UV_SHORT_UV        -74421
+               MRO_MARCI_UV_LONG_UV         -74422
+
+   The remainder of the keyword is an underscore character followed by
+   the unique name of the data item. For example, the focal length of
+   the MARCI visual camera is specified by
+
+               INS-74410_FOCAL_LENGTH
+
+   The upper bound on the length of all keywords is 32 characters.
+
+   If a keyword is included in more than one file, or if the same
+   keyword appears more than once within a single file, the last
+   assignment supersedes any earlier assignments.
+
+
+Overview
+--------------------------------------------------------
+
+   From [4]:
+
+      The Mars Color Imager (MARCI) is designed to acquire daily global
+      images of Mars for at least 1 martian year (687 Earth days) at 5
+      visible wavelengths and 2 ultraviolet wavelengths. MARCI images
+      will be used to document the weather on Mars by observing the
+      comings and goings of dust storms, polar frost, and clouds of
+      water vapor, water ice, and carbon dioxide crystals. MARCI's
+      ultraviolet observations will map the distribution of water vapor
+      and ozone in the atmosphere.
+ 
+      The MRO MARCI is the second such camera to be sent to Mars. The
+      first was competively selected by NASA to fly on the Mars Climate
+      Orbiter (MCO) in 1998. That spacecraft was lost during orbit
+      insertion in September 1999. The MCO MARCI had two cameras-- a
+      wide angle system to provide daily global views of the planet,
+      and a medium angle system to provide 40 meters per pixel views of
+      selected areas to be examined for landing site studies. For the
+      2005 MRO mission, NASA decided only to re-fly the MARCI wide
+      angle system, and replace the 40 meters per pixel medium angle
+      camera with the 6 meters per pixel Context Camera (CTX).
+ 
+      On each orbit that MRO makes around Mars, MARCI simultaneously
+      acquires 7 pictures at 7 different wavelengths. Over the course
+      of a day, MRO makes 12 to nearly 13 orbits around Mars. The 12
+      times 7 pictures per day (84 images) provide a daily record of
+      meteorologic events that have occurred on the planet. By building
+      up these images every day for an entire martian year, MARCI will
+      provide a record that spans through winter, spring, summer, and
+      autumn in both martian hemispheres.
+ 
+      The table, below, shows the wavelengths of each MARCI image. In
+      addition to their utility in observing ozone and discriminating
+      between clouds of dust, water vapor, water ice, and carbon
+      dioxide, these images can also track the changes in brightness of
+      the martian surface, monitor the growth and retreat of the polar
+      caps, and aid in identification of iron-bearing minerals.
+
+         Wavelength         Spectral Region
+         ----------------   -------------------
+         260 nanometers     ultraviolet
+         320 nanometers     ultraviolet
+         425 nanometers     visible
+         550 nanometers     visible
+         600 nanometers     visible
+         650 nanometers     visible
+         725 nanometers     visible
+
+      Looking straight down (nadir orientation) at Mars, MARCI images
+      are designed to have spatial resolutions in the 1 to 10
+      kilometers per pixel range. The system consists of two separate
+      sets of lenses and detectors -- one for the visible light images,
+      and one for the ultraviolet images. Both systems have a 180
+      degree field of view lens, which permits all of Mars to be in
+      view, even when MRO rolls up to 20 degrees off nadir for imaging
+      specific targets with its other instruments. Each MARCI image is
+      about 1000 pixels wide and can be many thousands of pixels long,
+      depending on the objective of the image.
+ 
+      The figure (above) shows a representation of the MARCI visible
+      (color) detector. A single CCD array is used. The five color
+      filters are bonded to the detector in strips as shown here. The
+      blue strip represents the 423 nanometers band, the green is the
+      550 nanometers band, and so forth.
+ 
+      As MARCI moves forward in its orbit around Mars, it will build up
+      color images using the 5 visible light filters as each filtered
+      area of the CCD detector passes over the martian surface.
+
+
+Mounting Alignment
+--------------------------------------------------------
+
+   Refer to the latest version of the MRO Frames Definition Kernel (FK)
+   [3] for the MARCI reference frame definitions and mounting alignment
+   information.
+
+
+Apparent FOV Layout
+--------------------------------------------------------
+
+   The diagram below illustrates the MARCI VIS camera FOV/CCD layout:
+
+ 
+                                  ^
+                                  | Down track
+                                  |
+
+                                
+      --- 0,0--------------------------------------------.          
+   ~2 deg  |  BLUE                *                      |     --------        
+      ---  `-----------------------------------------1023,15    | 51 pixels
+      --- 0,0--------------------------------------------.      |   
+   ~2 deg  |  GREEN               *                      |      |   ---
+      ---  `-----------------------------------------1023,15    |    |  26 
+      --- 0,0--------------------------------------------.      |    | pixels
+   ~2 deg  |  ORANGE        +Zvis x-------------> +Xvis  |     --------
+      ---  `----------------------|------------------1023,15    |    |  26
+      --- 0,0---------------------|----------------------.      |    | pixels
+   ~2 deg  |  RED                 *                      |      |   ---
+      ---  `----------------------|------------------1023,15    |
+      --- 0,0---------------------|----------------------.      | 51 pixels
+   ~2 deg  |  NIR                 *                      |     --------
+      ---  `----------------------|------------------1023,15  
+                                  |
+                                  V +Yvis
+                                   
+           |                   ~155 deg                  |      Boresight
+           |---------------------------------------------|    (+Zvis axis)
+           |                                             |      is into
+                                                                the page
+
+
+   The diagram below illustrates the MARCI UV camera FOV/CCD layout:
+
+                                  ^
+                                  | Down track
+                                  |
+
+                                
+      --- 0,0--------------------------------------------.          
+   ~2 deg  |  SHORT_UV            *                      |     --- 7 pixels
+      ---  `---------------- +Zuv x---------> +Xuv --1023,15   --------
+      --- 0,0---------------------|----------------------.      | 20 pixels
+   ~2 deg  |  LONG_UV             *                      |      |
+      ---  `----------------------|------------------1023,15   ---
+                                  |
+                                  |
+                                  |
+                                  |
+                                  V +Yuv
+                                   
+           |                   ~155 deg                  |      Boresight
+           |---------------------------------------------|     (+Zuv axis)
+           |                                             |      is into
+                                                                the page
+
+
+
+Optical and Detector Parameters
+--------------------------------------------------------
+
+   This section provides two parameters that, in combination with the
+   optical distortion and filter parameters, are needed to compute the
+   view directions of the individual CCD pixels. These parameters are
+   the focal length and pixel size for each of the two cameras (VIS and
+   UV).
+
+   The pixel size keywords below are set to the nominal value from [6]
+   -- 9 microns -- while the focal lengths are set to the values from
+   [5]. All values are in millimeters.
+
+   \begindata
+
+      INS-74410_FOCAL_LENGTH = ( 3.9215079 )
+      INS-74420_FOCAL_LENGTH = ( 3.9551850 )
+
+      INS-74410_PIXEL_SIZE   = ( 0.009 )
+      INS-74420_PIXEL_SIZE   = ( 0.009 )
+
+   \begintext
+
+
+FOV Definition 
+--------------------------------------------------------
+
+   This section contains definitions for the MARCI band FOVs. These
+   definitions are provided in the format required by the SPICE
+   (CSPICE) function GETFOV (getfov_c).
+
+   Due to the wide-angle nature of the camera the FOV for each of the
+   bands is specified as a polygon with the following pixels defining
+   its boresight and boundary vectors:
+
+
+        0.5,0.5   255.5,0.5    512,0.5  768.5,0.5  1023.5,0.5
+           *-----------*----------*----------*-----------*          
+           |                      * 512,8                |
+           *-----------*----------*----------*-----------*
+        0.5,15.5  255.5,15.5   512,15.5 768.5,15.5 1023.5,15.5
+
+
+   In the FOV definitions below the boundary vectors are listed in
+   clockwise order starting with the left-top corner. The Z component
+   of each vector is set to the focal length of the camera expressed in
+   pixels; the X and Y components are set to the undistorted values
+   computed for the pixels shown above using the camera distortion models.
+
+   \begindata
+   
+      INS-74411_FOV_FRAME              = 'MRO_MARCI_VIS'
+      INS-74411_FOV_SHAPE              = 'POLYGON'
+      INS-74411_BORESIGHT              = (
+                                              0.000    -51.239    435.723
+                                         )
+      INS-74411_FOV_BOUNDARY_CORNERS   = (
+                                          -2019.030   -230.915    435.723
+                                           -310.336    -70.778    435.723
+                                              0.000    -58.909    435.723
+                                            310.336    -70.778    435.723
+                                           2019.030   -230.915    435.723
+                                           1996.100   -169.756    435.723
+                                            308.788    -52.368    435.723
+                                              0.000    -43.617    435.723
+                                           -308.788    -52.368    435.723
+                                          -1996.100   -169.756    435.723
+                                         )
+
+      INS-74412_FOV_FRAME              = 'MRO_MARCI_VIS'
+      INS-74412_FOV_SHAPE              = 'POLYGON'
+      INS-74412_BORESIGHT              = (
+                                              0.000    -25.980    435.723
+                                         )
+      INS-74412_FOV_BOUNDARY_CORNERS   = (
+                                          -1984.657   -129.982    435.723
+                                           -308.019    -40.229    435.723
+                                              0.000    -33.517    435.723
+                                            308.019    -40.229    435.723
+                                           1984.657   -129.982    435.723
+                                           1973.131    -71.364    435.723
+                                            307.247    -22.160    435.723
+                                              0.000    -18.468    435.723
+                                           -307.247    -22.160    435.723
+                                          -1973.131    -71.364    435.723
+                                         )
+
+      INS-74413_FOV_FRAME              = 'MRO_MARCI_VIS'
+      INS-74413_FOV_SHAPE              = 'POLYGON'
+      INS-74413_BORESIGHT              = (
+                                              0.000      0.000    435.723
+                                         )
+      INS-74413_FOV_BOUNDARY_CORNERS   = (
+                                          -1968.921    -28.870    435.723
+                                           -306.965     -8.976    435.723
+                                              0.000     -7.481    435.723
+                                            306.965     -8.976    435.723
+                                           1968.921    -28.870    435.723
+                                           1968.921     28.870    435.723
+                                            306.965      8.976    435.723
+                                              0.000      7.481    435.723
+                                           -306.965      8.976    435.723
+                                          -1968.921     28.870    435.723
+                                         )
+
+      INS-74414_FOV_FRAME              = 'MRO_MARCI_VIS'
+      INS-74414_FOV_SHAPE              = 'POLYGON'
+      INS-74414_BORESIGHT              = (
+                                              0.000     25.980    435.723
+                                         )
+      INS-74414_FOV_BOUNDARY_CORNERS   = (
+                                          -1973.131     71.364    435.723
+                                           -307.247     22.160    435.723
+                                              0.000     18.468    435.723
+                                            307.247     22.160    435.723
+                                           1973.131     71.364    435.723
+                                           1984.657    129.982    435.723
+                                            308.019     40.229    435.723
+                                              0.000     33.517    435.723
+                                           -308.019     40.229    435.723
+                                          -1984.657    129.982    435.723
+                                         )
+
+      INS-74415_FOV_FRAME              = 'MRO_MARCI_VIS'
+      INS-74415_FOV_SHAPE              = 'POLYGON'
+      INS-74415_BORESIGHT              = (
+                                              0.000     51.239    435.723
+                                         )
+      INS-74415_FOV_BOUNDARY_CORNERS   = (
+                                          -1996.100    169.756    435.723
+                                           -308.788     52.368    435.723
+                                              0.000     43.617    435.723
+                                            308.788     52.368    435.723
+                                           1996.100    169.756    435.723
+                                           2019.030    230.915    435.723
+                                            310.336     70.778    435.723
+                                              0.000     58.909    435.723
+                                           -310.336     70.778    435.723
+                                          -2019.030    230.915    435.723
+                                         )
+
+      INS-74421_FOV_FRAME              = 'MRO_MARCI_UV'
+      INS-74421_FOV_SHAPE              = 'POLYGON'
+      INS-74421_BORESIGHT              = (
+                                              0.000     -7.117    439.465
+                                         )
+      INS-74421_FOV_BOUNDARY_CORNERS   = (
+                                          -2101.945    -59.586    439.465
+                                           -317.079    -17.925    439.465
+                                              0.000    -14.749    439.465
+                                            317.079    -17.925    439.465
+                                           2101.945    -59.586    439.465
+                                           2098.772      2.052    439.465
+                                            316.833      0.618    439.465
+                                              0.000      0.508    439.465
+                                           -316.833      0.618    439.465
+                                          -2098.772      2.052    439.465
+                                         )
+
+      INS-74422_FOV_FRAME              = 'MRO_MARCI_UV'
+      INS-74422_FOV_SHAPE              = 'POLYGON'
+      INS-74422_BORESIGHT              = (
+                                              0.000     20.353    439.465
+                                         )
+      INS-74422_FOV_BOUNDARY_CORNERS   = (
+                                          -2101.129     51.347    439.465
+                                           -317.016     15.449    439.465
+                                              0.000     12.713    439.465
+                                            317.016     15.449    439.465
+                                           2101.129     51.347    439.465
+                                           2110.217    113.453    439.465
+                                            317.721     34.064    439.465
+                                              0.000     28.011    439.465
+                                           -317.721     34.064    439.465
+                                          -2110.217    113.453    439.465
+                                         )
+
+   \begintext
+  
+
+Optical Distortion
+--------------------------------------------------------
+
+   The following model is used by the MARCI Team, MSSS to convert
+   distorted focal plane coordinates, Xd and Yd, to undistorted
+   coordinates, Xu and Yu (from [5]):
+
+      Rd = sqrt( Xd*Xd + Yd*Yd )
+
+      Ru = C0 + C1*Rd^2 + C2*Rd^4 + C3*Rd^6
+
+      Xu = Xd * ( Ru / Rd )
+      Yu = Yd * ( Ru / Rd )
+
+   where Rd and Ru are distorted and undistorted distances from the CCD
+   center and Ci are distortion coefficients.
+
+   According to [5] the distortion coefficients used by MSSS
+
+     "... were derived by fitting a polynomial to Peter Thomas's
+      distorted Rd versus undistorted look angle data. Angle was
+      converted to undistorted Ru = FL * tan(angle). Both Rd and Ru
+      were converted to pixels and the ratio Ru/Rd was fit to the
+      polynomial a + bx^2 + cx^4 + dx^6.
+
+      Data points corresponding to angles greater than 64 were
+      discarded. The theoretical maximum angle to hit Mars from the
+      various MRO operational orbit heights is 68. However, 64 was
+      chosen as a cutoff because variance of the residuals jumped
+      significantly after that point. Moreover, data points for angles
+      greater than 60 degrees contain almost no distinguishable
+      features.
+
+      The UV (Rd,Theta) data had fewer points and had much greater
+      variance around the fitted polynomial than the VIS data."
+   
+   The distortion coefficients for the VIS and UV cameras provided by
+   MSSS are included in the keywords below.
+
+   \begindata
+
+      INS-74410_DISTORTION_COEFFS = (
+                                    0.997322,
+                                    2.84786e-06, 
+                                   -6.67752e-12,
+                                    1.43076e-16
+
+                                  )
+      INS-74420_DISTORTION_COEFFS = ( 
+                                    1.01661,
+                                    2.62687e-06,
+                                    2.35307e-12,
+                                    1.24976e-16
+                                  )
+
+   \begintext
+
+
+Filters
+--------------------------------------------------------
+
+   This section specifies the follwing MARCI filter (band) parameters:
+
+
+      INS-74400_BAND_NUMBER          band ID number, 1-7, from [5]
+ 
+      INS-74400_BAND_NAME            band name, as appears in MARCI EDR
+                                     labels, from [5] and [7]
+ 
+      INS-74400_BAND_CENTER_SAMPLE   sample index of the center pixel
+                                     in the nominal 1024x16 area read
+                                     out for each band, in pixels, set
+                                     to 512 for all bands, from [5]
+ 
+      INS-74400_BAND_CENTER_LINE     line index of the center pixel in
+                                     the nominal 1024x16 area read out
+                                     for each band, in pixels, set to 8
+                                     for all bands, from [5]
+ 
+      INS-74400_BAND_CCD_OFFSET      offset of the band center line
+                                     from the center line of the CCD
+                                     area used by the camera through
+                                     which the band is exposed, in
+                                     pixels, from [5]
+ 
+      INS-74400_BAND_WAVELENGTH      effective center wavelength of the
+                                     band, in nanometers, from [6]
+ 
+      INS-74400_BAND_FWHM            full width at half maximum (FWHM)
+                                     of the band, in nanometers, from
+                                     [6]
+
+      INS-74400_BAND_NAIF_ID         NAIF ID of the band
+
+      INS-74400_BAND_CAMERA_NAIF_ID  NAIF ID of the camera through
+                                     which the band is exposed
+
+
+   This data section sets the keywords described above.
+
+   \begindata
+
+      INS-74400_BAND_NUMBER     = ( 
+
+          1,      2,       3,        4,      5,     6,          7
+
+                                  )
+
+      INS-74400_BAND_NAME       = ( 
+
+         'BLUE', 'GREEN', 'ORANGE', 'RED',  'NIR', 'SHORT_UV', 'LONG_UV'
+
+                                  )
+
+      INS-74400_BAND_CENTER_SAMPLE = (
+
+          512,    512,     512,      512,    512,   512,        512
+
+                                  )
+
+      INS-74400_BAND_CENTER_LINE = (
+
+          8,      8,       8,        8,      8,     8,          8
+
+                                  )
+
+      INS-74400_BAND_CCD_OFFSET = ( 
+
+          51,     26,      0,        -26,    -51,   7,          -20
+
+                                  )
+
+      INS-74400_BAND_WAVELENGTH = (
+
+          453,    561,     614,      636,    765,   280,        315
+
+                                  ) 
+
+      INS-74400_BAND_FWHM       = (
+
+          83,     45,      51,       123,    62,    69,         17
+
+                                  ) 
+
+      INS-74400_BAND_NAIF_ID    = (
+
+         -74411, -74412,  -74413,   -74414, -74415, -74421,     -74422
+
+                                  )
+
+      INS-74400_BAND_CAMERA_NAIF_ID = (
+
+         -74410, -74410,  -74410,   -74410, -74410, -74420,     -74420
+
+                                  )
+
+   \begintext
+
+
+A Recipe for Computing Observation Time and CCD Pixel View Direction
+--------------------------------------------------------------------
+
+   This section provides a recipe for computing the view direction and
+   observation time for a given pixel from a MARCI EDR image. The
+   recipe is based on [5] and [7]. The recipe uses a mix of formulas
+   and calls to CSPICE routines.
+
+   All indexes used in the recipe are zero-based.
+
+
+   Step 1: EDR image pixel coordinates to band pixel coordinates
+   -------------------------------------------------------------
+
+      Given:
+
+         -  image sample index (image_sample), measured left to right,
+            ranging from 0 to LINE_SAMPLES-1
+
+         -  image line index (image_line), measured top to bottom, ranging
+            from 0 to LINES-1
+
+         -  the following values from the image label:
+
+               SAMPLING_FACTOR (sampling_factor)
+               SAMPLE_FIRST_PIXEL (sample_first_pixel)
+               FILTER_NAME (filter_name_list, filter_name_count)
+
+         -  the following IK parameters:
+
+               INS-74400_BAND_NAME (ik_band_names)
+               INS-74400_BAND_NUMBER (ik_band_numbers)
+               INS-74400_BAND_CAMERA_NAIF_ID (camera_ids)
+
+      Compute:
+
+         -  frame_number (0..total_frames), band_number (1..7),
+            band_sample (0..1023), band_line (0..15)
+
+
+      a) Compute the number of pixels in one band:
+
+            pixels_per_band  = 16 / sampling_factor
+
+      b) Compute the number of pixels in one frame:
+
+            pixels_per_frame =  filter_name_count * pixels_per_band
+
+      c) Compute the frame number within the image:
+
+            frame_number = image_line / pixels_per_frame
+
+      d) Compute the line number within the frame:
+   
+            frame_line   = image_line - frame_number * pixels_per_frame
+
+      e) Compute the band index within the frame:
+
+            band_index   = frame_line / pixels_per_band
+
+      f) Lookup the band name (using list from label's FILTER_NAME or
+         the filter set identification lette from the product ID -- A,
+         B, C, D, U):
+
+            band_name    = filter_name_list[band_index]
+
+      g) Lookup band number and NAIF ID of the camera through which it
+         is exposed using IK lists INS-74400_BAND_NAME,
+         INS-74400_BAND_NUMBER, and INS-74400_BAND_CAMERA_NAIF_ID:
+
+            gcpool_c ( "INS-74400_BAND_NAME", 0, 7, 32,
+                       &n, ik_band_names, &found )
+
+            gipool_c ( "INS-74400_BAND_NUMBER", 0, 7, 
+                       &n, ik_band_numbers, &found )
+
+            gipool_c ( "INS-74400_BAND_CAMERA_NAIF_ID", 0, 7, 
+                       &n, ik_camera_ids, &found )
+
+            i            = isrchc_c( band_name, 7, 32, ik_band_names )
+
+            band_number  = ik_band_numbers[i]
+
+            camera_id    = ik_camera_ids[i]
+
+      h) Compute the line index within the band taking sampling into
+         account:
+
+            band_line    = ( frame_line - band_index * pixels_per_band )
+                           * sampling_factor + sampling_factor / 2
+
+      i) Compute the sample index within the band taking sampling into
+         account:
+
+            band_sample  = ( image_sample + sample_first_pixel ) 
+                           * sampling_factor + sampling_factor / 2
+
+
+   Step 2: Image pixel coordinates/label values -> pixel exposure time
+   -------------------------------------------------------------------
+
+      Given:
+
+         -  previously computed frame_number
+
+         -  the following values from the image label:
+
+               SPACECRAFT_CLOCK_START_COUNT (start_sclk)
+               INTERFRAME_DELAY (frame_delay)
+               LINE_EXPOSURE_DURATION (exposure)
+
+      Compute:
+
+         -  pixel ET time (pixel_time)      
+
+
+      j) Convert start_sclk to ET using SCS2E with MRO main clock ID -74:
+
+            scs2e( -74, start_sclk, start_et )
+
+      k) Compute pixel mid-exposure ET time:
+
+            pixel_time = start_et + frame_number * frame_delay + exposure / 2 
+                   
+
+   Step 3: Band pixel coordinates -> distorted view direction
+   ----------------------------------------------------------
+
+      Given:
+
+         -  previously computed band_number, camera_id, band_sample, and 
+            band_line
+
+         -  the following IK parameters:
+
+               INS-74410_FOCAL_LENGTH (focal_length for VIS)
+               INS-74420_FOCAL_LENGTH (focal_length for UV)
+               INS-74410_PIXEL_SIZE (pixel_size for VIS)
+               INS-74420_PIXEL_SIZE (pixel_size for UV)
+               INS-74400_BAND_CENTER_SAMPLE (center_sample_indexes)
+               INS-74400_BAND_CENTER_LINE (center_line_indexes)
+               INS-74400_BAND_CCD_OFFSET (band_ccd_offsets)
+
+      Compute:
+
+         -  distorted view direction (distorted_view)
+
+
+      l) Fetch from the IK the camera focal length and pixel size for
+         given camera_id along with lists providing the band center
+         sample and line indexes and offsets from CCD center:
+
+            gdpool_c ( "INS<camera_id>_FOCAL_LENGTH", 0, 1, 
+                       &n, &focal_length, &found )
+
+            gdpool_c ( "INS<camera_id>_PIXEL_SIZE", 0, 1, 
+                       &n, &pixel_size, &found )
+
+            gipool_c ( "INS-74400_BAND_CENTER_SAMPLE", 0, 7, 
+                       &n, center_sample_indexes, &found )
+
+            gipool_c ( "INS-74400_BAND_CENTER_LINE", 0, 7, 
+                       &n, center_line_indexes, &found )
+
+            gipool_c ( "INS-74400_BAND_CCD_OFFSET", 0, 7, 
+                       &n, band_ccd_offsets, &found )
+
+      m) Compute distorted X coordinate in pixels:
+
+            distorted_view[0] = band_sample - 
+                                center_sample_indexes[band_number]
+
+      n) Compute distorted Y coordinate in pixels:
+
+            distorted_view[1] = band_line - 
+                                center_line_indexes[band_number] -
+                                band_ccd_offsets[band_number]
+
+      o) Set distorted Z coordinate to focal length in pixels:
+
+            distorted_view[2] = focal_length / pixel_size
+
+
+
+   Step 4: Distorted view direction -> undistorted view direction
+   --------------------------------------------------------------
+
+      Given:
+
+         -  previously computed distorted_view and camera_id
+
+         -  the following IK parameters:
+
+               INS-74410_DISTORTION_COEFFS (c for VIS)
+               INS-74420_DISTORTION_COEFFS (c for UV)
+
+      Compute:
+
+         -  undistorted view direction (undistorted_view)
+
+
+      p) Fetch distortion coefficients for given camera ID from IK:
+
+            gdpool_c ( "INS<camera_id>_DISTORTION_COEFFS", 0, 4, 
+                       &n, c, &found )
+
+      q) Compute distorted distance in the focal plane:
+
+            rd = sqrt( distorted_view[0]^2 + distorted_view[1]^2 )
+
+      r) Compute radial distortion scaling factor:
+
+            f = c[0] + c[1] * rd^2 + c[2] * rd^4 + c[3] * rd^6
+
+      s) Compute undistorted X and Y by scaling distorted X and Y:
+
+            undistorted_view[0] = distorted_view[0] * f
+            undistorted_view[1] = distorted_view[1] * f
+
+      t) Set undistorted Z to distorted Z:
+
+            undistorted_view[2] = distorted_view[2]
+        
+
+
+Platform ID
+--------------------------------------------------------
+
+   These numbers are the NAIF instrument IDs of the platforms on which the
+   instrument and its detectors are mounted.
+
+      \begindata
+
+         INS-74400_PLATFORM_ID  = ( -74000 )
+
+         INS-74410_PLATFORM_ID  = ( -74400 )
+         INS-74420_PLATFORM_ID  = ( -74400 )
+
+         INS-74411_PLATFORM_ID  = ( -74410 )
+         INS-74412_PLATFORM_ID  = ( -74410 )
+         INS-74413_PLATFORM_ID  = ( -74410 )
+         INS-74414_PLATFORM_ID  = ( -74410 )
+         INS-74415_PLATFORM_ID  = ( -74410 )
+
+         INS-74421_PLATFORM_ID  = ( -74420 )
+         INS-74422_PLATFORM_ID  = ( -74420 )
+
+      \begintext
+

@@ -1,0 +1,73 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 512
+    TileLines   = 380
+
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 21280
+      Bands   = 5
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName           = "MARS RECONNAISSANCE ORBITER"
+    InstrumentId             = Marci
+    TargetName               = MARS
+    SummingMode              = 1
+    StartTime                = 2021-11-25T01:03:43.074
+    StopTime                 = 2021-11-25T02:00:57.674
+    SpacecraftClockCount     = 1322269479:177
+    DataFlipped              = 1
+    ColorOffset              = 2
+    InterframeDelay          = 2.6 <seconds>
+    ExposureDuration         = 0.0175 <seconds>
+    Framelets                = Even
+    FrameNumber              = 0
+    VariableExposureDuration = 17.5 <ms>
+  End_Group
+
+  Group = Archive
+    ProductId             = U02_071865_1322_MA_00N193W
+    OriginalProductId     = 4A_05_116C813600
+    OrbitNumber           = 71865
+    SampleBitModeId       = SQROOT
+    FocalPlaneTemperature = 259.8
+    RationaleDesc         = "global map swath"
+  End_Group
+
+  Group = BandBin
+    FilterName   = (BLUE, GREEN, ORANGE, RED, NIR)
+    OriginalBand = (1, 2, 3, 4, 5)
+  End_Group
+
+  Group = Kernels
+    NaifIkCode = -74410
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 435881730
+  Bytes     = 814
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 435879937
+  Bytes     = 1793
+End_Object
+End
