@@ -7,7 +7,84 @@ from unittest.mock import patch
 
 from conftest import get_image, get_image_label
 
-from ale.drivers.clipper_drivers import ClipperEISNACFCIsisLabelNaifSpiceDriver, ClipperEISWACPBIsisLabelNaifSpiceDriver, ClipperEISNACFCIsisLabelNaifSpiceDriver
+from ale.drivers.clipper_drivers import ClipperEISWACFCIsisLabelNaifSpiceDriver, ClipperEISWACPBIsisLabelNaifSpiceDriver, ClipperEISNACFCIsisLabelNaifSpiceDriver, ClipperEISNACPBIsisLabelNaifSpiceDriver
+
+
+# ========= Test EIS WAC FC isislabel and naifspice driver =========
+class test_EIS_WAC_FC_isis_naif(unittest.TestCase):
+
+    def setUp(self):
+        label = get_image_label("eis_wac_fc", "isis3")
+        self.driver = ClipperEISWACFCIsisLabelNaifSpiceDriver(label)
+
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == "EUROPAM_EIS_WAC"
+
+    def test_fikid(self):
+        assert self.driver.fikid == -159141
+
+    def test_filter_name(self):
+        assert self.driver.filter_name == "CLEAR"
+
+    def test_detector_center_sample(self):
+        assert self.driver.detector_center_sample == 2048
+
+    def test_detector_center_line(self):
+        assert self.driver.detector_center_line == 1024
+
+    def test_detector_start_line(self):
+        assert self.driver.detector_start_line == 580
+
+    def test_detector_start_sample(self):
+        assert self.driver.detector_start_sample == 132
+
+    def test_focal_length(self):
+        assert self.driver.focal_length == 46.25
+
+    def test_focal2pixel_lines(self):
+        np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0.0, 0.0, 1.0 / 0.014])
+
+    def test_focal2pixel_samples(self):
+        np.testing.assert_array_equal(self.driver.focal2pixel_samples, [0.0, -1.0 / 0.014, 0.0])
+
+
+# ========= Test EIS WAC PB isislabel and naifspice driver =========
+class test_EIS_WAC_PB_isis_naif(unittest.TestCase):
+
+    def setUp(self):
+        label = get_image_label("eis_wac_pb", "isis3")
+        self.driver = ClipperEISWACPBIsisLabelNaifSpiceDriver(label)
+
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == "EUROPAM_EIS_WAC"
+
+    def test_fikid(self):
+        assert self.driver.fikid == -159141
+
+    def test_filter_name(self):
+        assert self.driver.filter_name == "CLEAR"
+
+    def test_detector_center_sample(self):
+        assert self.driver.detector_center_sample == 2048
+
+    def test_detector_center_line(self):
+        assert self.driver.detector_center_line == 1024
+
+    def test_detector_start_line(self):
+        assert self.driver.detector_start_line == 580
+
+    def test_detector_start_sample(self):
+        assert self.driver.detector_start_sample == 132
+
+    def test_focal_length(self):
+        assert self.driver.focal_length == 46.25
+
+    def test_focal2pixel_lines(self):
+        np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0.0, 0.0, 1.0 / 0.014])
+
+    def test_focal2pixel_samples(self):
+        np.testing.assert_array_equal(self.driver.focal2pixel_samples, [0.0, -1.0 / 0.014, 0.0])
+
 
 # ========= Test EIS NAC FC isislabel and naifspice driver =========
 class test_EIS_NAC_FC_isis_naif(unittest.TestCase):
@@ -59,3 +136,47 @@ class test_EIS_NAC_FC_isis_naif(unittest.TestCase):
         with patch('ale.drivers.clipper_drivers.read_table_data', return_value=test_table_data) as table_mock:
             np.testing.assert_array_equal(self.driver.line_times, test_times)
             table_mock.assert_called()
+
+    def test_focal2pixel_lines(self):
+        np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0.0, 0.0, 1.0 / 0.014])
+
+    def test_focal2pixel_samples(self):
+        np.testing.assert_array_equal(self.driver.focal2pixel_samples, [0.0, -1.0 / 0.014, 0.0])
+
+
+# ========= Test EIS NAC PB isislabel and naifspice driver =========
+class test_EIS_NAC_PB_isis_naif(unittest.TestCase):
+
+    def setUp(self):
+        label = get_image_label("eis_nac_fc", "isis3")
+        self.driver = ClipperEISNACPBIsisLabelNaifSpiceDriver(label)
+
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == "EUROPAM_EIS_NAC"
+
+    def test_fikid(self):
+        assert self.driver.fikid == -159121
+
+    def test_filter_name(self):
+        assert self.driver.filter_name == "CLEAR"
+
+    def test_detector_center_sample(self):
+        assert self.driver.detector_center_sample == 2048
+
+    def test_detector_center_line(self):
+        assert self.driver.detector_center_line == 1024
+
+    def test_detector_start_line(self):
+        assert self.driver.detector_start_line == 580
+
+    def test_detector_start_sample(self):
+        assert self.driver.detector_start_sample == 132
+
+    def test_focal_length(self):
+        assert self.driver.focal_length == 1002.7
+
+    def test_focal2pixel_lines(self):
+        np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0.0, 0.0, 1.0 / 0.014])
+
+    def test_focal2pixel_samples(self):
+        np.testing.assert_array_equal(self.driver.focal2pixel_samples, [0.0, -1.0 / 0.014, 0.0])

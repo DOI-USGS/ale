@@ -108,7 +108,7 @@ class ClipperEISWACFCIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDi
         : string
           The name of the filter
         """
-        return self.label['IsisCube']['BandBin']['FilterName'].value
+        return self.label['IsisCube']['BandBin']['FilterName']
 
     @property
     def detector_center_sample(self):
@@ -172,6 +172,36 @@ class ClipperEISWACFCIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDi
         """
         return EIS_FOCAL_LENGTHS[self.instrument_id]
 
+    @property
+    def focal2pixel_lines(self):
+        """
+        The transformation from focal plan coordinates to detector lines.
+        To transform the coordinate (x,y) to detector lines do the following:
+
+        lines = focal2pixel_lines[0] + x * focal2pixel_lines[1] + y * focal2pixel_lines[2]
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector lines transform
+        """
+        return EIS_ITRANSL
+
+    @property
+    def focal2pixel_samples(self):
+        """
+        The transformation from focal plan coordinates to detector samples.
+        To transform the coordinate (x,y) to detector samples do the following:
+
+        samples = focal2pixel_samples[0] + x * focal2pixel_samples[1] + y * focal2pixel_samples[2]
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector samples transform
+        """
+        return EIS_ITRANSS
+
 
 class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
     @property
@@ -215,7 +245,7 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         : string
           The name of the filter
         """
-        return self.label['IsisCube']['BandBin']['FilterName'].value
+        return self.label['IsisCube']['BandBin']['FilterName']
 
     @property
     def detector_center_sample(self):
@@ -417,6 +447,36 @@ class ClipperEISNACFCIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDi
         return EIS_FOCAL_LENGTHS[self.instrument_id]
 
     @property
+    def focal2pixel_lines(self):
+        """
+        The transformation from focal plan coordinates to detector lines.
+        To transform the coordinate (x,y) to detector lines do the following:
+
+        lines = focal2pixel_lines[0] + x * focal2pixel_lines[1] + y * focal2pixel_lines[2]
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector lines transform
+        """
+        return EIS_ITRANSL
+
+    @property
+    def focal2pixel_samples(self):
+        """
+        The transformation from focal plan coordinates to detector samples.
+        To transform the coordinate (x,y) to detector samples do the following:
+
+        samples = focal2pixel_samples[0] + x * focal2pixel_samples[1] + y * focal2pixel_samples[2]
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector samples transform
+        """
+        return EIS_ITRANSS
+
+    @property
     def sample_jitter_coeffs(self):
         """
         Polynomial coefficients for the sample jitter.
@@ -474,3 +534,140 @@ class ClipperEISNACFCIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDi
         : array
         """
         return self.normalized_readout_times_table["time"]
+
+
+class ClipperEISNACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
+    @property
+    def instrument_id(self):
+        """
+        The short text name for the instrument
+
+        Returns an instrument id uniquely identifying the instrument. Used to acquire
+        instrument codes from Spice Lib bods2c routine.
+
+        Returns
+        -------
+        str
+          The short text name for the instrument
+        """
+        id_lookup = {
+            "EIS NAC FC": "EUROPAM_EIS_NAC"
+        }
+
+        return id_lookup[super().instrument_id]
+
+    @property
+    def fikid(self):
+        """
+        The NAIF ID for the filter.
+
+        Returns
+        -------
+        : int
+          The NAIF ID for the filter
+        """
+        return EIS_NAC_FILTER_CODES[self.filter_name]
+
+    @property
+    def filter_name(self):
+        """
+        The name of the filter used to capture the image
+
+        Returns
+        -------
+        : string
+          The name of the filter
+        """
+        return self.label['IsisCube']['BandBin']['FilterName']
+
+    @property
+    def detector_center_sample(self):
+        """
+        The center sample of the detector in zero based detector pixels
+        This isn't in the IK so hardcode it to the absolute center
+
+        Returns
+        -------
+        float :
+            The center sample of the detector
+        """
+        return 4096 / 2
+
+    @property
+    def detector_center_line(self):
+        """
+        The center line of the detector in zero based detector pixels
+        This isn't in the IK so hardcode it to the absolute center
+
+        Returns
+        -------
+        float :
+            The center line of the detector
+        """
+        return 2048 / 2
+
+    @property
+    def detector_start_line(self):
+        """
+        The first zero based line of the detector read out
+
+        Returns
+        -------
+        : int
+          Zero based Detector line corresponding to the first image line
+        """
+        return EIS_FILTER_START_LINES[self.filter_name]
+
+    @property
+    def detector_start_sample(self):
+        """
+        The first zero based sample of the detector read out
+
+        Returns
+        -------
+        : int
+          Zero based Detector sample corresponding to the first image sample
+        """
+        return EIS_FILTER_START_SAMPLES[self.filter_name]
+
+    @property
+    def focal_length(self):
+        """
+        The focal length in millimeters
+
+        Returns
+        -------
+        : float
+          focal length
+        """
+        return EIS_FOCAL_LENGTHS[self.instrument_id]
+
+    @property
+    def focal2pixel_lines(self):
+        """
+        The transformation from focal plan coordinates to detector lines.
+        To transform the coordinate (x,y) to detector lines do the following:
+
+        lines = focal2pixel_lines[0] + x * focal2pixel_lines[1] + y * focal2pixel_lines[2]
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector lines transform
+        """
+        return EIS_ITRANSL
+
+    @property
+    def focal2pixel_samples(self):
+        """
+        The transformation from focal plan coordinates to detector samples.
+        To transform the coordinate (x,y) to detector samples do the following:
+
+        samples = focal2pixel_samples[0] + x * focal2pixel_samples[1] + y * focal2pixel_samples[2]
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector samples transform
+        """
+        return EIS_ITRANSS
