@@ -5,8 +5,8 @@ DAFETF NAIF DAF ENCODED TRANSFER FILE
 'SPKMERGE                                                    '
 BEGIN_ARRAY 1 78
 'PLUXXX                                  '
-'1D14F34C61665^8'
-'1D14F356B20A28^8'
+'1D14F32D99352A^8'
+'1D14F373E9D9^8'
 '3E7'
 '9'
 '1'
@@ -93,8 +93,8 @@ BEGIN_ARRAY 1 78
 END_ARRAY 1 78
 BEGIN_ARRAY 2 24
 'DE-0433LE-0433                          '
-'1D14F34C61665^8'
-'1D14F356B20A28^8'
+'1D14F32D99352A^8'
+'1D14F373E9D9^8'
 '9'
 '0'
 '1'
@@ -127,8 +127,8 @@ BEGIN_ARRAY 2 24
 END_ARRAY 2 24
 BEGIN_ARRAY 3 39
 'DE-0433LE-0433                          '
-'1D14F34C61665^8'
-'1D14F356B20A28^8'
+'1D14F32D99352A^8'
+'1D14F373E9D9^8'
 'A'
 '0'
 '1'
@@ -176,8 +176,8 @@ BEGIN_ARRAY 3 39
 END_ARRAY 3 39
 BEGIN_ARRAY 4 73
 'pvshort.nio                             '
-'1D14F34C61665^8'
-'1D14F356B20A28^8'
+'1D14F32D99352A^8'
+'1D14F373E9D9^8'
 '-62'
 '9'
 '1'
@@ -261,7 +261,7 @@ TOTAL_ARRAYS 4
  ~NAIF/SPC BEGIN COMMENTS~
 ; /Users/astamile/testData/ale/leisa/lsb_0296962438_0x53c_eng/lsb_0296962438_0x53c_eng-spiced_1.bsp LOG FILE
 
-; Created 2022-06-10/07:27:52.00.
+; Created 2022-06-10/14:10:06.00.
 ;
 ; BEGIN SPKMERGE COMMANDS
 
@@ -271,8 +271,8 @@ SPK_KERNEL = /Users/astamile/testData/ale/leisa/lsb_0296962438_0x53c_eng/lsb_029
 SOURCE_SPK_KERNEL = /Volumes/pkgs/isis3/isis_data/newhorizons/kernels/spk/nh_recon_pluto_od122_v01.bsp
     INCLUDE_COMMENTS = NO
     BODIES           = 999, 9, 10, -98
-    BEGIN_TIME       = 2015 JUN 18 15:10:01.196
-    END_TIME         = 2015 JUN 18 15:10:11.511
+    BEGIN_TIME       = 2015 JUN 18 15:09:30.414
+    END_TIME         = 2015 JUN 18 15:10:40.729
 
 ; END SPKMERGE COMMANDS
  ~NAIF/SPC END COMMENTS~
