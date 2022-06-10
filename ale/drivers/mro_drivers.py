@@ -5,10 +5,194 @@ from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
-from ale.base.type_distortion import RadialDistortion
+from ale.base.type_distortion import RadialDistortion, NoDistortion
 from ale.base.type_sensor import LineScanner
 
 from ale import util
+
+class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
+
+    @property
+    def instrument_id(self):
+        """
+        Returns an instrument id for uniquely identifying the instrument, but often
+        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+        the same ID the Spice expects in bods2c calls.
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
+        id_lookup = {
+          "Marci" : {
+            "BLUE" : "MRO_MARCI_VIS",
+            "GREEN" : "MRO_MARCI_VIS",
+            "ORANGE" : "MRO_MARCI_VIS",
+            "RED" : "MRO_MARCI_VIS",
+            "NIR" : "MRO_MARCI_VIS",
+            "LONG_UV" : "MRO_MARCI_UV",
+            "SHORT_UV" : "MRO_MARCI_UV"
+          }
+        }
+        # This should likely return a list but would only matter in USGSCSM
+        band_bin = self.label["IsisCube"]["BandBin"]["FilterName"][0]
+        return id_lookup[super().instrument_id][band_bin]
+
+    @property
+    def base_ikid(self):
+        """
+        Returns the Naif ID code for the instrument
+        Expects the instrument_id to be defined. This must be a string containing
+        the short name of the instrument.
+
+        Returns
+        -------
+        : int
+          Naif ID used to for identifying the instrument in Spice kernels
+        """
+        if not hasattr(self, "_base_ikid"):
+            self._base_ikid = spice.bods2c("MRO_MARCI")
+        return self._base_ikid
+
+    @property
+    def flipped_framelets(self):
+        if not hasattr(self, "_flipped_framelets"):
+            self._flipped_framelets = (self.label["IsisCube"]["Instrument"]["DataFlipped"] != 0)
+        return self._flipped_framelets
+
+    def compute_marci_time(self, line):
+        if not hasattr(self, "_num_framelets"):
+            self._num_bands = self.label["IsisCube"]["Core"]["Dimensions"]["Bands"]
+            # is the detector line summing/line scale factor
+            sum_mode = self.label["IsisCube"]["Instrument"]["SummingMode"]
+
+            framelet_offset_factor = self.label["IsisCube"]["Instrument"]["ColorOffset"]
+            if self.flipped_framelets:
+                framelet_offset_factor *= -1
+
+            self._framelet_offset_lookup = {
+              "NIR" : 0 * framelet_offset_factor,
+              "RED" : 1 * framelet_offset_factor,
+              "ORANGE" : 2 * framelet_offset_factor,
+              "GREEN" : 3 * framelet_offset_factor,
+              "BLUE" : 4 * framelet_offset_factor,
+              "LONG_UV" : 5 * framelet_offset_factor,
+              "SHORT_UV" : 6 * framelet_offset_factor,
+            }
+            self._filters = self.label["IsisCube"]["BandBin"]["FilterName"]
+
+            self._framelet_rate = self.label["IsisCube"]["Instrument"]["InterframeDelay"].value
+            framelet_height = 16
+
+            self._actual_framelet_height = framelet_height / sum_mode
+
+            num_lines = self.label["IsisCube"]["Core"]["Dimensions"]["Lines"]
+            self._num_framelets = num_lines / (16 / sum_mode)
+
+        times = []
+        for band in range(self._num_bands):
+            framelet = ((line - 0.5) / self._actual_framelet_height) + 1
+            framelet_offset = self._framelet_offset_lookup[self._filters[band]]
+            adjusted_framelet = framelet - framelet_offset
+
+            time = self.start_time
+            # Keeping in line with ISIS
+            if not self.flipped_framelets:
+                time += (adjusted_framelet - 1) * self._framelet_rate
+            else:
+                time += (self._num_framelets - adjusted_framelet) * self._framelet_rate
+            times.append(time)
+        return times
+
+    @property
+    def start_time(self):
+        if not hasattr(self, "_start_time"):
+            start_time = super().ephemeris_start_time
+            start_time -= ((self.exposure_duration / 1000.0) / 2.0)
+            self._start_time = start_time
+        return self._start_time
+
+    @property
+    def ephemeris_start_time(self):
+        if not hasattr(self, "_ephemeris_start_time"):
+            if not self.flipped_framelets:
+                line = 0.5
+            else:
+                line = self.label["IsisCube"]["Core"]["Dimensions"]["Lines"] + 0.5
+            self._ephemeris_start_time = min(self.compute_marci_time(line))
+        return self._ephemeris_start_time
+
+    @property
+    def ephemeris_stop_time(self):
+        if not hasattr(self, "_ephemeris_stop_time"):
+            if not self.flipped_framelets:
+                line = self.label["IsisCube"]["Core"]["Dimensions"]["Lines"] + 0.5
+            else:
+                line = 0.5
+            self._ephemeris_stop_time = max(self.compute_marci_time(line))
+        return self._ephemeris_stop_time
+
+    @property
+    def detector_center_line(self):
+        return 0
+
+    @property
+    def detector_center_sample(self):
+        return 0
+
+    @property
+    def focal2pixel_samples(self):
+        """
+        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector samples
+        """
+        return list(spice.gdpool('INS{}_ITRANSS'.format(self.base_ikid), 0, 3))
+
+    @property
+    def focal2pixel_lines(self):
+        """
+        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector lines
+        """
+        return list(spice.gdpool('INS{}_ITRANSL'.format(self.base_ikid), 0, 3))
+
+    @property
+    def naif_keywords(self):
+        """
+        Adds the focal length cover keyword to the already populated naif keywords
+
+        Returns
+        -------
+        : dict
+          Dictionary of keywords and values that ISIS creates and attaches to the label
+        """
+        return {**super().naif_keywords, **util.query_kernel_pool(f"*{self.base_ikid}*")}
+
+    @property
+    def sensor_name(self):
+        """
+        ISIS doesn't propergate this to the ingested cube label, so hard-code it.
+        """
+        return "COLOR IMAGER CAMERA"
+
+    @property
+    def sensor_model_version(self):
+        """
+        Returns
+        -------
+        : int
+          ISIS sensor model version
+        """
+        return 1
 
 
 class MroCtxIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, RadialDistortion, Driver):
