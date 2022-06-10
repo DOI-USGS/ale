@@ -551,7 +551,7 @@ class ClipperEISNACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
           The short text name for the instrument
         """
         id_lookup = {
-            "EIS NAC FC": "EUROPAM_EIS_NAC"
+            "EIS NAC PB": "EUROPAM_EIS_NAC"
         }
 
         return id_lookup[super().instrument_id]
