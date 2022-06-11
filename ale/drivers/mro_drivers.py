@@ -57,11 +57,28 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
 
     @property
     def flipped_framelets(self):
+        """
+        Gets the keyword from the ISIS label to determine if the data is flipped or not
+
+        Returns
+        -------
+        : bool
+          True if flipped and False if not flipped
+        """
         if not hasattr(self, "_flipped_framelets"):
             self._flipped_framelets = (self.label["IsisCube"]["Instrument"]["DataFlipped"] != 0)
         return self._flipped_framelets
 
     def compute_marci_time(self, line):
+        """
+        Computes the marci time based on the line given. Original code taken
+        from the ISIS Marci Camera/PushFrameCameraDetectorMap.
+
+        Returns
+        -------
+        : list
+            List of times associated with the bands of the image
+        """
         if not hasattr(self, "_num_framelets"):
             self._num_bands = self.label["IsisCube"]["Core"]["Dimensions"]["Bands"]
             # is the detector line summing/line scale factor
@@ -107,6 +124,15 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
 
     @property
     def start_time(self):
+        """
+        Start time of the image computed from the SpacecraftClockCount/SpacecraftClockStartCount
+        in the IsisLabel. This is then translated to the center of a line.
+
+        Returns
+        -------
+        : float
+          The start time as it relates to ISIS of the image
+        """
         if not hasattr(self, "_start_time"):
             start_time = super().ephemeris_start_time
             start_time -= ((self.exposure_duration / 1000.0) / 2.0)
@@ -115,6 +141,16 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
 
     @property
     def ephemeris_start_time(self):
+        """
+        Returns the starting ephemeris time of the image. Generated based on
+        the returns from compute_marci_time, and whether the image is flipped or
+        not.
+
+        Returns
+        -------
+        : double
+          Starting ephemeris time of the image
+        """
         if not hasattr(self, "_ephemeris_start_time"):
             if not self.flipped_framelets:
                 line = 0.5
@@ -125,6 +161,16 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
 
     @property
     def ephemeris_stop_time(self):
+        """
+        Returns the ending ephemeris time of the image. Generated based on
+        the returns from compute_marci_time, and whether the image is flipped or
+        not.
+
+        Returns
+        -------
+        : double
+          Starting ephemeris time of the image
+        """
         if not hasattr(self, "_ephemeris_stop_time"):
             if not self.flipped_framelets:
                 line = self.label["IsisCube"]["Core"]["Dimensions"]["Lines"] + 0.5
@@ -135,16 +181,36 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
 
     @property
     def detector_center_line(self):
+        """
+        Returns the center detector line. This is a placeholder for use within
+        Isis. Since Isis does not use much of the ISD this value allows the as
+        accurate ISD for use in Isis but will be inaccurate for USGSCSM.
+
+        Returns
+        -------
+        : float
+          Detector sample of the principal point
+        """
         return 0
 
     @property
     def detector_center_sample(self):
+        """
+        Returns the center detector sample. This is a placeholder for use within
+        Isis. Since Isis does not use much of the ISD this value allows the as
+        accurate ISD for use in Isis but will be inaccurate for USGSCSM.
+
+        Returns
+        -------
+        : float
+          Detector line of the principal point
+        """
         return 0
 
     @property
     def focal2pixel_samples(self):
         """
-        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+        Expects base_ikid to be defined. This must be the integer Naif id code of the instrument
 
         Returns
         -------
@@ -156,7 +222,7 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
     @property
     def focal2pixel_lines(self):
         """
-        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+        Expects base_ikid to be defined. This must be the integer Naif id code of the instrument
 
         Returns
         -------
@@ -168,7 +234,8 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
     @property
     def naif_keywords(self):
         """
-        Adds the focal length cover keyword to the already populated naif keywords
+        Adds all naifkeywords that contain the base_ikid to the already
+        populated naif keywords
 
         Returns
         -------
@@ -490,9 +557,17 @@ class MroHiRiseIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radia
         """
         return "HIRISE CAMERA"
 
-
     @property
     def un_binned_rate(self):
+        """
+        Taken from the ISIS HiRise Camera model, returns the un_binned_rate
+        based on various hardcoded values and the DeltaLineTimerCount.
+
+        Returns
+        -------
+        : float
+          The un_binned_rate of the image
+        """
         if not hasattr(self, "_un_binned_rate"):
             delta_line_timer_count = self.label["IsisCube"]["Instrument"]["DeltaLineTimerCount"]
             self._un_binned_rate = (74.0 + (delta_line_timer_count / 16.0)) / 1000000.0
@@ -500,6 +575,15 @@ class MroHiRiseIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radia
 
     @property
     def ephemeris_start_time(self):
+        """
+        Computes the ephemeris_start_time of the image based on infomation from
+        the ISIS camera model.
+
+        Returns
+        -------
+        : float
+          Starting ephemeris time of the image
+        """
         if not hasattr(self, "_ephemeris_start_time"):
             tdi_mode = self.label["IsisCube"]["Instrument"]["Tdi"]
             bin_mode = self.label["IsisCube"]["Instrument"]["Summing"]
@@ -522,24 +606,52 @@ class MroHiRiseIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radia
 
     @property
     def exposure_duration(self):
+        """
+        Returns the computed exposure duration based on the exposure duration
+        computed in the ISIS HiRise camera model.
+
+        Returns
+        -------
+        : float
+          The exposure duration of the image
+        """
         if not hasattr(self, "_exposure_duration"):
             self._exposure_duration = self.un_binned_rate * self.label["IsisCube"]["Instrument"]["Summing"]
         return self._exposure_duration
 
     @property
     def ccd_ikid(self):
-        ccd_number = hirise_ccd_lookup[self.label["IsisCube"]["Instrument"]["CpmmNumber"]]
-        return spice.bods2c("MRO_HIRISE_CCD{}".format(ccd_number))
+        """
+        Computes the CCD ikid to get the necessary naifkeywords for Isis.
+
+        Returns
+        -------
+        : int
+          CCD ikid
+        """
+        if not hasattr(self, "_ccd_ikid"):
+            ccd_number = hirise_ccd_lookup[self.label["IsisCube"]["Instrument"]["CpmmNumber"]]
+            self._ccd_ikid = spice.bods2c("MRO_HIRISE_CCD{}".format(ccd_number))
+        return self._ccd_ikid
 
     @property
     def sensor_frame_id(self):
+        """
+        Hard coded sensor_frame_id based on the Isis HiRise camera model.
+
+        Returns
+        -------
+        : int
+          The sensor frame id
+        """
         return -74690
 
     @property
-    def detector_center_sample(self):
+    def detector_center_line(self):
         """
-        Returns the center detector sample. Expects ikid to be defined. This should
-        be an integer cont?aining the Naif Id code of the instrument.
+        Returns the center detector line. This is a placeholder for use within
+        Isis. Since Isis does not use much of the ISD this value allows the as
+        accurate ISD for use in Isis but will be inaccurate for USGSCSM.
 
         Returns
         -------
@@ -549,10 +661,11 @@ class MroHiRiseIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radia
         return 0
 
     @property
-    def detector_center_line(self):
+    def detector_center_sample(self):
         """
-        Returns the center detector line. Expects ikid to be defined. This should
-        be an integer containing the Naif Id code of the instrument.
+        Returns the center detector sample. This is a placeholder for use within
+        Isis. Since Isis does not use much of the ISD this value allows the as
+        accurate ISD for use in Isis but will be inaccurate for USGSCSM.
 
         Returns
         -------
@@ -564,8 +677,8 @@ class MroHiRiseIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radia
     @property
     def naif_keywords(self):
         """
-        Updated set of naif keywords containing the NaifIkCode for the specific
-        Juno filter used when taking the image.
+        Adds all naifkeywords that contain the ccd_ikid to the already
+        populated naif keywords
 
         Returns
         -------
