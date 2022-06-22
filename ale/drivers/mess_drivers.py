@@ -15,7 +15,7 @@ from ale.base.data_isis import IsisSpice
 
 ID_LOOKUP = {
     'MDIS-WAC': 'MSGR_MDIS_WAC',
-    'MDIS-NAC':'MSGR_MDIS_NAC',
+    'MDIS-NAC': 'MSGR_MDIS_NAC',
 }
 
 

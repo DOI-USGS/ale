@@ -1,0 +1,57 @@
+Object = IsisCube
+    Object = Core
+        StartByte   = 65537
+        Format      = Tile
+        TileSamples = 445
+        TileLines   = 958
+
+        Group = Dimensions
+            Samples = 1335
+            Lines   = 3832
+            Bands   = 1
+        End_Group
+
+        Group = Pixels
+            Type       = SignedWord
+            ByteOrder  = Lsb
+            Base       = 0.0
+            Multiplier = 1.0
+        End_Group
+    End_Object
+
+    Group = Instrument
+        SpacecraftName   = "Europa Clipper"
+        InstrumentId     = "EIS WAC FC"
+        TargetName       = Didymos
+        StartTime        = 2021-03-06T04:05:27.77
+        ExposureDuration = 1.0 <seconds>
+    End_Group
+
+    Group = BandBin
+        FilterName = CLEAR
+        Center     = 712.5 <nm>
+        Width      = 675 <nm>
+    End_Group
+
+    Group = Kernels
+        NaifFrameCode = -159104
+    End_Group
+End_Object
+
+Object = Label
+    Bytes = 65536
+End_Object
+
+Object = History
+    Name      = IsisCube
+    StartByte = 10296977
+    Bytes     = 654
+End_Object
+
+Object = OriginalXmlLabel
+    Name      = IsisCube
+    StartByte = 10297631
+    Bytes     = 13164
+    ByteOrder = Lsb
+End_Object
+End
