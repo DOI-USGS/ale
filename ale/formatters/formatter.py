@@ -143,10 +143,12 @@ def to_isd(driver):
 
     # interiror orientation
     meta_data['naif_keywords'] = driver.naif_keywords
-    meta_data['detector_sample_summing'] = driver.sample_summing
-    meta_data['detector_line_summing'] = driver.line_summing
 
     if isinstance(driver,LineScanner) or isinstance(driver, Framer) or isinstance(driver, PushFrame):
+
+        meta_data['detector_sample_summing'] = driver.sample_summing
+        meta_data['detector_line_summing'] = driver.line_summing
+
         meta_data['focal_length_model'] = {
             'focal_length' : driver.focal_length
         }
@@ -158,8 +160,8 @@ def to_isd(driver):
         meta_data['focal2pixel_samples'] = driver.focal2pixel_samples
         meta_data['optical_distortion'] = driver.usgscsm_distortion_model
 
-    meta_data['starting_detector_line'] = driver.detector_start_line
-    meta_data['starting_detector_sample'] = driver.detector_start_sample
+        meta_data['starting_detector_line'] = driver.detector_start_line
+        meta_data['starting_detector_sample'] = driver.detector_start_sample
     
 
     j2000_rotation = frame_chain.compute_rotation(target_frame, 1)
