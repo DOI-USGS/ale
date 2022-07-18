@@ -39,7 +39,7 @@ def test_kernels(scope="module"):
 @pytest.mark.parametrize("image", image_dict.keys())
 def test_nh_load(test_kernels, image):
     label_file = get_image_label(image, 'isis')
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]}, verbose=True)
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
     compare_isd = image_dict[image]
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))

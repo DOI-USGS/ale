@@ -187,4 +187,4 @@ class NewHorizonsLeisaIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         : float
           Exposure duration in seconds
         """
-        return self.label['IsisCube']['Instrument']['ExposureDuration'].value
+        return self.label['IsisCube']['Instrument']['ExposureDuration']
