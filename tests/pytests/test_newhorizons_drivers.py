@@ -35,9 +35,19 @@ def test_kernels(scope="module"):
         for kern in kern_list:
             os.remove(kern)
 
-# Test load of newhorizons labels
-@pytest.mark.parametrize("image", image_dict.keys())
-def test_nh_load(test_kernels, image):
+# Test load of nh lorri labels
+@pytest.mark.parametrize("image", ['lor_0034974380_0x630_sci_1'])
+def test_nhlorri_load(test_kernels, image):
+    label_file = get_image_label(image, 'isis')
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
+    compare_isd = image_dict[image]
+    isd_obj = json.loads(isd_str)
+    print(json.dumps(isd_obj, indent=2))
+    assert compare_dicts(isd_obj, compare_isd) == []
+
+# Test load of nh leisa labels
+@pytest.mark.parametrize("image", ['lsb_0296962438_0x53c_eng'])
+def test_nhleisa_load(test_kernels, image):
     label_file = get_image_label(image, 'isis')
     isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
     compare_isd = image_dict[image]
