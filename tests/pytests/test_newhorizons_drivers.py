@@ -54,3 +54,38 @@ def test_nhleisa_load(test_kernels, image):
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
     assert compare_dicts(isd_obj, compare_isd) == []
+
+
+# ========= Test Leisa isislabel and naifspice driver =========
+class test_leisa_isis_naif(unittest.TestCase):
+    def setUp(self):
+        label = get_image_label("lsb_0296962438_0x53c_eng", "isis")
+        self.driver = NewHorizonsLeisaIsisLabelNaifSpiceDriver(label)
+
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == "NH_RALPH_LEISA"
+
+    def test_ikid(self):
+            assert self.driver.ikid == -98901
+
+    def test_ephemeris_start_time(self):
+        with patch('ale.drivers.nh_drivers.spice.scs2e', return_value=12345) as scs2e:
+            assert self.driver.ephemeris_start_time == 12345
+            scs2e.assert_called_with(-98, '0296962438:00000')
+
+    def test_ephemeris_stop_time(self):
+        with patch('ale.drivers.nh_drivers.spice.scs2e', return_value=12345) as scs2e:
+            assert self.driver.ephemeris_stop_time == (12345 + self.driver.exposure_duration * self.driver.image_lines)
+            scs2e.assert_called_with(-98, '0296962438:00000')
+
+    def test_detector_center_sample(self):
+        assert self.driver.detector_center_sample == 0
+
+    def test_detector_center_line(self):
+        assert self.driver.detector_center_line == 0
+
+    def test_sensor_name(self):
+        assert self.driver.sensor_name == "NH_RALPH_LEISA"
+
+    def test_exposure_duration(self):
+        np.testing.assert_almost_equal(self.driver.exposure_duration, 0.856)
