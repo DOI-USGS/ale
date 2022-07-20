@@ -1,0 +1,59 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 512
+    TileLines   = 512
+
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 1024
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    MissionName                = OSIRIS-REx
+    SpacecraftName             = OSIRIS-REX
+    InstrumentId               = MapCam
+    TargetName                 = Bennu
+    StartTime                  = 2019-03-03T10:59:40.279
+    ExposureDuration           = 5.285275 <Millisec>
+    SpacecraftClockStartCount  = 3/0604882742.23115
+    FocusPosition              = 270
+    PolyCamFocusPositionNaifId = None
+  End_Group
+
+  Group = BandBin
+    FilterName = PAN
+    Center     = 650
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode = -64361
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 4259841
+  Bytes     = 647
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 4260488
+  Bytes     = 8073
+End_Object
+End
