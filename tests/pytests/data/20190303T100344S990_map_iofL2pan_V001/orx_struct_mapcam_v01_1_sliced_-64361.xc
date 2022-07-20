@@ -25,7 +25,7 @@ BEGIN_ARRAY 1 10
 END_ARRAY 1 10
 TOTAL_ARRAYS 1
  ~NAIF/SPC BEGIN COMMENTS~
-This CK is for testing with the image: /Users/astamile/testData/osirisrex/tsts/mapcam/truth/20190303T100344S990_map_iofL2pan_V001-spiceinit.cub
+This CK is for testing with the image: /osirisrex/tsts/mapcam/truth/20190303T100344S990_map_iofL2pan_V001-spiceinit.cub
 
 This CK was generated using the following command: {}
  ~NAIF/SPC END COMMENTS~

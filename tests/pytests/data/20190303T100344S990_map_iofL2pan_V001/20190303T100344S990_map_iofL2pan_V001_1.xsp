@@ -1348,7 +1348,7 @@ BEGIN_ARRAY 3 39
 END_ARRAY 3 39
 TOTAL_ARRAYS 3
  ~NAIF/SPC BEGIN COMMENTS~
-; /Users/astamile/testData/ale/osirisrex/20190303T100344S990_map_iofL2pan_V001-spiceinit_1.bsp LOG FILE
+; /ale/osirisrex/20190303T100344S990_map_iofL2pan_V001-spiceinit_1.bsp LOG FILE
 
 ; Created 2022-07-20/11:45:40.00.
 ;
@@ -1356,13 +1356,13 @@ TOTAL_ARRAYS 3
 
 LEAPSECONDS_KERNEL = /Volumes/pkgs/isis3/isis_data/base/kernels/lsk/naif0012.tls
 
-SPK_KERNEL = /Users/astamile/testData/ale/osirisrex/20190303T100344S990_map_iofL2pan_V001-spiceinit_1.bsp
-SOURCE_SPK_KERNEL = /Volumes/pkgs/isis3/isis_data/osirisrex/kernels/spk/orx_190301_190424_190412_od125_v1.bsp
+SPK_KERNEL = /ale/osirisrex/20190303T100344S990_map_iofL2pan_V001-spiceinit_1.bsp
+SOURCE_SPK_KERNEL = /osirisrex/kernels/spk/orx_190301_190424_190412_od125_v1.bsp
     INCLUDE_COMMENTS = NO
     BODIES           = -64, 2101955
     BEGIN_TIME       = 2019 MAR 03 10:57:40.245
     END_TIME         = 2019 MAR 03 11:01:45.657
-SOURCE_SPK_KERNEL = /Volumes/pkgs/isis3/isis_data/osirisrex/kernels/tspk/de424.bsp
+SOURCE_SPK_KERNEL = /osirisrex/kernels/tspk/de424.bsp
     INCLUDE_COMMENTS = NO
     BODIES           = 10
     BEGIN_TIME       = 2019 MAR 03 10:57:40.245
