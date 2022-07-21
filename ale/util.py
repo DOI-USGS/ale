@@ -16,6 +16,7 @@ except ImportError:
 from itertools import chain
 from datetime import datetime
 import pytz
+import numpy as np
 
 import subprocess
 import re
@@ -256,6 +257,10 @@ def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
     mk_paths['LeapSecond'] = [kernel_group.get('LeapSecond', None)]
     mk_paths['Clock'] = [kernel_group.get('Clock', None)]
     mk_paths['Extra'] = [kernel_group.get('Extra', None)]
+
+    # handles issue with OsirisRex instrument kernels being in a 2d list
+    if isinstance(mk_paths['Instrument'][0], list):
+        mk_paths['Instrument'] = np.concatenate(mk_paths['Instrument']).flat
 
     if (format_as == 'list'):
         # get kernels as 1-d string list
