@@ -1,0 +1,59 @@
+HiRISE Instrument Kernel
+=============================================================
+
+This instrument kernel (I-kernel) contains parameters that
+describe the Mars Reconnaissance Orbiter HiRISE (High Resolution
+Imaging Science Experiment) instrument.
+
+Version and Date
+-------------------------------------------------------------
+
+Version 1.0 -- October 23rd, 2008 -- Steven Lambright, U.S. Geological Survey,
+    Flagstaff, AZ
+    Initial version.
+
+Version 1.2 -- Mar 23, 2010 -- Debbie A. Cook USGS
+	Update to include CK_FRAME_ID and CK_REFERENCE_ID
+
+-------------------------------------------------------------
+
+The following are the parameters for computing focal plane
+coords from CCD coords. For a given detector number, these 
+allow computation of focal plane coordinates (in millimeters)
+from "centered" detector coordinates in pixels (0,0 is the 
+center of the detector array) as described in Randy Kirk's December 21,
+2004 email (ISIS3 sensor models, take 2), i.e.,
+
+x = transx[0] + transx[1]*ccdSample_c + transx[2]*ccdLine_c
+y = transy[0] + transy[1]*ccdSample_c + transy[2]*ccdLine_c
+
+TRANSX:
+  0, (detector origin is at center properly in the camera model)
+  Pixel Pitch,
+  0 (no line influence)
+
+TRANSY:
+  Pixel Pitch * PixelOffset,
+  0 (no sample influence),
+  PixelPitch
+
+*Pixel Offset is in the IK kernel under boresight
+
+\begindata
+
+INS-74400_TRANSX  = (  0.0,       0.009,         0.0)
+INS-74400_TRANSY  = (  0.0,       0.0,           0.009)
+INS-74400_ITRANSS = (  0.0,     111.11111111111, 0.0)
+INS-74400_ITRANSL = (  0.0,       0.0,         111.11111111111)
+
+\begintext
+These are the parameters for writing c-kernels.  Isis will create ck
+with the same frame endpoints as the mission ck. For Marci the ck
+instrument frame is  MRO_SPACECRAFT (-74000) and the ck reference frame
+is MRO_MME_OF_DATE (-74900).
+
+\begindata
+INS-74410_CK_FRAME_ID=-74000
+INS-74410_CK_REFERENCE_ID=-74900
+INS-74420_CK_FRAME_ID=-74000
+INS-74420_CK_REFERENCE_ID=-74900

@@ -5,6 +5,7 @@ import warnings
 import numpy as np
 import json
 import pvl
+import numbers
 from glob import glob
 from pathlib import Path
 
@@ -60,8 +61,16 @@ def compare_dicts(ldict, rdict):
         elif isinstance(item, np.ndarray) or isinstance(item, list):
             if len(item) != len(rdict[key]):
                 differences.append(f'Array sizes of key {key} are not equal {item} : {rdict[key]}.')
-            elif not np.allclose(item, rdict[key]):
-                differences.append(f'Array values of key {key} are not almost equal {item} : {rdict[key]}.')
+            else:
+                list_item = np.array(item).flat[0]
+                if isinstance(list_item, numbers.Number):
+                    if not np.allclose(item, rdict[key]):
+                        differences.append(f'Array values of key {key} are not almost equal {item} : {rdict[key]}.')
+                elif isinstance(list_item, str):
+                    if not (np.array(item) == np.array(rdict[key])).all():
+                        differences.append(f'Array values of key {key} are not equal {item} : {rdict[key]}.')
+                else:
+                    raise TypeError("No comparison handled for underlying list type {} for key {}".format(list_item, key))
         elif isinstance(item, str):
             if item.lower() != rdict[key].lower():
                 differences.append(f'Values of key {key} are not equal {item} : {rdict[key]}.')
