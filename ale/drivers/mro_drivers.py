@@ -414,7 +414,7 @@ class MroCtxIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDi
     def sensor_model_version(self):
         """
         The ISIS Sensor model number for HiRise in ISIS. This is likely just 1
-        
+
         Returns
         -------
         : int
@@ -784,6 +784,19 @@ class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
           name of the instrument.
         """
         return self.instrument_id
+
+    @property
+    def sensor_frame_id(self):
+        """
+        Returns the Naif ID code for the sensor reference frame.
+        This is the frame of the OsirisRex instrument itself, and is not dependent on filter.
+
+        Returns
+        -------
+        : int
+          Naif ID code for the sensor frame
+        """
+        return -74000
 
     @property
     def sensor_model_version(self):
