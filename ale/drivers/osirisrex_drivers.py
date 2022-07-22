@@ -10,6 +10,16 @@ from ale.base.type_distortion import RadialDistortion
 class OsirisRexCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDistortion, Driver):
     @property
     def instrument_id(self):
+        """
+        Returns an instrument id for uniquely identifying the instrument, but often
+        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+        the same ID the Spice expects in bods2c calls.
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
         sensor_lookup = {
         "MapCam" : "MAPCAM",
         "PolyCam" : "POLYCAM",
@@ -45,24 +55,36 @@ class OsirisRexCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Radi
 
     @property
     def sensor_frame_id(self):
+        """
+        Returns the Naif ID code for the sensor reference frame.
+        This is the frame of the OsirisRex instrument itself, and is not dependent on filter.
+
+        Returns
+        -------
+        : int
+          Naif ID code for the sensor frame
+        """
         return -64000
 
 
     @property
     def detector_center_line(self):
         """
+        Returns the center detector line. Expects ikid to be defined. This should
+        be an integer containing the Naif Id code of the instrument.
 
         Returns
         -------
         : int
           The detector line of the principle point
         """
-
         return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[1])
 
     @property
     def detector_center_sample(self):
         """
+        Returns the center detector sample. Expects ikid to be defined. This should
+        be an integer containing the Naif Id code of the instrument.
 
         Returns
         -------
