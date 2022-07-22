@@ -1,0 +1,359 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 512
+    TileLines   = 512
+
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 1024
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    MissionName                = OSIRIS-REx
+    SpacecraftName             = OSIRIS-REX
+    InstrumentId               = MapCam
+    TargetName                 = Bennu
+    StartTime                  = 2019-03-03T10:59:40.279
+    ExposureDuration           = 5.285275 <Millisec>
+    SpacecraftClockStartCount  = 3/0604882742.23115
+    FocusPosition              = 270
+    PolyCamFocusPositionNaifId = None
+  End_Group
+
+  Group = BandBin
+    FilterName = PAN
+    Center     = 650
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -64361
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = $osirisrex/kernels/pck/bennu_v16.tpc
+    TargetPosition            = (Table, $osirisrex/kernels/tspk/de424.bsp,
+                                 $osirisrex/kernels/tspk/bennu_refdrmc_v1.bsp,
+                                 $osirisrex/kernels/tspk/sb-101955-76.bsp,
+                                 $osirisrex/kernels/pck/pck00010.tpc)
+    InstrumentPointing        = (Table,
+                                 $osirisrex/kernels/ck/orx_sc_rel_190225_19030-
+                                 3_v01.bc, $osirisrex/kernels/fk/orx_v14.tf)
+    Instrument                = ($osirisrex/kernels/ik/orx_ocams_v07.ti,
+                                 $osirisrex/kernels/fk/orx_struct_mapcam_v01.b-
+                                 c)
+    SpacecraftClock           = $osirisrex/kernels/sclk/orx_sclkscet_00065.tsc
+    InstrumentPosition        = (Table,
+                                 $osirisrex/kernels/spk/orx_190301_190424_1904-
+                                 12_od125_v1.bsp)
+    InstrumentAddendum        = $osirisrex/kernels/iak/orex_ocams_addendum_v1-
+                                0.ti
+    ShapeModel                = Null
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
+    Source                    = isis
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 4268537
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-64361, -64000, 1)
+  CkTableStartTime    = 604882849.43279
+  CkTableEndTime      = 604882849.43279
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = ($osirisrex/kernels/ck/orx_sc_rel_190225_190303_v01.b-
+                         c, $osirisrex/kernels/fk/orx_v14.tf)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 4268601
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 604882849.43279
+  SpkTableEndTime      = 604882849.43279
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = $osirisrex/kernels/spk/orx_190301_190424_190412_od12-
+                         5_v1.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 4268657
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (10106, 1)
+  CkTableStartTime    = 604882849.43279
+  CkTableEndTime      = 604882849.43279
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 2
+  PoleRa              = (85.46097, 0.0, 0.0)
+  PoleDec             = (-60.3586, 0.0, 0.0)
+  PrimeMeridian       = (140.68835, 2011.1457553368, 1.815e-06)
+  Description         = "Created by spiceinit"
+  Kernels             = ($osirisrex/kernels/tspk/de424.bsp,
+                         $osirisrex/kernels/tspk/bennu_refdrmc_v1.bsp,
+                         $osirisrex/kernels/tspk/sb-101955-76.bsp,
+                         $osirisrex/kernels/pck/pck00010.tpc,
+                         $osirisrex/kernels/pck/bennu_v16.tpc)
+  SolarLongitude      = 37.803673453056
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 4268721
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 604882849.43279
+  SpkTableEndTime      = 604882849.43279
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = ($osirisrex/kernels/tspk/de424.bsp,
+                          $osirisrex/kernels/tspk/bennu_refdrmc_v1.bsp,
+                          $osirisrex/kernels/tspk/sb-101955-76.bsp,
+                          $osirisrex/kernels/pck/pck00010.tpc)
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 4272596
+  Bytes     = 2300
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 4260464
+  Bytes     = 8073
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE                                = 2101955
+  BODY2101955_RADII                        = (0.283065, 0.271215, 0.24972)
+  BODY_FRAME_CODE                          = 10106
+  INS-64361_SWAP_OBSERVER_TARGET           = TRUE
+  INS-64361_LIGHTTIME_CORRECTION           = LT+S
+  INS-64361_LT_SURFACE_CORRECT             = FALSE
+  INS-64361_FOCAL_LENGTH                   = 125.2
+  INS-64361_PIXEL_SIZE                     = 8.5
+  CLOCK_ET_-64_3/0604882742.23115_COMPUTED = 350fb7d0e306c241
+  INS-64361_TRANSX                         = (0.0, 0.0, 0.0085)
+  INS-64361_TRANSY                         = (0.0, 0.0085, 0.0)
+  INS-64361_ITRANSS                        = (0.0, 0.0, 117.64705882353)
+  INS-64361_ITRANSL                        = (0.0, 117.64705882353, 0.0)
+  INS-64361_CCD_CENTER                     = (511.5, 511.5)
+  INS-64361_OD_K_PAN                       = (2.21e-05, 1.71e-04, 5.96e-05,
+                                              0.0, 0.0)
+  INS-64361_OD_CENTER_PAN                  = (486.2, 450.3)
+End_Object
+
+Object = Polygon
+  Name      = Footprint
+  StartByte = 4270325
+  Bytes     = 2271
+End_Object
+End
