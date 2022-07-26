@@ -43,7 +43,8 @@ def test_nhlorri_load(test_kernels, image):
     compare_isd = image_dict[image]
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
-    assert compare_dicts(isd_obj, compare_isd) == []
+    comparison = compare_dicts(isd_obj, compare_isd)
+    assert comparison == []
 
 # Test load of nh leisa labels
 @pytest.mark.parametrize("image", ['lsb_0296962438_0x53c_eng'])
@@ -53,7 +54,8 @@ def test_nhleisa_load(test_kernels, image):
     compare_isd = image_dict[image]
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
-    assert compare_dicts(isd_obj, compare_isd) == []
+    comparison = compare_dicts(isd_obj, compare_isd)
+    assert comparison == []
 
 
 # ========= Test Leisa isislabel and naifspice driver =========
