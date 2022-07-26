@@ -9,7 +9,7 @@ import spiceypy as spice
 
 import ale
 
-from conftest import get_image_kernels, convert_kernels, get_image_label, compare_dicts
+from conftest import get_image_kernels, convert_kernels, get_image_label, compare_dicts, get_isd
 
 image_dict = {
     # Voyager 2 NAC
@@ -298,13 +298,15 @@ def test_kernels():
             os.remove(kern)
 
 @pytest.mark.parametrize("label_type", ['isis3'])
-@pytest.mark.parametrize("formatter", ['isis'])
 @pytest.mark.parametrize("image", image_dict.keys())
-def test_voyager_load(test_kernels, label_type, formatter, image):
+def test_voyager_load(test_kernels, label_type, image):
     label_file = get_image_label(image, label_type)
 
-    usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]}, formatter=formatter)
+    usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]}, verbose=True)
     usgscsm_isd_obj = json.loads(usgscsm_isd_str)
     print(json.dumps(usgscsm_isd_obj, indent=2))
 
-    assert compare_dicts(usgscsm_isd_obj, image_dict[image][formatter]) == []
+    isd_name = image
+    compare_dict = get_isd(isd_name)
+
+    assert compare_dicts(usgscsm_isd_obj, compare_dict) == []

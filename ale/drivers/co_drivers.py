@@ -280,7 +280,8 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
                 self._frame_chain = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
                                                           target_frame=self.target_frame_id,
                                                           center_ephemeris_time=self.center_ephemeris_time,
-                                                          ephemeris_times=self.ephemeris_time,)
+                                                          ephemeris_times=self.ephemeris_time,
+                                                          exact_ck_times=True)
 
                 rotation = ConstantRotation([[0, 0, 1, 0]], self.sensor_frame_id, self._original_naif_sensor_frame_id)
 
@@ -502,13 +503,14 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
             try:
                 # Call frinfo to check if the ISIS iak has been loaded with the
                 # additional reference frame. Otherwise, Fail and add it manually
-                spice.frinfo(self.sensor_frame_id)
+                _ = spice.frinfo(self.sensor_frame_id)
                 self._frame_chain = super().frame_chain
             except spice.utils.exceptions.NotFoundError as e:
                 self._frame_chain = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
                                                           target_frame=self.target_frame_id,
                                                           center_ephemeris_time=self.center_ephemeris_time,
-                                                          ephemeris_times=self.ephemeris_time,)
+                                                          ephemeris_times=self.ephemeris_time,
+                                                          exact_ck_times=True)
 
                 rotation = ConstantRotation([[0, 0, 1, 0]], self.sensor_frame_id, self._original_naif_sensor_frame_id)
 

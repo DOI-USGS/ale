@@ -427,7 +427,7 @@ class NaifSpice():
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
                                                       ephemeris_times=self.ephemeris_time,
-                                                      nadir=nadir)
+                                                      nadir=nadir, exact_ck_times=True)
 
             if nadir:
                 # Logic for nadir calculation was taken from ISIS3

@@ -38,7 +38,8 @@ def test_load(test_kernels, label_type, image, kernel_type):
 
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
-    assert compare_dicts(isd_obj, compare_isd) == []
+    comparison = compare_dicts(isd_obj, compare_isd)
+    assert comparison == []
 
 # ========= Test Pds3 Label and NAIF Spice driver =========
 class test_pds3_naif(unittest.TestCase):

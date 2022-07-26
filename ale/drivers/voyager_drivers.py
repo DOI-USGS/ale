@@ -4,9 +4,10 @@ import ale
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
+from ale.base.type_distortion import NoDistortion
 from ale.base.base import Driver
 
-class VoyagerCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
+class VoyagerCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
 
     @property
     def instrument_id(self):
@@ -19,6 +20,18 @@ class VoyagerCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver
         "WIDE_ANGLE_CAMERA" : "ISSWA"
         }
         return sc_lookup[super().spacecraft_name] + '_' + sensor_lookup[super().instrument_id]
+
+    @property
+    def sensor_name(self):
+        """
+        Returns the name of the instrument
+
+        Returns
+        -------
+        : str
+          Name of the sensor
+        """
+        return self.label['IsisCube']['Instrument']['InstrumentId']
 
     @property
     def sensor_model_version(self):

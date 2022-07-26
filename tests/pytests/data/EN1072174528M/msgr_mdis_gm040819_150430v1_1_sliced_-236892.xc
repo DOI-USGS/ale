@@ -1,0 +1,40 @@
+DAFETF NAIF DAF ENCODED TRANSFER FILE
+'DAF/CK  '
+'2'
+'6'
+' < DAFCAT: CK CONCATENATION >                               '
+BEGIN_ARRAY 1 19
+'MSGR_MDIS_PIVOT_ADJ                     '
+'133B772C0EF8D^D'
+'133B775234B6B^D'
+'-39D5C'
+'-39D50'
+'3'
+'1'
+19
+'FFFFFFF5B622B8^0'
+'0^0'
+'0^0'
+'4894413D2547A^-3'
+'0^0'
+'0^0'
+'1B18F691587B1D^-A'
+'FFFFFFF5B622D^0'
+'0^0'
+'0^0'
+'4894411B45F89C^-3'
+'0^0'
+'0^0'
+'1B18F691587B1D^-A'
+'133B772C0EF8D^D'
+'133B775234B6B^D'
+'133B772C0EF8D^D'
+'1^1'
+'2^1'
+END_ARRAY 1 19
+TOTAL_ARRAYS 1
+ ~NAIF/SPC BEGIN COMMENTS~
+This CK is for testing with the image: /Users/acpaquette/repos/ale/tests/pytests/data/EN1072174528M/EN1072174528M.cub
+
+This CK was generated using the following command: {}
+ ~NAIF/SPC END COMMENTS~
