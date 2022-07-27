@@ -51,7 +51,24 @@ Object = IsisCube
   End_Group
 
   Group = Kernels
-    NaifIkCode = -74410
+    NaifIkCode                = -74410
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = $base/kernels/pck/pck00009.tpc
+    TargetPosition            = (Table, $base/kernels/spk/de430.bsp,
+                                 $base/kernels/spk/mar097.bsp)
+    InstrumentPointing        = (Table,
+                                 $mro/kernels/ck/mro_sc_psp_211123_211129.bc,
+                                 $mro/kernels/fk/mro_v16.tf)
+    Instrument                = $mro/kernels/ik/mro_marci_v10.ti
+    SpacecraftClock           = $mro/kernels/sclk/MRO_SCLKSCET.00102.65536.tsc
+    InstrumentPosition        = (Table,
+                                 $mro/kernels/spk/mro_psp61_ssd_mro95a.bsp)
+    InstrumentAddendum        = $mro/kernels/iak/marciAddendum002.ti
+    ShapeModel                = $base/dems/molaMarsPlanetaryRadius0005.cub
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
+    Source                    = isis
   End_Group
 End_Object
 
@@ -59,15 +76,282 @@ Object = Label
   Bytes = 65536
 End_Object
 
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 435879937
+  Bytes               = 1507968
+  Records             = 23562
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-74000, -74900, 1)
+  ConstantFrames      = (-74410, -74400, -74000)
+  ConstantRotation    = (-0.095842103007656, 0.99535505816802,
+                         0.0090884250782823, -0.99535829673001,
+                         -0.095914470661811, 0.0078914794809984,
+                         0.0087265354983739, -0.0082899033165768,
+                         0.99992755991682)
+  CkTableStartTime    = 691074268.95955
+  CkTableEndTime      = 691077747.75955
+  CkTableOriginalSize = 21281
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = ($mro/kernels/ck/mro_sc_psp_211123_211129.bc,
+                         $mro/kernels/fk/mro_v16.tf)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 437387905
+  Bytes                = 13552
+  Records              = 242
+  ByteOrder            = Lsb
+  CacheType            = HermiteSpline
+  SpkTableStartTime    = 691074268.95955
+  SpkTableEndTime      = 691077747.75955
+  SpkTableOriginalSize = 21281.0
+  Description          = "Created by spiceinit"
+  Kernels              = $mro/kernels/spk/mro_psp61_ssd_mro95a.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 437401457
+  Bytes               = 128
+  Records             = 2
+  ByteOrder           = Lsb
+  TimeDependentFrames = (10014, 1)
+  CkTableStartTime    = 691074268.95955
+  CkTableEndTime      = 691077747.75955
+  CkTableOriginalSize = 2
+  FrameTypeCode       = 2
+  PoleRa              = (317.68143, -0.1061, 0.0)
+  PoleDec             = (52.8865, -0.0609, 0.0)
+  PrimeMeridian       = (176.63, 350.89198226, 0.0)
+  Description         = "Created by spiceinit"
+  Kernels             = ($base/kernels/spk/de430.bsp,
+                         $base/kernels/spk/mar097.bsp,
+                         $base/kernels/pck/pck00009.tpc)
+  SolarLongitude      = 132.25337017658
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 437401585
+  Bytes                = 112
+  Records              = 2
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 691074268.95955
+  SpkTableEndTime      = 691077747.75955
+  SpkTableOriginalSize = 2.0
+  Description          = "Created by spiceinit"
+  Kernels              = ($base/kernels/spk/de430.bsp,
+                          $base/kernels/spk/mar097.bsp)
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
 Object = History
   Name      = IsisCube
-  StartByte = 435881730
-  Bytes     = 814
+  StartByte = 437401697
+  Bytes     = 1790
 End_Object
 
 Object = OriginalLabel
   Name      = IsisCube
   StartByte = 435879937
   Bytes     = 1793
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE                            = 499
+  BODY499_RADII                        = (3396.19, 3396.19, 3376.2)
+  BODY_FRAME_CODE                      = 10014
+  INS-74410_FOCAL_LENGTH               = 3.9215079
+  INS-74410_PIXEL_SIZE                 = 0.009
+  CLOCK_ET_-74_1322269479:177_COMPUTED = 23062e7a7a98c441
+  INS-74400_TRANSX                     = (0.0, 0.009, 0.0)
+  INS-74400_TRANSY                     = (0.0, 0.0, 0.009)
+  INS-74400_ITRANSS                    = (0.0, 111.11111111111, 0.0)
+  INS-74400_ITRANSL                    = (0.0, 0.0, 111.11111111111)
+  INS-74410_DISTORTION_COEFFS          = (0.997322, 2.84786e-06, -6.67752e-12,
+                                          1.43076e-16)
 End_Object
 End

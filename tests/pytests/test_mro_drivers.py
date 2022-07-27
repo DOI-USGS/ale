@@ -68,7 +68,6 @@ def test_mro_hirise_load(test_hirise_kernels, label_type, kernel_type):
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
     comparison = compare_dicts(isd_obj, compare_isd)
-    print(comparison)
     assert comparison == []
 
 @pytest.mark.parametrize("label_type, kernel_type", [('isis3', 'naif')])
@@ -79,8 +78,8 @@ def test_mro_marci_load(test_marci_kernels, label_type, kernel_type):
     compare_isd = get_isd('marci')
 
     isd_obj = json.loads(isd_str)
+    print(json.dumps(isd_obj, indent=2))
     comparison = compare_dicts(isd_obj, compare_isd)
-    print(comparison)
     assert comparison == []
 
 # ========= Test ctx isislabel and isisspice driver =========

@@ -105,7 +105,7 @@ class test_data_naif(unittest.TestCase):
         self.driver.ephemeris_time = [297088762.61698407]
         self.driver._props = {}
         orientation = self.driver.sensor_orientation
-        np.testing.assert_allclose(orientation[0], [0.0841049514805286, 0.0177248856361847, 0.9945886695651666, 0.0583572098222156])
+        np.testing.assert_allclose(orientation[0], [0.0841078479898943, 0.0177246897808410, 0.9945884195952942, 0.0583573550258824])
 
     def test_sensor_position(self):
         self.driver.ephemeris_time = [297088762.61698407]
