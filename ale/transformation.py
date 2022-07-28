@@ -102,11 +102,9 @@ class FrameChain(nx.DiGraph):
         target_times = np.array(ephemeris_times)
 
         if exact_ck_times and not nadir:
-            print("Computing New Times")
             try:
                 sensor_times = cls.extract_exact_ck_times(ephemeris_times[0], ephemeris_times[-1], sensor_frame)
             except Exception as e:
-                print(e)
                 pass
 
         if (len(sensor_times) == 0):
@@ -120,8 +118,6 @@ class FrameChain(nx.DiGraph):
         target_time_dependent_frames = list(zip(target_time_dependent_frames[:-1], target_time_dependent_frames[1:]))
         target_constant_frames = list(zip(target_constant_frames[:-1], target_constant_frames[1:]))
 
-        # time_dependent_frames.extend(target_time_dependent_frames)
-        # print(time_dependent_frames)
         constant_frames.extend(target_constant_frames)
 
         for s, d in sensor_time_dependent_frames:
@@ -299,6 +295,28 @@ class FrameChain(nx.DiGraph):
 
     @staticmethod
     def extract_exact_ck_times(observStart, observEnd, targetFrame):
+        """
+        Generates all exact ephemeris data assocaited with a specific frame as
+        defined by targetFrame, between a start and end interval defined by 
+        observStart and observEnd
+
+        Parameters
+        ----------
+        observStart : float
+                      Start time in ephemeris time to extract ephemeris data from
+
+        observEnd : float
+                    End time in ephemeris time to extract ephemeris data to
+
+        targetFrame : int
+                      Target reference frame to get ephemeris data in
+
+        Returns
+        -------
+        times : list
+                A list of times where exact ephemeris data where recorded for
+                the targetFrame
+        """
         times = []
 
         FILESIZ = 128;
@@ -370,7 +388,6 @@ class FrameChain(nx.DiGraph):
                     times.append(et)
 
                     if not observationSpansToNextSegment:
-                        timeLoaded = True
                         break
                     else:
                         currentTime = segStopEt
