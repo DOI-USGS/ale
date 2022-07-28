@@ -91,6 +91,7 @@ for d in dirs:
     tmp = os.path.join(data_root, d)
     image_2_data[d] = [os.path.join(tmp, f) for f in os.listdir(tmp) if not f.startswith('.') and os.path.splitext(f)[1] != '.lbl']
     # force IAKs to the back of the list
+    image_2_data[d] = sorted(image_2_data[d])
     image_2_data[d] = sorted(image_2_data[d], key=lambda x: "Addendum" in x)
 
 def get_image_label(image, label_type='pds3'):

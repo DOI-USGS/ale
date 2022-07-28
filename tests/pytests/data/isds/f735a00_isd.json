@@ -1,0 +1,230 @@
+{
+  "isis_camera_version": 1,
+  "image_lines": 1056,
+  "image_samples": 1204,
+  "name_platform": "VIKING_ORBITER_1",
+  "name_sensor": "Visual Imaging Subsystem Camera B",
+  "reference_height": {
+    "maxheight": 1000,
+    "minheight": -1000,
+    "unit": "m"
+  },
+  "name_model": "USGS_ASTRO_FRAME_SENSOR_MODEL",
+  "center_ephemeris_time": -679343589.9901607,
+  "radii": {
+    "semimajor": 3396.19,
+    "semiminor": 3376.2,
+    "unit": "km"
+  },
+  "body_rotation": {
+    "time_dependent_frames": [
+      10014,
+      1
+    ],
+    "ck_table_start_time": -679343589.9901607,
+    "ck_table_end_time": -679343589.9901607,
+    "ck_table_original_size": 1,
+    "ephemeris_times": [
+      -679343589.9901607
+    ],
+    "quaternions": [
+      [
+        -0.7279379649229957,
+        0.013628259044724637,
+        0.31784329328601446,
+        -0.6073682825866675
+      ]
+    ],
+    "angular_velocities": [
+      [
+        3.162661247451332e-05,
+        -2.8773694182310637e-05,
+        5.6534196515818034e-05
+      ]
+    ],
+    "reference_frame": 1
+  },
+  "instrument_pointing": {
+    "time_dependent_frames": [
+      -27000,
+      2,
+      1
+    ],
+    "ck_table_start_time": -679343589.9901607,
+    "ck_table_end_time": -679343589.9901607,
+    "ck_table_original_size": 1,
+    "ephemeris_times": [
+      -679343589.9901607
+    ],
+    "quaternions": [
+      [
+        0.027631069885583687,
+        -0.04284465301523838,
+        0.6355011820954897,
+        0.7704148929247262
+      ]
+    ],
+    "angular_velocities": [
+      [
+        0.0,
+        0.0,
+        0.0
+      ]
+    ],
+    "reference_frame": 1,
+    "constant_frames": [
+      -27002,
+      -27000
+    ],
+    "constant_rotation": [
+      -0.0003979349968887269,
+      0.9999292841798486,
+      -0.011885633652182977,
+      -0.9999997648597387,
+      -0.00040454501684988875,
+      -0.0005537362156471286,
+      -0.0005585053316025856,
+      0.011885410506372724,
+      0.9999292100388355
+    ]
+  },
+  "naif_keywords": {
+    "BODY499_RADII": [
+      3396.19,
+      3396.19,
+      3376.2
+    ],
+    "BODY_FRAME_CODE": 10014,
+    "BODY_CODE": 499,
+    "INS-27002_CK_REFERENCE_ID": 2.0,
+    "INS-27002_ITRANSL": [
+      0.0,
+      0.0,
+      85.0
+    ],
+    "FRAME_-27002_CLASS_ID": -27002.0,
+    "INS-27002_ITRANSS": [
+      0.0,
+      85.0,
+      0.0
+    ],
+    "TKFRAME_-27002_ANGLES": [
+      0.681,
+      0.032,
+      -90.0228
+    ],
+    "FRAME_-27002_CENTER": -27.0,
+    "FRAME_-27002_NAME": "VO1_VISB",
+    "TKFRAME_-27002_RELATIVE": "VO1_PLATFORM",
+    "INS-27002_CK_FRAME_ID": -27000.0,
+    "TKFRAME_-27002_AXES": [
+      1.0,
+      2.0,
+      3.0
+    ],
+    "TKFRAME_-27002_SPEC": "ANGLES",
+    "FRAME_-27002_CLASS": 4.0,
+    "INS-27002_TRANSX": [
+      0.0,
+      0.011764705882352901,
+      0.0
+    ],
+    "INS-27002_TRANSY": [
+      0.0,
+      0.0,
+      0.011764705882352901
+    ],
+    "TKFRAME_-27002_UNITS": "DEGREES",
+    "BODY499_POLE_DEC": [
+      52.8865,
+      -0.0609,
+      0.0
+    ],
+    "BODY499_POLE_RA": [
+      317.68143,
+      -0.1061,
+      0.0
+    ],
+    "BODY499_PM": [
+      176.63,
+      350.89198226,
+      0.0
+    ]
+  },
+  "detector_sample_summing": 1,
+  "detector_line_summing": 1,
+  "focal_length_model": {
+    "focal_length": null
+  },
+  "detector_center": {
+    "line": 0,
+    "sample": 0
+  },
+  "starting_detector_line": 0,
+  "starting_detector_sample": 0,
+  "focal2pixel_lines": [
+    0.0,
+    0.0,
+    85.0
+  ],
+  "focal2pixel_samples": [
+    0.0,
+    85.0,
+    0.0
+  ],
+  "optical_distortion": {
+    "radial": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "instrument_position": {
+    "spk_table_start_time": -679343589.9901607,
+    "spk_table_end_time": -679343589.9901607,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
+      -679343589.9901607
+    ],
+    "positions": [
+      [
+        3804.7660151810724,
+        -29029.37931973394,
+        -8152.7028335638715
+      ]
+    ],
+    "velocities": [
+      [
+        0.6188706493397879,
+        -0.5486691625905323,
+        -0.037514393002492735
+      ]
+    ],
+    "reference_frame": 1
+  },
+  "sun_position": {
+    "spk_table_start_time": -679343589.9901607,
+    "spk_table_end_time": -679343589.9901607,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
+      -679343589.9901607
+    ],
+    "positions": [
+      [
+        242154815.26481828,
+        36901072.56745328,
+        10366793.729682952
+      ]
+    ],
+    "velocities": [
+      [
+        -4.66539076393051,
+        19.836822435505688,
+        9.224682056846097
+      ]
+    ],
+    "reference_frame": 1
+  }
+}

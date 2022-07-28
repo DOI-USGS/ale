@@ -96,38 +96,59 @@ class FrameChain(nx.DiGraph):
                      of frame rotations in the frame chain
     """
     @classmethod
-    def from_spice(cls, sensor_frame, target_frame, center_ephemeris_time, ephemeris_times=[], nadir=False):
+    def from_spice(cls, sensor_frame, target_frame, center_ephemeris_time, ephemeris_times=[], nadir=False, exact_ck_times=False):
         frame_chain = cls()
+        sensor_times = []
+        target_times = np.array(ephemeris_times)
 
-        times = np.array(ephemeris_times)
+        if exact_ck_times and not nadir:
+            try:
+                sensor_times = cls.extract_exact_ck_times(ephemeris_times[0], ephemeris_times[-1], sensor_frame)
+            except Exception as e:
+                pass
+
+        if (len(sensor_times) == 0):
+            sensor_times = np.array(ephemeris_times)
 
         sensor_time_dependent_frames, sensor_constant_frames = cls.frame_trace(sensor_frame, center_ephemeris_time, nadir)
         target_time_dependent_frames, target_constant_frames = cls.frame_trace(target_frame, center_ephemeris_time)
 
-        time_dependent_frames = list(zip(sensor_time_dependent_frames[:-1], sensor_time_dependent_frames[1:]))
+        sensor_time_dependent_frames = list(zip(sensor_time_dependent_frames[:-1], sensor_time_dependent_frames[1:]))
         constant_frames = list(zip(sensor_constant_frames[:-1], sensor_constant_frames[1:]))
         target_time_dependent_frames = list(zip(target_time_dependent_frames[:-1], target_time_dependent_frames[1:]))
         target_constant_frames = list(zip(target_constant_frames[:-1], target_constant_frames[1:]))
 
-        time_dependent_frames.extend(target_time_dependent_frames)
         constant_frames.extend(target_constant_frames)
 
-        for s, d in time_dependent_frames:
-            quats = np.zeros((len(times), 4))
-            avs = np.zeros((len(times), 3))
-            for j, time in enumerate(times):
+        for s, d in sensor_time_dependent_frames:
+            quats = np.zeros((len(sensor_times), 4))
+            avs = np.zeros((len(sensor_times), 3))
+            for j, time in enumerate(sensor_times):
                 state_matrix = spice.sxform(spice.frmnam(s), spice.frmnam(d), time)
                 rotation_matrix, avs[j] = spice.xf2rav(state_matrix)
                 quat_from_rotation = spice.m2q(rotation_matrix)
                 quats[j,:3] = quat_from_rotation[1:]
                 quats[j,3] = quat_from_rotation[0]
 
-            rotation = TimeDependentRotation(quats, times, s, d, av=avs)
+            rotation = TimeDependentRotation(quats, sensor_times, s, d, av=avs)
+            frame_chain.add_edge(rotation=rotation)
+
+        for s, d in target_time_dependent_frames:
+            quats = np.zeros((len(target_times), 4))
+            avs = np.zeros((len(target_times), 3))
+            for j, time in enumerate(target_times):
+                state_matrix = spice.sxform(spice.frmnam(s), spice.frmnam(d), time)
+                rotation_matrix, avs[j] = spice.xf2rav(state_matrix)
+                quat_from_rotation = spice.m2q(rotation_matrix)
+                quats[j,:3] = quat_from_rotation[1:]
+                quats[j,3] = quat_from_rotation[0]
+
+            rotation = TimeDependentRotation(quats, target_times, s, d, av=avs)
             frame_chain.add_edge(rotation=rotation)
 
         for s, d in constant_frames:
             quats = np.zeros(4)
-            rotation_matrix = spice.pxform(spice.frmnam(s), spice.frmnam(d), times[0])
+            rotation_matrix = spice.pxform(spice.frmnam(s), spice.frmnam(d), ephemeris_times[0])
             quat_from_rotation = spice.m2q(rotation_matrix)
             quats[:3] = quat_from_rotation[1:]
             quats[3] = quat_from_rotation[0]
@@ -271,3 +292,106 @@ class FrameChain(nx.DiGraph):
                 return path[i+1], path[i], edge
 
         return None
+
+    @staticmethod
+    def extract_exact_ck_times(observStart, observEnd, targetFrame):
+        """
+        Generates all exact ephemeris data assocaited with a specific frame as
+        defined by targetFrame, between a start and end interval defined by 
+        observStart and observEnd
+
+        Parameters
+        ----------
+        observStart : float
+                      Start time in ephemeris time to extract ephemeris data from
+
+        observEnd : float
+                    End time in ephemeris time to extract ephemeris data to
+
+        targetFrame : int
+                      Target reference frame to get ephemeris data in
+
+        Returns
+        -------
+        times : list
+                A list of times where exact ephemeris data where recorded for
+                the targetFrame
+        """
+        times = []
+
+        FILESIZ = 128;
+        TYPESIZ = 32;
+        SOURCESIZ = 128;
+
+        currentTime = observStart
+        timeLoaded = False
+
+        count = spice.ktotal("ck")
+        file, filtyp, source, handle = spice.kdata(0, "ck", FILESIZ, TYPESIZ, SOURCESIZ)
+        spice.dafbfs(handle)
+        found = spice.daffna()
+        spCode = int(targetFrame / 1000) * 1000
+
+        while found:
+            observationSpansToNextSegment = False
+            summary = spice.dafgs()
+            dc, ic = spice.dafus(summary, 2, 6)
+
+            # Don't read type 5 ck here
+            if ic[2] == 5:
+                break
+
+            if (ic[0] == spCode and ic[2] == 3):
+                segStartEt = spice.sct2e(int(spCode/1000), dc[0])
+                segStopEt = spice.sct2e(int(spCode/1000), dc[1])
+
+                if (currentTime >= segStartEt  and  currentTime <= segStopEt):
+                    # Check for a gap in the time coverage by making sure the time span of the observation
+                    #  does not cross a segment unless the next segment starts where the current one ends
+                    if (observationSpansToNextSegment and currentTime > segStartEt):
+                        msg = "Observation crosses segment boundary--unable to interpolate pointing"
+                        raise Exception(msg)
+                    if (observEnd > segStopEt):
+                        observationSpansToNextSegment = True
+
+                    dovelocity = ic[3]
+                    end = ic[5]
+                    val = spice.dafgda(handle, int(end - 1), int(end))
+                    # int nints = (int) val[0];
+                    ninstances = int(val[1])
+                    numvel  =  dovelocity * 3
+                    quatnoff  =  ic[4] + (4 + numvel) * ninstances - 1
+                    # int nrdir = (int) (( ninstances - 1 ) / DIRSIZ); /* sclkdp directory records */
+                    sclkdp1off  =  int(quatnoff + 1)
+                    sclkdpnoff  =  int(sclkdp1off + ninstances - 1)
+                    # int start1off = sclkdpnoff + nrdir + 1;
+                    # int startnoff = start1off + nints - 1;
+                    sclkSpCode = int(spCode / 1000)
+
+                    sclkdp = spice.dafgda(handle, sclkdp1off, sclkdpnoff)
+
+                    instance = 0
+                    et = spice.sct2e(sclkSpCode, sclkdp[0])
+
+                    while (instance < (ninstances - 1)  and  et < currentTime):
+                        instance = instance + 1
+                        et = spice.sct2e(sclkSpCode, sclkdp[instance])
+
+                    if (instance > 0):
+                        instance = instance - 1
+                    et = spice.sct2e(sclkSpCode, sclkdp[instance])
+
+                    while (instance < (ninstances - 1) and et < observEnd):
+                        times.append(et)
+                        instance = instance + 1
+                        et = spice.sct2e(sclkSpCode, sclkdp[instance])
+                    times.append(et)
+
+                    if not observationSpansToNextSegment:
+                        break
+                    else:
+                        currentTime = segStopEt
+            spice.dafcs(handle)     # Continue search in daf last searched
+            found = spice.daffna()   # Find next forward array in current daf
+
+        return times

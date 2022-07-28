@@ -35,6 +35,9 @@ class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoD
         }
         return id_lookup[super().instrument_id]
 
+    @property
+    def ephemeris_stop_time(self):
+        return super().ephemeris_start_time
 
     @property
     def ikid(self):
@@ -67,6 +70,10 @@ class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoD
     def sensor_name(self):
         return self.label['IsisCube']['Instrument']['SpacecraftName']
 
+    @property
+    def frame_chain(self):
+        self._props['exact_ck_times'] = False
+        return super().frame_chain
 
 class NewHorizonsLeisaIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
     """
@@ -103,7 +110,6 @@ class NewHorizonsLeisaIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
           Naif ID used to for identifying the instrument in Spice kernels
         """
         return self.label['IsisCube']['Kernels']['NaifFrameCode'][0]
-
 
     @property
     def ephemeris_start_time(self):

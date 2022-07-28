@@ -264,7 +264,12 @@ def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
 
     if (format_as == 'list'):
         # get kernels as 1-d string list
-        kernels = [kernel for kernel in chain.from_iterable(mk_paths.values()) if isinstance(kernel, str)]
+        kernels = []
+        for kernel in chain.from_iterable(mk_paths.values()):
+            if isinstance(kernel, str):
+                kernels.append(kernel)
+            elif isinstance(kernel, list):
+                kernels.extend(kernel)
         if expand:
             isisprefs = get_isis_preferences()
 
@@ -495,7 +500,7 @@ def duckpool(naifvar, start=0, length=10, default=None):
     return default
 
 
-def query_kernel_pool(matchstr="*"):
+def query_kernel_pool(matchstr="*", max_length=10):
     """
     Collect multiple keywords from the naif kernel pool based on a
     template string
@@ -504,6 +509,9 @@ def query_kernel_pool(matchstr="*"):
     ----------
     matchstr : str
                matchi_c formatted str
+
+    max_length : int
+                 maximum length array to get from naif keywords
 
     Returns
     -------
@@ -517,7 +525,7 @@ def query_kernel_pool(matchstr="*"):
         warnings.warn(f"kernel search for {matchstr} failed with {e}")
         svars = []
 
-    svals = [duckpool(v) for v in svars]
+    svals = [duckpool(v, length=max_length) for v in svars]
     return dict(zip(svars, svals))
 
 

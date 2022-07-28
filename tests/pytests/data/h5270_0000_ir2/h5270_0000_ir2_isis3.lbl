@@ -28,10 +28,10 @@ Object = IsisCube
     SpacecraftClockStopCount  = 1/0150552792.64947
     MissionPhaseName          = ME_Phase_11
     TargetName                = Mars
+    Summing                   = 4
     FocalPlaneTemperature     = 7.9716 <degC>
     LensTemperature           = 8.1755 <degC>
     InstrumentTemperature     = 11.0301 <degC>
-    Summing                   = 4
   End_Group
 
   Group = Archive
@@ -55,9 +55,9 @@ Object = IsisCube
                                  $base/kernels/spk/mar097.bsp)
     InstrumentPointing        = (Table,
                                  $mex/kernels/ck/ATNM_MEASURED_080101_090101_V-
-                                 03.BC, $mex/kernels/fk/MEX_V14.TF)
-    Instrument                = $mex/kernels/ik/MEX_HRSC_V03.TI
-    SpacecraftClock           = $mex/kernels/sclk/MEX_190911_STEP.TSC
+                                 03.BC, $mex/kernels/fk/MEX_V16.TF)
+    Instrument                = $mex/kernels/ik/MEX_HRSC_V09.TI
+    SpacecraftClock           = $mex/kernels/sclk/MEX_220705_STEP.TSC
     InstrumentPosition        = (Table,
                                  $mex/kernels/spk/ORMM__080201000000_00474.BSP)
     InstrumentAddendum        = $mex/kernels/iak/hrscAddendum004.ti
@@ -65,6 +65,7 @@ Object = IsisCube
     InstrumentPositionQuality = Reconstructed
     InstrumentPointingQuality = Reconstructed
     CameraVersion             = 1
+    Source                    = isis
   End_Group
 End_Object
 
@@ -100,7 +101,7 @@ End_Object
 
 Object = Table
   Name                = InstrumentPointing
-  StartByte           = 77798973
+  StartByte           = 77805496
   Bytes               = 1856
   Records             = 29
   ByteOrder           = Lsb
@@ -117,7 +118,7 @@ Object = Table
   FrameTypeCode       = 3
   Description         = "Created by spiceinit"
   Kernels             = ($mex/kernels/ck/ATNM_MEASURED_080101_090101_V03.BC,
-                         $mex/kernels/fk/MEX_V14.TF)
+                         $mex/kernels/fk/MEX_V16.TF)
 
   Group = Field
     Name = J2000Q0
@@ -170,7 +171,7 @@ End_Object
 
 Object = Table
   Name                 = InstrumentPosition
-  StartByte            = 77812029
+  StartByte            = 77807352
   Bytes                = 1344
   Records              = 24
   ByteOrder            = Lsb
@@ -226,7 +227,7 @@ End_Object
 
 Object = Table
   Name                = BodyRotation
-  StartByte           = 77813373
+  StartByte           = 77808696
   Bytes               = 128
   Records             = 2
   ByteOrder           = Lsb
@@ -295,7 +296,7 @@ End_Object
 
 Object = Table
   Name                 = SunPosition
-  StartByte            = 77813501
+  StartByte            = 77808824
   Bytes                = 112
   Records              = 2
   ByteOrder            = Lsb
@@ -352,8 +353,14 @@ End_Object
 
 Object = History
   Name      = IsisCube
-  StartByte = 77813613
-  Bytes     = 1806
+  StartByte = 77808936
+  Bytes     = 896
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 77798973
+  Bytes     = 6523
 End_Object
 
 Object = NaifKeywords
