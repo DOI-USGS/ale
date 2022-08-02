@@ -28,6 +28,7 @@ def test_load_pds(test_kernels):
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
     x = compare_dicts(isd_obj, compare_dict)
+    print(x)
     assert x == []
 
 def test_load_isis():
