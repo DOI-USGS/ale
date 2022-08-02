@@ -277,6 +277,9 @@ def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
               warnings.warn("No IsisPreferences file found, is your ISISROOT env var set?")
 
             kernels = [expandvars(expandvars(k, dict_to_lower(isisprefs['DataDirectory']))) for k in kernels]
+        # Ensure that the ISIS Addendum kernel is last in case it overrides
+        # some values from the default Instrument kernel
+        kernels = sorted(kernels, key=lambda x: "Addendum" in x)
         return kernels
     elif (format_as == 'dict'):
         # return created dict

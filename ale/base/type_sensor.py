@@ -54,7 +54,11 @@ class LineScanner():
         : ndarray
           ephemeris times split based on image lines
         """
-        return np.linspace(self.ephemeris_start_time,  self.ephemeris_stop_time, max(2, int(self.image_lines/64)))
+        if not hasattr(self, "_ephemeris_time"):
+          cache_size = self.image_lines + 1
+          cache_slope = (self.ephemeris_stop_time - self.ephemeris_start_time) / (cache_size - 1)
+          self._ephemeris_time = np.asarray([self.ephemeris_start_time +  (i * cache_slope) for i in range(cache_size)])
+        return self._ephemeris_time
 
     @property
     def ephemeris_stop_time(self):
@@ -238,8 +242,16 @@ class Radar():
           ephemeris times split based on image lines
         """
         # 0.25 is the delta used by minirf, used as a default.
-        num_states = int((self.ephemeris_stop_time - self.ephemeris_start_time)/0.25) + 1
-        return np.linspace(self.ephemeris_start_time,  self.ephemeris_stop_time, num_states)
+        # num_states = int((self.ephemeris_stop_time - self.ephemeris_start_time)/0.25) + 1
+        if not hasattr(self, "_ephemeris_time"):
+          cache_size = self.image_lines + 1
+          cache_slope = (self.ephemeris_stop_time - self.ephemeris_start_time) / (cache_size - 1)
+          print(self.ephemeris_start_time)
+          print(self.ephemeris_stop_time)
+          self._ephemeris_time = np.asarray([self.ephemeris_start_time +  (i * cache_slope) for i in range(cache_size)])
+          print(len(self._ephemeris_time))
+        return self._ephemeris_time
+        # return np.linspace(self.ephemeris_start_time,  self.ephemeris_stop_time, num_states)
 
     @property
     def wavelength(self):

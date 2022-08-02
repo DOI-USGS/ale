@@ -126,7 +126,7 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
         : str
           instrument id
         """
-        return id_lookup[super().instrument_id]
+        return iss_id_lookup[super().instrument_id]
 
     @property
     def spacecraft_name(self):
@@ -151,7 +151,7 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
         : str
           Name of the sensor
         """
-        return name_lookup[super().instrument_id]
+        return iss_name_lookup[super().instrument_id]
 
     @property
     def ephemeris_start_time(self):
