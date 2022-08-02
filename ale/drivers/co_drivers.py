@@ -253,7 +253,6 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
         : int
           NAIF's Wac sensor frame ID, or ALE's Nac sensor frame ID
         """
-        print(self.instrument_id)
         if self.instrument_id == "CASSINI_ISS_NAC":
             return 14082360
         elif self.instrument_id == "CASSINI_ISS_WAC":
@@ -275,7 +274,6 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
             try:
                 # Call frinfo to check if the ISIS iak has been loaded with the
                 # additional reference frame. Otherwise, Fail and add it manually
-                print(self.sensor_frame_id)
                 _ = spice.frinfo(self.sensor_frame_id)
                 self._frame_chain = super().frame_chain
             except spice.utils.exceptions.NotFoundError as e:
