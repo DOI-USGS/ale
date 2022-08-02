@@ -4,8 +4,6 @@ import unittest
 from unittest.mock import PropertyMock, patch
 
 import pytest
-import numpy as np
-import spiceypy as spice
 
 import ale
 from ale.drivers.mro_drivers import MroCtxPds3LabelNaifSpiceDriver, MroCtxIsisLabelNaifSpiceDriver, MroCtxIsisLabelIsisSpiceDriver
@@ -51,8 +49,8 @@ def test_mro_ctx_load(test_ctx_kernels, label_type, kernel_type):
 
     isd_obj = json.loads(isd_str)
 
-    if label_type == 'pds3' and kernel_type == 'naif':
-        compare_isd['image_samples'] = 5056
+    if label_type == 'isis3' and kernel_type == 'naif':
+        compare_isd['image_samples'] = 5000
 
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
