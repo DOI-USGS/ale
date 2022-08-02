@@ -43,7 +43,7 @@ def test_mro_ctx_load(test_ctx_kernels, label_type, kernel_type):
 
     if label_type == 'isis3' and kernel_type == 'isis':
         label_file = get_image('B10_013341_1010_XN_79S172W')
-        isd_str = ale.loads(label_file)
+        isd_str = ale.loads(label_file, verbose=True)
         compare_isd = get_isd('ctx_isis')
     else:
         isd_str = ale.loads(label_file, props={'kernels': test_ctx_kernels})
@@ -51,22 +51,21 @@ def test_mro_ctx_load(test_ctx_kernels, label_type, kernel_type):
 
     isd_obj = json.loads(isd_str)
 
-    if label_type == 'isis3' and kernel_type == 'naif':
-        compare_isd['image_samples'] = 5000
+    if label_type == 'pds3' and kernel_type == 'naif':
+        compare_isd['image_samples'] = 5056
 
-    print(json.dumps(isd_obj, indent=2))
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
 
 @pytest.mark.parametrize("label_type, kernel_type", [('isis3', 'naif')])
 def test_mro_hirise_load(test_hirise_kernels, label_type, kernel_type):
+    print(test_hirise_kernels)
     label_file = get_image_label("PSP_001446_1790_BG12_0", label_type)
 
     isd_str = ale.loads(label_file, props={'kernels': test_hirise_kernels})
     compare_isd = get_isd('hirise')
 
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
 
@@ -78,7 +77,6 @@ def test_mro_marci_load(test_marci_kernels, label_type, kernel_type):
     compare_isd = get_isd('marci')
 
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
 
