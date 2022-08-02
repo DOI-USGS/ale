@@ -13,6 +13,11 @@ Mars Reconnaissance Orbiter Frames Kernel
 Version and Date
 -------------------------------------------------------------------------------
 
+   Version 1.6 -- November 11, 2020 -- Boris Semenov, NAIF
+
+      Updated MRO_HGA_BASEPLATE and MRO_HGA frame alignments based on
+      [22].
+
    Version 1.5 -- October 22, 2012 -- Boris Semenov, NAIF
 
       Updated orientations of the MRO_MCS_BASE and
@@ -220,6 +225,9 @@ References
 
   21. Updated MCS alignment based on 2012 off-track observations,
       e-mails from Dr. John T. Schofield, 07/24/12 & 10/22/12.
+
+  22. E-mail from Paul Salame, LMCO, regarding the HGA frame definitions,
+      October 28, 2020.
 
 
 Contact Information
@@ -2106,6 +2114,21 @@ HGA Baseplate and Gimbal Drive Frames
    The gimbal frames are defined such that rotation axis designations 
    are consistent with [4].
 
+   [22] provided the following HGA baseplate DCM w.r.t. to the s/c frame
+
+       9.999999804376672e-01 -1.977993966601806e-04  2.295934537796784e-07
+      -1.977992524732815e-04 -9.999998719444498e-01 -4.658181490872693e-04
+       3.217319645753285e-07  4.658180945613699e-04 -9.999998915066927e-01
+
+   and the following antenna boresight direction in the ``ideal'' HGA
+   frame:
+
+       5.221214000806500e-05 -1.497243425405999e-03  9.999988777673789e-01
+
+   The baseplate DCM and the rotations aligning the antenna's Z axis
+   with the vector above are provided in the corresponding frame
+   definitons below.
+
 
 HGA Frame Definitions
 ---------------------
@@ -2119,11 +2142,15 @@ HGA Frame Definitions
       FRAME_-74211_CLASS         = 4
       FRAME_-74211_CLASS_ID      = -74211
       FRAME_-74211_CENTER        = -74
-      TKFRAME_-74211_SPEC        = 'ANGLES'
+      TKFRAME_-74211_SPEC        = 'MATRIX'
       TKFRAME_-74211_RELATIVE    = 'MRO_SPACECRAFT'
-      TKFRAME_-74211_ANGLES      = ( 0.0, 0.0, 180.0 )
-      TKFRAME_-74211_AXES        = (   3,   2,   1   )
-      TKFRAME_-74211_UNITS       = 'DEGREES'
+      TKFRAME_-74211_MATRIX      = ( 
+
+       9.999999804376672e-01 -1.977993966601806e-04  2.295934537796784e-07
+      -1.977992524732815e-04 -9.999998719444498e-01 -4.658181490872693e-04
+       3.217319645753285e-07  4.658180945613699e-04 -9.999998915066927e-01
+
+                                   )
 
       FRAME_MRO_HGA_INNER_GIMBAL = -74212
       FRAME_-74212_NAME          = 'MRO_HGA_INNER_GIMBAL'
@@ -2148,8 +2175,8 @@ HGA Frame Definitions
       FRAME_-74214_CENTER        = -74
       TKFRAME_-74214_SPEC        = 'ANGLES'
       TKFRAME_-74214_RELATIVE    = 'MRO_HGA_OUTER_GIMBAL'
-      TKFRAME_-74214_ANGLES      = ( -90.0, 0.0, 0.0 )
-      TKFRAME_-74214_AXES        = (   3,   2,   1 )
+      TKFRAME_-74214_ANGLES      = ( -0.08578576, -0.00299154, -90.0 )
+      TKFRAME_-74214_AXES        = (  1,           2,            3   )
       TKFRAME_-74214_UNITS       = 'DEGREES'
 
    \begintext
