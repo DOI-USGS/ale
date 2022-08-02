@@ -231,7 +231,7 @@ class Radar():
     def ephemeris_time(self):
         """
         Returns an array of times between the start/stop ephemeris times
-        based on the start/stop times with a timestep 0.25.
+        based on the start/stop times with a timestep (stop - start) / image_lines.
         Expects ephemeris start/stop times to be defined. These should be
         floating point numbers containing the start and stop times of the
         images.
@@ -241,15 +241,10 @@ class Radar():
         : ndarray
           ephemeris times split based on image lines
         """
-        # 0.25 is the delta used by minirf, used as a default.
-        # num_states = int((self.ephemeris_stop_time - self.ephemeris_start_time)/0.25) + 1
         if not hasattr(self, "_ephemeris_time"):
           cache_size = self.image_lines + 1
           cache_slope = (self.ephemeris_stop_time - self.ephemeris_start_time) / (cache_size - 1)
-          print(self.ephemeris_start_time)
-          print(self.ephemeris_stop_time)
           self._ephemeris_time = np.asarray([self.ephemeris_start_time +  (i * cache_slope) for i in range(cache_size)])
-          print(len(self._ephemeris_time))
         return self._ephemeris_time
         # return np.linspace(self.ephemeris_start_time,  self.ephemeris_stop_time, num_states)
 
