@@ -12,7 +12,7 @@ from ale.base.data_isis import IsisSpice
 import unittest
 from unittest.mock import patch
 
-from conftest import get_image_label, get_image_kernels, convert_kernels, compare_dicts
+from conftest import get_image_label, get_image_kernels, convert_kernels, compare_dicts, get_isd
 
 from ale.drivers.nh_drivers import NewHorizonsLorriIsisLabelNaifSpiceDriver, NewHorizonsLeisaIsisLabelNaifSpiceDriver, NewHorizonsMvicIsisLabelNaifSpiceDriver
 from conftest import get_image_kernels, convert_kernels, get_image_label, get_isd
