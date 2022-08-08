@@ -1,7 +1,7 @@
 import os
 import json
 import unittest
-from unittest.mock import patch
+from unittest.mock import PropertyMock, patch
 
 import pytest
 import numpy as np
@@ -9,30 +9,44 @@ import spiceypy as spice
 
 import ale
 from ale.drivers.mro_drivers import MroCtxPds3LabelNaifSpiceDriver, MroCtxIsisLabelNaifSpiceDriver, MroCtxIsisLabelIsisSpiceDriver
+from ale.drivers.mro_drivers import MroHiRiseIsisLabelNaifSpiceDriver, MroMarciIsisLabelNaifSpiceDriver
 
 from conftest import get_image, get_image_kernels, get_isd, convert_kernels, get_image_label, compare_dicts
 
-#@pytest.fixture
-# def ctx_isf
-
 @pytest.fixture(scope='module')
-def test_kernels():
+def test_ctx_kernels():
     kernels = get_image_kernels('B10_013341_1010_XN_79S172W')
     updated_kernels, binary_kernels = convert_kernels(kernels)
     yield updated_kernels
     for kern in binary_kernels:
         os.remove(kern)
 
+@pytest.fixture(scope='module')
+def test_hirise_kernels():
+    kernels = get_image_kernels('PSP_001446_1790_BG12_0')
+    updated_kernels, binary_kernels = convert_kernels(kernels)
+    yield updated_kernels
+    for kern in binary_kernels:
+        os.remove(kern)
+
+@pytest.fixture(scope='module')
+def test_marci_kernels():
+    kernels = get_image_kernels('U02_071865_1322_MA_00N193W')
+    updated_kernels, binary_kernels = convert_kernels(kernels)
+    yield updated_kernels
+    for kern in binary_kernels:
+        os.remove(kern)
+
 @pytest.mark.parametrize("label_type, kernel_type", [('pds3', 'naif'), ('isis3', 'naif'), ('isis3', 'isis')])
-def test_mro_load(test_kernels, label_type, kernel_type):
+def test_mro_ctx_load(test_ctx_kernels, label_type, kernel_type):
     label_file = get_image_label('B10_013341_1010_XN_79S172W', label_type)
 
-    if label_type == 'isis3' and kernel_type == 'isis': 
+    if label_type == 'isis3' and kernel_type == 'isis':
         label_file = get_image('B10_013341_1010_XN_79S172W')
         isd_str = ale.loads(label_file)
         compare_isd = get_isd('ctx_isis')
-    else: 
-        isd_str = ale.loads(label_file, props={'kernels': test_kernels})
+    else:
+        isd_str = ale.loads(label_file, props={'kernels': test_ctx_kernels})
         compare_isd = get_isd('ctx')
 
     isd_obj = json.loads(isd_str)
@@ -40,10 +54,36 @@ def test_mro_load(test_kernels, label_type, kernel_type):
     if label_type == 'isis3' and kernel_type == 'naif':
         compare_isd['image_samples'] = 5000
 
-    assert compare_dicts(isd_obj, compare_isd) == []
+    print(json.dumps(isd_obj, indent=2))
+    comparison = compare_dicts(isd_obj, compare_isd)
+    assert comparison == []
 
-# ========= Test isislabel and isisspice driver =========
-class test_isis_isis(unittest.TestCase):
+@pytest.mark.parametrize("label_type, kernel_type", [('isis3', 'naif')])
+def test_mro_hirise_load(test_hirise_kernels, label_type, kernel_type):
+    label_file = get_image_label("PSP_001446_1790_BG12_0", label_type)
+
+    isd_str = ale.loads(label_file, props={'kernels': test_hirise_kernels})
+    compare_isd = get_isd('hirise')
+
+    isd_obj = json.loads(isd_str)
+    print(json.dumps(isd_obj, indent=2))
+    comparison = compare_dicts(isd_obj, compare_isd)
+    assert comparison == []
+
+@pytest.mark.parametrize("label_type, kernel_type", [('isis3', 'naif')])
+def test_mro_marci_load(test_marci_kernels, label_type, kernel_type):
+    label_file = get_image_label('U02_071865_1322_MA_00N193W', label_type)
+    isd_str = ale.loads(label_file, props={'kernels': test_marci_kernels})
+
+    compare_isd = get_isd('marci')
+
+    isd_obj = json.loads(isd_str)
+    print(json.dumps(isd_obj, indent=2))
+    comparison = compare_dicts(isd_obj, compare_isd)
+    assert comparison == []
+
+# ========= Test ctx isislabel and isisspice driver =========
+class test_ctx_isis_isis(unittest.TestCase):
 
     def setUp(self):
         label = get_image_label("B10_013341_1010_XN_79S172W", "isis3")
@@ -61,8 +101,8 @@ class test_isis_isis(unittest.TestCase):
     def test_detector_center_sample(self):
         assert self.driver.detector_center_sample == 2542.96099
 
-# ========= Test isislabel and naifspice driver =========
-class test_isis_naif(unittest.TestCase):
+# ========= Test ctx isislabel and naifspice driver =========
+class test_ctx_isis_naif(unittest.TestCase):
 
     def setUp(self):
         label = get_image_label("B10_013341_1010_XN_79S172W", "isis3")
@@ -99,8 +139,8 @@ class test_isis_naif(unittest.TestCase):
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
 
-# ========= Test pds3label and naifspice driver =========
-class test_pds_naif(unittest.TestCase):
+# ========= Test ctx pds3label and naifspice driver =========
+class test_ctx_pds_naif(unittest.TestCase):
 
     def setUp(self):
         label = get_image_label("B10_013341_1010_XN_79S172W", "pds3")
@@ -126,3 +166,118 @@ class test_pds_naif(unittest.TestCase):
 
     def test_platform_name(self):
         assert self.driver.platform_name == "MARS_RECONNAISSANCE_ORBITER"
+
+
+# ========= Test hirise isislabel and naifspice driver =========
+class test_hirise_isis_naif(unittest.TestCase):
+
+    def setUp(self):
+        label = get_image_label("PSP_001446_1790_BG12_0", "isis3")
+        self.driver = MroHiRiseIsisLabelNaifSpiceDriver(label)
+
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == "MRO_HIRISE"
+
+    def test_sensor_name(self):
+        assert self.driver.sensor_name == "HIRISE CAMERA"
+
+    def test_un_binned_rate(self):
+        assert self.driver.un_binned_rate == 0.0000836875
+
+    def test_ephemeris_start_time(self):
+        with patch('ale.drivers.mro_drivers.spice.scs2e', return_value=12345) as scs2e:
+            assert self.driver.ephemeris_start_time == 12344.997489375
+            scs2e.assert_called_with(-74999, '848201291:62546')
+
+    def test_exposure_duration(self):
+        assert self.driver.exposure_duration == 0.00033475
+
+    def test_ccd_ikid(self):
+        with patch('ale.drivers.mro_drivers.spice.bods2c', return_value=12345) as bods2c:
+            assert self.driver.ccd_ikid == 12345
+            bods2c.assert_called_with('MRO_HIRISE_CCD12')
+
+    def test_sensor_frame_id(self):
+        assert self.driver.sensor_frame_id == -74690
+
+    def test_detector_center_sample(self):
+        assert self.driver.detector_center_sample == 0
+
+    def test_detector_center_line(self):
+        assert self.driver.detector_center_line == 0
+
+    def test_sensor_model_version(self):
+        assert self.driver.sensor_model_version == 1
+
+# ========= Test marci isislabel and naifspice driver =========
+class test_marci_isis_naif(unittest.TestCase):
+
+    def setUp(self):
+        label = get_image_label("U02_071865_1322_MA_00N193W", "isis3")
+        self.driver = MroMarciIsisLabelNaifSpiceDriver(label)
+
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == "MRO_MARCI_VIS"
+
+    def test_base_ikid(self):
+        with patch('ale.drivers.mro_drivers.spice.bods2c', return_value=12345) as bods2c:
+            assert self.driver.base_ikid == 12345
+            bods2c.assert_called_with("MRO_MARCI")
+
+    def test_flipped_framelets(self):
+        assert self.driver.flipped_framelets == True
+
+    def test_compute_marci_time(self):
+        with patch('ale.drivers.mro_drivers.MroMarciIsisLabelNaifSpiceDriver.start_time', \
+                    new_callable=PropertyMock) as start_time:
+            start_time.return_value = 0
+            times = self.driver.compute_marci_time(1)
+            assert len(times) == 5
+            assert times[0] == 3434.51875
+            assert times[1] == 3439.71875
+            assert times[2] == 3444.9187500000003
+            assert times[3] == 3450.11875
+            assert times[4] == 3455.31875
+
+    def test_start_time(self):
+        with patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c, \
+             patch('ale.drivers.mro_drivers.spice.scs2e', return_value=12345) as scs2e:
+            assert self.driver.start_time == 12344.99999125
+            bods2c.assert_called_with('MARS RECONNAISSANCE ORBITER')
+            scs2e.assert_called_with(-12345, '1322269479:177')
+
+    def test_ephemeris_start_time(self):
+        with patch('ale.drivers.mro_drivers.MroMarciIsisLabelNaifSpiceDriver.compute_marci_time') as compute_marci_time:
+            compute_marci_time.return_value = [0, 100]
+            assert self.driver.ephemeris_start_time == 0
+            compute_marci_time.assert_called_with(21280.5)
+
+    def test_ephemeris_stop_time(self):
+        with patch('ale.drivers.mro_drivers.MroMarciIsisLabelNaifSpiceDriver.compute_marci_time') as compute_marci_time:
+            compute_marci_time.return_value = [0, 100]
+            assert self.driver.ephemeris_stop_time == 100
+            compute_marci_time.assert_called_with(0.5)
+
+    def test_detector_center_sample(self):
+        assert self.driver.detector_center_sample == 0
+
+    def test_detector_center_line(self):
+        assert self.driver.detector_center_line == 0
+
+    def test_focal2pixel_samples(self):
+        with patch('ale.drivers.mro_drivers.spice.gdpool', return_value=[0.0, 111.11111111111, 0.0]) as gdpool, \
+             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+             assert self.driver.focal2pixel_samples == [0.0, 111.11111111111, 0.0]
+             gdpool.assert_called_with('INS-12345_ITRANSS', 0, 3)
+
+    def test_focal2pixel_lines(self):
+        with patch('ale.drivers.mro_drivers.spice.gdpool', return_value=[0.0, 0.0, 111.11111111111]) as gdpool, \
+             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+             assert self.driver.focal2pixel_lines == [0.0, 0.0, 111.11111111111]
+             gdpool.assert_called_with('INS-12345_ITRANSL', 0, 3)
+
+    def test_sensor_name(self):
+        assert self.driver.sensor_name == "COLOR IMAGER CAMERA"
+
+    def test_sensor_model_version(self):
+        assert self.driver.sensor_model_version == 1

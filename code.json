@@ -2,7 +2,7 @@
   {
     "name": "ale",
     "organization": "U.S. Geological Survey",
-    "description": "GitHub repository for the Abstraction Layer for Ephemerides package",
+    "description": "GitLab repository for the Abstraction Layer for Ephemerides package",
     "version": "0.8.7",
     "status": "Production",
 
@@ -11,15 +11,15 @@
       "licenses": [
         {
           "name": "Public Domain, CC0-1.0",
-          "URL": "https://github.com/USGS-Astrogeology/ale/blob/master/LICENSE.md"
+          "URL": "https://code.usgs.gov/astrogeology/ale/-/blob/master/LICENSE.md"
         }
       ]
     },
 
-    "homepageURL": "https://github.com/USGS-Astrogeology/ale/releases/tag/0.8.7",
-    "downloadURL": "https://github.com/USGS-Astrogeology/ale/archive/refs/tags/0.8.7.zip",
-    "disclaimerURL": "https://github.com/USGS-Astrogeology/ale/blob/master/DISCLAIMER.md",
-    "repositoryURL": "https://github.com/USGS-Astrogeology/ale",
+    "homepageURL": "https://code.usgs.gov/astrogeology/ale/-/releases/0.8.7",
+    "downloadURL": "https://code.usgs.gov/astrogeology/ale/-/archive/0.8.7/ale-0.8.7.zip",
+    "disclaimerURL": "https://code.usgs.gov/astrogeology/ale/-/blob/master/DISCLAIMER.md",
+    "repositoryURL": "https://code.usgs.gov/astrogeology/ale",
     "vcs": "git",
 
     "laborHours": 40,
@@ -43,7 +43,7 @@
     },
 
     "date": {
-      "metadataLastUpdated": "2022-03-04"
+      "metadataLastUpdated": "2022-06-03"
     }
   }
 ]

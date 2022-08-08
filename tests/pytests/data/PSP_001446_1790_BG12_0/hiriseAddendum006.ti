@@ -1,0 +1,135 @@
+HiRISE Instrument Kernel
+=============================================================
+
+This instrument kernel (I-kernel) contains parameters that
+describe the Mars Reconnaissance Orbiter HiRISE (High Resolution
+Imaging Science Experiment) instrument.
+
+Version and Date
+-------------------------------------------------------------
+
+Version 1.0 -- February 16, 2005 -- Jim Torson, U.S. Geological Survey,
+    Flagstaff, AZ
+    Initial version.
+
+Version 1.1 -- April 5, 2006 -- Kris Becker USGS.
+	Added entries so NADIR pointing can be utilized.  These entries are
+	indentified with prefixes of INS-74699.  They can be any CCD
+	measurement but this one so happens to CCD #0.
+
+Version 1.2 -- May 10, 2006 -- Kris Becker USGS
+	Update focal length from 12056.0189 to 11994.9988 per Randy's email
+	of 2006/04/26.
+
+Version 1.3 -- July 17, 2009 -- Steven Lambright USGS
+	Update to exclude data now provided in the ik
+
+Version 1.4 -- January 12, 2010 -- Debbie A. Cook USGS
+	Update to include CK_FRAME_ID and CK_REFERENCE_ID
+
+Version 1.6 -- Mar 12, 2010 -- Debbie A. Cook USGS
+	Update to include CK_FRAME_ID and CK_REFERENCE_ID
+-------------------------------------------------------------
+The following are the parameters for computing focal plane
+coords from CCD coords.  The last two characters of the
+parameter names are the HiRISE detector number (00 to 13).
+For a given detector number, these allow computation of
+focal plane coordinates (in millimeters) from "centered"
+detector coordinates in pixels (0,0 is the center of the
+detector array) as described in Randy Kirk's December 21,
+2004 email (ISIS3 sensor models, take 2), i.e.,
+
+x = transx[0] + transx[1]*ccdSample_c + transx[2]*ccdLine_c
+y = transy[0] + transy[1]*ccdSample_c + transy[2]*ccdLine_c
+
+The parameter values come from the spreadsheet attached to
+Randy Kirk's December 22, 2004 email (HiRISE pixel to
+focal plane).
+
+The INS-74699_TRANS[XY] is new and needed to support Nadir
+pointing CK simulations now supported in ISIS.
+
+\begindata
+         INS-74699_TRANSX=(   -96.3935,   -0.000057,   0.012000)
+         INS-74699_TRANSY=(   107.9956,   -0.012000,  -0.000057)
+
+         INS-74600_TRANSX=(   -96.3935,   -0.000057,   0.012000)
+         INS-74600_TRANSY=(   107.9956,   -0.012000,  -0.000057)
+         INS-74601_TRANSX=(   -89.4914,   -0.000042,   0.012000)
+         INS-74601_TRANSY=(    83.9950,   -0.012000,  -0.000042)
+         INS-74602_TRANSX=(   -96.9459,   -0.000034,   0.012000)
+         INS-74602_TRANSY=(    60.0469,   -0.012000,  -0.000034)
+         INS-74603_TRANSX=(   -89.4927,   -0.000018,   0.012000)
+         INS-74603_TRANSY=(    36.0380,   -0.012000,  -0.000018)
+         INS-74604_TRANSX=(   -96.4998,    0.000002,   0.012000)
+         INS-74604_TRANSY=(    11.9992,   -0.012000,   0.000002)
+         INS-74605_TRANSX=(   -89.4960,   -0.000001,   0.012000)
+         INS-74605_TRANSY=(   -12.0010,   -0.012000,  -0.000001)
+         INS-74606_TRANSX=(   -96.6811,    0.000019,   0.012000)
+         INS-74606_TRANSY=(   -35.9996,   -0.012000,   0.000019)
+         INS-74607_TRANSX=(   -89.4935,    0.000031,   0.012000)
+         INS-74607_TRANSY=(   -60.0034,   -0.012000,   0.000031)
+         INS-74608_TRANSX=(   -96.3954,    0.000049,   0.012000)
+         INS-74608_TRANSY=(   -83.9990,   -0.012000,   0.000049)
+         INS-74609_TRANSX=(   -89.1039,    0.000056,   0.012000)
+         INS-74609_TRANSY=(  -107.9997,   -0.012000,   0.000056)
+         INS-74610_TRANSX=(  -110.9610,    0.000000,   0.012000)
+         INS-74610_TRANSY=(    11.9991,   -0.012000,   0.000000)
+         INS-74611_TRANSX=(  -103.6857,   -0.000001,   0.012000)
+         INS-74611_TRANSY=(   -12.0010,   -0.012000,  -0.000001)
+         INS-74612_TRANSX=(   -82.2033,    0.000002,   0.012000)
+         INS-74612_TRANSY=(    11.9993,   -0.012000,   0.000002)
+         INS-74613_TRANSX=(   -74.9334,    0.000003,   0.012000)
+         INS-74613_TRANSY=(   -12.0007,   -0.012000,   0.000003)
+
+
+
+\begintext
+Parameters for computing CCD coords from focal plane coords.
+The INS-74699_ITRANS[SL] is new and needed to support Nadir
+pointing CK simulations now supported in ISIS.
+
+\begindata
+         INS-74699_ITRANSS=(    8961.49,     -0.3947,   -83.3324)
+         INS-74699_ITRANSL=(    8075.32,     83.3324,    -0.3947)
+
+         INS-74600_ITRANSS=(    8961.49,     -0.3947,   -83.3324)
+         INS-74600_ITRANSL=(    8075.32,     83.3324,    -0.3947)
+         INS-74601_ITRANSS=(    6973.17,     -0.2947,   -83.3328)
+         INS-74601_ITRANSL=(    7482.32,     83.3328,    -0.2947)
+         INS-74602_ITRANSS=(    4981.07,     -0.2353,   -83.3330)
+         INS-74602_ITRANSL=(    8092.92,     83.3330,    -0.2353)
+         INS-74603_ITRANSS=(    2991.85,     -0.1263,   -83.3332)
+         INS-74603_ITRANSL=(    7462.27,     83.3332,    -0.1263)
+         INS-74604_ITRANSS=(    1001.06,      0.0117,   -83.3333)
+         INS-74604_ITRANSL=(    8041.51,     83.3333,     0.0117)
+         INS-74605_ITRANSS=(   -1000.86,     -0.0087,   -83.3333)
+         INS-74605_ITRANSL=(    7457.90,     83.3333,    -0.0087)
+         INS-74606_ITRANSS=(   -2987.14,      0.1327,   -83.3332)
+         INS-74606_ITRANSL=(    8061.52,     83.3332,     0.1327)
+         INS-74607_ITRANSS=(   -4981.11,      0.2140,   -83.3331)
+         INS-74607_ITRANSL=(    7470.61,     83.3331,     0.2140)
+         INS-74608_ITRANSS=(   -6966.96,      0.3413,   -83.3326)
+         INS-74608_ITRANSL=(    8061.56,     83.3326,     0.3413)
+         INS-74609_ITRANSS=(   -8965.39,      0.3870,   -83.3324)
+         INS-74609_ITRANSL=(    7467.04,     83.3324,     0.3870)
+         INS-74610_ITRANSS=(     999.93,      0.0000,   -83.3333)
+         INS-74610_ITRANSL=(    9246.75,     83.3333,     0.0000)
+         INS-74611_ITRANSS=(   -1001.12,     -0.0100,   -83.3333)
+         INS-74611_ITRANSL=(    8640.36,     83.3333,    -0.0100)
+         INS-74612_ITRANSS=(    1001.28,      0.0163,   -83.3333)
+         INS-74612_ITRANSL=(    6850.08,     83.3333,     0.0163)
+         INS-74613_ITRANSS=(    -998.61,      0.0193,   -83.3333)
+         INS-74613_ITRANSL=(    6244.68,     83.3333,     0.0193)
+
+
+
+\begintext
+These are the parameters for writing c-kernels.  Isis will create ck
+with the same frame endpoints as the mission ck. For Hirise the ck
+instrument frame is  MRO_SPACECRAFT (-74000) and the ck reference frame
+is MRO_MME_OF_DATE (-74900).
+
+\begindata
+         INS-74699_CK_FRAME_ID=-74000
+         INS-74699_CK_REFERENCE_ID=-74900

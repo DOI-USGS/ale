@@ -1,0 +1,65 @@
+\begintext
+Leisa's pixel pitch is currently set to the size of the pixels (assuming that it is measured in mm,) so assuming no space in-between. 
+
+Leisa's focal length is the same as MVIC's because the light is
+focused onto a shared focal plane. This is also in mm.  But there is
+some anamorphism, so we are choosing the value that works best for the
+scan direction.  It doesn't work as well for the orthogonal axis, but
+distortions along that axis are much easier to correct later.
+
+INS-98901_FOCAL_LENGTH=644.486
+INS-98201_TRANSX = (0.0,0.040,0.0)
+INS-98201_TRANSY  = ( 0.0, 0.0, 0.040 )
+INS-98201_ITRANSS = ( 0.0, 25.0, 0.0 ) 
+INS-98201_ITRANSL = ( 0.0, 0.0, 25.0)
+INS-98201_PIXEL_PITCH=0.040
+
+\begintext 
+ISIS requires the +Z or -Z axis to be along the boresight of
+the telescope. So we rotate the -98201 axes by 90deg about +Y
+ 
+Create a new naif id for the new rotated frame in ISIS:
+(Naif Frame ID = -98201 -> Isis Frame ID = -98901)
+
+\begindata
+ FRAME_ISIS_NH_RALPH_LEISA    = -98901
+ FRAME_-98901_NAME          = 'ISIS_NH_RALPH_LEISA'
+ FRAME_-98901_CLASS         = 4
+ FRAME_-98901_CLASS_ID      = -98901
+ FRAME_-98901_CENTER        = -98
+ TKFRAME_-98901_RELATIVE    = 'NH_RALPH_LEISA'
+ TKFRAME_-98901_SPEC        = 'ANGLES'
+ TKFRAME_-98901_ANGLES      = ( 0.0 90.0 0.0 )
+ TKFRAME_-98901_AXES        = (  1,  2,  3 )
+ TKFRAME_-98901_UNITS       = 'DEGREES'
+
+ INS-98901_PIXEL_PITCH=0.040
+ INS-98901_FOCAL_LENGTH=644.486
+
+\begintext
+ The following affine coefficients are useful for band 1 of the ISIS cube. Without
+ a constant term in the Y and Line there is no offset in the line direction to 
+ correctly transform band 2-256. All lines in band 1 come from line 1 of the 
+ 256x256 array, all lines of band 2 come from line 2 and so on.
+ INS-98901_TRANSX = ( 0.0,0.040,0.0 )
+ INS-98901_TRANSY  = ( 0.0, 0.0, 0.040 )
+
+ INS-98901_ITRANSS = ( 0.0, 25.0, 0.0 ) 
+ INS-98901_ITRANSL = ( 0.0, 0.0, 25.0 )
+
+
+\begintext
+The following affine coefficents are not to be used as is. They are used as the
+starting/base values. The constant term is multiplied by the band_number-1 to get the
+correct Y and Line constant terms. The other coefficients are used as is for all bands.
+\begindata
+ INS-98901_TRANSX = ( 0.0, 0.040, 0.0 )
+ INS-98901_TRANSY  = ( 0.04, 0.0, 0.040 )
+
+ INS-98901_ITRANSS = ( 0.0, 25.0, 0.0 ) 
+ INS-98901_ITRANSL = ( -1.0, 0.0, 25.0 )
+
+
+
+
+

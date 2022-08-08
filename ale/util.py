@@ -16,6 +16,7 @@ except ImportError:
 from itertools import chain
 from datetime import datetime
 import pytz
+import numpy as np
 
 import subprocess
 import re
@@ -257,9 +258,18 @@ def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
     mk_paths['Clock'] = [kernel_group.get('Clock', None)]
     mk_paths['Extra'] = [kernel_group.get('Extra', None)]
 
+    # handles issue with OsirisRex instrument kernels being in a 2d list
+    if isinstance(mk_paths['Instrument'][0], list):
+        mk_paths['Instrument'] = np.concatenate(mk_paths['Instrument']).flat
+
     if (format_as == 'list'):
         # get kernels as 1-d string list
-        kernels = [kernel for kernel in chain.from_iterable(mk_paths.values()) if isinstance(kernel, str)]
+        kernels = []
+        for kernel in chain.from_iterable(mk_paths.values()):
+            if isinstance(kernel, str):
+                kernels.append(kernel)
+            elif isinstance(kernel, list):
+                kernels.extend(kernel)
         if expand:
             isisprefs = get_isis_preferences()
 
@@ -490,7 +500,7 @@ def duckpool(naifvar, start=0, length=10, default=None):
     return default
 
 
-def query_kernel_pool(matchstr="*"):
+def query_kernel_pool(matchstr="*", max_length=10):
     """
     Collect multiple keywords from the naif kernel pool based on a
     template string
@@ -499,6 +509,9 @@ def query_kernel_pool(matchstr="*"):
     ----------
     matchstr : str
                matchi_c formatted str
+
+    max_length : int
+                 maximum length array to get from naif keywords
 
     Returns
     -------
@@ -512,7 +525,7 @@ def query_kernel_pool(matchstr="*"):
         warnings.warn(f"kernel search for {matchstr} failed with {e}")
         svars = []
 
-    svals = [duckpool(v) for v in svars]
+    svals = [duckpool(v, length=max_length) for v in svars]
     return dict(zip(svars, svals))
 
 
@@ -559,7 +572,7 @@ def get_isis_mission_translations(isis_data):
     """
     mission_translation_file = read_pvl(os.path.join(isis_data, "base", "translations", "MissionName2DataDir.trn"))
     # For some reason this file takes the form [value, key] for mission name -> data dir
-    lookup = [l[::-1] for l in mission_translation_file["MissionName"].getlist("Translation")]
+    lookup = [l[::-1] for l in mission_translation_file["MissionName"].getall("Translation")]
     return dict(lookup)
 
 
@@ -693,15 +706,19 @@ def search_isis_db(dbobj, labelobj, isis_data):
     # Flag is set when kernels encapsulating the entire image time is found
     full_match = False
 
-    for selection in dbobj.getlist("Selection"):
-        files = selection.getlist("File")
-
-        # selection criteria
-        matches = selection.getlist("Match")
-        times = selection.getlist("Time")
-
+    for selection in dbobj.getall("Selection"):
+        files = selection.getall("File")
         if not files:
             raise Exception(f"No File found in {selection}")
+
+        # selection criteria
+        matches = []
+        if "Match" in selection:
+            matches = selection.getall("Match")
+
+        times = []
+        if "Time" in selection:
+            times = selection.getall("Time")
 
         files = [path.join(*file) if isinstance(file, list) else file  for file in files]
 

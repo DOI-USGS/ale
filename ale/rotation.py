@@ -1,4 +1,3 @@
-from scipy.interpolate import interp1d
 from scipy.spatial.transform import Rotation
 
 import numpy as np

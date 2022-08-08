@@ -1,0 +1,1243 @@
+KPL/PCK
+
+\beginlabel
+PDS_VERSION_ID               = PDS3
+RECORD_TYPE                  = STREAM
+RECORD_BYTES                 = "N/A"
+^SPICE_KERNEL                = "nh_stars_kbo_centaur_v002.tpc"
+MISSION_NAME                 = "NEW HORIZONS"
+SPACECRAFT_NAME              = "NEW HORIZONS"
+DATA_SET_ID                  = "NH-J/P/SS-SPICE-6-V1.0"
+KERNEL_TYPE_ID               = PCK
+PRODUCT_ID                   = "nh_stars_kbo_centaur_v002.tpc"
+PRODUCT_CREATION_TIME        = 2017-04-30T00:00:00
+PRODUCER_ID                  = "NAIF/JPL"
+MISSION_PHASE_NAME           = "N/A"
+PRODUCT_VERSION_TYPE         = ACTUAL
+PLATFORM_OR_MOUNTING_NAME    = "N/A"
+START_TIME                   = "N/A"
+STOP_TIME                    = "N/A"
+SPACECRAFT_CLOCK_START_COUNT = "N/A"
+SPACECRAFT_CLOCK_STOP_COUNT  = "N/A"
+TARGET_NAME                  = {
+                               JUPITER,
+                               PLUTO,
+                               "SOLAR SYSTEM"
+                               }
+INSTRUMENT_NAME              = "N/A"
+NAIF_INSTRUMENT_ID           = "N/A"
+SOURCE_PRODUCT_ID            = "N/A"
+NOTE                         = "See comments in the file for details"
+OBJECT                       = SPICE_KERNEL
+  INTERCHANGE_FORMAT         = ASCII
+  KERNEL_TYPE                = TARGET_CONSTANTS
+  DESCRIPTION                = "PCK/Pinpoint input/Synthetic body constants"
+END_OBJECT                   = SPICE_KERNEL
+\endlabel
+
+########################################################################
+Start of comments
+
+This SPICE text kernel file is a catchall to provide
+
+- NAME/ID translations for bodies for which none existed within SPICE
+  at the time this file was created, including stars.
+
+- a non-rotating synthetic rotation state for all such bodies and
+  stars such that the body-fixed frames are aligned with the J2000
+  inertial frame.
+
+- Input to the SPICE pinpoint utility to model stars as objects moving
+  parallel to the spacecraft at a distance of 1km and positioned in the
+  same inertial direction (RA and DEC) w.r.t. the spacecraft as the star
+  being modelled.  This is an oversimplified model for stars but its
+  accuracy is sufficient for the purpose intended.
+
+- A finite list of bodies (kernel pool variable - KPV - NH_TARGET_BODIES)
+  to check against New Horizons spacecraft pointing commands, parsed from
+  command sequence products, to heuristically determine the target for
+  any given observation.
+
+  - N.B. There may be duplicate entries in this list in some versions
+         of this kernel.  The NH_TARGET_BODIES KPV is used internally
+         by the New Horizons (NH) project.  NH project software makes
+         allowances for this duplication, and so such duplication is not
+         an error in this kernel.
+
+########################################################################
+
+During New Horizons long cruise phase, budgets and resources were limited,
+and the time of personnel who did planning and command sequencing so much
+so that is was not possible to put a process in place where the
+sequencing personnel would document the target and/or intent of
+observations in a usable way.  Instead, the Science Operations Center
+(SOC) developed software to parse command sequencing products and
+determine the targets heuristically either from Chebyshev
+coefficient-based trajectory models, or from inertial pointing
+directions, which had been simulated on the ground before being uploaded
+to the spacecraft.
+
+########################################################################
+BODYnnn_PM
+BODYnnn_POLE_DEC
+BODYnnn_POLE_RA
+BODYnnn_RADII
+
+  The BODYnnn_... kernel pool variables, with the nnn substrings indicating
+  SPICE ID codes, provide synthetic body-fixed frames and radii for all
+  possible targets.
+
+
+NAIF_BODY_CODE
+NAIF_BODY_NAME
+
+  The NAIF_BODY_... kernel pool variables provide translation between
+  SPICE text names and SPICE numeric IDs
+
+
+NH_TARGET_BODIES
+
+  The NAIF_TARGET_BODIES kernel pool variable provides a set of bodies
+  that may be tested against uplink commands with Chebyshev
+  coefficient-based ephememeris models and spacecraft attitude pointing
+  to identify potential targets.
+
+
+SITEnnn_CENTER
+SITEnnn_FRAME
+SITEnnn_IDCODE
+SITES
+SITEnnn_XYZ
+
+  The SITEnnn_... and SITES kernel pool variables are inputs to the
+  NAIF/SPICE pinpoint utility to create bodies that stay in a fixed
+  position with respect to the New Horizons spacecraft; the nh_stars.bsp
+  SPK is the product of these inputs and the pinpoint utility
+
+########################################################################
+
+The set of bodies defined in this kernel comprise stars, asteoids, KBOs
+and plutonian satellites.  Except for the stars, all the bodies have
+ephemerides in SPKs provided by this data set.
+
+Stars identified in this kernel have KPVs used by the pinpoint SPICE
+utility; that is, an SP-kernel for the stars may be created using this
+text kernel as an input to the pinpoint SPICE utility.  Non-stars
+identified in this kernel to not have associated KPVs for pinpoint.
+
+The 8888nnn schema for assigning SPICE IDs to stars is an ad hoc
+convention adopted for the NH project; within the NH project and within
+this data set it does not conflict with any other SPICE IDs.  No such
+claim is made beyond that scope; it is up to the user of this file to
+check whether it conflicts with any NH-external kernels that may be
+FURNSHed within the same application.
+
+The following is a list of the stars and other bodies:  the first token
+in each line is an integer SPICE ID; the rest of each line contains the
+primary name for the body; see the rest of the kernel for alternate
+names used for the bodies.
+
+The alternate names used in this kernel, e.g. JR1 for 15810 ARAWN (1994
+JR1), will almost certainly be ambiguous or non-unique if this kernel is
+used outside the scope of New Horizons data.  Again, it is up to the
+user of this file to resolve any conflicts with NH-external kernels that
+may be FURNSHed within the same application.
+
+
+Stars:
+    8888000    zet Pup
+    8888001    Vega
+    8888002    gam Gru
+    8888003    rho Leo
+    8888004    M7
+    8888005    Spica
+    8888006    HD 93521
+    8888007    Interplanetary Medium (IPM)
+    8888008    NGC 3532
+    8888009    Arcturus
+    8888010    HD 214168
+    8888011    Bellatrix
+    8888012    M 1
+    8888013    HD 205905
+    8888014    HD 37962
+    8888015    Cyg A
+    8888016    Cas A
+    8888017    M 87
+
+
+Solar system bodies:  asteroids; KBOs; plutonian satelllites.
+    2010199    10199 CHARIKLO
+    2136472    136472 MAKEMAKE
+    2136108    136108 HAUMEA
+        904    KERBEROS
+        905    STYX
+    2015810    15810 ARAWN (1994 JR1)
+    3523335    2010 JJ124
+    2002060    2060 CHIRON
+    2028978    28978 IXION (2001 KX76)
+    2307261    ASTEROID 307261 (2002 MS4)
+    2050000    50000 QUAOAR (2002 LM60)
+    3713011    ASTEROID 486958 (2014 MU69)
+
+
+End of comments; the rest of this file is a string from a Python script.
+########################################################################
+
+This is a SPICE text kernel, created via script
+  uplinkdb_objects.py
+in directory
+  /home/brian/pipeline/uplinkdb/nh_targets
+
+The preamble that follows is the __doc__ string from that script, which
+contains crucial information for the use of this kernel, i.e. the
+integer SPICE ID codes of the bodies for which ephemerides will be
+checked when Chebychev-based trajectories are found in SASFs/SSFs/CMDs.
+========================================================================
+Preamble for uplinkdb_objects.py
+
+This was originally the __doc__ string in file uplinkdb_objects.py
+
+You may be reading it in a SPICE text kernel e.g.
+
+  nh_stars_kbo_centaur_ppinp.tpc
+
+This script creates that SPICE text kernel for use by PINPOINT to
+create a SPICE SP-Kernel with several stars.
+
+That kernel also provide name/ID mappings (NAIF_BODY_CODE/NAME) for
+those stars, plus KBOs Makemake and Haumea, and Centaur asteroid
+Chariklo, via this __doc__ string as a SPICE meta-kernel by defining
+kernel pool variable NH_TARGET_BODIES.
+
+Usage:
+
+  N.B. Usually called via the Makefile in the same directory
+
+  python uplinkdb_objects.py > nh_stars_kbo_centaur_ppinp.tpc
+
+  e.g. followed by
+
+    rm -f spk/nh_stars.bsp
+
+    pinpoint -def nh_stars_kbo_centaur_ppinp.tpc -spk spk/nh_stars.bsp -batch
+
+########################################################################
+########################################################################
+### N.B. This triple-quoted __doc__ string can be read in this file as a
+###      SPICE text kernel; for use in this script, the backslash-b
+###      characters (backspace, ASCII 8) are replaced by '\b', a
+###      two-character string, so f.write will output the correct
+###      backslash-begindata/text codes to the output file.
+########################################################################
+########################################################################
+
+  506 is HIMALIA
+  507 is ELARA
+  517 is CALLIRHOE
+
+NH_TARGET_BODIES is a SPICE kernel pool variable (KPV) that lists the IDs
+of bodies the ephemerides of which will be checked against
+Chebyshev polynomial-based trajectories in New Horizons SASFs/SSFs/CMDs
+
+N.B. There may be duplicate entries in this list in some versions
+     of this kernel.  The NH_TARGET_BODIES KPV is used internally
+     by the New Horizons (NH) project.  NH project software makes
+     allowances for this duplication, and so such duplication is not
+     an error in this kernel.
+
+\begindata
+
+NH_TARGET_BODIES = ( 10 3
+                     501 502 503 504 505 506 507 517 599
+                     7 8
+                     901 902 903 904 905 999
+                   )
+
+\begintext
+========================================================================
+End of preamble
+
+zet Pup
+['SIMBAD:', '* zet Pup', '120.89603141', '-40.00314780', 'Variable of BY Dra type']
+
+\begindata
+NAIF_BODY_NAME           += ( 'zet Pup' )
+NAIF_BODY_CODE           += ( 8888000 )
+NH_TARGET_BODIES         += ( 8888000 )
+BODY8888000_POLE_RA        = (    0.    0.    0. )
+BODY8888000_POLE_DEC       = (   90.    0.    0. )
+BODY8888000_PM             = (  270.    0.    0. )
+BODY8888000_RADII          = (  100.  100.  100. )
+\begintext
+
+PINPOINT parameters for star zet Pup:
+\begindata
+SITES += ( 'SITE8888000' )
+SITE8888000_FRAME  = 'J2000'
+SITE8888000_IDCODE = 8888000
+SITE8888000_XYZ = ( -0.393332 0.657313 -0.642830 )
+SITE8888000_CENTER = -98
+\begintext
+
+Vega
+['SIMBAD:', '* alf Lyr', '279.23473479', '+38.78368896', 'Variable Star of delta Sct type']
+
+\begindata
+NAIF_BODY_NAME           += ( 'Vega' )
+NAIF_BODY_CODE           += ( 8888001 )
+NH_TARGET_BODIES         += ( 8888001 )
+BODY8888001_POLE_RA        = (    0.    0.    0. )
+BODY8888001_POLE_DEC       = (   90.    0.    0. )
+BODY8888001_PM             = (  270.    0.    0. )
+BODY8888001_RADII          = (  100.  100.  100. )
+\begintext
+
+PINPOINT parameters for star Vega:
+\begindata
+SITES += ( 'SITE8888001' )
+SITE8888001_FRAME  = 'J2000'
+SITE8888001_IDCODE = 8888001
+SITE8888001_XYZ = ( 0.125096 -0.769413 0.626382 )
+SITE8888001_CENTER = -98
+\begintext
+
+gam Gru
+['SIMBAD:', '* gam Gru', '328.48219248', '-37.36485527', 'Star']
+
+\begindata
+NAIF_BODY_NAME           += ( 'gam Gru' )
+NAIF_BODY_CODE           += ( 8888002 )
+NH_TARGET_BODIES         += ( 8888002 )
+BODY8888002_POLE_RA        = (    0.    0.    0. )
+BODY8888002_POLE_DEC       = (   90.    0.    0. )
+BODY8888002_PM             = (  270.    0.    0. )
+BODY8888002_RADII          = (  100.  100.  100. )
+\begintext
+
+PINPOINT parameters for star gam Gru:
+\begindata
+SITES += ( 'SITE8888002' )
+SITE8888002_FRAME  = 'J2000'
+SITE8888002_IDCODE = 8888002
+SITE8888002_XYZ = ( 0.677538 -0.415486 -0.606888 )
+SITE8888002_CENTER = -98
+\begintext
+
+RHOLEO (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'RHOLEO' )
+NAIF_BODY_CODE           += ( 8888003 )
+\begintext
+
+rho Leo
+['SIMBAD:', '* rho Leo', '158.20279865', '+09.30658596', 'Blue supergiant star']
+
+\begindata
+NAIF_BODY_NAME           += ( 'rho Leo' )
+NAIF_BODY_CODE           += ( 8888003 )
+NH_TARGET_BODIES         += ( 8888003 )
+BODY8888003_POLE_RA        = (    0.    0.    0. )
+BODY8888003_POLE_DEC       = (   90.    0.    0. )
+BODY8888003_PM             = (  270.    0.    0. )
+BODY8888003_RADII          = (  100.  100.  100. )
+\begintext
+
+PINPOINT parameters for star rho Leo:
+\begindata
+SITES += ( 'SITE8888003' )
+SITE8888003_FRAME  = 'J2000'
+SITE8888003_IDCODE = 8888003
+SITE8888003_XYZ = ( -0.916282 0.366435 0.161717 )
+SITE8888003_CENTER = -98
+\begintext
+
+M6M7 (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'M6M7' )
+NAIF_BODY_CODE           += ( 8888004 )
+\begintext
+
+M 7 (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'M 7' )
+NAIF_BODY_CODE           += ( 8888004 )
+\begintext
+
+M7
+['SIMBAD:', 'NGC  6475', '268.463', '-34.793', 'Open (galactic) Cluster']
+
+\begindata
+NAIF_BODY_NAME           += ( 'M7' )
+NAIF_BODY_CODE           += ( 8888004 )
+NH_TARGET_BODIES         += ( 8888004 )
+BODY8888004_POLE_RA        = (    0.    0.    0. )
+BODY8888004_POLE_DEC       = (   90.    0.    0. )
+BODY8888004_PM             = (  270.    0.    0. )
+BODY8888004_RADII          = (  100.  100.  100. )
+\begintext
+
+PINPOINT parameters for star M7:
+\begindata
+SITES += ( 'SITE8888004' )
+SITE8888004_FRAME  = 'J2000'
+SITE8888004_IDCODE = 8888004
+SITE8888004_XYZ = ( -0.022027 -0.820923 -0.570613 )
+SITE8888004_CENTER = -98
+\begintext
+
+Spica
+['SIMBAD:', '* alf Vir', '201.29824736', '-11.16131949', 'Variable Star of beta Cep type']
+
+\begindata
+NAIF_BODY_NAME           += ( 'Spica' )
+NAIF_BODY_CODE           += ( 8888005 )
+NH_TARGET_BODIES         += ( 8888005 )
+BODY8888005_POLE_RA        = (    0.    0.    0. )
+BODY8888005_POLE_DEC       = (   90.    0.    0. )
+BODY8888005_PM             = (  270.    0.    0. )
+BODY8888005_RADII          = (  100.  100.  100. )
+\begintext
+
+PINPOINT parameters for star Spica:
+\begindata
+SITES += ( 'SITE8888005' )
+SITE8888005_FRAME  = 'J2000'
+SITE8888005_IDCODE = 8888005
+SITE8888005_XYZ = ( -0.914080 -0.356353 -0.193572 )
+SITE8888005_CENTER = -98
+\begintext
+
+HD93521 (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'HD93521' )
+NAIF_BODY_CODE           += ( 8888006 )
+\begintext
+
+HD 93521
+['SIMBAD:', 'HD  93521', '162.09796404', '+37.57030340', 'Star']
+
+\begindata
+NAIF_BODY_NAME           += ( 'HD 93521' )
+NAIF_BODY_CODE           += ( 8888006 )
+NH_TARGET_BODIES         += ( 8888006 )
+BODY8888006_POLE_RA        = (    0.    0.    0. )
+BODY8888006_POLE_DEC       = (   90.    0.    0. )
+BODY8888006_PM             = (  270.    0.    0. )
+BODY8888006_RADII          = (  100.  100.  100. )
+\begintext
+
+PINPOINT parameters for star HD 93521:
+\begindata
+SITES += ( 'SITE8888006' )
+SITE8888006_FRAME  = 'J2000'
+SITE8888006_IDCODE = 8888006
+SITE8888006_XYZ = ( -0.754231 0.243639 0.609734 )
+SITE8888006_CENTER = -98
+\begintext
+
+Interplanetary Medium (IPM); 51.3; 44.8; ECLIPJ2000; RADEC
+
+\begindata
+NAIF_BODY_NAME           += ( 'Interplanetary Medium (IPM)' )
+NAIF_BODY_CODE           += ( 8888007 )
+NH_TARGET_BODIES         += ( 8888007 )
+BODY8888007_POLE_RA        = (    0.    0.    0. )
+BODY8888007_POLE_DEC       = (   90.    0.    0. )
+BODY8888007_PM             = (  270.    0.    0. )
+BODY8888007_RADII          = (  100.  100.  100. )
+\begintext
+
+PINPOINT parameters for star Interplanetary Medium (IPM):
+\begindata
+SITES += ( 'SITE8888007' )
+SITE8888007_FRAME  = 'J2000'
+SITE8888007_IDCODE = 8888007
+SITE8888007_XYZ = ( 0.443654 0.227787 0.866767 )
+SITE8888007_CENTER = -98
+\begintext
+
+NGC3532 (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'NGC3532' )
+NAIF_BODY_CODE           += ( 8888008 )
+\begintext
+
+NGC 3532
+['SIMBAD:', 'NGC  3532', '166.413', '-58.753', 'Open (galactic) Cluster']
+
+\begindata
+NAIF_BODY_NAME           += ( 'NGC 3532' )
+NAIF_BODY_CODE           += ( 8888008 )
+NH_TARGET_BODIES         += ( 8888008 )
+BODY8888008_POLE_RA        = (    0.    0.    0. )
+BODY8888008_POLE_DEC       = (   90.    0.    0. )
+BODY8888008_PM             = (  270.    0.    0. )
+BODY8888008_RADII          = (  100.  100.  100. )
+\begintext
+
+PINPOINT parameters for star NGC 3532:
+\begindata
+SITES += ( 'SITE8888008' )
+SITE8888008_FRAME  = 'J2000'
+SITE8888008_IDCODE = 8888008
+SITE8888008_XYZ = ( -0.504212 0.121861 -0.854939 )
+SITE8888008_CENTER = -98
+\begintext
+
+Arcturus
+['SIMBAD:', '* alf Boo', '213.91530029', '+19.18240916', 'Red Giant Branch star']
+
+\begindata
+NAIF_BODY_NAME           += ( 'Arcturus' )
+NAIF_BODY_CODE           += ( 8888009 )
+NH_TARGET_BODIES         += ( 8888009 )
+BODY8888009_POLE_RA        = (    0.    0.    0. )
+BODY8888009_POLE_DEC       = (   90.    0.    0. )
+BODY8888009_PM             = (  270.    0.    0. )
+BODY8888009_RADII          = (  100.  100.  100. )
+\begintext
+
+PINPOINT parameters for star Arcturus:
+\begindata
+SITES += ( 'SITE8888009' )
+SITE8888009_FRAME  = 'J2000'
+SITE8888009_IDCODE = 8888009
+SITE8888009_XYZ = ( -0.783787 -0.526987 0.328577 )
+SITE8888009_CENTER = -98
+\begintext
+
+HD214168 (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'HD214168' )
+NAIF_BODY_CODE           += ( 8888010 )
+\begintext
+
+HD 214168
+['SIMBAD:', '*   8 Lac B', '338.96711542', '+39.62813397', 'Star']
+
+\begindata
+NAIF_BODY_NAME           += ( 'HD 214168' )
+NAIF_BODY_CODE           += ( 8888010 )
+NH_TARGET_BODIES         += ( 8888010 )
+BODY8888010_POLE_RA        = (    0.    0.    0. )
+BODY8888010_POLE_DEC       = (   90.    0.    0. )
+BODY8888010_PM             = (  270.    0.    0. )
+BODY8888010_RADII          = (  100.  100.  100. )
+\begintext
+
+PINPOINT parameters for star HD 214168:
+\begindata
+SITES += ( 'SITE8888010' )
+SITE8888010_FRAME  = 'J2000'
+SITE8888010_IDCODE = 8888010
+SITE8888010_XYZ = ( 0.718885 -0.276428 0.637802 )
+SITE8888010_CENTER = -98
+\begintext
+
+10199 CHARIKLO; 2010199
+
+\begindata
+NAIF_BODY_NAME           += ( '10199 CHARIKLO' )
+NAIF_BODY_CODE           += ( 2010199 )
+NH_TARGET_BODIES         += ( 2010199 )
+BODY2010199_POLE_RA        = (    0.    0.    0. )
+BODY2010199_POLE_DEC       = (   90.    0.    0. )
+BODY2010199_PM             = (  270.    0.    0. )
+BODY2010199_RADII          = (  100.  100.  100. )
+\begintext
+
+136472 MAKEMAKE; 2136472
+
+\begindata
+NAIF_BODY_NAME           += ( '136472 MAKEMAKE' )
+NAIF_BODY_CODE           += ( 2136472 )
+NH_TARGET_BODIES         += ( 2136472 )
+BODY2136472_POLE_RA        = (    0.    0.    0. )
+BODY2136472_POLE_DEC       = (   90.    0.    0. )
+BODY2136472_PM             = (  270.    0.    0. )
+BODY2136472_RADII          = (  100.  100.  100. )
+\begintext
+
+136108 HAUMEA;  2136108
+
+\begindata
+NAIF_BODY_NAME           += ( '136108 HAUMEA' )
+NAIF_BODY_CODE           += ( 2136108 )
+NH_TARGET_BODIES         += ( 2136108 )
+BODY2136108_POLE_RA        = (    0.    0.    0. )
+BODY2136108_POLE_DEC       = (   90.    0.    0. )
+BODY2136108_PM             = (  270.    0.    0. )
+BODY2136108_RADII          = (  100.  100.  100. )
+\begintext
+
+KERBEROS; 904
+
+\begindata
+NAIF_BODY_NAME           += ( 'P4' 'KERBEROS' )
+NAIF_BODY_CODE           += ( 904 904 )
+NH_TARGET_BODIES         += ( 904 )
+BODY904_POLE_RA        = (    0.    0.    0. )
+BODY904_POLE_DEC       = (   90.    0.    0. )
+BODY904_PM             = (  270.    0.    0. )
+BODY904_RADII          = (  100.  100.  100. )
+\begintext
+
+STYX; 905
+
+\begindata
+NAIF_BODY_NAME           += ( 'P5' 'STYX' )
+NAIF_BODY_CODE           += ( 905 905 )
+NH_TARGET_BODIES         += ( 905 )
+BODY905_POLE_RA        = (    0.    0.    0. )
+BODY905_POLE_DEC       = (   90.    0.    0. )
+BODY905_PM             = (  270.    0.    0. )
+BODY905_RADII          = (  100.  100.  100. )
+\begintext
+
+Bellatrix
+['SIMBAD:', '* gam Ori', '081.28276356', '+06.34970326', 'Variable Star']
+
+\begindata
+NAIF_BODY_NAME           += ( 'Bellatrix' )
+NAIF_BODY_CODE           += ( 8888011 )
+NH_TARGET_BODIES         += ( 8888011 )
+BODY8888011_POLE_RA        = (    0.    0.    0. )
+BODY8888011_POLE_DEC       = (   90.    0.    0. )
+BODY8888011_PM             = (  270.    0.    0. )
+BODY8888011_RADII          = (  100.  100.  100. )
+\begintext
+
+PINPOINT parameters for star Bellatrix:
+\begindata
+SITES += ( 'SITE8888011' )
+SITE8888011_FRAME  = 'J2000'
+SITE8888011_IDCODE = 8888011
+SITE8888011_XYZ = ( 0.150628 0.982385 0.110597 )
+SITE8888011_CENTER = -98
+\begintext
+
+Tau A (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'Tau A' )
+NAIF_BODY_CODE           += ( 8888012 )
+\begintext
+
+Tau-A (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'Tau-A' )
+NAIF_BODY_CODE           += ( 8888012 )
+\begintext
+
+Taurus A (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'Taurus A' )
+NAIF_BODY_CODE           += ( 8888012 )
+\begintext
+
+Taurus-A (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'Taurus-A' )
+NAIF_BODY_CODE           += ( 8888012 )
+\begintext
+
+M 1
+['SIMBAD:', 'M   1', '083.63308', '+22.01450', 'SuperNova Remnant']
+
+\begindata
+NAIF_BODY_NAME           += ( 'M 1' )
+NAIF_BODY_CODE           += ( 8888012 )
+NH_TARGET_BODIES         += ( 8888012 )
+BODY8888012_POLE_RA        = (    0.    0.    0. )
+BODY8888012_POLE_DEC       = (   90.    0.    0. )
+BODY8888012_PM             = (  270.    0.    0. )
+BODY8888012_RADII          = (  100.  100.  100. )
+\begintext
+
+PINPOINT parameters for star M 1:
+\begindata
+SITES += ( 'SITE8888012' )
+SITE8888012_FRAME  = 'J2000'
+SITE8888012_IDCODE = 8888012
+SITE8888012_XYZ = ( 0.102810 0.921371 0.374841 )
+SITE8888012_CENTER = -98
+\begintext
+
+HD205905 (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'HD205905' )
+NAIF_BODY_CODE           += ( 8888013 )
+\begintext
+
+HD 205905
+['SIMBAD:', 'HD 205905', '324.79229796', '-27.30657448', 'Pre-main sequence Star']
+
+\begindata
+NAIF_BODY_NAME           += ( 'HD 205905' )
+NAIF_BODY_CODE           += ( 8888013 )
+NH_TARGET_BODIES         += ( 8888013 )
+BODY8888013_POLE_RA        = (    0.    0.    0. )
+BODY8888013_POLE_DEC       = (   90.    0.    0. )
+BODY8888013_PM             = (  270.    0.    0. )
+BODY8888013_RADII          = (  100.  100.  100. )
+\begintext
+
+PINPOINT parameters for star HD 205905:
+\begindata
+SITES += ( 'SITE8888013' )
+SITE8888013_FRAME  = 'J2000'
+SITE8888013_IDCODE = 8888013
+SITE8888013_XYZ = ( 0.726017 -0.512295 -0.458752 )
+SITE8888013_CENTER = -98
+\begintext
+
+HD37962 (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'HD37962' )
+NAIF_BODY_CODE           += ( 8888014 )
+\begintext
+
+HD 37962
+['SIMBAD:', 'HD  37962', '085.21652848', '-31.35110766', 'High proper-motion Star']
+
+\begindata
+NAIF_BODY_NAME           += ( 'HD 37962' )
+NAIF_BODY_CODE           += ( 8888014 )
+NH_TARGET_BODIES         += ( 8888014 )
+BODY8888014_POLE_RA        = (    0.    0.    0. )
+BODY8888014_POLE_DEC       = (   90.    0.    0. )
+BODY8888014_PM             = (  270.    0.    0. )
+BODY8888014_RADII          = (  100.  100.  100. )
+\begintext
+
+PINPOINT parameters for star HD 37962:
+\begindata
+SITES += ( 'SITE8888014' )
+SITE8888014_FRAME  = 'J2000'
+SITE8888014_IDCODE = 8888014
+SITE8888014_XYZ = ( 0.071215 0.851021 -0.520281 )
+SITE8888014_CENTER = -98
+\begintext
+
+Cygnus-A (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'Cygnus-A' )
+NAIF_BODY_CODE           += ( 8888015 )
+\begintext
+
+Cygnus A (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'Cygnus A' )
+NAIF_BODY_CODE           += ( 8888015 )
+\begintext
+
+Cyg-A (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'Cyg-A' )
+NAIF_BODY_CODE           += ( 8888015 )
+\begintext
+
+Cyg A
+['SIMBAD:', 'NAME Cyg A', '299.86815263', '+40.73391583', 'Seyfert 2 Galaxy']
+
+\begindata
+NAIF_BODY_NAME           += ( 'Cyg A' )
+NAIF_BODY_CODE           += ( 8888015 )
+NH_TARGET_BODIES         += ( 8888015 )
+BODY8888015_POLE_RA        = (    0.    0.    0. )
+BODY8888015_POLE_DEC       = (   90.    0.    0. )
+BODY8888015_PM             = (  270.    0.    0. )
+BODY8888015_RADII          = (  100.  100.  100. )
+\begintext
+
+PINPOINT parameters for star Cyg A:
+\begindata
+SITES += ( 'SITE8888015' )
+SITE8888015_FRAME  = 'J2000'
+SITE8888015_IDCODE = 8888015
+SITE8888015_XYZ = ( 0.377363 -0.657099 0.652547 )
+SITE8888015_CENTER = -98
+\begintext
+
+Cass A (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'Cass A' )
+NAIF_BODY_CODE           += ( 8888016 )
+\begintext
+
+Cass-A (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'Cass-A' )
+NAIF_BODY_CODE           += ( 8888016 )
+\begintext
+
+Cas-A (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'Cas-A' )
+NAIF_BODY_CODE           += ( 8888016 )
+\begintext
+
+Cas A
+['SIMBAD:', 'NAME Cassiopeia A', '350.850000', '+58.815000', 'SuperNova Remnant']
+
+\begindata
+NAIF_BODY_NAME           += ( 'Cas A' )
+NAIF_BODY_CODE           += ( 8888016 )
+NH_TARGET_BODIES         += ( 8888016 )
+BODY8888016_POLE_RA        = (    0.    0.    0. )
+BODY8888016_POLE_DEC       = (   90.    0.    0. )
+BODY8888016_PM             = (  270.    0.    0. )
+BODY8888016_RADII          = (  100.  100.  100. )
+\begintext
+
+PINPOINT parameters for star Cas A:
+\begindata
+SITES += ( 'SITE8888016' )
+SITE8888016_FRAME  = 'J2000'
+SITE8888016_IDCODE = 8888016
+SITE8888016_XYZ = ( 0.511214 -0.082341 0.855500 )
+SITE8888016_CENTER = -98
+\begintext
+
+Vir-A (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'Vir-A' )
+NAIF_BODY_CODE           += ( 8888017 )
+\begintext
+
+Vir A (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'Vir A' )
+NAIF_BODY_CODE           += ( 8888017 )
+\begintext
+
+Virgo-A (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'Virgo-A' )
+NAIF_BODY_CODE           += ( 8888017 )
+\begintext
+
+Virgo A (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'Virgo A' )
+NAIF_BODY_CODE           += ( 8888017 )
+\begintext
+
+M87 (alternate name)
+
+\begindata
+NAIF_BODY_NAME           += ( 'M87' )
+NAIF_BODY_CODE           += ( 8888017 )
+\begintext
+
+M 87
+['SIMBAD:', 'M  87', '187.70593075', '+12.39112331', 'LINER-type Active Galaxy Nucleus']
+
+\begindata
+NAIF_BODY_NAME           += ( 'M 87' )
+NAIF_BODY_CODE           += ( 8888017 )
+NH_TARGET_BODIES         += ( 8888017 )
+BODY8888017_POLE_RA        = (    0.    0.    0. )
+BODY8888017_POLE_DEC       = (   90.    0.    0. )
+BODY8888017_PM             = (  270.    0.    0. )
+BODY8888017_RADII          = (  100.  100.  100. )
+\begintext
+
+PINPOINT parameters for star M 87:
+\begindata
+SITES += ( 'SITE8888017' )
+SITE8888017_FRAME  = 'J2000'
+SITE8888017_IDCODE = 8888017
+SITE8888017_XYZ = ( -0.967885 -0.130965 0.214584 )
+SITE8888017_CENTER = -98
+\begintext
+
+1994JR1; 2015810
+
+\begindata
+NAIF_BODY_NAME           += ( '1994JR1' )
+NAIF_BODY_CODE           += ( 2015810 )
+\begintext
+
+1994_JR1; 2015810
+
+\begindata
+NAIF_BODY_NAME           += ( '1994_JR1' )
+NAIF_BODY_CODE           += ( 2015810 )
+\begintext
+
+1994 JR1; 2015810
+
+\begindata
+NAIF_BODY_NAME           += ( '1994 JR1' )
+NAIF_BODY_CODE           += ( 2015810 )
+\begintext
+
+JR1; 2015810
+
+\begindata
+NAIF_BODY_NAME           += ( 'JR1' )
+NAIF_BODY_CODE           += ( 2015810 )
+\begintext
+
+ARAWN; 2015810
+
+\begindata
+NAIF_BODY_NAME           += ( 'ARAWN' )
+NAIF_BODY_CODE           += ( 2015810 )
+\begintext
+
+15810 ARAWN; 2015810
+
+\begindata
+NAIF_BODY_NAME           += ( '15810 ARAWN' )
+NAIF_BODY_CODE           += ( 2015810 )
+\begintext
+
+15810 ARAWN (1994 JR1); 2015810
+
+\begindata
+NAIF_BODY_NAME           += ( '15810 ARAWN (1994 JR1)' )
+NAIF_BODY_CODE           += ( 2015810 )
+NH_TARGET_BODIES         += ( 2015810 )
+BODY2015810_POLE_RA        = (    0.    0.    0. )
+BODY2015810_POLE_DEC       = (   90.    0.    0. )
+BODY2015810_PM             = (  270.    0.    0. )
+BODY2015810_RADII          = (  100.  100.  100. )
+\begintext
+
+2010JJ124; 3523335
+
+\begindata
+NAIF_BODY_NAME           += ( '2010JJ124' )
+NAIF_BODY_CODE           += ( 3523335 )
+\begintext
+
+2010_JJ124; 3523335
+
+\begindata
+NAIF_BODY_NAME           += ( '2010_JJ124' )
+NAIF_BODY_CODE           += ( 3523335 )
+\begintext
+
+2010 JJ124; 3523335
+
+\begindata
+NAIF_BODY_NAME           += ( '2010 JJ124' )
+NAIF_BODY_CODE           += ( 3523335 )
+\begintext
+
+JJ124; 3523335
+
+\begindata
+NAIF_BODY_NAME           += ( 'JJ124' )
+NAIF_BODY_CODE           += ( 3523335 )
+\begintext
+
+523335 (2010 JJ124); 3523335
+
+\begindata
+NAIF_BODY_NAME           += ( '523335 (2010 JJ124)' )
+NAIF_BODY_CODE           += ( 3523335 )
+\begintext
+
+2010 JJ124; 3523335
+
+\begindata
+NAIF_BODY_NAME           += ( '2010 JJ124' )
+NAIF_BODY_CODE           += ( 3523335 )
+NH_TARGET_BODIES         += ( 3523335 )
+BODY3523335_POLE_RA        = (    0.    0.    0. )
+BODY3523335_POLE_DEC       = (   90.    0.    0. )
+BODY3523335_PM             = (  270.    0.    0. )
+BODY3523335_RADII          = (  100.  100.  100. )
+\begintext
+
+1977UB; 2002060
+
+\begindata
+NAIF_BODY_NAME           += ( '1977UB' )
+NAIF_BODY_CODE           += ( 2002060 )
+\begintext
+
+1977_UB; 2002060
+
+\begindata
+NAIF_BODY_NAME           += ( '1977_UB' )
+NAIF_BODY_CODE           += ( 2002060 )
+\begintext
+
+1977 UB; 2002060
+
+\begindata
+NAIF_BODY_NAME           += ( '1977 UB' )
+NAIF_BODY_CODE           += ( 2002060 )
+\begintext
+
+2060CHIRON; 2002060
+
+\begindata
+NAIF_BODY_NAME           += ( '2060CHIRON' )
+NAIF_BODY_CODE           += ( 2002060 )
+\begintext
+
+2060_CHIRON; 2002060
+
+\begindata
+NAIF_BODY_NAME           += ( '2060_CHIRON' )
+NAIF_BODY_CODE           += ( 2002060 )
+\begintext
+
+CHIRON; 2002060
+
+\begindata
+NAIF_BODY_NAME           += ( 'CHIRON' )
+NAIF_BODY_CODE           += ( 2002060 )
+\begintext
+
+2060 CHIRON; 2002060
+
+\begindata
+NAIF_BODY_NAME           += ( '2060 CHIRON' )
+NAIF_BODY_CODE           += ( 2002060 )
+NH_TARGET_BODIES         += ( 2002060 )
+BODY2002060_POLE_RA        = (    0.    0.    0. )
+BODY2002060_POLE_DEC       = (   90.    0.    0. )
+BODY2002060_PM             = (  270.    0.    0. )
+BODY2002060_RADII          = (  100.  100.  100. )
+\begintext
+
+2001KX76; 2028978
+
+\begindata
+NAIF_BODY_NAME           += ( '2001KX76' )
+NAIF_BODY_CODE           += ( 2028978 )
+\begintext
+
+2001_KX76; 2028978
+
+\begindata
+NAIF_BODY_NAME           += ( '2001_KX76' )
+NAIF_BODY_CODE           += ( 2028978 )
+\begintext
+
+2001 KX76; 2028978
+
+\begindata
+NAIF_BODY_NAME           += ( '2001 KX76' )
+NAIF_BODY_CODE           += ( 2028978 )
+\begintext
+
+KX76; 2028978
+
+\begindata
+NAIF_BODY_NAME           += ( 'KX76' )
+NAIF_BODY_CODE           += ( 2028978 )
+\begintext
+
+IXION; 2028978
+
+\begindata
+NAIF_BODY_NAME           += ( 'IXION' )
+NAIF_BODY_CODE           += ( 2028978 )
+\begintext
+
+28978 IXION; 2028978
+
+\begindata
+NAIF_BODY_NAME           += ( '28978 IXION' )
+NAIF_BODY_CODE           += ( 2028978 )
+\begintext
+
+28978 IXION (2001 KX76); 2028978
+
+\begindata
+NAIF_BODY_NAME           += ( '28978 IXION (2001 KX76)' )
+NAIF_BODY_CODE           += ( 2028978 )
+NH_TARGET_BODIES         += ( 2028978 )
+BODY2028978_POLE_RA        = (    0.    0.    0. )
+BODY2028978_POLE_DEC       = (   90.    0.    0. )
+BODY2028978_PM             = (  270.    0.    0. )
+BODY2028978_RADII          = (  100.  100.  100. )
+\begintext
+
+2002MS4; 2307261
+
+\begindata
+NAIF_BODY_NAME           += ( '2002MS4' )
+NAIF_BODY_CODE           += ( 2307261 )
+\begintext
+
+2002_MS4; 2307261
+
+\begindata
+NAIF_BODY_NAME           += ( '2002_MS4' )
+NAIF_BODY_CODE           += ( 2307261 )
+\begintext
+
+2002 MS4; 2307261
+
+\begindata
+NAIF_BODY_NAME           += ( '2002 MS4' )
+NAIF_BODY_CODE           += ( 2307261 )
+\begintext
+
+MS4; 2307261
+
+\begindata
+NAIF_BODY_NAME           += ( 'MS4' )
+NAIF_BODY_CODE           += ( 2307261 )
+\begintext
+
+307261 (2002 MS4); 2307261
+
+\begindata
+NAIF_BODY_NAME           += ( '307261 (2002 MS4)' )
+NAIF_BODY_CODE           += ( 2307261 )
+\begintext
+
+ASTEROID 307261 (2002 MS4); 2307261
+
+\begindata
+NAIF_BODY_NAME           += ( 'ASTEROID 307261 (2002 MS4)' )
+NAIF_BODY_CODE           += ( 2307261 )
+NH_TARGET_BODIES         += ( 2307261 )
+BODY2307261_POLE_RA        = (    0.    0.    0. )
+BODY2307261_POLE_DEC       = (   90.    0.    0. )
+BODY2307261_PM             = (  270.    0.    0. )
+BODY2307261_RADII          = (  100.  100.  100. )
+\begintext
+
+2002LM60; 2050000
+
+\begindata
+NAIF_BODY_NAME           += ( '2002LM60' )
+NAIF_BODY_CODE           += ( 2050000 )
+\begintext
+
+2002_LM60; 2050000
+
+\begindata
+NAIF_BODY_NAME           += ( '2002_LM60' )
+NAIF_BODY_CODE           += ( 2050000 )
+\begintext
+
+2002 LM60; 2050000
+
+\begindata
+NAIF_BODY_NAME           += ( '2002 LM60' )
+NAIF_BODY_CODE           += ( 2050000 )
+\begintext
+
+LM60; 2050000
+
+\begindata
+NAIF_BODY_NAME           += ( 'LM60' )
+NAIF_BODY_CODE           += ( 2050000 )
+\begintext
+
+QUAOAR; 2050000
+
+\begindata
+NAIF_BODY_NAME           += ( 'QUAOAR' )
+NAIF_BODY_CODE           += ( 2050000 )
+\begintext
+
+50000 QUAOAR; 2050000
+
+\begindata
+NAIF_BODY_NAME           += ( '50000 QUAOAR' )
+NAIF_BODY_CODE           += ( 2050000 )
+\begintext
+
+50000 QUAOAR (2002 LM60); 2050000
+
+\begindata
+NAIF_BODY_NAME           += ( '50000 QUAOAR (2002 LM60)' )
+NAIF_BODY_CODE           += ( 2050000 )
+NH_TARGET_BODIES         += ( 2050000 )
+BODY2050000_POLE_RA        = (    0.    0.    0. )
+BODY2050000_POLE_DEC       = (   90.    0.    0. )
+BODY2050000_PM             = (  270.    0.    0. )
+BODY2050000_RADII          = (  100.  100.  100. )
+\begintext
+
+2014MU69; 3713011
+
+\begindata
+NAIF_BODY_NAME           += ( '2014MU69' )
+NAIF_BODY_CODE           += ( 3713011 )
+\begintext
+
+2014_MU69; 3713011
+
+\begindata
+NAIF_BODY_NAME           += ( '2014_MU69' )
+NAIF_BODY_CODE           += ( 3713011 )
+\begintext
+
+2014 MU69; 3713011
+
+\begindata
+NAIF_BODY_NAME           += ( '2014 MU69' )
+NAIF_BODY_CODE           += ( 3713011 )
+\begintext
+
+MU69; 3713011
+
+\begindata
+NAIF_BODY_NAME           += ( 'MU69' )
+NAIF_BODY_CODE           += ( 3713011 )
+\begintext
+
+486958 (2014 MU69); 3713011
+
+\begindata
+NAIF_BODY_NAME           += ( '486958 (2014 MU69)' )
+NAIF_BODY_CODE           += ( 3713011 )
+\begintext
+
+ASTEROID 486958 (2014 MU69); 3713011
+
+\begindata
+NAIF_BODY_NAME           += ( 'ASTEROID 486958 (2014 MU69)' )
+NAIF_BODY_CODE           += ( 3713011 )
+NH_TARGET_BODIES         += ( 3713011 )
+BODY3713011_POLE_RA        = (    0.    0.    0. )
+BODY3713011_POLE_DEC       = (   90.    0.    0. )
+BODY3713011_PM             = (  270.    0.    0. )
+BODY3713011_RADII          = (  100.  100.  100. )
+\begintext
+
+::GUARD::; 390; last element is guard
+
+\begindata
+NAIF_BODY_NAME           += ( '::GUARD::' )
+NAIF_BODY_CODE           += ( 390 )
+NH_TARGET_BODIES         += ( 390 )
+BODY390_POLE_RA        = (    0.    0.    0. )
+BODY390_POLE_DEC       = (   90.    0.    0. )
+BODY390_PM             = (  270.    0.    0. )
+BODY390_RADII          = (  100.  100.  100. )
+\begintext

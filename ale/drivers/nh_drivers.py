@@ -11,6 +11,7 @@ from ale.base.type_distortion import NoDistortion, LegendreDistortion
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
+from ale.base.type_sensor import LineScanner
 
 class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, LegendreDistortion, Driver):
     """
@@ -34,6 +35,9 @@ class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Leg
         }
         return id_lookup[super().instrument_id]
 
+    @property
+    def ephemeris_stop_time(self):
+        return super().ephemeris_start_time
 
     @property
     def ikid(self):
@@ -93,6 +97,131 @@ class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Leg
         """
         return self.label['IsisCube']['Instrument']['SpacecraftName']
 
+    @property
+    def frame_chain(self):
+        self._props['exact_ck_times'] = False
+        return super().frame_chain
+
+class NewHorizonsLeisaIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
+    """
+    Driver for reading New Horizons LEISA ISIS3 Labels.
+    """
+
+    @property
+    def instrument_id(self):
+        """
+        Returns an instrument id for uniquely identifying the instrument, but often
+        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+        the same ID the Spice expects in bods2c calls.
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
+        id_lookup = {
+            "LEISA" : "NH_RALPH_LEISA"
+        }
+        return id_lookup[super().instrument_id]
+
+    @property
+    def ikid(self):
+        """
+        Overridden to grab the ikid from the Isis Cube since there is no way to
+        obtain this value with a spice bods2c call. Isis sets this value during
+        ingestion, based on the original fits file.
+
+        Returns
+        -------
+        : int
+          Naif ID used to for identifying the instrument in Spice kernels
+        """
+        return self.label['IsisCube']['Kernels']['NaifFrameCode'][0]
+
+    @property
+    def ephemeris_start_time(self):
+        """
+        Returns the ephemeris start time of the image.
+        Expects spacecraft_id to be defined. This should be the integer
+        Naif ID code for the spacecraft.
+
+        Returns
+        -------
+        : float
+          ephemeris start time of the image
+        """
+        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_start_count)
+
+    @property
+    def ephemeris_stop_time(self):
+        """
+        ISIS doesn't preserve the spacecraft stop count that we can use to get
+        the ephemeris stop time of the image, so compute the ephemeris stop time
+        from the start time and the exposure duration.
+        """
+        return self.ephemeris_start_time + self.exposure_duration * self.image_lines
+
+    @property
+    def detector_center_line(self):
+        """
+        Returns the center detector line. Expects ikid to be defined. This should
+        be an integer containing the Naif Id code of the instrument.
+
+        Returns
+        -------
+        : float
+          Detector line of the principal point
+        """
+        return 0
+
+    @property
+    def detector_center_sample(self):
+        """
+        Returns the center detector sample. Expects ikid to be defined. This should
+        be an integer containing the Naif Id code of the instrument.
+
+        Returns
+        -------
+        : float
+          Detector sample of the principal point
+        """
+        return 0
+
+    @property
+    def sensor_name(self):
+        """
+        Returns the name of the instrument. Need to over-ride isis_label because
+        InstrumentName is not defined in the ISIS label for NH Leisa cubes.
+
+        Returns
+        -------
+        : str
+        Name of the sensor
+        """
+        return self.instrument_id
+
+    @property
+    def sensor_model_version(self):
+        """
+        Returns
+        -------
+        : int
+          ISIS sensor model version
+        """
+        return 1
+
+    @property
+    def exposure_duration(self):
+        """
+        The exposure duration of the image, in seconds
+
+        Returns
+        -------
+        : float
+          Exposure duration in seconds
+        """
+        return self.label['IsisCube']['Instrument']['ExposureDuration']
+
 
 class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, LegendreDistortion, Driver):
     """
@@ -104,10 +233,8 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
     def parent_id(self):
         """
         The base naif id of the spacecraft.  For New Horizons, this is -98000.
-
         Required for distortion coefficients, which are not unique to instruments,
         but are instead shared by all instruments on the spacecraft + residuals.
-
         Returns
         -------
         : int
@@ -120,7 +247,6 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
     def sensor_model_version(self):
         """
         Returns instrument model version
-
         Returns
         -------
         : int
@@ -135,7 +261,6 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
         The name of the instrument.  This is not included in the .fit label, but is
         present in the .lbl file, so it is not present in ISIS conversion, and it
         must be hard-coded.
-
         Returns
         -------
         : str
@@ -150,7 +275,6 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
         Returns an instrument id for uniquely identifying the instrument, but often
         also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
         the same ID the Spice expects in bods2c calls.
-
         Returns
         -------
         : str
@@ -168,7 +292,6 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
         Overridden to grab the ikid from the Isis Cube since there is no way to
         obtain this value with a spice bods2c call. Isis sets this value during
         ingestion, based on the original fits file.
-
         Returns
         -------
         : integer
@@ -196,7 +319,6 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
     def sensor_name(self):
         """
         Returns the name of the instrument
-
         Returns
         -------
         : str
@@ -210,7 +332,6 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
         """
         Returns the x coefficient for the optical distortion model
         Expects ikid to be defined. This must be the integer Naif id code of the instrument
-
         Returns
         -------
         : list
@@ -224,7 +345,6 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
         """
         Returns the y coefficient for the optical distortion model.
         Expects ikid to be defined. This must be the integer Naif id code of the instrument
-
         Returns
         -------
         : list
@@ -237,7 +357,6 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
     def naif_keywords(self):
         """
         Adds base NH instrument distortion, which is shared among all instruments on NH.
-
         Returns
         -------
         : dict

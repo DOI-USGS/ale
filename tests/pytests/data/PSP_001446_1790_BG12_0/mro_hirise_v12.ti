@@ -1,0 +1,824 @@
+KPL/IK
+
+HIRISE Instrument kernel
+===========================================================================
+
+   This instrument kernel (I-kernel) contains MRO High Resolution
+   Imaging Science Experiment (HIRISE) optics, detector, and
+   field-of-view parameters.
+
+   The version 1.0 of this IK must be used with the MRO FK versions 1.3
+   or earlier.
+
+   The version 1.1 of this IK must be used with the MRO FK versions 1.4
+   or later.
+
+
+Version and Date
+---------------------------------------------------------------------------
+
+   Version 1.2 -- May 24, 2011 -- Boris Semenov, NAIF/JPL
+
+      Added a note about the round trip, round off errors at the level
+      of a few 10^-2 pixels when using TRANS[XY] to go from line/sample
+      to position x/y in the focal plane and then ITRANS[SL] to do the
+      inverse. No changes in the data values in Version 1.2 compared to
+      Version 1.1.
+
+   Version 1.1 -- February 24, 2009 -- Boris Semenov, NAIF/JPL
+
+      Incorporated USGS ISIS 3 HiRISE Instrument Kernel
+      ``hiriseAddendum003aaa.ti'' providing updated CCD positions by
+      shifting whole focal plane 5 mm to match analysis by Randy Kirk
+      (USGS) of camera distortions of star images.
+
+   Version 1.0 -- June 7, 2007 -- Boris Semenov, NAIF/JPL
+
+      Initial release.
+
+
+References
+---------------------------------------------------------------------------
+
+   1. ``Kernel Pool Required Reading''
+
+   2. ``C-kernel Required Reading''
+
+   3. MRO Frames Definition Kernel (FK), latest version.
+
+   4. ``SIS for HIRISE EDR Products'', Ver 1.1.1, March 17, 2006.
+
+   5. ``hiriseAddendum003.ti'' IK file by USGS, Flagstaff, included 
+      ``as is'' at the bottom of this IK.
+
+   6. ``hiriseAddendum003aaa.ti'' IK file by USGS, Flagstaff, included 
+      ``as is'' at the bottom of this IK.
+
+
+Implementation Notes
+--------------------------------------------------------
+
+   Applications that need SPICE I-kernel data must ``load'' the
+   I-kernel file, normally during program initialization.
+
+   Loading the kernel using the SPICELIB routine FURNSH causes the data
+   items and their associated values present in the kernel to become
+   associated with a data structure called the ``kernel pool''. The
+   application program may then obtain the value(s) for any IK data
+   item using the SPICELIB routines GDPOOL, GIPOOL, GCPOOL. Routine
+   GETFOV may be used if the file contains instrument field-of-view
+   (FOV) specification. See [1] for details.
+
+   This file was created with, and can be updated with a text editor or
+   word processor.
+
+
+Conventions for Specifying Data
+--------------------------------------------------------
+
+   Data items are specified using ``keyword=value'' assignments [1].
+   All keywords referencing values in this I-kernel start with the
+   characters `INS' followed by the NAIF MRO instrument ID code,
+   constructed using the spacecraft ID number (-74) followed by the
+   NAIF three digit ID number for HIRISE (699) or one of its detectors
+   (600..613). These IDs are defined in [3] as follows:
+
+               Instrument name                ID
+               --------------------         -------
+               MRO_HIRISE                    -74699
+               MRO_HIRISE_CCD0               -74600
+               MRO_HIRISE_CCD1               -74601
+               MRO_HIRISE_CCD2               -74602
+               MRO_HIRISE_CCD3               -74603
+               MRO_HIRISE_CCD4               -74604
+               MRO_HIRISE_CCD5               -74605
+               MRO_HIRISE_CCD6               -74606
+               MRO_HIRISE_CCD7               -74607
+               MRO_HIRISE_CCD8               -74608
+               MRO_HIRISE_CCD9               -74609
+               MRO_HIRISE_CCD10              -74610
+               MRO_HIRISE_CCD11              -74611
+               MRO_HIRISE_CCD12              -74612
+               MRO_HIRISE_CCD13              -74613
+
+   The remainder of the keyword is an underscore character followed by
+   the unique name of the data item. For example, the focal length of
+   the HIRISE camera is specified by
+
+               INS-74699_FOCAL_LENGTH
+
+   The upper bound on the length of all keywords is 32 characters.
+ 
+   If a keyword is included in more than one file, or if the same
+   keyword appears more than once within a single file, the last
+   assignment supersedes any earlier assignments.
+
+
+Overview
+--------------------------------------------------------
+
+   From [4]:
+
+      The HiRISE camera is a "pushbroom" imaging system featuring a 0.5
+      m aperture telescope with a 12 m focal length and 14 CCD
+      detectors capable of generating images of up to 20,264 cross-scan
+      observation pixels (exclusive of overlap pixels) and 65,000
+      unbinned scan lines (Table 2.0). The HiRISE instrument
+      capabilities include the acquisition of: (1) observations of the
+      Mars surface from orbit with a ground sampling dimension between
+      25 and 32 cm/pixel, depending on the orbital altitude, along with
+      an intrinsic point spread function of 1.4 pixels (full width at
+      half maximum assuming no spacecraft jitter) and high
+      signal-to-noise ratio (SNR), (2) high-resolution topographic data
+      from stereo observations with a vertical precision of ~0.2 m over
+      areas of ~5x5 pixels (~1.5 m), and (3) observations in 3 colors
+      with high radiometric fidelity. A key instrument design feature
+      includes Charge Couple Device (CCD) detectors with up to 128
+      lines of Time Delay and Integration (TDI) to create high (>100:1)
+      SNR in the Red filter bandpass anywhere on Mars. At the nominal
+      300 km MRO orbital altitude the instrument can acquire image
+      swaths of approximately 6 kilometers cross-orbit and 20
+      kilometers along-orbit.
+
+
+      Table 2.0 - HiRISE Instrument Performance
+
+      -----------------------------------------------------------------------
+      Parameter                Performance         Comments
+      -----------------------------------------------------------------------
+      Ground Sample Distance   30 cm/pixel         From 300 km altitude
+      (GSD )
+      -----------------------------------------------------------------------
+      Telescope Aperture       0.5 m, f/24         For resolution and Signal  
+                                                   to Noise ratio
+      -----------------------------------------------------------------------
+      Spectral range           500 nm (400-600)    Blue-Green
+                               700 nm (550-850)    Red
+                               900 nm (800-1100)   Near infrared
+      -----------------------------------------------------------------------
+      SNR Blue-Green           Typically 100:1     Achieved with Time Delay 
+          Red                  Typically 200:1     Integration, backside 
+          NIR                  Typically 100:1     thinned CCDs, and 50 cm 
+                                                   aperture
+      -----------------------------------------------------------------------
+      Swath Width Blue-Green   > 1.2 km            From 300 km altitude
+                  Red          > 6 km
+                  NIR          > 1.2 km
+      -----------------------------------------------------------------------
+      Swath length             > 2x swath width    Along track
+      -----------------------------------------------------------------------
+      Data Precision           14 bit Analog to    12 to 13 usable bits
+                               Digital 
+                               Converters
+      -----------------------------------------------------------------------
+      Data Compression         Real-time 14 to     Look-up table
+                               8 bit
+
+                               1, 2, 3, 4, 8, 16   Pixel binning increases 
+                                                   areal coverage
+                              
+                               Lossless            ~ 2:1 compression
+                               compression on
+                               Solid State 
+                               Recorder (8-bit 
+                               only)
+      -----------------------------------------------------------------------
+      Camera memory            28 Gbits            All channels
+      -----------------------------------------------------------------------
+      Number of pixels         4,048 Blue-Green    From swath width and 
+      across swath             20,264 Red          pixel scale
+                               4,048 NIR
+      -----------------------------------------------------------------------
+      TDI line time            >=74 mksec          Set to match ground track 
+                                                   speed
+      -----------------------------------------------------------------------
+      CCD read noise           < 50 electrons rms  Achieve SNR at low
+                               at 22 deg C         signal levels
+      -----------------------------------------------------------------------
+      FOV                      1.14 x 0.18 deg     
+      -----------------------------------------------------------------------
+      IFOV                     1 x 1 mkrad         Detector angular subtense
+      -----------------------------------------------------------------------
+      Relative Radiometry      < 1 % pixel to      Absolute 20%
+                               pixel
+      -----------------------------------------------------------------------
+
+
+Mounting Alignment
+--------------------------------------------------------
+
+   Refer to the latest version of the MRO Frames Definition Kernel (FK)
+   [3] for the HIRISE reference frame definitions and mounting alignment
+   information.
+
+
+CCD FOV Layout
+--------------------------------------------------------
+ 
+   This section provides a diagram illustrating the HIRISE CCD
+   nomenclature and layout (from [4]):
+
+                                ------
+                               | IR10 |
+                                ------ ------
+                                      | IR11 |
+    ------        ------        ------ ------ ------        ------ 
+   | RED0 |      | RED2 |      | RED4 |      | RED6 |      | RED8 |
+    ------ ------ ------ ------ ------ ------ ------ ------ ------ ------
+          | RED1 |      | RED3 |      | RED5 |      | RED7 |      | RED9 |
+           ------        ------ ------ ------        ------        ------ 
+                               | BG12 |
+                                ------ ------
+                                      | BG13 |
+                                       ------
+                                             +Yhirise         +Zhirise (nadir)
+                                                     <------x
+                                                            |
+                                                            |
+                                                            |
+                                                            V +Xhirise 
+                                                              (s/c velocity)
+
+
+   The keywords below provide the CCD names and the corresponding 
+   CCD Processing and Memory Module (CPMM) IDs:
+
+      \begindata
+
+         INS-74600_NAME               = ( 'RED0' )
+         INS-74601_NAME               = ( 'RED1' )
+         INS-74602_NAME               = ( 'RED2' )
+         INS-74603_NAME               = ( 'RED3' )
+         INS-74604_NAME               = ( 'RED4' )
+         INS-74605_NAME               = ( 'RED5' )
+         INS-74606_NAME               = ( 'RED6' )
+         INS-74607_NAME               = ( 'RED7' )
+         INS-74608_NAME               = ( 'RED9' )
+         INS-74609_NAME               = ( 'RED9' )
+         INS-74610_NAME               = ( 'IR10' )
+         INS-74611_NAME               = ( 'IR11' )
+         INS-74612_NAME               = ( 'BG12' )
+         INS-74613_NAME               = ( 'BG13' )
+
+         INS-74600_CPMM               = (  0 )
+         INS-74601_CPMM               = (  1 )
+         INS-74602_CPMM               = (  2 )
+         INS-74603_CPMM               = (  3 )
+         INS-74604_CPMM               = (  5 )
+         INS-74605_CPMM               = (  8 )
+         INS-74606_CPMM               = ( 10 )
+         INS-74607_CPMM               = ( 11 )
+         INS-74608_CPMM               = ( 12 )
+         INS-74609_CPMM               = ( 13 )
+         INS-74610_CPMM               = (  6 )
+         INS-74611_CPMM               = (  7 )
+         INS-74612_CPMM               = (  4 )
+         INS-74613_CPMM               = (  9 )
+         
+      \begintext
+
+
+CCD Parameters
+--------------------------------------------------------
+
+   Each of the 14 HIRISE CCD detectors has the following nominal
+   geometry parameters, from [4]:
+
+      ------------------------------------------------
+      parameter                       value      
+      ------------------------------------------------
+      Pixel Size, microns             12 x 12
+      Detector Array Size
+          Samples                     2048
+          Lines                       128
+      Detector Array Center           1024.5, 64.5
+      ------------------------------------------------
+
+   The CCD detector corner based pixel numbering convention is shown on
+   this diagram:
+
+           1, 1          samples ----->                 2048, 1
+            ._______________________________________________.
+            |                       |                       |  
+            |                       |                       | |
+            |                       |                       | |
+            |                       * 1024.5, 64.5          | | lines       
+            |                       |                       | |
+            |<----- channel 1 ----->|<----- channel 0 ----->| V
+            |                       |                       | 
+            ._______________________._______________________.
+           1, 128               1024|1025               2048, 128
+              
+                                             +Yhirise         +Zhirise (nadir)
+                                                     <------x
+                                                            |
+                                                            |
+                                                            |
+                                                            V +Xhirise 
+                                                              (s/c velocity)
+
+   The values are given in millimeters for PIXEL_SIZE keywords and in
+   counts for PIXEL_SAMPLES, PIXEL_LINES, and CENTER keywords.
+
+      \begindata
+
+         INS-74600_PIXEL_SIZE         = ( 0.012, 0.012 )
+         INS-74600_PIXEL_SAMPLES      = ( 2048 )
+         INS-74600_PIXEL_LINES        = ( 128 )
+         INS-74600_CCD_CENTER         = ( 1024.5, 64.5 )
+
+         INS-74601_PIXEL_SIZE         = ( 0.012, 0.012 )
+         INS-74601_PIXEL_SAMPLES      = ( 2048 )
+         INS-74601_PIXEL_LINES        = ( 128 )
+         INS-74601_CCD_CENTER         = ( 1024.5, 64.5 )
+
+         INS-74602_PIXEL_SIZE         = ( 0.012, 0.012 )
+         INS-74602_PIXEL_SAMPLES      = ( 2048 )
+         INS-74602_PIXEL_LINES        = ( 128 )
+         INS-74602_CCD_CENTER         = ( 1024.5, 64.5 )
+
+         INS-74603_PIXEL_SIZE         = ( 0.012, 0.012 )
+         INS-74603_PIXEL_SAMPLES      = ( 2048 )
+         INS-74603_PIXEL_LINES        = ( 128 )
+         INS-74603_CCD_CENTER         = ( 1024.5, 64.5 )
+
+         INS-74604_PIXEL_SIZE         = ( 0.012, 0.012 )
+         INS-74604_PIXEL_SAMPLES      = ( 2048 )
+         INS-74604_PIXEL_LINES        = ( 128 )
+         INS-74604_CCD_CENTER         = ( 1024.5, 64.5 )
+
+         INS-74605_PIXEL_SIZE         = ( 0.012, 0.012 )
+         INS-74605_PIXEL_SAMPLES      = ( 2048 )
+         INS-74605_PIXEL_LINES        = ( 128 )
+         INS-74605_CCD_CENTER         = ( 1024.5, 64.5 )
+
+         INS-74606_PIXEL_SIZE         = ( 0.012, 0.012 )
+         INS-74606_PIXEL_SAMPLES      = ( 2048 )
+         INS-74606_PIXEL_LINES        = ( 128 )
+         INS-74606_CCD_CENTER         = ( 1024.5, 64.5 )
+
+         INS-74607_PIXEL_SIZE         = ( 0.012, 0.012 )
+         INS-74607_PIXEL_SAMPLES      = ( 2048 )
+         INS-74607_PIXEL_LINES        = ( 128 )
+         INS-74607_CCD_CENTER         = ( 1024.5, 64.5 )
+
+         INS-74608_PIXEL_SIZE         = ( 0.012, 0.012 )
+         INS-74608_PIXEL_SAMPLES      = ( 2048 )
+         INS-74608_PIXEL_LINES        = ( 128 )
+         INS-74608_CCD_CENTER         = ( 1024.5, 64.5 )
+
+         INS-74609_PIXEL_SIZE         = ( 0.012, 0.012 )
+         INS-74609_PIXEL_SAMPLES      = ( 2048 )
+         INS-74609_PIXEL_LINES        = ( 128 )
+         INS-74609_CCD_CENTER         = ( 1024.5, 64.5 )
+
+         INS-74610_PIXEL_SIZE         = ( 0.012, 0.012 )
+         INS-74610_PIXEL_SAMPLES      = ( 2048 )
+         INS-74610_PIXEL_LINES        = ( 128 )
+         INS-74610_CCD_CENTER         = ( 1024.5, 64.5 )
+
+         INS-74611_PIXEL_SIZE         = ( 0.012, 0.012 )
+         INS-74611_PIXEL_SAMPLES      = ( 2048 )
+         INS-74611_PIXEL_LINES        = ( 128 )
+         INS-74611_CCD_CENTER         = ( 1024.5, 64.5 )
+
+         INS-74612_PIXEL_SIZE         = ( 0.012, 0.012 )
+         INS-74612_PIXEL_SAMPLES      = ( 2048 )
+         INS-74612_PIXEL_LINES        = ( 128 )
+         INS-74612_CCD_CENTER         = ( 1024.5, 64.5 )
+
+         INS-74613_PIXEL_SIZE         = ( 0.012, 0.012 )
+         INS-74613_PIXEL_SAMPLES      = ( 2048 )
+         INS-74613_PIXEL_LINES        = ( 128 )
+         INS-74613_CCD_CENTER         = ( 1024.5, 64.5 )
+
+      \begintext
+
+   The CCD detector center based pixel numbering convention used in
+   USGS ISIS 3 camera model ([5]) is shown on this diagram:
+
+     -1023.5, -63.5         samples ----->           1023.5, -63.5
+            ._______________________________________________.
+            |                       |                       |  
+            |                       |                       | |
+            |                       |                       | |
+            |                       * 0, 0                  | | lines       
+            |                       |                       | |
+            |<----- channel 1 ----->|<----- channel 0 ----->| V
+            |                       |                       | 
+            ._______________________._______________________.
+     -1023.5,  63.5             -0.5|0.5              1023.5, 63.5
+              
+                                             +Yhirise         +Zhirise (nadir)
+                                                     <------x
+                                                            |
+                                                            |
+                                                            |
+                                                            V +Xhirise 
+                                                              (s/c velocity)
+
+ 
+   In TDI the last line that observes the scene is always the top line
+   of the CCD while the first line observing the scene is "TDI" lines
+   down the CCD, as shown on this diagram:
+
+            ._______________________________________________. last line
+            |                       |                       |     ^
+            |                       |                       |     | TDI
+            |                       |                       |     | lines
+            |                       |                       |     v 
+            |                       |                       | first line
+            |<----- channel 1 ----->|<----- channel 0 ----->|
+            |                       |                       | 
+            ._______________________._______________________. 
+              
+                                             +Yhirise         +Zhirise (nadir)
+                                                     <------x
+                                                            |
+                                                            |
+                                                            |
+                                                            V +Xhirise 
+                                                              (s/c velocity)
+
+   The numbers of TDI lines depends on the commanded TDI mode.
+
+
+FOV Parameters and Definition
+---------------------------------------------------------------------------
+ 
+   The following HIRISE FOV and IFOV parameters are provided by keywords
+   in this section (all values are nominal values from [4]):
+
+      ------------------------------------------------
+      parameter                       value
+      ------------------------------------------------
+      IFOV, rad/pixel                 0.000001   
+      Field of view (deg)             1.14 x 0.18
+      ------------------------------------------------
+
+   Angular size values in the keywords are given in radians.
+
+      \begindata
+
+         INS-74699_FOV_ANGULAR_SIZE   = ( 0.01989675, 0.00314159 )
+         INS-74699_IFOV               = ( 0.000001,   0.000001   )
+
+      \begintext
+
+   The set of keywords below contains definition of the HIRISE FOV.
+   This definition is provided in the format required by the SPICE
+   (CSPICE) function GETFOV (getfov_c). It defines the HIRISE FOV with
+   respect to the MRO_HIRISE_LOOK_DIRECTION frame to be a rectangle
+   with the nominal sizes specified above.
+
+      \begindata
+
+         INS-74699_FOV_FRAME          = 'MRO_HIRISE_LOOK_DIRECTION'
+         INS-74699_FOV_SHAPE          = 'RECTANGLE'
+         INS-74699_BORESIGHT          = (
+                                         0.000000     0.000000     1.000000
+                                        )
+         INS-74699_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-74699_FOV_REF_VECTOR     = (
+                                         0.000000     1.000000     0.000000
+                                        )
+         INS-74699_FOV_REF_ANGLE      = ( 0.57 )
+         INS-74699_FOV_CROSS_ANGLE    = ( 0.09 )
+         INS-74699_FOV_ANGLE_UNITS    = 'DEGREES'
+
+      \begintext
+
+
+A Recipe for Computing Observation Time and CCD Pixel View Direction
+---------------------------------------------------------------------------
+
+   The following recipe explains how starting with a HIRISE EDR pixel
+   identified by its line (l) and sample (s) determine the ephemeris
+   time (et) at which this pixel made observation and the pixel view
+   direction (v) in the HIRISE frame (MRO_HIRISE_OPTICAL_AXIS).
+
+   The following values from the EDR label will be needed:
+
+      -  "bsclk", the image start time from the keyword
+         SPACECRAFT_CLOCK_START_COUNT (p/ssssssssss.fffff)
+
+      -  "binning", binning mode ID from the keyword BINNING
+         (1,2,3,4,8,16)
+
+      -  "tdi", TDI mode ID from the keyword TDI (8,32,64,128)
+
+      -  "dline", additional TDI line delay from the keyword
+         DELTA_LINE_TIME_COUNT (an integer number)
+
+      -  "chan", channel ID from the keyword CHANNEL_NUMBER (0 or 1)
+
+   The following IK parameters will be needed as well:
+
+      -  "cen_s" and "cen_l", the CCD center coordinates from
+         INS-74???_CCD_CENTER keywords
+
+      -  parameters from the ``hiriseAddendum003.ti'' USGS
+         ISIS 3 IK included at the end of this IK file.
+
+
+   Step A:  Compute ephemeris time (et) for the middle point of the TDI
+   -------  line block
+
+      1) compute line rate in seconds
+
+            lr = ( 74.0 + ( dline / 16.0 ) ) / 1000000
+
+      2) compute binned line rate
+
+            lrb = lr * binning
+
+      3) convert first line sclk to et using high precision MRO SPICE
+         SCLK (-74999)
+
+            bsclk -> et
+
+      4) compute et of the last line in the TDI block that was recorded
+         into this EDR line (l)
+
+            et = et + l * lrb
+
+      5) adjust et time to be for the middle point of the TDI block 
+
+            et = et - lr * ( ( tdi / 2 ) - 0.5 )
+
+      6) adjust et time for binning 
+
+            et = et + lr * ( ( binning / 2 ) - 0.5 )
+
+
+   Step B:   Compute the index of the physical CCD line in the middle
+   -------   of the TDI block with respect to CCD center that was
+             exposed at this et
+
+      1) compute un-binned number of the CCD line in the middle of TDI
+         block
+
+            ccdLine_c = -64 + ( tdi / 2 )
+
+      2) adjust CCD line number for binning 
+
+            ccdLine_c = ccd_lnum - ( ( binning / 2 ) - 0.5 )
+
+
+   Step C:  Compute the index of the physical CCD pixel corresponding
+   -------  to this EDR pixel with respect to the CCD center
+
+      1) compute unbinned pixel index from binned pixels with respect 
+         to the image "corner"
+
+            ccdSample_c = ( s - 0.5 ) * binning + 0.5
+
+   
+      2) adjust unbinned pixel index to be with respect to the 
+         CCD center:
+
+            ccdSample_c = ccdSample_c + off_s - cen_s   
+
+         where off_s=0 for channel 1 and off_s=1025.0 for channel 0
+
+
+   Step D:  Compute focal plane coordinates for physical CCD line and
+   -------  sample
+
+      1) start with ccdSample_c and ccdLine_c and use formulas and
+         values from the "computing focal plane coords from CCD coords"
+         section of the ``hiriseAddendum003.ti'' IK
+
+            ccdSample_c, ccdLine_c  --> x, y
+
+   Step E:  Compute ideal focal plane coordinates from distorted
+   -------  coordinates
+
+      1) start with x, y and use formulas and values from the "optical
+         distortion parameters" section of the ``hiriseAddendum003.ti''
+         IK
+
+            x, y --> xp, yp
+
+   Step F:  Construct view vector in the ``MRO_HIRISE_OPTICAL_AXIS''
+   -------  frame
+
+      1) Used computed xp, yp and focal length from the 
+         ``hiriseAddendum003.ti'' IK
+ 
+            v = [xp, yp, fl]
+
+
+
+USGS ISIS 3 HiRISE Instrument Kernel ``hiriseAddendum003aaa.ti''
+===========================================================================
+
+   This instrument kernel (I-kernel) contains parameters that describe
+   the Mars Reconnaissance Orbiter HiRISE (High Resolution Imaging
+   Science Experiment) instrument model used by UGSG's ISIS 3.
+
+   This model is defined with respect to the MRO_HIRISE_OPTICAL_AXIS
+   frame.
+
+
+``hiriseAddendum003aaa.ti'' Version and Date
+-------------------------------------------------------------
+
+   Version 1.0 -- February 16, 2005 -- Jim Torson, USGS, Flagstaff, AZ
+
+      Initial version.
+
+   Version 1.1 -- April 5, 2006 -- Kris Becker USGS.
+
+      Added entries so NADIR pointing can be utilized. These entries
+      are identified with prefixes of INS-74699. They can be any CCD
+      measurement but this one so happens to CCD #0.
+
+   Version 1.2 -- May 10, 2006 -- Kris Becker USGS
+
+      Update focal length from 12056.0189 to 11994.9988 per Randy's
+      email of 2006/04/26.
+
+   Version 1.3 -- April, 2008 -- Laszlo Keszthelyi USGS
+
+      Updated CCD positions by shifting whole focal plane 5 mm to match
+      analysis by Randy Kirk (USGS) of camera distortions of star images.
+
+
+``hiriseAddendum003aaa.ti'' Data
+-------------------------------------------------------------
+
+      \begindata
+
+         INS-74699_PLATFORM_ID        = -74000
+
+         INS-74699_SPK_TIME_BIAS      = 0.0
+         INS-74699_CK_TIME_BIAS       = 0.0
+         INS-74699_CK_TIME_TOLERANCE  = 1
+
+      \begintext
+
+   The following is the focal length, which is expressed in
+   MILLIMETERS. This value comes from Randy Kirk's December 21, 2004
+   email (HiRISE optical distortion report).  This is the Version 2
+   value (EFL and balanced optical distortion).
+
+   This was the initial value until 2006/05/10.
+
+         INS-74699_FOCAL_LENGTH       = 12056.0189
+
+      \begindata
+
+         INS-74699_FOCAL_LENGTH       = 11994.9988
+
+      \begintext
+
+   The following is the pixel pitch, which is the distance between
+   adjacent pixels on the CCD arrays.  This is expressed in MILLIMETERS
+   per pixel.
+
+      \begindata
+
+         INS-74699_PIXEL_PITCH        = 12.0E-3
+
+      \begintext
+
+   The following are the optical distortion parameters. These are used
+   to transform from observed (distorted) coordinates (unprimed, e.g.,
+   x) to ideal coordinates (primed, e.g., xp).  Both sets of
+   coordinates are expressed in millimeters.  These are used as
+   described in Randy Kirk's December 21, 2004 email (ISIS 3 sensor
+   models, take 2).  From Randy's email (assuming x0 and y0 are zero):
+
+      r=sqrt(x^2 + y^2)
+      dr = k0*r + k1*r3 + k2*r^5
+      rp = r - dr
+      xp = x * (rp/r), similarly for yp
+
+   or, rearranging a bit, we have a more efficient version:
+
+      r^2 = x^2 + y^2
+      dr/r = k0 + r^2*(k1 + r^2*k2)
+      xp = x - (dr/r)*x
+      yp = y - (dr/r)*y
+
+   (Randy's original email had a "+" in these last two equations, which
+   is incorrect.)
+
+   The optical distortion parameters below come from Randy
+   Kirk's December 21, 2004 email (HiRISE optical distortion
+   report):
+
+      \begindata
+
+         INS-74699_OD_K = ( -0.0048509, 2.41312E-07, -1.62369E-13)
+
+      \begintext
+
+   The following are the parameters for computing focal plane coords
+   from CCD coords.  The last two characters of the parameter names are
+   the HiRISE detector number (00 to 13). For a given detector number,
+   these allow computation of focal plane coordinates (in millimeters)
+   from "centered" detector coordinates in pixels (0,0 is the center of
+   the detector array) as described in Randy Kirk's December 21, 2004
+   email (ISIS3 sensor models, take 2), i.e.,
+
+      x = transx[0] + transx[1]*ccdSample_c + transx[2]*ccdLine_c
+      y = transy[0] + transy[1]*ccdSample_c + transy[2]*ccdLine_c
+
+   The parameter values come from the spreadsheet attached to Randy
+   Kirk's December 22, 2004 email (HiRISE pixel to focal plane).
+
+   The INS-74699_TRANS[XY] is new and needed to support Nadir pointing
+   CK simulations now supported in ISIS.
+
+      \begindata
+
+         INS-74699_TRANSX=(   -96.3935,   -0.000057,   0.012000)
+         INS-74699_TRANSY=(   107.9956,   -0.012000,  -0.000057)
+
+         INS-74600_TRANSX=(   -96.3935,   -0.000057,   0.012000)
+         INS-74600_TRANSY=(   112.9956,   -0.012000,  -0.000057)
+         INS-74601_TRANSX=(   -89.4914,   -0.000042,   0.012000)
+         INS-74601_TRANSY=(    88.9950,   -0.012000,  -0.000042)
+         INS-74602_TRANSX=(   -96.9459,   -0.000034,   0.012000)
+         INS-74602_TRANSY=(    65.0469,   -0.012000,  -0.000034)
+         INS-74603_TRANSX=(   -89.4927,   -0.000018,   0.012000)
+         INS-74603_TRANSY=(    41.0380,   -0.012000,  -0.000018)
+         INS-74604_TRANSX=(   -96.4998,    0.000002,   0.012000)
+         INS-74604_TRANSY=(    16.9992,   -0.012000,   0.000002)
+         INS-74605_TRANSX=(   -89.4960,   -0.000001,   0.012000)
+         INS-74605_TRANSY=(    -7.0010,   -0.012000,  -0.000001)
+         INS-74606_TRANSX=(   -96.6811,    0.000019,   0.012000)
+         INS-74606_TRANSY=(   -30.9996,   -0.012000,   0.000019)
+         INS-74607_TRANSX=(   -89.4935,    0.000031,   0.012000)
+         INS-74607_TRANSY=(   -55.0034,   -0.012000,   0.000031)
+         INS-74608_TRANSX=(   -96.3954,    0.000049,   0.012000)
+         INS-74608_TRANSY=(   -78.9990,   -0.012000,   0.000049)
+         INS-74609_TRANSX=(   -89.1039,    0.000056,   0.012000)
+         INS-74609_TRANSY=(  -102.9997,   -0.012000,   0.000056)
+         INS-74610_TRANSX=(  -110.9610,    0.000000,   0.012000)
+         INS-74610_TRANSY=(    16.9991,   -0.012000,   0.000000)
+         INS-74611_TRANSX=(  -103.6857,   -0.000001,   0.012000)
+         INS-74611_TRANSY=(    -7.0010,   -0.012000,  -0.000001)
+         INS-74612_TRANSX=(   -82.2033,    0.000002,   0.012000)
+         INS-74612_TRANSY=(    16.9993,   -0.012000,   0.000002)
+         INS-74613_TRANSX=(   -74.9334,    0.000003,   0.012000)
+         INS-74613_TRANSY=(    -7.0007,   -0.012000,   0.000003)
+
+      \begintext
+
+   Parameters for computing CCD coords from focal plane coords. The
+   INS-74699_ITRANS[SL] is new and needed to support Nadir pointing CK
+   simulations now supported in ISIS.
+
+   Note that because the TRANS[XY] values above and the ITRANS[SL]
+   values below are given with just 4-to-7 significant digits, a round
+   trip, round off errors at the level of a few 10^-2 pixels exist when
+   using TRANS[XY] to go from line/sample to position x/y in the focal
+   plane and then ITRANS[SL] to do the inverse. While these errors,
+   discovered by Bob King, PIRL/UofA in May 2011, prevent consistent
+   round trip conversions, they, according to Randy Kirk, may not cause
+   any operational problems because photogrammetric calculations are
+   usually only needed to be accurate to ~0.1 pixel (typical image
+   matching error). While these tabulated coefficients give an
+   "adequate" round trip error, for full consistency users should
+   calculate the inverses (ITRANS[SL]) of the forward coefficients
+   (TRANS[XY]) to higher precision themselves.
+
+      \begindata
+
+         INS-74699_ITRANSS=(   8961.49,     -0.3947,   -83.3324)
+         INS-74699_ITRANSL=(   8075.32,     83.3324,    -0.3947)
+
+         INS-74600_ITRANSS=(   9378.15,     -0.3947,   -83.3324)
+         INS-74600_ITRANSL=(   8077.29,     83.3324,    -0.3947)
+         INS-74601_ITRANSS=(   7389.83,     -0.2947,   -83.3328)
+         INS-74601_ITRANSL=(   7483.79,     83.3328,    -0.2947)
+         INS-74602_ITRANSS=(   5397.74,     -0.2353,   -83.3330)
+         INS-74602_ITRANSL=(   8094.10,     83.3330,    -0.2353)
+         INS-74603_ITRANSS=(   3408.52,     -0.1263,   -83.3332)
+         INS-74603_ITRANSL=(   7462.90,     83.3332,    -0.1263)
+         INS-74604_ITRANSS=(   1417.73,      0.0117,   -83.3333)
+         INS-74604_ITRANSL=(   8041.45,     83.3333,     0.0117)
+         INS-74605_ITRANSS=(   -584.19,     -0.0087,   -83.3333)
+         INS-74605_ITRANSL=(   7457.94,     83.3333,    -0.0087)
+         INS-74606_ITRANSS=(  -2570.47,      0.1327,   -83.3332)
+         INS-74606_ITRANSL=(   8060.86,     83.3332,     0.1327)
+         INS-74607_ITRANSS=(   -4564.45,     0.2140,   -83.3331)
+         INS-74607_ITRANSL=(   7469.54,     83.3331,     0.2140)
+         INS-74608_ITRANSS=(  -6550.29,      0.3413,   -83.3326)
+         INS-74608_ITRANSL=(   8059.85,     83.3326,     0.3413)
+         INS-74609_ITRANSS=(  -8548.73,      0.3870,   -83.3324)
+         INS-74609_ITRANSL=(   7465.11,     83.3324,     0.3870)
+         INS-74610_ITRANSS=(   1416.59,      0.0000,   -83.3333)
+         INS-74610_ITRANSL=(   9246.75,     83.3333,     0.0000)
+         INS-74611_ITRANSS=(   -584.45,     -0.0100,   -83.3333)
+         INS-74611_ITRANSL=(   8640.41,     83.3333,    -0.0100)
+         INS-74612_ITRANSS=(   1417.95,      0.0163,   -83.3333)
+         INS-74612_ITRANSL=(   6850.00,     83.3333,     0.0163)
+         INS-74613_ITRANSS=(   -581.94,      0.0193,   -83.3333)
+         INS-74613_ITRANSL=(   6244.59,     83.3333,     0.0193)
+
+      \begintext
+

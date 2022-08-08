@@ -23,7 +23,7 @@ alt_id_lookup = {
     'VIKING ORBITER 2':-30999
 }
 
-class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
+class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
 
 
 
@@ -118,6 +118,41 @@ class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Driver):
         offset2 = 1.0 / 64.0 * 4.48
 
         return ephemeris_start_time + offset1 + offset2
+
+    @property
+    def focal_length(self):
+        """
+        Override the focal length attribute to return the appropriate viking
+        focal length. Values and logic based on ISIS viking camera model.
+
+        Returns
+        -------
+        : float
+          Focal length of viking instrument
+        """
+        if not hasattr(self, "_focal_length"):
+            if (self.spacecraft_name == "VIKING ORBITER 1"):
+                if (self.sensor_name == "VISUAL_IMAGING_SUBSYSTEM_CAMERA_A"):
+                    self._focal_length = 474.398
+                elif (self.sensor_name ==  "VISUAL_IMAGING_SUBSYSTEM_CAMERA_B"):
+                    self._focal_length = 474.448
+            elif (self.spacecraft_name == "VIKING ORBITER 2"):
+                if (self.sensor_name == "VISUAL_IMAGING_SUBSYSTEM_CAMERA_A"):
+                    self._focal_length = 474.610
+                elif (self.sensor_name ==  "VISUAL_IMAGING_SUBSYSTEM_CAMERA_B"):
+                    self._focal_length = 474.101
+            else:
+                raise Exception(f"Unknown viking instrument to get focal length: {self.spacecraft_name}, {self.sensor_name}")
+
+    @property
+    def detector_center_line(self):
+        return 0
+
+    @property
+    def detector_center_sample(self):
+        return 0
+
+
 
 class VikingIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistortion, Driver):
 

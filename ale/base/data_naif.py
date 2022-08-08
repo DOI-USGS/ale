@@ -306,10 +306,12 @@ class NaifSpice():
         : str
         String name of the target reference frame
         """
-        try:
-            return spice.cidfrm(spice.bodn2c(self.target_name))[1]
-        except:
-            return 'IAU_{}'.format(self.target_name)
+        if not hasattr(self, "_reference_frame"):
+            try:
+                self._reference_frame = spice.cidfrm(spice.bodn2c(self.target_name))[1]
+            except:
+                self._reference_frame = 'IAU_{}'.format(self.target_name)
+        return self._reference_frame
 
     @property
     def sun_position(self):
@@ -421,11 +423,12 @@ class NaifSpice():
     def frame_chain(self):
         if not hasattr(self, '_frame_chain'):
             nadir = self._props.get('nadir', False)
+            exact_ck_times = self._props.get('exact_ck_times', True)
             self._frame_chain = FrameChain.from_spice(sensor_frame=self.sensor_frame_id,
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
                                                       ephemeris_times=self.ephemeris_time,
-                                                      nadir=nadir)
+                                                      nadir=nadir, exact_ck_times=exact_ck_times)
 
             if nadir:
                 # Logic for nadir calculation was taken from ISIS3

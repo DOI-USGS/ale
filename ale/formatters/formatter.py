@@ -23,11 +23,10 @@ def to_isd(driver):
         The ISIS compatible meta data as a JSON encoded string.
     """
 
-
     meta_data = {}
 
     meta_data['isis_camera_version'] = driver.sensor_model_version
-
+    
     # general information
     meta_data['image_lines'] = driver.image_lines
     meta_data['image_samples'] = driver.image_samples
@@ -45,10 +44,9 @@ def to_isd(driver):
         meta_data['interpolation_method'] = 'lagrange'
 
         start_lines, start_times, scan_rates = driver.line_scan_rate
-        center_time = driver.center_ephemeris_time
         meta_data['line_scan_rate'] = [[line, time, rate] for line, time, rate in zip(start_lines, start_times, scan_rates)]
         meta_data['starting_ephemeris_time'] = driver.ephemeris_start_time
-        meta_data['center_ephemeris_time'] = center_time
+        meta_data['center_ephemeris_time'] = driver.center_ephemeris_time
 
     # frame sensor model specifics
     if isinstance(driver, Framer):
@@ -116,38 +114,41 @@ def to_isd(driver):
     body_rotation["reference_frame"] = destination_frame
     meta_data['body_rotation'] = body_rotation
 
-    if isinstance(driver, LineScanner) or isinstance(driver, Framer) or isinstance(driver, PushFrame):
-        # sensor orientation
-        sensor_frame = driver.sensor_frame_id
+    # sensor orientation
+    sensor_frame = driver.sensor_frame_id
 
-        instrument_pointing = {}
-        source_frame, destination_frame, time_dependent_sensor_frame = frame_chain.last_time_dependent_frame_between(1, sensor_frame)
+    instrument_pointing = {}
+    source_frame, destination_frame, time_dependent_sensor_frame = frame_chain.last_time_dependent_frame_between(1, sensor_frame)
 
-        # Reverse the frame order because ISIS orders frames as
-        # (destination, intermediate, ..., intermediate, source)
-        instrument_pointing['time_dependent_frames'] = shortest_path(frame_chain, destination_frame, 1)
-        time_dependent_rotation = frame_chain.compute_rotation(1, destination_frame)
-        instrument_pointing['ck_table_start_time'] = time_dependent_rotation.times[0]
-        instrument_pointing['ck_table_end_time'] = time_dependent_rotation.times[-1]
-        instrument_pointing['ck_table_original_size'] = len(time_dependent_rotation.times)
-        instrument_pointing['ephemeris_times'] = time_dependent_rotation.times
-        instrument_pointing['quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
-        instrument_pointing['angular_velocities'] = time_dependent_rotation.av
+    # Reverse the frame order because ISIS orders frames as
+    # (destination, intermediate, ..., intermediate, source)
+    instrument_pointing['time_dependent_frames'] = shortest_path(frame_chain, destination_frame, 1)
+    time_dependent_rotation = frame_chain.compute_rotation(1, destination_frame)
+    instrument_pointing['ck_table_start_time'] = time_dependent_rotation.times[0]
+    instrument_pointing['ck_table_end_time'] = time_dependent_rotation.times[-1]
+    instrument_pointing['ck_table_original_size'] = len(time_dependent_rotation.times)
+    instrument_pointing['ephemeris_times'] = time_dependent_rotation.times
+    instrument_pointing['quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
+    instrument_pointing['angular_velocities'] = time_dependent_rotation.av
 
-        # reference frame should be the last frame in the chain
-        instrument_pointing["reference_frame"] = instrument_pointing['time_dependent_frames'][-1]
+    # reference frame should be the last frame in the chain
+    instrument_pointing["reference_frame"] = instrument_pointing['time_dependent_frames'][-1]
 
-        # Reverse the frame order because ISIS orders frames as
-        # (destination, intermediate, ..., intermediate, source)
-        instrument_pointing['constant_frames'] = shortest_path(frame_chain, sensor_frame, destination_frame)
-        constant_rotation = frame_chain.compute_rotation(destination_frame, sensor_frame)
-        instrument_pointing['constant_rotation'] = constant_rotation.rotation_matrix().flatten()
-        meta_data['instrument_pointing'] = instrument_pointing
+    # Reverse the frame order because ISIS orders frames as
+    # (destination, intermediate, ..., intermediate, source)
+    instrument_pointing['constant_frames'] = shortest_path(frame_chain, sensor_frame, destination_frame)
+    constant_rotation = frame_chain.compute_rotation(destination_frame, sensor_frame)
+    instrument_pointing['constant_rotation'] = constant_rotation.rotation_matrix().flatten()
+    meta_data['instrument_pointing'] = instrument_pointing
 
-        # interiror orientation
-        meta_data['naif_keywords'] = driver.naif_keywords
+    # interiror orientation
+    meta_data['naif_keywords'] = driver.naif_keywords
+
+    if isinstance(driver,LineScanner) or isinstance(driver, Framer) or isinstance(driver, PushFrame):
+
         meta_data['detector_sample_summing'] = driver.sample_summing
         meta_data['detector_line_summing'] = driver.line_summing
+
         meta_data['focal_length_model'] = {
             'focal_length' : driver.focal_length
         }
@@ -155,12 +156,13 @@ def to_isd(driver):
             'line' : driver.detector_center_line,
             'sample' : driver.detector_center_sample
         }
-
-        meta_data['starting_detector_line'] = driver.detector_start_line
-        meta_data['starting_detector_sample'] = driver.detector_start_sample
         meta_data['focal2pixel_lines'] = driver.focal2pixel_lines
         meta_data['focal2pixel_samples'] = driver.focal2pixel_samples
         meta_data['optical_distortion'] = driver.usgscsm_distortion_model
+
+        meta_data['starting_detector_line'] = driver.detector_start_line
+        meta_data['starting_detector_sample'] = driver.detector_start_sample
+    
 
     j2000_rotation = frame_chain.compute_rotation(target_frame, 1)
 
