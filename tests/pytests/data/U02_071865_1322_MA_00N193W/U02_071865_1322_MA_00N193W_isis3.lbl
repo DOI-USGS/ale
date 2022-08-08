@@ -3,11 +3,11 @@ Object = IsisCube
     StartByte   = 65537
     Format      = Tile
     TileSamples = 512
-    TileLines   = 380
+    TileLines   = 400
 
     Group = Dimensions
       Samples = 1024
-      Lines   = 21280
+      Lines   = 400
       Bands   = 5
     End_Group
 
@@ -51,24 +51,18 @@ Object = IsisCube
   End_Group
 
   Group = Kernels
-    NaifIkCode                = -74410
-    LeapSecond                = $base/kernels/lsk/naif0012.tls
-    TargetAttitudeShape       = $base/kernels/pck/pck00009.tpc
-    TargetPosition            = (Table, $base/kernels/spk/de430.bsp,
-                                 $base/kernels/spk/mar097.bsp)
-    InstrumentPointing        = (Table,
-                                 $mro/kernels/ck/mro_sc_psp_211123_211129.bc,
-                                 $mro/kernels/fk/mro_v16.tf)
-    Instrument                = $mro/kernels/ik/mro_marci_v10.ti
-    SpacecraftClock           = $mro/kernels/sclk/MRO_SCLKSCET.00102.65536.tsc
-    InstrumentPosition        = (Table,
-                                 $mro/kernels/spk/mro_psp61_ssd_mro95a.bsp)
-    InstrumentAddendum        = $mro/kernels/iak/marciAddendum002.ti
-    ShapeModel                = $base/dems/molaMarsPlanetaryRadius0005.cub
-    InstrumentPositionQuality = Reconstructed
-    InstrumentPointingQuality = Reconstructed
-    CameraVersion             = 1
-    Source                    = isis
+    NaifIkCode = -74410
+  End_Group
+
+  Group = AlphaCube
+    AlphaSamples        = 1024
+    AlphaLines          = 21280
+    AlphaStartingSample = 0.5
+    AlphaStartingLine   = 0.5
+    AlphaEndingSample   = 1024.5
+    AlphaEndingLine     = 400.5
+    BetaSamples         = 1024
+    BetaLines           = 400
   End_Group
 End_Object
 
@@ -78,7 +72,7 @@ End_Object
 
 Object = Table
   Name                = InstrumentPointing
-  StartByte           = 435879937
+  StartByte           = 8257537
   Bytes               = 1507968
   Records             = 23562
   ByteOrder           = Lsb
@@ -148,9 +142,9 @@ End_Object
 
 Object = Table
   Name                 = InstrumentPosition
-  StartByte            = 437387905
-  Bytes                = 13552
-  Records              = 242
+  StartByte            = 9765505
+  Bytes                = 13776
+  Records              = 246
   ByteOrder            = Lsb
   CacheType            = HermiteSpline
   SpkTableStartTime    = 691074268.95955
@@ -204,7 +198,7 @@ End_Object
 
 Object = Table
   Name                = BodyRotation
-  StartByte           = 437401457
+  StartByte           = 9779281
   Bytes               = 128
   Records             = 2
   ByteOrder           = Lsb
@@ -273,7 +267,7 @@ End_Object
 
 Object = Table
   Name                 = SunPosition
-  StartByte            = 437401585
+  StartByte            = 9779409
   Bytes                = 112
   Records              = 2
   ByteOrder            = Lsb
@@ -330,14 +324,8 @@ End_Object
 
 Object = History
   Name      = IsisCube
-  StartByte = 437401697
-  Bytes     = 1790
-End_Object
-
-Object = OriginalLabel
-  Name      = IsisCube
-  StartByte = 435879937
-  Bytes     = 1793
+  StartByte = 9781314
+  Bytes     = 5121
 End_Object
 
 Object = NaifKeywords
@@ -353,5 +341,11 @@ Object = NaifKeywords
   INS-74400_ITRANSL                    = (0.0, 0.0, 111.11111111111)
   INS-74410_DISTORTION_COEFFS          = (0.997322, 2.84786e-06, -6.67752e-12,
                                           1.43076e-16)
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 9779521
+  Bytes     = 1793
 End_Object
 End
