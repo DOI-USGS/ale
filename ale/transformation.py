@@ -304,10 +304,13 @@ class FrameChain(nx.DiGraph):
         SOURCESIZ = 128;
 
         currentTime = observStart
-        timeLoaded = False
 
         count = spice.ktotal("ck")
-        file, filtyp, source, handle = spice.kdata(0, "ck", FILESIZ, TYPESIZ, SOURCESIZ)
+        if (count > 1):
+            msg = "Unable to get exact CK record times when more than 1 CK is loaded, Aborting"
+            raise Exception(msg)
+
+        _, _, _, handle = spice.kdata(0, "ck", FILESIZ, TYPESIZ, SOURCESIZ)
         spice.dafbfs(handle)
         found = spice.daffna()
         spCode = int(targetFrame / 1000) * 1000

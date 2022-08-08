@@ -55,9 +55,7 @@ class LineScanner():
           ephemeris times split based on image lines
         """
         if not hasattr(self, "_ephemeris_time"):
-          cache_size = self.image_lines + 1
-          cache_slope = (self.ephemeris_stop_time - self.ephemeris_start_time) / (cache_size - 1)
-          self._ephemeris_time = np.asarray([self.ephemeris_start_time +  (i * cache_slope) for i in range(cache_size)])
+          self._ephemeris_time = np.linspace(self.ephemeris_start_time, self.ephemeris_stop_time, self.image_lines + 1)
         return self._ephemeris_time
 
     @property
@@ -242,11 +240,8 @@ class Radar():
           ephemeris times split based on image lines
         """
         if not hasattr(self, "_ephemeris_time"):
-          cache_size = self.image_lines + 1
-          cache_slope = (self.ephemeris_stop_time - self.ephemeris_start_time) / (cache_size - 1)
-          self._ephemeris_time = np.asarray([self.ephemeris_start_time +  (i * cache_slope) for i in range(cache_size)])
+          self._ephemeris_time = np.linspace(self.ephemeris_start_time, self.ephemeris_stop_time, self.image_lines + 1)
         return self._ephemeris_time
-        # return np.linspace(self.ephemeris_start_time,  self.ephemeris_stop_time, num_states)
 
     @property
     def wavelength(self):
