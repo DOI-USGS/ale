@@ -57,7 +57,6 @@ def test_mro_ctx_load(test_ctx_kernels, label_type, kernel_type):
 
 @pytest.mark.parametrize("label_type, kernel_type", [('isis3', 'naif')])
 def test_mro_hirise_load(test_hirise_kernels, label_type, kernel_type):
-    print(test_hirise_kernels)
     label_file = get_image_label("PSP_001446_1790_BG12_0", label_type)
 
     isd_str = ale.loads(label_file, props={'kernels': test_hirise_kernels})
@@ -229,11 +228,11 @@ class test_marci_isis_naif(unittest.TestCase):
             start_time.return_value = 0
             times = self.driver.compute_marci_time(1)
             assert len(times) == 5
-            assert times[0] == 3434.51875
-            assert times[1] == 3439.71875
-            assert times[2] == 3444.9187500000003
-            assert times[3] == 3450.11875
-            assert times[4] == 3455.31875
+            assert times[0] == 41.518750000000004
+            assert times[1] == 46.71875
+            assert times[2] == 51.91875
+            assert times[3] == 57.11875
+            assert times[4] == 62.31875
 
     def test_start_time(self):
         with patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c, \
@@ -246,7 +245,7 @@ class test_marci_isis_naif(unittest.TestCase):
         with patch('ale.drivers.mro_drivers.MroMarciIsisLabelNaifSpiceDriver.compute_marci_time') as compute_marci_time:
             compute_marci_time.return_value = [0, 100]
             assert self.driver.ephemeris_start_time == 0
-            compute_marci_time.assert_called_with(21280.5)
+            compute_marci_time.assert_called_with(400.5)
 
     def test_ephemeris_stop_time(self):
         with patch('ale.drivers.mro_drivers.MroMarciIsisLabelNaifSpiceDriver.compute_marci_time') as compute_marci_time:
