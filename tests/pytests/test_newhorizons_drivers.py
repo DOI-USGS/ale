@@ -37,7 +37,7 @@ def test_kernels(scope="module"):
 # Test load of newhorizons labels
 @pytest.mark.parametrize("image", image_dict.keys())
 def test_nh_load(test_kernels, image):
-    label_file = get_image_label(image, 'isis3')
+    label_file = get_image_label(image, 'isis')
     isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
     compare_isd = image_dict[image]
 
@@ -49,7 +49,7 @@ def test_nh_load(test_kernels, image):
 class test_mvic_isis3_naif(unittest.TestCase):
 
     def setUp(self):
-        label = get_image_label("mc3_0295574631_0x536_sci", "isis3")
+        label = get_image_label("mc3_0295574631_0x536_sci", "isis")
         self.driver = NewHorizonsMvicIsisLabelNaifSpiceDriver(label)
 
     def test_instrument_id(self):
