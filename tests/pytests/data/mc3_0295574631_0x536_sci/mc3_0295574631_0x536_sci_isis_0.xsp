@@ -5,8 +5,8 @@ DAFETF NAIF DAF ENCODED TRANSFER FILE
 'SPKMERGE                                                    '
 BEGIN_ARRAY 1 78
 'PLUXXX                                  '
-'1CFFC5D51AD941^8'
-'1CFFC76D5F335C^8'
+'1CFFC51C0C41B5^8'
+'1CFFC889438D77^8'
 '3E7'
 '9'
 '1'
@@ -93,8 +93,8 @@ BEGIN_ARRAY 1 78
 END_ARRAY 1 78
 BEGIN_ARRAY 2 24
 'DE-0433LE-0433                          '
-'1CFFC5D51AD941^8'
-'1CFFC76D5F335C^8'
+'1CFFC51C0C41B5^8'
+'1CFFC889438D77^8'
 '9'
 '0'
 '1'
@@ -127,8 +127,8 @@ BEGIN_ARRAY 2 24
 END_ARRAY 2 24
 BEGIN_ARRAY 3 39
 'DE-0433LE-0433                          '
-'1CFFC5D51AD941^8'
-'1CFFC76D5F335C^8'
+'1CFFC51C0C41B5^8'
+'1CFFC889438D77^8'
 'A'
 '0'
 '1'
@@ -176,8 +176,8 @@ BEGIN_ARRAY 3 39
 END_ARRAY 3 39
 BEGIN_ARRAY 4 73
 'pvshort.nio                             '
-'1CFFC5D51AD941^8'
-'1CFFC76D5F335C^8'
+'1CFFC51C0C41B5^8'
+'1CFFC889438D77^8'
 '-62'
 '9'
 '1'
@@ -259,20 +259,20 @@ BEGIN_ARRAY 4 73
 END_ARRAY 4 73
 TOTAL_ARRAYS 4
  ~NAIF/SPC BEGIN COMMENTS~
-; /Users/arsanders/pds/nh/mvic/small/kernels/mc3_0295574631_0x536_sci_0.bsp LOG FILE
+; /Users/arsanders/pds/nh/mvic/sliced_kernels/mc3_0295574631_0x536_sci_isis_0.bsp LOG FILE
 
-; Created 2022-03-18/12:37:56.00.
+; Created 2022-08-09/16:28:42.00.
 ;
 ; BEGIN SPKMERGE COMMANDS
 
 LEAPSECONDS_KERNEL = /Volumes/pkgs/isis3/isis_data/base/kernels/lsk/naif0012.tls
 
-SPK_KERNEL = /Users/arsanders/pds/nh/mvic/small/kernels/mc3_0295574631_0x536_sci_0.bsp
+SPK_KERNEL = /Users/arsanders/pds/nh/mvic/sliced_kernels/mc3_0295574631_0x536_sci_isis_0.bsp
 SOURCE_SPK_KERNEL = /Volumes/pkgs/isis3/isis_data/newhorizons/kernels/spk/nh_recon_pluto_od122_v01.bsp
     INCLUDE_COMMENTS = NO
     BODIES           = 999, 9, 10, -98
-    BEGIN_TIME       = 2015 JUN 02 13:38:25.920
-    END_TIME         = 2015 JUN 02 13:45:14.187
+    BEGIN_TIME       = 2015 JUN 02 13:35:20.863
+    END_TIME         = 2015 JUN 02 13:49:58.079
 
 ; END SPKMERGE COMMANDS
  ~NAIF/SPC END COMMENTS~
