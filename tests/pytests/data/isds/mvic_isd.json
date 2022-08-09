@@ -12,8 +12,8 @@
   "name_model": "USGS_ASTRO_FRAME_SENSOR_MODEL",
   "center_ephemeris_time": 486540787.1490412,
   "radii": {
-    "semimajor": 1188.3,
-    "semiminor": 1188.3,
+    "semimajor": 1195.0,
+    "semiminor": 1195.0,
     "unit": "km"
   },
   "body_rotation": {
@@ -90,9 +90,9 @@
   },
   "naif_keywords": {
     "BODY999_RADII": [
-      1188.3,
-      1188.3,
-      1188.3
+      1195.0,
+      1195.0,
+      1195.0
     ],
     "BODY_FRAME_CODE": 10019,
     "BODY_CODE": 999,

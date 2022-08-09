@@ -35,10 +35,11 @@ def test_kernels(scope="module"):
             os.remove(kern)
 
 # Test load of newhorizons labels
-@pytest.mark.parametrize("image", image_dict.keys())
-def test_nh_load(test_kernels, image):
+@pytest.mark.parametrize("image", ["mc3_0295574631_0x536_sci"])
+def test_nhmvic_load(test_kernels, image):
     label_file = get_image_label(image, 'isis')
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image],
+                                           'exact_ck_times': False})
     compare_isd = image_dict[image]
 
     isd_obj = json.loads(isd_str)
@@ -65,7 +66,7 @@ class test_mvic_isis3_naif(unittest.TestCase):
 @pytest.mark.parametrize("image", ['lor_0034974380_0x630_sci_1'])
 def test_nhlorri_load(test_kernels, image):
     label_file = get_image_label(image, 'isis')
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
+    isd_str = ale.loads(label_file, verbose=True, props={'kernels': test_kernels[image]})
     compare_isd = image_dict[image]
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
@@ -76,7 +77,7 @@ def test_nhlorri_load(test_kernels, image):
 @pytest.mark.parametrize("image", ['lsb_0296962438_0x53c_eng'])
 def test_nhleisa_load(test_kernels, image):
     label_file = get_image_label(image, 'isis')
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
+    isd_str = ale.loads(label_file, verbose=True, props={'kernels': test_kernels[image]})
     compare_isd = image_dict[image]
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))

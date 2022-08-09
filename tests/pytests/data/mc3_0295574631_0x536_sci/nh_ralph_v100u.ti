@@ -1,0 +1,783 @@
+KPL/IK
+
+\beginlabel
+PDS_VERSION_ID               = PDS3
+RECORD_TYPE                  = STREAM
+RECORD_BYTES                 = "N/A"
+^SPICE_KERNEL                = "nh_ralph_v100u.ti"
+MISSION_NAME                 = "NEW HORIZONS"
+SPACECRAFT_NAME              = "NEW HORIZONS"
+DATA_SET_ID                  = "NH-J/P/SS-SPICE-6-V1.0"
+KERNEL_TYPE_ID               = IK
+PRODUCT_ID                   = "nh_ralph_v100u.ti"
+PRODUCT_CREATION_TIME        = 2018-10-18T00:00:00
+PRODUCER_ID                  = APL
+MISSION_PHASE_NAME           = "N/A"
+PRODUCT_VERSION_TYPE         = ACTUAL
+PLATFORM_OR_MOUNTING_NAME    = "NEW HORIZONS"
+START_TIME                   = "N/A"
+STOP_TIME                    = "N/A"
+SPACECRAFT_CLOCK_START_COUNT = "N/A"
+SPACECRAFT_CLOCK_STOP_COUNT  = "N/A"
+TARGET_NAME                  = {
+                               JUPITER,
+                               PLUTO,
+                               "SOLAR SYSTEM"
+                               }
+INSTRUMENT_NAME              = "LINEAR ETALON IMAGING SPECTRAL ARRAY"
+NAIF_INSTRUMENT_ID           = {
+                               -98209,
+                               -98208,
+                               -98207,
+                               -98206,
+                               -98205,
+                               -98204,
+                               -98203,
+                               -98202,
+                               -98201,
+                               }
+SOURCE_PRODUCT_ID            = "N/A"
+NOTE                         = "See comments in the file for details"
+OBJECT                       = SPICE_KERNEL
+  INTERCHANGE_FORMAT         = ASCII
+  KERNEL_TYPE                = INSTRUMENT
+  DESCRIPTION                = "NH RALPH instrument kernel "
+END_OBJECT                   = SPICE_KERNEL
+END
+\endlabel
+
+
+RALPH Instrument Kernel
+==============================================================================
+
+   This instrument kernel (I-kernel) contains references to the mounting
+   alignment, internal and FOV geometry for the New Horizons Visible/IR
+   integrated imaging and spectroscopy remote sensing package (RALPH).
+
+Version and Date
+----------------------------------------------------------
+
+   The TEXT_KERNEL_ID stores version information of loaded project text
+   kernels. Each entry associated with the keyword is a string that consists
+   of four parts: the kernel name, version, entry date, and type. For example,
+   the RALPH I-kernel might have an entry as follows:
+
+         TEXT_KERNEL_ID += 'NEWHORIZONS_RALPH V1.0.0 22-FEBRUARY-2007 IK'
+                                    |           |         |           |
+                                    |           |         |           |
+                KERNEL NAME <-------+           |         |           |
+                                                |         |           V
+                                VERSION <-------+         |      KERNEL TYPE
+                                                          |
+                                                          V
+                                                     ENTRY DATE
+
+   RALPH I-Kernel Version:
+
+           \begindata
+
+           TEXT_KERNEL_ID += 'NEWHORIZONS_RALPH V1.0.0 22-FEBRUARY-2007 IK'
+
+           NAIF_BODY_NAME += ( 'NH_RALPH' )
+           NAIF_BODY_CODE += ( -98200 )
+
+           NAIF_BODY_NAME += ( 'NH_RALPH_MVIC_FT' )
+           NAIF_BODY_CODE += ( -98203 )
+
+           NAIF_BODY_NAME += ( 'NH_RALPH_MVIC_PAN2' )
+           NAIF_BODY_CODE += ( -98204 )
+
+           NAIF_BODY_NAME += ( 'NH_RALPH_MVIC_PAN1' )
+           NAIF_BODY_CODE += ( -98205 )
+
+           NAIF_BODY_NAME += ( 'NH_RALPH_MVIC_RED' )
+           NAIF_BODY_CODE += ( -98206 )
+
+           NAIF_BODY_NAME += ( 'NH_RALPH_MVIC_BLUE' )
+           NAIF_BODY_CODE += ( -98207 )
+
+           NAIF_BODY_NAME += ( 'NH_RALPH_MVIC_METHANE' )
+           NAIF_BODY_CODE += ( -98208 )
+
+           NAIF_BODY_NAME += ( 'NH_RALPH_MVIC_NIR' )
+           NAIF_BODY_CODE += ( -98209 )
+
+           NAIF_BODY_NAME += ( 'NH_RALPH_LEISA' )
+           NAIF_BODY_CODE += ( -98201 )
+
+           NAIF_BODY_NAME += ( 'NH_RALPH_SIA' )
+           NAIF_BODY_CODE += ( -98202 )
+
+           \begintext
+
+
+   Version 1.0.0 -- February 22, 2007 -- Lillian Nguyen, JHU/APL
+
+            --   Removed the NH_RALPH_MVIC field of view definition and
+                 added a NH_RALPH instrument boresight.
+            --   Removed the NH_RALPH_MVIC pixel size and IFOV definitions
+                 and replaced them with the identical definitions for each
+                 of the MVIC arrays.
+            --   Promoting to version 1.0.0 denoting approval of kernel set
+                 by instrument teams.
+
+   Version 0.0.3 -- February 13, 2007 -- Lillian Nguyen, JHU/APL
+
+            --   Updated the MVIC FOV, LEISA FOV, and LEISA IFOV.
+            --   Added fields of view for the Frame Transfer and TDI arrays.
+
+   Version 0.0.2 -- October 4, 2006 -- Lillian Nguyen, JHU/APL
+
+            --   Removed the 3-letter frames NH_MVI, NH_LEI.
+
+   Version 0.0.1 -- June 15, 2006 -- Lillian Nguyen
+
+            --   Pixel size and IFOV added for MVIC and LEISA.
+
+   Version 0.0.0 -- December 28, 2005 -- Lillian Nguyen
+
+            --   Draft Version. NOT YET APPROVED BY INSTRUMENT TEAM.
+
+
+References
+----------------------------------------------------------
+
+            1.   Slides from Ralph Instrument Acceptance Review,
+                 April 13, 2005.
+
+            2. ``Kernel Pool Required Reading''
+
+            3.   New Horizons Spacecraft to PERSI/RALPH Interface
+                 Control Document, Rev B, 7399-9201.
+
+            4.   APL New Horizons web site,
+                 http://pluto.jhuapl.edu/spacecraft/overview.html.
+
+            5.   New Horizons Spacecraft Frames Kernel.
+
+            6.   New Horizons Mission Science Definitions (MSD),
+                 NH7399-9000v1.6.
+
+            7.   RALPH Mechanical Interface Control Drawing (MICD), Rev B,
+                 574995_b.
+
+            8.   ALICE Instrument Kernel.
+
+            9.   Ralph Instrument Specification, Rev. A ECR SWRI 5310-001.
+
+           10.   LEISA to Ralph Interface Control Document.
+
+           11.   Document titled "RalphArrayPositions.doc", received from
+                 Cathy Olkin by e-mail, Mar. 23, 2006, and e-mail exchange
+                 concerning the document, Apr. 3-4, 2006.
+
+           12.   "RalphAlignWriteup03.doc", received from Allen Lunsford
+                 2/7/2007.
+
+           13.   E-mail from Cathy Olkin regarding the removal of the
+                 NH_RALPH_MVIC frame and the introduction of the NH_RALPH
+                 frame, received 2/22/2007.
+
+Contact Information
+----------------------------------------------------------
+
+   Lillian Nguyen, JHU/APL, (443)-778-5477, Lillian.Nguyen@jhuapl.edu
+
+
+Implementation Notes
+----------------------------------------------------------
+
+   This file is used by the SPICE system as follows: programs that make use of
+   this instrument kernel must ``load'' the kernel, normally during program
+   initialization. Loading the kernel associates data items with their names
+   in a data structure called the ``kernel pool''. The SPICELIB routine FURNSH,
+   CSPICE routine furnsh_c, and IDL routine cspice_furnsh load SPICE kernels
+   as shown below:
+
+   FORTRAN (SPICELIB)
+
+           CALL FURNSH ( 'kernel_name' )
+
+   C (CSPICE)
+
+           furnsh_c ( "kernel_name" )
+
+   ICY (IDL)
+
+           cspice_furnsh, 'kernel_name'
+
+   In order for a program or subroutine to extract data from the pool, the
+   SPICELIB routines GDPOOL, GCPOOL, and GIPOOL are used. See [2] for details.
+
+   This file was created and may be updated with a text editor or word
+   processor.
+
+
+Naming Conventions
+----------------------------------------------------------
+
+   All names referencing values in this I-kernel start with the characters
+   `INS' followed by the NAIF New Horizons spacecraft ID number (-98)
+   followed by a NAIF three digit ID code for the RALPH instrument.
+
+   The remainder of the name is an underscore character followed by the unique
+   name of the data item. For example, the Ralph boresight direction in the
+   Ralph LEISA frame (``NH_RALPH_LEISA'' -- see [5] ) is specified by:
+
+           INS-98201_BORESIGHT
+
+   The upper bound on the length of the name of any data item is 32
+   characters.
+
+   If the same item is included in more than one file, or if the same item
+   appears more than once within a single file, the latest value supersedes
+   any earlier values.
+
+
+RALPH description
+----------------------------------------------------------
+
+   From [4]:
+
+   ``Ralph: Visible and infrared imager/spectrometer; provides color,
+   composition and thermal maps.
+     .
+     .
+     .
+   Ralph's main objectives are to obtain high resolution color maps and
+   surface composition maps of the surfaces of Pluto and Charon. The
+   instrument has two separate channels: the Multispectral Visible Imaging
+   Camera (MVIC) and the Linear Etalon Imaging Spectral Array (LEISA). A
+   single telescope with a 3-inch (6-centimeter) aperture collects and
+   focuses the light used in both channels.
+
+   MVIC operates at visible wavelengths - using the same light by which we
+   see - and has 4 different filters for producing color maps. One filter is
+   tailored to measure the methane frost distribution over the surface, while
+   the others are more generic and cover blue, red and near-infrared colors,
+   respectively. MVIC also has two panchromatic filters, which pass
+   essentially all visible light, for when maximum sensitivity to faint light
+   levels is required. In all cases, the light passes from the telescope
+   through the filters and is focused onto a charge coupled device (CCD).
+   (Although the MVIC CCD is a unique, sophisticated device, virtually all
+   consumer digital cameras use CCDs.)
+
+   LEISA operates at infrared wavelengths (it uses heat radiation), and its
+   etalon acts like a prism to bend different wavelengths of light by
+   different amounts so that each wavelength can be analyzed separately.
+   Since quantum physics teaches us that different molecules emit and absorb
+   light at different wavelengths, analysis of the different components of
+   the light by LEISA can be used to identify the unique "fingerprints" of
+   these molecules. LEISA will be used to map the distribution of frosts of
+   methane (CH4), molecular nitrogen (N2), carbon monoxide (CO), and water
+   (H2O) over the surface of Pluto and the water frost distribution over the
+   surface of Charon. LEISA data may also reveal new constituents on the
+   surfaces that have not yet been detected.''
+
+   From [10]:
+
+   ``Ralph is a visible and infrared remote sensing camera comprised of MVIC
+   and LEISA. MVIC is the multispectral visible imaging camera. LEISA is the
+   infrared spectral imaging focal plane. The Ralph common telescope is based
+   on a standard off-axis three mirror anastigmat design, which directs the
+   image to a beamsplitter, sending the image to both the MVIC detector and
+   LEISA.
+   .
+   .
+   .
+   The Ralph telescope is an all aluminum three-mirror "anastigmat"
+   telescope.  It has a 75 mm aperture and a 650 mm effective focal length
+   when at its operating temperature of 220 K, or -53 degrees C.  Its large,
+   flat focal plane is shared by a beamsplitter that transmits the infrared
+   light to the LEISA detector, while reflecting the visible and near-IR
+   light to the MVIC detector.  The field of view is 5.7 by 0.9 degrees for
+   the visible, and 0.91 degrees square for the IR.  The mirrors are to be
+   made of aluminum, diamond turned, with uncoated aluminum surfaces.''
+
+   From [9]:
+
+   ``MVIC shall provide imaging science data in five spectral bands at visible
+   and near-infrared wavelengths. MVIC shall also provide Optical Navigation
+   (OPNAV) imaging data for spacecraft navigation and orientation. The LEISA
+   instrument shall provide high spectral resolution imaging science data at
+   short-wave infrared wavelengths. MVIC will use optical filters to provide
+   spectral band discrimination. LEISA will use a linear variable etalon
+   filter to provide spectral discrimination. MVIC and the LEISA instrument
+   shall use a common light collection telescope. The common telescope shall
+   use a beamsplitter to direct light into two individual optical paths for
+   the MVIC and LEISA detectors. MVIC shall obtain two dimensional science
+   imaging data using time-delayed integration (TDI) data acquisition
+   synchronized to one dimensional spacecraft rotation. MVIC will also obtain
+   science imaging data using frame transfer data acquisition. The LEISA
+   instrument shall obtain two-dimensional imaging data in push broom mode.
+   MVIC shall use optical filters to provide the spectral band discrimination.
+   MVIC shall have five spectral bands, for data obtained using TDI data
+   acquisition, with wavelength ranges as described in Table 1 [reproduced
+   below].
+
+      ---------------  ------------------------------
+       Spectral Band    Nominal Wavelength Range (nm)
+      ---------------  ------------------------------
+       Blue                      400 - 550
+       Red                       550 - 700
+       NIR                       780 - 960
+       Methane                   875 - 915
+       Panchromatic              400 - 960
+      ---------------  ------------------------------
+
+   MVIC
+   ----
+   MVIC shall have a field of view (FOV) in the cross-track direction of 5.7d.
+   MVIC shall have a FOV that is determined by the TDI data acquisition range
+   in the in-track direction.
+   MVIC will have a FOV of 5.7 deg. x 0.15 deg.for images obtained using frame
+   transfer.
+   MVIC will use a front-side illuminated CCD silicon detector array.
+   MVIC will possess one TDI sensor for each of the blue, red, NIR, and
+   methane bands.
+   MVIC will possess one frame transfer sensor.
+   MVIC will possess two TDI sensors for the panchromatic band, to be referred
+   to as Pan1 and Pan2.
+   The detector shall be sensitive to light at wavelengths from 400 to 960 nm.
+   The CCD detector shall have pixels of size 13 X 13 microns +/- 0.1 microns.
+   Each TDI sensor shall have 32 x 5000 photosensitive pixels.
+   The frame transfer sensor shall possess 128 x 5000 photosensitive pixels.
+
+   LEISA
+   -----
+   The LEISA detector shall be a 256x256 HgCdTe array with 40 micron square
+   pixels.
+   The detector shall be sensitive to light from 1.25-2.50 microns.
+
+   Definitions/Glossary of Terms
+   -----------------------------
+   Cross-Track Direction - In spacecraft coordinates, motion that includes a
+   component in the +Z or -Z directions where the Z-axis is the axis of
+   rotation for the spacecraft in scan mode.
+   In-Track Direction - In spacecraft coordinates, motion in the X-Y plane
+   associated with spacecraft rotation about the Z-axis.
+   Instantaneous Field of View - The field of view imaged by the full detector
+   array with the spacecraft in staring mode.
+   OpNav Imaging Mode - For the MVIC sensor, this mode is used to take data to
+   meet OpNav requirements. 2D imaging for OpNav imaging mode is acquired
+   through frame transfer with the spacecraft in staring mode.
+   Scan Mode - In spacecraft coordinates, spacecraft rotation about the
+   Z-axis. Scan mode is used to acquire data for 2D images through
+   synchronized physical scanning and detector array readout. In scan mode,
+   the field of view in the in-track direction is determined by the length of
+   observation, IFOV, and the scan rate.
+   Science Imaging Mode - For the MVIC sensor, this mode is used to take data
+   to meet science requirements. 2D imaging for science imaging mode is
+   acquired through synchronized operation with 1D spacecraft maneuvers. The
+   detector readout occurs in TDI mode.
+   Single Pixel Instantaneous Field of View - The field of view for a single
+   pixel in a detector array.
+   Staring Mode - The spacecraft is pointed at a specific point and does not
+   have rotation about the Z-axis of the spacecraft. Staring mode is used to
+   acquire data for 2D images through frame transfer techniques for 2D
+   detector arrays.
+   TDI Mode Data Acquisition - For TDI data acquisition, a 2D image is
+   obtained by scanning around the Z axis. Looking down on the spacecraft from
+   above the ecliptic, in the nominal flight configuration (+Z pointing up,
+   -X pointing at Pluto or Charon), the spacecraft scans from left to right
+   clockwise.
+   TDI FOV - This indicates that the field of view for an image is variable
+   because it is related to spacecraft motion. Roughly, TDI FOV is the total
+   angle scanned by the spacecraft for a single observation. The TDI FOV is
+   comprised of multiples of the single pixel instantaneous field of view. For
+   a single observation by the FOV in the cross track direction.
+   LEISA Data Acquisition - For LEISA data acquisition, a 2D spectral image
+   is obtained by scanning around the Z axis in either the clockwise or
+   counterclockwise direction.''
+
+ RALPH Field of View Parameters
+----------------------------------------------------------
+
+   The detectors that constitute Ralph are MVIC, LEISA, and SIA. MVIC
+   has several focal plane arrays.
+
+            --   Multispectral Visible Imaging Camera (MVIC)
+
+                 --   MVIC Frame Transfer Array (FT)
+
+                 --   MVIC Pan 1 Array (PAN1)
+
+                 --   MVIC Pan 2 Array (PAN2)
+
+                 --   MVIC Red Array (RED)
+
+                 --   MVIC Blue Transfer Array (BLUE)
+
+                 --   MVIC Methane Array (METHANE)
+
+                 --   MVIC NIR Array (NIR)
+
+            --   Linear Etalon Imaging Spectral Array (LEISA)
+
+            --   Solar Illumination Aperture (SIA)
+
+   The field of view sizes for the above detectors/arrays are given in [11],
+   with the exception of the PAN1, PAN2, RED, BLUE, METHANE, and NIR vertical
+   (along-scan) directions. Each of those arrays has 32 pixels per row [11].
+   The fields of view for those arrays were calculated using the following
+   formula:
+
+      along-scan FOV size = ( rows * IFOV ) deg
+
+                          = ( 32 * 19.8/1000000 rad ) * ( 180/pi ) deg
+
+                          = 0.036 deg
+
+   The cross-scan FOV size is 5.67 deg for each of the MVIC arrays [11].
+
+   The field of view sizes are given in the tables below.
+
+           Rectangular FOVs (coordinates in parenthesis are in the
+           spacecraft frame):
+
+           ----------  ----------------  ----------------  ----------------
+            Detector      Horizontal        Vertical          Cone Axis
+                         (cross scan)
+           ----------  ----------------  ----------------  ----------------
+            FT          5.67 deg (in Z)   0.145 deg (in Y)  boresight (-X)
+
+            PAN1        5.67 deg (in Z)   0.036 deg (in Y)  boresight (-X)
+
+            PAN2        5.67 deg (in Z)   0.036 deg (in Y)  boresight (-X)
+
+            RED         5.67 deg (in Z)   0.036 deg (in Y)  boresight (-X)
+
+            BLUE        5.67 deg (in Z)   0.036 deg (in Y)  boresight (-X)
+
+            METHANE     5.67 deg (in Z)   0.036 deg (in Y)  boresight (-X)
+
+            NIR         5.67 deg (in Z)   0.036 deg (in Y)  boresight (-X)
+
+            LEISA       0.89 deg          0.89 deg          boresight (-X)
+           ----------  ----------------  ----------------  ----------------
+
+           Circular FOV:
+
+           ----------  ----------------  ----------------
+            Detector       Diameter         Cone Axis
+           ----------  ----------------  ----------------
+            SIA           5.0 degrees        near +Y
+           ----------  ----------------  ----------------
+
+   The SIA cone axis is nominally aligned with the ALICE Solar Occultation
+   Channel (SOC) [3], whose boresight is aligned to a line in the spacecraft
+   YZ plane right-hand rotated by 2 degrees around the X axis from the REX
+   boresight (spacecraft Y axis) [8]. The ALICE SOC FOV is illustrated in [8].
+
+   The MVIC and LEISA boresights are nominally aligned to the spacecraft -X
+   axis.
+
+   The INS[ID]_FOV_FRAME, INS[ID]_FOV_SHAPE, INS[ID]_BORESIGHT, and FOV
+   ANGLES specification keywords defined below are used to describe the
+   instrument field of view. Since the SIA detector has a circular field
+   of view, and the MVIC arrays and LEISA have rectangular ones, the
+   INS[ID]_FOV_SHAPE will either be 'CIRCLE' or 'RECTANGLE'. For SIA, GETFOV
+   returns a single vector that lies along the edge of the circular cone, and
+   for the MVIC arrays and LEISA, GETFOV returns four boundary corner vectors.
+
+   Note that a field of view is not defined for the instrument boresight. The
+   SPICE routine GDPOOL may be used to get the NH_RALPH boresight.
+
+
+Multispectral Visible Imaging Camera (MVIC) FOV Definitions
+
+   There is no single field of view definition for the Ralph instrument [13],
+   but the instrument boresight is by definition the center of the frame
+   transfer array. That boresight is the -X axis of the NH_RALPH frame:
+
+   N.B. This incomplete FOV frame has been disabled to satisfy a lien from
+        the PDS review of Release 0002 of this data set in August, 2014.
+
+           \begin_disabled_data
+
+           INS-98200_FOV_FRAME = 'NH_RALPH'
+           INS-98200_BORESIGHT = ( -1.0, 0.0, 0.0 )
+
+           \begintext
+
+   Each of the MVIC arrays, LEISA, and SIA have a field of view defined. Those
+   definitions are below.
+
+   Since the MVIC frame transfer array's angular separation in Y is 0.145
+   degrees, looking down the Z axis in the instrument frame we have: (Note
+   we are arbitrarily choosing vectors that terminate in the X=-1 plane.)
+
+
+                                  ^ Y
+                                  |  inst
+                                  |
+                       |.         |
+                       | `.       |
+                       |   `.     |
+                       |    o`.   |
+                       .0725   `. |
+                  <---------------o
+               -X      |       ,'  Z  (out)
+                 inst  |     ,'     inst
+                       |   ,'
+                       | ,'
+                       |'
+
+                       |--- 1.0 ---|
+                                                Plane Z = 0
+
+   And since the MVIC frame transfer array's angular separation in Z is 5.67
+   degrees, looking up the Y axis in the instrument frame, we have: (Note we
+   are arbitrarily choosing vectors that terminate in the X=-1 plane.)
+
+
+                                  ^ Z
+                                  |  inst
+                                  |
+                       |.         |
+                       | `.       |
+                       |   `.     |
+                       |    o`.   |
+                       2.835   `. |
+                  <---------------x
+               -X      |       ,'  Y  (in)
+                 inst  |     ,'     inst
+                       |   ,'
+                       | ,'
+                       |'
+
+                       |--- 1.0 ---|
+                                                Plane Y = 0
+
+   These FOV values for the MVIC frame transfer array are given in the
+   keywords below:
+
+           \begindata
+
+           INS-98203_FOV_FRAME                 = 'NH_RALPH_MVIC_FT'
+           INS-98203_FOV_SHAPE                 = 'RECTANGLE'
+           INS-98203_BORESIGHT                 = ( -1.0, 0.0, 0.0 )
+           INS-98203_FOV_CLASS_SPEC            = 'ANGLES'
+           INS-98203_FOV_REF_VECTOR            = ( 0.0, +1.0, 0.0 )
+           INS-98203_FOV_REF_ANGLE             = ( 0.0725 )
+           INS-98203_FOV_CROSS_ANGLE           = ( 2.835  )
+           INS-98203_FOV_ANGLE_UNITS           = 'DEGREES'
+
+           \begintext
+
+   The angular separation in Y for each of the TDI arrays is 0.036 degrees.
+   Looking down the Z axis in the TDI frame we have: (Note we are arbitrarily
+   choosing vectors that terminate in the X=-1 plane.)
+
+
+                                  ^ Y
+                                  |  inst
+                                  |
+                       |.         |
+                       | `.       |
+                       |   `.     |
+                       |    o`.   |
+                       0.018   `. |
+                  <---------------o
+               -X      |       ,'  Z  (out)
+                 inst  |     ,'     inst
+                       |   ,'
+                       | ,'
+                       |'
+
+                       |--- 1.0 ---|
+                                                Plane Z = 0
+
+   Which leads to the following field of view definitions:
+
+           \begindata
+
+           INS-98204_FOV_FRAME                 = 'NH_RALPH_MVIC_PAN2'
+           INS-98204_FOV_SHAPE                 = 'RECTANGLE'
+           INS-98204_BORESIGHT                 = ( -1.0, 0.0, 0.0 )
+           INS-98204_FOV_CLASS_SPEC            = 'ANGLES'
+           INS-98204_FOV_REF_VECTOR            = ( 0.0, +1.0, 0.0 )
+           INS-98204_FOV_REF_ANGLE             = ( 0.018 )
+           INS-98204_FOV_CROSS_ANGLE           = ( 2.835 )
+           INS-98204_FOV_ANGLE_UNITS           = 'DEGREES'
+
+           INS-98205_FOV_FRAME                 = 'NH_RALPH_MVIC_PAN1'
+           INS-98205_FOV_SHAPE                 = 'RECTANGLE'
+           INS-98205_BORESIGHT                 = ( -1.0, 0.0, 0.0 )
+           INS-98205_FOV_CLASS_SPEC            = 'ANGLES'
+           INS-98205_FOV_REF_VECTOR            = ( 0.0, +1.0, 0.0 )
+           INS-98205_FOV_REF_ANGLE             = ( 0.018 )
+           INS-98205_FOV_CROSS_ANGLE           = ( 2.835 )
+           INS-98205_FOV_ANGLE_UNITS           = 'DEGREES'
+
+           INS-98206_FOV_FRAME                 = 'NH_RALPH_MVIC_RED'
+           INS-98206_FOV_SHAPE                 = 'RECTANGLE'
+           INS-98206_BORESIGHT                 = ( -1.0, 0.0, 0.0 )
+           INS-98206_FOV_CLASS_SPEC            = 'ANGLES'
+           INS-98206_FOV_REF_VECTOR            = ( 0.0, +1.0, 0.0 )
+           INS-98206_FOV_REF_ANGLE             = ( 0.018 )
+           INS-98206_FOV_CROSS_ANGLE           = ( 2.835 )
+           INS-98206_FOV_ANGLE_UNITS           = 'DEGREES'
+
+           INS-98207_FOV_FRAME                 = 'NH_RALPH_MVIC_BLUE'
+           INS-98207_FOV_SHAPE                 = 'RECTANGLE'
+           INS-98207_BORESIGHT                 = ( -1.0, 0.0, 0.0 )
+           INS-98207_FOV_CLASS_SPEC            = 'ANGLES'
+           INS-98207_FOV_REF_VECTOR            = ( 0.0, +1.0, 0.0 )
+           INS-98207_FOV_REF_ANGLE             = ( 0.018 )
+           INS-98207_FOV_CROSS_ANGLE           = ( 2.835 )
+           INS-98207_FOV_ANGLE_UNITS           = 'DEGREES'
+
+           INS-98208_FOV_FRAME                 = 'NH_RALPH_MVIC_METHANE'
+           INS-98208_FOV_SHAPE                 = 'RECTANGLE'
+           INS-98208_BORESIGHT                 = ( -1.0, 0.0, 0.0 )
+           INS-98208_FOV_CLASS_SPEC            = 'ANGLES'
+           INS-98208_FOV_REF_VECTOR            = ( 0.0, +1.0, 0.0 )
+           INS-98208_FOV_REF_ANGLE             = ( 0.018 )
+           INS-98208_FOV_CROSS_ANGLE           = ( 2.835 )
+           INS-98208_FOV_ANGLE_UNITS           = 'DEGREES'
+
+           INS-98209_FOV_FRAME                 = 'NH_RALPH_MVIC_NIR'
+           INS-98209_FOV_SHAPE                 = 'RECTANGLE'
+           INS-98209_BORESIGHT                 = ( -1.0, 0.0, 0.0 )
+           INS-98209_FOV_CLASS_SPEC            = 'ANGLES'
+           INS-98209_FOV_REF_VECTOR            = ( 0.0, +1.0, 0.0 )
+           INS-98209_FOV_REF_ANGLE             = ( 0.018 )
+           INS-98209_FOV_CROSS_ANGLE           = ( 2.835 )
+           INS-98209_FOV_ANGLE_UNITS           = 'DEGREES'
+
+           \begintext
+
+
+   From [11], the MVIC pixels are 13 microns wide with a single pixel FOV of
+   19.8 microradians. These values are captured for each of the MVIC arrays
+   in the keywords below.
+
+           \begindata
+
+           INS-98203_PIXEL_SIZE        =  (   13.0    )
+           INS-98203_IFOV              =  (   19.8    )
+
+           INS-98204_PIXEL_SIZE        =  (   13.0    )
+           INS-98204_IFOV              =  (   19.8    )
+
+           INS-98205_PIXEL_SIZE        =  (   13.0    )
+           INS-98205_IFOV              =  (   19.8    )
+
+           INS-98206_PIXEL_SIZE        =  (   13.0    )
+           INS-98206_IFOV              =  (   19.8    )
+
+           INS-98207_PIXEL_SIZE        =  (   13.0    )
+           INS-98207_IFOV              =  (   19.8    )
+
+           INS-98208_PIXEL_SIZE        =  (   13.0    )
+           INS-98208_IFOV              =  (   19.8    )
+
+           INS-98209_PIXEL_SIZE        =  (   13.0    )
+           INS-98209_IFOV              =  (   19.8    )
+
+           \begintext
+
+
+Linear Etalon Imaging Spectral Array (LEISA) FOV Definition
+
+   Since LEISA's angular separation in Y is 0.89 degrees, looking down the
+   Z axis in the spacecraft frame we have: (Note we are arbitrarily choosing
+   vectors that terminate in the X=-1 plane.)
+
+
+                                  ^ Y
+                                  |  sc
+                                  |
+                       |.         |
+                       | `.       |
+                       |   `.     |
+                       |    o`.   |
+                       |.445   `. |
+                  <---------------o
+               -X      |       ,'  Z  (out)
+                 sc    |     ,'     sc
+                       |   ,'
+                       | ,'
+                       |'
+
+                       |--- 1.0 ---|
+                                                Plane Z = 0
+
+   Since LEISA's field of view is square, a similar computation yields the
+   Z component.
+
+   These FOV values for MVIC are given in the keywords below:
+
+           \begindata
+
+           INS-98201_FOV_FRAME                 = 'NH_RALPH_LEISA'
+           INS-98201_FOV_SHAPE                 = 'RECTANGLE'
+           INS-98201_BORESIGHT                 = ( -1.0, 0.0, 0.0 )
+           INS-98201_FOV_CLASS_SPEC            = 'ANGLES'
+           INS-98201_FOV_REF_VECTOR            = ( 0.0, 1.0, 0.0 )
+           INS-98201_FOV_REF_ANGLE             = ( 0.445 )
+           INS-98201_FOV_CROSS_ANGLE           = ( 0.445 )
+           INS-98201_FOV_ANGLE_UNITS           = 'DEGREES'
+
+           \begintext
+
+   From [11], the LEISA pixels are 40 microns wide with a single pixel FOV of
+   61 microradians. These values are captured in the keywords below.
+
+           INS-98201_PIXEL_SIZE        =  (   40.0    )
+           INS-98201_IFOV              =  (   61.0    )
+
+   The above IFOV is nominal and has been adjusted in-flight to the value
+   below [12]. The pixel size in microns is the nominal value:
+
+           \begindata
+
+           INS-98201_PIXEL_SIZE        =  (   40.0    )
+           INS-98201_IFOV              =  (  62.065   )
+
+           \begintext
+
+
+Solar Illumination Aperture (SIA) FOV Definition
+
+   The SIA frame is defined such that the boresight is the instrument
+   Z axis. The field of view is circular with a 5 degree angular separation.
+   A cross section is illustrated below. (Note we are arbitrarily choosing
+   vectors that terminate in the Z=1 plane.)
+
+                              Y   ^
+                               sc |
+                                  |
+                                  |
+                                  |
+                                  |        _.-|
+                                  |    _.-'  o|
+                                  |_.-'   2.5 |
+                                  x-------------->
+                             X (in)`~._       |    Z
+                              sc       `~._   |     ins
+                                           `~.|
+
+                                  |--- 1.0 ---|
+
+                                          Plane X = 0
+
+
+   Because the SIA field of view is circular, the FOV reference vector (keyword
+   FOV_REF_VECTOR) is any vector with a component that lies in a plane normal
+   to the field of view boresight. We chose the +Y axis of the instrument
+   frame. These FOV values are given in the keywords below:
+
+           \begindata
+
+           INS-98202_FOV_FRAME                 = 'NH_RALPH_SIA'
+           INS-98202_FOV_SHAPE                 = 'CIRCLE'
+           INS-98202_BORESIGHT                 = ( 0.0, 0.0, 1.0 )
+           INS-98202_FOV_CLASS_SPEC            = 'ANGLES'
+           INS-98202_FOV_REF_VECTOR            = ( 0.0, 1.0, 0.0 )
+           INS-98202_FOV_REF_ANGLE             = ( 2.5 )
+           INS-98202_FOV_ANGLE_UNITS           = 'DEGREES'
+
+           \begintext
+

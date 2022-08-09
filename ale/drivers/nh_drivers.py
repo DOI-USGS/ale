@@ -13,7 +13,7 @@ from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
 from ale.base.type_sensor import LineScanner
 
-class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, LegendreDistortion, Driver):
+class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
     """
     Driver for reading New Horizons LORRI ISIS3 Labels. These are Labels that have been
     ingested into ISIS from PDS EDR images but have not been spiceinit'd yet.
