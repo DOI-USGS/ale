@@ -7,7 +7,7 @@ from unittest.mock import patch, PropertyMock
 import unittest
 from conftest import get_image_label, get_image_kernels, convert_kernels, get_isd, compare_dicts
 import ale
-from ale.drivers import AleJsonEncoder
+
 from ale.drivers.mex_drivers import MexHrscPds3NaifSpiceDriver, MexHrscIsisLabelNaifSpiceDriver, MexSrcPds3NaifSpiceDriver 
 
 @pytest.fixture()
@@ -577,10 +577,7 @@ def test_mex_load(test_mex_hrsc_kernels, formatter, usgscsm_compare_dict, label)
         binary_lines.return_value = [0.5, 1.5, 15086.5]
 
         usgscsm_isd = ale.load(label_file, props={'kernels': test_mex_hrsc_kernels}, formatter=formatter)
-        print(json.dumps(usgscsm_isd, cls=AleJsonEncoder, indent=2))
-        comparison = compare_dicts(usgscsm_isd, usgscsm_compare_dict['h5270_0000_ir2'][formatter])
-        print(comparison)
-        assert comparison == []
+        assert compare_dicts(usgscsm_isd, usgscsm_compare_dict['h5270_0000_ir2'][formatter]) == []
 
 # ========= Test mex pds3label and naifspice driver =========
 class test_mex_pds3_naif(unittest.TestCase):

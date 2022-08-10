@@ -6,8 +6,10 @@ from unittest.mock import PropertyMock, patch
 import pytest
 
 import ale
+from ale.drivers import AleJsonEncoder
 from ale.drivers.mro_drivers import MroCtxPds3LabelNaifSpiceDriver, MroCtxIsisLabelNaifSpiceDriver, MroCtxIsisLabelIsisSpiceDriver
 from ale.drivers.mro_drivers import MroHiRiseIsisLabelNaifSpiceDriver, MroMarciIsisLabelNaifSpiceDriver
+from ale.formatters.formatter import to_isd
 
 from conftest import get_image, get_image_kernels, get_isd, convert_kernels, get_image_label, compare_dicts
 
@@ -41,7 +43,7 @@ def test_mro_ctx_load(test_ctx_kernels, label_type, kernel_type):
 
     if label_type == 'isis3' and kernel_type == 'isis':
         label_file = get_image('B10_013341_1010_XN_79S172W')
-        isd_str = ale.loads(label_file, verbose=True)
+        isd_str = ale.loads(label_file)
         compare_isd = get_isd('ctx_isis')
     else:
         isd_str = ale.loads(label_file, props={'kernels': test_ctx_kernels})
