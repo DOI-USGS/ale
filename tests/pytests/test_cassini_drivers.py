@@ -27,8 +27,7 @@ def test_load_pds(test_kernels):
     isd_str = ale.loads(label_file, props={'kernels': test_kernels})
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
-    x = compare_dicts(isd_obj, compare_dict)
-    assert x == []
+    assert compare_dicts(isd_obj, compare_dict) == []
 
 def test_load_isis():
     label_file = get_image_label("N1702360370_1", label_type="isis3")

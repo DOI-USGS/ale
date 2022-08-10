@@ -99,7 +99,10 @@ class FrameChain(nx.DiGraph):
     def from_spice(cls, sensor_frame, target_frame, center_ephemeris_time, ephemeris_times=[], nadir=False, exact_ck_times=False):
         frame_chain = cls()
         sensor_times = []
-        target_times = np.array(ephemeris_times)
+        # Default assume one time
+        target_times = np.asarray(ephemeris_times)
+        if len(target_times) > 1:
+            target_times = np.asarray([ephemeris_times[0], ephemeris_times[-1]])
 
         if exact_ck_times and not nadir:
             try:
@@ -120,31 +123,8 @@ class FrameChain(nx.DiGraph):
 
         constant_frames.extend(target_constant_frames)
 
-        for s, d in sensor_time_dependent_frames:
-            quats = np.zeros((len(sensor_times), 4))
-            avs = np.zeros((len(sensor_times), 3))
-            for j, time in enumerate(sensor_times):
-                state_matrix = spice.sxform(spice.frmnam(s), spice.frmnam(d), time)
-                rotation_matrix, avs[j] = spice.xf2rav(state_matrix)
-                quat_from_rotation = spice.m2q(rotation_matrix)
-                quats[j,:3] = quat_from_rotation[1:]
-                quats[j,3] = quat_from_rotation[0]
-
-            rotation = TimeDependentRotation(quats, sensor_times, s, d, av=avs)
-            frame_chain.add_edge(rotation=rotation)
-
-        for s, d in target_time_dependent_frames:
-            quats = np.zeros((len(target_times), 4))
-            avs = np.zeros((len(target_times), 3))
-            for j, time in enumerate(target_times):
-                state_matrix = spice.sxform(spice.frmnam(s), spice.frmnam(d), time)
-                rotation_matrix, avs[j] = spice.xf2rav(state_matrix)
-                quat_from_rotation = spice.m2q(rotation_matrix)
-                quats[j,:3] = quat_from_rotation[1:]
-                quats[j,3] = quat_from_rotation[0]
-
-            rotation = TimeDependentRotation(quats, target_times, s, d, av=avs)
-            frame_chain.add_edge(rotation=rotation)
+        frame_chain.compute_time_dependent_rotiations(sensor_time_dependent_frames, sensor_times)
+        frame_chain.compute_time_dependent_rotiations(target_time_dependent_frames, target_times)
 
         for s, d in constant_frames:
             quats = np.zeros(4)
@@ -324,10 +304,13 @@ class FrameChain(nx.DiGraph):
         SOURCESIZ = 128;
 
         currentTime = observStart
-        timeLoaded = False
 
         count = spice.ktotal("ck")
-        file, filtyp, source, handle = spice.kdata(0, "ck", FILESIZ, TYPESIZ, SOURCESIZ)
+        if (count > 1):
+            msg = "Unable to get exact CK record times when more than 1 CK is loaded, Aborting"
+            raise Exception(msg)
+
+        _, _, _, handle = spice.kdata(0, "ck", FILESIZ, TYPESIZ, SOURCESIZ)
         spice.dafbfs(handle)
         found = spice.daffna()
         spCode = int(targetFrame / 1000) * 1000
@@ -395,3 +378,35 @@ class FrameChain(nx.DiGraph):
             found = spice.daffna()   # Find next forward array in current daf
 
         return times
+
+    def compute_time_dependent_rotiations(self, frames, times):
+        """
+        Computes the time dependent rotations based on a list of tuples that define the
+        relationships between frames as (source, destination) and a list of times to
+        compute the rotation at. The rotations are then appended to the frame chain
+        object
+
+        frames : list
+                 A list of tuples that define the relationships between frames
+
+        times : list
+                A list of times to compute the rotation at
+        """
+        for s, d in frames:
+            quats = np.zeros((len(times), 4))
+            avs = []
+            for j, time in enumerate(times):
+                try:
+                    state_matrix = spice.sxform(spice.frmnam(s), spice.frmnam(d), time)
+                    rotation_matrix, av = spice.xf2rav(state_matrix)
+                    avs.append(av)
+                except:
+                    rotation_matrix = spice.pxform(spice.frmnam(s), spice.frmnam(d), time)
+                quat_from_rotation = spice.m2q(rotation_matrix)
+                quats[j,:3] = quat_from_rotation[1:]
+                quats[j,3] = quat_from_rotation[0]
+
+            if not avs:
+                avs = None
+            rotation = TimeDependentRotation(quats, times, s, d, av=avs)
+            self.add_edge(rotation=rotation)

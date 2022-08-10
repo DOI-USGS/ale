@@ -807,7 +807,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
     @property
     def ephemeris_start_time(self):
         """
-        Returns the start and stop ephemeris times for the image.
+        Returns the start ephemeris time for the image.
 
         Returns
         -------
@@ -819,7 +819,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
     @property
     def ephemeris_stop_time(self):
         """
-        Returns the stop ephemeris times for the image.
+        Returns the stop ephemeris time for the image.
 
         Returns
         -------

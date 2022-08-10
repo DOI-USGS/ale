@@ -4,12 +4,12 @@ import unittest
 from unittest.mock import PropertyMock, patch
 
 import pytest
-import numpy as np
-import spiceypy as spice
 
 import ale
+from ale.drivers import AleJsonEncoder
 from ale.drivers.mro_drivers import MroCtxPds3LabelNaifSpiceDriver, MroCtxIsisLabelNaifSpiceDriver, MroCtxIsisLabelIsisSpiceDriver
 from ale.drivers.mro_drivers import MroHiRiseIsisLabelNaifSpiceDriver, MroMarciIsisLabelNaifSpiceDriver
+from ale.formatters.formatter import to_isd
 
 from conftest import get_image, get_image_kernels, get_isd, convert_kernels, get_image_label, compare_dicts
 
@@ -54,7 +54,6 @@ def test_mro_ctx_load(test_ctx_kernels, label_type, kernel_type):
     if label_type == 'isis3' and kernel_type == 'naif':
         compare_isd['image_samples'] = 5000
 
-    print(json.dumps(isd_obj, indent=2))
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
 
@@ -66,7 +65,6 @@ def test_mro_hirise_load(test_hirise_kernels, label_type, kernel_type):
     compare_isd = get_isd('hirise')
 
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
 
@@ -78,7 +76,6 @@ def test_mro_marci_load(test_marci_kernels, label_type, kernel_type):
     compare_isd = get_isd('marci')
 
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
 
@@ -233,11 +230,11 @@ class test_marci_isis_naif(unittest.TestCase):
             start_time.return_value = 0
             times = self.driver.compute_marci_time(1)
             assert len(times) == 5
-            assert times[0] == 3434.51875
-            assert times[1] == 3439.71875
-            assert times[2] == 3444.9187500000003
-            assert times[3] == 3450.11875
-            assert times[4] == 3455.31875
+            assert times[0] == 41.518750000000004
+            assert times[1] == 46.71875
+            assert times[2] == 51.91875
+            assert times[3] == 57.11875
+            assert times[4] == 62.31875
 
     def test_start_time(self):
         with patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c, \
@@ -250,7 +247,7 @@ class test_marci_isis_naif(unittest.TestCase):
         with patch('ale.drivers.mro_drivers.MroMarciIsisLabelNaifSpiceDriver.compute_marci_time') as compute_marci_time:
             compute_marci_time.return_value = [0, 100]
             assert self.driver.ephemeris_start_time == 0
-            compute_marci_time.assert_called_with(21280.5)
+            compute_marci_time.assert_called_with(400.5)
 
     def test_ephemeris_stop_time(self):
         with patch('ale.drivers.mro_drivers.MroMarciIsisLabelNaifSpiceDriver.compute_marci_time') as compute_marci_time:

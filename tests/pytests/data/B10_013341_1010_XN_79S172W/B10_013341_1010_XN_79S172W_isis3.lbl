@@ -3,7 +3,7 @@ Object = IsisCube
     StartByte   = 65537
     Format      = Tile
     TileSamples = 1000
-    TileLines   = 1024
+    TileLines   = 400
 
     Group = Dimensions
       Samples = 5000
@@ -56,9 +56,9 @@ Object = IsisCube
                                  $base/kernels/spk/mar097.bsp)
     InstrumentPointing        = (Table,
                                  $mro/kernels/ck/mro_sc_psp_090526_090601.bc,
-                                 $mro/kernels/fk/mro_v15.tf)
+                                 $mro/kernels/fk/mro_v16.tf)
     Instrument                = Null
-    SpacecraftClock           = $mro/kernels/sclk/MRO_SCLKSCET.00082.65536.tsc
+    SpacecraftClock           = $mro/kernels/sclk/MRO_SCLKSCET.00103.65536.tsc
     InstrumentPosition        = (Table,
                                  $mro/kernels/spk/mro_psp11_ssd_mro110c.bsp)
     InstrumentAddendum        = $mro/kernels/iak/mroctxAddendum005.ti
@@ -66,6 +66,18 @@ Object = IsisCube
     InstrumentPositionQuality = Reconstructed
     InstrumentPointingQuality = Reconstructed
     CameraVersion             = 1
+    Source                    = isis
+  End_Group
+
+  Group = AlphaCube
+    AlphaSamples        = 5000
+    AlphaLines          = 24576
+    AlphaStartingSample = 0.5
+    AlphaStartingLine   = 0.5
+    AlphaEndingSample   = 5000.5
+    AlphaEndingLine     = 400.5
+    BetaSamples         = 5000
+    BetaLines           = 400
   End_Group
 End_Object
 
@@ -75,7 +87,7 @@ End_Object
 
 Object = Table
   Name      = "Ctx Prefix Dark Pixels"
-  StartByte = 245826082
+  StartByte = 4065537
   Bytes     = 2359296
   Records   = 24576
   ByteOrder = Lsb
@@ -89,7 +101,7 @@ End_Object
 
 Object = Table
   Name                = InstrumentPointing
-  StartByte           = 248187092
+  StartByte           = 6424833
   Bytes               = 14848
   Records             = 232
   ByteOrder           = Lsb
@@ -106,7 +118,7 @@ Object = Table
   FrameTypeCode       = 3
   Description         = "Created by spiceinit"
   Kernels             = ($mro/kernels/ck/mro_sc_psp_090526_090601.bc,
-                         $mro/kernels/fk/mro_v15.tf)
+                         $mro/kernels/fk/mro_v16.tf)
 
   Group = Field
     Name = J2000Q0
@@ -159,7 +171,7 @@ End_Object
 
 Object = Table
   Name                 = InstrumentPosition
-  StartByte            = 248201940
+  StartByte            = 6439681
   Bytes                = 672
   Records              = 12
   ByteOrder            = Lsb
@@ -215,7 +227,7 @@ End_Object
 
 Object = Table
   Name                = BodyRotation
-  StartByte           = 248202612
+  StartByte           = 6440353
   Bytes               = 128
   Records             = 2
   ByteOrder           = Lsb
@@ -284,7 +296,7 @@ End_Object
 
 Object = Table
   Name                 = SunPosition
-  StartByte            = 248202740
+  StartByte            = 6440481
   Bytes                = 112
   Records              = 2
   ByteOrder            = Lsb
@@ -341,14 +353,8 @@ End_Object
 
 Object = History
   Name      = IsisCube
-  StartByte = 248202852
-  Bytes     = 1472
-End_Object
-
-Object = OriginalLabel
-  Name      = IsisCube
-  StartByte = 248185378
-  Bytes     = 1714
+  StartByte = 6442307
+  Bytes     = 7429
 End_Object
 
 Object = NaifKeywords
@@ -367,5 +373,11 @@ Object = NaifKeywords
   INS-74021_OD_K                       = (-0.0073433925920055,
                                           2.83758786362417e-05,
                                           1.28419891240271e-08)
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 6440593
+  Bytes     = 1714
 End_Object
 End

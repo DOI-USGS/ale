@@ -104,7 +104,7 @@ Object = IsisCube
 
   Group = Kernels
     NaifFrameCode             = -85700
-    LeapSecond                = $base/kernels/lsk/naif0009.tls
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
     TargetAttitudeShape       = ($base/kernels/pck/pck00009.tpc,
                                  $lro/kernels/pck/moon_080317.tf,
                                  $lro/kernels/pck/moon_assoc_me.tf)
@@ -112,18 +112,20 @@ Object = IsisCube
                                  $lro/kernels/tspk/moon_pa_de421_1900-2050.bpc,
                                  $lro/kernels/tspk/de421.bsp)
     InstrumentPointing        = (Table,
-                                 $lro/kernels/ck/moc42_2010115_2010116_v02.bc,
-                                 $lro/kernels/fk/lro_frames_2010277_v01.tf)
+                                 $lro/kernels/ck/moc42r_2010090_2010121_v03.bc,
+                                 $lro/kernels/fk/lro_frames_2014049_v01.tf)
     Instrument                = Null
-    SpacecraftClock           = $lro/kernels/sclk/lro_clkcor_2010292_v00.tsc
-    InstrumentPosition        = (Table, LOLA_spk/spkLOLA_100209_100503.bsp)
+    SpacecraftClock           = $lro/kernels/sclk/lro_clkcor_2022208_v00.tsc
+    InstrumentPosition        = (Table,
+                                 $lro/kernels/spk/fdf29r_2010091_2010121_v01.b-
+                                 sp)
     InstrumentAddendum        = $lro/kernels/iak/mrflroAddendum002.ti
-    ShapeModel                = Null
-    InstrumentPositionQuality = Unknown
+    ShapeModel                = $base/dems/ldem_128ppd_Mar2011_clon180_radius-
+                                _pad.cub
+    InstrumentPositionQuality = Reconstructed
     InstrumentPointingQuality = Reconstructed
-    StartPadding              = 2.0 <seconds>
-    EndPadding                = 2.0 <seconds>
     CameraVersion             = 1
+    Source                    = isis
   End_Group
 
   Group = ImageInfo
@@ -146,21 +148,22 @@ End_Object
 
 Object = Table
   Name                = InstrumentPointing
-  StartByte           = 628892136
-  Bytes               = 98624
-  Records             = 1541
+  StartByte           = 7536641
+  Bytes               = 1216
+  Records             = 19
   ByteOrder           = Lsb
   TimeDependentFrames = (-85000, 1)
   ConstantFrames      = (-85700, -85000)
   ConstantRotation    = (1.0, 0.0, 0.0, 0.0, 0.67430238758372,
                          0.73845534062588, 0.0, -0.73845534062588,
                          0.67430238758372)
-  CkTableStartTime    = 325441415.42572
-  CkTableEndTime      = 325441723.22785
-  CkTableOriginalSize = 64577
+  CkTableStartTime    = 325441417.42572
+  CkTableEndTime      = 325441420.72822
+  CkTableOriginalSize = 701
+  FrameTypeCode       = 3
   Description         = "Created by spiceinit"
-  Kernels             = ($lro/kernels/ck/moc42_2010115_2010116_v02.bc,
-                         $lro/kernels/fk/lro_frames_2010277_v01.tf)
+  Kernels             = ($lro/kernels/ck/moc42r_2010090_2010121_v03.bc,
+                         $lro/kernels/fk/lro_frames_2014049_v01.tf)
 
   Group = Field
     Name = J2000Q0
@@ -212,14 +215,17 @@ Object = Table
 End_Object
 
 Object = Table
-  Name        = InstrumentPosition
-  StartByte   = 628990760
-  Bytes       = 280
-  Records     = 5
-  ByteOrder   = Lsb
-  CacheType   = HermiteSpline
-  Description = "Created by spiceinit"
-  Kernels     = LOLA_spk/spkLOLA_100209_100503.bsp
+  Name                 = InstrumentPosition
+  StartByte            = 628990760
+  Bytes                = 168
+  Records              = 3
+  ByteOrder            = Lsb
+  CacheType            = HermiteSpline
+  SpkTableStartTime    = 325441417.42572
+  SpkTableEndTime      = 325441420.72822
+  SpkTableOriginalSize = 701.0
+  Description          = "Created by spiceinit"
+  Kernels              = $lro/kernels/spk/fdf29r_2010091_2010121_v01.bsp
 
   Group = Field
     Name = J2000X
@@ -277,16 +283,17 @@ Object = Table
                          0.99999994578431, -1.45444093783627e-06,
                          -3.80869119096078e-04, 1.57985578682691e-06,
                          0.99999992746811)
-  CkTableStartTime    = 325441415.42572
-  CkTableEndTime      = 325441723.22785
+  CkTableStartTime    = 325441417.42572
+  CkTableEndTime      = 325441420.72822
   CkTableOriginalSize = 2
+  FrameTypeCode       = 6
   Description         = "Created by spiceinit"
   Kernels             = ($lro/kernels/tspk/moon_pa_de421_1900-2050.bpc,
                          $lro/kernels/tspk/de421.bsp,
                          $base/kernels/pck/pck00009.tpc,
                          $lro/kernels/pck/moon_080317.tf,
                          $lro/kernels/pck/moon_assoc_me.tf)
-  SolarLongitude      = 106.55850890612
+  SolarLongitude      = 106.55387897673
 
   Group = Field
     Name = J2000Q0
@@ -338,15 +345,18 @@ Object = Table
 End_Object
 
 Object = Table
-  Name        = SunPosition
-  StartByte   = 628991168
-  Bytes       = 112
-  Records     = 2
-  ByteOrder   = Lsb
-  CacheType   = Linear
-  Description = "Created by spiceinit"
-  Kernels     = ($lro/kernels/tspk/moon_pa_de421_1900-2050.bpc,
-                 $lro/kernels/tspk/de421.bsp)
+  Name                 = SunPosition
+  StartByte            = 628991168
+  Bytes                = 112
+  Records              = 2
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 325441417.42572
+  SpkTableEndTime      = 325441420.72822
+  SpkTableOriginalSize = 2.0
+  Description          = "Created by spiceinit"
+  Kernels              = ($lro/kernels/tspk/moon_pa_de421_1900-2050.bpc,
+                          $lro/kernels/tspk/de421.bsp)
 
   Group = Field
     Name = J2000X
@@ -394,12 +404,22 @@ End_Object
 Object = History
   Name      = IsisCube
   StartByte = 628991280
-  Bytes     = 1816
+  Bytes     = 3667
 End_Object
 
 Object = OriginalLabel
   Name      = IsisCube
   StartByte = 628883457
   Bytes     = 7598
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE         = 301
+  BODY301_RADII     = (1737.4, 1737.4, 1737.4)
+  BODY_FRAME_CODE   = 31001
+  INS-85700_TRANSX  = (-7.5, 7.5, 0.0)
+  INS-85700_TRANSY  = (0.0, 0.0, 0.0)
+  INS-85700_ITRANSS = (1.0, 0.13333333333333, 0.0)
+  INS-85700_ITRANSL = (0.0, 0.0, 0.0)
 End_Object
 End
