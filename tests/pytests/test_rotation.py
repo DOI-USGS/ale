@@ -61,7 +61,7 @@ def test_time_dependent_time_dependent_composition():
     assert rot1_3.source == 1
     assert rot1_3.dest == 3
     expected_times = [0, 1, 2]
-    expected_quats = [[0, 0, 0, -1], [-1, 0, 0, 0], [0, 0, 0, 1]]
+    expected_quats = [[0, 0, 0, -1], [1, 0, 0, 0], [0, 0, 0, -1]]
     expected_av = [[np.pi, 0, 0], [np.pi, 0, 0], [np.pi, 0, 0]]
     np.testing.assert_equal(rot1_3.times, expected_times)
     np.testing.assert_almost_equal(rot1_3.quats, expected_quats)
