@@ -268,8 +268,8 @@ class TimeDependentRotation:
 
         # Determine interpolation intervals for input times
         av_idx = np.searchsorted(self.times, vec_times)
-        rot_idx = av_idx - 1
-        rot_idx[rot_idx < 0] = 0
+        rot_idx = av_idx
+        rot_idx[rot_idx > len(self.times) - 1] = len(self.times) - 1
 
         # Interpolate/extrapolate rotations
         time_diffs = vec_times - self.times[rot_idx]
