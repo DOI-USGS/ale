@@ -20,7 +20,7 @@ from conftest import get_image_kernels, convert_kernels, get_image_label, get_is
 image_dict = {
     'lor_0034974380_0x630_sci_1': get_isd("nhlorri"),
     'lsb_0296962438_0x53c_eng': get_isd("nhleisa"),
-    'mc3_0295574631_0x536_sci' : get_isd("mvic")
+    'mpf_0295610274_0x539_sci' : get_isd("mvic")
 }
 
 
@@ -40,10 +40,9 @@ def test_kernels(scope="module"):
 @pytest.mark.parametrize("image", ['lor_0034974380_0x630_sci_1'])
 def test_nhlorri_load(test_kernels, image):
     label_file = get_image_label(image, 'isis')
-    isd_str = ale.loads(label_file, verbose=True, props={'kernels': test_kernels[image]})
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
     compare_isd = image_dict[image]
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
 
@@ -51,22 +50,20 @@ def test_nhlorri_load(test_kernels, image):
 @pytest.mark.parametrize("image", ['lsb_0296962438_0x53c_eng'])
 def test_nhleisa_load(test_kernels, image):
     label_file = get_image_label(image, 'isis')
-    isd_str = ale.loads(label_file, verbose=True, props={'kernels': test_kernels[image]})
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
     compare_isd = image_dict[image]
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
 
 # Test load of mvic labels
-@pytest.mark.parametrize("image", ['mc3_0295574631_0x536_sci'])
+@pytest.mark.parametrize("image", ['mpf_0295610274_0x539_sci'])
 def test_nhmvic_load(test_kernels, image):
-    label_file = get_image_label(image, 'isis3')
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
+    label_file = get_image_label(image, 'isis')
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image], 'exact_ck_times': False})
     compare_isd = image_dict[image]
 
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
     assert compare_dicts(isd_obj, compare_isd) == []
 
 # ========= Test Leisa isislabel and naifspice driver =========
@@ -106,14 +103,14 @@ class test_leisa_isis_naif(unittest.TestCase):
 class test_mvic_isis3_naif(unittest.TestCase):
 
     def setUp(self):
-        label = get_image_label("mc3_0295574631_0x536_sci", "isis3")
+        label = get_image_label("mpf_0295610274_0x539_sci", "isis")
         self.driver = NewHorizonsMvicIsisLabelNaifSpiceDriver(label)
 
     def test_instrument_id(self):
         assert self.driver.instrument_id == 'NH_MVIC'
 
     def test_ikid(self):
-        assert self.driver.ikid == -98908
+        assert self.driver.ikid == -98903
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
