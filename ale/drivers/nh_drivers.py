@@ -281,7 +281,7 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
           instrument id
         """
         id_lookup = {
-            "MVIC_TDI" : "NH_MVIC"
+          "MVIC_FRAMING" : "NH_MVIC"
         }
         return id_lookup[super().instrument_id]
 
@@ -297,7 +297,6 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
         : integer
           Naif Integer ID code for the instrument
         """
-        print(self.label['IsisCube']['Kernels']['NaifFrameCode'][0])
         return self.label['IsisCube']['Kernels']['NaifFrameCode'][0]
 
 
@@ -351,6 +350,21 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
           Optical distortion y coefficients
         """
         return spice.gdpool('INS{}_DISTORTION_COEF_Y'.format(self.parent_id), 0, 20).tolist()
+
+
+    @property
+    def ephemeris_stop_time(self):
+        """
+        Returns the ephemeris stop time of the image.
+        Expects spacecraft_id to be defined. This should be the integer
+        Naif ID code for the spacecraft.
+
+        Returns
+        -------
+        : float
+          ephemeris stop time of the image
+        """
+        return spice.scs2e(self.spacecraft_id, self.label['IsisCube']['Instrument']['MidObservationTimeClk'])
 
 
     @property
