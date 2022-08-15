@@ -23,7 +23,6 @@ image_dict = {
     'mpf_0295610274_0x539_sci' : get_isd("mvic")
 }
 
-
 @pytest.fixture()
 def test_kernels(scope="module"):
     updated_kernels = {}
@@ -36,11 +35,39 @@ def test_kernels(scope="module"):
         for kern in kern_list:
             os.remove(kern)
 
+# Test load of newhorizons labels
+@pytest.mark.parametrize("image", ["mc3_0295574631_0x536_sci"])
+def test_nhmvic_load(test_kernels, image):
+    label_file = get_image_label(image, 'isis')
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image],
+                                           'exact_ck_times': False})
+    compare_isd = image_dict[image]
+
+    isd_obj = json.loads(isd_str)
+    print(json.dumps(isd_obj, indent=2))
+    assert compare_dicts(isd_obj, compare_isd) == []
+
+
+class test_mvic_isis3_naif(unittest.TestCase):
+
+    def setUp(self):
+        label = get_image_label("mc3_0295574631_0x536_sci", "isis")
+        self.driver = NewHorizonsMvicIsisLabelNaifSpiceDriver(label)
+
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == 'NH_MVIC'
+
+    def test_ikid(self):
+        assert self.driver.ikid == -98908
+
+    def test_sensor_model_version(self):
+        assert self.driver.sensor_model_version == 1
+
 # Test load of nh lorri labels
 @pytest.mark.parametrize("image", ['lor_0034974380_0x630_sci_1'])
 def test_nhlorri_load(test_kernels, image):
     label_file = get_image_label(image, 'isis')
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
+    isd_str = ale.loads(label_file, verbose=True, props={'kernels': test_kernels[image]})
     compare_isd = image_dict[image]
     isd_obj = json.loads(isd_str)
     comparison = compare_dicts(isd_obj, compare_isd)
@@ -50,7 +77,7 @@ def test_nhlorri_load(test_kernels, image):
 @pytest.mark.parametrize("image", ['lsb_0296962438_0x53c_eng'])
 def test_nhleisa_load(test_kernels, image):
     label_file = get_image_label(image, 'isis')
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
+    isd_str = ale.loads(label_file, verbose=True, props={'kernels': test_kernels[image]})
     compare_isd = image_dict[image]
     isd_obj = json.loads(isd_str)
     comparison = compare_dicts(isd_obj, compare_isd)
