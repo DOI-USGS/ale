@@ -351,6 +351,53 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
         """
         return spice.gdpool('INS{}_DISTORTION_COEF_Y'.format(self.parent_id), 0, 20).tolist()
 
+    @property
+    def band_times(self):
+        if not hasattr(self, "_ephem_band_times"):
+            band_times = self.label['IsisCube']['BandBin']['UtcTime']
+            self._ephem_band_times = []
+            for time in band_times:
+                if type(time) is pvl.Quantity:
+                   time = time.value
+                self._ephem_band_times.append(spice.utc2et(time.strftime("%Y-%m-%d %H:%M:%S.%f")))
+        return self._ephem_band_times
+
+
+    @property
+    def ephemeris_time(self):
+        """
+        Returns an array of times between the start/stop ephemeris times
+        based on the number of lines in the image.
+        Expects ephemeris start/stop times to be defined. These should be
+        floating point numbers containing the start and stop times of the
+        images.
+        Expects image_lines to be defined. This should be an integer containing
+        the number of lines in the image.
+
+        Returns
+        -------
+        : ndarray
+          ephemeris times split based on image lines
+        """
+        if not hasattr(self, "_ephemeris_time"):
+          self._ephemeris_time = np.linspace(self.ephemeris_start_time, self.ephemeris_stop_time, self.image_lines + 1)
+        return self._ephemeris_time 
+
+
+    @property
+    def ephemeris_start_time(self):
+        """
+        Returns the ephemeris start time of the image.
+        Expects spacecraft_id to be defined. This should be the integer
+        Naif ID code for the spacecraft.
+
+        Returns
+        -------
+        : float
+          ephemeris start time of the image
+        """
+        return self.band_times[0]
+
 
     @property
     def ephemeris_stop_time(self):
@@ -364,7 +411,7 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
         : float
           ephemeris stop time of the image
         """
-        return spice.scs2e(self.spacecraft_id, self.label['IsisCube']['Instrument']['MidObservationTimeClk'])
+        return self.band_times[-1]
 
 
     @property
