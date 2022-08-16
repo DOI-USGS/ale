@@ -1,30 +1,35 @@
 import pytest
 import ale
 import os
-import pvl
 
-import numpy as np
-from ale.drivers import co_drivers
 import unittest
 from unittest.mock import PropertyMock, patch
 import json
 from conftest import get_image_label, get_image_kernels, get_isd, convert_kernels, compare_dicts, get_table_data
 
-from ale.drivers.co_drivers import CassiniIssPds3LabelNaifSpiceDriver, CassiniIssIsisLabelNaifSpiceDriver
+from ale.drivers.co_drivers import CassiniIssPds3LabelNaifSpiceDriver, CassiniIssIsisLabelNaifSpiceDriver, CassiniVimsIsisLabelNaifSpiceDriver
 
 @pytest.fixture()
-def test_kernels(scope="module", autouse=True):
+def test_iss_kernels(scope="module", autouse=True):
     kernels = get_image_kernels("N1702360370_1")
     updated_kernels, binary_kernels = convert_kernels(kernels)
     yield updated_kernels
     for kern in binary_kernels:
         os.remove(kern)
 
-def test_load_pds(test_kernels):
+@pytest.fixture()
+def test_vims_kernels(scope="module", autouse=True):
+    kernels = get_image_kernels("v1514284191_1")
+    updated_kernels, binary_kernels = convert_kernels(kernels)
+    yield updated_kernels
+    for kern in binary_kernels:
+        os.remove(kern)
+
+def test_load_pds(test_iss_kernels):
     label_file = get_image_label("N1702360370_1")
     compare_dict = get_isd("cassiniiss")
 
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels})
+    isd_str = ale.loads(label_file, props={'kernels': test_iss_kernels})
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
     assert compare_dicts(isd_obj, compare_dict) == []
@@ -43,18 +48,28 @@ def test_load_isis():
     x = compare_dicts(isd_obj, compare_dict)
     assert x == []
 
-def test_load_isis_naif(test_kernels):
+def test_load_iss_isis_naif(test_iss_kernels):
     label_file = get_image_label("N1702360370_1")
     compare_dict = get_isd("cassiniiss")
 
-    isd_str = ale.loads(label_file, props={"kernels": test_kernels})
+    isd_str = ale.loads(label_file, props={"kernels": test_iss_kernels})
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
     x = compare_dicts(isd_obj, compare_dict)
     assert x == []
 
-# ========= Test cassini pds3label and naifspice driver =========
-class test_cassini_pds3_naif(unittest.TestCase):
+def test_load_vims_isis_naif(test_vims_kernels):
+    label_file = get_image_label("v1514284191_1_vis", label_type="isis")
+    compare_dict = get_isd("cassinivims")
+
+    isd_str = ale.loads(label_file, props={"kernels": test_vims_kernels})
+    isd_obj = json.loads(isd_str)
+    print(json.dumps(isd_obj, indent=2))
+    x = compare_dicts(isd_obj, compare_dict)
+    assert x == []
+
+# ========= Test cassini ISS pds3label and naifspice driver =========
+class test_cassini_iss_pds3_naif(unittest.TestCase):
 
     def setUp(self):
         label = get_image_label("N1702360370_1", "pds3")
@@ -142,8 +157,8 @@ class test_cassini_pds3_naif(unittest.TestCase):
             assert len(frame_chain.nodes()) == 0
             from_spice.assert_called_with(center_ephemeris_time=2.4, ephemeris_times=[2.4], nadir=False, sensor_frame=14082360, target_frame=-800, exact_ck_times=True)
 
-# ========= Test cassini isislabel and naifspice driver =========
-class test_cassini_isis_naif(unittest.TestCase):
+# ========= Test cassini ISS isislabel and naifspice driver =========
+class test_cassini_iss_isis_naif(unittest.TestCase):
 
     def setUp(self):
         label = get_image_label("N1702360370_1", "isis3")
@@ -213,3 +228,51 @@ class test_cassini_isis_naif(unittest.TestCase):
             frame_chain = self.driver.frame_chain
             assert len(frame_chain.nodes()) == 0
             from_spice.assert_called_with(center_ephemeris_time=2.4000000000000004, ephemeris_times=[2.4000000000000004], nadir=False, sensor_frame=14082360, target_frame=-800, exact_ck_times=True)
+
+# ========= Test cassini ISS pds3label and naifspice driver =========
+class test_cassini_vims_isis_naif(unittest.TestCase):
+
+    def setUp(self):
+        label = get_image_label("v1514284191_1_vis", "isis")
+        self.driver = CassiniVimsIsisLabelNaifSpiceDriver(label)
+
+    def test_vims_channel(self):
+        assert self.driver.vims_channel == "VIS"
+
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == "CASSINI_VIMS_V"
+
+    def test_spacecraft_names(self):
+        assert self.driver.spacecraft_name == "Cassini"
+
+    def test_focal2pixel_lines(self):
+        assert self.driver.exposure_duration == 10.0
+
+    def test_focal_length(self):
+        assert self.driver.focal_length == 143.0
+
+    def test_detector_center_line(self):
+        assert self.driver.detector_center_line == 0
+
+    def test_detector_center_sample(self):
+        assert self.driver.detector_center_sample == 0
+
+    def test_compute_vims_time(self):
+        # This value isn't used for anything in the test, as it's only used for the
+        # default focal length calculation if the filter can't be found.
+        with patch('ale.drivers.co_drivers.spice.scs2e', return_value=12345) as scs2e:
+            assert self.driver.compute_vims_time(1, 1, self.driver.image_samples, "VIS")
+            scs2e.assert_called_with(-82, '1514284191')
+
+    def test_ephemeris_start_time(self):
+        with patch('ale.drivers.co_drivers.CassiniVimsIsisLabelNaifSpiceDriver.compute_vims_time', return_value=12345) as compute_vims_time:
+            assert self.driver.ephemeris_start_time == 12345
+            compute_vims_time.assert_called_with(-0.5, -0.5, 64, mode="VIS")
+
+    def test_ephemeris_stop_time(self):
+        with patch('ale.drivers.co_drivers.CassiniVimsIsisLabelNaifSpiceDriver.compute_vims_time', return_value=12345) as compute_vims_time:
+            assert self.driver.ephemeris_stop_time == 12345
+            compute_vims_time.assert_called_with(63.5, 63.5, 64, mode="VIS")
+
+    def test_sensor_model_version(self):
+        assert self.driver.sensor_model_version == 1
