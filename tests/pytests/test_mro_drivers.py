@@ -6,7 +6,6 @@ from unittest.mock import PropertyMock, patch
 import pytest
 
 import ale
-from ale.drivers import AleJsonEncoder
 from ale.drivers.mro_drivers import MroCtxPds3LabelNaifSpiceDriver, MroCtxIsisLabelNaifSpiceDriver, MroCtxIsisLabelIsisSpiceDriver
 from ale.drivers.mro_drivers import MroHiRiseIsisLabelNaifSpiceDriver, MroMarciIsisLabelNaifSpiceDriver, MroCrismIsisLabelNaifSpiceDriver
 
