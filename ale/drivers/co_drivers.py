@@ -141,7 +141,7 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
         : str
           instrument id
         """
-        return id_lookup[super().instrument_id]
+        return iss_id_lookup[super().instrument_id]
 
     @property
     def spacecraft_name(self):
@@ -166,7 +166,7 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
         : str
           Name of the sensor
         """
-        return name_lookup[super().instrument_id]
+        return iss_name_lookup[super().instrument_id]
 
     @property
     def ephemeris_start_time(self):
@@ -420,12 +420,10 @@ class CassiniVimsIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoD
 
     @property
     def ephemeris_start_time(self):
-        instrument_group = self.label["IsisCube"]["Instrument"]
         return self.compute_vims_time(0 - 0.5, 0 - 0.5, self.image_samples, mode=self.vims_channel)
 
     @property
     def ephemeris_stop_time(self):
-        instrument_group = self.label["IsisCube"]["Instrument"]
         return self.compute_vims_time((self.image_lines - 1) + 0.5, (self.image_samples - 1) + 0.5, self.image_samples, mode=self.vims_channel)
 
     @property
