@@ -20,7 +20,7 @@ from conftest import get_image_kernels, convert_kernels, get_image_label, get_is
 image_dict = {
     'lor_0034974380_0x630_sci_1': get_isd("nhlorri"),
     'lsb_0296962438_0x53c_eng': get_isd("nhleisa"),
-    'mpf_0295610274_0x539_sci' : get_isd("mvic")
+    'mpf_0295610274_0x539_sci' : get_isd("mvic_mpf")
 }
 
 @pytest.fixture()
