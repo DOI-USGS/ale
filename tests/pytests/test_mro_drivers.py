@@ -88,7 +88,7 @@ def test_mro_marci_load(test_marci_kernels, label_type, kernel_type):
 
 def test_mro_crism_load(test_crism_kernels):
     label_file = get_image_label('FRT00003B73_01_IF156S_TRR2', 'isis3')
-    isd_str = ale.loads(label_file, props={'kernels': test_crism_kernels})
+    isd_str = ale.loads(label_file, props={'kernels': test_crism_kernels, 'exact_ck_times': False})
     isd_obj = json.loads(isd_str)
     compare_isd = get_isd('crism')
     assert compare_dicts(isd_obj, compare_isd) == []
