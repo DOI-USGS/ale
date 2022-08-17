@@ -12,16 +12,16 @@ from ale.base.data_isis import IsisSpice
 import unittest
 from unittest.mock import patch
 
-from conftest import get_image_label, get_image_kernels, convert_kernels, compare_dicts
+from conftest import get_image_label, get_image_kernels, convert_kernels, compare_dicts, get_isd
 
-from ale.drivers.nh_drivers import NewHorizonsLorriIsisLabelNaifSpiceDriver, NewHorizonsLeisaIsisLabelNaifSpiceDriver
+from ale.drivers.nh_drivers import NewHorizonsLorriIsisLabelNaifSpiceDriver, NewHorizonsLeisaIsisLabelNaifSpiceDriver, NewHorizonsMvicIsisLabelNaifSpiceDriver
 from conftest import get_image_kernels, convert_kernels, get_image_label, get_isd
 
 image_dict = {
     'lor_0034974380_0x630_sci_1': get_isd("nhlorri"),
-    'lsb_0296962438_0x53c_eng': get_isd("nhleisa")
+    'lsb_0296962438_0x53c_eng': get_isd("nhleisa"),
+    'mpf_0295610274_0x539_sci' : get_isd("mvic_mpf")
 }
-
 
 @pytest.fixture()
 def test_kernels(scope="module"):
@@ -42,7 +42,6 @@ def test_nhlorri_load(test_kernels, image):
     isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
     compare_isd = image_dict[image]
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
 
@@ -53,10 +52,18 @@ def test_nhleisa_load(test_kernels, image):
     isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
     compare_isd = image_dict[image]
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
 
+# Test load of mvic labels
+@pytest.mark.parametrize("image", ['mpf_0295610274_0x539_sci'])
+def test_nhmvic_load(test_kernels, image):
+    label_file = get_image_label(image, 'isis')
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image], 'exact_ck_times': False})
+    compare_isd = image_dict[image]
+
+    isd_obj = json.loads(isd_str)
+    assert compare_dicts(isd_obj, compare_isd) == []
 
 # ========= Test Leisa isislabel and naifspice driver =========
 class test_leisa_isis_naif(unittest.TestCase):
@@ -91,3 +98,42 @@ class test_leisa_isis_naif(unittest.TestCase):
 
     def test_exposure_duration(self):
         np.testing.assert_almost_equal(self.driver.exposure_duration, 0.856)
+
+class test_mvic_framer_isis3_naif(unittest.TestCase):
+
+    def setUp(self):
+        label = get_image_label("mpf_0295610274_0x539_sci", "isis")
+        self.driver = NewHorizonsMvicIsisLabelNaifSpiceDriver(label)
+
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == 'NH_MVIC'
+
+    def test_ikid(self):
+        assert self.driver.ikid == -98903
+
+    def test_sensor_model_version(self):
+        assert self.driver.sensor_model_version == 1
+
+    def test_ephemeris_start_time(self):
+        with patch('ale.drivers.nh_drivers.spice.utc2et', return_value=12345) as utc2et:
+            assert self.driver.ephemeris_start_time == 12345
+            utc2et.assert_called_with("2015-06-03 04:06:32.848000")
+
+    def test_ephemeris_stop_time(self):
+        with patch('ale.drivers.nh_drivers.spice.utc2et', return_value=12345) as utc2et:
+            assert self.driver.ephemeris_start_time == 12345
+            utc2et.assert_called_with("2015-06-03 04:06:32.848000")
+
+    def test_detector_center_line(self):
+        assert self.driver.detector_center_line == -1
+
+    def test_detector_center_sample(self):
+        assert self.driver.detector_center_sample == 0
+
+    def test_sensor_name(self):
+        assert self.driver.sensor_name == 'NEW HORIZONS'
+
+    def test_band_times(self):
+        with patch('ale.drivers.nh_drivers.spice.utc2et', return_value=12345) as utc2et:
+            assert self.driver.ephemeris_start_time == 12345
+            utc2et.assert_called_with("2015-06-03 04:06:32.848000")

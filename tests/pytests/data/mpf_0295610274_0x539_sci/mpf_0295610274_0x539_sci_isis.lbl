@@ -1,0 +1,403 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 500
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 5000
+      Lines   = 128
+      Bands   = 9
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName            = "NEW HORIZONS"
+    InstrumentId              = MVIC_FRAMING
+    TargetName                = Pluto
+    MidObservationTime        = 2015-06-03T04:06:16.236 <Cal d>
+    MidObservationTimeClk     = 3/0295610293:20200
+    SpacecraftClockStartCount = 0295610276:14600
+    ExposureDuration          = 1.0
+    Detector                  = FRAME
+    HwSide                    = 0
+    ScanType                  = FRAMING
+    InstrumentMode            = 1
+    RalphExposureDuration     = 1.0
+    StartTime                 = 2015-06-03T04:05:58.283
+  End_Group
+
+  Group = Archive
+    HighSpeedCompressionMode    = LOSSLESS
+    ObservationCompletionStatus = COMPLETE
+    SequenceDescription         = NONE
+  End_Group
+
+  Group = BandBin
+    Name         = (CLEAR, CLEAR, CLEAR, CLEAR, CLEAR, CLEAR, CLEAR, CLEAR,
+                    CLEAR)
+    Center       = (680, 680, 680, 680, 680, 680, 680, 680, 680) <nanometers>
+    Width        = (560, 560, 560, 560, 560, 560, 560, 560, 560) <nanometers>
+    UtcTime      = (2015-06-03T04:05:59.624 <Cal d>, 2015-06-03T04:06:03.777,
+                    2015-06-03T04:06:07.930, 2015-06-03T04:06:12.083,
+                    2015-06-03T04:06:16.236, 2015-06-03T04:06:20.389,
+                    2015-06-03T04:06:24.542, 2015-06-03T04:06:28.695,
+                    2015-06-03T04:06:32.848)
+    OriginalBand = (1, 2, 3, 4, 5, 6, 7, 8, 9)
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -98903 <SPICE ID>
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = ($newhorizons/kernels/pck/pck00010.tpc,
+                                 $newhorizons/kernels/pck/nh_stars_kbo_centaur-
+                                 _v002.tpc,
+                                 $newhorizons/kernels/pck/nh_pcnh_006.tpc)
+    TargetPosition            = (Table, $newhorizons/kernels/tspk/de413.bsp,
+                                 $newhorizons/kernels/tspk/nh_plu017.bsp)
+    InstrumentPointing        = (Table,
+                                 $newhorizons/kernels/ck/merged_nhpc_2015_v001-
+                                 .bc, $newhorizons/kernels/fk/nh_v220.tf,
+                                 $newhorizons/kernels/fk/nh_soc_misc_v002.tf)
+    Instrument                = Null
+    SpacecraftClock           = $newhorizons/kernels/sclk/new_horizons_1454.t-
+                                sc
+    InstrumentPosition        = (Table,
+                                 $newhorizons/kernels/spk/nh_recon_pluto_od122-
+                                 _v01.bsp)
+    InstrumentAddendum        = $newhorizons/kernels/iak/mvicAddendum004.ti
+    ShapeModel                = Null
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
+    Source                    = isis
+  End_Group
+
+  Group = RadiometricCalibration
+    PixelSize                 = 13.0000 <microns>
+    PixelFov                  = 19.8065 <microrad/pix>
+    Gain                      = 58.6000 <electrons/DN>
+    ReadNoise                 = 30.0000 <electrons>
+    SolarSpectrumResolved     = 98313.172 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    SolarSpectrumUnresolved   = 2.506E+14 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    PholusSpectrumResolved    = 97097.703 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    PholusSpectrumUnresolved  = 2.475E+14 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    CharonSpectrumResolved    = 97732.594 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    CharonSpectrumUnresolved  = 2.491E+14 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    JupiterSpectrumResolved   = 84425.375 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    JupiterSpectrumUnresolved = 2.152E+14 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    PlutoSpectrumResolved     = 94817.766 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    PlutoSpectrumUnresolved   = 2.417E+14 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    SolarPivotWavelength      = 0.0 <cm>
+    JupiterPivotWavelength    = 0.0 <cm>
+    PholusPivotWavelength     = 0.0 <cm>
+    PlutoPivotWavelength      = 0.0 <cm>
+    CharonPivotWavelength     = 0.0 <cm>
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 23136197
+  Bytes               = 2304
+  Records             = 36
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-98000, 1)
+  ConstantFrames      = (-98903, -98203, -98000)
+  ConstantRotation    = (-0.0012515422158848, 0.0038569984927746,
+                         0.99999177856856, 0.012962773109644, 0.99990860453625,
+                         -0.0038404540968571, -0.99991519648188,
+                         0.012957860046663, -0.0013014252269497)
+  CkTableStartTime    = 486576426.80886
+  CkTableEndTime      = 486576460.03286
+  CkTableOriginalSize = 129
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = ($newhorizons/kernels/ck/merged_nhpc_2015_v001.bc,
+                         $newhorizons/kernels/fk/nh_v220.tf,
+                         $newhorizons/kernels/fk/nh_soc_misc_v002.tf)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 23138501
+  Bytes                = 168
+  Records              = 3
+  ByteOrder            = Lsb
+  CacheType            = HermiteSpline
+  SpkTableStartTime    = 486576426.80886
+  SpkTableEndTime      = 486576460.03286
+  SpkTableOriginalSize = 129.0
+  Description          = "Created by spiceinit"
+  Kernels              = $newhorizons/kernels/spk/nh_recon_pluto_od122_v01.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 23138669
+  Bytes               = 128
+  Records             = 2
+  ByteOrder           = Lsb
+  TimeDependentFrames = (10019, 1)
+  CkTableStartTime    = 486576426.80886
+  CkTableEndTime      = 486576460.03286
+  CkTableOriginalSize = 2
+  FrameTypeCode       = 2
+  PoleRa              = (132.993, 0.0, 0.0)
+  PoleDec             = (-6.163, 0.0, 0.0)
+  PrimeMeridian       = (302.695, 56.3625225, 0.0)
+  Description         = "Created by spiceinit"
+  Kernels             = ($newhorizons/kernels/tspk/de413.bsp,
+                         $newhorizons/kernels/tspk/nh_plu017.bsp,
+                         $newhorizons/kernels/pck/pck00010.tpc,
+                         $newhorizons/kernels/pck/nh_stars_kbo_centaur_v002.tp-
+                         c, $newhorizons/kernels/pck/nh_pcnh_006.tpc)
+  SolarLongitude      = 63.945701817507
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 23138797
+  Bytes                = 112
+  Records              = 2
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 486576426.80886
+  SpkTableEndTime      = 486576460.03286
+  SpkTableOriginalSize = 2.0
+  Description          = "Created by spiceinit"
+  Kernels              = ($newhorizons/kernels/tspk/de413.bsp,
+                          $newhorizons/kernels/tspk/nh_plu017.bsp)
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 23138909
+  Bytes     = 1364
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 23105998
+  Bytes     = 30199
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE                              = 999
+  BODY999_RADII                          = (1188.3, 1188.3, 1188.3)
+  BODY_FRAME_CODE                        = 10019
+  INS-98903_FOCAL_LENGTH                 = 657.5
+  INS-98903_PIXEL_PITCH                  = 0.013
+  CLOCK_ET_-98_0295610276:14600_COMPUTED = 15264f2a9100bd41
+  INS-98903_TRANSX                       = (0.0, -0.013, 0.0)
+  INS-98903_TRANSY                       = (0.0, 0.0, 0.013)
+  INS-98903_ITRANSS                      = (0.0, -76.923076923077, 0.0)
+  INS-98903_ITRANSL                      = (0.0, 0.0, 76.923076923077)
+  INS-98900_DISTORTION_COEF_X            = (-2.184e-05, 3.2911e-04, -2.43e-06,
+                                            7.444e-05, -1.9201e-04, -2.18e-06,
+                                            6.86e-06, -5.02e-06, -0.0014441,
+                                            6.62e-06, -1.94e-06, 5.37e-06,
+                                            -8.43e-06, 2.01e-06, -2.89e-06,
+                                            -1.53e-06, -2.09e-06, -6.7e-07,
+                                            -4.9e-06, -1.2455e-04)
+  INS-98900_DISTORTION_COEF_Y            = (0.0019459, 0.0016936, 1.1e-05,
+                                            -3.5e-05, 0.0060964, -4.3e-05,
+                                            4.0e-06, -0.002871, -0.001149,
+                                            -5.1e-05, 3.36e-04, -4.14e-04,
+                                            -3.88e-04, -0.001225, 3.73e-04,
+                                            4.15e-04, 4.5e-05, 1.13e-04,
+                                            -6.0e-04, 4.09e-04)
+End_Object
+End
