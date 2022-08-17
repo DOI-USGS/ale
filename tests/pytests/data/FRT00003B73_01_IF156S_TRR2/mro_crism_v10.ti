@@ -1,0 +1,1571 @@
+KPL/IK
+
+MRO CRISM Instrument Kernel
+===================================================================
+
+   This instrument kernel (I-kernel) contains references to mounting
+   alignment, operating modes, and timing as well as internal and
+   field of view geometry for the Mars Reconnaissance Orbiter (MRO)
+   Compact Reconnaissance Imaging Spectrometer for Mars (CRISM) instrument.
+
+
+Version and Date
+---------------------------------------------------------------
+
+   Version 1.0 -- June 1, 2007 -- Boris Semenov, NAIF/JPL.
+
+      The name of the file was changed from 
+
+         MRO_CRISM_IK_0000_000_N_10.TI
+
+      to 
+
+         mro_crism_v10.ti
+
+      to comply the IK naming convention used in the MRO SPICE PDS
+      archive.
+
+      The version of the file was kept the same because none of the
+      data or comments were modified (except this block of the
+      ``Version and Date'' section).
+
+   Version 1.0 -- May 31, 2007 -- Lillian Nguyen, JHU/APL
+
+      Finalized the text (instrument description, camera model parameter
+      description).
+
+   Version 0.1 -- September 18, 2006 -- Lillian Nguyen, JHU/APL
+
+      Added field of view definitions and text.
+
+   Version 0.0 -- ??? -- Wen-Jong Shyong, JHU/APL
+
+      Initial Release.
+
+
+References
+---------------------------------------------------------------
+
+      1.   "Kernel Pool Required Reading"
+
+      2.   CRISM pointing sign conventions, "CALRPT_26_1_V2_PointSign.ppt",
+           received from David Humm (JHU/APL).
+
+      3.   MRO CRISM frames kernel (to be incorporated into the MRO
+           spacecraft frames kernel).
+
+      4.   E-mails from David Humm containing CRISM camera model parameters,
+           forwarded on 9/14/2006, and cameral model parameter description,
+           received 5/17/2007 and 5/31/2007.
+
+      5.   CRISM web site, http://crism.jhuapl.edu.
+
+      6.   "CRISM Alignment Test Report", JHU/APL drawing number 7398-9600.
+
+      7.   "CRISM (Compact Reconnaissance Imaging Spectrometer for Mars) on
+           MRO (Mars Reconnaissance Orbiter)", Proceedings of the
+           International Society for Optical Engineering (SPIE), vol. 5660.
+
+      8.   E-mail from Peter Cavender containing CRISM timing information,
+           received 5/31/2007.
+
+Contact Information
+----------------------------------------------------------------
+
+   Lillian Nguyen, JHU/APL, (443)-778-5477, Lillian.Nguyen@jhuapl.edu
+
+
+Implementation Notes
+---------------------------------------------------------------
+
+   This file is used by the SPICE system as follows: programs that make use
+   of this frame kernel must "load" the kernel normally during program
+   initialization.  Loading the kernel associates the data items with
+   their names in a data structure called the "kernel pool".  The SPICELIB
+   routine FURNSH loads a kernel into the pool as shown below:
+
+      FORTRAN: (SPICELIB)
+
+         CALL FURNSH ( frame_kernel_name )
+
+      C: (CSPICE)
+
+         furnsh_c ( frame_kernel_name );
+
+      IDL: (ICY)
+
+         cspice_furnsh, frame_kernel_name
+
+   In order for a program or routine to extract data from the pool, the
+   SPICELIB routines GDPOOL, GIPOOL, and GCPOOL are used.  See [2] for
+   more details.
+
+   This file was created and may be updated with a text editor or word
+   processor.
+
+
+Naming Conventions
+---------------------------------------------------------------
+
+   All names referencing values in this I-kernel start with the characters
+   'INS' followed by the NAIF MRO spacecraft ID number (-74) and
+   then followed by a NAIF three digit code for the instrument.
+
+   The remainder of the name is an underscore character followed by the
+   unique name of the data item.  For example, the VNIR boresight direction
+   in the MRO_CRISM_VNIR frame (see [3]) is specified by:
+
+      INS-74017_BORESIGHT
+
+   The upper bound on the length of the name of any data item identifier
+   is 32 characters.
+
+   If the same item is included in more than one file, or if the same item
+   appears more than once within a single file, the latest value supersedes
+   any earlier values.
+
+
+CRISM Description
+---------------------------------------------------------------
+
+   From [5]:
+
+   Instrument Overview
+
+   CRISM is a visible-infrared imaging spectrometer with a scannable field
+   of view. CRISM can cover wavelengths from 0.362 to 3.92 microns (362 to
+   3920 nanometers) at 6.55 nanometers/channel, enabling the CRISM team to
+   identify a broad range of minerals on the Martian surface.
+
+   CRISM consists of three boxes:
+
+      - the Optical Sensor Unit (OSU), which includes the optics, gimbal,
+      focal planes, cryocoolers, radiators, and focal plane electronics
+      - the Gimbal Motor Electronics (GME), which commands and powers the
+      gimbal and analyzes data from its angular position encoder in a feedback
+      loop
+      - the Data Processing Unit (DPU), which accepts and processes commands
+      from the spacecraft and accepts and processes data from the OSU and
+      communicates it to the spacecraft
+
+   Optical Design
+
+   CRISM uses a 100-mm aperture, 441-mm focal length Ritchey-Chretien
+   telescope that focuses light onto a long, narrow slit. The telescope is
+   protected by a baffle that reduces scattered light from outside the field
+   of view. The end of the baffle is covered by a hinged, one-time deployable
+   cover to protect the telescope during MRO's launch and cruise to Mars.
+
+   Following the slit are the spectrometer optics. A beamsplitter reflects the
+   visible/near-infrared (VNIR, 0.36-1.05 microns) while transmitting the
+   infrared (IR, 1-3.92 microns), each to its own spectrometer and detector.
+   Each of the spectrometers uses mirrors and a diffraction grating to spread
+   the white light from each spatial pixel into a spectrum that is brought to
+   focus on its detector.
+
+   How CRISM Takes an Image
+
+   One two-dimensional frame of CRISM data ... is a single line of a spatial
+   image. That's right, CRISM takes an image one line at a time. But each
+   pixel along the line has a spectrum that fills out the second dimension of
+   the frame. A two-dimensional spatial image of a target is built up by
+   taking successive data frames as the spectrometer field of view is swept
+   across a target, either by scanning CRISM's gimbal or by MRO's along-track
+   motion over the Martian surface.
+
+   The stack of resulting data frames is a multiband image, or "image cube".
+
+   From [7]:
+
+   CRISM's spectral range spans the ultraviolet (UV) to the mid-wave
+   infrared (MWIR), 383 nm to 3960 nm. The instrument utilizes a Ritchey-
+   Chretien telescope with a 2.12 deg. field-of-view (FOV) to focus light on
+   the entrance slit of a dual spectrometer. Within the spectrometer, light
+   is split by a dichroic into VNIR (visible-near-infrared, 383-1071 nm) and
+   IR (infrared, 988-3960 nm) beams. Each beam is directed into a separate
+   modified Offner spectrometer that focuses a spectrally dispersed image of
+   the slit onto a two dimensional focal plane (FP). The IR FP is a 640 x 480
+   HgCdTe area array; the VNIR FP is a 640 x 480 silicon photodiode area
+   array. The spectral image is contiguously sampled with a 6.6 nm spectral
+   spacing and an instantaneous field of view of 61.5 microradians. The
+   Optical Sensor Unit (OSU) can be gimbaled to take out along-track smear,
+   allowing long integration times that afford high signal-to-noise ratio
+   (SNR) at high spectral and spatial resolution. The scan motor and encoder
+   are controlled by a separately housed Gimbal Motor Electronics (GME) unit.
+   A Data Processing Unit (DPU) provides power, command and control, and
+   data editing and compression.
+
+   CRISM acquires three major types of observations of the Martian surface
+   and atmosphere. In Multispectral Mapping Mode, with the gimbal pointed a
+   planet nadir, data are collected at frame rates of 15 or 30 Hz. A
+   commandable subset of wavelengths is saved by the DPU and binned 5:1 or
+   10:1 cross-track. The combination of frame rates and binning yields pixel
+   footprints of 100 or 200 m. In this mode, nearly the entire planet can be
+   mapped at wavelengths of key mineralogic absorption bands to select
+   regions of interest. In Targeted Mode, the gimbal is scanned over
+   +/- 60 deg. from nadir to remove most along-track motion, and a region of
+   interest is mapped at full spatial and spectral resolution. Ten
+   additional abbreviated, pixel-binned observations are taken before and
+   after the main hyperspectral image at longer atmospheric path lengths,
+   providing an emission phase function (EPF) of the site for atmospheric
+   study and correction of surface spectra for atmospheric effects. In
+   Atmospheric Mode, the central observation is eliminated and only the EPF
+   is acquired. Global grids of the resulting lower data volume observation
+   are taken repeatedly throughout the Martian year to measure seasonal
+   variations in atmospheric properties.
+
+
+CRISM Field of View Specification
+---------------------------------------------------------------
+
+   The MRO_CRISM_VNIR frame is defined [3] such that the boresight is the Z
+   axis in instrument coordinates, the -X axis is the gimbal rotation axis,
+   and the Y axis completes a right-handed frame. These coordinates are
+   shown here:
+
+
+                 ^  instrument slit center
+                 |
+                _|_                                         Z     (Z  )
+               |   |                                      ^  VNIR   sc
+               |   | gimbal axis into the page            |
+           ____|___|____                                  |
+          |             |                                 |
+          |     .O.     |------> S/C velocity             x------> Y    (X  )
+          |____/   \____|                         -X     (Y  )      VNIR  sc
+          ____/_____\____                           VNIR   sc
+          ///////////////
+            spacecraft
+
+
+   The diagram below illustrates the CRISM field of view, with boresight
+   pointing out of the page. The entrance slit is measured to be 2.122
+   degrees [6] in the along-slit direction (instrument X) by 61.5
+   microradians [7] in the scan direction (instrument Y). The CRISM detector
+   has 640 pixel columns.
+
+                                          Y
+                                         ^ VNIR
+                                         |
+                  _______________________|_______________________
+               ^ |                       |                       |
+   increasing  | |                       x-----------------------|----> X
+   frames      | |_______________________________________________|       VNIR
+                0 ------------------------------>               639
+                  increasing columns
+
+                 <-----------------------|----------------------->
+                  negative pixel angle   | positive pixel angle
+
+
+   The conventions in the diagram above are given in [2]. [2] also gives:
+
+      Commanded angle is positive looking forward along track, negative
+      looking back.
+      Encoder counts are positive looking backward along track, negative
+      looking forward.
+      Home and zero gimbal angle are the same (nominally nadir).
+
+   The following diagrams, taken from [2], illustrate the gimbal angle sign
+   definitions:
+
+
+       CRISM                                   CRISM _
+           /`. ---> velocity (+X  )                 | | ---> velocity (+X  )
+           |. `.                sc                  | |                  sc
+           | `./.                                   |_|
+           |     `.                                  |
+           |    o  `.                              o |
+           | +60     `.  target                   0  | target
+       ____|__________/\_____               ________/_\_________
+      ///////////////////////              /////////////////////
+             surface                              surface
+
+                    CRISM
+                       ,'\ ---> velocity (+X  )
+                     ,' ,|                  sc
+                    ,\,' |
+                  ,'     |
+                ,'   o   |
+              ,'  -60    |
+       ______/\__________|___
+      ///////////////////////
+               surface
+
+   Since the field of view is 2.122 degrees in X, looking down the Y axis in
+   the MRO_CRISM_VNIR frame we have: (We are arbitrarily choosing vectors
+   that terminate in the Z=1 plane.)
+
+                                ^ X
+                                |  VNIR
+                                |
+                                |           _.'
+                                |        _.'  |
+                                |     _.'     |
+                                |  _.'      o |
+                                |.'    1.061  |
+                                o-------------+------>
+                          Y (out)'._        o |       Z
+                           VNIR     '._1.061  |        VNIR
+                                       '._    |
+                                          '._ |
+                                             '.
+
+                                |<----1.0---->|
+
+   Since the field of view is 61.5 microradians in Y, looking up the X axis
+   in the MRO_CRISM_VNIR frame we have: (We are arbitrarily choosing vectors
+   that terminate in the Z=1 plane.)
+
+                                ^ Y
+                                |  VNIR
+                                |
+                                |
+                                |            _.
+                                |        _.-' |
+                                |    _.-'     |
+                                |_.-'   30.75 mrad
+                                x-------------+------>
+                          X (in) `-._   30.75 mrad    Z
+                           VNIR      `-._     |        VNIR
+                                         `-._ |
+                                             `-
+                                |<----1.0---->|
+
+   These field of view values for CRISM VNIR are given in radians in the
+   keywords below:
+
+   \begindata
+
+      INS-74017_FOV_FRAME         = 'MRO_CRISM_VNIR'
+      INS-74017_FOV_SHAPE         = 'RECTANGLE'
+      INS-74017_BORESIGHT         = ( 0.0, 0.0, 1.0 )
+      INS-74017_FOV_CLASS_SPEC    = 'ANGLES'
+      INS-74017_FOV_REF_VECTOR    = ( 0.0, 1.0, 0.0 )
+      INS-74017_FOV_REF_ANGLE     = ( 0.000030750 )
+      INS-74017_FOV_CROSS_ANGLE   = ( 0.018517943181 )
+      INS-74017_FOV_ANGLE_UNITS   = 'RADIANS'
+
+   \begintext
+
+   The field of view for the IR detector is defined identically to the VNIR
+   detector. Any differences are captured in the camera model, described
+   below.
+
+   \begindata
+
+      INS-74018_FOV_FRAME         = 'MRO_CRISM_IR'
+      INS-74018_FOV_SHAPE         = 'RECTANGLE'
+      INS-74018_BORESIGHT         = ( 0.0, 0.0, 1.0 )
+      INS-74018_FOV_CLASS_SPEC    = 'ANGLES'
+      INS-74018_FOV_REF_VECTOR    = ( 0.0, 1.0, 0.0 )
+      INS-74018_FOV_REF_ANGLE     = ( 0.000030750 )
+      INS-74018_FOV_CROSS_ANGLE   = ( 0.018517943181 )
+      INS-74018_FOV_ANGLE_UNITS   = 'RADIANS'
+
+   \begintext
+
+
+VNIR Camera Model Parameters
+---------------------------------------------------------------
+
+   From [4]:
+
+   The CRISM image cubes consist of a set of frames, and each frame has
+   multiple wavelengths (also called bands or detector rows) and multiple
+   cross-track spatial positions (also called columns or line samples). The
+   CRISM ground track image is built up by taking multiple frames and scanning
+   along-track, so each detector frame is associated with a single line in the
+   ground track image. The position of a single VNIR ground track image line
+   along-track is the same for all VNIR bands and depends only on the time the
+   frame is taken, the spacecraft pointing, and the CRISM gimbal pointing.
+   The position of each cross-track sample in that image line will depend
+   slightly on band number, because the magnification of the instrument
+   depends slightly on wavelength. This effect is called "optical keystone".
+
+   The camera model parameters provide a formula to calculate the cross-track
+   line-of-sight angle of each cross-track sample in a line. This result is
+   the same for all lines in the image.
+
+   The CRISM image coordinate frame has Z axis defined as along the boresight.
+   The boresight is defined as the center of the VNIR optical field of view.
+   The X axis is in the plane defined by the boresight and gimbal axis. The
+   X axis is approximately along the gimbal axis, pointing from the
+   anti-sunward radiator toward the gimbal motor. The Y axis is approximately
+   in the direction of spacecraft motion.
+
+   Definition of camera model line-of-sight angles in CRISM VNIR image
+   coordinates:
+   The VNIR camera model parameters allow one to calculate a line-of-sight
+   VNIR angle for each line sample at each band in a CRISM image cube. The
+   line-of-sight is in the XZ plane by definition (nominally cross-track), and
+   the line-of-sight VNIR angle is measured from the Z axis, with positive
+   angles toward the X axis. Another way of putting it is that the
+   line-of-sight VNIR angle represents a y-axis rotation in the CRISM image
+   frame [MRO_CRISM_VNIR], with zero angle representing a line of sight
+   directly along the Z-axis. See page 4 of CALRPT_26_1_V3_POINT_SIGN.PDF,
+   which may be found in the /CALIB directory of the EDR portion of the PDS
+   archive. A side view of the diagram on that page is reproduced here:
+
+
+                   boresight
+                       ^
+              \        |        /
+              + angle  |  - angle
+                \      |      /
+                 \    _|_    /
+                  \  | | |  /                                      Z    (Z  )
+                   \ | | | /     /                               ^  VNIR  sc
+       CRISM        \| | |/     / radiator                       |
+           __________|_|_|__   /                                 |
+          |           \|/   | /                                  |
+     <---||------------o----||---> gimbal     X    (-Y  ) <------o
+         ||_________________||     axis        VNIR   sc          Y     (X  )
+       __||_________________||__                                   VNIR   sc
+       /////////////////////////
+              spacecraft
+
+
+   The following table of CRISM camera coefficients give the band number,
+   intercept, and slope of the linear function
+
+      line-of-sight_VNIR_angle = a0 + a1*line_sample
+
+   where the intercept a0 and the slope a1 are both functions of band number.
+   Band number is integer 0-479 and line sample is integer 0-639.
+
+   Keywords for reference band and slit direction are given below the camera
+   coefficient table. Those terms are defined here (from [4]):
+
+   Slit direction:
+   In the direction nominally perpendicular to the orbital track
+   ("cross-track"), multiple spatial positions are sampled simultaneously. In
+   the optical hardware, these multiple spatial positions are sampled at
+   different positions along the entrance slit of the spectrometer. The
+   alignment measurements performed on the ground show there is no clocking
+   of the slit with respect to the gimbal axis of the CRISM instrument. That
+   is, to the accuracy required by CRISM, we can assume the slit is along the
+   gimbal, and we make that assumption in the pointing and mapping. The "slit
+   direction" is therefore the same as the axis of the gimbal.
+
+   Reference band:
+   The position of each cross-track sample in an image line will depend
+   slightly on band number, because the magnification of the instrument
+   depends slightly on wavelength. This effect is called "optical keystone",
+   and the camera model parameters reflect this because they change slightly
+   with band number. It would be too cumbersome to map the planet separately
+   for each band, so we choose one band at a central wavelength for VNIR and
+   one band at a central wavelength for IR, and all the geometry parameters
+   given in the DDRs are calculated for those two "reference bands". The bands
+   used are 223 for VNIR, which is close to 610 nm, and 247 for IR, which is
+   close to 2300 nm. Band number is out of 0-479.
+
+   The indexing of the camera coefficient table below is zero-based and
+   monotonically increasing. The first column in the table is the band. The
+   second column is a0 for that band, and the third column is a1 for that
+   band.
+
+\begindata
+
+INS-74017_CAMERA_COEFF = (
+  0.0   0.0000000  0.0000000000
+  1.0   0.0000000  0.0000000000
+  2.0   0.0000000  0.0000000000
+  3.0   0.0000000  0.0000000000
+  4.0   0.0000000  0.0000000000
+  5.0   0.0000000  0.0000000000
+  6.0   0.0000000  0.0000000000
+  7.0   0.0000000  0.0000000000
+  8.0   0.0000000  0.0000000000
+  9.0   0.0000000  0.0000000000
+ 10.0   0.0000000  0.0000000000
+ 11.0   0.0000000  0.0000000000
+ 12.0   0.0000000  0.0000000000
+ 13.0   0.0000000  0.0000000000
+ 14.0   0.0000000  0.0000000000
+ 15.0   0.0000000  0.0000000000
+ 16.0   0.0000000  0.0000000000
+ 17.0   0.0000000  0.0000000000
+ 18.0   0.0000000  0.0000000000
+ 19.0   0.0000000  0.0000000000
+ 20.0   0.0000000  0.0000000000
+ 21.0   0.0000000  0.0000000000
+ 22.0   0.0000000  0.0000000000
+ 23.0   0.0000000  0.0000000000
+ 24.0   0.0000000  0.0000000000
+ 25.0   0.0000000  0.0000000000
+ 26.0   0.0000000  0.0000000000
+ 27.0   0.0000000  0.0000000000
+ 28.0   0.0000000  0.0000000000
+ 29.0   0.0000000  0.0000000000
+ 30.0   0.0000000  0.0000000000
+ 31.0   0.0000000  0.0000000000
+ 32.0   0.0000000  0.0000000000
+ 33.0   0.0000000  0.0000000000
+ 34.0   0.0000000  0.0000000000
+ 35.0   0.0000000  0.0000000000
+ 36.0   0.0000000  0.0000000000
+ 37.0   0.0000000  0.0000000000
+ 38.0   0.0000000  0.0000000000
+ 39.0   0.0000000  0.0000000000
+ 40.0   0.0000000  0.0000000000
+ 41.0   0.0000000  0.0000000000
+ 42.0   0.0000000  0.0000000000
+ 43.0   0.0000000  0.0000000000
+ 44.0   0.0000000  0.0000000000
+ 45.0   0.0000000  0.0000000000
+ 46.0   0.0000000  0.0000000000
+ 47.0   0.0000000  0.0000000000
+ 48.0   0.0000000  0.0000000000
+ 49.0   0.0000000  0.0000000000
+ 50.0   0.0000000  0.0000000000
+ 51.0   0.0000000  0.0000000000
+ 52.0   0.0000000  0.0000000000
+ 53.0   0.0000000  0.0000000000
+ 54.0   0.0000000  0.0000000000
+ 55.0   0.0000000  0.0000000000
+ 56.0   0.0000000  0.0000000000
+ 57.0   0.0000000  0.0000000000
+ 58.0   0.0000000  0.0000000000
+ 59.0   0.0000000  0.0000000000
+ 60.0   0.0000000  0.0000000000
+ 61.0   0.0000000  0.0000000000
+ 62.0   0.0000000  0.0000000000
+ 63.0   0.0000000  0.0000000000
+ 64.0   0.0000000  0.0000000000
+ 65.0   0.0000000  0.0000000000
+ 66.0   0.0000000  0.0000000000
+ 67.0   0.0000000  0.0000000000
+ 68.0   0.0000000  0.0000000000
+ 69.0   0.0000000  0.0000000000
+ 70.0   0.0000000  0.0000000000
+ 71.0   0.0000000  0.0000000000
+ 72.0   0.0000000  0.0000000000
+ 73.0   0.0000000  0.0000000000
+ 74.0   0.0000000  0.0000000000
+ 75.0   0.0000000  0.0000000000
+ 76.0   0.0000000  0.0000000000
+ 77.0   0.0000000  0.0000000000
+ 78.0   0.0000000  0.0000000000
+ 79.0   0.0000000  0.0000000000
+ 80.0   0.0000000  0.0000000000
+ 81.0   0.0000000  0.0000000000
+ 82.0   0.0000000  0.0000000000
+ 83.0   0.0000000  0.0000000000
+ 84.0   0.0000000  0.0000000000
+ 85.0   0.0000000  0.0000000000
+ 86.0   0.0000000  0.0000000000
+ 87.0   0.0000000  0.0000000000
+ 88.0   0.0000000  0.0000000000
+ 89.0   0.0000000  0.0000000000
+ 90.0   0.0000000  0.0000000000
+ 91.0   0.0000000  0.0000000000
+ 92.0   0.0000000  0.0000000000
+ 93.0   0.0000000  0.0000000000
+ 94.0   0.0000000  0.0000000000
+ 95.0   0.0000000  0.0000000000
+ 96.0   0.0000000  0.0000000000
+ 97.0   0.0000000  0.0000000000
+ 98.0   0.0000000  0.0000000000
+ 99.0   0.0000000  0.0000000000
+100.0   0.0000000  0.0000000000
+101.0   0.0000000  0.0000000000
+102.0   0.0000000  0.0000000000
+103.0   0.0000000  0.0000000000
+104.0   0.0000000  0.0000000000
+105.0   0.0000000  0.0000000000
+106.0   0.0000000  0.0000000000
+107.0   0.0000000  0.0000000000
+108.0   0.0000000  0.0000000000
+109.0   0.0000000  0.0000000000
+110.0   0.0000000  0.0000000000
+111.0   0.0000000  0.0000000000
+112.0   0.0000000  0.0000000000
+113.0   0.0000000  0.0000000000
+114.0   0.0000000  0.0000000000
+115.0   0.0000000  0.0000000000
+116.0   0.0000000  0.0000000000
+117.0   0.0000000  0.0000000000
+118.0   0.0000000  0.0000000000
+119.0   0.0000000  0.0000000000
+120.0   0.0000000  0.0000000000
+121.0   0.0000000  0.0000000000
+122.0   0.0000000  0.0000000000
+123.0   0.0000000  0.0000000000
+124.0   0.0000000  0.0000000000
+125.0   0.0000000  0.0000000000
+126.0   0.0000000  0.0000000000
+127.0   0.0000000  0.0000000000
+128.0   0.0000000  0.0000000000
+129.0   0.0000000  0.0000000000
+130.0   0.0000000  0.0000000000
+131.0   0.0000000  0.0000000000
+132.0   0.0000000  0.0000000000
+133.0   0.0000000  0.0000000000
+134.0   0.0000000  0.0000000000
+135.0   0.0000000  0.0000000000
+136.0   0.0000000  0.0000000000
+137.0   0.0000000  0.0000000000
+138.0   0.0000000  0.0000000000
+139.0   0.0000000  0.0000000000
+140.0   0.0000000  0.0000000000
+141.0   0.0000000  0.0000000000
+142.0   0.0000000  0.0000000000
+143.0   0.0000000  0.0000000000
+144.0   0.0000000  0.0000000000
+145.0   0.0000000  0.0000000000
+146.0   0.0000000  0.0000000000
+147.0   0.0000000  0.0000000000
+148.0   0.0000000  0.0000000000
+149.0   0.0000000  0.0000000000
+150.0   0.0000000  0.0000000000
+151.0   0.0000000  0.0000000000
+152.0   0.0000000  0.0000000000
+153.0   0.0000000  0.0000000000
+154.0   0.0000000  0.0000000000
+155.0   0.0000000  0.0000000000
+156.0   0.0000000  0.0000000000
+157.0   0.0000000  0.0000000000
+158.0   0.0000000  0.0000000000
+159.0   0.0000000  0.0000000000
+160.0   0.0000000  0.0000000000
+161.0   0.0000000  0.0000000000
+162.0   0.0000000  0.0000000000
+163.0   0.0000000  0.0000000000
+164.0   0.0000000  0.0000000000
+165.0   0.0000000  0.0000000000
+166.0   0.0000000  0.0000000000
+167.0   0.0000000  0.0000000000
+168.0   0.0000000  0.0000000000
+169.0   0.0000000  0.0000000000
+170.0   0.0000000  0.0000000000
+171.0   0.0000000  0.0000000000
+172.0   0.0000000  0.0000000000
+173.0   0.0000000  0.0000000000
+174.0   0.0000000  0.0000000000
+175.0   0.0000000  0.0000000000
+176.0   0.0000000  0.0000000000
+177.0   0.0000000  0.0000000000
+178.0   0.0000000  0.0000000000
+179.0   0.0000000  0.0000000000
+180.0   0.0000000  0.0000000000
+181.0   0.0000000  0.0000000000
+182.0   0.0000000  0.0000000000
+183.0   0.0000000  0.0000000000
+184.0   0.0000000  0.0000000000
+185.0  -1.1448915  0.0035201141
+186.0  -1.1449165  0.0035201996
+187.0  -1.1449414  0.0035202850
+188.0  -1.1449664  0.0035203705
+189.0  -1.1449915  0.0035204559
+190.0  -1.1450166  0.0035205416
+191.0  -1.1450415  0.0035206270
+192.0  -1.1450664  0.0035207125
+193.0  -1.1450914  0.0035207979
+194.0  -1.1451163  0.0035208834
+195.0  -1.1451412  0.0035209691
+196.0  -1.1451665  0.0035210545
+197.0  -1.1451914  0.0035211400
+198.0  -1.1452163  0.0035212252
+199.0  -1.1452414  0.0035213109
+200.0  -1.1452665  0.0035213965
+201.0  -1.1452912  0.0035214820
+202.0  -1.1453164  0.0035215674
+203.0  -1.1453413  0.0035216527
+204.0  -1.1453664  0.0035217386
+205.0  -1.1453912  0.0035218240
+206.0  -1.1454163  0.0035219092
+207.0  -1.1454413  0.0035219949
+208.0  -1.1454663  0.0035220804
+209.0  -1.1454911  0.0035221658
+210.0  -1.1455162  0.0035222515
+211.0  -1.1455411  0.0035223367
+212.0  -1.1455660  0.0035224222
+213.0  -1.1455911  0.0035225078
+214.0  -1.1456162  0.0035225933
+215.0  -1.1456412  0.0035226790
+216.0  -1.1456661  0.0035227644
+217.0  -1.1456910  0.0035228496
+218.0  -1.1457161  0.0035229353
+219.0  -1.1457411  0.0035230208
+220.0  -1.1457660  0.0035231062
+221.0  -1.1457913  0.0035231919
+222.0  -1.1458161  0.0035232771
+223.0  -1.1458410  0.0035233626
+224.0  -1.1458662  0.0035234485
+225.0  -1.1458910  0.0035235337
+226.0  -1.1459160  0.0035236194
+227.0  -1.1459409  0.0035237046
+228.0  -1.1459662  0.0035237903
+229.0  -1.1459910  0.0035238760
+230.0  -1.1460158  0.0035239612
+231.0  -1.1460409  0.0035240466
+232.0  -1.1460660  0.0035241321
+233.0  -1.1460909  0.0035242178
+234.0  -1.1461159  0.0035243032
+235.0  -1.1461409  0.0035243887
+236.0  -1.1461657  0.0035244741
+237.0  -1.1461908  0.0035245595
+238.0  -1.1462159  0.0035246452
+239.0  -1.1462407  0.0035247307
+240.0  -1.1462657  0.0035248161
+241.0  -1.1462907  0.0035249016
+242.0  -1.1463157  0.0035249870
+243.0  -1.1463407  0.0035250727
+244.0  -1.1463658  0.0035251582
+245.0  -1.1463908  0.0035252434
+246.0  -1.1464157  0.0035253291
+247.0  -1.1464409  0.0035254147
+248.0  -1.1464655  0.0035255000
+249.0  -1.1464907  0.0035255856
+250.0  -1.1465157  0.0035256711
+251.0  -1.1465408  0.0035257565
+252.0  -1.1465657  0.0035258422
+253.0  -1.1465907  0.0035259274
+254.0  -1.1466157  0.0035260131
+255.0  -1.1466407  0.0035260986
+256.0  -1.1466655  0.0035261838
+257.0  -1.1466906  0.0035262697
+258.0  -1.1467154  0.0035263551
+259.0  -1.1467406  0.0035264404
+260.0  -1.1467657  0.0035265260
+261.0  -1.1467904  0.0035266113
+262.0  -1.1468157  0.0035266972
+263.0  -1.1468407  0.0035267826
+264.0  -1.1468654  0.0035268678
+265.0  -1.1468905  0.0035269535
+266.0  -1.1469157  0.0035270392
+267.0  -1.1469405  0.0035271244
+268.0  -1.1469655  0.0035272101
+269.0  -1.1469902  0.0035272953
+270.0  -1.1470156  0.0035273808
+271.0  -1.1470404  0.0035274667
+272.0  -1.1470653  0.0035275519
+273.0  -1.1470903  0.0035276373
+274.0  -1.1471153  0.0035277230
+275.0  -1.1471403  0.0035278082
+276.0  -1.1471654  0.0035278942
+277.0  -1.1471905  0.0035279794
+278.0  -1.1472151  0.0035280648
+279.0  -1.1472404  0.0035281505
+280.0  -1.1472652  0.0035282357
+281.0  -1.1472903  0.0035283214
+282.0  -1.1473153  0.0035284068
+283.0  -1.1473403  0.0035284923
+284.0  -1.1473650  0.0035285777
+285.0  -1.1473901  0.0035286632
+286.0  -1.1474153  0.0035287489
+287.0  -1.1474402  0.0035288343
+288.0  -1.1474653  0.0035289198
+289.0  -1.1474900  0.0035290052
+290.0  -1.1475153  0.0035290909
+291.0  -1.1475401  0.0035291763
+292.0   0.0000000  0.0000000000
+293.0   0.0000000  0.0000000000
+294.0   0.0000000  0.0000000000
+295.0   0.0000000  0.0000000000
+296.0   0.0000000  0.0000000000
+297.0   0.0000000  0.0000000000
+298.0   0.0000000  0.0000000000
+299.0   0.0000000  0.0000000000
+300.0   0.0000000  0.0000000000
+301.0   0.0000000  0.0000000000
+302.0   0.0000000  0.0000000000
+303.0   0.0000000  0.0000000000
+304.0   0.0000000  0.0000000000
+305.0   0.0000000  0.0000000000
+306.0   0.0000000  0.0000000000
+307.0   0.0000000  0.0000000000
+308.0   0.0000000  0.0000000000
+309.0   0.0000000  0.0000000000
+310.0   0.0000000  0.0000000000
+311.0   0.0000000  0.0000000000
+312.0   0.0000000  0.0000000000
+313.0   0.0000000  0.0000000000
+314.0   0.0000000  0.0000000000
+315.0   0.0000000  0.0000000000
+316.0   0.0000000  0.0000000000
+317.0   0.0000000  0.0000000000
+318.0   0.0000000  0.0000000000
+319.0   0.0000000  0.0000000000
+320.0   0.0000000  0.0000000000
+321.0   0.0000000  0.0000000000
+322.0   0.0000000  0.0000000000
+323.0   0.0000000  0.0000000000
+324.0   0.0000000  0.0000000000
+325.0   0.0000000  0.0000000000
+326.0   0.0000000  0.0000000000
+327.0   0.0000000  0.0000000000
+328.0   0.0000000  0.0000000000
+329.0   0.0000000  0.0000000000
+330.0   0.0000000  0.0000000000
+331.0   0.0000000  0.0000000000
+332.0   0.0000000  0.0000000000
+333.0   0.0000000  0.0000000000
+334.0   0.0000000  0.0000000000
+335.0   0.0000000  0.0000000000
+336.0   0.0000000  0.0000000000
+337.0   0.0000000  0.0000000000
+338.0   0.0000000  0.0000000000
+339.0   0.0000000  0.0000000000
+340.0   0.0000000  0.0000000000
+341.0   0.0000000  0.0000000000
+342.0   0.0000000  0.0000000000
+343.0   0.0000000  0.0000000000
+344.0   0.0000000  0.0000000000
+345.0   0.0000000  0.0000000000
+346.0   0.0000000  0.0000000000
+347.0   0.0000000  0.0000000000
+348.0   0.0000000  0.0000000000
+349.0   0.0000000  0.0000000000
+350.0   0.0000000  0.0000000000
+351.0   0.0000000  0.0000000000
+352.0   0.0000000  0.0000000000
+353.0   0.0000000  0.0000000000
+354.0   0.0000000  0.0000000000
+355.0   0.0000000  0.0000000000
+356.0   0.0000000  0.0000000000
+357.0   0.0000000  0.0000000000
+358.0   0.0000000  0.0000000000
+359.0   0.0000000  0.0000000000
+360.0   0.0000000  0.0000000000
+361.0   0.0000000  0.0000000000
+362.0   0.0000000  0.0000000000
+363.0   0.0000000  0.0000000000
+364.0   0.0000000  0.0000000000
+365.0   0.0000000  0.0000000000
+366.0   0.0000000  0.0000000000
+367.0   0.0000000  0.0000000000
+368.0   0.0000000  0.0000000000
+369.0   0.0000000  0.0000000000
+370.0   0.0000000  0.0000000000
+371.0   0.0000000  0.0000000000
+372.0   0.0000000  0.0000000000
+373.0   0.0000000  0.0000000000
+374.0   0.0000000  0.0000000000
+375.0   0.0000000  0.0000000000
+376.0   0.0000000  0.0000000000
+377.0   0.0000000  0.0000000000
+378.0   0.0000000  0.0000000000
+379.0   0.0000000  0.0000000000
+380.0   0.0000000  0.0000000000
+381.0   0.0000000  0.0000000000
+382.0   0.0000000  0.0000000000
+383.0   0.0000000  0.0000000000
+384.0   0.0000000  0.0000000000
+385.0   0.0000000  0.0000000000
+386.0   0.0000000  0.0000000000
+387.0   0.0000000  0.0000000000
+388.0   0.0000000  0.0000000000
+389.0   0.0000000  0.0000000000
+390.0   0.0000000  0.0000000000
+391.0   0.0000000  0.0000000000
+392.0   0.0000000  0.0000000000
+393.0   0.0000000  0.0000000000
+394.0   0.0000000  0.0000000000
+395.0   0.0000000  0.0000000000
+396.0   0.0000000  0.0000000000
+397.0   0.0000000  0.0000000000
+398.0   0.0000000  0.0000000000
+399.0   0.0000000  0.0000000000
+400.0   0.0000000  0.0000000000
+401.0   0.0000000  0.0000000000
+402.0   0.0000000  0.0000000000
+403.0   0.0000000  0.0000000000
+404.0   0.0000000  0.0000000000
+405.0   0.0000000  0.0000000000
+406.0   0.0000000  0.0000000000
+407.0   0.0000000  0.0000000000
+408.0   0.0000000  0.0000000000
+409.0   0.0000000  0.0000000000
+410.0   0.0000000  0.0000000000
+411.0   0.0000000  0.0000000000
+412.0   0.0000000  0.0000000000
+413.0   0.0000000  0.0000000000
+414.0   0.0000000  0.0000000000
+415.0   0.0000000  0.0000000000
+416.0   0.0000000  0.0000000000
+417.0   0.0000000  0.0000000000
+418.0   0.0000000  0.0000000000
+419.0   0.0000000  0.0000000000
+420.0   0.0000000  0.0000000000
+421.0   0.0000000  0.0000000000
+422.0   0.0000000  0.0000000000
+423.0   0.0000000  0.0000000000
+424.0   0.0000000  0.0000000000
+425.0   0.0000000  0.0000000000
+426.0   0.0000000  0.0000000000
+427.0   0.0000000  0.0000000000
+428.0   0.0000000  0.0000000000
+429.0   0.0000000  0.0000000000
+430.0   0.0000000  0.0000000000
+431.0   0.0000000  0.0000000000
+432.0   0.0000000  0.0000000000
+433.0   0.0000000  0.0000000000
+434.0   0.0000000  0.0000000000
+435.0   0.0000000  0.0000000000
+436.0   0.0000000  0.0000000000
+437.0   0.0000000  0.0000000000
+438.0   0.0000000  0.0000000000
+439.0   0.0000000  0.0000000000
+440.0   0.0000000  0.0000000000
+441.0   0.0000000  0.0000000000
+442.0   0.0000000  0.0000000000
+443.0   0.0000000  0.0000000000
+444.0   0.0000000  0.0000000000
+445.0   0.0000000  0.0000000000
+446.0   0.0000000  0.0000000000
+447.0   0.0000000  0.0000000000
+448.0   0.0000000  0.0000000000
+449.0   0.0000000  0.0000000000
+450.0   0.0000000  0.0000000000
+451.0   0.0000000  0.0000000000
+452.0   0.0000000  0.0000000000
+453.0   0.0000000  0.0000000000
+454.0   0.0000000  0.0000000000
+455.0   0.0000000  0.0000000000
+456.0   0.0000000  0.0000000000
+457.0   0.0000000  0.0000000000
+458.0   0.0000000  0.0000000000
+459.0   0.0000000  0.0000000000
+460.0   0.0000000  0.0000000000
+461.0   0.0000000  0.0000000000
+462.0   0.0000000  0.0000000000
+463.0   0.0000000  0.0000000000
+464.0   0.0000000  0.0000000000
+465.0   0.0000000  0.0000000000
+466.0   0.0000000  0.0000000000
+467.0   0.0000000  0.0000000000
+468.0   0.0000000  0.0000000000
+469.0   0.0000000  0.0000000000
+470.0   0.0000000  0.0000000000
+471.0   0.0000000  0.0000000000
+472.0   0.0000000  0.0000000000
+473.0   0.0000000  0.0000000000
+474.0   0.0000000  0.0000000000
+475.0   0.0000000  0.0000000000
+476.0   0.0000000  0.0000000000
+477.0   0.0000000  0.0000000000
+478.0   0.0000000  0.0000000000
+479.0   0.0000000  0.0000000000
+                          )
+
+      INS-74017_REFERENCE_BAND    = 223
+      INS-74017_SLIT_DIRECTION    = ( 1.0, 0.0, 0.0 )
+
+\begintext
+
+
+IR Camera Model Parameters
+---------------------------------------------------------------
+
+   The description of the IR camera model parameters and their usage is
+   identical to the description for the VNIR camera model parameters. Refer to
+   the text and diagram in the section above titled "VNIR Camera Model
+   Parameters", replacing all references to "VNIR" with "IR". The slit
+   direction and reference band keywords are also described above.
+
+   The indexing of the camera coefficient table below is zero-based and
+   monotonically increasing. The first column in the table is the band. The
+   second column is a0 for that band, and the third column is a1 for that
+   band.
+
+\begindata
+
+INS-74018_CAMERA_COEFF = (
+  0.0   0.0000000  0.0000000000
+  1.0  -1.1600100  0.0034842819
+  2.0  -1.1600032  0.0034842738
+  3.0  -1.1599964  0.0034842661
+  4.0  -1.1599896  0.0034842582
+  5.0  -1.1599826  0.0034842500
+  6.0  -1.1599759  0.0034842421
+  7.0  -1.1599691  0.0034842342
+  8.0  -1.1599622  0.0034842265
+  9.0  -1.1599556  0.0034842188
+ 10.0  -1.1599488  0.0034842107
+ 11.0  -1.1599417  0.0034842025
+ 12.0  -1.1599350  0.0034841946
+ 13.0  -1.1599283  0.0034841867
+ 14.0  -1.1599214  0.0034841788
+ 15.0  -1.1599145  0.0034841709
+ 16.0  -1.1599078  0.0034841630
+ 17.0  -1.1599009  0.0034841551
+ 18.0  -1.1598943  0.0034841474
+ 19.0  -1.1598877  0.0034841397
+ 20.0  -1.1598805  0.0034841311
+ 21.0  -1.1598737  0.0034841232
+ 22.0  -1.1598669  0.0034841152
+ 23.0  -1.1598601  0.0034841076
+ 24.0  -1.1598533  0.0034840996
+ 25.0  -1.1598464  0.0034840917
+ 26.0  -1.1598397  0.0034840838
+ 27.0  -1.1598330  0.0034840759
+ 28.0  -1.1598262  0.0034840680
+ 29.0  -1.1598191  0.0034840598
+ 30.0  -1.1598123  0.0034840519
+ 31.0  -1.1598057  0.0034840440
+ 32.0  -1.1597991  0.0034840365
+ 33.0  -1.1597921  0.0034840284
+ 34.0  -1.1597853  0.0034840205
+ 35.0  -1.1597785  0.0034840126
+ 36.0  -1.1597717  0.0034840044
+ 37.0  -1.1597649  0.0034839970
+ 38.0  -1.1597579  0.0034839886
+ 39.0  -1.1597512  0.0034839807
+ 40.0  -1.1597444  0.0034839727
+ 41.0  -1.1597377  0.0034839651
+ 42.0  -1.1597308  0.0034839574
+ 43.0  -1.1597240  0.0034839492
+ 44.0  -1.1597172  0.0034839411
+ 45.0  -1.1597103  0.0034839332
+ 46.0  -1.1597036  0.0034839255
+ 47.0  -1.1596967  0.0034839173
+ 48.0  -1.1596900  0.0034839094
+ 49.0  -1.1596832  0.0034839015
+ 50.0  -1.1596762  0.0034838936
+ 51.0  -1.1596695  0.0034838859
+ 52.0  -1.1596627  0.0034838778
+ 53.0  -1.1596559  0.0034838698
+ 54.0  -1.1596490  0.0034838619
+ 55.0  -1.1596423  0.0034838540
+ 56.0  -1.1596354  0.0034838459
+ 57.0  -1.1596287  0.0034838382
+ 58.0  -1.1596218  0.0034838303
+ 59.0  -1.1596148  0.0034838221
+ 60.0  -1.1596082  0.0034838142
+ 61.0  -1.1596013  0.0034838063
+ 62.0  -1.1595948  0.0034837986
+ 63.0  -1.1595877  0.0034837907
+ 64.0  -1.1595811  0.0034837828
+ 65.0  -1.1595742  0.0034837746
+ 66.0  -1.1595674  0.0034837667
+ 67.0  -1.1595607  0.0034837590
+ 68.0  -1.1595535  0.0034837509
+ 69.0  -1.1595469  0.0034837432
+ 70.0  -1.1595403  0.0034837350
+ 71.0  -1.1595334  0.0034837273
+ 72.0  -1.1595265  0.0034837194
+ 73.0  -1.1595197  0.0034837115
+ 74.0  -1.1595131  0.0034837036
+ 75.0  -1.1595061  0.0034836954
+ 76.0  -1.1594993  0.0034836875
+ 77.0  -1.1594924  0.0034836796
+ 78.0  -1.1594858  0.0034836717
+ 79.0  -1.1594790  0.0034836638
+ 80.0  -1.1594719  0.0034836559
+ 81.0  -1.1594653  0.0034836482
+ 82.0  -1.1594585  0.0034836403
+ 83.0  -1.1594518  0.0034836323
+ 84.0  -1.1594448  0.0034836240
+ 85.0  -1.1594380  0.0034836160
+ 86.0  -1.1594311  0.0034836084
+ 87.0  -1.1594244  0.0034836004
+ 88.0  -1.1594176  0.0034835928
+ 89.0  -1.1594107  0.0034835846
+ 90.0  -1.1594039  0.0034835767
+ 91.0  -1.1593972  0.0034835688
+ 92.0  -1.1593903  0.0034835609
+ 93.0  -1.1593833  0.0034835527
+ 94.0  -1.1593765  0.0034835448
+ 95.0  -1.1593698  0.0034835369
+ 96.0  -1.1593632  0.0034835292
+ 97.0  -1.1593565  0.0034835215
+ 98.0  -1.1593494  0.0034835134
+ 99.0  -1.1593425  0.0034835052
+100.0  -1.1593360  0.0034834973
+101.0  -1.1593289  0.0034834894
+102.0  -1.1593221  0.0034834817
+103.0  -1.1593153  0.0034834736
+104.0  -1.1593086  0.0034834656
+105.0  -1.1593019  0.0034834577
+106.0  -1.1592951  0.0034834500
+107.0  -1.1592882  0.0034834419
+108.0  -1.1592814  0.0034834340
+109.0  -1.1592745  0.0034834258
+110.0  -1.1592677  0.0034834181
+111.0  -1.1592610  0.0034834105
+112.0  -1.1592541  0.0034834023
+113.0  -1.1592474  0.0034833944
+114.0  -1.1592405  0.0034833865
+115.0  -1.1592338  0.0034833786
+116.0  -1.1592269  0.0034833709
+117.0  -1.1592200  0.0034833627
+118.0  -1.1592132  0.0034833546
+119.0  -1.1592065  0.0034833467
+120.0  -1.1591995  0.0034833390
+121.0  -1.1591928  0.0034833311
+122.0  -1.1591860  0.0034833229
+123.0  -1.1591792  0.0034833150
+124.0  -1.1591724  0.0034833071
+125.0  -1.1591656  0.0034832996
+126.0  -1.1591588  0.0034832915
+127.0  -1.1591519  0.0034832833
+128.0  -1.1591450  0.0034832754
+129.0  -1.1591383  0.0034832675
+130.0  -1.1591315  0.0034832596
+131.0  -1.1591249  0.0034832517
+132.0  -1.1591179  0.0034832438
+133.0  -1.1591110  0.0034832358
+134.0  -1.1591045  0.0034832282
+135.0  -1.1590976  0.0034832202
+136.0  -1.1590906  0.0034832121
+137.0  -1.1590838  0.0034832042
+138.0  -1.1590770  0.0034831960
+139.0  -1.1590703  0.0034831881
+140.0  -1.1590633  0.0034831804
+141.0  -1.1590567  0.0034831725
+142.0  -1.1590500  0.0034831646
+143.0  -1.1590431  0.0034831567
+144.0  -1.1590362  0.0034831488
+145.0  -1.1590295  0.0034831408
+146.0  -1.1590226  0.0034831327
+147.0  -1.1590158  0.0034831248
+148.0  -1.1590090  0.0034831171
+149.0  -1.1590022  0.0034831092
+150.0  -1.1589954  0.0034831013
+151.0  -1.1589885  0.0034830933
+152.0  -1.1589818  0.0034830854
+153.0  -1.1589750  0.0034830777
+154.0  -1.1589682  0.0034830694
+155.0  -1.1589614  0.0034830614
+156.0  -1.1589545  0.0034830535
+157.0  -1.1589478  0.0034830458
+158.0  -1.1589409  0.0034830377
+159.0  -1.1589340  0.0034830300
+160.0  -1.1589273  0.0034830221
+161.0  -1.1589205  0.0034830139
+162.0  -1.1589136  0.0034830063
+163.0  -1.1589068  0.0034829979
+164.0  -1.1589000  0.0034829902
+165.0  -1.1588933  0.0034829823
+166.0  -1.1588866  0.0034829744
+167.0  -1.1588795  0.0034829665
+168.0  -1.1588727  0.0034829585
+169.0  -1.1588660  0.0034829509
+170.0  -1.1588593  0.0034829427
+171.0  -1.1588525  0.0034829350
+172.0  -1.1588454  0.0034829266
+173.0  -1.1588386  0.0034829187
+174.0  -1.1588318  0.0034829110
+175.0  -1.1588253  0.0034829031
+176.0  -1.1588186  0.0034828954
+177.0  -1.1588112  0.0034828871
+178.0  -1.1588047  0.0034828791
+179.0   0.0000000  0.0000000000
+180.0   0.0000000  0.0000000000
+181.0   0.0000000  0.0000000000
+182.0   0.0000000  0.0000000000
+183.0   0.0000000  0.0000000000
+184.0   0.0000000  0.0000000000
+185.0   0.0000000  0.0000000000
+186.0   0.0000000  0.0000000000
+187.0  -1.1587435  0.0034828079
+188.0  -1.1587367  0.0034828002
+189.0  -1.1587298  0.0034827923
+190.0  -1.1587230  0.0034827844
+191.0  -1.1587162  0.0034827762
+192.0  -1.1587093  0.0034827683
+193.0  -1.1587025  0.0034827604
+194.0  -1.1586957  0.0034827525
+195.0  -1.1586889  0.0034827446
+196.0  -1.1586821  0.0034827366
+197.0  -1.1586752  0.0034827287
+198.0  -1.1586685  0.0034827210
+199.0  -1.1586618  0.0034827131
+200.0  -1.1586549  0.0034827050
+201.0  -1.1586479  0.0034826968
+202.0  -1.1586412  0.0034826889
+203.0  -1.1586344  0.0034826812
+204.0  -1.1586279  0.0034826736
+205.0  -1.1586208  0.0034826654
+206.0  -1.1586140  0.0034826575
+207.0  -1.1586072  0.0034826496
+208.0  -1.1586003  0.0034826417
+209.0  -1.1585937  0.0034826335
+210.0  -1.1585867  0.0034826256
+211.0  -1.1585798  0.0034826177
+212.0  -1.1585730  0.0034826098
+213.0  -1.1585665  0.0034826023
+214.0  -1.1585597  0.0034825942
+215.0  -1.1585528  0.0034825862
+216.0  -1.1585459  0.0034825783
+217.0  -1.1585392  0.0034825702
+218.0  -1.1585325  0.0034825623
+219.0  -1.1585257  0.0034825543
+220.0  -1.1585187  0.0034825464
+221.0  -1.1585119  0.0034825385
+222.0  -1.1585051  0.0034825308
+223.0  -1.1584984  0.0034825231
+224.0  -1.1584916  0.0034825150
+225.0  -1.1584845  0.0034825066
+226.0  -1.1584777  0.0034824987
+227.0  -1.1584712  0.0034824912
+228.0  -1.1584642  0.0034824831
+229.0  -1.1584574  0.0034824752
+230.0  -1.1584505  0.0034824673
+231.0  -1.1584438  0.0034824593
+232.0  -1.1584370  0.0034824514
+233.0  -1.1584303  0.0034824435
+234.0  -1.1584234  0.0034824354
+235.0  -1.1584165  0.0034824274
+236.0  -1.1584098  0.0034824198
+237.0  -1.1584029  0.0034824118
+238.0  -1.1583960  0.0034824039
+239.0  -1.1583894  0.0034823960
+240.0  -1.1583825  0.0034823879
+241.0  -1.1583756  0.0034823800
+242.0  -1.1583691  0.0034823723
+243.0  -1.1583620  0.0034823641
+244.0  -1.1583554  0.0034823562
+245.0  -1.1583486  0.0034823485
+246.0  -1.1583415  0.0034823404
+247.0  -1.1583349  0.0034823327
+248.0  -1.1583281  0.0034823245
+249.0  -1.1583214  0.0034823166
+250.0  -1.1583145  0.0034823089
+251.0  -1.1583077  0.0034823008
+252.0  -1.1583009  0.0034822929
+253.0  -1.1582941  0.0034822850
+254.0  -1.1582873  0.0034822770
+255.0  -1.1582805  0.0034822694
+256.0  -1.1582736  0.0034822612
+257.0  -1.1582668  0.0034822533
+258.0  -1.1582600  0.0034822454
+259.0  -1.1582532  0.0034822375
+260.0  -1.1582463  0.0034822295
+261.0  -1.1582394  0.0034822214
+262.0  -1.1582327  0.0034822137
+263.0  -1.1582259  0.0034822058
+264.0  -1.1582190  0.0034821979
+265.0  -1.1582123  0.0034821897
+266.0  -1.1582054  0.0034821820
+267.0  -1.1581988  0.0034821741
+268.0  -1.1581919  0.0034821662
+269.0  -1.1581852  0.0034821585
+270.0  -1.1581782  0.0034821501
+271.0  -1.1581714  0.0034821422
+272.0  -1.1581644  0.0034821343
+273.0  -1.1581577  0.0034821266
+274.0  -1.1581510  0.0034821185
+275.0  -1.1581442  0.0034821106
+276.0  -1.1581377  0.0034821029
+277.0  -1.1581306  0.0034820950
+278.0  -1.1581239  0.0034820873
+279.0  -1.1581171  0.0034820789
+280.0  -1.1581099  0.0034820708
+281.0  -1.1581032  0.0034820631
+282.0  -1.1580964  0.0034820552
+283.0  -1.1580898  0.0034820475
+284.0  -1.1580831  0.0034820393
+285.0  -1.1580760  0.0034820314
+286.0  -1.1580694  0.0034820237
+287.0  -1.1580625  0.0034820158
+288.0  -1.1580555  0.0034820074
+289.0  -1.1580486  0.0034819995
+290.0  -1.1580420  0.0034819916
+291.0  -1.1580353  0.0034819839
+292.0  -1.1580285  0.0034819762
+293.0  -1.1580217  0.0034819681
+294.0  -1.1580149  0.0034819602
+295.0  -1.1580080  0.0034819522
+296.0  -1.1580013  0.0034819443
+297.0  -1.1579944  0.0034819362
+298.0  -1.1579875  0.0034819283
+299.0  -1.1579807  0.0034819203
+300.0  -1.1579739  0.0034819124
+301.0  -1.1579672  0.0034819047
+302.0  -1.1579605  0.0034818968
+303.0  -1.1579534  0.0034818887
+304.0  -1.1579466  0.0034818808
+305.0  -1.1579400  0.0034818731
+306.0  -1.1579331  0.0034818649
+307.0  -1.1579262  0.0034818570
+308.0  -1.1579195  0.0034818491
+309.0  -1.1579126  0.0034818412
+310.0  -1.1579058  0.0034818333
+311.0  -1.1578990  0.0034818253
+312.0  -1.1578923  0.0034818174
+313.0  -1.1578856  0.0034818095
+314.0  -1.1578785  0.0034818016
+315.0  -1.1578718  0.0034817939
+316.0  -1.1578649  0.0034817858
+317.0  -1.1578583  0.0034817779
+318.0  -1.1578516  0.0034817699
+319.0  -1.1578445  0.0034817620
+320.0  -1.1578379  0.0034817543
+321.0  -1.1578310  0.0034817462
+322.0  -1.1578242  0.0034817383
+323.0  -1.1578174  0.0034817304
+324.0  -1.1578104  0.0034817224
+325.0  -1.1578035  0.0034817145
+326.0  -1.1577969  0.0034817066
+327.0  -1.1577901  0.0034816985
+328.0  -1.1577833  0.0034816905
+329.0  -1.1577766  0.0034816829
+330.0  -1.1577698  0.0034816749
+331.0  -1.1577629  0.0034816670
+332.0  -1.1577561  0.0034816589
+333.0  -1.1577491  0.0034816510
+334.0  -1.1577425  0.0034816430
+335.0  -1.1577357  0.0034816351
+336.0  -1.1577287  0.0034816272
+337.0  -1.1577219  0.0034816193
+338.0  -1.1577152  0.0034816116
+339.0  -1.1577085  0.0034816035
+340.0  -1.1577016  0.0034815958
+341.0  -1.1576948  0.0034815876
+342.0  -1.1576878  0.0034815797
+343.0  -1.1576811  0.0034815716
+344.0  -1.1576744  0.0034815639
+345.0  -1.1576675  0.0034815560
+346.0  -1.1576607  0.0034815480
+347.0  -1.1576538  0.0034815401
+348.0  -1.1576471  0.0034815324
+349.0  -1.1576402  0.0034815243
+350.0  -1.1576335  0.0034815161
+351.0  -1.1576267  0.0034815082
+352.0  -1.1576201  0.0034815005
+353.0  -1.1576130  0.0034814924
+354.0  -1.1576064  0.0034814847
+355.0  -1.1575994  0.0034814768
+356.0  -1.1575925  0.0034814689
+357.0  -1.1575861  0.0034814612
+358.0  -1.1575788  0.0034814528
+359.0  -1.1575722  0.0034814449
+360.0  -1.1575652  0.0034814370
+361.0  -1.1575587  0.0034814293
+362.0  -1.1575519  0.0034814212
+363.0  -1.1575451  0.0034814132
+364.0  -1.1575381  0.0034814056
+365.0  -1.1575314  0.0034813976
+366.0  -1.1575247  0.0034813897
+367.0  -1.1575176  0.0034813816
+368.0  -1.1575109  0.0034813734
+369.0  -1.1575042  0.0034813657
+370.0  -1.1574972  0.0034813578
+371.0  -1.1574905  0.0034813499
+372.0  -1.1574837  0.0034813420
+373.0  -1.1574769  0.0034813341
+374.0  -1.1574702  0.0034813262
+375.0  -1.1574634  0.0034813182
+376.0  -1.1574564  0.0034813103
+377.0  -1.1574496  0.0034813022
+378.0  -1.1574428  0.0034812943
+379.0  -1.1574360  0.0034812866
+380.0  -1.1574293  0.0034812789
+381.0  -1.1574224  0.0034812707
+382.0  -1.1574155  0.0034812626
+383.0  -1.1574087  0.0034812549
+384.0  -1.1574020  0.0034812470
+385.0  -1.1573954  0.0034812393
+386.0  -1.1573883  0.0034812309
+387.0  -1.1573817  0.0034812230
+388.0  -1.1573746  0.0034812151
+389.0  -1.1573681  0.0034812074
+390.0  -1.1573610  0.0034811993
+391.0  -1.1573542  0.0034811914
+392.0  -1.1573474  0.0034811834
+393.0  -1.1573406  0.0034811758
+394.0  -1.1573340  0.0034811681
+395.0  -1.1573271  0.0034811597
+396.0  -1.1573204  0.0034811518
+397.0  -1.1573135  0.0034811439
+398.0  -1.1573067  0.0034811359
+399.0  -1.1572999  0.0034811280
+400.0  -1.1572930  0.0034811201
+401.0  -1.1572862  0.0034811122
+402.0  -1.1572793  0.0034811043
+403.0  -1.1572727  0.0034810966
+404.0  -1.1572659  0.0034810884
+405.0  -1.1572590  0.0034810803
+406.0  -1.1572521  0.0034810724
+407.0  -1.1572453  0.0034810645
+408.0  -1.1572387  0.0034810570
+409.0  -1.1572317  0.0034810489
+410.0  -1.1572249  0.0034810409
+411.0  -1.1572181  0.0034810330
+412.0  -1.1572114  0.0034810251
+413.0  -1.1572045  0.0034810170
+414.0  -1.1571977  0.0034810090
+415.0  -1.1571908  0.0034810011
+416.0  -1.1571840  0.0034809932
+417.0  -1.1571773  0.0034809855
+418.0  -1.1571705  0.0034809776
+419.0  -1.1571637  0.0034809697
+420.0  -1.1571568  0.0034809618
+421.0  -1.1571501  0.0034809539
+422.0  -1.1571432  0.0034809457
+423.0  -1.1571363  0.0034809378
+424.0  -1.1571294  0.0034809299
+425.0  -1.1571227  0.0034809220
+426.0  -1.1571161  0.0034809143
+427.0  -1.1571090  0.0034809061
+428.0  -1.1571023  0.0034808984
+429.0  -1.1570956  0.0034808903
+430.0  -1.1570889  0.0034808824
+431.0  -1.1570818  0.0034808742
+432.0  -1.1570752  0.0034808666
+433.0  -1.1570683  0.0034808586
+434.0  -1.1570615  0.0034808507
+435.0  -1.1570547  0.0034808428
+436.0  -1.1570477  0.0034808351
+437.0  -1.1570411  0.0034808270
+438.0  -1.1570342  0.0034808191
+439.0  -1.1570277  0.0034808111
+440.0  -1.1570208  0.0034808032
+441.0  -1.1570138  0.0034807951
+442.0  -1.1570070  0.0034807874
+443.0  -1.1570002  0.0034807795
+444.0  -1.1569934  0.0034807716
+445.0  -1.1569867  0.0034807636
+446.0   0.0000000  0.0000000000
+447.0   0.0000000  0.0000000000
+448.0   0.0000000  0.0000000000
+449.0   0.0000000  0.0000000000
+450.0   0.0000000  0.0000000000
+451.0   0.0000000  0.0000000000
+452.0   0.0000000  0.0000000000
+453.0   0.0000000  0.0000000000
+454.0   0.0000000  0.0000000000
+455.0   0.0000000  0.0000000000
+456.0   0.0000000  0.0000000000
+457.0   0.0000000  0.0000000000
+458.0   0.0000000  0.0000000000
+459.0   0.0000000  0.0000000000
+460.0   0.0000000  0.0000000000
+461.0   0.0000000  0.0000000000
+462.0   0.0000000  0.0000000000
+463.0   0.0000000  0.0000000000
+464.0   0.0000000  0.0000000000
+465.0   0.0000000  0.0000000000
+466.0   0.0000000  0.0000000000
+467.0   0.0000000  0.0000000000
+468.0   0.0000000  0.0000000000
+469.0   0.0000000  0.0000000000
+470.0   0.0000000  0.0000000000
+471.0   0.0000000  0.0000000000
+472.0   0.0000000  0.0000000000
+473.0   0.0000000  0.0000000000
+474.0   0.0000000  0.0000000000
+475.0   0.0000000  0.0000000000
+476.0   0.0000000  0.0000000000
+477.0   0.0000000  0.0000000000
+478.0   0.0000000  0.0000000000
+479.0   0.0000000  0.0000000000
+)
+
+      INS-74018_REFERENCE_BAND    = 247
+      INS-74018_SLIT_DIRECTION    = ( 1.0, 0.0, 0.0 )
+
+\begintext
+
+
+CRISM Image Timing
+---------------------------------------------------------------
+
+   From [8]:
+
+   The CRISM detector can operate at a rate of 1, 3.75, 15, or 30 frames per
+   second. A frame period is the reciprocal of the frame rate.
+
+   A frame period consists of a period where the detector is not integrating
+   (not exposing an image), followed by a period where it is. The spacecraft
+   clock time associated with a frame is the beginning of a frame period.
+
+   Each of the two detectors in CRISM consists of 480 rows of 640 pixels each.
+   Each of the detectors operate independently of each other, but always at
+   the same frame rate. Each row of the detector corresponds to one spectral
+   region; each column corresponds to one spatial region. The detectors are
+   constructed as four columnar quadrants of 480 rows of 160 pixels each.
+   Corresponding pixels from each quadrant are read out simultaneously and
+   processed through identical analog-to-digital converters and processing
+   pipelines. The detector operates by integrating the photons for the current
+   image, while simultaneously reading out the previous image.
+
+   The integration (exposure) time for CRISM is specified by an integer in the
+   range 0..480, with 0 indicating no exposure, and 480 indicating an exposure
+   time equal to the whole frame period. The actual integration time obtained,
+   however, is not exactly equal to the ratio of the exposure parameter to 480
+   times the frame period; complex timing circuitry in the detector adds
+   particular quantizations and delays. There is also jitter in the CRISM Data
+   Processing Unit's interrupt response time, which may cause the frame period
+   to vary by several tens of microseconds, but the actual deviation is
+   unknown, and ignored in calculations.
+
+   The detector is controlled by a pixel clock signal, of which there are
+   nominally 83333 clock periods per frame period, regardless of the frame
+   rate. The frame period is broken down into 502 line periods of 166 pixel
+   clocks each; actual image data is read from the detector during 480 of
+   these line periods. In each line period, there are 160 pixel clock periods
+   that read out a row of image data, and 6 pixel clock periods of inter-line
+   time. Since the detector does not respond to an assertion of the integrate
+   signal except at the beginning of a line period, the integration period is
+   quantized to one of 502 possible values. Also, the detector delays acting
+   on an assertion of the integrate signal by 3 line periods, and delays
+   acting on a negation of the signal by 4 line periods.
+
+   The following "C" function will calculate the time offset, relative to the
+   telemetered frame time, of the start and stop of detector integration,
+   assuming zero frame period jitter.
+
+//----------------------------------------------------------------------------
+// frame_exposure_time() -  Find when a CRISM frame exposure starts and stops
+//
+// Parameters:
+//   exposure: requested exposure in [0..480], higher number is longer exposure
+//   frame_rate: enumerated frame rate in [0..4]
+//   start_time: time integration starts, after telemetered time, in seconds
+//   stop_time: time integration stops, after telemetered time, in seconds
+//
+// Notes:
+//   stop_time is a constant for a given frame rate
+//   There are nominally 83333 pixel clocks to a frame-time
+//   There are 166 pixel clocks to a line-time
+//----------------------------------------------------------------------------
+void frame_exposure_time(int exposure, int frame_rate, double *start_time,
+                         double *stop_time)
+{
+  // array to convert enumerated rate to frames-per-second
+  static double rate_table[5] = { 1.0, 3.75, 5.0, 15.0, 30.0 };
+
+  // calculate seconds for a full frame
+  double frame_time = 1.0 / rate_table[frame_rate];
+
+  // calculate seconds per pixel clock
+  double pixel_clock_time = frame_time / 83333.0;
+
+  // This is what John Hayes does in the DPU (Data Processing Unit), to write
+  // register to FPU (Focal Plane Unit) specifying how long NOT to integrate,
+  // in pixel clocks [0..83333]
+  int reg = ((480 - exposure) * 83333) / 480;
+
+  // Actual integration starts 3 line-times later, rounded up to next line
+  // time
+  int start_clocks = reg + (3 * 166);
+  if(start_clocks % 166)
+    start_clocks += 166 - (start_clocks % 166);
+
+  // integration continues 4 line-times after de-assertion
+  int stop_clocks = 83333 + (4 * 166);
+
+  *start_time = start_clocks * pixel_clock_time;
+  *stop_time  = stop_clocks  * pixel_clock_time;
+}
+
+
+
+NAIF ID Code to Name Mapping
+---------------------------------------------------------------
+
+   \begindata
+
+      NAIF_BODY_NAME += ( 'MRO_CRISM_VNIR' )
+      NAIF_BODY_CODE += ( -74017 )
+
+      NAIF_BODY_NAME += ( 'MRO_CRISM_IR' )
+      NAIF_BODY_CODE += ( -74018 )
+
+   \begintext
+
+

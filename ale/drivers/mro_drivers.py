@@ -7,6 +7,7 @@ from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
 from ale.base.type_distortion import RadialDistortion, NoDistortion
 from ale.base.type_sensor import LineScanner
+from ale.base.type_distortion import NoDistortion
 
 from ale import util
 
@@ -413,7 +414,7 @@ class MroCtxIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDi
     def sensor_model_version(self):
         """
         The ISIS Sensor model number for HiRise in ISIS. This is likely just 1
-        
+
         Returns
         -------
         : int
@@ -692,6 +693,114 @@ class MroHiRiseIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radia
     @property
     def sensor_model_version(self):
         """
+        Returns
+        -------
+        : int
+          ISIS sensor model version
+        """
+        return 1
+
+
+class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
+    """
+    Driver for reading Crism ISIS labels.
+    """
+
+    @property
+    def instrument_id(self):
+        """
+        Returns an instrument id for uniquely identifying the instrument, but often
+        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+        the same ID the Spice expects in bods2c calls.
+        Expects instrument_id to be defined in the IsisLabel mixin. This should be
+        a string of the form 'CRISM'
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
+        id_lookup = {
+        "CRISM" : "MRO_CRISM_VNIR"
+        }
+        return id_lookup[super().instrument_id]
+
+    @property
+    def ephemeris_start_time(self):
+        """
+        Returns the starting ephemeris time of the image. Expects spacecraft_id to
+        be defined. NAIF code -74999 was obtained from ISIS Crism camera model. Expects
+        spacecraft_clock_start_count to be defined. This must be a string
+        containing the start clock count of the spacecraft
+
+        Returns
+        -------
+        : double
+          Starting ephemeris time of the image
+        """
+        return spice.scs2e(-74999, self.spacecraft_clock_start_count)
+
+    @property
+    def ephemeris_stop_time(self):
+        """
+        Returns the ephemeris stop time of the image. Expects spacecraft_id to
+        be defined. NAIF code -74999 was obtained from ISIS Crism camera model.
+        Expects spacecraft_clock_stop_count to be defined. This must be a string
+        containing the stop clock count of the spacecraft
+
+        Returns
+        -------
+        : double
+          Ephemeris stop time of the image
+        """
+        return spice.scs2e(-74999, self.spacecraft_clock_stop_count)
+
+    @property
+    def spacecraft_name(self):
+        """
+        Returns the spacecraft name used in various Spice calls to acquire
+        ephemeris data.
+        Expects the platform_name to be defined. This should be a string of
+        the form 'MARS RECONNAISSANCE ORBITER'
+
+        Returns
+        -------
+        : str
+          spacecraft name
+        """
+        name_lookup = {
+            'MARS RECONNAISSANCE ORBITER': 'MRO'
+        }
+        return name_lookup[super().platform_name]
+
+    @property
+    def sensor_name(self):
+        """
+        Returns the name of the instrument
+
+        Returns
+        -------
+        : str
+          name of the instrument.
+        """
+        return self.instrument_id
+
+    @property
+    def sensor_frame_id(self):
+        """
+        Returns the Naif ID code for the sensor reference frame.
+        This is the frame of the OsirisRex instrument itself, and is not dependent on filter.
+
+        Returns
+        -------
+        : int
+          Naif ID code for the sensor frame
+        """
+        return -74000
+
+    @property
+    def sensor_model_version(self):
+        """
         The ISIS Sensor model number for HiRise in ISIS. This is likely just 1
 
         Returns
@@ -700,3 +809,16 @@ class MroHiRiseIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radia
           ISIS sensor model version
         """
         return 1
+
+    @property
+    def line_exposure_duration(self):
+        """
+        Line exposure duration calculated by the ephemeris time divided by the
+        number of lines.
+
+        Returns
+        -------
+        : float
+          Returns the line exposure duration in seconds.
+        """
+        return (self.ephemeris_stop_time - self.ephemeris_start_time) / self.image_lines

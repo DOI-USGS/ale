@@ -6,10 +6,8 @@ from unittest.mock import PropertyMock, patch
 import pytest
 
 import ale
-from ale.drivers import AleJsonEncoder
 from ale.drivers.mro_drivers import MroCtxPds3LabelNaifSpiceDriver, MroCtxIsisLabelNaifSpiceDriver, MroCtxIsisLabelIsisSpiceDriver
-from ale.drivers.mro_drivers import MroHiRiseIsisLabelNaifSpiceDriver, MroMarciIsisLabelNaifSpiceDriver
-from ale.formatters.formatter import to_isd
+from ale.drivers.mro_drivers import MroHiRiseIsisLabelNaifSpiceDriver, MroMarciIsisLabelNaifSpiceDriver, MroCrismIsisLabelNaifSpiceDriver
 
 from conftest import get_image, get_image_kernels, get_isd, convert_kernels, get_image_label, compare_dicts
 
@@ -32,6 +30,14 @@ def test_hirise_kernels():
 @pytest.fixture(scope='module')
 def test_marci_kernels():
     kernels = get_image_kernels('U02_071865_1322_MA_00N193W')
+    updated_kernels, binary_kernels = convert_kernels(kernels)
+    yield updated_kernels
+    for kern in binary_kernels:
+        os.remove(kern)
+
+@pytest.fixture(scope='module')
+def test_crism_kernels():
+    kernels = get_image_kernels('FRT00003B73_01_IF156S_TRR2')
     updated_kernels, binary_kernels = convert_kernels(kernels)
     yield updated_kernels
     for kern in binary_kernels:
@@ -78,6 +84,13 @@ def test_mro_marci_load(test_marci_kernels, label_type, kernel_type):
     isd_obj = json.loads(isd_str)
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
+
+def test_mro_crism_load(test_crism_kernels):
+    label_file = get_image_label('FRT00003B73_01_IF156S_TRR2', 'isis3')
+    isd_str = ale.loads(label_file, props={'kernels': test_crism_kernels, 'exact_ck_times': False})
+    isd_obj = json.loads(isd_str)
+    compare_isd = get_isd('crism')
+    assert compare_dicts(isd_obj, compare_isd) == []
 
 # ========= Test ctx isislabel and isisspice driver =========
 class test_ctx_isis_isis(unittest.TestCase):
@@ -278,3 +291,36 @@ class test_marci_isis_naif(unittest.TestCase):
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
+
+# ========= Test crism isislabel and naifspice driver =========
+class test_crism_isis_naif(unittest.TestCase):
+
+    def setUp(self):
+        label = get_image_label("FRT00003B73_01_IF156S_TRR2", "isis3")
+        self.driver = MroCrismIsisLabelNaifSpiceDriver(label)
+
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == "MRO_CRISM_VNIR"
+
+    def test_ephemeris_start_time(self):
+        with patch('ale.drivers.mro_drivers.spice.scs2e', return_value=12345) as scs2e:
+            assert self.driver.ephemeris_start_time == 12345
+            scs2e.assert_called_with(-74999, '2/0852246631.07190')
+
+    def test_ephemeris_stop_time(self):
+        with patch('ale.drivers.mro_drivers.spice.scs2e', return_value=12345) as scs2e:
+            assert self.driver.ephemeris_stop_time == 12345
+            scs2e.assert_called_with(-74999, '2/0852246634.55318')
+
+    def spacecraft_name(self):
+        assert self.driver.sensor_name == "MRO"
+
+    def sensor_name(self):
+        assert self.driver.sensor_name == "CRISM"
+
+    def test_sensor_model_version(self):
+        assert self.driver.sensor_model_version == 1
+
+    def test_line_exposure_duration(self):
+        with patch('ale.drivers.mro_drivers.spice.scs2e', return_value=12345) as scs2e:
+            assert self.driver.line_exposure_duration == 0.0
