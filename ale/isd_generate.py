@@ -167,7 +167,6 @@ def file_to_isd(
         logger.info(f"Overriding radius to:")
         logger.info(usgscsm_json["radii"])
         usgscsm_str = json.dumps(usgscsm_json, indent=2)
-        isd_file.write_text(usgscsm_str)
 
     logger.info(f"Writing: {isd_file}")
     isd_file.write_text(usgscsm_str)
