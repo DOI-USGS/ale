@@ -16,7 +16,7 @@ import logging
 import os
 from pathlib import Path
 import sys
-
+import json
 import ale
 
 logger = logging.getLogger(__name__)
@@ -52,6 +52,19 @@ def main():
              ".json will be used to generate the output file paths."
     )
     parser.add_argument(
+        "-r", "--radius",
+        type=float,
+        default=None,
+        help="Optional spherical radius (km) override.  If not specified, the default "
+             "radius values, as defined in the NAIF kernels, will be used.  "
+             "There often cases were the defined NAIF radii are set as a triaxial "
+             "when the IAU WGCCRE report recommends a best-fit sphere for a "
+             "derived map product. For current IAU spherical recommendations see: "
+             "https://doi.org/10.1007/s10569-017-9805-5 or "
+             "http://voparis-vespa-crs.obspm.fr:8080/web/. "
+             "Make sure radius value is in kilometers."
+    )
+    parser.add_argument(
         "-v", "--verbose",
         action="store_true",
         help="Display information as program runs."
@@ -84,9 +97,12 @@ def main():
         except KeyError:
             k = [args.kernel, ]
 
+    if args.radius is not None:
+        rad = args.radius
+
     if len(args.input) == 1:
         try:
-            file_to_isd(args.input[0], args.out, kernels=k, log_level=log_level)
+            file_to_isd(args.input[0], args.out, rad, kernels=k, log_level=log_level)
         except Exception as err:
             # Seriously, this just throws a generic Exception?
             sys.exit(f"File {args.input[0]}: {err}")
@@ -96,7 +112,7 @@ def main():
         ) as executor:
             futures = {
                 executor.submit(
-                    file_to_isd, f, **{"kernels": k, "log_level": log_level}
+                    file_to_isd, f, **{"radius": rad, "kernels": k, "log_level": log_level}
                 ): f for f in args.input
             }
             for f in concurrent.futures.as_completed(futures):
@@ -113,6 +129,7 @@ def main():
 def file_to_isd(
     file: os.PathLike,
     out: os.PathLike = None,
+    radius: float = None,
     kernels: list = None,
     log_level=logging.WARNING
 ):
@@ -142,6 +159,15 @@ def file_to_isd(
         usgscsm_str = ale.loads(file, props={'kernels': kernels})
     else:
         usgscsm_str = ale.loads(file)
+
+    if radius is not None:
+        usgscsm_json = json.loads(usgscsm_str)
+        usgscsm_json["radii"]["semimajor"] = radius
+        usgscsm_json["radii"]["semiminor"] = radius
+        logger.info(f"Overriding radius to:")
+        logger.info(usgscsm_json["radii"])
+        usgscsm_str = json.dumps(usgscsm_json, indent=2)
+        isd_file.write_text(usgscsm_str)
 
     logger.info(f"Writing: {isd_file}")
     isd_file.write_text(usgscsm_str)
