@@ -1,4 +1,6 @@
+import numpy as np
 import spiceypy as spice
+import pvl
 
 from ale import util
 
@@ -423,12 +425,23 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
                 f"INS{self.parent_id}_DISTORTION_COEF_X": self.odtx,
                 f"INS{self.parent_id}_DISTORTION_COEF_Y": self.odty}
 
-
-class NewHorizonsMvicTdiIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
+class NewHorizonsMvicTdiIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, LegendreDistortion, Driver):
     """
     Driver for reading New Horizons MVIC TDI ISIS3 Labels. These are Labels that have been
     ingested into ISIS from PDS EDR images but have not been spiceinit'd yet.
     """
+    @property
+    def parent_id(self):
+        """
+        The base naif id of the spacecraft.  For New Horizons, this is -98000.
+        Required for distortion coefficients, which are not unique to instruments,
+        but are instead shared by all instruments on the spacecraft + residuals.
+        Returns
+        -------
+        : int
+          Naif id of the spacecraft
+        """
+        return round(self.ikid, -2)
 
     @property
     def instrument_id(self):
@@ -513,16 +526,42 @@ class NewHorizonsMvicTdiIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpi
         return 0
 
     @property
+    def odtx(self):
+        """
+        Returns the x coefficient for the optical distortion model
+        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+        Returns
+        -------
+        : list
+          Optical distortion x coefficients
+        """
+        return spice.gdpool('INS{}_DISTORTION_COEF_X'.format(self.parent_id),0, 20).tolist()
+
+    @property
+    def odty(self):
+        """
+        Returns the y coefficient for the optical distortion model.
+        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+        Returns
+        -------
+        : list
+          Optical distortion y coefficients
+        """
+        return spice.gdpool('INS{}_DISTORTION_COEF_Y'.format(self.parent_id), 0, 20).tolist()
+
+    @property
     def naif_keywords(self):
         """
-        Adds all naif keywords associated with "-98900" to the naif keywords group
+        Adds base NH instrument distortion, which is shared among all instruments on NH.
 
         Returns
         -------
         : dict
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
-        return {**super().naif_keywords, **util.query_kernel_pool(f"*{-98900}*", 20)}
+        return {**super().naif_keywords,
+                f"INS{self.parent_id}_DISTORTION_COEF_X": self.odtx,
+                f"INS{self.parent_id}_DISTORTION_COEF_Y": self.odty}
 
     @property
     def sensor_model_version(self):

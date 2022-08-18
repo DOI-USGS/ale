@@ -73,9 +73,7 @@ def test_nhmvictdi_load(test_kernels, image):
     isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
     compare_isd = image_dict[image]
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
-    comparison = compare_dicts(isd_obj, compare_isd)
-    assert comparison == []
+    assert compare_dicts(isd_obj, compare_isd) == []
 
 
 # ========= Test Leisa isislabel and naifspice driver =========
