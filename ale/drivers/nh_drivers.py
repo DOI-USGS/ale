@@ -422,3 +422,114 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
         return {**super().naif_keywords,
                 f"INS{self.parent_id}_DISTORTION_COEF_X": self.odtx,
                 f"INS{self.parent_id}_DISTORTION_COEF_Y": self.odty}
+
+
+class NewHorizonsMvicTdiIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
+    """
+    Driver for reading New Horizons MVIC TDI ISIS3 Labels. These are Labels that have been
+    ingested into ISIS from PDS EDR images but have not been spiceinit'd yet.
+    """
+
+    @property
+    def instrument_id(self):
+        """
+        Returns an instrument id for uniquely identifying the instrument, but often
+        also used to be piped into Spice Kernels to acquire IKIDs. Therefore they
+        the same ID the Spice expects in bods2c calls.
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
+        id_lookup = {
+            "MVIC_TDI" : "ISIS_NH_RALPH_MVIC_METHANE"
+        }
+        return id_lookup[super().instrument_id]
+
+    @property
+    def ikid(self):
+        """
+        Read the ikid from the cube label
+        """
+        if not hasattr(self, "_ikid"):
+            self._ikid = None
+            # Attempt to get the frame code using frame name,
+            # If that fails, try to get it directly from the cube label
+            try:
+                self._ikid = spice.frmname(self.instrument_id)
+            except:
+                self._ikid = self.label["IsisCube"]["Kernels"]["NaifFrameCode"].value
+        return self._ikid
+
+    @property
+    def sensor_name(self):
+        """
+        Returns the name of the instrument
+
+        Returns
+        -------
+        : str
+          Name of the sensor
+        """
+        return self.label['IsisCube']['Instrument']['InstrumentId']
+
+    @property
+    def exposure_duration(self):
+        """
+        Returns the exposure duration for MVIC TDI cameras
+
+        Returns
+        -------
+        : float
+          The exposure duration
+        """
+        return (1.0 / self.label["IsisCube"]["Instrument"]["TdiRate"].value)
+
+    @property
+    def detector_center_sample(self):
+        """
+        Returns the center detector sample. This is currently defaulted to 0
+        as it is unused in ISIS
+
+        Returns
+        -------
+        : float
+          Detector sample of the principal point
+        """
+        return 0
+
+    @property
+    def detector_center_line(self):
+        """
+        Returns the center detector line. This is currently defaulted to 0
+        as it is unused in ISIS
+
+        Returns
+        -------
+        : float
+          Detector line of the principal point
+        """
+        return 0
+
+    @property
+    def naif_keywords(self):
+        """
+        Adds all naif keywords associated with "-98900" to the naif keywords group
+
+        Returns
+        -------
+        : dict
+          Dictionary of keywords and values that ISIS creates and attaches to the label
+        """
+        return {**super().naif_keywords, **util.query_kernel_pool(f"*{-98900}*", 20)}
+
+    @property
+    def sensor_model_version(self):
+        """
+        Returns
+        -------
+        : int
+          ISIS sensor model version
+        """
+        return 1
