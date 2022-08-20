@@ -52,17 +52,32 @@ def main():
              ".json will be used to generate the output file paths."
     )
     parser.add_argument(
-        "-r", "--radius",
+        "--semimajor",
+        required='--semiminor' in sys.argv,
         type=float,
         default=None,
-        help="Optional spherical radius (km) override.  If not specified, the default "
-             "radius values, as defined in the NAIF kernels, will be used.  "
-             "There often cases were the defined NAIF radii are set as a triaxial "
-             "when the IAU WGCCRE report recommends a best-fit sphere for a "
-             "derived map product. For current IAU spherical recommendations see: "
+        help="Optional spherical radius (km) override.  Setting "
+             " '--semimajor 3396.19' "
+             "will override both semi-major and semi-minor radius values with the same value.  "
+             "An ellipse can be defined if '--semiminor' is also sent.  "
+             "If not specified, the default radius "
+             "values (e.g.; from NAIF kernels or the ISIS Cube) will be used.  "
+             "When is needed? Beyond a specialized need, it is common "
+             "that planetary bodies are defined as a triaxial body.  "
+             "In most of these cases, the IAU WGCCRE report recommends the use of a "
+             "best-fit sphere for a derived map product.  "
+             "For current IAU spherical recommendations see: "
              "https://doi.org/10.1007/s10569-017-9805-5 or "
-             "http://voparis-vespa-crs.obspm.fr:8080/web/. "
-             "Make sure radius value is in kilometers."
+             "http://voparis-vespa-crs.obspm.fr:8080/web/  "
+             "Make sure radius values are in kilometers."
+    )
+    parser.add_argument(
+        "--semiminor",
+        type=float,
+        default=None,
+        help="Optional semi-minor radius (km) override. When using this parameter, you must also define the semi-major radius. Setting "
+             " '--semimajor 3396.19 --semiminor 3376.2' "
+             "will override the semi-major and semi-minor radii to define an ellipse.  "
     )
     parser.add_argument(
         "-v", "--verbose",
@@ -97,12 +112,17 @@ def main():
         except KeyError:
             k = [args.kernel, ]
 
-    if args.radius is not None:
-        rad = args.radius
+    if args.semimajor is None:
+        radii = None
+    else:
+        if args.semiminor is None:  # set a sphere
+          radii = [args.semimajor, args.semimajor]
+        else:                       # set as ellipse
+          radii = [args.semimajor, args.semiminor]
 
     if len(args.input) == 1:
         try:
-            file_to_isd(args.input[0], args.out, rad, kernels=k, log_level=log_level)
+            file_to_isd(args.input[0], args.out, radii, kernels=k, log_level=log_level)
         except Exception as err:
             # Seriously, this just throws a generic Exception?
             sys.exit(f"File {args.input[0]}: {err}")
@@ -112,7 +132,7 @@ def main():
         ) as executor:
             futures = {
                 executor.submit(
-                    file_to_isd, f, **{"radius": rad, "kernels": k, "log_level": log_level}
+                    file_to_isd, f, **{"radii": radii, "kernels": k, "log_level": log_level}
                 ): f for f in args.input
             }
             for f in concurrent.futures.as_completed(futures):
@@ -129,7 +149,7 @@ def main():
 def file_to_isd(
     file: os.PathLike,
     out: os.PathLike = None,
-    radius: float = None,
+    radii: list = None,
     kernels: list = None,
     log_level=logging.WARNING
 ):
@@ -160,10 +180,10 @@ def file_to_isd(
     else:
         usgscsm_str = ale.loads(file)
 
-    if radius is not None:
+    if radii is not None:
         usgscsm_json = json.loads(usgscsm_str)
-        usgscsm_json["radii"]["semimajor"] = radius
-        usgscsm_json["radii"]["semiminor"] = radius
+        usgscsm_json["radii"]["semimajor"] = radii[0]
+        usgscsm_json["radii"]["semiminor"] = radii[1]
         logger.info(f"Overriding radius to:")
         logger.info(usgscsm_json["radii"])
         usgscsm_str = json.dumps(usgscsm_json, indent=2)
