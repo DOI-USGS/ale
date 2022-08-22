@@ -15,7 +15,7 @@ dependencies:
   - python
   - python-dateutil
   - scipy>=1.4.0
-  - spiceypy>=4.0.1
+  - spiceypy>=5.1.0
   - pyyaml
   - pytest
   - pytest-cov

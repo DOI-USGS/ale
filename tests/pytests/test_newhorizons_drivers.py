@@ -14,13 +14,14 @@ from unittest.mock import patch
 
 from conftest import get_image_label, get_image_kernels, convert_kernels, compare_dicts, get_isd
 
-from ale.drivers.nh_drivers import NewHorizonsLorriIsisLabelNaifSpiceDriver, NewHorizonsLeisaIsisLabelNaifSpiceDriver, NewHorizonsMvicIsisLabelNaifSpiceDriver
+from ale.drivers.nh_drivers import NewHorizonsLorriIsisLabelNaifSpiceDriver, NewHorizonsLeisaIsisLabelNaifSpiceDriver, NewHorizonsMvicIsisLabelNaifSpiceDriver, NewHorizonsMvicTdiIsisLabelNaifSpiceDriver
 from conftest import get_image_kernels, convert_kernels, get_image_label, get_isd
 
 image_dict = {
     'lor_0034974380_0x630_sci_1': get_isd("nhlorri"),
     'lsb_0296962438_0x53c_eng': get_isd("nhleisa"),
-    'mpf_0295610274_0x539_sci' : get_isd("mvic_mpf")
+    'mpf_0295610274_0x539_sci' : get_isd("mvic_mpf"),
+    'mc3_0034948318_0x536_sci_1': get_isd("nhmvic_tdi")
 }
 
 @pytest.fixture()
@@ -64,6 +65,16 @@ def test_nhmvic_load(test_kernels, image):
 
     isd_obj = json.loads(isd_str)
     assert compare_dicts(isd_obj, compare_isd) == []
+
+# Test load of nh leisa labels
+@pytest.mark.parametrize("image", ['mc3_0034948318_0x536_sci_1'])
+def test_nhmvictdi_load(test_kernels, image):
+    label_file = get_image_label(image, 'isis')
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
+    compare_isd = image_dict[image]
+    isd_obj = json.loads(isd_str)
+    assert compare_dicts(isd_obj, compare_isd) == []
+
 
 # ========= Test Leisa isislabel and naifspice driver =========
 class test_leisa_isis_naif(unittest.TestCase):
@@ -137,3 +148,23 @@ class test_mvic_framer_isis3_naif(unittest.TestCase):
         with patch('ale.drivers.nh_drivers.spice.utc2et', return_value=12345) as utc2et:
             assert self.driver.ephemeris_start_time == 12345
             utc2et.assert_called_with("2015-06-03 04:06:32.848000")
+
+class test_mvictdi_isis_naif(unittest.TestCase):
+    def setUp(self):
+        label = get_image_label("mc3_0034948318_0x536_sci_1", "isis")
+        self.driver = NewHorizonsMvicTdiIsisLabelNaifSpiceDriver(label)
+
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == "ISIS_NH_RALPH_MVIC_METHANE"
+
+    def test_ikid(self):
+            assert self.driver.ikid == -98908
+
+    def test_detector_center_sample(self):
+        assert self.driver.detector_center_sample == 0
+
+    def test_detector_center_line(self):
+        assert self.driver.detector_center_line == 0
+
+    def test_exposure_duration(self):
+        np.testing.assert_almost_equal(self.driver.exposure_duration, 0.01848999598767087)
