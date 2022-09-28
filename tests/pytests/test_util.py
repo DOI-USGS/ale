@@ -6,9 +6,7 @@ import networkx as nx
 
 import pytest
 import tempfile
-import spiceypy as spice
 import pvl
-from unittest import mock
 from unittest.mock import MagicMock, patch
 
 from collections import OrderedDict

@@ -143,7 +143,7 @@ class NaifSpice():
           Radial distortion coefficients
         """
         if not hasattr(self, "_odtk"):
-            self._odtk = pyspiceql.getKernelVectorValue('INS{}_OD_K'.format(self.ikid)).toList()
+            self._odtk = list(pyspiceql.getKernelVectorValue('INS{}_OD_K'.format(self.ikid)))
         return self._odtk
 
     @property
@@ -250,7 +250,7 @@ class NaifSpice():
         : list<double>
           focal plane to detector samples
         """
-        if not hasattr(self, "_focal2pixel_lines"):
+        if not hasattr(self, "_focal2pixel_samples"):
             self._focal2pixel_samples = list(pyspiceql.getKernelVectorValue('INS{}_ITRANSS'.format(self.ikid)))
         return self._focal2pixel_samples
 
@@ -278,7 +278,7 @@ class NaifSpice():
         : list<double>
         detector to focal plane y
         """
-        if not hasattr(self, "_pixel2focal_x"):
+        if not hasattr(self, "_pixel2focal_y"):
             self._pixel2focal_y = list(pyspiceql.getKernelVectorValue('INS{}_ITRANSY'.format(self.ikid)))
         return self._pixel2focal_y
 
@@ -294,7 +294,7 @@ class NaifSpice():
           focal length
         """
         if not hasattr(self, "_focal_length"):
-            self._focal_length = float(pyspiceql.getKernelStringValue('INS{}_FOCAL_LENGTH'.format(self.ikid))[0])
+            self._focal_length = float(pyspiceql.getKernelVectorValue('INS{}_FOCAL_LENGTH'.format(self.ikid))[0])
         return self._focal_length
 
     @property
@@ -307,7 +307,7 @@ class NaifSpice():
         : float pixel size
         """
         if not hasattr(self, "_pixel_size"):
-            self._pixel_size = pyspiceql.getKernelStringValue('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
+            self._pixel_size = pyspiceql.getKernelVectorValue('INS{}_PIXEL_SIZE'.format(self.ikid))[0] * 0.001
         return self._pixel_size
 
     @property
@@ -371,7 +371,7 @@ class NaifSpice():
                                                         self.spacecraft_name,
                                                         'J2000',
                                                         self.light_time_correction)
-                sun_state = sun_lt_state.starg
+                sun_state = np.array(list(sun_lt_state.starg))
                 positions.append(sun_state[:3])
                 velocities.append(sun_state[3:6])
             positions = 1000 * np.asarray(positions)
@@ -418,7 +418,6 @@ class NaifSpice():
                                                        observer,
                                                        'J2000',
                                                        self.light_time_correction)
-                    obs_tar_state = obs_tar.starg
                     obs_tar_lt = obs_tar.lt
 
                     # ssb to spacecraft
@@ -427,8 +426,7 @@ class NaifSpice():
                                                        'SSB',
                                                        'J2000',
                                                        "NONE")
-                    ssb_obs_state = ssb_obs.starg
-                    ssb_obs_lt = ssb_obs.lt
+                    ssb_obs_state = np.array(list(ssb_obs.starg))
 
                     radius_lt = (self.target_body_radii[2] + self.target_body_radii[0]) / 2 / (scipy.constants.c/1000.0)
                     adjusted_time = time - obs_tar_lt + radius_lt
@@ -438,8 +436,7 @@ class NaifSpice():
                                                        'SSB',
                                                        'J2000',
                                                        "NONE")
-                    ssb_tar_state = ssb_tar.starg
-                    ssb_tar_lt = ssb_tar.lt
+                    ssb_tar_state = np.array(list(ssb_tar.starg))
                     state = ssb_tar_state - ssb_obs_state
 
                     matrix = spice.sxform("J2000", self.reference_frame, time)
@@ -450,19 +447,20 @@ class NaifSpice():
                                                      observer,
                                                      self.reference_frame,
                                                      self.light_time_correction)
+                    state = np.array(list(state.starg))
 
                 if self.swap_observer_target:
-                    pos.append(-state.starg[:3])
-                    vel.append(-state.starg[3:])
+                    pos.append(-state[:3])
+                    vel.append(-state[3:])
                 else:
-                    pos.append(state.starg[:3])
-                    vel.append(state.starg[3:])
+                    pos.append(state[:3])
+                    vel.append(state[3:])
 
 
             # By default, SPICE works in km, so convert to m
             self._position = 1000 * np.asarray(pos)
             self._velocity = 1000 * np.asarray(vel)
-        return self._position, self._velocity, self.ephemeris_time
+        return self._position, self._velocity, ephem
 
     @property
     def frame_chain(self):
