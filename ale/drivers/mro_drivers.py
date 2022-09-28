@@ -358,7 +358,7 @@ class MroCtxIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDi
         """
         if not hasattr(self, '_ephemeris_start_time'):
             sclock = self.label['IsisCube']['Instrument']['SpacecraftClockCount']
-            self._ephemeris_start_time = pyspiceql.sclkToEt(self.spacecraft_id, sclock)
+            self._ephemeris_start_time = pyspiceql.sclkToEt(str(self.spacecraft_name).lower(), sclock)
         return self._ephemeris_start_time
 
     @property
