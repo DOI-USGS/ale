@@ -362,3 +362,51 @@ class RollingShutter():
         : array
         """
         raise NotImplementedError
+
+
+class Cavhor():
+    """
+    """
+
+    @property
+    def cahvor_rotation_matrix(self):
+        """
+        """
+        keys = ['GEOMETRIC_CAMERA_MODEL', 'GEOMETRIC_CAMERA_MODEL_PARMS']
+        for key in keys:
+            camera_model_group = self.label.get(key, None)
+            if camera_model_group is not None:
+                break
+        if camera_model_group is None:
+            return []
+        # C = np.array(camera_model_group["MODEL_COMPONENT_1"])
+        A = np.array(camera_model_group["MODEL_COMPONENT_2"])
+        H = np.array(camera_model_group["MODEL_COMPONENT_3"])
+        V = np.array(camera_model_group["MODEL_COMPONENT_4"])
+        # if (len(camera_model_group.get('MODEL_COMPONENT_ID', ['C', 'A', 'H', 'V'])) == 6):
+        #     O = np.array(camera_model_group["MODEL_COMPONENT_5"])
+        #     R = np.array(camera_model_group["MODEL_COMPONENT_6"])
+        h_c = np.dot(A, H)
+        h_s = np.linalg.norm(np.cross(A, H))
+        v_c = np.dot(A, V)
+        v_s = np.linalg.norm(np.cross(A, V))
+        H_prime = (H - h_c * A)/h_s
+        V_prime = (V - v_c * A)/v_s
+        rot_matrix = np.array([H_prime, -V_prime, -A])
+
+        return rot_matrix
+
+    @property
+    def frame_chain(self):
+        """
+        """
+        frame_chain = super().frame_chain
+        cahvor_quats = np.zeros(4)
+        cahvor_quat_from_rotation = spice.m2q(self.cahvor_rotation_matrix)
+        cahvor_quats[:3] = cahvor_quat_from_rotation[1:]
+        cahvor_quats[3] = cahvor_quat_from_rotation[0]
+        site_frame = str(self.label["GEOMETRIC_CAMERA_MODEL_PARMS"]["REFERENCE_COORD_SYSTEM_INDEX"][0])
+        site_frame = spice.bods2c("MSL_SITE_" + site_frame)
+        cahvor_rotation = ConstantRotation(cahvor_quats, site_frame, -76220)
+        frame_chain.add_edge(rotation = cahvor_rotation)
+        return frame_chain
