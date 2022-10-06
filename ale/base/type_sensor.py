@@ -366,11 +366,19 @@ class RollingShutter():
 
 class Cavhor():
     """
+    Mixin for largely ground based sensors to add the an
+    extra step in the frame chain to go from ground to J2000
     """
 
     @property
     def cahvor_rotation_matrix(self):
         """
+        Computes the cahvor rotation matrix for the instrument to Rover frame
+        
+        Returns
+        -------
+        : array
+          Rotation Matrix as a 2D numpy array
         """
         keys = ['GEOMETRIC_CAMERA_MODEL', 'GEOMETRIC_CAMERA_MODEL_PARMS']
         for key in keys:
@@ -379,13 +387,9 @@ class Cavhor():
                 break
         if camera_model_group is None:
             return []
-        # C = np.array(camera_model_group["MODEL_COMPONENT_1"])
         A = np.array(camera_model_group["MODEL_COMPONENT_2"])
         H = np.array(camera_model_group["MODEL_COMPONENT_3"])
         V = np.array(camera_model_group["MODEL_COMPONENT_4"])
-        # if (len(camera_model_group.get('MODEL_COMPONENT_ID', ['C', 'A', 'H', 'V'])) == 6):
-        #     O = np.array(camera_model_group["MODEL_COMPONENT_5"])
-        #     R = np.array(camera_model_group["MODEL_COMPONENT_6"])
         h_c = np.dot(A, H)
         h_s = np.linalg.norm(np.cross(A, H))
         v_c = np.dot(A, V)
@@ -399,6 +403,13 @@ class Cavhor():
     @property
     def frame_chain(self):
         """
+        Returns a modified frame chain with the cahvor models extra rotation
+        added into the model
+
+        Returns
+        -------
+        : object
+          A networkx frame chain object
         """
         frame_chain = super().frame_chain
         cahvor_quats = np.zeros(4)
@@ -407,6 +418,7 @@ class Cavhor():
         cahvor_quats[3] = cahvor_quat_from_rotation[0]
         site_frame = str(self.label["GEOMETRIC_CAMERA_MODEL_PARMS"]["REFERENCE_COORD_SYSTEM_INDEX"][0])
         site_frame = spice.bods2c("MSL_SITE_" + site_frame)
-        cahvor_rotation = ConstantRotation(cahvor_quats, site_frame, -76220)
+        rover_frame = spice.bods2c(self.instrument_id)
+        cahvor_rotation = ConstantRotation(cahvor_quats, site_frame, rover_frame)
         frame_chain.add_edge(rotation = cahvor_rotation)
         return frame_chain
