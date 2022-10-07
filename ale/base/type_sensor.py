@@ -470,7 +470,6 @@ class Cahvor():
             cahvor_quat_from_rotation = spice.m2q(self.cahvor_rotation_matrix)
             cahvor_quats[:3] = cahvor_quat_from_rotation[1:]
             cahvor_quats[3] = cahvor_quat_from_rotation[0]
-            print(self.sensor_frame_id)
             cahvor_rotation = ConstantRotation(cahvor_quats, self.sensor_frame_id, self.ikid)
             self._frame_chain.add_edge(rotation = cahvor_rotation)
         return self._frame_chain
