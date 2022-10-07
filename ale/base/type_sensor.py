@@ -1,4 +1,10 @@
+import math
+
 import numpy as np
+import spiceypy as spice
+
+from ale.transformation import FrameChain
+from ale.transformation import ConstantRotation
 
 class LineScanner():
     """
@@ -364,41 +370,82 @@ class RollingShutter():
         raise NotImplementedError
 
 
-class Cavhor():
+class Cahvor():
     """
     Mixin for largely ground based sensors to add the an
     extra step in the frame chain to go from ground to J2000
     """
 
     @property
+    def cahvor_camera_params(self):
+        """
+        Gets the PVL group that represents the CAHVOR camera model
+        for the site
+
+        Returns
+        -------
+        : dict
+          A dict of CAHVOR keys to use in other methods
+        """
+        if not hasattr(self, '_cahvor_camera_params'):
+            keys = ['GEOMETRIC_CAMERA_MODEL', 'GEOMETRIC_CAMERA_MODEL_PARMS']
+            for key in keys:
+                camera_model_group = self.label.get(key, None)
+                if camera_model_group != None:
+                    break
+            self._camera_model_group = {}
+            self._camera_model_group['C'] = np.array(camera_model_group["MODEL_COMPONENT_1"])
+            self._camera_model_group['A'] = np.array(camera_model_group["MODEL_COMPONENT_2"])
+            self._camera_model_group['H'] = np.array(camera_model_group["MODEL_COMPONENT_3"])
+            self._camera_model_group['V'] = np.array(camera_model_group["MODEL_COMPONENT_4"])
+            if len(camera_model_group.get('MODEL_COMPONENT_ID', ['C', 'A', 'H', 'V'])) == 6:
+                self._camera_model_group['O'] = np.array(camera_model_group["MODEL_COMPONENT_5"])
+                self._camera_model_group['R'] = np.array(camera_model_group["MODEL_COMPONENT_6"])
+        return self._camera_model_group
+
+    @property
     def cahvor_rotation_matrix(self):
         """
         Computes the cahvor rotation matrix for the instrument to Rover frame
-        
+
         Returns
         -------
         : array
           Rotation Matrix as a 2D numpy array
         """
-        keys = ['GEOMETRIC_CAMERA_MODEL', 'GEOMETRIC_CAMERA_MODEL_PARMS']
-        for key in keys:
-            camera_model_group = self.label.get(key, None)
-            if camera_model_group is not None:
-                break
-        if camera_model_group is None:
-            return []
-        A = np.array(camera_model_group["MODEL_COMPONENT_2"])
-        H = np.array(camera_model_group["MODEL_COMPONENT_3"])
-        V = np.array(camera_model_group["MODEL_COMPONENT_4"])
-        h_c = np.dot(A, H)
-        h_s = np.linalg.norm(np.cross(A, H))
-        v_c = np.dot(A, V)
-        v_s = np.linalg.norm(np.cross(A, V))
-        H_prime = (H - h_c * A)/h_s
-        V_prime = (V - v_c * A)/v_s
-        rot_matrix = np.array([H_prime, -V_prime, -A])
+        if not hasattr(self, "_cahvor_rotation_matrix"):
+            h_c = np.dot(self.cahvor_camera_params['A'], self.cahvor_camera_params['H'])
+            h_s = np.linalg.norm(np.cross(self.cahvor_camera_params['A'], self.cahvor_camera_params['H']))
+            v_c = np.dot(self.cahvor_camera_params['A'], self.cahvor_camera_params['V'])
+            v_s = np.linalg.norm(np.cross(self.cahvor_camera_params['A'], self.cahvor_camera_params['V']))
+            H_prime = (self.cahvor_camera_params['H'] - h_c * self.cahvor_camera_params['A'])/h_s
+            V_prime = (self.cahvor_camera_params['V'] - v_c * self.cahvor_camera_params['A'])/v_s
+            r_matrix = np.array([H_prime, -V_prime, -self.cahvor_camera_params['A']])
 
-        return rot_matrix
+            phi = math.asin(r_matrix[2][0])
+            w = - math.asin(r_matrix[2][1] / math.cos(phi))
+            k = math.acos(r_matrix[0][0] / math.cos(phi))
+
+            w = math.degrees(w)
+            phi = math.degrees(phi)
+            k = math.degrees(k)
+
+            # Rotational Matrix M generation
+            self._cahvor_rotation_matrix = np.zeros((3, 3))
+            self._cahvor_rotation_matrix[0, 0] = math.cos(phi) * math.cos(k)
+            self._cahvor_rotation_matrix[0, 1] = math.sin(w) * math.sin(phi) * math.cos(k) + \
+                math.cos(w) * math.sin(k)
+            self._cahvor_rotation_matrix[0, 2] = - math.cos(w) * math.sin(phi) * math.cos(k) + \
+                math.sin(w) * math.sin(k)
+            self._cahvor_rotation_matrix[1, 0] = - math.cos(phi) * math.sin(k)
+            self._cahvor_rotation_matrix[1, 1] = - math.sin(w) * math.sin(phi) * math.sin(k) + \
+                math.cos(w) * math.cos(k)
+            self._cahvor_rotation_matrix[1, 2] = math.cos(w) * math.sin(phi) * math.sin(k) + \
+                math.sin(w) * math.cos(k)
+            self._cahvor_rotation_matrix[2, 0] = math.sin(phi)
+            self._cahvor_rotation_matrix[2, 1] = - math.sin(w) * math.cos(phi)
+            self._cahvor_rotation_matrix[2, 2] = math.cos(w) * math.cos(phi)
+        return self._cahvor_rotation_matrix
 
     @property
     def frame_chain(self):
@@ -411,14 +458,36 @@ class Cavhor():
         : object
           A networkx frame chain object
         """
-        frame_chain = super().frame_chain
-        cahvor_quats = np.zeros(4)
-        cahvor_quat_from_rotation = spice.m2q(self.cahvor_rotation_matrix)
-        cahvor_quats[:3] = cahvor_quat_from_rotation[1:]
-        cahvor_quats[3] = cahvor_quat_from_rotation[0]
-        site_frame = str(self.label["GEOMETRIC_CAMERA_MODEL_PARMS"]["REFERENCE_COORD_SYSTEM_INDEX"][0])
-        site_frame = spice.bods2c("MSL_SITE_" + site_frame)
-        rover_frame = spice.bods2c(self.instrument_id)
-        cahvor_rotation = ConstantRotation(cahvor_quats, site_frame, rover_frame)
-        frame_chain.add_edge(rotation = cahvor_rotation)
-        return frame_chain
+        if not hasattr(self, '_frame_chain'):
+            nadir = self._props.get('nadir', False)
+            exact_ck_times = self._props.get('exact_ck_times', True)
+            self._frame_chain = FrameChain.from_spice(sensor_frame=self.ikid,
+                                                      target_frame=self.target_frame_id,
+                                                      center_ephemeris_time=self.center_ephemeris_time,
+                                                      ephemeris_times=self.ephemeris_time,
+                                                      nadir=nadir, exact_ck_times=exact_ck_times)
+            cahvor_quats = np.zeros(4)
+            cahvor_quat_from_rotation = spice.m2q(self.cahvor_rotation_matrix)
+            cahvor_quats[:3] = cahvor_quat_from_rotation[1:]
+            cahvor_quats[3] = cahvor_quat_from_rotation[0]
+            print(self.sensor_frame_id)
+            cahvor_rotation = ConstantRotation(cahvor_quats, self.sensor_frame_id, self.ikid)
+            self._frame_chain.add_edge(rotation = cahvor_rotation)
+        return self._frame_chain
+
+    @property
+    def sensor_frame_id(self):
+        """
+        Returns the Naif ID code for the site reference frame
+        Expects REFERENCE_COORD_SYSTEM_INDEX to be defined in the camera
+        PVL group. 
+
+        Returns
+        -------
+        : int
+          Naif ID code for the sensor frame
+        """
+        if not hasattr(self, "_site_frame_id"):
+          site_frame = "MSL_SITE_" + str(self.label["GEOMETRIC_CAMERA_MODEL_PARMS"]["REFERENCE_COORD_SYSTEM_INDEX"][0])
+          self._site_frame_id= spice.bods2c(site_frame)
+        return self._site_frame_id
