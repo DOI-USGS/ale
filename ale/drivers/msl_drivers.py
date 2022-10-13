@@ -109,8 +109,6 @@ class MslMastcamPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortion, 
     @property
     def sensor_model_version(self):
         """
-        The ISIS Sensor model number for HiRise in ISIS. This is likely just 1
-
         Returns
         -------
         : int
