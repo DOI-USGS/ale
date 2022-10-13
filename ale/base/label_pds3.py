@@ -288,19 +288,23 @@ class Pds3Label():
          """
         # The EXPOSURE_DURATION may either be stored as a (value, unit) or just a value
         if 'EXPOSURE_DURATION' in self.label:
-            try:
-                unit = self.label['EXPOSURE_DURATION'].units
-                unit = unit.lower()
-                if unit == "ms" or unit == "msec" or unit == "millisecond":
-                  return self.label['EXPOSURE_DURATION'].value * 0.001
-                else:
-                  return self.label['EXPOSURE_DURATION'].value
-
-            # With no units, assume milliseconds
-            except:
-                return self.label['EXPOSURE_DURATION'] * 0.001
+            key = self.label['EXPOSURE_DURATION']
+        elif 'INSTRUMENT_STATE_PARMS' in self.label:
+            key = self.label['INSTRUMENT_STATE_PARMS']['EXPOSURE_DURATION']
         else:
             return self.line_exposure_duration
+        try:
+            unit = key.units
+            unit = unit.lower()
+            if unit == "ms" or unit == "msec" or unit == "millisecond":
+                return key.value * 0.001
+            else:
+                return key.value
+
+        # With no units, assume milliseconds
+        except:
+            return key * 0.001
+        
 
 
     # Consider expanding this to handle units

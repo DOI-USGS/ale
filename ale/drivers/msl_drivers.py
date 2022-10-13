@@ -44,29 +44,7 @@ class MslMastcamPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortion, 
       return self.instrument_host_id + "_" + lookup[super().instrument_id]
 
     @property
-    def exposure_duration(self):
-      """
-      Returns the exposure duration converted to seconds. EXPOSURE_DURATION keyword is found
-      in the INSTRUMENT_STATE_PARMS group of the PDS3 label.
-
-      Returns
-      -------
-      : float
-        Returns the exposure duration in seconds from the PDS3 label.
-      """
-      try:
-        unit = self.label['INSTRUMENT_STATE_PARMS']['EXPOSURE_DURATION'].units
-        unit = unit.lower()
-        if unit == "ms" or unit == "msec" or unit == "millisecond":
-            return self.label['INSTRUMENT_STATE_PARMS']['EXPOSURE_DURATION'].value * 0.001
-        else:
-            return self.label['INSTRUMENT_STATE_PARMS']['EXPOSURE_DURATION'].value
-      # With no units, assume milliseconds
-      except:
-        return self.label['INSTRUMENT_STATE_PARMS']['EXPOSURE_DURATION'] * 0.001
-
-    @property
-    def cahvor_camera_params(self):
+    def cahvor_camera_dict(self):
       """
       Gets the PVL group that represents the CAHVOR camera model
       for the site
@@ -76,20 +54,17 @@ class MslMastcamPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortion, 
         A dict of CAHVOR keys to use in other methods
       """
       if not hasattr(self, '_cahvor_camera_params'):
-          keys = ['GEOMETRIC_CAMERA_MODEL', 'GEOMETRIC_CAMERA_MODEL_PARMS']
-          for key in keys:
-              camera_model_group = self.label.get(key, None)
-              if camera_model_group != None:
-                  break
-          self._camera_model_group = {}
-          self._camera_model_group['C'] = np.array(camera_model_group["MODEL_COMPONENT_1"])
-          self._camera_model_group['A'] = np.array(camera_model_group["MODEL_COMPONENT_2"])
-          self._camera_model_group['H'] = np.array(camera_model_group["MODEL_COMPONENT_3"])
-          self._camera_model_group['V'] = np.array(camera_model_group["MODEL_COMPONENT_4"])
+          camera_model_group = self.label.get('GEOMETRIC_CAMERA_MODEL_PARMS', None)
+
+          self._cahvor_camera_params = {}
+          self._cahvor_camera_params['C'] = np.array(camera_model_group["MODEL_COMPONENT_1"])
+          self._cahvor_camera_params['A'] = np.array(camera_model_group["MODEL_COMPONENT_2"])
+          self._cahvor_camera_params['H'] = np.array(camera_model_group["MODEL_COMPONENT_3"])
+          self._cahvor_camera_params['V'] = np.array(camera_model_group["MODEL_COMPONENT_4"])
           if len(camera_model_group.get('MODEL_COMPONENT_ID', ['C', 'A', 'H', 'V'])) == 6:
-              self._camera_model_group['O'] = np.array(camera_model_group["MODEL_COMPONENT_5"])
-              self._camera_model_group['R'] = np.array(camera_model_group["MODEL_COMPONENT_6"])
-      return self._camera_model_group
+              self._cahvor_camera_params['O'] = np.array(camera_model_group["MODEL_COMPONENT_5"])
+              self._cahvor_camera_params['R'] = np.array(camera_model_group["MODEL_COMPONENT_6"])
+      return self._cahvor_camera_params
 
     @property
     def sensor_frame_id(self):
