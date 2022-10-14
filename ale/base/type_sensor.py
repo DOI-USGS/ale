@@ -386,8 +386,28 @@ class Cahvor():
         """
         raise NotImplementedError
 
+    def compute_h_c(self):
+        """
+        """
+        return np.dot(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['H'])
+
+    def compute_h_s(self):
+        """
+        """
+        return np.linalg.norm(np.cross(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['H']))
+
+    def compute_v_c(self):
+        """
+        """
+        return np.dot(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['V'])
+
+    def compute_v_s(self):
+        """
+        """
+        return np.linalg.norm(np.cross(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['V']))
+
     @property
-    def cahvor_model_elements(self):
+    def cahvor_rotation_matrix(self):
         """
         Computes the cahvor rotation matrix for the instrument to Rover frame
 
@@ -396,16 +416,11 @@ class Cahvor():
         : array
           Rotation Matrix as a 2D numpy array
         """
-        if not hasattr(self, "_cahvor_model_elements"):
-            self._cahvor_model_elements = {}
-            h_c = np.dot(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['H'])
-            h_s = np.linalg.norm(np.cross(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['H']))
-            v_c = np.dot(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['V'])
-            v_s = np.linalg.norm(np.cross(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['V']))
-            self._cahvor_model_elements["h_c"] = h_c
-            self._cahvor_model_elements["h_s"] = h_s
-            self._cahvor_model_elements["v_c"] = v_c
-            self._cahvor_model_elements["v_s"] = v_s
+        if not hasattr(self, "_cahvor_rotation_matrix"):
+            h_c = self.compute_h_c()
+            h_s = self.compute_h_s()
+            v_c = self.compute_v_c()
+            v_s = self.compute_v_s()
             H_prime = (self.cahvor_camera_dict['H'] - h_c * self.cahvor_camera_dict['A'])/h_s
             V_prime = (self.cahvor_camera_dict['V'] - v_c * self.cahvor_camera_dict['A'])/v_s
             r_matrix = np.array([H_prime, -V_prime, -self.cahvor_camera_dict['A']])
@@ -433,8 +448,8 @@ class Cahvor():
             cahvor_rotation_matrix[2, 0] = math.sin(phi)
             cahvor_rotation_matrix[2, 1] = - math.sin(w) * math.cos(phi)
             cahvor_rotation_matrix[2, 2] = math.cos(w) * math.cos(phi)
-            self._cahvor_model_elements["r_matrix"] = cahvor_rotation_matrix
-        return self._cahvor_model_elements
+            self._cahvor_rotation_matrix = cahvor_rotation_matrix
+        return self._cahvor_rotation_matrix
 
     @property
     def frame_chain(self):
@@ -453,7 +468,7 @@ class Cahvor():
                                                       center_ephemeris_time=self.center_ephemeris_time,
                                                       ephemeris_times=self.ephemeris_time,
                                                       nadir=False, exact_ck_times=False)
-            cahvor_quats = Rotation.from_matrix(self.cahvor_model_elements["r_matrix"]).as_quat()
+            cahvor_quats = Rotation.from_matrix(self.cahvor_rotation_matrix).as_quat()
             cahvor_rotation = ConstantRotation(cahvor_quats, self.sensor_frame_id, self.ikid)
             self._frame_chain.add_edge(rotation = cahvor_rotation)
         return self._frame_chain
@@ -469,7 +484,7 @@ class Cahvor():
         : float
           The detector center line/boresight center line
         """
-        return self.cahvor_model_elements["v_c"]
+        return self.compute_v_c()
 
     @property
     def detector_center_sample(self):
@@ -482,7 +497,7 @@ class Cahvor():
         : float
           The detector center sample/boresight center sample
         """
-        return self.cahvor_model_elements["h_c"]
+        return self.compute_h_c()
 
     @property
     def pixel_size(self):
@@ -495,4 +510,4 @@ class Cahvor():
         : float
           Focal length of a cahvor model instrument
         """
-        return self.focal_length/self.cahvor_model_elements["h_s"]
+        return self.focal_length/self.compute_h_s()
