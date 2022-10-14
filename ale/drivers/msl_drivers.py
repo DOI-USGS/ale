@@ -5,9 +5,10 @@ from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.type_sensor import Framer
 from ale.base.type_distortion import NoDistortion
+from ale.base.type_sensor import Cahvor
 from ale.base.base import Driver
 
-class MslMastcamPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortion, Driver):
+class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, NoDistortion, Driver):
     @property
     def spacecraft_name(self):
         """
