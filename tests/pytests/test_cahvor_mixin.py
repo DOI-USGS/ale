@@ -29,9 +29,13 @@ class test_cahvor_sensor(unittest.TestCase):
         self.driver.ephemeris_time = [0]
 
     @patch("ale.base.type_sensor.Cahvor.cahvor_camera_dict", new_callable=PropertyMock, return_value=cahvor_camera_dict())
-    def test_cahvor_rotation_matrix(self, cahvor_camera_dict):
-        r_matrix = self.driver.cahvor_rotation_matrix
-        np.testing.assert_allclose(r_matrix, [[-0.42447558, -0.7572992,  -0.49630475],
+    def test_cahvor_model_elements(self, cahvor_camera_dict):
+        cahvor_model = self.driver.cahvor_model_elements
+        np.testing.assert_almost_equal(cahvor_model["h_s"], 13796.844341513603)
+        np.testing.assert_almost_equal(cahvor_model["h_c"], 673.4306859859296)
+        np.testing.assert_almost_equal(cahvor_model["v_s"], 13796.847423351614)
+        np.testing.assert_almost_equal(cahvor_model["v_c"], 590.1933422831007)
+        np.testing.assert_allclose(cahvor_model["r_matrix"], [[-0.42447558, -0.7572992,  -0.49630475],
                                               [ 0.73821222,  0.02793007, -0.67399009],
                                               [ 0.52427398, -0.65247056,  0.54719189]])
 
