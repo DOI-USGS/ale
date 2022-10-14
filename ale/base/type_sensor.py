@@ -388,21 +388,49 @@ class Cahvor():
 
     def compute_h_c(self):
         """
+        Computes the h_c element of a cahvor model for the conversion
+        to a photogrametric model
+
+        Returns
+        -------
+        : float
+          Dot product of A and H vectors
         """
         return np.dot(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['H'])
 
     def compute_h_s(self):
         """
+        Computes the h_s element of a cahvor model for the conversion
+        to a photogrametric model
+
+        Returns
+        -------
+        : float
+          Norm of the cross product of A and H vectors
         """
         return np.linalg.norm(np.cross(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['H']))
 
     def compute_v_c(self):
         """
+        Computes the v_c element of a cahvor model for the conversion
+        to a photogrametric model
+
+        Returns
+        -------
+        : float
+          Dot product of A and V vectors
         """
         return np.dot(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['V'])
 
     def compute_v_s(self):
         """
+        Computes the v_s element of a cahvor model for the conversion
+        to a photogrametric model
+
+        Returns
+        -------
+        : float
+          Norm of the cross product of A and V vectors
         """
         return np.linalg.norm(np.cross(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['V']))
 
