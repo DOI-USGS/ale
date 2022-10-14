@@ -372,36 +372,19 @@ class RollingShutter():
 
 class Cahvor():
     """
-    Mixin for largely ground based sensors to add the an
-    extra step in the frame chain to go from ground to J2000
+    Mixin for largely ground based sensors to add an
+    extra step in the frame chain to go from ground camera to
+    the Camera
     """
 
     @property
-    def cahvor_camera_params(self):
+    def cahvor_camera_dict(self):
         """
-        Gets the PVL group that represents the CAHVOR camera model
-        for the site
-
-        Returns
-        -------
-        : dict
-          A dict of CAHVOR keys to use in other methods
+        This function extracts and returns the elements for the
+        CAHVOR camera model from a concrete driver as a dictionary.
+        See the MSL MASTCAM Cahvor, Framer, Pds3Label, NaifSpice, Driver
         """
-        if not hasattr(self, '_cahvor_camera_params'):
-            keys = ['GEOMETRIC_CAMERA_MODEL', 'GEOMETRIC_CAMERA_MODEL_PARMS']
-            for key in keys:
-                camera_model_group = self.label.get(key, None)
-                if camera_model_group != None:
-                    break
-            self._camera_model_group = {}
-            self._camera_model_group['C'] = np.array(camera_model_group["MODEL_COMPONENT_1"])
-            self._camera_model_group['A'] = np.array(camera_model_group["MODEL_COMPONENT_2"])
-            self._camera_model_group['H'] = np.array(camera_model_group["MODEL_COMPONENT_3"])
-            self._camera_model_group['V'] = np.array(camera_model_group["MODEL_COMPONENT_4"])
-            if len(camera_model_group.get('MODEL_COMPONENT_ID', ['C', 'A', 'H', 'V'])) == 6:
-                self._camera_model_group['O'] = np.array(camera_model_group["MODEL_COMPONENT_5"])
-                self._camera_model_group['R'] = np.array(camera_model_group["MODEL_COMPONENT_6"])
-        return self._camera_model_group
+        raise NotImplementedError
 
     @property
     def cahvor_rotation_matrix(self):
@@ -414,13 +397,13 @@ class Cahvor():
           Rotation Matrix as a 2D numpy array
         """
         if not hasattr(self, "_cahvor_rotation_matrix"):
-            h_c = np.dot(self.cahvor_camera_params['A'], self.cahvor_camera_params['H'])
-            h_s = np.linalg.norm(np.cross(self.cahvor_camera_params['A'], self.cahvor_camera_params['H']))
-            v_c = np.dot(self.cahvor_camera_params['A'], self.cahvor_camera_params['V'])
-            v_s = np.linalg.norm(np.cross(self.cahvor_camera_params['A'], self.cahvor_camera_params['V']))
-            H_prime = (self.cahvor_camera_params['H'] - h_c * self.cahvor_camera_params['A'])/h_s
-            V_prime = (self.cahvor_camera_params['V'] - v_c * self.cahvor_camera_params['A'])/v_s
-            r_matrix = np.array([H_prime, -V_prime, -self.cahvor_camera_params['A']])
+            h_c = np.dot(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['H'])
+            h_s = np.linalg.norm(np.cross(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['H']))
+            v_c = np.dot(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['V'])
+            v_s = np.linalg.norm(np.cross(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['V']))
+            H_prime = (self.cahvor_camera_dict['H'] - h_c * self.cahvor_camera_dict['A'])/h_s
+            V_prime = (self.cahvor_camera_dict['V'] - v_c * self.cahvor_camera_dict['A'])/v_s
+            r_matrix = np.array([H_prime, -V_prime, -self.cahvor_camera_dict['A']])
 
             phi = math.asin(r_matrix[2][0])
             w = - math.asin(r_matrix[2][1] / math.cos(phi))
@@ -475,18 +458,19 @@ class Cahvor():
         return self._frame_chain
 
     @property
-    def sensor_frame_id(self):
+    def detector_center_line(self):
         """
-        Returns the Naif ID code for the site reference frame
-        Expects REFERENCE_COORD_SYSTEM_INDEX to be defined in the camera
-        PVL group. 
+        """
+        return np.dot(self.cahvor_camera_dict['V'], self.cahvor_camera_dict['A'])
 
-        Returns
-        -------
-        : int
-          Naif ID code for the sensor frame
+    @property
+    def detector_center_sample(self):
         """
-        if not hasattr(self, "_site_frame_id"):
-          site_frame = "MSL_SITE_" + str(self.label["GEOMETRIC_CAMERA_MODEL_PARMS"]["REFERENCE_COORD_SYSTEM_INDEX"][0])
-          self._site_frame_id= spice.bods2c(site_frame)
-        return self._site_frame_id
+        """
+        return np.dot(self.cahvor_camera_dict['H'], self.cahvor_camera_dict['A'])
+
+    @property
+    def pixel_size(self):
+        """
+        """
+        return self.focal_length/np.linalg.norm(np.cross(self.cahvor_camera_dict['H'], self.cahvor_camera_dict['A']))
