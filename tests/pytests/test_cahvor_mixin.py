@@ -47,11 +47,11 @@ class test_cahvor_sensor(unittest.TestCase):
 
     @patch("ale.base.type_sensor.Cahvor.cahvor_camera_dict", new_callable=PropertyMock, return_value=cahvor_camera_dict())
     def test_cahvor_detector_center_line(self, cahvor_camera_dict):
-        assert self.driver.detector_center_line == 590.1933422831007
+        np.testing.assert_almost_equal(self.driver.detector_center_line, 590.1933422831007)
     
     @patch("ale.base.type_sensor.Cahvor.cahvor_camera_dict", new_callable=PropertyMock, return_value=cahvor_camera_dict())
     def test_cahvor_detector_center_sample(self, cahvor_camera_dict):
-        assert self.driver.detector_center_sample == 673.4306859859296
+        np.testing.assert_almost_equal(self.driver.detector_center_sample, 673.4306859859296)
 
     @patch("ale.base.type_sensor.Cahvor.cahvor_camera_dict", new_callable=PropertyMock, return_value=cahvor_camera_dict())
     def test_cahvor_pixel_size(self, cahvor_camera_dict):
