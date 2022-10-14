@@ -1,7 +1,6 @@
 import numpy as np
 import unittest
 
-import ale
 from ale.drivers.msl_drivers import MslMastcamPds3NaifSpiceDriver
 
 from conftest import get_image_label
@@ -33,10 +32,17 @@ class test_mastcam_pds_naif(unittest.TestCase):
         with patch('ale.drivers.msl_drivers.spice.bods2c', return_value=-76562) as bods2c:
             assert self.driver.sensor_frame_id == -76562
             bods2c.assert_called_with("MSL_SITE_62")
+    
+    def test_focal2pixel_lines(self):
+        with patch('ale.drivers.msl_drivers.spice.bods2c', new_callable=PropertyMock, return_value=-76220) as bods2c, \
+             patch('ale.drivers.msl_drivers.spice.gdpool', new_callable=PropertyMock, return_value=[100]) as gdpool:
+            np.testing.assert_allclose(self.driver.focal2pixel_lines, [0, 137.96844341513602, 0])
+            bods2c.assert_called_with('MSL_MASTCAM_RIGHT')
+            gdpool.assert_called_with('INS-76220_FOCAL_LENGTH', 0, 1)
 
-    # uncomment once cahvor mixin is merged
-    # def test_focal2pixel_lines(self):
-    #     np.testing.assert_allclose(self.driver.focal2pixel_lines, [0, 137968.44341513602, 0])
-
-    # def test_focal2pixel_samples(self):
-    #     np.testing.assert_allclose(self.driver.focal2pixel_samples, [137968.44341513602, 0, 0])
+    def test_focal2pixel_samples(self):
+        with patch('ale.drivers.msl_drivers.spice.bods2c', new_callable=PropertyMock, return_value=-76220) as bods2c, \
+             patch('ale.drivers.msl_drivers.spice.gdpool', new_callable=PropertyMock, return_value=[100]) as gdpool:
+            np.testing.assert_allclose(self.driver.focal2pixel_samples, [137.96844341513602, 0, 0])
+            bods2c.assert_called_with('MSL_MASTCAM_RIGHT')
+            gdpool.assert_called_with('INS-76220_FOCAL_LENGTH', 0, 1)

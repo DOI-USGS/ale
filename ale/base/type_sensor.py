@@ -1,4 +1,10 @@
+import math
+
 import numpy as np
+from scipy.spatial.transform import Rotation
+
+from ale.transformation import FrameChain
+from ale.transformation import ConstantRotation
 
 class LineScanner():
     """
@@ -362,3 +368,174 @@ class RollingShutter():
         : array
         """
         raise NotImplementedError
+
+
+class Cahvor():
+    """
+    Mixin for largely ground based sensors to add an
+    extra step in the frame chain to go from ground camera to
+    the Camera
+    """
+
+    @property
+    def cahvor_camera_dict(self):
+        """
+        This function extracts and returns the elements for the
+        CAHVOR camera model from a concrete driver as a dictionary.
+        See the MSL MASTCAM Cahvor, Framer, Pds3Label, NaifSpice, Driver
+        """
+        raise NotImplementedError
+
+    def compute_h_c(self):
+        """
+        Computes the h_c element of a cahvor model for the conversion
+        to a photogrametric model
+
+        Returns
+        -------
+        : float
+          Dot product of A and H vectors
+        """
+        return np.dot(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['H'])
+
+    def compute_h_s(self):
+        """
+        Computes the h_s element of a cahvor model for the conversion
+        to a photogrametric model
+
+        Returns
+        -------
+        : float
+          Norm of the cross product of A and H vectors
+        """
+        return np.linalg.norm(np.cross(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['H']))
+
+    def compute_v_c(self):
+        """
+        Computes the v_c element of a cahvor model for the conversion
+        to a photogrametric model
+
+        Returns
+        -------
+        : float
+          Dot product of A and V vectors
+        """
+        return np.dot(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['V'])
+
+    def compute_v_s(self):
+        """
+        Computes the v_s element of a cahvor model for the conversion
+        to a photogrametric model
+
+        Returns
+        -------
+        : float
+          Norm of the cross product of A and V vectors
+        """
+        return np.linalg.norm(np.cross(self.cahvor_camera_dict['A'], self.cahvor_camera_dict['V']))
+
+    @property
+    def cahvor_rotation_matrix(self):
+        """
+        Computes the cahvor rotation matrix for the instrument to Rover frame
+
+        Returns
+        -------
+        : array
+          Rotation Matrix as a 2D numpy array
+        """
+        if not hasattr(self, "_cahvor_rotation_matrix"):
+            h_c = self.compute_h_c()
+            h_s = self.compute_h_s()
+            v_c = self.compute_v_c()
+            v_s = self.compute_v_s()
+            H_prime = (self.cahvor_camera_dict['H'] - h_c * self.cahvor_camera_dict['A'])/h_s
+            V_prime = (self.cahvor_camera_dict['V'] - v_c * self.cahvor_camera_dict['A'])/v_s
+            r_matrix = np.array([H_prime, -V_prime, -self.cahvor_camera_dict['A']])
+
+            phi = math.asin(r_matrix[2][0])
+            w = - math.asin(r_matrix[2][1] / math.cos(phi))
+            k = math.acos(r_matrix[0][0] / math.cos(phi))
+
+            w = math.degrees(w)
+            phi = math.degrees(phi)
+            k = math.degrees(k)
+
+            # Rotational Matrix M generation
+            cahvor_rotation_matrix = np.zeros((3, 3))
+            cahvor_rotation_matrix[0, 0] = math.cos(phi) * math.cos(k)
+            cahvor_rotation_matrix[0, 1] = math.sin(w) * math.sin(phi) * math.cos(k) + \
+                math.cos(w) * math.sin(k)
+            cahvor_rotation_matrix[0, 2] = - math.cos(w) * math.sin(phi) * math.cos(k) + \
+                math.sin(w) * math.sin(k)
+            cahvor_rotation_matrix[1, 0] = - math.cos(phi) * math.sin(k)
+            cahvor_rotation_matrix[1, 1] = - math.sin(w) * math.sin(phi) * math.sin(k) + \
+                math.cos(w) * math.cos(k)
+            cahvor_rotation_matrix[1, 2] = math.cos(w) * math.sin(phi) * math.sin(k) + \
+                math.sin(w) * math.cos(k)
+            cahvor_rotation_matrix[2, 0] = math.sin(phi)
+            cahvor_rotation_matrix[2, 1] = - math.sin(w) * math.cos(phi)
+            cahvor_rotation_matrix[2, 2] = math.cos(w) * math.cos(phi)
+            self._cahvor_rotation_matrix = cahvor_rotation_matrix
+        return self._cahvor_rotation_matrix
+
+    @property
+    def frame_chain(self):
+        """
+        Returns a modified frame chain with the cahvor models extra rotation
+        added into the model
+
+        Returns
+        -------
+        : object
+          A networkx frame chain object
+        """
+        if not hasattr(self, '_frame_chain'):
+            self._frame_chain = FrameChain.from_spice(sensor_frame=self.ikid,
+                                                      target_frame=self.target_frame_id,
+                                                      center_ephemeris_time=self.center_ephemeris_time,
+                                                      ephemeris_times=self.ephemeris_time,
+                                                      nadir=False, exact_ck_times=False)
+            cahvor_quats = Rotation.from_matrix(self.cahvor_rotation_matrix).as_quat()
+            cahvor_rotation = ConstantRotation(cahvor_quats, self.sensor_frame_id, self.ikid)
+            self._frame_chain.add_edge(rotation = cahvor_rotation)
+        return self._frame_chain
+
+    @property
+    def detector_center_line(self):
+        """
+        Computes the detector center line using the cahvor model.
+        Equation for computation comes from MSL instrument kernels
+
+        Returns
+        -------
+        : float
+          The detector center line/boresight center line
+        """
+        return self.compute_v_c()
+
+    @property
+    def detector_center_sample(self):
+        """
+        Computes the detector center sample using the cahvor model.
+        Equation for computation comes from MSL instrument kernels
+
+        Returns
+        -------
+        : float
+          The detector center sample/boresight center sample
+        """
+        return self.compute_h_c()
+
+    @property
+    def pixel_size(self):
+        """
+        Computes the pixel size given the focal length from spice kernels
+        or other sources
+
+        Returns
+        -------
+        : float
+          Focal length of a cahvor model instrument
+        """
+        return self.focal_length/self.compute_h_s()
