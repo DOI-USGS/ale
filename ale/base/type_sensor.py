@@ -447,10 +447,7 @@ class Cahvor():
                                                       center_ephemeris_time=self.center_ephemeris_time,
                                                       ephemeris_times=self.ephemeris_time,
                                                       nadir=False, exact_ck_times=False)
-            cahvor_quats = np.zeros(4)
-            cahvor_quat_from_rotation = Rotation.from_matrix(self.cahvor_rotation_matrix).as_quat()
-            cahvor_quats[:3] = cahvor_quat_from_rotation[1:]
-            cahvor_quats[3] = cahvor_quat_from_rotation[0]
+            cahvor_quats = Rotation.from_matrix(self.cahvor_rotation_matrix).as_quat()
             cahvor_rotation = ConstantRotation(cahvor_quats, self.sensor_frame_id, self.ikid)
             self._frame_chain.add_edge(rotation = cahvor_rotation)
         return self._frame_chain
@@ -458,17 +455,38 @@ class Cahvor():
     @property
     def detector_center_line(self):
         """
+        Computes the detector center line using the cahvor model.
+        Equation for computation comes from MSL instrument kernels
+
+        Returns
+        -------
+        : float
+          The detector center line/boresight center line
         """
         return np.dot(self.cahvor_camera_dict['V'], self.cahvor_camera_dict['A'])
 
     @property
     def detector_center_sample(self):
         """
+        Computes the detector center sample using the cahvor model.
+        Equation for computation comes from MSL instrument kernels
+
+        Returns
+        -------
+        : float
+          The detector center sample/boresight center sample
         """
         return np.dot(self.cahvor_camera_dict['H'], self.cahvor_camera_dict['A'])
 
     @property
     def pixel_size(self):
         """
+        Computes the pixel size given the focal length from spice kernels
+        or other sources
+
+        Returns
+        -------
+        : float
+          Focal length of a cahvor model instrument
         """
         return self.focal_length/np.linalg.norm(np.cross(self.cahvor_camera_dict['H'], self.cahvor_camera_dict['A']))
