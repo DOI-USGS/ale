@@ -1,7 +1,7 @@
 import math
 
 import numpy as np
-import spiceypy as spice
+from scipy.spatial.transform import Rotation
 
 from ale.transformation import FrameChain
 from ale.transformation import ConstantRotation
@@ -442,15 +442,13 @@ class Cahvor():
           A networkx frame chain object
         """
         if not hasattr(self, '_frame_chain'):
-            nadir = self._props.get('nadir', False)
-            exact_ck_times = self._props.get('exact_ck_times', True)
             self._frame_chain = FrameChain.from_spice(sensor_frame=self.ikid,
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
                                                       ephemeris_times=self.ephemeris_time,
-                                                      nadir=nadir, exact_ck_times=exact_ck_times)
+                                                      nadir=False, exact_ck_times=False)
             cahvor_quats = np.zeros(4)
-            cahvor_quat_from_rotation = spice.m2q(self.cahvor_rotation_matrix)
+            cahvor_quat_from_rotation = Rotation.from_matrix(self.cahvor_rotation_matrix).as_quat()
             cahvor_quats[:3] = cahvor_quat_from_rotation[1:]
             cahvor_quats[3] = cahvor_quat_from_rotation[0]
             cahvor_rotation = ConstantRotation(cahvor_quats, self.sensor_frame_id, self.ikid)
