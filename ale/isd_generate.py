@@ -141,7 +141,7 @@ def file_to_isd(
     logger.info(f"Reading: {file}")
     if kernels is not None:
         kernels = [str(PurePath(p)) for p in kernels]
-        usgscsm_str = ale.loads(file, props={'kernels': kernels}, formatter="ale", verbose=True)
+        usgscsm_str = ale.loads(file, props={'kernels': kernels})
     else:
         usgscsm_str = ale.loads(file)
 
