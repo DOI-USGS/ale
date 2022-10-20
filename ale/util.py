@@ -143,7 +143,12 @@ def dict_merge(dct, merge_dct):
 
 def get_isis_preferences(isis_preferences=None):
     """
-    Returns ISIS Preference file as a pvl object
+    Returns ISIS Preference file as a pvl object.
+
+    This will search the following locations, in order, for an IsisPreferences file:
+
+    #. The .Isis directory in your home directory
+    #. The directory pointed to by the ISISROOT environment variable
     """
     argprefs = {}
     if isis_preferences:
@@ -194,6 +199,7 @@ def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
         Path to the cube to pull the kernels from.
     expand : bool, optional
         Whether or not to expand variables within kernel paths based on your IsisPreferences file.
+        See :func:`get_isis_preferences` for how the IsisPreferences file is found.
     format_as : str, optional {'list', 'dict'}
         How to return the kernels: either as a one-dimensional ordered list, or as a dictionary
         of kernel lists.
