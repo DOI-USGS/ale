@@ -14,7 +14,7 @@ import argparse
 import concurrent.futures
 import logging
 import os
-from pathlib import Path
+from pathlib import Path, PurePath
 import sys
 
 import ale
@@ -80,7 +80,8 @@ def main():
         k = None
     else:
         try:
-            k = ale.util.generate_kernels_from_cube(args.kernel, expand=True)
+            # k = ale.util.generate_kernels_from_cube(args.kernel, expand=True)
+            raise KeyError
         except KeyError:
             k = [args.kernel, ]
 
@@ -139,7 +140,8 @@ def file_to_isd(
 
     logger.info(f"Reading: {file}")
     if kernels is not None:
-        usgscsm_str = ale.loads(file, props={'kernels': kernels})
+        kernels = [str(PurePath(p)) for p in kernels]
+        usgscsm_str = ale.loads(file, props={'kernels': kernels}, formatter="ale", verbose=True)
     else:
         usgscsm_str = ale.loads(file)
 
