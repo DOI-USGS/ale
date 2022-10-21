@@ -43,6 +43,6 @@ class test_mastcam_pds_naif(unittest.TestCase):
     def test_focal2pixel_samples(self):
         with patch('ale.drivers.msl_drivers.spice.bods2c', new_callable=PropertyMock, return_value=-76220) as bods2c, \
              patch('ale.drivers.msl_drivers.spice.gdpool', new_callable=PropertyMock, return_value=[100]) as gdpool:
-            np.testing.assert_allclose(self.driver.focal2pixel_samples, [137.96844341513602, 0, 0])
+            np.testing.assert_allclose(self.driver.focal2pixel_samples, [0, 0, 137.96844341513602])
             bods2c.assert_called_with('MSL_MASTCAM_RIGHT')
             gdpool.assert_called_with('INS-76220_FOCAL_LENGTH', 0, 1)

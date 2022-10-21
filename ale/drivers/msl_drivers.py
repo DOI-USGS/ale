@@ -105,7 +105,7 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, NoDist
         : list<double>
           focal plane to detector samples
         """
-        return [1/self.pixel_size, 0, 0]
+        return [0, 0, 1/self.pixel_size]
     
     @property
     def sensor_model_version(self):
