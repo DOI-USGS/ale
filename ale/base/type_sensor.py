@@ -451,32 +451,7 @@ class Cahvor():
             v_s = self.compute_v_s()
             H_prime = (self.cahvor_camera_dict['H'] - h_c * self.cahvor_camera_dict['A'])/h_s
             V_prime = (self.cahvor_camera_dict['V'] - v_c * self.cahvor_camera_dict['A'])/v_s
-            r_matrix = np.array([H_prime, -V_prime, -self.cahvor_camera_dict['A']])
-
-            phi = math.asin(r_matrix[2][0])
-            w = - math.asin(r_matrix[2][1] / math.cos(phi))
-            k = math.acos(r_matrix[0][0] / math.cos(phi))
-
-            w = math.degrees(w)
-            phi = math.degrees(phi)
-            k = math.degrees(k)
-
-            # Rotational Matrix M generation
-            cahvor_rotation_matrix = np.zeros((3, 3))
-            cahvor_rotation_matrix[0, 0] = math.cos(phi) * math.cos(k)
-            cahvor_rotation_matrix[0, 1] = math.sin(w) * math.sin(phi) * math.cos(k) + \
-                math.cos(w) * math.sin(k)
-            cahvor_rotation_matrix[0, 2] = - math.cos(w) * math.sin(phi) * math.cos(k) + \
-                math.sin(w) * math.sin(k)
-            cahvor_rotation_matrix[1, 0] = - math.cos(phi) * math.sin(k)
-            cahvor_rotation_matrix[1, 1] = - math.sin(w) * math.sin(phi) * math.sin(k) + \
-                math.cos(w) * math.cos(k)
-            cahvor_rotation_matrix[1, 2] = math.cos(w) * math.sin(phi) * math.sin(k) + \
-                math.sin(w) * math.cos(k)
-            cahvor_rotation_matrix[2, 0] = math.sin(phi)
-            cahvor_rotation_matrix[2, 1] = - math.sin(w) * math.cos(phi)
-            cahvor_rotation_matrix[2, 2] = math.cos(w) * math.cos(phi)
-            self._cahvor_rotation_matrix = cahvor_rotation_matrix
+            self._cahvor_rotation_matrix = np.array([H_prime, -V_prime, -self.cahvor_camera_dict['A']])
         return self._cahvor_rotation_matrix
 
     @property
@@ -491,13 +466,13 @@ class Cahvor():
           A networkx frame chain object
         """
         if not hasattr(self, '_frame_chain'):
-            self._frame_chain = FrameChain.from_spice(sensor_frame=self.ikid,
+            self._frame_chain = FrameChain.from_spice(sensor_frame=self.spacecraft_id * 1000,
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
                                                       ephemeris_times=self.ephemeris_time,
                                                       nadir=False, exact_ck_times=False)
             cahvor_quats = Rotation.from_matrix(self.cahvor_rotation_matrix).as_quat()
-            cahvor_rotation = ConstantRotation(cahvor_quats, self.sensor_frame_id, self.ikid)
+            cahvor_rotation = ConstantRotation(cahvor_quats, self.spacecraft_id * 1000, self.sensor_frame_id)
             self._frame_chain.add_edge(rotation = cahvor_rotation)
         return self._frame_chain
 
