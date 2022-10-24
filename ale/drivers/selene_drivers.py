@@ -3,13 +3,300 @@ from glob import glob
 import numpy as np
 import spiceypy as spice
 
+from ale import util
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
+from ale.base.data_isis import IsisSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import LineScanner
 
 
+class KaguyaTcIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, Driver):
+    """
+    """
+    # Comes from IsisSpice
+    '''@property
+    def instrument_id(self):
+        """
+        Id takes the form of LISM_<INSTRUMENT_ID>_<SD><COMPRESS><SWATH> where
+
+        INSTRUMENT_ID = TC1/TC2
+        SD = S/D short for single or double, which in turn means whether the
+        label belongs to a mono or stereo image.
+
+        COMPRESS = D/T short for DCT or through, we assume image has been
+        decompressed already
+
+        SWATCH = swatch mode, different swatch modes have different FOVs
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
+        instrument = super().instrument_id
+        swath = self.label["IsisCube"]["Instrument"]["SwathModeId"][0]
+        sd = self.label["IsisCube"]["Archive"]["ProductSetId"].split("_")[1].upper()
+
+        inst_id = "LISM_{}_{}T{}".format(instrument, sd, swath)
+        return inst_id'''
+
+    # In data_isis
+    '''@property
+    def sensor_frame_id(self):
+        """
+        Returns the sensor frame id.  Depends on the instrument that was used to
+        capture the image.
+
+        Returns
+        -------
+        : int
+          Sensor frame id
+        """
+        return spice.namfrm("LISM_{}_HEAD".format(super().instrument_id))'''
+    
+    # In data_isis
+    '''@property
+    def ikid(self):
+        """
+        Read the ikid from the cube label
+        """
+        if not hasattr(self, "_ikid"):
+            self._ikid = spice.bods2c("LISM_{}".format(super().instrument_id))
+        return self._ikid'''
+
+    # Comes from IsisSpice
+    '''@property
+    def platform_name(self):
+        """
+        Returns the name of the platform containing the sensor. This is usually
+        the spacecraft name.
+
+        Returns
+        -------
+        : str
+          Name of the platform which the sensor is mounted on
+        """
+        return self.label['IsisCube']['Instrument']['MissionName']'''
+
+    @property
+    def spacecraft_name(self):
+        return self.label['IsisCube']['Instrument']['SpacecraftName']
+
+    # In data_isis
+    '''
+    @property
+    def ephemeris_start_time(self):
+        """
+        Returns the starting ephemeris time of the image. Expects spacecraft_id to
+        be defined. This must be the integer Naif Id code for the spacecraft. Expects
+        spacecraft_clock_start_count to be defined. This must be a string
+        containing the start clock count of the spacecraft
+
+        Returns
+        -------
+        : double
+          Starting ephemeris time of the image
+        """
+        return spice.sct2e(self.spacecraft_id, float(self.spacecraft_clock_start_count))'''
+
+    @property
+    def detector_start_line(self):
+        return 1
+
+    @property
+    def detector_start_sample(self):
+        """
+        """
+        start_sample = 1
+        swath_mode = self.label["IsisCube"]["Instrument"]["SwathModeId"]
+        if (swath_mode == "FULL"):
+          start_sample = 1
+        elif (swath_mode == "NOMINAL"):
+          start_sample = 297
+        elif (swath_mode.compare("HALF") == 0):
+          start_sample = 1172;
+        return start_sample - 0.5
+    # In data_isis
+    '''@property
+    def focal2pixel_lines(self):
+        """
+        Calculated using 1/pixel pitch
+        Expects tc_id to be defined. This should be a string of the form
+        LISM_TC1 or LISM_TC2.
+
+        Returns
+        -------
+        : list
+          focal plane to detector lines
+        """
+        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0]
+        return [0, -1/pixel_size, 0]'''
+
+    # In data_isis
+    '''
+    @property
+    def focal2pixel_samples(self):
+        """
+        Calculated using 1/pixel pitch
+        Expects tc_id to be defined. This should be a string of the form
+        LISM_TC1 or LISM_TC2.
+
+        Returns
+        -------
+        : list
+          focal plane to detector samples
+        """
+        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0]
+        return [0, 0, -1/pixel_size]'''
+
+    # In data_isis
+    '''
+    @property
+    def detector_center_line(self):
+        """
+        Returns the center detector line of the detector. Expects ikid to be
+        defined. This should be the NAIF integer ID code for the sensor.
+
+        We subtract 0.5 from the center line because as per the IK:
+        Center of the first pixel is defined as "1.0".
+
+        Returns
+        -------
+        : int
+          The detector line of the principle point
+        """
+        return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[1] - 0.5
+        '''
+    # In data_isis
+    '''
+    @property
+    def detector_center_sample(self):
+        """
+        Returns the center detector sample of the detector. Expects ikid to be
+        defined. This should be the NAIF integer ID code for the sensor.
+
+        We subtract 0.5 from the center sample because as per the IK:
+        Center of the first pixel is defined as "1.0".
+
+        Returns
+        -------
+        : int
+          The detector sample of the principle point
+        """
+        return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[0] - 0.5
+      '''
+
+    @property
+    def _odkx(self):
+        """
+        Returns the x coefficients of the optical distortion model.
+        Expects tc_id to be defined. This should be a string of the form
+        LISM_TC1 or LISM_TC2.
+
+        Returns
+        -------
+        : list
+          Optical distortion x coefficients
+        """
+        self.kernels
+        return spice.gdpool('INS{}_DISTORTION_COEF_X'.format(self.ikid),0, 4).tolist()
+
+    @property
+    def kernels(self):
+      if not hasattr(self, '_kernels'):
+        self._kernels = util.get_kernels_from_isis_pvl(self.label['IsisCube'])
+        print(self._kernels)
+        [spice.furnsh(k) for k in self._kernels]
+
+    @property
+    def _odky(self):
+        """
+        Returns the y coefficients of the optical distortion model.
+        Expects tc_id to be defined. This should be a string of the form
+        LISM_TC1 or LISM_TC2.
+
+        Returns
+        -------
+        : list
+          Optical distortion y coefficients
+        """
+        self.kernels
+        return spice.gdpool('INS{}_DISTORTION_COEF_Y'.format(self.ikid), 0, 4).tolist()
+
+    @property
+    def boresight_x(self):
+        """
+        Returns the x focal plane coordinate of the boresight.
+        Expects ikid to be defined. This should be the NAIF integer ID for the
+        sensor.
+
+        Returns
+        -------
+        : float
+          Boresight focal plane x coordinate
+        """
+        return spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 1)[0]
+
+    @property
+    def boresight_y(self):
+        """
+        Returns the y focal plane coordinate of the boresight.
+        Expects ikid to be defined. This should be the NAIF integer ID for the
+        sensor.
+
+        Returns
+        -------
+        : float
+          Boresight focal plane x coordinate
+        """
+        return spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 1, 1)[0]
+
+    @property
+    def usgscsm_distortion_model(self):
+        """
+        Kaguya uses a unique radial distortion model so we need to overwrite the
+        method packing the distortion model into the ISD.
+
+        from the IK:
+
+        Line-of-sight vector of pixel no. n can be expressed as below.
+
+        Distortion coefficients information:
+        INS<INSTID>_DISTORTION_COEF_X  = ( a0, a1, a2, a3)
+        INS<INSTID>_DISTORTION_COEF_Y  = ( b0, b1, b2, b3),
+
+        Distance r from the center:
+        r = - (n - INS<INSTID>_CENTER) * INS<INSTID>_PIXEL_SIZE.
+
+        Line-of-sight vector v is calculated as
+        v[X] = INS<INSTID>BORESIGHT[X] + a0 + a1*r + a2*r^2 + a3*r^3 ,
+        v[Y] = INS<INSTID>BORESIGHT[Y] + r+a0 + a1*r +a2*r^2 + a3*r^3 ,
+        v[Z] = INS<INSTID>BORESIGHT[Z]
+
+        Expects odkx and odky to be defined. These should be a list of optical
+        distortion x and y coefficients respectively.
+
+        Returns
+        -------
+        : dict
+          radial distortion model
+
+        """
+        return {
+            "kaguyalism": {
+                "x" : self._odkx,
+                "y" : self._odky,
+                "boresight_x" : self.boresight_x,
+                "boresight_y" : self.boresight_y
+            }
+        }
+    
+    @property
+    def sensor_model_version(self):
+        return 2
+        
 class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
     """
     Driver for a PDS3 Kaguya Terrain Camera (TC) images. Specifically level2b0 mono and stereo images.
