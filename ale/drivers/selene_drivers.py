@@ -27,7 +27,6 @@ class KaguyaTcIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, Kaguya
         """
         start_sample = 1
         swath_mode = self.label["IsisCube"]["Instrument"]["SwathModeId"]
-        print(swath_mode)
         if (swath_mode == "FULL"):
           start_sample = 1
         elif (swath_mode == "NOMINAL"):
