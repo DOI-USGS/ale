@@ -1,16 +1,101 @@
-import os
-from glob import glob
-import numpy as np
 import spiceypy as spice
 
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
+from ale.base.data_isis import IsisSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
+from ale.base.type_distortion import KaguyaSeleneDistortion
 from ale.base.type_sensor import LineScanner
 
 
-class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
+class KaguyaTcIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, KaguyaSeleneDistortion, Driver):
+    """
+    """
+
+    @property
+    def spacecraft_name(self):
+        return self.label['IsisCube']['Instrument']['SpacecraftName']
+
+    @property
+    def detector_start_line(self):
+        return 1
+
+    @property
+    def _swath_mode(self):
+      return self.label["IsisCube"]["Instrument"]["SwathModeId"]
+
+    @property
+    def detector_start_sample(self):
+        if (self._swath_mode == "FULL"):
+          start_sample = 1
+        elif (self._swath_mode == "NOMINAL"):
+          start_sample = 297
+        elif (self._swath_mode == "HALF"):
+          start_sample = 1172;
+        return start_sample - 0.5
+
+    @property
+    def _odkx(self):
+        """
+        Returns the x coefficients of the optical distortion model.
+        Expects tc_id to be defined. This should be a string of the form
+        LISM_TC1 or LISM_TC2.
+
+        Returns
+        -------
+        : list
+          Optical distortion x coefficients
+        """
+        return self.label['NaifKeywords'][f'INS{self.ikid}_DISTORTION_COEF_X']
+
+    @property
+    def _odky(self):
+        """
+        Returns the y coefficients of the optical distortion model.
+        Expects tc_id to be defined. This should be a string of the form
+        LISM_TC1 or LISM_TC2.
+
+        Returns
+        -------
+        : list
+          Optical distortion y coefficients
+        """
+        return self.label['NaifKeywords'][f'INS{self.ikid}_DISTORTION_COEF_Y']
+
+    @property
+    def boresight_x(self):
+        """
+        Returns the x focal plane coordinate of the boresight.
+        Expects ikid to be defined. This should be the NAIF integer ID for the
+        sensor.
+
+        Returns
+        -------
+        : float
+          Boresight focal plane x coordinate
+        """
+        return self.label['NaifKeywords'][f'INS{self.ikid}_BORESIGHT'][0]
+
+    @property
+    def boresight_y(self):
+        """
+        Returns the y focal plane coordinate of the boresight.
+        Expects ikid to be defined. This should be the NAIF integer ID for the
+        sensor.
+
+        Returns
+        -------
+        : float
+          Boresight focal plane x coordinate
+        """
+        return self.label['NaifKeywords'][f'INS{self.ikid}_BORESIGHT'][1]
+    
+    @property
+    def sensor_model_version(self):
+        return 2
+        
+class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSeleneDistortion, Driver):
     """
     Driver for a PDS3 Kaguya Terrain Camera (TC) images. Specifically level2b0 mono and stereo images.
 
@@ -351,46 +436,6 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         return float(spice.gdpool('INS{}_FOCAL_LENGTH'.format(self.ikid), 0, 1)[0])
 
     @property
-    def usgscsm_distortion_model(self):
-        """
-        Kaguya uses a unique radial distortion model so we need to overwrite the
-        method packing the distortion model into the ISD.
-
-        from the IK:
-
-        Line-of-sight vector of pixel no. n can be expressed as below.
-
-        Distortion coefficients information:
-        INS<INSTID>_DISTORTION_COEF_X  = ( a0, a1, a2, a3)
-        INS<INSTID>_DISTORTION_COEF_Y  = ( b0, b1, b2, b3),
-
-        Distance r from the center:
-        r = - (n - INS<INSTID>_CENTER) * INS<INSTID>_PIXEL_SIZE.
-
-        Line-of-sight vector v is calculated as
-        v[X] = INS<INSTID>BORESIGHT[X] + a0 + a1*r + a2*r^2 + a3*r^3 ,
-        v[Y] = INS<INSTID>BORESIGHT[Y] + r+a0 + a1*r +a2*r^2 + a3*r^3 ,
-        v[Z] = INS<INSTID>BORESIGHT[Z]
-
-        Expects odkx and odky to be defined. These should be a list of optical
-        distortion x and y coefficients respectively.
-
-        Returns
-        -------
-        : dict
-          radial distortion model
-
-        """
-        return {
-            "kaguyalism": {
-                "x" : self._odkx,
-                "y" : self._odky,
-                "boresight_x" : self.boresight_x,
-                "boresight_y" : self.boresight_y
-            }
-        }
-
-    @property
     def detector_start_sample(self):
         """
         Returns starting detector sample
@@ -497,8 +542,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         """
         return 2
 
-
-class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
+class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSeleneDistortion, Driver):
     """
     Driver for a PDS3 Kaguya Multiband Imager (Mi) images. Specifically level2b2 Vis and Nir images.
 
@@ -804,46 +848,6 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         return float(spice.gdpool('INS{}_FOCAL_LENGTH'.format(self.ikid), 0, 1)[0])
 
     @property
-    def usgscsm_distortion_model(self):
-        """
-        Kaguya uses a unique radial distortion model so we need to overwrite the
-        method packing the distortion model into the ISD.
-
-        from the IK:
-
-        Line-of-sight vector of pixel no. n can be expressed as below.
-
-        Distortion coefficients information:
-        INS<INSTID>_DISTORTION_COEF_X  = ( a0, a1, a2, a3)
-        INS<INSTID>_DISTORTION_COEF_Y  = ( b0, b1, b2, b3),
-
-        Distance r from the center:
-        r = - (n - INS<INSTID>_CENTER) * INS<INSTID>_PIXEL_SIZE.
-
-        Line-of-sight vector v is calculated as
-        v[X] = INS<INSTID>BORESIGHT[X] + a0 + a1*r + a2*r^2 + a3*r^3 ,
-        v[Y] = INS<INSTID>BORESIGHT[Y] + r+a0 + a1*r +a2*r^2 + a3*r^3 ,
-        v[Z] = INS<INSTID>BORESIGHT[Z]
-
-        Expects odkx and odky to be defined. These should be a list of optical
-        distortion x and y coefficients respectively.
-
-        Returns
-        -------
-        : dict
-          radial distortion model
-
-        """
-        return {
-            "kaguyalism": {
-                "x" : self._odkx,
-                "y" : self._odky,
-                "boresight_x" : self.boresight_x,
-                "boresight_y" : self.boresight_y
-            }
-        }
-
-    @property
     def sensor_model_version(self):
         """
         Returns
@@ -853,8 +857,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Driver):
         """
         return 1
 
-
-class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver):
+class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, KaguyaSeleneDistortion, Driver):
     @property
     def base_band(self):
         """
@@ -920,8 +923,6 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver
         """
         return self.label['IsisCube']['Instrument']['CorrectedScClockStartCount'].value
 
-
-
     @property
     def spacecraft_clock_stop_count(self):
         """
@@ -934,7 +935,6 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver
           spacecraft clock start count in seconds
         """
         return self.label['IsisCube']['Instrument']['CorrectedScClockStopCount'].value
-
 
     @property
     def ephemeris_start_time(self):
@@ -1071,49 +1071,6 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver
         """
         return spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 1, 1)[0]
 
-
-
-    @property
-    def usgscsm_distortion_model(self):
-        """
-        Kaguya uses a unique radial distortion model so we need to overwrite the
-        method packing the distortion model into the ISD.
-
-        from the IK:
-
-        Line-of-sight vector of pixel no. n can be expressed as below.
-
-        Distortion coefficients information:
-        INS<INSTID>_DISTORTION_COEF_X  = ( a0, a1, a2, a3)
-        INS<INSTID>_DISTORTION_COEF_Y  = ( b0, b1, b2, b3),
-
-        Distance r from the center:
-        r = - (n - INS<INSTID>_CENTER) * INS<INSTID>_PIXEL_SIZE.
-
-        Line-of-sight vector v is calculated as
-        v[X] = INS<INSTID>BORESIGHT[X] + a0 + a1*r + a2*r^2 + a3*r^3 ,
-        v[Y] = INS<INSTID>BORESIGHT[Y] + r+a0 + a1*r +a2*r^2 + a3*r^3 ,
-        v[Z] = INS<INSTID>BORESIGHT[Z]
-
-        Expects odkx and odky to be defined. These should be a list of optical
-        distortion x and y coefficients respectively.
-
-        Returns
-        -------
-        : dict
-          radial distortion model
-
-        """
-        return {
-            "kaguyalism": {
-                "x" : self._odkx,
-                "y" : self._odky,
-                "boresight_x" : self.boresight_x,
-                "boresight_y" : self.boresight_y
-            }
-        }
-
-
     @property
     def line_exposure_duration(self):
         """
@@ -1137,8 +1094,6 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver
         except:
             return self.label['IsisCube']['Instrument']['CorrectedSamplingInterval'].value * 0.001  # Scale to seconds
 
-
-
     @property
     def focal2pixel_samples(self):
         """
@@ -1153,7 +1108,6 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver
         """
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0]
         return [0, 0, -1/pixel_size]
-
 
     @property
     def focal2pixel_lines(self):

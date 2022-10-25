@@ -60,6 +60,14 @@ running the following command will retrieve the gtest submodule manually:
 git submodule update --init --recursive
 ```
 
+## Adding the ALESPICEROOT environment variable
+If an ale driver is going to be used that leverages SPICE data, it is necessary to set the ALESPICEROOT. One can do this using normal shell syntax, e.g.:
+
+`export ALESPICEROOT=/path/to/ale/spice`
+
+or inside of a conda environment:
+
+`conda env config vars set ALESPICEROOT=/path/to/ale/spice`.
 ## Adding ALE as a dependency
 
 You can add ALE as a dependency of your CMake based C++ project by linking the exported CMake target, `ale::ale`.

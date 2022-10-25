@@ -2,7 +2,6 @@ import pytest
 import os
 import numpy as np
 from datetime import datetime, timezone
-import spiceypy as spice
 from importlib import reload
 import json
 
@@ -13,7 +12,7 @@ from conftest import get_isd, get_image_label, get_image_kernels, convert_kernel
 
 import ale
 
-from ale.drivers.selene_drivers import KaguyaTcPds3NaifSpiceDriver, KaguyaMiIsisLabelNaifSpiceDriver
+from ale.drivers.selene_drivers import KaguyaTcPds3NaifSpiceDriver, KaguyaMiIsisLabelNaifSpiceDriver, KaguyaTcIsisLabelIsisSpiceDriver
 
 image_dict = {
     'TC1S2B0_01_06691S820E0465' : get_isd("kaguyatc"),
@@ -191,3 +190,43 @@ class test_kaguyami_isis3_naif(unittest.TestCase):
             spacecraft_direction.return_value = -1
             assert self.driver.focal2pixel_lines == [0, 1/2, 0]
             gdpool.assert_called_with('INS-12345_PIXEL_SIZE', 0, 1)
+
+# ========= Test kaguyatc isis3label and isisspice driver =========
+
+class test_isis_isis(unittest.TestCase):
+
+    def setUp(self):
+        label = get_image_label("TC1S2B0_01_06691S820E0465", "isis")
+        self.driver = KaguyaTcIsisLabelIsisSpiceDriver(label)
+
+    def test_spacecraft_name(self):
+        assert self.driver.spacecraft_name == 'KAGUYA'
+
+    def test_detector_start_line(self):
+        assert self.driver.detector_start_line == 1
+
+    def test_detector_start_sample(self):
+        # Check FULL; default in label
+        assert self.driver.detector_start_sample == 0.5
+    
+        with patch('ale.drivers.selene_drivers.KaguyaTcIsisLabelIsisSpiceDriver._swath_mode', new_callable=PropertyMock) as swath_mode:
+            swath_mode.return_value = 'NOMINAL'
+            assert self.driver.detector_start_sample == 296.5
+
+            swath_mode.return_value = 'HALF'
+            assert self.driver.detector_start_sample == 1171.5
+
+    def test__odkx(self):
+        assert self.driver._odkx == [-9.6499e-04, 9.8441e-04, 8.5773e-06, -3.7438e-06]
+
+    def test__odky(self):
+        assert self.driver._odky == [-0.0013796, 1.3502e-05, 2.7251e-06, -6.1938e-06]
+
+    def test_boresight_x(self):
+        assert self.driver.boresight_x == -0.0725
+
+    def test_boresight_y(self):
+        assert self.driver.boresight_y == 0.0214
+
+    def test_sensor_model_version(self):
+        assert self.driver.sensor_model_version == 2
