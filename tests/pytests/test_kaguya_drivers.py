@@ -2,7 +2,6 @@ import pytest
 import os
 import numpy as np
 from datetime import datetime, timezone
-import spiceypy as spice
 from importlib import reload
 import json
 
@@ -210,16 +209,12 @@ class test_isis_isis(unittest.TestCase):
         # Check FULL; default in label
         assert self.driver.detector_start_sample == 0.5
     
-        '''
-        ### Can't modify label inside test?
-        # Modify label and check NOMINAL
-        self.driver.label["IsisCube"]["Instrument"]["SwathModeId"] == 'NOMINAL'
-        assert self.driver.detector_start_sample == 296.5
-        
-        # Modify label and check HALF
-        self.driver.label["IsisCube"]["Instrument"]["SwathModeId"] == 'HALF'
-        assert self.driver.detector_start_sample == 1171.5
-        '''
+        with patch('ale.drivers.selene_drivers.KaguyaTcIsisLabelIsisSpiceDriver._swath_mode', new_callable=PropertyMock) as swath_mode:
+            swath_mode.return_value = 'NOMINAL'
+            assert self.driver.detector_start_sample == 296.5
+
+            swath_mode.return_value = 'HALF'
+            assert self.driver.detector_start_sample == 1171.5
 
     def test__odkx(self):
         assert self.driver._odkx == [-9.6499e-04, 9.8441e-04, 8.5773e-06, -3.7438e-06]

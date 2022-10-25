@@ -22,16 +22,16 @@ class KaguyaTcIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, Kaguya
         return 1
 
     @property
+    def _swath_mode(self):
+      return self.label["IsisCube"]["Instrument"]["SwathModeId"]
+
+    @property
     def detector_start_sample(self):
-        """
-        """
-        start_sample = 1
-        swath_mode = self.label["IsisCube"]["Instrument"]["SwathModeId"]
-        if (swath_mode == "FULL"):
+        if (self._swath_mode == "FULL"):
           start_sample = 1
-        elif (swath_mode == "NOMINAL"):
+        elif (self._swath_mode == "NOMINAL"):
           start_sample = 297
-        elif (swath_mode.compare("HALF") == 0):
+        elif (self._swath_mode == "HALF"):
           start_sample = 1172;
         return start_sample - 0.5
 
