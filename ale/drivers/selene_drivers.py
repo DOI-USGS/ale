@@ -1,4 +1,3 @@
-from unittest.loader import VALID_MODULE_NAME
 import spiceypy as spice
 
 from ale.base import Driver
