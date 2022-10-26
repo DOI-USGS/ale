@@ -1,3 +1,4 @@
+from unittest.loader import VALID_MODULE_NAME
 import spiceypy as spice
 
 from ale.base import Driver
@@ -12,6 +13,13 @@ from ale.base.type_sensor import LineScanner
 class KaguyaTcIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, KaguyaSeleneDistortion, Driver):
     """
     """
+    VALID_INSTRUMENT_IDS = ['TC1', 'TC2']
+    @property
+    def instrument_id(self):
+      iid = self.label['IsisCube']['Instrument']['InstrumentId']
+      if iid not in self.VALID_INSTRUMENT_IDS:
+        raise ValueError(f"Instrument ID: '{iid}' not in VALID_INSTRUMENT_IDS list. Failing.")
+      return iid
 
     @property
     def spacecraft_name(self):
