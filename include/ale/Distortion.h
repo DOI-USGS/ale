@@ -7,7 +7,8 @@ namespace ale {
     RADIAL,
     KAGUYALISM,
     DAWNFC,
-    LROLROCNAC
+    LROLROCNAC,
+    CAHVOR
   };
 }
 

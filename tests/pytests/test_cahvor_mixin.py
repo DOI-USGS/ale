@@ -38,7 +38,6 @@ class test_cahvor_sensor(unittest.TestCase):
     @patch("ale.base.type_sensor.Cahvor.cahvor_camera_dict", new_callable=PropertyMock, return_value=cahvor_camera_dict())
     def test_cahvor_model_elements(self, cahvor_camera_dict):
         cahvor_matrix = self.driver.cahvor_rotation_matrix
-        print(cahvor_matrix)
         np.testing.assert_allclose(cahvor_matrix, [[-0.82067034, -0.57129702, 0.01095033],
                                                    [-0.43920248, 0.6184257, -0.65165238],
                                                    [ 0.3655151, -0.5396012, -0.7584387 ]])
@@ -51,7 +50,6 @@ class test_cahvor_sensor(unittest.TestCase):
       assert -76000 in frame_chain.nodes()
       assert -76562 in frame_chain.nodes()
       from_spice.assert_called_with(center_ephemeris_time=0, ephemeris_times=[0], sensor_frame=-76000, target_frame=10014, nadir=False, exact_ck_times=False)
-      print(frame_chain[-76562][-76000]['rotation'].quat)
       np.testing.assert_allclose(frame_chain[-76562][-76000]['rotation'].quat, [-0.28255205, 0.8940826, -0.33309383, 0.09914206])
 
     @patch("ale.base.type_sensor.Cahvor.cahvor_camera_dict", new_callable=PropertyMock, return_value=cahvor_camera_dict())

@@ -4,11 +4,13 @@ import spiceypy as spice
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.type_sensor import Framer
-from ale.base.type_distortion import NoDistortion
+from ale.base.type_distortion import CahvorDistortion
 from ale.base.type_sensor import Cahvor
 from ale.base.base import Driver
 
-class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, NoDistortion, Driver):
+class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, CahvorDistortion, Driver):
+    """
+    """
     @property
     def spacecraft_name(self):
         """
@@ -73,6 +75,7 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, NoDist
         Returns the Naif ID code for the site reference frame
         Expects REFERENCE_COORD_SYSTEM_INDEX to be defined in the camera
         PVL group. 
+
         Returns
         -------
         : int
