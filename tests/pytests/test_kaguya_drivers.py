@@ -199,6 +199,14 @@ class test_isis_isis(unittest.TestCase):
         label = get_image_label("TC1S2B0_01_06691S820E0465", "isis")
         self.driver = KaguyaTcIsisLabelIsisSpiceDriver(label)
 
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == 'TC1'
+
+    def test_bad_instrument_id(self):
+        self.driver.label['IsisCube']['Instrument']['InstrumentId'] = 'FAIL'
+        with self.assertRaises(ValueError):
+            self.driver.instrument_id
+
     def test_spacecraft_name(self):
         assert self.driver.spacecraft_name == 'KAGUYA'
 
