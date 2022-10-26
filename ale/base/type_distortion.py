@@ -135,8 +135,8 @@ class CahvorDistortion():
         O = self.cahvor_camera_dict.get("O", [0, 0, 0])
         i = np.dot(O, H) / np.dot(O, A)
         j = np.dot(O, V) / np.dot(O, A)
-        x = pixel_size * i
-        y = pixel_size * j
+        x = self.pixel_size * i
+        y = self.pixel_size * j
         R = self.cahvor_camera_dict.get("R", [0, 0, 0])
         R[1] = R[1]/(self.focal_length**2)
         R[2] = R[2]/(self.focal_length**4)
