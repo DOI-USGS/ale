@@ -1,3 +1,4 @@
+import pytest
 from unittest.mock import PropertyMock, patch
 
 import numpy as np
@@ -21,6 +22,7 @@ def test_kaguyaselene_distortion():
     assert kaguyaselene_distortion.usgscsm_distortion_model['kaguyalism']['boresight_x'] == 0.1
     assert kaguyaselene_distortion.usgscsm_distortion_model['kaguyalism']['boresight_y'] == -0.1
 
+@pytest.fixture()
 def cahvor_camera_dict():
     camera_dict = {}
     camera_dict['C'] = np.array([0.9050933, 0.475724, -1.972196])
@@ -31,11 +33,17 @@ def cahvor_camera_dict():
     camera_dict['R'] = np.array([-1.510000e-04, -1.391890e-01, -1.250336e+00])
     return camera_dict
     
-def test_cahvor_distortion():
+def test_cahvor_distortion(cahvor_camera_dict):
     cahvor_distortion = CahvorDistortion()
-    cahvor_distortion.cahvor_camera_dict = cahvor_camera_dict()
     cahvor_distortion.pixel_size = 0.007319440022615588
     cahvor_distortion.focal_length = 34.0
 
+    cahvor_distortion.cahvor_camera_dict = cahvor_camera_dict
     coefficients = cahvor_distortion.usgscsm_distortion_model['cahvor']['coefficients']
     assert coefficients == [-0.000151, -0.00012040570934256056, -9.35644927622993e-07, 3.90696328921136, 1.5234714720319682]
+
+    cahvor_distortion.cahvor_camera_dict = cahvor_camera_dict
+    cahvor_distortion.cahvor_camera_dict.pop('O')
+    cahvor_distortion.cahvor_camera_dict.pop('R')
+    coefficients = cahvor_distortion.usgscsm_distortion_model['cahvor']['coefficients']
+    assert coefficients == [0, 0, 0, 0, 0]
