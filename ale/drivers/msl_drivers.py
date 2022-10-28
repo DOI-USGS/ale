@@ -109,7 +109,23 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
           focal plane to detector samples
         """
         return [0, 0, 1/self.pixel_size]
-    
+
+    @property
+    def detector_center_line(self):
+        return self.label["INSTRUMENT_STATE_PARMS"]["DETECTOR_LINES"]/2
+
+    @property
+    def detector_center_sample(self):
+        return self.label["INSTRUMENT_STATE_PARMS"]["MSL:DETECTOR_SAMPLES"]/2
+
+    @property
+    def detector_start_line(self):
+        return self.label["IMAGE_REQUEST_PARMS"]["FIRST_LINE"]
+
+    @property
+    def detector_start_sample(self):
+        return self.label["IMAGE_REQUEST_PARMS"]["FIRST_LINE_SAMPLE"]
+
     @property
     def sensor_model_version(self):
         """
