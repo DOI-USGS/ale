@@ -24,6 +24,30 @@ class KaguyaTcIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, Kaguya
     def spacecraft_name(self):
         return self.label['IsisCube']['Instrument']['SpacecraftName']
 
+
+    @property
+    def exposure_duration(self):
+        """
+        Returns Line Exposure Duration
+
+        Kaguya TC has an unintuitive key for this called LineSamplingInterval.
+        The original ExposureDuration Instrument key is often incorrect and cannot
+        be trusted.
+
+        Returns
+        -------
+        : float
+          Line exposure duration
+        """
+        # It's a list, but only sometimes.
+        # seems to depend on whether you are using the original zipped archives or
+        # if its downloaded from JAXA's image search:
+        # (https://darts.isas.jaxa.jp/planet/pdap/selene/product_search.html#)
+        try:
+            return self.label['IsisCube']['Instrument']['LineSamplingInterval'][0].value * 0.001 # Scale to seconds
+        except:
+            return self.label['IsisCube']['Instrument']['LineSamplingInterval'].value * 0.001  # Scale to seconds
+
     @property
     def detector_start_line(self):
         return 1
@@ -602,6 +626,29 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
         return spice.sct2e(self.spacecraft_id, float(self.spacecraft_clock_start_count))
 
     @property
+    def exposure_duration(self):
+        """
+        Returns Line Exposure Duration
+
+        Kaguya TC has an unintuitive key for this called LineSamplingInterval.
+        The original ExposureDuration Instrument key is often incorrect and cannot
+        be trusted.
+
+        Returns
+        -------
+        : float
+          Line exposure duration
+        """
+        # It's a list, but only sometimes.
+        # seems to depend on whether you are using the original zipped archives or
+        # if its downloaded from JAXA's image search:
+        # (https://darts.isas.jaxa.jp/planet/pdap/selene/product_search.html#)
+        try:
+            return self.label['IsisCube']['Instrument']['LineSamplingInterval'][0].value * 0.001 # Scale to seconds
+        except:
+            return self.label['IsisCube']['Instrument']['LineSamplingInterval'].value * 0.001  # Scale to seconds
+
+    @property
     def detector_start_line(self):
         return 1
 
@@ -610,12 +657,12 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
         """
         """
         start_sample = 1
-        swath_mode = self.label["IsisCube"]["Instrument"]["SwathModeId"]
+        swath_mode = str(self.label["IsisCube"]["Instrument"]["SwathModeId"])
         if (swath_mode == "FULL"):
           start_sample = 1
         elif (swath_mode == "NOMINAL"):
           start_sample = 297
-        elif (swath_mode.compare("HALF") == 0):
+        elif (swath_mode == "HALF"):
           start_sample = 1172;
         return start_sample - 0.5
 
