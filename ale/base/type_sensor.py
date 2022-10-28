@@ -61,7 +61,11 @@ class LineScanner():
           ephemeris times split based on image lines
         """
         if not hasattr(self, "_ephemeris_time"):
-          self._ephemeris_time = np.linspace(self.ephemeris_start_time, self.ephemeris_stop_time, self.image_lines + 1)
+            exact_ck_times = self._props.get('exact_ck_times', True)
+            if (exact_ck_times):
+                self._ephemeris_time = np.linspace(self.ephemeris_start_time, self.ephemeris_stop_time, self.image_lines + 1)
+            else:
+                self._ephemeris_time = np.linspace(self.ephemeris_start_time, self.ephemeris_stop_time, max(2, int(self.image_lines/64)))
         return self._ephemeris_time
 
     @property
