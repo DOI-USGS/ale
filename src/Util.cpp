@@ -466,8 +466,8 @@ std::vector<double> getDistortionCoeffs(json isd) {
     catch (...)
     {
       throw std::runtime_error(
-          "Could not parse the radial distortion model coefficients.");
-      coefficients = std::vector<double>(3, 0.0);
+          "Could not parse the cahvor distortion model coefficients.");
+      coefficients = std::vector<double>(5, 0.0);
     }
   }
   break;

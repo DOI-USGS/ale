@@ -132,7 +132,7 @@ class CahvorDistortion():
         R = [0, 0, 0]
         x = 0
         y = 0
-        # If our model contains ORE in the CAHVORE model
+        # If our model contains OR in the CAHVOR model
         # then compute the distortion coeffs/offset
         if (len(self.cahvor_camera_dict.keys()) >= 6):
             A = self.cahvor_camera_dict.get("A", [0, 0, 0])
@@ -144,8 +144,8 @@ class CahvorDistortion():
             x = self.pixel_size * i
             y = self.pixel_size * j
             R = self.cahvor_camera_dict.get("R", [0, 0, 0])
-            R[1] = R[1]/(self.focal_length**2)
-            R[2] = R[2]/(self.focal_length**4)
+            R[1] /= self.focal_length**2
+            R[2] /= self.focal_length**4
         return {
             "cahvor": {
                 "coefficients": [*R, x, y]
