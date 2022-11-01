@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import PropertyMock, patch
+from unittest.mock import MagicMock
 
 import numpy as np
 
@@ -32,15 +32,19 @@ def cahvor_camera_dict():
     camera_dict['O'] = np.array([0.377433, 0.9257466, 0.02284064])
     camera_dict['R'] = np.array([-1.510000e-04, -1.391890e-01, -1.250336e+00])
     return camera_dict
-    
+
 def test_cahvor_distortion(cahvor_camera_dict):
     cahvor_distortion = CahvorDistortion()
     cahvor_distortion.pixel_size = 0.007319440022615588
     cahvor_distortion.focal_length = 34.0
 
     cahvor_distortion.cahvor_camera_dict = cahvor_camera_dict
+    h_c = np.dot(cahvor_distortion.cahvor_camera_dict['A'], cahvor_distortion.cahvor_camera_dict['H'])
+    v_c = np.dot(cahvor_distortion.cahvor_camera_dict['A'], cahvor_distortion.cahvor_camera_dict['V'])
+    cahvor_distortion.compute_h_c = MagicMock(return_value=h_c)
+    cahvor_distortion.compute_v_c = MagicMock(return_value=v_c)
     coefficients = cahvor_distortion.usgscsm_distortion_model['cahvor']['coefficients']
-    assert coefficients == [-0.000151, -0.00012040570934256056, -9.35644927622993e-07, 3.90696328921136, 1.5234714720319682]
+    assert coefficients == [-0.000151, -0.00012040570934256056, -9.35644927622993e-07, 0.06295036132043122, 0.06727152372705038]
 
     cahvor_distortion.cahvor_camera_dict = cahvor_camera_dict
     cahvor_distortion.cahvor_camera_dict.pop('O')
