@@ -44,7 +44,7 @@ def test_cahvor_distortion(cahvor_camera_dict):
     cahvor_distortion.compute_h_c = MagicMock(return_value=h_c)
     cahvor_distortion.compute_v_c = MagicMock(return_value=v_c)
     coefficients = cahvor_distortion.usgscsm_distortion_model['cahvor']['coefficients']
-    assert coefficients == [-0.000151, -0.00012040570934256056, -9.35644927622993e-07, 0.06295036132043122, 0.06727152372705038]
+    np.testing.assert_allclose(coefficients, [-0.000151, -0.00012040570934256056, -9.35644927622993e-07, 0.06295036132043122, 0.06727152372705038])
 
     cahvor_distortion.cahvor_camera_dict = cahvor_camera_dict
     cahvor_distortion.cahvor_camera_dict.pop('O')
