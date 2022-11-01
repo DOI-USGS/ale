@@ -4,11 +4,13 @@ import spiceypy as spice
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.type_sensor import Framer
-from ale.base.type_distortion import NoDistortion
+from ale.base.type_distortion import CahvorDistortion
 from ale.base.type_sensor import Cahvor
 from ale.base.base import Driver
 
-class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, NoDistortion, Driver):
+class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, CahvorDistortion, Driver):
+    """
+    """
     @property
     def spacecraft_name(self):
         """
@@ -73,6 +75,7 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, NoDist
         Returns the Naif ID code for the site reference frame
         Expects REFERENCE_COORD_SYSTEM_INDEX to be defined in the camera
         PVL group. 
+
         Returns
         -------
         : int
@@ -106,7 +109,23 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, NoDist
           focal plane to detector samples
         """
         return [0, 0, 1/self.pixel_size]
-    
+
+    @property
+    def detector_center_line(self):
+        return self.label["INSTRUMENT_STATE_PARMS"]["DETECTOR_LINES"]/2
+
+    @property
+    def detector_center_sample(self):
+        return self.label["INSTRUMENT_STATE_PARMS"]["MSL:DETECTOR_SAMPLES"]/2
+
+    @property
+    def detector_start_line(self):
+        return self.label["IMAGE_REQUEST_PARMS"]["FIRST_LINE"]
+
+    @property
+    def detector_start_sample(self):
+        return self.label["IMAGE_REQUEST_PARMS"]["FIRST_LINE_SAMPLE"]
+
     @property
     def sensor_model_version(self):
         """

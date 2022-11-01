@@ -1,3 +1,5 @@
+import numpy as np
+
 class LegendreDistortion():
     """
     Mix-in for sensors that use a legendre distortion model.
@@ -104,5 +106,48 @@ class KaguyaSeleneDistortion():
                 "y" : self._odky,
                 "boresight_x" : self.boresight_x,
                 "boresight_y" : self.boresight_y
+            }
+        }
+
+class CahvorDistortion():
+    """
+    Mix-in for sensors and data sets that have a CAHVOR distortion model.
+
+    This model is based on info from https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2003JE002199
+    Expects that cahvor_camera_dict and focal_length to be defined. This should be
+    a dictionary defining the CAHVOR distortion parameters.
+    """
+
+    @property
+    def usgscsm_distortion_model(self):
+        """
+        Dictionary containing the usgscsm specification for CAHVOR distortion.
+        This will be a list of coeffs for radial distortion (x0, x1, x2)
+        followed by the optical center (x, y)
+
+        Returns
+        -------
+        : dict
+        """
+        R = [0, 0, 0]
+        x = 0
+        y = 0
+        # If our model contains OR in the CAHVOR model
+        # then compute the distortion coeffs/offset
+        if (len(self.cahvor_camera_dict.keys()) >= 6):
+            A = self.cahvor_camera_dict.get("A", [0, 0, 0])
+            H = self.cahvor_camera_dict.get("H", [0, 0, 0])
+            V = self.cahvor_camera_dict.get("V", [0, 0, 0])
+            O = self.cahvor_camera_dict.get("O", [0, 0, 0])
+            i = np.dot(O, H) / np.dot(O, A)
+            j = np.dot(O, V) / np.dot(O, A)
+            x = self.pixel_size * (i - self.compute_h_c())
+            y = self.pixel_size * (self.compute_v_c() - j)
+            R = self.cahvor_camera_dict.get("R", [0, 0, 0])
+            R[1] /= self.focal_length**2
+            R[2] /= self.focal_length**4
+        return {
+            "cahvor": {
+                "coefficients": [*R, x, y]
             }
         }

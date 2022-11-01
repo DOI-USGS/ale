@@ -333,6 +333,8 @@ DistortionType getDistortionModel(json isd) {
       return DistortionType::DAWNFC;
     } else if (distortion.compare("lrolrocnac") == 0) {
       return DistortionType::LROLROCNAC;
+    } else if (distortion.compare("cahvor") == 0) {
+      return DistortionType::CAHVOR;
     }
   } catch (...) {
     throw std::runtime_error("Could not parse the distortion model.");
@@ -450,6 +452,25 @@ std::vector<double> getDistortionCoeffs(json isd) {
       coefficients = std::vector<double>(1, 0.0);
     }
   } break;
+  case DistortionType::CAHVOR:
+  {
+    try
+    {
+      coefficients = isd.at("optical_distortion")
+                         .at("cahvor")
+                         .at("coefficients")
+                         .get<std::vector<double>>();
+
+      return coefficients;
+    }
+    catch (...)
+    {
+      throw std::runtime_error(
+          "Could not parse the cahvor distortion model coefficients.");
+      coefficients = std::vector<double>(5, 0.0);
+    }
+  }
+  break;
   }
   throw std::runtime_error(
       "Could not parse the distortion model coefficients.");
