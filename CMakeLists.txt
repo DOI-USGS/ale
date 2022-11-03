@@ -7,7 +7,7 @@
 # Specify the required version of CMake.
 # cmake 3.15 required for findPython virtualenv configuration
 cmake_minimum_required(VERSION 3.15)
-project(ale VERSION 0.8.6 DESCRIPTION "Abstraction Library for Ephemerides ")
+project(ale VERSION 0.8.8 DESCRIPTION "Abstraction Library for Ephemerides ")
 
 # include what we need
 include(GNUInstallDirs)
