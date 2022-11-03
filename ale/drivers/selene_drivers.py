@@ -650,7 +650,7 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
 
     @property
     def detector_start_line(self):
-        return 1
+        return 0.5
 
     @property
     def detector_start_sample(self):
@@ -661,9 +661,9 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
         if (swath_mode == "FULL"):
           start_sample = 1
         elif (swath_mode == "NOMINAL"):
-          start_sample = 297
+          start_sample = 296
         elif (swath_mode == "HALF"):
-          start_sample = 1172;
+          start_sample = 1171;
         return start_sample - 0.5
 
     @property
@@ -710,7 +710,7 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
         : int
           The detector line of the principle point
         """
-        return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[1] - 0.5
+        return spice.gdpool('INS{}_BORESIGHT_LINE'.format(self.ikid), 0, 1)[0] - 0.5
 
     @property
     def detector_center_sample(self):
@@ -726,7 +726,7 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
         : int
           The detector sample of the principle point
         """
-        return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[0] - 0.5
+        return spice.gdpool('INS{}_BORESIGHT_SAMPLE'.format(self.ikid), 0, 1)[0] - 0.5
 
     @property
     def _odkx(self):
