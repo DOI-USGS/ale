@@ -28,7 +28,7 @@ class TestFile(unittest.TestCase):
             cube_str = "dummy.cub"
             isdg.file_to_isd(cube_str)
             self.assertEqual(
-                m_loads.call_args_list, [call(cube_str)]
+                m_loads.call_args_list, [call(cube_str, verbose=True)]
             )
             self.assertEqual(
                 m_path_wt.call_args_list, [call(json_text)]
@@ -37,11 +37,11 @@ class TestFile(unittest.TestCase):
         m_path_wt.reset_mock()
         with patch("ale.loads", return_value=json_text) as m_loads:
             out_str = "dummy.json"
-            kernel_val = "list of kernels"
+            kernel_val = ["list of kernels"]
             isdg.file_to_isd(cube_str, out=out_str, kernels=kernel_val)
             self.assertEqual(
                 m_loads.call_args_list,
-                [call(cube_str, props={'kernels': kernel_val})]
+                [call(cube_str, props={'kernels': kernel_val}, verbose=True)]
             )
             self.assertEqual(
                 m_path_wt.call_args_list, [call(json_text)]
