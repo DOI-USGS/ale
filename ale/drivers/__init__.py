@@ -54,7 +54,7 @@ class AleJsonEncoder(json.JSONEncoder):
             return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
-def load(label, props={}, formatter='ale', verbose=False, only_isis_label=False,  only_isis_spice=False,  only_pds3_label=False,  only_naif_spice=False):
+def load(label, props={}, formatter='ale', verbose=False, only_isis_label=False, only_isis_spice=False, only_pds3_label=False, only_naif_spice=False):
     """
     Attempt to load a given label from possible drivers.
 
@@ -121,6 +121,7 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_label=False,
     dict
          The ISD as a dictionary
     """
+    print(only_isis_label,  only_isis_spice,  only_pds3_label,  only_naif_spice)
     if isinstance(formatter, str):
         formatter = __formatters__[formatter]
     
@@ -133,7 +134,6 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_label=False,
     driver_list = [inspect.getmembers(dmod, predicat) for dmod in __driver_modules__]
     drivers = chain.from_iterable(driver_list)
     drivers = sort_drivers([d[1] for d in drivers])
-    print(drivers)
 
     if verbose:
         print("Attempting to pre-parse label file")
@@ -179,7 +179,7 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_label=False,
                 traceback.print_exc()
     raise Exception('No Such Driver for Label')
 
-def loads(label, props='', formatter='ale', indent = 2, verbose=False, only_isis_label=False,  only_isis_spice=False,  only_pds3_label=False,  only_naif_spice=False):
+def loads(label, props='', formatter='ale', indent = 2, verbose=False, only_isis_label=False, only_isis_spice=False, only_pds3_label=False, only_naif_spice=False):
     """
     Attempt to load a given label from all possible drivers.
 
@@ -202,7 +202,7 @@ def loads(label, props='', formatter='ale', indent = 2, verbose=False, only_isis
     --------
     load
     """
-    res = load(label, props, formatter, verbose, only_isis_label,  only_isis_spice,  only_pds3_label,  only_naif_spice)
+    res = load(label, props, formatter, verbose, only_isis_label, only_isis_spice, only_pds3_label, only_naif_spice)
     return json.dumps(res, indent=indent, cls=AleJsonEncoder)
 
 def parse_label(label, grammar=pvl.grammar.PVLGrammar()):

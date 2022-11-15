@@ -26,7 +26,7 @@ namespace ale {
    *
    * @returns A string containing a JSON formatted ISD for the image.
    */
-  std::string loads(std::string filename, std::string props="", std::string formatter="usgscsm", int indent = 2, bool verbose=true);
+  std::string loads(std::string filename, std::string props="", std::string formatter="ale", int indent = 2, bool verbose=true, bool onlyIsisLabel=false,  bool onlyIsisSpice=false,  bool onlyPds3Label=false,  bool onlyNaifSpice=false);
 
   /**
    * Load all of the metadata for an image into a JSON ISD.
@@ -47,7 +47,7 @@ namespace ale {
    *
    * @returns A string containing a JSON formatted ISD for the image.
    */
-  nlohmann::json load(std::string filename, std::string props="", std::string formatter="usgscsm", bool verbose=true);
+  nlohmann::json load(std::string filename, std::string props="", std::string formatter="ale", bool verbose=true, bool onlyIsisLabel=false,  bool onlyIsisSpice=false,  bool onlyPds3Label=false,  bool onlyNaifSpice=false);
 }
 
 #endif // ALE_H
