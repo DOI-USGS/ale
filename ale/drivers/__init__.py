@@ -126,13 +126,14 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_label=False,
     
     driver_mask = [only_isis_label, only_pds3_label, only_isis_spice, only_naif_spice]
     class_list = np.array([IsisLabel, Pds3Label, IsisSpice, NaifSpice])
-    masked_class_list = list(class_list[driver_mask])
+    class_list = list(class_list[driver_mask])
     # predicat logic: make sure x is a class, who contains the word "driver" (clipper_drivers) and 
     # the componenet classes 
-    predicat = lambda x: inspect.isclass(x) and "_driver" in x.__module__ and [i for i in class_list if i in inspect.getmro(x)] == masked_class_list
+    predicat = lambda x: inspect.isclass(x) and "_driver" in x.__module__ and [i for i in class_list if i in inspect.getmro(x)] == class_list
     driver_list = [inspect.getmembers(dmod, predicat) for dmod in __driver_modules__]
     drivers = chain.from_iterable(driver_list)
     drivers = sort_drivers([d[1] for d in drivers])
+    print(drivers)
 
     if verbose:
         print("Attempting to pre-parse label file")
