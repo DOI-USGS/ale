@@ -2,7 +2,7 @@ import pvl
 
 import importlib
 import inspect
-from itertools import chain
+from itertools import chain, compress
 import os
 from glob import glob
 import json
@@ -54,7 +54,7 @@ class AleJsonEncoder(json.JSONEncoder):
             return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
-def load(label, props={}, formatter='ale', verbose=False, only_isis_label=False, only_isis_spice=False, only_pds3_label=False, only_naif_spice=False):
+def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False, only_naif_spice=False):
     """
     Attempt to load a given label from possible drivers.
 
@@ -65,20 +65,13 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_label=False,
 
     Using the only_* flags will limit the drivers used to construct ISDs. If you
     are not sure what input data you have, just leave the only_* parameters as False.
-    Leaveing/Setting all only_* parameters to False should satisfy most situations.
+    Leaving/Setting all only_* parameters to False should satisfy most situations.
 
-    Here is and example of a case where we would want to be explicit,
-    if I have an IsisCube with SPICE data attached, then I would want to set:
-    ``only_isis_label=True,  only_isis_spice=True`` in my load call to only attempt
-    ISD construction from drivers that are constructed from IsisLabel and IsisSpice
-    componenets.
-
-    This is sensative as not all combinations will work. Here is a list of valid
-    only_* parameter combinations:
-    * Any individual parameter
-    * ``only_isis_label=True,  only_isis_spice=True`` Used for spiceinit'd ISIS cubes
-    * ``only_isis_label=True,  only_naif_spice=True`` Used for non-spiceinit'd ISIS cubes
-    * ``only_pds3_label=True,  only_naif_spice=True`` Used for PDS3 labels
+    Only parameters explained and there uses:
+    * ``only_isis_spice=True`` Used for spiceinit'd ISIS cubes, used, for example, 
+    when one has updated the ephemeris information on an ISIS cube.
+    * ``only_naif_spice=True`` Used for example, when one has a data product or 
+    an ISIS cube, but not yet obtained ephemeris information.
 
     Parameters
     ----------
@@ -100,16 +93,8 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_label=False,
               If True, displays debug output specifying which drivers were
               attempted and why they failed.
 
-    only_isis_label : bool
-                      Explicitly searches for drivers constructed from the IsisLabel
-                      component class
-
     only_isis_spice : bool
                       Explicitly searches for drivers constructed from the IsisSpice
-                      component class
-
-    only_pds3_label : bool
-                      Explicitly searches for drivers constructed from the Pds3Label
                       component class
 
     only_naif_spice : bool
@@ -121,13 +106,13 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_label=False,
     dict
          The ISD as a dictionary
     """
-    print(only_isis_label,  only_isis_spice,  only_pds3_label,  only_naif_spice)
+    print("Banana", only_isis_spice, only_naif_spice)
     if isinstance(formatter, str):
         formatter = __formatters__[formatter]
     
-    driver_mask = [only_isis_label, only_pds3_label, only_isis_spice, only_naif_spice]
-    class_list = np.array([IsisLabel, Pds3Label, IsisSpice, NaifSpice])
-    class_list = list(class_list[driver_mask])
+    driver_mask = [only_isis_spice, only_naif_spice]
+    class_list = [IsisSpice, NaifSpice]
+    class_list = list(compress(class_list, driver_mask))
     # predicat logic: make sure x is a class, who contains the word "driver" (clipper_drivers) and 
     # the componenet classes 
     predicat = lambda x: inspect.isclass(x) and "_driver" in x.__module__ and [i for i in class_list if i in inspect.getmro(x)] == class_list
@@ -179,7 +164,7 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_label=False,
                 traceback.print_exc()
     raise Exception('No Such Driver for Label')
 
-def loads(label, props='', formatter='ale', indent = 2, verbose=False, only_isis_label=False, only_isis_spice=False, only_pds3_label=False, only_naif_spice=False):
+def loads(label, props='', formatter='ale', indent = 2, verbose=False, only_isis_spice=False, only_naif_spice=False):
     """
     Attempt to load a given label from all possible drivers.
 
@@ -202,7 +187,8 @@ def loads(label, props='', formatter='ale', indent = 2, verbose=False, only_isis
     --------
     load
     """
-    res = load(label, props, formatter, verbose, only_isis_label, only_isis_spice, only_pds3_label, only_naif_spice)
+    print(only_isis_spice, only_naif_spice)
+    res = load(label, props, formatter, verbose, only_isis_spice, only_naif_spice)
     return json.dumps(res, indent=indent, cls=AleJsonEncoder)
 
 def parse_label(label, grammar=pvl.grammar.PVLGrammar()):

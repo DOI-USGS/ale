@@ -24,8 +24,8 @@ def test_priority(tmpdir, monkeypatch):
     sorted_drivers = sort_drivers(drivers)
     assert all([IsisSpice in klass.__bases__ for klass in sorted_drivers[2:]])
 
-@pytest.mark.parametrize(("class_truth, return_val"), [({"only_isis_label": False,  "only_isis_spice": False,  "only_pds3_label": False,  "only_naif_spice": False}, True), 
-                                                       ({"only_isis_label": False,  "only_isis_spice": True,  "only_pds3_label": False,  "only_naif_spice": False}, False)])
+@pytest.mark.parametrize(("class_truth, return_val"), [({"only_isis_spice": False,  "only_naif_spice": False}, True), 
+                                                       ({"only_isis_spice": True,  "only_naif_spice": False}, False)])
 def test_mess_load(class_truth, return_val, mess_kernels):
     label_file = get_image_label('EN1072174528M')
 
