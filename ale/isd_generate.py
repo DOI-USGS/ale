@@ -58,6 +58,16 @@ def main():
         help="Display information as program runs."
     )
     parser.add_argument(
+        "-i", "--only_isis_spice",
+        action="store_true",
+        help="Only use drivers that read from spiceinit'd ISIS cubes"
+    )
+    parser.add_argument(
+        "-n", "--only_naif_spice",
+        action="store_true",
+        help="Only use drivers that generate fresh spice data"
+    )
+    parser.add_argument(
         '--version',
         action='version',
         version=f"ale version {ale.__version__}",
@@ -87,7 +97,7 @@ def main():
 
     if len(args.input) == 1:
         try:
-            file_to_isd(args.input[0], args.out, kernels=k, log_level=log_level)
+            file_to_isd(args.input[0], args.out, kernels=k, log_level=log_level, only_isis_spice=args.only_isis_spice, only_naif_spice=args.only_naif_spice)
         except Exception as err:
             # Seriously, this just throws a generic Exception?
             sys.exit(f"File {args.input[0]}: {err}")
@@ -97,7 +107,7 @@ def main():
         ) as executor:
             futures = {
                 executor.submit(
-                    file_to_isd, f, **{"kernels": k, "log_level": log_level}
+                    file_to_isd, f, **{"kernels": k, "log_level": log_level, "only_isis_spice": args.only_isis_spice, "only_naif_spice": args.only_naif_spice}
                 ): f for f in args.input
             }
             for f in concurrent.futures.as_completed(futures):
@@ -115,7 +125,9 @@ def file_to_isd(
     file: os.PathLike,
     out: os.PathLike = None,
     kernels: list = None,
-    log_level=logging.WARNING
+    log_level=logging.WARNING,
+    only_isis_spice=False,
+    only_naif_spice=False
 ):
     """
     Returns nothing, but acts as a thin wrapper to take the *file* and generate
@@ -139,11 +151,11 @@ def file_to_isd(
     logger.setLevel(log_level)
 
     logger.info(f"Reading: {file}")
+    props = {}
     if kernels is not None:
         kernels = [str(PurePath(p)) for p in kernels]
-        usgscsm_str = ale.loads(file, props={'kernels': kernels}, verbose=log_level>=logging.INFO)
-    else:
-        usgscsm_str = ale.loads(file, verbose=log_level>=logging.INFO)
+        props["kernels"] = kernels
+    usgscsm_str = ale.loads(file, props=props, verbose=log_level>=logging.INFO, only_isis_spice=only_isis_spice, only_naif_spice=only_naif_spice)
 
     logger.info(f"Writing: {isd_file}")
     isd_file.write_text(usgscsm_str)
