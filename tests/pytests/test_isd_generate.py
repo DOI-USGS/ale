@@ -28,7 +28,7 @@ class TestFile(unittest.TestCase):
             cube_str = "dummy.cub"
             isdg.file_to_isd(cube_str)
             self.assertEqual(
-                m_loads.call_args_list, [call(cube_str, verbose=True)]
+                m_loads.call_args_list, [call(cube_str, props={}, verbose=True, only_isis_spice=False, only_naif_spice=False)]
             )
             self.assertEqual(
                 m_path_wt.call_args_list, [call(json_text)]
@@ -41,7 +41,7 @@ class TestFile(unittest.TestCase):
             isdg.file_to_isd(cube_str, out=out_str, kernels=kernel_val)
             self.assertEqual(
                 m_loads.call_args_list,
-                [call(cube_str, props={'kernels': kernel_val}, verbose=True)]
+                [call(cube_str, props={'kernels': kernel_val}, verbose=True, only_isis_spice=False, only_naif_spice=False)]
             )
             self.assertEqual(
                 m_path_wt.call_args_list, [call(json_text)]

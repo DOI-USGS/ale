@@ -24,16 +24,22 @@ def test_priority(tmpdir, monkeypatch):
     sorted_drivers = sort_drivers(drivers)
     assert all([IsisSpice in klass.__bases__ for klass in sorted_drivers[2:]])
 
-def test_mess_load(mess_kernels):
-    updated_kernels = mess_kernels
+@pytest.mark.parametrize(("class_truth, return_val"), [({"only_isis_spice": False,  "only_naif_spice": False}, True), 
+                                                       ({"only_isis_spice": True,  "only_naif_spice": False}, False)])
+def test_mess_load(class_truth, return_val, mess_kernels):
     label_file = get_image_label('EN1072174528M')
 
-    usgscsm_isd_str = ale.loads(label_file, props={'kernels': updated_kernels}, formatter='usgscsm')
-    usgscsm_isd_obj = json.loads(usgscsm_isd_str)
+    try:
+        usgscsm_isd_str = ale.loads(label_file, {'kernels': mess_kernels}, 'usgscsm', False, **class_truth)
+        usgscsm_isd_obj = json.loads(usgscsm_isd_str)
 
-    assert usgscsm_isd_obj['name_platform'] == 'MESSENGER'
-    assert usgscsm_isd_obj['name_sensor'] == 'MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA'
-    assert usgscsm_isd_obj['name_model'] == 'USGS_ASTRO_FRAME_SENSOR_MODEL'
+        assert return_val is True
+        assert usgscsm_isd_obj['name_platform'] == 'MESSENGER'
+        assert usgscsm_isd_obj['name_sensor'] == 'MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA'
+        assert usgscsm_isd_obj['name_model'] == 'USGS_ASTRO_FRAME_SENSOR_MODEL'
+    except Exception as load_failure:
+        assert str(load_failure) == "No Such Driver for Label"
+        assert return_val is False
 
 def test_load_invalid_label():
     with pytest.raises(Exception):

@@ -59,7 +59,7 @@ namespace ale {
     return "";
   }
 
-  std::string loads(std::string filename, std::string props, std::string formatter, int indent, bool verbose) {
+  std::string loads(std::string filename, std::string props, std::string formatter, int indent, bool verbose, bool onlyIsisSpice, bool onlyNaifSpice) {
     static bool first_run = true;
 
     if(first_run) {
@@ -88,7 +88,7 @@ namespace ale {
 
 
     // Create a Python tuple to hold the arguments to the method.
-    PyObject *pArgs = PyTuple_New(5);
+    PyObject *pArgs = PyTuple_New(7);
     if(!pArgs) {
       throw runtime_error(getPyTraceback());
     }
@@ -111,12 +111,25 @@ namespace ale {
     Py_INCREF(pIntIndent); // take ownership of reference
 
     PyObject *pBoolVerbose = Py_False;
-    if (!verbose) {
+    if (verbose == true) {
       pBoolVerbose = Py_True;
     }
     PyTuple_SetItem(pArgs, 4, pBoolVerbose);
     Py_INCREF(pBoolVerbose); // take ownership of reference
 
+    PyObject *pBoolOnlyIsisSpice = Py_False;
+    if (onlyIsisSpice == true) {
+      pBoolOnlyIsisSpice = Py_True;
+    }
+    PyTuple_SetItem(pArgs, 5, pBoolOnlyIsisSpice);
+    Py_INCREF(pBoolOnlyIsisSpice); // take ownership of reference
+
+    PyObject *pBoolOnlyNaifSpice = Py_False;
+    if (onlyNaifSpice == true) {
+      pBoolOnlyNaifSpice = Py_True;
+    }
+    PyTuple_SetItem(pArgs, 6, pBoolOnlyNaifSpice);
+    Py_INCREF(pBoolOnlyNaifSpice); // take ownership of reference
 
     // Call the function with the arguments.
     PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
@@ -149,8 +162,8 @@ namespace ale {
     return cResult;
   }
 
-  json load(std::string filename, std::string props, std::string formatter, bool verbose) {
-    std::string jsonstr = loads(filename, props, formatter, verbose);
+  json load(std::string filename, std::string props, std::string formatter, bool verbose, bool onlyIsisSpice, bool onlyNaifSpice) {
+    std::string jsonstr = loads(filename, props, formatter, 0, verbose, onlyIsisSpice, onlyNaifSpice);
     return json::parse(jsonstr);
   }
 }
