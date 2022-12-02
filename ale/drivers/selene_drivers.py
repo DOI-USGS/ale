@@ -295,7 +295,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
         : float
           ephemeris start time of the image
         """
-        return spice.sct2e(self.spacecraft_id, float(self.spacecraft_clock_start_count))
+        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_start_count)
 
     @property
     def detector_center_line(self):
@@ -623,7 +623,7 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
         : double
           Starting ephemeris time of the image
         """
-        return spice.sct2e(self.spacecraft_id, float(self.spacecraft_clock_start_count))
+        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_start_count)
 
     @property
     def exposure_duration(self):
@@ -661,9 +661,9 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
         if (swath_mode == "FULL"):
           start_sample = 1
         elif (swath_mode == "NOMINAL"):
-          start_sample = 296
+          start_sample = 297
         elif (swath_mode == "HALF"):
-          start_sample = 1171;
+          start_sample = 1172;
         return start_sample - 0.5
 
     @property
@@ -973,7 +973,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
         : float
           ephemeris start time of the image
         """
-        return spice.sct2e(self.spacecraft_id, float(self.spacecraft_clock_start_count))
+        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_start_count)
 
     @property
     def detector_center_line(self):
@@ -1233,7 +1233,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
         : float
           ephemeris start time of the image
         """
-        return spice.sct2e(self.spacecraft_id, float(self.spacecraft_clock_start_count))
+        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_start_count)
 
 
     @property
