@@ -24,6 +24,7 @@ before_build:
 
 build_script:
   - python ..\setup.py install
+# pip3 install --trusted-host files.pythonhosted.org --trusted-host pypi.org --trusted-host pypi.python.org -e ..
   - cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON -G "Visual Studio 16 2019" -A x64 -DALE_BUILD_TESTS=OFF ..
   - cmake --build . --target ALL_BUILD --config Release
 
