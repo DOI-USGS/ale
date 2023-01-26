@@ -96,7 +96,7 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         : list<double>
           focal plane to detector lines
         """
-        return [0, 1/self.pixel_size, 0]
+        return [0, 0, 1/self.pixel_size]
     
     @property
     def focal2pixel_samples(self):
@@ -108,23 +108,23 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         : list<double>
           focal plane to detector samples
         """
-        return [0, 0, 1/self.pixel_size]
+        return [0, 1/self.pixel_size, 0]
 
-    @property
-    def detector_center_line(self):
-        return self.label["INSTRUMENT_STATE_PARMS"]["DETECTOR_LINES"]/2
-
-    @property
-    def detector_center_sample(self):
-        return self.label["INSTRUMENT_STATE_PARMS"]["MSL:DETECTOR_SAMPLES"]/2
+    # The detector_center_line() and detector_center_sample()
+    # functions from Cahvor() will be invoked. There is no need to
+    # reimplement them here.
 
     @property
     def detector_start_line(self):
-        return self.label["IMAGE_REQUEST_PARMS"]["FIRST_LINE"]
+        # Do not return self.label["IMAGE_REQUEST_PARMS"]["FIRST_LINE"]
+        # The value 0 is consistent with the Cahvor camera model.
+        return 0
 
     @property
     def detector_start_sample(self):
-        return self.label["IMAGE_REQUEST_PARMS"]["FIRST_LINE_SAMPLE"]
+        # Do not return self.label["IMAGE_REQUEST_PARMS"]["FIRST_LINE_SAMPLE"])
+        # The value 0 is consistent with the Cahvor camera model.
+        return 0
 
     @property
     def sensor_model_version(self):

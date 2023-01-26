@@ -451,7 +451,7 @@ class Cahvor():
             v_s = self.compute_v_s()
             H_prime = (self.cahvor_camera_dict['H'] - h_c * self.cahvor_camera_dict['A'])/h_s
             V_prime = (self.cahvor_camera_dict['V'] - v_c * self.cahvor_camera_dict['A'])/v_s
-            self._cahvor_rotation_matrix = np.array([H_prime, -V_prime, -self.cahvor_camera_dict['A']])
+            self._cahvor_rotation_matrix = np.array([-H_prime, V_prime, -self.cahvor_camera_dict['A']])
         return self._cahvor_rotation_matrix
 
     @property
@@ -487,7 +487,9 @@ class Cahvor():
         : float
           The detector center line/boresight center line
         """
-        return self.compute_v_c()
+        # Add here 0.5 for consistency with the CSM convention that the
+        # upper-left image pixel is at (0.5, 0.5).
+        return self.compute_v_c() + 0.5
 
     @property
     def detector_center_sample(self):
@@ -500,7 +502,9 @@ class Cahvor():
         : float
           The detector center sample/boresight center sample
         """
-        return self.compute_h_c()
+        # Add here 0.5 for consistency with the CSM convention that the
+        # upper-left image pixel is at (0.5, 0.5).
+        return self.compute_h_c() + 0.5
 
     @property
     def pixel_size(self):
