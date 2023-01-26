@@ -42,7 +42,9 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         """
         lookup = {
           "MAST_RIGHT": 'MASTCAM_RIGHT',
-          "MAST_LEFT": 'MASTCAM_LEFT'
+          "MAST_LEFT": 'MASTCAM_LEFT',
+          "NAV_RIGHT_B": 'MASTCAM_RIGHT',
+          "NAV_LEFT_B": 'MASTCAM_LEFT'
         }
         return self.instrument_host_id + "_" + lookup[super().instrument_id]
 
@@ -72,14 +74,14 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
     @property
     def final_inst_frame(self):
         """
-        Defines MSLs last naif frame before the cahvor model frame
+        Defines the rover frame, relative to which the MSL cahvor camera is defined
 
         Returns
         -------
         : int
-          Naif frame code for MSL_RSM_HEAD
+          Naif frame code for MSL_ROVER
         """
-        return spice.bods2c("MSL_RSM_HEAD")
+        return spice.bods2c("MSL_ROVER")
 
     @property
     def sensor_frame_id(self):
@@ -108,10 +110,7 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         : list<double>
           focal plane to detector lines
         """
-        if self._props.get("landed", False):
-            return [0, 0, -1/self.pixel_size]
-        else:
-            return [0, 0, 1/self.pixel_size]
+        return [0, 0, -1/self.pixel_size]
     
     @property
     def focal2pixel_samples(self):
@@ -123,10 +122,7 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         : list<double>
           focal plane to detector samples
         """
-        if (self._props.get("nadir", False)):
-            return [0, 1/self.pixel_size, 0]
-        else:
-            return [0, -1/self.pixel_size, 0]
+        return [0, -1/self.pixel_size, 0]
 
     @property
     def sensor_model_version(self):
@@ -137,3 +133,34 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
           ISIS sensor model version
         """
         return 1
+
+    @property
+    def light_time_correction(self):
+        """
+        Returns the type of light time correction and aberration correction to
+        use in NAIF calls.
+
+        For MSL using such a correction returns wrong results, so turn it off.
+        
+        Returns
+        -------
+        : str
+          The light time and aberration correction string for use in NAIF calls.
+          See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/abcorr.html
+          for the different options available.
+        """
+        return 'NONE'
+        
+    @property
+    def focal_length(self):
+        """
+        Returns the focal length of the sensor
+        Returns the opposite of what spice returns. This was tested to work
+        with MSL.
+
+        Returns
+        -------
+        : float
+          focal length
+        """
+        return -1 * super().focal_length 

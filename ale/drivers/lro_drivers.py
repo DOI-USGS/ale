@@ -102,7 +102,7 @@ class LroLrocNacPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driv
     @property
     def light_time_correction(self):
         """
-        Returns the type of light time correction and abberation correction to
+        Returns the type of light time correction and aberration correction to
         use in NAIF calls.
 
         LROC is specifically set to not use light time correction because it is
@@ -112,7 +112,7 @@ class LroLrocNacPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driv
         Returns
         -------
         : str
-          The light time and abberation correction string for use in NAIF calls.
+          The light time and aberration correction string for use in NAIF calls.
           See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/abcorr.html
           for the different options available.
         """
