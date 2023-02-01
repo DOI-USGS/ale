@@ -106,7 +106,6 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
     dict
          The ISD as a dictionary
     """
-    print("Banana", only_isis_spice, only_naif_spice)
     if isinstance(formatter, str):
         formatter = __formatters__[formatter]
     
@@ -187,7 +186,6 @@ def loads(label, props='', formatter='ale', indent = 2, verbose=False, only_isis
     --------
     load
     """
-    print(only_isis_spice, only_naif_spice)
     res = load(label, props, formatter, verbose, only_isis_spice, only_naif_spice)
     return json.dumps(res, indent=indent, cls=AleJsonEncoder)
 
