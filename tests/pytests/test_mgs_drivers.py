@@ -73,3 +73,5 @@ class test_isis3_naif(unittest.TestCase):
 
     def test_odtk(self):
         assert self.driver.odtk == [0, -.007, .007]
+        with patch('ale.drivers.mgs_drivers.MgsMocWideAngleCameraIsisLabelNaifSpiceDriver.instrument_id', return_value='MGS_MOC_WA_BLUE'):
+            assert self.driver.odtk == [0, .007, .007]
