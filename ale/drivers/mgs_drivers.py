@@ -149,4 +149,4 @@ class MgsMocWideAngleCameraIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, Naif
         if self.instrument_id == "MGS_MOC_WA_RED":
             return [0, -.007, .007]
         else:
-            return [0, 0.0131240578522949, 0.0131240578522949]
+            return [0, .007, .007]
