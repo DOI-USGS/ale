@@ -23,6 +23,26 @@ class UvvisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, 
     """
 
     @property
+    def instrument_id(self):
+        """
+        Returns an instrument id for uniquely identifying the instrument,
+        but often also used to be piped into Spice Kernels to acquire
+        IKIDS. Therefor they are the same ID that Spice expects in bods2c
+        calls. Expect instrument_id to be defined in the IsisLabel mixin.
+        This should be a string of the form NEAR EARTH ASTEROID RENDEZVOUS
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
+        lookup_table = {
+        "MSI": "NEAR EARTH ASTEROID RENDEZVOUS"
+        }
+        print(lookup_table[super().instrument_id])
+        return lookup_table[super().instrument_id]
+    
+    @property
     def sensor_name(self):
         """
         Returns the name of the instrument
