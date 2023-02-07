@@ -141,12 +141,13 @@ class FrameChain(nx.DiGraph):
 
     @staticmethod
     def frame_trace(reference_frame, ephemeris_time, nadir=False):
+        if nadir:
+            return [], []
+
         frame_codes = [reference_frame]
         _, frame_type, _ = spice.frinfo(frame_codes[-1])
         frame_types = [frame_type]
 
-        if nadir:
-            return [], []
 
         while(frame_codes[-1] != 1):
             try:

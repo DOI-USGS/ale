@@ -369,7 +369,7 @@ class NaifSpice():
             target = self.spacecraft_name
             observer = self.target_name
             # Check for ISIS flag to fix target and observer swapping
-            if self.swap_observer_target:
+            if self.swap_observer_target or self._props.get("nadir", False):
                 target = self.target_name
                 observer = self.spacecraft_name
 
