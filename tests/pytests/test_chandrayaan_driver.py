@@ -39,6 +39,16 @@ def test_chandrayaan_load(m3_kernels):
     x = compare_dicts(isd_obj, compare_dict)
     assert x == []
 
+def test_chandrayaan_mrffr_load(mrffr_kernels):
+    label_file = get_image_label("fsb_00720_1cd_xhu_84n209_v1", label_type="isis3")
+    compare_dict = get_isd("chandrayaan_mrffr")
+
+    isd_str = ale.loads(label_file, props={"kernels": mrffr_kernels, "nadir": True}, verbose=True)
+    isd_obj = json.loads(isd_str)
+    x = compare_dicts(isd_obj, compare_dict)
+    assert x == []
+
+
 # ========= Test chandrayaan isislabel and naifspice driver =========
 class test_chandrayaan_isis_naif(unittest.TestCase):
 
