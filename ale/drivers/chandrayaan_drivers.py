@@ -207,7 +207,7 @@ class Chandrayaan1MRFFRIsisLabelNaifSpiceDriver(Radar, IsisLabel, NaifSpice, Cha
         : double
           scaled pixel width
         """
-        return self.label['IsisCube']['Instrument']['ScaledPixelWidth'];
+        return self.label['IsisCube']['Instrument']['ScaledPixelWidth']
 
     @property
     def scaled_pixel_height(self):
@@ -219,7 +219,7 @@ class Chandrayaan1MRFFRIsisLabelNaifSpiceDriver(Radar, IsisLabel, NaifSpice, Cha
         : double
           scaled pixel height
         """
-        return self.label['IsisCube']['Instrument']['ScaledPixelHeight'];
+        return self.label['IsisCube']['Instrument']['ScaledPixelHeight']
 
 
     @property
