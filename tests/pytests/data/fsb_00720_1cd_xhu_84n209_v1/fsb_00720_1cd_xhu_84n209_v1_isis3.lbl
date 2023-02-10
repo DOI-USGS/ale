@@ -1,0 +1,404 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 284
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 284
+      Lines   = 3239
+      Bands   = 4
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    MissionName               = CHANDRAYAAN-1
+    SpacecraftName            = CHANDRAYAAN1_ORBITER
+    InstrumentHostId          = CH1-ORB
+    InstrumentName            = "MINI-RF FORERUNNER"
+    InstrumentId              = MRFFR
+    TargetName                = MOON
+    StartTime                 = 2009-01-07T16:35:29.466477
+    StopTime                  = 2009-01-07T16:38:07.1710
+    SpacecraftClockStartCount = UNK
+    SpacecraftClockStopCount  = UNK
+    OrbitNumber               = 720
+    IncidenceAngle            = 26.29401082 <deg>
+    InstrumentModeId          = BASELINE_S_STEEP2
+    InstrumentModeDesc        = SAR
+    LookDirection             = RIGHT
+    ScaledPixelHeight         = 75.000000000000
+    ScaledPixelWidth          = 75.000000000000
+    LineExposureDuration      = 0.048689283086
+    AzimuthResolution         = 216.073269
+    RangeResolution           = 202.952153
+    RangeCoefficientSet       = (("2009-01-07T16:35:29.706", 110868.442988,
+                                 3.810057E-01, 4.124753E-06, -1.466465E-11),
+                                 ("2009-01-07T16:35:40.576", 110868.444240,
+                                 3.796658E-01, 4.129659E-06, -1.464468E-11),
+                                 ("2009-01-07T16:35:48.082", 110868.444490,
+                                 3.787289E-01, 4.133130E-06, -1.463274E-11),
+                                 ("2009-01-07T16:35:55.220", 110868.445351,
+                                 3.778723E-01, 4.136168E-06, -1.461699E-11),
+                                 ("2009-01-07T16:36:02.742", 110868.444720,
+                                 3.769318E-01, 4.139526E-06, -1.460099E-11),
+                                 ("2009-01-07T16:36:10.272", 110868.445533,
+                                 3.760293E-01, 4.142824E-06, -1.458856E-11),
+                                 ("2009-01-07T16:36:17.810", 110868.445726,
+                                 3.750838E-01, 4.146198E-06, -1.457244E-11),
+                                 ("2009-01-07T16:36:25.112", 110868.419992,
+                                 3.741786E-01, 4.149807E-06, -1.458329E-11),
+                                 ("2009-01-07T16:36:32.873", 110868.434485,
+                                 3.732243E-01, 4.153561E-06, -1.457841E-11),
+                                 ("2009-01-07T16:36:40.633", 110868.443761,
+                                 3.722685E-01, 4.157252E-06, -1.457197E-11),
+                                 ("2009-01-07T16:36:48.006", 110868.437745,
+                                 3.713561E-01, 4.160426E-06, -1.455643E-11),
+                                 ("2009-01-07T16:36:55.766", 110868.451259,
+                                 3.703950E-01, 4.164122E-06, -1.454940E-11),
+                                 ("2009-01-07T16:37:03.526", 110868.463642,
+                                 3.693890E-01, 4.168037E-06, -1.454424E-11),
+                                 ("2009-01-07T16:37:10.801", 110868.510636,
+                                 3.684559E-01, 4.172284E-06, -1.455555E-11),
+                                 ("2009-01-07T16:37:18.529", 110868.509186,
+                                 3.674905E-01, 4.175738E-06, -1.454253E-11),
+                                 ("2009-01-07T16:37:26.260", 110868.510808,
+                                 3.665218E-01, 4.179252E-06, -1.453087E-11),
+                                 ("2009-01-07T16:37:33.991", 110868.519392,
+                                 3.655487E-01, 4.182901E-06, -1.452212E-11),
+                                 ("2009-01-07T16:37:41.338", 110868.521945,
+                                 3.646167E-01, 4.186284E-06, -1.451118E-11),
+                                 ("2009-01-07T16:37:49.074", 110868.537889,
+                                 3.636367E-01, 4.190081E-06, -1.450608E-11),
+                                 ("2009-01-07T16:38:00.293", 110868.542236,
+                                 3.621877E-01, 4.195289E-06, -1.448781E-11))
+    Frequency                 = 2384.15 <GHz>
+  End_Group
+
+  Group = Archive
+    DataSetId               = CH1-ORB-L-MRFFR-4-CDR-V1.0
+    DataSetName             = "CH1-ORB MOON MINI-RF 4 CALIBRATED DATA RECORD
+                               V1.0"
+    ProducerId              = JHUAPL
+    ProducerFullName        = "MINI-RF POC TEAM"
+    ProducerInstitutionName = "JOHNS HOPKINS UNIVERSITY APPLIED PHYSICS
+                               LABORATORY"
+    ProductId               = FSB_00720_1CD_XHU_84N209_V1
+    ProductVersionId        = 1.0
+    ProductCreationTime     = 2011-01-20T14:51:46
+    ReleaseId               = 0001
+    SoftwareName            = FOCUS
+    SoftwareVersionId       = 10.0.050
+  End_Group
+
+  Group = BandBin
+    FilterName = ("H RECEIVE INTENSITY", "V RECEIVE INTENSITY",
+                  "CROSS POWER INTENSITY (REAL)",
+                  "CROSS POWER INTENSITY (IMAGINARY)")
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -86001
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = ($base/kernels/pck/pck00009.tpc,
+                                 $chandrayaan1/kernels/pck/moon_080317.tf,
+                                 $chandrayaan1/kernels/pck/moon_assoc_me.tf)
+    TargetPosition            = (Table,
+                                 $Chandrayaan1/kernels/tspk/moon_pa_de421_1900-
+                                 -2050.bpc,
+                                 $Chandrayaan1/kernels/tspk/de421.bsp)
+    InstrumentPointing        = (Table, Nadir)
+    Instrument                = Null
+    SpacecraftClock           = Null
+    InstrumentPosition        = (Table,
+                                 $chandrayaan1/kernels/spk/chan1_short_2008102-
+                                 2_00.bsp)
+    InstrumentAddendum        = $chandrayaan1/kernels/iak/mrffrAddendum002.ti
+    ShapeModel                = $base/dems/ldem_128ppd_Mar2011_clon180_radius-
+                                _pad.cub
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Unknown
+    CameraVersion             = 1
+    Source                    = isis
+  End_Group
+
+  Group = ImageInfo
+    MaximumLatitude      = 88.18283 <deg>
+    MinimumLatitude      = 80.149305 <deg>
+    WesternmostLongitude = 204.43492 <deg>
+    EasternmostLongitude = 231.58486 <deg>
+    CenterLongitude      = -150.966184 <deg>
+    CenterLatitude       = 84.167762 <deg>
+    Minimum              = 0.000001571
+    Maximum              = 18.317401886
+    Mean                 = 0.291473554
+    StandardDeviation    = 0.027481261
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 15196054
+  Bytes               = 129600
+  Records             = 3240
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-86001, 1)
+  CkTableStartTime    = 284618195.60191
+  CkTableEndTime      = 284618353.40388
+  CkTableOriginalSize = 3240
+  FrameTypeCode       = 5
+  Description         = "Created by spiceinit"
+  Kernels             = Nadir
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 15325654
+  Bytes                = 168
+  Records              = 3
+  ByteOrder            = Lsb
+  CacheType            = HermiteSpline
+  SpkTableStartTime    = 284618195.60191
+  SpkTableEndTime      = 284618353.40388
+  SpkTableOriginalSize = 3240.0
+  Description          = "Created by spiceinit"
+  Kernels              = $chandrayaan1/kernels/spk/chan1_short_20081022_00.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 15325822
+  Bytes               = 128
+  Records             = 2
+  ByteOrder           = Lsb
+  TimeDependentFrames = (31006, 1)
+  ConstantFrames      = (31001, 31007, 31006)
+  ConstantRotation    = (0.99999987325471, -3.29285422375571e-04,
+                         3.80869618671387e-04, 3.29286000210947e-04,
+                         0.99999994578431, -1.45444093783627e-06,
+                         -3.80869119096078e-04, 1.57985578682691e-06,
+                         0.99999992746811)
+  CkTableStartTime    = 284618195.60191
+  CkTableEndTime      = 284618353.40388
+  CkTableOriginalSize = 2
+  FrameTypeCode       = 6
+  Description         = "Created by spiceinit"
+  Kernels             = ($Chandrayaan1/kernels/tspk/moon_pa_de421_1900-2050.b-
+                         pc, $Chandrayaan1/kernels/tspk/de421.bsp,
+                         $base/kernels/pck/pck00009.tpc,
+                         $chandrayaan1/kernels/pck/moon_080317.tf,
+                         $chandrayaan1/kernels/pck/moon_assoc_me.tf)
+  SolarLongitude      = 336.99514173807
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 15325950
+  Bytes                = 112
+  Records              = 2
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 284618195.60191
+  SpkTableEndTime      = 284618353.40388
+  SpkTableOriginalSize = 2.0
+  Description          = "Created by spiceinit"
+  Kernels              = ($Chandrayaan1/kernels/tspk/moon_pa_de421_1900-2050.-
+                          bpc, $Chandrayaan1/kernels/tspk/de421.bsp)
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 15326062
+  Bytes     = 1463
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 15188509
+  Bytes     = 7545
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE         = 301
+  BODY301_RADII     = (1737.4, 1737.4, 1737.4)
+  BODY_FRAME_CODE   = 31001
+  INS-86001_TRANSX  = (-75.0, 75.0, 0.0)
+  INS-86001_TRANSY  = (0.0, 0.0, 0.0)
+  INS-86001_ITRANSS = (1.0, 0.013333333333333, 0.0)
+  INS-86001_ITRANSL = (0.0, 0.0, 0.0)
+End_Object
+End

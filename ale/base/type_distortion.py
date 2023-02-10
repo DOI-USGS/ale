@@ -151,3 +151,19 @@ class CahvorDistortion():
                 "coefficients": [*R, x, y]
             }
         }
+
+
+class ChandrayaanMrffrDistortion():
+    @property
+    def usgscsm_distortion_model(self):
+        transx = [-1* self.scaled_pixel_height, self.scaled_pixel_height, 0.0]
+        transy = [0,0,0]
+        transs = [1.0, 1.0 / self.scaled_pixel_height, 0.0]
+        transl = [0.0, 0.0, 0.0]
+
+        return {
+            "ChandrayaanMrffr":{
+                "x_coefficients" : transx,
+                "y_coefficients" : transy
+            }
+        }

@@ -1,0 +1,19 @@
+\begintext
+ Translation values were added here as placeholders; the actual 
+ translation values are calculated in the RadarGroundRangeMap class
+
+\begindata
+INS-86001_TRANSX = ( 0.0, 0.0, 1.0)
+INS-86001_TRANSY = ( 0.0, 1.0, 0.0)
+INS-86001_ITRANSS = ( 0.0, 0.0, 1.0)
+INS-86001_ITRANSL = ( 0.0, 1.0, 0.0)
+
+\begintext
+These are the parameters required for writing c-kernels.  Isis will
+create ck with the same frame endpoints as the mission ck.  For 
+the Chandryaan spacecraft the ck frame is CHAND1_SPACECRAFT (-86001), and the
+ck reference frame is J2000 (1).
+
+\begindata
+INS-86001_CK_FRAME_ID=-86001
+INS-86001_CK_REFERENCE_ID=1
