@@ -49,14 +49,6 @@ class MgsMocNarrowAngleCameraIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, Na
         return self.instrument_id
 
     @property
-    def spacecraft_clock_start_count(self):
-        """
-        Returns the Spacecraft Clock Start Count for the image.
-        Expects to find SpacecraftClockCount in the label.
-        """
-        return str(self.label['IsisCube']['Instrument']['SpacecraftClockCount'])
-
-    @property
     def ephemeris_stop_time(self):
         """
         ISIS doesn't preserve the spacecraft stop count that we can use to get
