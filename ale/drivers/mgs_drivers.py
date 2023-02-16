@@ -40,7 +40,8 @@ class MgsMocNarrowAngleCameraIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, Na
     @property
     def sensor_name(self):
         """
-        Returns
+        Returns sensor name.
+        Expects instrument_id to be defined.
         -------
         : String
           The name of the sensor
@@ -48,21 +49,12 @@ class MgsMocNarrowAngleCameraIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, Na
         return self.instrument_id
 
     @property
-    def ephemeris_start_time(self):
+    def spacecraft_clock_start_count(self):
         """
-        Returns the ephemeris start time of the image.
-        Expects spacecraft_id to be defined. This should be the integer
-        Naif ID code for the spacecraft.
-
-        Returns
-        -------
-        : float
-          ephemeris start time of the image
+        Returns the Spacecraft Clock Start Count for the image.
+        Expects to find SpacecraftClockCount in the label.
         """
-        if not hasattr(self, '_ephemeris_start_time'):
-            sclock = self.label['IsisCube']['Instrument']['SpacecraftClockCount']
-            self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
-        return self._ephemeris_start_time
+        return str(self.label['IsisCube']['Instrument']['SpacecraftClockCount'])
 
     @property
     def ephemeris_stop_time(self):
