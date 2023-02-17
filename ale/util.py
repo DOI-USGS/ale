@@ -284,7 +284,9 @@ def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
             kernels = [expandvars(expandvars(k, isisprefs['DataDirectory'], case_sensitive=False)) for k in kernels]
         # Ensure that the ISIS Addendum kernel is last in case it overrides
         # some values from the default Instrument kernel
+        # Sorts planetary constants kernel first so it can be overridden by more specific kernels
         kernels = sorted(kernels, key=lambda x: "Addendum" in x)
+        kernels = sorted(kernels, key=lambda x: "pck00" in x, reverse=True)
         return kernels
     elif (format_as == 'dict'):
         # return created dict

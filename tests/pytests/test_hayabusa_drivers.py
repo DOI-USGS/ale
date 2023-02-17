@@ -24,10 +24,8 @@ def test_amica_load(test_amica_kernels):
     label_file = get_image_label('st_2458542208_v', 'isis')
     compare_dict = get_isd("hayabusaamica")
 
-    isd_str = ale.loads(label_file, props={'kernels': test_amica_kernels}, verbose=True)
+    isd_str = ale.loads(label_file, props={'kernels': test_amica_kernels})
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
-    print(compare_dicts(isd_obj, compare_dict))
     assert compare_dicts(isd_obj, compare_dict) == []
 
 
