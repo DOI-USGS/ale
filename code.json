@@ -3,8 +3,8 @@
     "name": "ale",
     "organization": "U.S. Geological Survey",
     "description": "GitLab repository for the Abstraction Layer for Ephemerides package",
-    "version": "0.8.8",
-    "status": "Production",
+    "version": "0.8.9",
+    "status": "Development",
 
     "permissions": {
       "usageType": "openSource",
@@ -16,13 +16,13 @@
       ]
     },
 
-    "homepageURL": "https://code.usgs.gov/astrogeology/ale/-/releases/0.8.8",
-    "downloadURL": "https://code.usgs.gov/astrogeology/ale/-/archive/0.8.8/ale-0.8.8.zip",
-    "disclaimerURL": "https://code.usgs.gov/astrogeology/ale/-/blob/master/DISCLAIMER.md",
-    "repositoryURL": "https://code.usgs.gov/astrogeology/ale",
+    "homepageURL": "https://code.usgs.gov/astrogeology/ale/",
+    "downloadURL": "https://code.usgs.gov/astrogeology/ale/-/archive/main/ale-main.zip",
+    "disclaimerURL": "https://code.usgs.gov/astrogeology/ale/-/raw/main/DISCLAMER.md",
+    "repositoryURL": "https://code.usgs.gov/astrogeology/ale/",
     "vcs": "git",
 
-    "laborHours": 40,
+    "laborHours": 480,
 
     "tags": [
       "Planetary",
@@ -38,12 +38,12 @@
     ],
 
     "contact": {
-      "name": "Jesse Mapel",
-      "email": "jmapel@usgs.gov"
+      "name": "Jason Laura",
+      "email": "jlaura@usgs.gov"
     },
 
     "date": {
-      "metadataLastUpdated": "2022-06-03"
+      "metadataLastUpdated": "2023-02-23"
     }
   }
 ]
