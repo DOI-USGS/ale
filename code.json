@@ -3,8 +3,8 @@
     "name": "ale",
     "organization": "U.S. Geological Survey",
     "description": "GitLab repository for the Abstraction Layer for Ephemerides package",
-    "version": "main",
-    "status": "Development",
+    "version": "0.8.7",
+    "status": "Production",
 
     "permissions": {
       "usageType": "openSource",
