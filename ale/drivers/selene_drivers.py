@@ -121,7 +121,23 @@ class KaguyaTcIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, Kaguya
           Boresight focal plane x coordinate
         """
         return self.label['NaifKeywords'][f'INS{self.ikid}_BORESIGHT'][1]
-    
+
+    @property
+    def focal2pixel_lines(self):
+        """
+        Calculated using 1/pixel pitch
+        Expects tc_id to be defined. This should be a string of the form
+        LISM_TC1 or LISM_TC2.
+
+        Returns
+        -------
+        : list
+          focal plane to detector lines
+        """
+        focal2pixel_lines = super().focal2pixel_lines
+        focal2pixel_lines[1] = -focal2pixel_lines[1]
+        return focal2pixel_lines
+
     @property
     def sensor_model_version(self):
         return 2
@@ -220,7 +236,10 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
         : str
           Spacecraft name as a proxy for instrument host name.
         """
-        return self.label.get("MISSION_NAME", None)
+        try:
+          return super().instrument_host_name
+        except:
+          return self.label.get("MISSION_NAME", None)
 
     @property
     def ikid(self):
@@ -295,7 +314,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
         : float
           ephemeris start time of the image
         """
-        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_start_count)
+        return spice.sct2e(self.spacecraft_id, self.spacecraft_clock_start_count)
 
     @property
     def detector_center_line(self):
@@ -357,7 +376,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           focal plane to detector lines
         """
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0]
-        return [0, -1/pixel_size, 0]
+        return [0, 1/pixel_size, 0]
 
     @property
     def _odkx(self):
@@ -623,7 +642,7 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
         : double
           Starting ephemeris time of the image
         """
-        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_start_count)
+        return spice.sct2e(self.spacecraft_id, float(self.spacecraft_clock_start_count))
 
     @property
     def exposure_duration(self):
@@ -650,7 +669,7 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
 
     @property
     def detector_start_line(self):
-        return 0.5
+        return 1.0
 
     @property
     def detector_start_sample(self):
@@ -679,7 +698,7 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
           focal plane to detector lines
         """
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0]
-        return [0, -1/pixel_size, 0]
+        return [0, 1/pixel_size, 0]
 
     @property
     def focal2pixel_samples(self):
@@ -710,7 +729,7 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
         : int
           The detector line of the principle point
         """
-        return spice.gdpool('INS{}_BORESIGHT_LINE'.format(self.ikid), 0, 1)[0] - 0.5
+        return spice.gdpool('INS{}_BORESIGHT_LINE'.format(self.ikid), 0, 1)[0]
 
     @property
     def detector_center_sample(self):
@@ -726,7 +745,7 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
         : int
           The detector sample of the principle point
         """
-        return spice.gdpool('INS{}_BORESIGHT_SAMPLE'.format(self.ikid), 0, 1)[0] - 0.5
+        return spice.gdpool('INS{}_BORESIGHT_SAMPLE'.format(self.ikid), 0, 1)[0]
 
     @property
     def _odkx(self):
