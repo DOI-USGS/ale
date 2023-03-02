@@ -330,7 +330,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
         : int
           The detector line of the principle point
         """
-        return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[1] - 0.5
+        return spice.gdpool('INS{}_BORESIGHT_LINE'.format(self.ikid), 0, 1)[0]
 
     @property
     def detector_center_sample(self):
@@ -346,7 +346,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
         : int
           The detector sample of the principle point
         """
-        return spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[0] - 0.5
+        return spice.gdpool('INS{}_BORESIGHT_SAMPLE'.format(self.ikid), 0, 1)[0]
 
     @property
     def focal2pixel_samples(self):
@@ -1252,7 +1252,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
         : float
           ephemeris start time of the image
         """
-        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_start_count)
+        return spice.sct2e(self.spacecraft_id, self.spacecraft_clock_start_count)
 
 
     @property

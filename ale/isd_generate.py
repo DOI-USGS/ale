@@ -157,7 +157,7 @@ def file_to_isd(
         props["kernels"] = kernels
         usgscsm_str = ale.loads(file, props=props, verbose=log_level>logging.INFO, only_isis_spice=only_isis_spice, only_naif_spice=only_naif_spice)
     else:
-        usgscsm_str = ale.loads(file, verbose=log_level>logging.INFO, only_isis_spice=only_isis_spice, only_naif_spice=only_naif_spice)
+        usgscsm_str = ale.loads(file, props=props, verbose=log_level>logging.INFO, only_isis_spice=only_isis_spice, only_naif_spice=only_naif_spice)
 
     logger.info(f"Writing: {isd_file}")
     isd_file.write_text(usgscsm_str)

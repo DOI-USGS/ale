@@ -5042,12 +5042,12 @@
     "focal_length": 72.45
   },
   "detector_center": {
-    "line": 0.5,
-    "sample": 2048.0
+    "line": 0.0,
+    "sample": 2047.5
   },
   "focal2pixel_lines": [
     0,
-    -142.85714285714286,
+    142.85714285714286,
     0
   ],
   "focal2pixel_samples": [
