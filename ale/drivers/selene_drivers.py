@@ -121,7 +121,8 @@ class KaguyaTcIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, Kaguya
     @property
     def focal2pixel_lines(self):
         """
-        Calculated using 1/pixel pitch
+        Calculated using 1/pixel_pitch
+
         Expects tc_id to be defined. This should be a string of the form
         LISM_TC1 or LISM_TC2.
 
@@ -305,7 +306,8 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
     @property
     def focal2pixel_samples(self):
         """
-        Calculated using 1/pixel pitch
+        Calculated using 1/pixel_pitch
+
         Expects tc_id to be defined. This should be a string of the form
         LISM_TC1 or LISM_TC2.
 
@@ -322,7 +324,8 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
     @property
     def focal2pixel_lines(self):
         """
-        Calculated using 1/pixel pitch
+        Calculated using 1/pixel_pitch
+
         Expects tc_id to be defined. This should be a string of the form
         LISM_TC1 or LISM_TC2.
 
@@ -640,7 +643,8 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
     @property
     def focal2pixel_lines(self):
         """
-        Calculated using 1/pixel pitch
+        Calculated using 1/pixel_pitch
+        
         Expects tc_id to be defined. This should be a string of the form
         LISM_TC1 or LISM_TC2.
 
@@ -657,7 +661,8 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
     @property
     def focal2pixel_samples(self):
         """
-        Calculated using 1/pixel pitch
+        Calculated using 1/pixel_pitch
+        
         Expects tc_id to be defined. This should be a string of the form
         LISM_TC1 or LISM_TC2.
 
@@ -967,7 +972,8 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
     @property
     def focal2pixel_samples(self):
         """
-        Calculated using 1/pixel pitch
+        Calculated using 1/pixel_pitch
+
         Expects ikid to be defined. This should be the NAIF integer ID code
         for the sensor.
 
@@ -984,7 +990,8 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
     @property
     def focal2pixel_lines(self):
         """
-        Calculated using 1/pixel pitch
+        Calculated using 1/pixel_pitch
+
         Expects ikid to be defined. This should be the NAIF integer ID code
         for the sensor.
 
@@ -1347,6 +1354,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
     def focal2pixel_samples(self):
         """
         Calculated using 1/pixel_pitch
+
         Expects ikid to be defined. This should be the NAIF integer ID code
         for the sensor.
 
@@ -1364,6 +1372,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
     def focal2pixel_lines(self):
         """
         Calculated using 1/pixel_pitch
+
         Expects ikid to be defined. This should be the NAIF integer ID code
         for the sensor.
 
