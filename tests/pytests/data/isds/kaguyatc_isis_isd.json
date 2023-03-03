@@ -2,7 +2,7 @@
   "isis_camera_version": 2,
   "image_lines": 400,
   "image_samples": 3208,
-  "name_platform": "SELENE MAIN ORBITER",
+  "name_platform": "SELENE",
   "name_sensor": "Terrain Camera 1",
   "reference_height": {
     "maxheight": 1000,

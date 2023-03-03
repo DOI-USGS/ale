@@ -14,8 +14,8 @@ import ale
 from ale.drivers.selene_drivers import KaguyaTcPds3NaifSpiceDriver, KaguyaMiIsisLabelNaifSpiceDriver, KaguyaTcIsisLabelIsisSpiceDriver, KaguyaTcIsisLabelNaifSpiceDriver
 
 image_dict = {
-    'TC1S2B0_01_06691S820E0465' : get_isd("kaguyatc"),
-    'MNA_2B2_01_04192S136E3573' : get_isd("kaguyami")
+    'TC1S2B0_01_06691S820E0465' : "kaguyatc",
+    'MNA_2B2_01_04192S136E3573' : "kaguyami"
 }
 
 
@@ -36,13 +36,16 @@ def test_kernels():
 def test_kaguya_load(test_kernels, label_type, image):
     if label_type == "pds3" and image == "MNA_2B2_01_04192S136E3573":
         pytest.xfail("No pds3 image label to test for kaguya mi")
+    if label_type == "isis3":
+        compare_isd = get_isd(image_dict[image] + "_isis")
+    else:
+        compare_isd = get_isd(image_dict[image])
     label_file = get_image_label(image, label_type)
 
     isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]}, verbose=False)
     isd_obj = json.loads(isd_str)
-    # print(json.dumps(isd_obj, indent=2))
 
-    assert compare_dicts(isd_obj, image_dict[image]) == []
+    assert compare_dicts(isd_obj, compare_isd) == []
 
 
 # ========= Test kaguya tc pdslabel and naifspice driver =========
@@ -69,9 +72,6 @@ class test_kaguyatc_pds_naif(unittest.TestCase):
             assert self.driver.sensor_frame_id == 12345
             namfrm.assert_called_with('LISM_TC1_HEAD')
 
-    def test_instrument_host_name(self):
-        assert self.driver.instrument_host_name == 'SELENE'
-
     def test_ikid(self):
         with patch('ale.drivers.selene_drivers.spice.bods2c', return_value=12345) as bods2c:
             assert self.driver.ikid == 12345
@@ -92,18 +92,6 @@ class test_kaguyatc_pds_naif(unittest.TestCase):
             assert self.driver.ephemeris_start_time == 12345
             sct2e.assert_called_with(-12345, 922997380.174174)
 
-    def test_detector_center_line(self):
-        with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=np.array([12345])) as gdpool, \
-             patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
-            assert self.driver.detector_center_line == 12345
-            gdpool.assert_called_with('INS-12345_BORESIGHT_LINE', 0, 1)
-
-    def test_detector_center_sample(self):
-        with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=np.array([54321])) as gdpool, \
-             patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
-            assert self.driver.detector_center_sample == 54321
-            gdpool.assert_called_with('INS-12345_BORESIGHT_SAMPLE', 0, 1)
-
     def test_focal2pixel_samples(self):
         with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=np.array([2])) as gdpool, \
              patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
@@ -115,6 +103,12 @@ class test_kaguyatc_pds_naif(unittest.TestCase):
              patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
             assert self.driver.focal2pixel_lines == [0, 1/2, 0]
             gdpool.assert_called_with('INS-12345_PIXEL_SIZE', 0, 1)
+    
+    def test_detector_start_line(self):
+        assert self.driver.detector_start_line == 1
+
+    def test_detector_start_sample(self):
+        assert self.driver.detector_start_sample == 0.5
 
 # ========= Test kaguyami isis3label and naifspice driver =========
 class test_kaguyami_isis3_naif(unittest.TestCase):
@@ -177,7 +171,7 @@ class test_kaguyami_isis3_naif(unittest.TestCase):
             gdpool.assert_called_with('INS-12345_PIXEL_SIZE', 0, 1)
 
 # ========= Test kaguyatc isis3label and isisspice driver =========
-class test_isis_isis(unittest.TestCase):
+class test_kaguyatc_isis_isis(unittest.TestCase):
 
     def setUp(self):
         label = get_image_label("TC1S2B0_01_06691S820E0465", "isis")
@@ -271,15 +265,3 @@ class test_kaguyatc_isis3_naif(unittest.TestCase):
              patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
             assert self.driver.focal2pixel_lines == [0, 1/2, 0]
             gdpool.assert_called_with('INS-12345_PIXEL_SIZE', 0, 1)
-
-    def test_detector_center_line(self):
-        with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=np.array([12345])) as gdpool, \
-             patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
-            assert self.driver.detector_center_line == 12345
-            gdpool.assert_called_with('INS-12345_BORESIGHT_LINE', 0, 1)
-
-    def test_detector_center_sample(self):
-        with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=np.array([54321])) as gdpool, \
-             patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
-            assert self.driver.detector_center_sample == 54321
-            gdpool.assert_called_with('INS-12345_BORESIGHT_SAMPLE', 0, 1)

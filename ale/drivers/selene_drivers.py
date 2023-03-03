@@ -20,10 +20,6 @@ class KaguyaTcIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, Kaguya
         raise ValueError(f"Instrument ID: '{iid}' not in VALID_INSTRUMENT_IDS list. Failing.")
       return iid
 
-    @property
-    def spacecraft_name(self):
-        return self.label['IsisCube']['Instrument']['SpacecraftName']
-
 
     @property
     def exposure_duration(self):
@@ -195,10 +191,10 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
         SD = S/D short for single or double, which in turn means whether the
         label belongs to a mono or stereo image.
 
-        COMPRESS = D/T short for DCT or through, we assume image has been
-        decompressed already
+        COMPRESS = D or T short for DCT or Through, we assume image has been
+        decompressed already (T)
 
-        SWATCH = swatch mode, different swatch modes have different FOVs
+        SWATH = swath mode, different swath modes have different FOVs
 
         Returns
         -------
@@ -226,22 +222,6 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
         if not hasattr(self, "_sensor_frame_id"):
           self._sensor_frame_id = spice.namfrm("LISM_{}_HEAD".format(super().instrument_id))
         return self._sensor_frame_id
-
-    @property
-    def instrument_host_name(self):
-        """
-        Returns the name of the instrument host.  Kaguya/SELENE labels do not have an
-        explicit instrument host name in the pvl, so we use the spacecraft name.
-
-        Returns
-        -------
-        : str
-          Spacecraft name as a proxy for instrument host name.
-        """
-        try:
-          return super().instrument_host_name
-        except:
-          return self.label.get("MISSION_NAME", None)
 
     @property
     def ikid(self):
@@ -545,10 +525,10 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
         SD = S/D short for single or double, which in turn means whether the
         label belongs to a mono or stereo image.
 
-        COMPRESS = D/T short for DCT or through, we assume image has been
-        decompressed already
+        COMPRESS = D or T short for DCT or Through, we assume image has been
+        decompressed already (T)
 
-        SWATCH = swatch mode, different swatch modes have different FOVs
+        SWATH = swath mode, different swath modes have different FOVs
 
         Returns
         -------
