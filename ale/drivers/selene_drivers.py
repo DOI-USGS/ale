@@ -600,10 +600,6 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
         return self.label['IsisCube']['Instrument']['MissionName']
 
     @property
-    def spacecraft_name(self):
-        return self.label['IsisCube']['Instrument']['MissionName']
-
-    @property
     def ephemeris_start_time(self):
         """
         Returns the starting ephemeris time of the image. Expects spacecraft_id to
