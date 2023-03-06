@@ -80,9 +80,9 @@ def main():
     )
     args = parser.parse_args()
 
-    log_level = logging.WARNING
+    log_level = logging.INFO
     if args.verbose:
-        log_level = logging.INFO
+        log_level = logging.WARNING
 
     logging.basicConfig(format="%(message)s", level=log_level)
     logger.setLevel(log_level)
@@ -155,7 +155,9 @@ def file_to_isd(
     if kernels is not None:
         kernels = [str(PurePath(p)) for p in kernels]
         props["kernels"] = kernels
-    usgscsm_str = ale.loads(file, props=props, verbose=log_level>=logging.INFO, only_isis_spice=only_isis_spice, only_naif_spice=only_naif_spice)
+        usgscsm_str = ale.loads(file, props=props, verbose=log_level>logging.INFO, only_isis_spice=only_isis_spice, only_naif_spice=only_naif_spice)
+    else:
+        usgscsm_str = ale.loads(file, props=props, verbose=log_level>logging.INFO, only_isis_spice=only_isis_spice, only_naif_spice=only_naif_spice)
 
     logger.info(f"Writing: {isd_file}")
     isd_file.write_text(usgscsm_str)
