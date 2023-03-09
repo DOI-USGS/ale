@@ -1,8 +1,3 @@
-from glob import glob
-import os
-
-import pvl
-import spiceypy as spice
 import numpy as np
 
 from pyspiceql import pyspiceql
@@ -72,7 +67,6 @@ class MessengerMdisIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDist
           instrument id
         """
         return ID_LOOKUP[super().instrument_id]
-
 
 class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortion, Driver):
     """
@@ -248,7 +242,6 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortio
         : float pixel size
         """
         return pyspiceql.getKernelStringValue('INS{}_PIXEL_PITCH'.format(self.ikid))
-
 
 class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDistortion, Driver):
     """

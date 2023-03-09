@@ -829,6 +829,7 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
     def sensor_model_version(self):
         return 2
 
+
 class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSeleneDistortion, Driver):
     """
     Driver for a PDS3 Kaguya Multiband Imager (Mi) images. Specifically level2b2 Vis and Nir images.
