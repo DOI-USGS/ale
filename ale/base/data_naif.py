@@ -1,10 +1,14 @@
-import spiceypy as spice
-from pyspiceql import pyspiceql
+import json
+import requests
+import warnings
+
 import numpy as np
+import pyspiceql
 import scipy.constants
+import spiceypy as spice
 
 import ale
-from ale.base.type_sensor import Framer
+from ale.base import spiceql_mission_map
 from ale.transformation import FrameChain
 from ale.rotation import TimeDependentRotation
 from ale import util
@@ -76,6 +80,29 @@ class NaifSpice():
 
         return self._kernels
 
+    @property
+    def use_web(self):
+        """
+        Reads the web property in the props dictionary to define the use_web value.
+        This property dictates if you are running in a web enabled driver
+
+        Returns
+        -------
+        : bool
+          Boolean defining if you are running web enabled(True) or Disabled(False)
+        """
+        if not hasattr(self, '_use_web'):
+            self._use_web = False
+
+            if "web" in self._props.keys():
+                web_prop = self._props["web"]
+                if not isinstance(web_prop, bool):
+                    warnings.warn(f"Web value {web_prop} not a boolean type, setting web to False")
+                    web_prop = False
+                self._use_web = web_prop
+
+        return self._use_web
+                
     @property
     def light_time_correction(self):
         """
@@ -643,3 +670,59 @@ class NaifSpice():
                 pass
 
         return self._naif_keywords
+    
+    @property
+    def spiceql_mission(self):
+        """
+        Access the mapping between a SpiceQL "mission" and the driver.
+        The mapping can be found under ale.base.__init__.py
+
+        See Also
+        --------
+        ale.base.__init__.py
+        """
+        return spiceql_mission_map[self.instrument_id]
+
+    def spiceql_call(self, function_name = "", function_args = {}):
+        """
+        Interface to SpiceQL (Spice Query Library) for both Offline and Online use
+
+        This function will access the value passed through props defined as `web`. This
+        value determines the access pattern for spice data. When set to Online, you will
+        access the SpiceQL service provided through the USGS Astro AWS platform. This service
+        performs kernel and data aquisition. If set to Offline, you will access locally loaded
+        kernels, and SpiceQL will do no searching for you.
+
+        Parameters
+        ----------
+        functions_name : str
+                         String defineing the function to call, properly exposed SpiceQL
+                         functions should map 1-to-1 with endpoints on the service
+                        
+        function_args : dict
+                        Dictionary of arguments used by the function
+
+        Returns : any
+                  Any return from a SpiceQL function
+        """
+        if not self.use_web:
+            func = getattr(pyspiceql, function_name)
+
+            # Ensure that in offline mode we anticipate the user loading/passing their own kernels
+            # to ALE
+            function_args["searchKernels"] = self.use_web
+            return func(**function_args)
+
+        try:
+            url = "http://localhost:9000/2015-03-31/functions/function/invocations"
+            headers = {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+            function_args["func"] = function_name
+            r = requests.get(url, data=json.dumps(function_args), headers=headers, verify=False)
+            r.raise_for_status()
+            if r.json()["statusCode"] != 200:
+                raise requests.HTTPError(f"Recieved code {r.json()['statusCode']} from spice server, with error: {r.json()}")
+            return r.json()["body"]["return"]
+        except requests.exceptions.HTTPError as err:
+            raise err
