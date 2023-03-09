@@ -513,6 +513,7 @@ class MroCtxPds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDi
         """
         return self.label['SPACECRAFT_NAME']
 
+
 hirise_ccd_lookup = {
   0: 0,
   1: 1,
@@ -700,6 +701,7 @@ class MroHiRiseIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radia
           ISIS sensor model version
         """
         return 1
+
 
 
 class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):

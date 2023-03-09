@@ -1,12 +1,8 @@
-import os
-import re
 import numpy as np
-import pvl
 import spiceypy as spice
-from glob import glob
 
 from pyspiceql import pyspiceql
-from ale.util import get_metakernels, query_kernel_pool
+from ale.util import query_kernel_pool
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
@@ -277,8 +273,6 @@ class LroLrocNacPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driv
         rotation = frame_chain.compute_rotation(1, lro_bus_id)
         rotated_velocity = spice.mxv(rotation._rots.as_matrix()[0], velocity)
         return rotated_velocity[0]
-
-
 
 class LroLrocNacIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver):
     @property
@@ -857,7 +851,6 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
           Naif ID code for the sensor frame
         """
         return self.target_frame_id
-
 
 
 class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, RadialDistortion, Driver):
