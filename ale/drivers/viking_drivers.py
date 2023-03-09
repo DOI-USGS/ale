@@ -1,4 +1,4 @@
-import ale
+from ale.base import spiceql_mission_map
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
 from ale.base.label_isis import IsisLabel
@@ -151,7 +151,9 @@ class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
     def detector_center_sample(self):
         return 0
 
-
+    @property
+    def spiceql_mission(self):
+        return spiceql_mission_map[self.spacecraft_name]
 
 class VikingIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistortion, Driver):
 
