@@ -336,8 +336,8 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
 
         # Ensure that in offline mode we anticipate the user loading/passing their own kernels
         # to ALE
-        # function_args["searchKernels"] = self.use_web
         return func(**function_args)
+
     url = "https://spiceql-dev.prod-asc.chs.usgs.gov/v1/"
     url += function_name
     headers = {
