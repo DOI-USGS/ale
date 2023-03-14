@@ -1,9 +1,12 @@
 from glob import glob
 from itertools import groupby
+import json
 import os
 from os import path
+import requests
 import warnings
 
+import pyspiceql
 
 from ale import spice_root
 from ale.util import get_isis_preferences
@@ -304,3 +307,65 @@ def find_kernels(cube, isis_data, format_as=dict):
     else:
         warnings.warn(f"{format_as} is not a valid format, returning as dict")
         return kernels
+
+
+def spiceql_call(function_name = "", function_args = {}, use_web=False):
+    """
+    Interface to SpiceQL (Spice Query Library) for both Offline and Online use
+
+    This function will access the value passed through props defined as `web`. This
+    value determines the access pattern for spice data. When set to Online, you will
+    access the SpiceQL service provided through the USGS Astro AWS platform. This service
+    performs kernel and data aquisition. If set to Offline, you will access locally loaded
+    kernels, and SpiceQL will do no searching for you.
+
+    Parameters
+    ----------
+    functions_name : str
+                        String defineing the function to call, properly exposed SpiceQL
+                        functions should map 1-to-1 with endpoints on the service
+                    
+    function_args : dict
+                    Dictionary of arguments used by the function
+
+    Returns : any
+                Any return from a SpiceQL function
+    """
+    if not use_web:
+        func = getattr(pyspiceql, function_name)
+
+        # Ensure that in offline mode we anticipate the user loading/passing their own kernels
+        # to ALE
+        # function_args["searchKernels"] = self.use_web
+        return func(**function_args)
+    url = "https://spiceql-dev.prod-asc.chs.usgs.gov/v1/"
+    url += function_name
+    headers = {
+        'accept': '*/*',
+        'Content-Type': 'application/json'
+    }
+
+    r = requests.get(url, params=function_args, headers=headers, verify=False)
+    r.raise_for_status()
+    response = r.json()
+
+    if r.status_code != 200:
+        raise requests.HTTPError(f"Recieved code {response['statusCode']} from spice server, with error: {response}")
+    elif response["statusCode"] != 200:
+        raise requests.HTTPError(f"Recieved code {response['statusCode']} from spice server, with error: {response}")
+    return response["body"]["return"]
+
+    # Code for accessing SpiceQL docker container
+    # try:
+    #     url = "http://localhost:9000/2015-03-31/functions/function/invocations"
+    #     headers = {
+    #         'Content-Type': 'application/x-www-form-urlencoded',
+    #     }
+    #     function_args["func"] = function_name
+    #     r = requests.get(url, data=json.dumps(function_args), headers=headers, verify=False)
+    #     r.raise_for_status()
+    #     if r.json()["statusCode"] != 200:
+    #         raise requests.HTTPError(f"Recieved code {r.json()['statusCode']} from spice server, with error: {r.json()}")
+    #     return r.json()["body"]["return"]
+    # except requests.exceptions.HTTPError as err:
+    #     raise err
