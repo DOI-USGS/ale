@@ -282,7 +282,9 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
                                                           target_frame=self.target_frame_id,
                                                           center_ephemeris_time=self.center_ephemeris_time,
                                                           ephemeris_times=self.ephemeris_time,
-                                                          exact_ck_times=True)
+                                                          exact_ck_times=True,
+                                                          mission=self.spiceql_mission,
+                                                          use_web=self.use_web)
 
                 rotation = ConstantRotation([[0, 0, 1, 0]], self.sensor_frame_id, self._original_naif_sensor_frame_id)
 
@@ -511,7 +513,9 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
                                                           target_frame=self.target_frame_id,
                                                           center_ephemeris_time=self.center_ephemeris_time,
                                                           ephemeris_times=self.ephemeris_time,
-                                                          exact_ck_times=True)
+                                                          exact_ck_times=True,
+                                                          mission=self.spiceql_mission,
+                                                          use_web=self.use_web)
 
                 rotation = ConstantRotation([[0, 0, 1, 0]], self.sensor_frame_id, self._original_naif_sensor_frame_id)
 
