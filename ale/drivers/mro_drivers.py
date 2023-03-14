@@ -1,6 +1,5 @@
 import spiceypy as spice
 
-from pyspiceql import pyspiceql
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
@@ -345,23 +344,6 @@ class MroCtxIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDi
         return "CONTEXT CAMERA"
 
     @property
-    def ephemeris_start_time(self):
-        """
-        Returns the ephemeris start time of the image.
-        Expects spacecraft_id to be defined. This should be the integer
-        Naif ID code for the spacecraft.
-
-        Returns
-        -------
-        : float
-          ephemeris start time of the image
-        """
-        if not hasattr(self, '_ephemeris_start_time'):
-            sclock = self.label['IsisCube']['Instrument']['SpacecraftClockCount']
-            self._ephemeris_start_time = pyspiceql.sclkToEt(str(self.spacecraft_name).lower(), sclock)
-        return self._ephemeris_start_time
-
-    @property
     def ephemeris_stop_time(self):
         """
         ISIS doesn't preserve the spacecraft stop count that we can use to get
@@ -701,7 +683,6 @@ class MroHiRiseIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radia
           ISIS sensor model version
         """
         return 1
-
 
 
 class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
