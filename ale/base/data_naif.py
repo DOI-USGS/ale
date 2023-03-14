@@ -1,5 +1,3 @@
-import json
-import requests
 import warnings
 
 import numpy as np
@@ -11,6 +9,7 @@ import ale
 from ale.base import spiceql_mission_map
 from ale.transformation import FrameChain
 from ale.rotation import TimeDependentRotation
+from ale import kernel_access
 from ale import util
 
 class NaifSpice():
@@ -123,7 +122,7 @@ class NaifSpice():
         """
         if not hasattr(self, "_light_time_correction"):
             try:
-                self._light_time_correction = pyspiceql.getKernelStringValue('INS{}_LIGHTTIME_CORRECTION'.format(self.ikid))[0]
+                self._light_time_correction = self.naif_keywords['INS{}_LIGHTTIME_CORRECTION'.format(self.ikid)][0]
             except:
                 self._light_time_correction = 'LT+S'
         return self._light_time_correction
@@ -140,7 +139,7 @@ class NaifSpice():
           Optical distortion x coefficients
         """
         if not hasattr(self, "_odtx"):
-            self._odtx = pyspiceql.getKernelVectorValue('INS{}_OD_T_X'.format(self.ikid)).toList()
+            self._odtx = self.naif_keywords['INS{}_OD_T_X'.format(self.ikid)]
         return self._odtx
 
     @property
@@ -155,7 +154,7 @@ class NaifSpice():
           Optical distortion y coefficients
         """
         if not hasattr(self, "_odty"):
-            self._odty = pyspiceql.getKernelVectorValue('INS{}_OD_T_Y'.format(self.ikid)).toList()
+            self._odty = self.naif_keywords['INS{}_OD_T_Y'.format(self.ikid)]
         return self._odty
 
     @property
@@ -170,7 +169,7 @@ class NaifSpice():
           Radial distortion coefficients
         """
         if not hasattr(self, "_odtk"):
-            self._odtk = list(pyspiceql.getKernelVectorValue('INS{}_OD_K'.format(self.ikid)))
+            self._odtk = self.naif_keywords['INS{}_OD_K'.format(self.ikid)]
         return self._odtk
 
     @property
@@ -186,7 +185,7 @@ class NaifSpice():
           Naif ID used to for identifying the instrument in Spice kernels
         """
         if not hasattr(self, "_ikid"):
-            self._ikid = pyspiceql.Kernel_translateFrame(self.instrument_id)
+            self._ikid = self.spiceql_call("translateNameToCode", {"frame": self.instrument_id, "mission": self.spiceql_mission})
         return self._ikid
 
     @property
@@ -202,7 +201,7 @@ class NaifSpice():
           Naif ID code for the spacecraft
         """
         if not hasattr(self, "_spacecraft_id"):
-            self._spacecraft_id = pyspiceql.Kernel_translateFrame(self.spacecraft_name)
+            self._spacecraft_id = self.spiceql_call("translateNameToCode", {"frame": self.spacecraft_name, "mission": self.spiceql_mission})
         return self._spacecraft_id
 
     @property
@@ -218,7 +217,7 @@ class NaifSpice():
           Naif ID code for the target body
         """
         if not hasattr(self, "_target_id"):
-            self._target_id = pyspiceql.Kernel_translateFrame(self.target_name)
+            self._target_id = self.spiceql_call("translateNameToCode", {"frame": self.target_name, "mission": self.spiceql_mission})
         return self._target_id
 
     @property
@@ -234,8 +233,8 @@ class NaifSpice():
           Naif ID code for the target frame
         """
         if not hasattr(self, "_target_frame_id"):
-            frame_info = spice.cidfrm(self.target_id)
-            self._target_frame_id = frame_info[0]
+            frame_info = self.spiceql_call("getTargetFrameInfo", {"targetId": self.target_id, "mission": self.spiceql_mission})
+            self._target_frame_id = frame_info["frameCode"]
         return self._target_frame_id
 
     @property
@@ -264,7 +263,7 @@ class NaifSpice():
           focal plane to detector lines
         """
         if not hasattr(self, "_focal2pixel_lines"):
-            self._focal2pixel_lines = list(pyspiceql.getKernelVectorValue('INS{}_ITRANSL'.format(self.ikid)))
+            self._focal2pixel_lines = self.naif_keywords['INS{}_ITRANSL'.format(self.ikid)]
         return self._focal2pixel_lines
 
     @property
@@ -278,7 +277,7 @@ class NaifSpice():
           focal plane to detector samples
         """
         if not hasattr(self, "_focal2pixel_samples"):
-            self._focal2pixel_samples = list(pyspiceql.getKernelVectorValue('INS{}_ITRANSS'.format(self.ikid)))
+            self._focal2pixel_samples = self.naif_keywords['INS{}_ITRANSS'.format(self.ikid)]
         return self._focal2pixel_samples
 
     @property
@@ -292,7 +291,7 @@ class NaifSpice():
         detector to focal plane x
         """
         if not hasattr(self, "_pixel2focal_x"):
-            self._pixel2focal_x = list(pyspiceql.getKernelVectorValue('INS{}_ITRANSX'.format(self.ikid)))
+            self._pixel2focal_x = self.naif_keywords['INS{}_ITRANSX'.format(self.ikid)]
         return self._pixel2focal_x
 
     @property
@@ -306,7 +305,7 @@ class NaifSpice():
         detector to focal plane y
         """
         if not hasattr(self, "_pixel2focal_y"):
-            self._pixel2focal_y = list(pyspiceql.getKernelVectorValue('INS{}_ITRANSY'.format(self.ikid)))
+            self._pixel2focal_y = self.naif_keywords['INS{}_ITRANSY'.format(self.ikid)]
         return self._pixel2focal_y
 
     @property
@@ -321,7 +320,7 @@ class NaifSpice():
           focal length
         """
         if not hasattr(self, "_focal_length"):
-            self._focal_length = float(pyspiceql.getKernelVectorValue('INS{}_FOCAL_LENGTH'.format(self.ikid))[0])
+            self._focal_length = self.naif_keywords['INS{}_FOCAL_LENGTH'.format(self.ikid)]
         return self._focal_length
 
     @property
@@ -334,7 +333,7 @@ class NaifSpice():
         : float pixel size
         """
         if not hasattr(self, "_pixel_size"):
-            self._pixel_size = pyspiceql.getKernelVectorValue('INS{}_PIXEL_SIZE'.format(self.ikid))[0] * 0.001
+            self._pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)] * 0.001
         return self._pixel_size
 
     @property
@@ -350,7 +349,7 @@ class NaifSpice():
           Radius of all three axis of the target body
         """
         if not hasattr(self, "_target_body_radii"):
-            self._target_body_radii = spice.bodvrd(self.target_name, 'RADII', 3)[1]
+            self._target_body_radii = self.naif_keywords[f"BODY{self.target_id}_RADII"]
         return self._target_body_radii
 
     @property
@@ -367,7 +366,8 @@ class NaifSpice():
         """
         if not hasattr(self, "_reference_frame"):
             try:
-                self._reference_frame = spice.cidfrm(spice.bodn2c(self.target_name))[1]
+                frame_info = self.spiceql_call("getTargetFrameInfo", {"targetId": self.target_id, "mission": self.spiceql_mission})
+                self._reference_frame = frame_info["frameName"]
             except:
                 self._reference_frame = 'IAU_{}'.format(self.target_name)
         return self._reference_frame
@@ -394,13 +394,14 @@ class NaifSpice():
             positions = []
             velocities = []
 
-            for time in times:
-                sun_lt_state = pyspiceql.getTargetState(time,
-                                                        self.target_name,
-                                                        self.spacecraft_name,
-                                                        'J2000',
-                                                        self.light_time_correction)
-                sun_state = np.array(list(sun_lt_state.starg))
+            sun_lt_states = self.spiceql_call("getTargetStates",{"ets": str(times),
+                                                                 "target": self.target_name,
+                                                                 "observer": self.spacecraft_name,
+                                                                 "frame": 'J2000',
+                                                                 "abcorr": self.light_time_correction,
+                                                                 "mission": self.spiceql_mission})
+            for sun_state in sun_lt_states:
+                sun_state = np.array(sun_state)
                 positions.append(sun_state[:3])
                 velocities.append(sun_state[3:6])
             positions = 1000 * np.asarray(positions)
@@ -427,6 +428,10 @@ class NaifSpice():
         """
         if not hasattr(self, '_position'):
             ephem = self.ephemeris_time
+
+            if isinstance(ephem, np.ndarray):
+                ephem = ephem.tolist()
+
             pos = []
             vel = []
 
@@ -437,47 +442,74 @@ class NaifSpice():
                 target = self.target_name
                 observer = self.spacecraft_name
 
-            for time in ephem:
-                # spkezr returns a vector from the observer's location to the aberration-corrected
-                # location of the target. For more information, see:
-                # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
-                if self.correct_lt_to_surface and self.light_time_correction.upper() == 'LT+S':
-                    obs_tar = pyspiceql.getTargetState(time,
-                                                       target,
-                                                       observer,
-                                                       'J2000',
-                                                       self.light_time_correction)
-                    obs_tar_lt = obs_tar.lt
+            # spkezr returns a vector from the observer's location to the aberration-corrected
+            # location of the target. For more information, see:
+            # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
+            if self.correct_lt_to_surface and self.light_time_correction.upper() == 'LT+S':
+                print("BANANA", ephem)
+                obs_tars = self.spiceql_call("getTargetStates",{"ets": str(ephem),
+                                                                "target": target,
+                                                                "observer": observer,
+                                                                "frame": "J2000",
+                                                                "abcorr": self.light_time_correction,
+                                                                "mission": self.spiceql_mission})
+                # obs_tar = pyspiceql.getTargetState(time,
+                #                                     target,
+                #                                     observer,
+                #                                     'J2000',
+                #                                     self.light_time_correction)
+                obs_tar_lts = np.array(obs_tars)[:,-1]
 
-                    # ssb to spacecraft
-                    ssb_obs = pyspiceql.getTargetState(time,
-                                                       target,
-                                                       'SSB',
-                                                       'J2000',
-                                                       "NONE")
-                    ssb_obs_state = np.array(list(ssb_obs.starg))
+                # ssb to spacecraft
+                ssb_obs = self.spiceql_call("getTargetStates",{"ets": str(ephem),
+                                                               "target": target,
+                                                               "observer": "SSB",
+                                                               "frame": "J2000",
+                                                               "abcorr": "NONE",
+                                                               "mission": self.spiceql_mission})
+                # ssb_obs = pyspiceql.getTargetState(time,
+                #                                     target,
+                #                                     'SSB',
+                #                                     'J2000',
+                #                                     "NONE")
+                ssb_obs_states = np.array(ssb_obs)[:,0:6]
 
-                    radius_lt = (self.target_body_radii[2] + self.target_body_radii[0]) / 2 / (scipy.constants.c/1000.0)
-                    adjusted_time = time - obs_tar_lt + radius_lt
+                radius_lt = (self.target_body_radii[2] + self.target_body_radii[0]) / 2 / (scipy.constants.c/1000.0)
+                adjusted_time = np.array(ephem) - obs_tar_lts + radius_lt
 
-                    ssb_tar = pyspiceql.getTargetState(adjusted_time,
-                                                       target,
-                                                       'SSB',
-                                                       'J2000',
-                                                       "NONE")
-                    ssb_tar_state = np.array(list(ssb_tar.starg))
-                    state = ssb_tar_state - ssb_obs_state
-
-                    matrix = spice.sxform("J2000", self.reference_frame, time)
+                ssb_tars = self.spiceql_call("getTargetStates",{"ets": str(adjusted_time),
+                                                                "target": target,
+                                                                "observer": "SSB",
+                                                                "frame": "J2000",
+                                                                "abcorr": "NONE",
+                                                                "mission": self.spiceql_mission})
+                # ssb_tar = pyspiceql.getTargetState(adjusted_time,
+                #                                     target,
+                #                                     'SSB',
+                #                                     'J2000',
+                #                                     "NONE")
+                ssb_tar_state = np.array(ssb_tars)[:,0:6]
+                _states = ssb_tar_state - ssb_obs_states
+                states = []
+                for state in _states:
+                    matrix = spice.sxform("J2000", self.reference_frame, ephem)
                     state = spice.mxvg(matrix, state)
-                else:
-                    state = pyspiceql.getTargetState(time,
-                                                     target,
-                                                     observer,
-                                                     self.reference_frame,
-                                                     self.light_time_correction)
-                    state = np.array(list(state.starg))
+                    states.append(state)
+            else:
+                states = self.spiceql_call("getTargetStates",{"ets": str(ephem),
+                                                              "target": target,
+                                                              "observer": observer,
+                                                              "frame": self.reference_frame,
+                                                              "abcorr": self.light_time_correction,
+                                                              "mission": self.spiceql_mission})
+                # state = pyspiceql.getTargetState(time,
+                #                                     target,
+                #                                     observer,
+                #                                     self.reference_frame,
+                #                                     self.light_time_correction)
+                states = np.array(states)[:,0:6]
 
+            for state in states:
                 if self.swap_observer_target:
                     pos.append(-state[:3])
                     vel.append(-state[3:])
@@ -501,7 +533,9 @@ class NaifSpice():
                                                       center_ephemeris_time=self.center_ephemeris_time,
                                                       ephemeris_times=self.ephemeris_time,
                                                       nadir=nadir, exact_ck_times=exact_ck_times,
-                                                      inst_time_bias=self.instrument_time_bias)
+                                                      inst_time_bias=self.instrument_time_bias,
+                                                      mission=self.spiceql_mission,
+                                                      use_web=self.use_web)
 
             if nadir:
                 # Logic for nadir calculation was taken from ISIS3
@@ -563,7 +597,7 @@ class NaifSpice():
           Starting ephemeris time of the image
         """
         if not hasattr(self, "_ephemeris_start_time"):
-            self._ephemeris_start_time = pyspiceql.sclkToEt(str(self.spacecraft_name), self.spacecraft_clock_start_count)
+            self._ephemeris_start_time = self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": self.spacecraft_clock_start_count, "mission": self.spiceql_mission})
         return self._ephemeris_start_time
 
     @property
@@ -580,7 +614,7 @@ class NaifSpice():
           Ephemeris stop time of the image
         """
         if not hasattr(self, "_ephemeris_stop_time"):
-            self._ephemeris_stop_time = pyspiceql.sclkToEt(self.spacecraft_name, self.spacecraft_clock_stop_count)
+            self._ephemeris_stop_time = self.spiceql_call("strSclkToEt", {"frameCode": str(self.spacecraft_id), "sclk": self.spacecraft_clock_stop_count, "mission": self.spiceql_mission})
         return self._ephemeris_stop_time
 
     @property
@@ -595,7 +629,7 @@ class NaifSpice():
           Detector sample of the principal point
         """
         if not hasattr(self, "_detector_center_sample"):
-            self._detector_center_sample = float(pyspiceql.getKernelStringValue('INS{}_BORESIGHT_SAMPLE'.format(self.ikid))[0])
+            self._detector_center_sample = self.naif_keywords['INS{}_BORESIGHT_SAMPLE'.format(self.ikid)]
         return self._detector_center_sample
 
     @property
@@ -610,7 +644,7 @@ class NaifSpice():
           Detector line of the principal point
         """
         if not hasattr(self, "_detector_center_line"):
-            self._detector_center_line = float(pyspiceql.getKernelStringValue('INS{}_BORESIGHT_LINE'.format(self.ikid))[0])
+            self._detector_center_line = self.naif_keywords['INS{}_BORESIGHT_LINE'.format(self.ikid)]
         return self._detector_center_line
 
     @property
@@ -626,7 +660,7 @@ class NaifSpice():
         """
         if not hasattr(self, "_swap_observer_target"):
             try:
-                swap = pyspiceql.getKernelStringValue('INS{}_SWAP_OBSERVER_TARGET'.format(self.ikid))[0]
+                swap = self.naif_keywords['INS{}_SWAP_OBSERVER_TARGET'.format(self.ikid)]
                 self._swap_observer_target = swap.upper() == "TRUE"
             except:
                 self._swap_observer_target = False
@@ -644,7 +678,7 @@ class NaifSpice():
         """
         if not hasattr(self, "_correct_lt_to_surface"):
             try:
-                surface_correct = pyspiceql.getKernelStringValue('INS{}_LT_SURFACE_CORRECT'.format(self.ikid))[0]
+                surface_correct = self.naif_keywords['INS{}_LT_SURFACE_CORRECT'.format(self.ikid)]
                 self._correct_lt_to_surface = surface_correct.upper() == "TRUE"
             except:
                 self._correct_lt_to_surface = False
@@ -661,14 +695,15 @@ class NaifSpice():
         if not hasattr(self, "_naif_keywords"):
             self._naif_keywords = dict()
 
-            self._naif_keywords['BODY{}_RADII'.format(self.target_id)] = self.target_body_radii
             self._naif_keywords['BODY_FRAME_CODE'] = self.target_frame_id
             self._naif_keywords['BODY_CODE'] = self.target_id
 
-            self._naif_keywords = {**self._naif_keywords, **util.query_kernel_pool(f"*{self.ikid}*"),  **util.query_kernel_pool(f"*{self.target_id}*")}
-
+            self._naif_keywords = {**self._naif_keywords, 
+                                   **self.spiceql_call("findMissionKeywords", {"key": f"*{self.ikid}*", "mission": self.spiceql_mission}), 
+                                   **self.spiceql_call("findTargetKeywords", {"key": f"*{self.target_id}*", "mission": self.spiceql_mission})}
+            
             try:
-                self._naif_keywords = {**self._naif_keywords, **util.query_kernel_pool(f"*{self.fikid}*")}
+                self._naif_keywords = {**self._naif_keywords, **self.spiceql_call("findMissionKeywords", {"key": f"*{self.fikid}*", "mission": self.spiceql_mission})}
             except AttributeError as error:
                 pass
 
@@ -702,44 +737,19 @@ class NaifSpice():
 
     def spiceql_call(self, function_name = "", function_args = {}):
         """
-        Interface to SpiceQL (Spice Query Library) for both Offline and Online use
+        Driver based wrapper for accessing spice data through spiceql
 
-        This function will access the value passed through props defined as `web`. This
-        value determines the access pattern for spice data. When set to Online, you will
-        access the SpiceQL service provided through the USGS Astro AWS platform. This service
-        performs kernel and data aquisition. If set to Offline, you will access locally loaded
-        kernels, and SpiceQL will do no searching for you.
+        See Also
+        --------
+        ale.kernel_access.spiceql_call
 
-        Parameters
-        ----------
-        functions_name : str
-                         String defineing the function to call, properly exposed SpiceQL
-                         functions should map 1-to-1 with endpoints on the service
-                        
-        function_args : dict
-                        Dictionary of arguments used by the function
-
-        Returns : any
-                  Any return from a SpiceQL function
+        Returns
+        -------
+        : json
+          Json data from the SpiceQL call
         """
-        if not self.use_web:
-            func = getattr(pyspiceql, function_name)
-
-            # Ensure that in offline mode we anticipate the user loading/passing their own kernels
-            # to ALE
-            function_args["searchKernels"] = self.use_web
-            return func(**function_args)
-
-        try:
-            url = "http://localhost:9000/2015-03-31/functions/function/invocations"
-            headers = {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            }
-            function_args["func"] = function_name
-            r = requests.get(url, data=json.dumps(function_args), headers=headers, verify=False)
-            r.raise_for_status()
-            if r.json()["statusCode"] != 200:
-                raise requests.HTTPError(f"Recieved code {r.json()['statusCode']} from spice server, with error: {r.json()}")
-            return r.json()["body"]["return"]
-        except requests.exceptions.HTTPError as err:
-            raise err
+        # Ideally this would work if a user passed no kernels but still
+        # set ISISDATA
+        if (not hasattr(self, "kernels")):
+            function_args["searchKernels"] = True
+        return kernel_access.spiceql_call(function_name, function_args, self.use_web)

@@ -1,10 +1,9 @@
 import numpy as np
-from numpy.polynomial.polynomial import polyval, polyder
+from numpy.polynomial.polynomial import polyval
 import networkx as nx
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
-import spiceypy as spice
-
+from ale.kernel_access import spiceql_call
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
 def create_rotations(rotation_table):
@@ -96,14 +95,14 @@ class FrameChain(nx.DiGraph):
                      of frame rotations in the frame chain
     """
     @classmethod
-    def from_spice(cls, sensor_frame, target_frame, center_ephemeris_time, ephemeris_times=[], nadir=False, exact_ck_times=False, inst_time_bias=0):
+    def from_spice(cls, sensor_frame, target_frame, center_ephemeris_time, ephemeris_times=[], nadir=False, exact_ck_times=False, inst_time_bias=0, use_web=False, mission=""):
         frame_chain = cls()
-        sensor_times = []
         # Default assume one time
-        target_times = np.asarray(ephemeris_times)
+        target_times = ephemeris_times
         if len(target_times) > 1:
-            target_times = np.asarray([ephemeris_times[0], ephemeris_times[-1]])
-
+            target_times = [ephemeris_times[0], ephemeris_times[-1]]
+        
+        sensor_times = []
         if exact_ck_times and len(ephemeris_times) > 1 and not nadir:
             try:
                 sensor_times = cls.extract_exact_ck_times(ephemeris_times[0] + inst_time_bias, ephemeris_times[-1] + inst_time_bias, sensor_frame)
@@ -111,10 +110,12 @@ class FrameChain(nx.DiGraph):
                 pass
 
         if (len(sensor_times) == 0):
-            sensor_times = np.array(ephemeris_times)
+            sensor_times = ephemeris_times
+            if isinstance(sensor_times, np.ndarray):
+                sensor_times = sensor_times.tolist()
 
-        sensor_time_dependent_frames, sensor_constant_frames = cls.frame_trace(sensor_frame, center_ephemeris_time, nadir)
-        target_time_dependent_frames, target_constant_frames = cls.frame_trace(target_frame, center_ephemeris_time)
+        sensor_time_dependent_frames, sensor_constant_frames = spiceql_call("frameTrace", {"et": center_ephemeris_time, "initialFrame": sensor_frame, "mission": mission}, use_web)
+        target_time_dependent_frames, target_constant_frames = spiceql_call("frameTrace", {"et": center_ephemeris_time, "initialFrame": target_frame, "mission": mission}, use_web)
 
         sensor_time_dependent_frames = list(zip(sensor_time_dependent_frames[:-1], sensor_time_dependent_frames[1:]))
         constant_frames = list(zip(sensor_constant_frames[:-1], sensor_constant_frames[1:]))
@@ -123,15 +124,20 @@ class FrameChain(nx.DiGraph):
 
         constant_frames.extend(target_constant_frames)
 
-        frame_chain.compute_time_dependent_rotations(sensor_time_dependent_frames, sensor_times, inst_time_bias)
-        frame_chain.compute_time_dependent_rotations(target_time_dependent_frames, target_times, 0)
+        # Add all time dependent frame chains to the graph
+        frame_chain.compute_time_dependent_rotiations(sensor_time_dependent_frames, sensor_times, inst_time_bias, mission, use_web=use_web)
+        frame_chain.compute_time_dependent_rotiations(target_time_dependent_frames, target_times, 0, mission, use_web=use_web)
 
+        # Add all constant frame chains to the graph
         for s, d in constant_frames:
             quats = np.zeros(4)
-            rotation_matrix = spice.pxform(spice.frmnam(s), spice.frmnam(d), ephemeris_times[0])
-            quat_from_rotation = spice.m2q(rotation_matrix)
-            quats[:3] = quat_from_rotation[1:]
-            quats[3] = quat_from_rotation[0]
+            quat_and_av = spiceql_call("getTargetOrientations",{"ets": str([ephemeris_times[0]]),
+                                                                "toFrame": d,
+                                                                "refFrame": s,
+                                                                "mission": mission},
+                                                                use_web=use_web)[0]
+            quats[:3] = quat_and_av[1:4]
+            quats[3] = quat_and_av[0]
 
             rotation = ConstantRotation(quats, s, d)
 
@@ -380,7 +386,7 @@ class FrameChain(nx.DiGraph):
 
         return times
 
-    def compute_time_dependent_rotations(self, frames, times, time_bias):
+    def compute_time_dependent_rotiations(self, frames, times, time_bias, mission="", use_web=False):
         """
         Computes the time dependent rotations based on a list of tuples that define the
         relationships between frames as (source, destination) and a list of times to
@@ -396,18 +402,20 @@ class FrameChain(nx.DiGraph):
         for s, d in frames:
             quats = np.zeros((len(times), 4))
             avs = []
-            for j, time in enumerate(times):
-                try:
-                    state_matrix = spice.sxform(spice.frmnam(s), spice.frmnam(d), time)
-                    rotation_matrix, av = spice.xf2rav(state_matrix)
-                    avs.append(av)
-                except:
-                    rotation_matrix = spice.pxform(spice.frmnam(s), spice.frmnam(d), time)
-                quat_from_rotation = spice.m2q(rotation_matrix)
-                quats[j,:3] = quat_from_rotation[1:]
-                quats[j,3] = quat_from_rotation[0]
+            quats_and_avs = spiceql_call("getTargetOrientations",{"ets": str(times),
+                                                                  "toFrame": d,
+                                                                  "refFrame": s,
+                                                                  "mission": mission},
+                                                                  use_web=use_web)
+            _quats = np.array(quats_and_avs)[:, 0:4]
+            for j, quat in enumerate(_quats):
+                quats[j,:3] = quat[1:]
+                quats[j,3] = quat[0]
 
-            if not avs:
+            if (len(quats_and_avs[0]) > 4):
+                avs = np.array(quats_and_avs)[:, 4:]
+
+            if len(avs) == 0:
                 avs = None
             biased_times = [time - time_bias for time in times]
             rotation = TimeDependentRotation(quats, biased_times, s, d, av=avs)
