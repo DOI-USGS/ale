@@ -40,7 +40,7 @@ class NaifSpice():
         """
         Get the NAIF SPICE Kernels to furnish
 
-        There are two ways to specify which kernels a driver will use:
+        There are three ways to specify which kernels a driver will use:
 
         1. Passing the 'kernels' property into load(s) or at instantiation.
            This can be either a straight iterable or a dictionary that specifies
@@ -51,14 +51,18 @@ class NaifSpice():
            `shortMissionName-versionInfo`. The directory corresponding to the
            driver's mission will be searched for the appropriate meta kernel to
            load.
+        3. Default to using SpiceQL for extracting spice information which does not
+           require kernels to be set. If used with `web: False` the user will have to
+           specifiy either `SPICEDATA, ALESPICEROOT, or ISISDATA` ato point to there
+           data area
 
         See Also
         --------
-        ale.util.get_kernels_from_isis_pvl : Function used to parse ISIS style dict
-        ale.util.get_metakernels : Function that searches ALESPICEROOT for meta kernels
-        ale.util.generate_kernels_from_cube : Helper function to get an ISIS style dict
-                                              from an ISIS cube that has been through
-                                              spiceinit
+        ale.kernel_access.get_kernels_from_isis_pvl : Function used to parse ISIS style dict
+        ale.kernel_access.get_metakernels : Function that searches ALESPICEROOT for meta kernels
+        ale.kernel_access.generate_kernels_from_cube : Helper function to get an ISIS style dict
+                                                       from an ISIS cube that has been through
+                                                       spiceinit
 
         """
         if not hasattr(self, '_kernels'):
@@ -67,15 +71,14 @@ class NaifSpice():
                     self._kernels = util.get_kernels_from_isis_pvl(self._props['kernels'])
                 except Exception as e:
                     self._kernels =  self._props['kernels']
-            else:
-                if not ale.spice_root:
-                    raise EnvironmentError(f'ale.spice_root is not set, cannot search for metakernels. ale.spice_root = "{ale.spice_root}"')
-
+            elif ale.spice_root:
                 search_results = util.get_metakernels(ale.spice_root, missions=self.short_mission_name, years=self.utc_start_time.year, versions='latest')
 
                 if search_results['count'] == 0:
                     raise ValueError(f'Failed to find metakernels. mission: {self.short_mission_name}, year:{self.utc_start_time.year}, versions="latest" spice root = "{ale.spice_root}"')
                 self._kernels = [search_results['data'][0]['path']]
+            else:
+                self._kernels = []
 
         return self._kernels
 
