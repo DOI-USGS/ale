@@ -1,6 +1,3 @@
-import spiceypy as spice
-
-import ale
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
@@ -45,29 +42,3 @@ class HayabusaAmicaIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Radial
           Name of the sensor
         """
         return self.instrument_id
-
-    @property
-    def spacecraft_clock_start_count(self):
-        """
-        The spacecraft clock start count, frequently used to determine the start time
-        of the image.
-
-        Returns
-        -------
-        : str
-          Spacecraft clock start count
-        """
-        return str(self.label['IsisCube']['Instrument']['SpacecraftClockStartCount'].value)
-
-    @property
-    def spacecraft_clock_stop_count(self):
-        """
-        The spacecraft clock stop count, frequently used to determine the stop time
-        of the image.
-
-        Returns
-        -------
-        : str
-          Spacecraft clock stop count
-        """
-        return str(self.label['IsisCube']['Instrument']['SpacecraftClockStopCount'].value)
