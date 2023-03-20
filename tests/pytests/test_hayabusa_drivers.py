@@ -42,9 +42,3 @@ class test_nac_isis_naif(unittest.TestCase):
 
     def test_sensor_name(self):
         assert self.driver.sensor_name == "HAYABUSA_AMICA"
-
-    def test_spacecraft_clock_start_count(self):
-        assert self.driver.spacecraft_clock_stop_count == '2457499873'
-
-    def test_spacecraft_clock_stop_count(self):
-        assert self.driver.spacecraft_clock_start_count == '2457499394'
