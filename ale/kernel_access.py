@@ -1,11 +1,11 @@
 from glob import glob
 from itertools import groupby
-import json
 import os
 from os import path
 import requests
 import warnings
 
+import numpy as np
 import pyspiceql
 
 from ale import spice_root
@@ -345,7 +345,13 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
         'Content-Type': 'application/json'
     }
 
-    r = requests.get(url, params=function_args, headers=headers, verify=False)
+    # Convert any lists being passed over the wire to strings
+    clean_function_args = function_args
+    for key, value in function_args.items():
+        if isinstance(value, list) or isinstance(value, np.ndarray):
+            clean_function_args[key] = str(value)
+
+    r = requests.get(url, params=clean_function_args, headers=headers, verify=False)
     r.raise_for_status()
     response = r.json()
 

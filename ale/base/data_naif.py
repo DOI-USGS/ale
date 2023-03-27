@@ -104,6 +104,12 @@ class NaifSpice():
                 self._use_web = web_prop
 
         return self._use_web
+
+    @property
+    def search_kernels(self):
+        if not hasattr(self, "_search_kernels"):
+            self._search_kernels = self.kernels == []
+        return self._search_kernels
                 
     @property
     def light_time_correction(self):
@@ -397,11 +403,11 @@ class NaifSpice():
             positions = []
             velocities = []
 
-            sun_lt_states = self.spiceql_call("getTargetStates",{"ets": str(times),
-                                                                 "target": self.target_name,
-                                                                 "observer": self.spacecraft_name,
-                                                                 "frame": 'J2000',
-                                                                 "abcorr": self.light_time_correction,
+            sun_lt_states = self.spiceql_call("getTargetStates",{"ets": times,
+                                                                 "target": "SUN",
+                                                                 "observer": self.target_name,
+                                                                 "frame": self.reference_frame,
+                                                                 "abcorr": "LT+S",
                                                                  "mission": self.spiceql_mission})
             for sun_state in sun_lt_states:
                 sun_state = np.array(sun_state)
@@ -449,48 +455,32 @@ class NaifSpice():
             # location of the target. For more information, see:
             # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
             if self.correct_lt_to_surface and self.light_time_correction.upper() == 'LT+S':
-                print("BANANA", ephem)
-                obs_tars = self.spiceql_call("getTargetStates",{"ets": str(ephem),
+                obs_tars = self.spiceql_call("getTargetStates",{"ets": ephem,
                                                                 "target": target,
                                                                 "observer": observer,
                                                                 "frame": "J2000",
                                                                 "abcorr": self.light_time_correction,
                                                                 "mission": self.spiceql_mission})
-                # obs_tar = pyspiceql.getTargetState(time,
-                #                                     target,
-                #                                     observer,
-                #                                     'J2000',
-                #                                     self.light_time_correction)
                 obs_tar_lts = np.array(obs_tars)[:,-1]
 
                 # ssb to spacecraft
-                ssb_obs = self.spiceql_call("getTargetStates",{"ets": str(ephem),
+                ssb_obs = self.spiceql_call("getTargetStates",{"ets": ephem,
                                                                "target": target,
                                                                "observer": "SSB",
                                                                "frame": "J2000",
                                                                "abcorr": "NONE",
                                                                "mission": self.spiceql_mission})
-                # ssb_obs = pyspiceql.getTargetState(time,
-                #                                     target,
-                #                                     'SSB',
-                #                                     'J2000',
-                #                                     "NONE")
                 ssb_obs_states = np.array(ssb_obs)[:,0:6]
 
                 radius_lt = (self.target_body_radii[2] + self.target_body_radii[0]) / 2 / (scipy.constants.c/1000.0)
                 adjusted_time = np.array(ephem) - obs_tar_lts + radius_lt
 
-                ssb_tars = self.spiceql_call("getTargetStates",{"ets": str(adjusted_time),
+                ssb_tars = self.spiceql_call("getTargetStates",{"ets": adjusted_time,
                                                                 "target": target,
                                                                 "observer": "SSB",
                                                                 "frame": "J2000",
                                                                 "abcorr": "NONE",
                                                                 "mission": self.spiceql_mission})
-                # ssb_tar = pyspiceql.getTargetState(adjusted_time,
-                #                                     target,
-                #                                     'SSB',
-                #                                     'J2000',
-                #                                     "NONE")
                 ssb_tar_state = np.array(ssb_tars)[:,0:6]
                 _states = ssb_tar_state - ssb_obs_states
                 states = []
@@ -499,17 +489,12 @@ class NaifSpice():
                     state = spice.mxvg(matrix, state)
                     states.append(state)
             else:
-                states = self.spiceql_call("getTargetStates",{"ets": str(ephem),
+                states = self.spiceql_call("getTargetStates",{"ets": ephem,
                                                               "target": target,
                                                               "observer": observer,
                                                               "frame": self.reference_frame,
                                                               "abcorr": self.light_time_correction,
                                                               "mission": self.spiceql_mission})
-                # state = pyspiceql.getTargetState(time,
-                #                                     target,
-                #                                     observer,
-                #                                     self.reference_frame,
-                #                                     self.light_time_correction)
                 states = np.array(states)[:,0:6]
 
             for state in states:
@@ -538,7 +523,8 @@ class NaifSpice():
                                                       nadir=nadir, exact_ck_times=exact_ck_times,
                                                       inst_time_bias=self.instrument_time_bias,
                                                       mission=self.spiceql_mission,
-                                                      use_web=self.use_web)
+                                                      use_web=self.use_web,
+                                                      search_kernels=self.search_kernels)
 
             if nadir:
                 # Logic for nadir calculation was taken from ISIS3
@@ -753,6 +739,5 @@ class NaifSpice():
         """
         # Ideally this would work if a user passed no kernels but still
         # set ISISDATA
-        if (not hasattr(self, "kernels")):
-            function_args["searchKernels"] = True
+        function_args["searchKernels"] = self.search_kernels
         return kernel_access.spiceql_call(function_name, function_args, self.use_web)

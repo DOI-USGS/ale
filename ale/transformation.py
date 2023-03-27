@@ -94,9 +94,21 @@ class FrameChain(nx.DiGraph):
                      A of ephemeris times that need to be rotated for each set
                      of frame rotations in the frame chain
     """
+    def __init__(self, use_web=False, search_kernels=False, incoming_graph_data=None, **attr):
+        super().__init__(incoming_graph_data, **attr)
+        self.use_web = use_web
+        self.search_kernels = search_kernels
+
     @classmethod
-    def from_spice(cls, sensor_frame, target_frame, center_ephemeris_time, ephemeris_times=[], nadir=False, exact_ck_times=False, inst_time_bias=0, use_web=False, mission=""):
-        frame_chain = cls()
+    def from_spice(cls, sensor_frame, target_frame, center_ephemeris_time, 
+                                                    ephemeris_times=[], 
+                                                    nadir=False, 
+                                                    exact_ck_times=False,
+                                                    inst_time_bias=0,
+                                                    use_web=False, 
+                                                    search_kernels=False, 
+                                                    mission=""):
+        frame_chain = cls(use_web, search_kernels)
         # Default assume one time
         target_times = ephemeris_times
         if len(target_times) > 1:
@@ -114,8 +126,16 @@ class FrameChain(nx.DiGraph):
             if isinstance(sensor_times, np.ndarray):
                 sensor_times = sensor_times.tolist()
 
-        sensor_time_dependent_frames, sensor_constant_frames = spiceql_call("frameTrace", {"et": center_ephemeris_time, "initialFrame": sensor_frame, "mission": mission}, use_web)
-        target_time_dependent_frames, target_constant_frames = spiceql_call("frameTrace", {"et": center_ephemeris_time, "initialFrame": target_frame, "mission": mission}, use_web)
+        sensor_time_dependent_frames, sensor_constant_frames = spiceql_call("frameTrace", {"et": center_ephemeris_time, 
+                                                                                           "initialFrame": sensor_frame,
+                                                                                           "mission": mission,
+                                                                                           "searchKernels": frame_chain.search_kernels},
+                                                                                           frame_chain.use_web)
+        target_time_dependent_frames, target_constant_frames = spiceql_call("frameTrace", {"et": center_ephemeris_time, 
+                                                                                           "initialFrame": target_frame,
+                                                                                           "mission": mission,
+                                                                                           "searchKernels": frame_chain.search_kernels},
+                                                                                           frame_chain.use_web)
 
         sensor_time_dependent_frames = list(zip(sensor_time_dependent_frames[:-1], sensor_time_dependent_frames[1:]))
         constant_frames = list(zip(sensor_constant_frames[:-1], sensor_constant_frames[1:]))
@@ -131,10 +151,11 @@ class FrameChain(nx.DiGraph):
         # Add all constant frame chains to the graph
         for s, d in constant_frames:
             quats = np.zeros(4)
-            quat_and_av = spiceql_call("getTargetOrientations",{"ets": str([ephemeris_times[0]]),
+            quat_and_av = spiceql_call("getTargetOrientations",{"ets": [ephemeris_times[0]],
                                                                 "toFrame": d,
                                                                 "refFrame": s,
-                                                                "mission": mission},
+                                                                "mission": mission,
+                                                                "searchKernels": frame_chain.search_kernels},
                                                                 use_web=use_web)[0]
             quats[:3] = quat_and_av[1:4]
             quats[3] = quat_and_av[0]
@@ -402,11 +423,12 @@ class FrameChain(nx.DiGraph):
         for s, d in frames:
             quats = np.zeros((len(times), 4))
             avs = []
-            quats_and_avs = spiceql_call("getTargetOrientations",{"ets": str(times),
+            quats_and_avs = spiceql_call("getTargetOrientations",{"ets": times,
                                                                   "toFrame": d,
                                                                   "refFrame": s,
-                                                                  "mission": mission},
-                                                                  use_web=use_web)
+                                                                  "mission": mission,
+                                                                  "searchKernels": self.search_kernels},
+                                                                  use_web=self.use_web)
             _quats = np.array(quats_and_avs)[:, 0:4]
             for j, quat in enumerate(_quats):
                 quats[j,:3] = quat[1:]

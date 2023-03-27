@@ -537,7 +537,8 @@ class Cahvor():
                                                       ephemeris_times=self.ephemeris_time,
                                                       nadir=nadir, exact_ck_times=False,
                                                       mission=self.spiceql_mission,
-                                                      use_web=self.use_web)
+                                                      use_web=self.use_web,
+                                                      search_kernels=self.search_kernels)
             cahvor_quats = Rotation.from_matrix(self.cahvor_rotation_matrix).as_quat()
             
             if nadir:
