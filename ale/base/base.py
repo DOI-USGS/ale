@@ -364,7 +364,7 @@ class Driver():
             try: 
               from osgeo import gdal 
             except: 
-                self._geotransform = None
+                self._geotransform = (0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
                 return self._geotransform
 
             if isinstance(self._file, pvl.PVLModule):
@@ -377,7 +377,7 @@ class Driver():
             else: 
                 # should be a path
                 if not os.path.exists(self._file): 
-                    self._geotransform = None 
+                    self._geotransform = (0.0, 1.0, 0.0, 0.0, 0.0, 1.0) 
                 else: 
                     geodata = gdal.Open(self._file)
                     self._geotransform = geodata.GetGeoTransform()
