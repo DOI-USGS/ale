@@ -353,3 +353,11 @@ def test_no_projection(test_frame_driver):
 def test_isis_projection():
     isd = usgscsm_formatter.to_usgscsm(TestLineScanner(get_image_label('B10_013341_1010_XN_79S172W', "isis3")))
     assert isd["projection"] == "+proj=sinu +lon_0=148.36859083039 +x_0=0 +y_0=0 +R=3396190 +units=m +no_defs"
+
+
+def test_isis_geotransform():
+    isd = usgscsm_formatter.to_usgscsm(TestLineScanner(get_image_label('B10_013341_1010_XN_79S172W', "isis3")))
+    expected = (-219771.1526456, 1455.4380969907, 0.0, 5175537.8728989, 0.0, -1455.4380969907)
+    for value, truth in zip(isd["geotransform"], expected):
+        pytest.approx(value, truth)
+

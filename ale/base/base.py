@@ -356,3 +356,30 @@ class Driver():
                 self._projection = self._projection.ExportToProj4()
                 
         return self._projection
+    
+
+    @property 
+    def geotransform(self):
+        if not hasattr(self, "_geotransform"): 
+            try: 
+              from osgeo import gdal 
+            except: 
+                self._geotransform = None
+                return self._geotransform
+
+            if isinstance(self._file, pvl.PVLModule):
+                # save it to a temp folder
+                with tempfile.NamedTemporaryFile() as tmp:
+                    tmp.write(pvl.dumps(self._file)) 
+
+                    geodata = gdal.Open(tempfile.name)
+                    self._geotransform = geodata.GetGeoTransform()
+            else: 
+                # should be a path
+                if not os.path.exists(self._file): 
+                    self._geotransform = None 
+                else: 
+                    geodata = gdal.Open(self._file)
+                    self._geotransform = geodata.GetGeoTransform()
+                
+        return self._geotransform
