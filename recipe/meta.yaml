@@ -31,7 +31,9 @@ requirements:
     - scipy >=1.4.0
     - spiceypy >=4.0.1
     - pyyaml
-
+  run_contrained: 
+    - gdal 
+    
 test:
   imports:
     - ale

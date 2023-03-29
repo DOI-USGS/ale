@@ -1,6 +1,9 @@
 import pvl
 import json
 
+import tempfile
+import os 
+
 class Driver():
     """
     Base class for all Drivers.
@@ -323,3 +326,33 @@ class Driver():
     @property
     def short_mission_name(self):
         return self.__module__.split('.')[-1].split('_')[0]
+
+    @property 
+    def projection(self):
+        if not hasattr(self, "_projection"): 
+            try: 
+              from osgeo import gdal 
+            except: 
+                self._projection = None
+                return self._projection
+
+            if isinstance(self._file, pvl.PVLModule):
+                # save it to a temp folder
+                with tempfile.NamedTemporaryFile() as tmp:
+                    tmp.write(pvl.dumps(self._file)) 
+
+                    geodata = gdal.Open(tempfile.name)
+                    self._projection = geodata.GetSpatialRef()
+            else: 
+                # should be a path
+                if not os.path.exists(self._file): 
+                    self._projection = None 
+                else: 
+                    geodata = gdal.Open(self._file)
+                    self._projection = geodata.GetSpatialRef()
+
+            # is None if not projected
+            if self._projection: 
+                self._projection = self._projection.ExportToProj4()
+                
+        return self._projection

@@ -69,6 +69,25 @@ Object = IsisCube
     Source                    = isis
   End_Group
 
+  Group = Mapping
+    ProjectionName     = Sinusoidal
+    CenterLongitude    = 148.36859083039
+    TargetName         = MARS
+    EquatorialRadius   = 3396190.0 <meters>
+    PolarRadius        = 3376200.0 <meters>
+    LatitudeType       = Planetocentric
+    LongitudeDirection = PositiveEast
+    LongitudeDomain    = 360
+    MinimumLatitude    = 63.636322793577
+    MaximumLatitude    = 87.296295823424
+    MinimumLongitude   = 139.6658284858
+    MaximumLongitude   = 157.07135317498
+    UpperLeftCornerX   = -219771.1526456 <meters>
+    UpperLeftCornerY   = 5175537.8728989 <meters>
+    PixelResolution    = 1455.4380969907 <meters/pixel>
+    Scale              = 40.726361118253 <pixels/degree>
+  End_Group
+  
   Group = AlphaCube
     AlphaSamples        = 5000
     AlphaLines          = 24576
