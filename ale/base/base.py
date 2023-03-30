@@ -333,7 +333,7 @@ class Driver():
             try: 
               from osgeo import gdal 
             except: 
-                self._projection = None
+                self._projection = ""
                 return self._projection
 
             if isinstance(self._file, pvl.PVLModule):
@@ -346,7 +346,7 @@ class Driver():
             else: 
                 # should be a path
                 if not os.path.exists(self._file): 
-                    self._projection = None 
+                    self._projection = "" 
                 else: 
                     geodata = gdal.Open(self._file)
                     self._projection = geodata.GetSpatialRef()
@@ -354,7 +354,8 @@ class Driver():
             # is None if not projected
             if self._projection: 
                 self._projection = self._projection.ExportToProj4()
-                
+            else: 
+                self._projection = "" 
         return self._projection
     
 
