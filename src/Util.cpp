@@ -44,7 +44,7 @@ std::vector<double> getGeoTransform(json isd) {
     transform = isd.at("geotransform").get<std::vector<double>>();
   } catch (std::exception &e) {
     std::string originalError = e.what();
-    std::string msg = "Could not parse the geo_transform. ERROR: " + originalError + isd.dump();
+    std::string msg = "Could not parse the geo_transform. ERROR: \n" + originalError;
     throw std::runtime_error(msg);
   }
   return transform;
