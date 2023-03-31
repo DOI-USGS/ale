@@ -51,7 +51,7 @@ std::vector<double> getGeoTransform(json isd) {
 }
 
 
-std::string getProjectionString(json isd) {
+std::string getProjection(json isd) {
   std::string projection_string = "";
   try {
     projection_string = isd.at("projection");
