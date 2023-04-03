@@ -37,6 +37,31 @@ std::string getImageId(json isd) {
   return id;
 }
 
+
+std::vector<double> getGeoTransform(json isd) {
+  std::vector<double> transform = {};
+  try {
+    transform = isd.at("geotransform").get<std::vector<double>>();
+  } catch (std::exception &e) {
+    std::string originalError = e.what();
+    std::string msg = "Could not parse the geo_transform. ERROR: \n" + originalError;
+    throw std::runtime_error(msg);
+  }
+  return transform;
+}
+
+
+std::string getProjection(json isd) {
+  std::string projection_string = "";
+  try {
+    projection_string = isd.at("projection");
+  } catch (...) {
+    throw std::runtime_error("Could not parse the projection string.");
+  }
+  return projection_string;
+}
+
+
 std::string getSensorName(json isd) {
   std::string name = "";
   try {

@@ -202,7 +202,9 @@ def usgscsm_compare_dict():
               "t0_ephemeris": -101.83713859319687,
               "dt_ephemeris": 40.734855437278746,
               "t0_quaternion": -101.83713859319687,
-              "dt_quaternion": 40.734855437278746
+              "dt_quaternion": 40.734855437278746,
+              "projection" : "",
+              "geotransform" : (0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
               },
 
         "isis" :
