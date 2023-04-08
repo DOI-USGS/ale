@@ -202,9 +202,7 @@ def usgscsm_compare_dict():
               "t0_ephemeris": -101.83713859319687,
               "dt_ephemeris": 40.734855437278746,
               "t0_quaternion": -101.83713859319687,
-              "dt_quaternion": 40.734855437278746,
-              "projection" : "",
-              "geotransform" : (0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+              "dt_quaternion": 40.734855437278746
               },
 
         "isis" :
@@ -579,6 +577,8 @@ def test_mex_load(test_mex_hrsc_kernels, formatter, usgscsm_compare_dict, label)
         binary_lines.return_value = [0.5, 1.5, 15086.5]
 
         usgscsm_isd = ale.load(label_file, props={'kernels': test_mex_hrsc_kernels}, formatter=formatter)
+        print(usgscsm_isd)
+        print(usgscsm_compare_dict['h5270_0000_ir2'][formatter])
         assert compare_dicts(usgscsm_isd, usgscsm_compare_dict['h5270_0000_ir2'][formatter]) == []
 
 # ========= Test mex pds3label and naifspice driver =========
