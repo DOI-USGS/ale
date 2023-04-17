@@ -478,9 +478,8 @@ class Cahvor():
                                                       center_ephemeris_time=self.center_ephemeris_time,
                                                       ephemeris_times=self.ephemeris_time,
                                                       nadir=False, exact_ck_times=False)
-            cahvor_quats = Rotation.from_matrix(self.cahvor_rotation_matrix)
-            quats = cahvor_quats.as_quat()
-            cahvor_rotation = ConstantRotation(quats, self.final_inst_frame, self.sensor_frame_id)
+            cahvor_quats = Rotation.from_matrix(self.cahvor_rotation_matrix).as_quat()
+            cahvor_rotation = ConstantRotation(cahvor_quats, self.final_inst_frame, self.sensor_frame_id)
             self._frame_chain.add_edge(rotation = cahvor_rotation)
         return self._frame_chain
 
