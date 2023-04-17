@@ -70,6 +70,18 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         return self._cahvor_camera_params
 
     @property
+    def final_inst_frame(self):
+        """
+        Defines MSLs last naif frame before the cahvor model frame
+
+        Returns
+        -------
+        : int
+          Naif frame code for MSL_RSM_HEAD
+        """
+        return spice.bods2c("MSL_RSM_HEAD")
+
+    @property
     def sensor_frame_id(self):
         """
         Returns the Naif ID code for the site reference frame
