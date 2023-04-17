@@ -451,7 +451,7 @@ class Cahvor():
             v_s = self.compute_v_s()
             H_prime = (self.cahvor_camera_dict['H'] - h_c * self.cahvor_camera_dict['A'])/h_s
             V_prime = (self.cahvor_camera_dict['V'] - v_c * self.cahvor_camera_dict['A'])/v_s
-            self._cahvor_rotation_matrix = np.array([H_prime, -V_prime, self.cahvor_camera_dict['A']])
+            self._cahvor_rotation_matrix = np.array([H_prime, V_prime, self.cahvor_camera_dict['A']])
         return self._cahvor_rotation_matrix
 
     @property
@@ -471,8 +471,17 @@ class Cahvor():
                                                       center_ephemeris_time=self.center_ephemeris_time,
                                                       ephemeris_times=self.ephemeris_time,
                                                       nadir=False, exact_ck_times=False)
-            cahvor_quats = Rotation.from_matrix(self.cahvor_rotation_matrix).as_quat()
-            cahvor_rotation = ConstantRotation(cahvor_quats, self.spacecraft_id * 1000, self.sensor_frame_id)
+
+            # Extra temporary rotation in the rover frame
+            C1 = np.array([[6.80577524e-01, -9.11460527e-03,  7.32619382e-01],
+                            [ 7.32652737e-01,  4.81672679e-04, -6.80602479e-01],
+                            [ 5.85055122e-03,  9.99958359e-01,  7.00565704e-03]])
+            transformed_cahv = np.matmul(self.cahvor_rotation_matrix, C1)
+            cahvor_quats = Rotation.from_matrix(transformed_cahv).as_quat()
+
+            cahvor_rotation = ConstantRotation(cahvor_quats, self.spacecraft_id * 1000,
+                                               self.sensor_frame_id)
+
             self._frame_chain.add_edge(rotation = cahvor_rotation)
         return self._frame_chain
 
