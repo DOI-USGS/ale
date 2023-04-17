@@ -386,6 +386,13 @@ class Cahvor():
         """
         raise NotImplementedError
 
+    @property
+    def final_inst_frame(self):
+      """
+      Defines the final frame before cahvor frame in the frame chain
+      """
+      raise NotImplementedError
+
     def compute_h_c(self):
         """
         Computes the h_c element of a cahvor model for the conversion
