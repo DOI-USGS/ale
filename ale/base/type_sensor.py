@@ -473,22 +473,14 @@ class Cahvor():
           A networkx frame chain object
         """
         if not hasattr(self, '_frame_chain'):
-            self._frame_chain = FrameChain.from_spice(sensor_frame=self.spacecraft_id * 1000,
+            self._frame_chain = FrameChain.from_spice(sensor_frame=self.final_inst_frame,
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
                                                       ephemeris_times=self.ephemeris_time,
                                                       nadir=False, exact_ck_times=False)
-
-            # Extra temporary rotation in the rover frame
-            C1 = np.array([[6.80577524e-01, -9.11460527e-03,  7.32619382e-01],
-                            [ 7.32652737e-01,  4.81672679e-04, -6.80602479e-01],
-                            [ 5.85055122e-03,  9.99958359e-01,  7.00565704e-03]])
-            transformed_cahv = np.matmul(self.cahvor_rotation_matrix, C1)
-            cahvor_quats = Rotation.from_matrix(transformed_cahv).as_quat()
-
-            cahvor_rotation = ConstantRotation(cahvor_quats, self.spacecraft_id * 1000,
-                                               self.sensor_frame_id)
-
+            cahvor_quats = Rotation.from_matrix(self.cahvor_rotation_matrix)
+            quats = cahvor_quats.as_quat()
+            cahvor_rotation = ConstantRotation(quats, self.final_inst_frame, self.sensor_frame_id)
             self._frame_chain.add_edge(rotation = cahvor_rotation)
         return self._frame_chain
 
