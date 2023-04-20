@@ -1,8 +1,9 @@
 import math
 
 import numpy as np
+import os
 from scipy.spatial.transform import Rotation
-
+import scipy.spatial.transform.rotation as rot
 from ale.transformation import FrameChain
 from ale.transformation import ConstantRotation
 
@@ -462,6 +463,22 @@ class Cahvor():
         return self._cahvor_rotation_matrix
 
     @property
+    def cahvor_X(self):
+        return self.X
+
+    @property
+    def cahvor_center(self):
+        """
+        Computes the cahvor center for the instrument to Rover frame
+
+        Returns
+        -------
+        : array
+          Cahvor center as a 1D numpy array
+        """
+        return self.cahvor_camera_dict['C']  
+    
+    @property
     def frame_chain(self):
         """
         Returns a modified frame chain with the cahvor models extra rotation
@@ -473,15 +490,82 @@ class Cahvor():
           A networkx frame chain object
         """
         if not hasattr(self, '_frame_chain'):
-            self._frame_chain = FrameChain.from_spice(sensor_frame=self.final_inst_frame,
+            self._frame_chain = FrameChain.from_spice(sensor_frame=self.spacecraft_id * 1000,
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
                                                       ephemeris_times=self.ephemeris_time,
                                                       nadir=False, exact_ck_times=False)
-            cahvor_quats = Rotation.from_matrix(self.cahvor_rotation_matrix).as_quat()
-            #cahvor_rotation = ConstantRotation(cahvor_quats, self.final_inst_frame, self.#sensor_frame_id)
-            cahvor_rotation = ConstantRotation(cahvor_quats, self.target_frame_id,
-                                               self.sensor_frame_id)
+
+            #print("Euler angles before\n", Rotation.from_matrix(self.cahvor_rotation_matrix).as_euler("zyx", degrees=True))
+            # Print determinant of the cahvor rotation matrix
+            print("Determinant of cahvor rotation matrix: ", np.linalg.det(self.cahvor_rotation_matrix))
+            #Q = np.linalg.inv(self.cahvor_rotation_matrix).flatten()
+            # print q with comma-separated values
+
+            #print("---inv cahvore matrix before", Q)
+            # print Q with comma as separator
+            #print("---inv cahvore matrix before", ",".join(map(str, Q)))
+
+
+            # Apply an artifical 90 degree rotation about the z axis to the cahvor model       
+            # Angles below: move left, move down, roll 
+            #r = Rotation.from_euler("zyx", [-50, -90, 170], degrees=True) # reference
+            #r = Rotation.from_euler("zyx", [-60, -90, 170], degrees=True) # better
+            #r = Rotation.from_euler("zyx", [-80, -90, 170], degrees=True) # w5
+            #r = Rotation.from_euler("zyx", [-80, -95, 165], degrees=True) # w6
+            #r = Rotation.from_euler("zyx", [-80, -90, 155], degrees=True) # w7
+            #r = Rotation.from_euler("zyx", [-80, -90, 145], degrees=True) # w8 # pretty good
+            #r = Rotation.from_euler("zyx", [-80, -80, 145], degrees=True) # w2 # better
+            #r = Rotation.from_euler("zyx", [-80, -70, 145], degrees=True) # w3
+            #r = Rotation.from_euler("zyx", [-80, -70, 135], degrees=True) # w4 better
+            r = Rotation.from_euler("zyx", [-85, -70, 135], degrees=True) # w5 better
+            r = Rotation.from_euler("zyx", [-85, -60, 135], degrees=True) # w6
+            r = Rotation.from_euler("zyx", [-85, -50, 135], degrees=True) # w7 better
+            r = Rotation.from_euler("zyx", [-85, -50, 125], degrees=True) # w8 better
+            r = Rotation.from_euler("zyx", [-85, -50, 115], degrees=True) # w9 better
+            r = Rotation.from_euler("zyx", [-90, -50, 115], degrees=True) # w1 better
+            r = Rotation.from_euler("zyx", [-100, -50, 115], degrees=True) # w2 better
+            r = Rotation.from_euler("zyx", [-110, -50, 115], degrees=True) # w3 better
+            r = Rotation.from_euler("zyx", [-110, -40, 115], degrees=True) # w4 better
+            r = Rotation.from_euler("zyx", [-110, -30, 115], degrees=True) # w5 better
+            r = Rotation.from_euler("zyx", [-110, -30, 105], degrees=True) # w6
+            r = Rotation.from_euler("zyx", [-110, -30, 95], degrees=True) # w7
+            r = Rotation.from_euler("zyx", [-120, -30, 95], degrees=True) # w8 better
+            r = Rotation.from_euler("zyx", [-130, -30, 95], degrees=True) # w9
+            r = Rotation.from_euler("zyx", [-130, -30, 85], degrees=True) # w1 better
+            r = Rotation.from_euler("zyx", [-140, -30, 85], degrees=True) # w2
+            r = Rotation.from_euler("zyx", [-140, -35, 85], degrees=True) # w3 better
+            r = Rotation.from_euler("zyx", [-150, -35, 85], degrees=True) # w4
+            r = Rotation.from_euler("zyx", [0, 0, 0], degrees=True) # w5 better
+            r = Rotation.from_euler("zyx", [0, -15, 0], degrees=True) # good
+            r = Rotation.from_euler("zyx", [0, -20, 0], degrees=True) # good
+            r = Rotation.from_euler("zyx", [10, -20, 10], degrees=True) # good #v6
+            r = Rotation.from_euler("zyx", [10, -20, 20], degrees=True) # v7 beter
+            r = Rotation.from_euler("zyx", [50, -20, 20], degrees=True) # v1
+            r = Rotation.from_euler("zyx", [10, -20, 20], degrees=True) # v2
+            r = Rotation.from_euler("zyx", [20, -20, 20], degrees=True) # v3 # better
+
+            # Print flattened T
+            X = "-0.13005758  0.79616099  0.59095196 -0.46804661 -0.57473784  0.67126629  0.87404766 -0.1893059   0.44742102"
+            X = np.array(X.split(),  dtype=np.float64)
+            X = X.reshape(3, 3)
+            #X = np.matmul(X, r.as_matrix()) # works better than below?
+            #X = np.matmul(np.linalg.inv(r.as_matrix()), X)
+            X = np.matmul(r.as_matrix(), X)
+            self.X = X
+            #M = np.matmul(self.cahvor_rotation_matrix, X)
+            M = self.cahvor_rotation_matrix
+
+            #self.cahvor_rotation_matrix
+            print("cahcovr rotation matrix before\n", M)
+            #cahvor_quats = Rotation.from_matrix(self.cahvor_rotation_matrix).as_quat() 
+            cahvor_quats = Rotation.from_matrix(M).as_quat() 
+            #print("--temporary!!!--")
+            #cahvor_quats = [0, 0, 0, 1]
+            cahvor_rotation = ConstantRotation(cahvor_quats, 
+                                               self.target_frame_id, self.sensor_frame_id)
+            print("cahvor_rotation after\n", cahvor_rotation.rotation_matrix())
+            #print("Euler angles after\n", Rotation.from_matrix(C).as_euler("zyx", degrees=True))
 
             self._frame_chain.add_edge(rotation = cahvor_rotation)
         return self._frame_chain

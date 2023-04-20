@@ -1,4 +1,4 @@
-import json
+import json, os
 import numpy as np
 from scipy.interpolate import interp1d, BPoly
 
@@ -7,6 +7,7 @@ from networkx.algorithms.shortest_paths.generic import shortest_path
 from ale.transformation import FrameChain
 from ale.base.type_sensor import LineScanner, Framer, Radar, PushFrame
 from ale.rotation import ConstantRotation, TimeDependentRotation
+from scipy.spatial.transform import Rotation
 
 def to_isd(driver):
     """
@@ -26,7 +27,7 @@ def to_isd(driver):
     meta_data = {}
 
     meta_data['isis_camera_version'] = driver.sensor_model_version
-    
+
     # general information
     meta_data['image_lines'] = driver.image_lines
     meta_data['image_samples'] = driver.image_samples
@@ -92,6 +93,7 @@ def to_isd(driver):
     body_rotation = {}
     source_frame, destination_frame, time_dependent_target_frame = frame_chain.last_time_dependent_frame_between(target_frame, 1)
 
+    M2R = []
     if source_frame != 1:
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
@@ -103,6 +105,10 @@ def to_isd(driver):
         body_rotation['ephemeris_times'] = time_dependent_rotation.times
         body_rotation['quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
         body_rotation['angular_velocities'] = time_dependent_rotation.av
+        Q = time_dependent_rotation.quats
+        #print("Time dependent rotation is ", time_dependent_rotation)
+        M2R_mat = Rotation.from_quat(Q)
+        M2R = M2R_mat.as_matrix() # mars to rover rotation
 
     if source_frame != target_frame:
         # Reverse the frame order because ISIS orders frames as
@@ -134,13 +140,6 @@ def to_isd(driver):
     # reference frame should be the last frame in the chain
     instrument_pointing["reference_frame"] = instrument_pointing['time_dependent_frames'][-1]
 
-    # Reverse the frame order because ISIS orders frames as
-    # (destination, intermediate, ..., intermediate, source)
-    instrument_pointing['constant_frames'] = shortest_path(frame_chain, sensor_frame, destination_frame)
-    constant_rotation = frame_chain.compute_rotation(destination_frame, sensor_frame)
-    instrument_pointing['constant_rotation'] = constant_rotation.rotation_matrix().flatten()
-    meta_data['instrument_pointing'] = instrument_pointing
-
     # interiror orientation
     meta_data['naif_keywords'] = driver.naif_keywords
 
@@ -148,10 +147,10 @@ def to_isd(driver):
 
         meta_data['detector_sample_summing'] = driver.sample_summing
         meta_data['detector_line_summing'] = driver.line_summing
-
         meta_data['focal_length_model'] = {
-            'focal_length' : driver.focal_length
+            'focal_length' : -1.0 * driver.focal_length
         }
+
         meta_data['detector_center'] = {
             'line' : driver.detector_center_line,
             'sample' : driver.detector_center_sample
@@ -159,19 +158,51 @@ def to_isd(driver):
         meta_data['focal2pixel_lines'] = driver.focal2pixel_lines
         meta_data['focal2pixel_samples'] = driver.focal2pixel_samples
         meta_data['optical_distortion'] = driver.usgscsm_distortion_model
-
         meta_data['starting_detector_line'] = driver.detector_start_line
         meta_data['starting_detector_sample'] = driver.detector_start_sample
-    
 
     j2000_rotation = frame_chain.compute_rotation(target_frame, 1)
 
+    # Reverse the frame order because ISIS orders frames as
+    # (destination, intermediate, ..., intermediate, source)
+    instrument_pointing['constant_frames'] = shortest_path(frame_chain, sensor_frame, destination_frame)
+    constant_rotation = frame_chain.compute_rotation(destination_frame, sensor_frame)
+    C = constant_rotation.rotation_matrix()
+    C = np.matmul(C, driver.cahvor_X)
+    C = np.matmul(C, M2R)
+    instrument_pointing['constant_rotation'] = C.flatten()
+    meta_data['instrument_pointing'] = instrument_pointing
+    
     instrument_position = {}
     positions, velocities, times = driver.sensor_position
+
+    # This is a bugfix for the fact that the left and right cameras are supposed
+    # to be on different locations on the rover. Get the CAHVOR center, and 
+    # convert it from that camera's coordinates to ECEF, then add it to the
+    # rover position.
+    # Mutiply numpy matrix M by positions
+    M2R2 = np.matmul(driver.cahvor_X, M2R)
+    Q = np.matmul(np.linalg.inv(M2R2), driver.cahvor_center)[0]
+    positions[0] += Q
+
+    # This is a fix for the fact that the height above datum can suddenly change
+    # by about 60 meters. If the user sets HEIGHT_ABOVE_DATUM then we will shift
+    # the position vertically to match this value.
+    key = 'HEIGHT_ABOVE_DATUM'
+    if key in os.environ:
+        x = positions[0]
+        datum_ht = 3396190
+        radius = np.sqrt(x[0]*x[0] + x[1]*x[1] + x[2]*x[2])
+        radius2 = float(os.environ[key]) + datum_ht
+        print("radius - radius 2", radius - radius2)
+        for it in range(3):
+            positions[0][it] = positions[0][it] * radius2 / radius
+
     instrument_position['spk_table_start_time'] = times[0]
     instrument_position['spk_table_end_time'] = times[-1]
     instrument_position['spk_table_original_size'] = len(times)
     instrument_position['ephemeris_times'] = times
+    
     # Rotate positions and velocities into J2000 then scale into kilometers
     velocities = j2000_rotation.rotate_velocity_at(positions, velocities, times)/1000
     positions = j2000_rotation.apply_at(positions, times)/1000
@@ -195,7 +226,6 @@ def to_isd(driver):
     sun_position["reference_frame"] = j2000_rotation.dest
 
     meta_data['sun_position'] = sun_position
-
 
     # check that there is a valid sensor model name
     if 'name_model' not in meta_data:
