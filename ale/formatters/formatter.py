@@ -166,11 +166,11 @@ def to_isd(driver):
     # Reverse the frame order because ISIS orders frames as
     # (destination, intermediate, ..., intermediate, source)
     instrument_pointing['constant_frames'] = shortest_path(frame_chain, sensor_frame, destination_frame)
-    constant_rotation = frame_chain.compute_rotation(destination_frame, sensor_frame)
-    C = constant_rotation.rotation_matrix()
-    C = np.matmul(C, driver.cahvor_X)
-    C = np.matmul(C, M2R)
-    instrument_pointing['constant_rotation'] = C.flatten()
+    # Find rotation from ECEF to camera. See rover_frame_rotation() for an explanation.
+    Cah = driver.cahvor_rotation_matrix
+    X = driver.rover_frame_rotation
+    EcefToCamera = np.matmul(np.matmul(Cah, X), M2R)
+    instrument_pointing['constant_rotation'] = EcefToCamera.flatten()
     meta_data['instrument_pointing'] = instrument_pointing
     
     instrument_position = {}
@@ -181,7 +181,7 @@ def to_isd(driver):
     # convert it from that camera's coordinates to ECEF, then add it to the
     # rover position.
     # Mutiply numpy matrix M by positions
-    M2R2 = np.matmul(driver.cahvor_X, M2R)
+    M2R2 = np.matmul(driver.rover_frame_rotation, M2R)
     Q = np.matmul(np.linalg.inv(M2R2), driver.cahvor_center)[0]
     positions[0] += Q
 
@@ -194,7 +194,6 @@ def to_isd(driver):
         datum_ht = 3396190
         radius = np.sqrt(x[0]*x[0] + x[1]*x[1] + x[2]*x[2])
         radius2 = float(os.environ[key]) + datum_ht
-        print("radius - radius 2", radius - radius2)
         for it in range(3):
             positions[0][it] = positions[0][it] * radius2 / radius
 
