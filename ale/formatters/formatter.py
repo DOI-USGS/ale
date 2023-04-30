@@ -93,7 +93,7 @@ def to_isd(driver):
     body_rotation = {}
     source_frame, destination_frame, time_dependent_target_frame = frame_chain.last_time_dependent_frame_between(target_frame, 1)
 
-    M2R = []
+    EcefToRover = []
     if source_frame != 1:
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
@@ -105,10 +105,12 @@ def to_isd(driver):
         body_rotation['ephemeris_times'] = time_dependent_rotation.times
         body_rotation['quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
         body_rotation['angular_velocities'] = time_dependent_rotation.av
-        Q = time_dependent_rotation.quats
-        #print("Time dependent rotation is ", time_dependent_rotation)
-        M2R_mat = Rotation.from_quat(Q)
-        M2R = M2R_mat.as_matrix() # mars to rover rotation
+
+        # Find the rotation from ECEF to the rover frame
+        EcefToRover = Rotation.from_quat(time_dependent_rotation.quats).as_matrix()
+        # It was found empirically that an additional rotation is needed
+        # TODO(oalexan1): Must read the NAIF doc and do an honest job.
+        EcefToRover = np.matmul(driver.rover_frame_rotation, EcefToRover)
 
     if source_frame != target_frame:
         # Reverse the frame order because ISIS orders frames as
@@ -140,7 +142,7 @@ def to_isd(driver):
     # reference frame should be the last frame in the chain
     instrument_pointing["reference_frame"] = instrument_pointing['time_dependent_frames'][-1]
 
-    # interiror orientation
+    # interior orientation
     meta_data['naif_keywords'] = driver.naif_keywords
 
     if isinstance(driver,LineScanner) or isinstance(driver, Framer) or isinstance(driver, PushFrame):
@@ -167,9 +169,8 @@ def to_isd(driver):
     # (destination, intermediate, ..., intermediate, source)
     instrument_pointing['constant_frames'] = shortest_path(frame_chain, sensor_frame, destination_frame)
     # Find rotation from ECEF to camera. See rover_frame_rotation() for an explanation.
-    Cah = driver.cahvor_rotation_matrix
-    X = driver.rover_frame_rotation
-    EcefToCamera = np.matmul(np.matmul(Cah, X), M2R)
+    roverToCamera = driver.cahvor_rotation_matrix
+    EcefToCamera = np.matmul(roverToCamera, EcefToRover)
     instrument_pointing['constant_rotation'] = EcefToCamera.flatten()
     meta_data['instrument_pointing'] = instrument_pointing
     
@@ -180,10 +181,8 @@ def to_isd(driver):
     # to be on different locations on the rover. Get the CAHVOR center, and 
     # convert it from that camera's coordinates to ECEF, then add it to the
     # rover position.
-    # Mutiply numpy matrix M by positions
-    M2R2 = np.matmul(driver.rover_frame_rotation, M2R)
-    Q = np.matmul(np.linalg.inv(M2R2), driver.cahvor_center)[0]
-    positions[0] += Q
+    camCtrEcef = np.matmul(np.linalg.inv(EcefToRover), driver.cahvor_center)[0]
+    positions[0] += camCtrEcef
 
     # This is a fix for the fact that the height above datum can suddenly change
     # by about 60 meters. If the user sets HEIGHT_ABOVE_DATUM then we will shift
