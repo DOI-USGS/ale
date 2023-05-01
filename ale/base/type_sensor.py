@@ -393,6 +393,15 @@ class Cahvor():
       """
       raise NotImplementedError
 
+    @property
+    def sensor_position(self):
+      positions, velocities, times = super().sensor_position
+      positions += self.cahvor_camera_dict["C"]
+      if self._props.get("landed", False):
+        positions = np.array([[0, 0, 0]] * len(times))
+        velocities = np.array([[0, 0, 0]] * len(times))
+      return positions, velocities, times
+
     def compute_h_c(self):
         """
         Computes the h_c element of a cahvor model for the conversion
@@ -458,7 +467,10 @@ class Cahvor():
             v_s = self.compute_v_s()
             H_prime = (self.cahvor_camera_dict['H'] - h_c * self.cahvor_camera_dict['A'])/h_s
             V_prime = (self.cahvor_camera_dict['V'] - v_c * self.cahvor_camera_dict['A'])/v_s
-            self._cahvor_rotation_matrix = np.array([H_prime, V_prime, self.cahvor_camera_dict['A']])
+            if self._props.get("landed", False):
+              self._cahvor_rotation_matrix = np.array([H_prime, -V_prime, -self.cahvor_camera_dict['A']])
+            else:
+              self._cahvor_rotation_matrix = np.array([H_prime, V_prime, self.cahvor_camera_dict['A']])
         return self._cahvor_rotation_matrix
 
     @property
@@ -479,10 +491,11 @@ class Cahvor():
                                                       ephemeris_times=self.ephemeris_time,
                                                       nadir=False, exact_ck_times=False)
             cahvor_quats = Rotation.from_matrix(self.cahvor_rotation_matrix).as_quat()
-            #cahvor_rotation = ConstantRotation(cahvor_quats, self.final_inst_frame, self.#sensor_frame_id)
-            cahvor_rotation = ConstantRotation(cahvor_quats, self.target_frame_id,
-                                               self.sensor_frame_id)
-
+            # If we are landed we only care about the final cahvor frame relative to the target
+            if self._props.get("landed", False):
+              cahvor_rotation = ConstantRotation(cahvor_quats, self.target_frame_id, self.sensor_frame_id)
+            else:
+              cahvor_rotation = ConstantRotation(cahvor_quats, self.final_inst_frame, self.sensor_frame_id)
             self._frame_chain.add_edge(rotation = cahvor_rotation)
         return self._frame_chain
 

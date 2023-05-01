@@ -120,7 +120,7 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         : list<double>
           focal plane to detector samples
         """
-        return [0, 1/self.pixel_size, 0]
+        return [0, -1/self.pixel_size, 0]
 
     # The detector_center_line() and detector_center_sample()
     # functions from Cahvor() will be invoked. There is no need to
