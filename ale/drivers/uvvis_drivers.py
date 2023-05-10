@@ -21,7 +21,7 @@ class UvvisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, 
     """
     Driver for reading Ultra-violet Invisible Spectrum ISIS3 Labels
     """
-
+    
     @property
     def instrument_id(self):
         """
@@ -37,11 +37,10 @@ class UvvisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, 
           instrument id
         """
         lookup_table = {
-        "MSI": "NEAR EARTH ASTEROID RENDEZVOUS"
+        "UVVIS": "ULTRAVIOLET/VISIBLE CAMERA"
         }
-        print(lookup_table[super().instrument_id])
         return lookup_table[super().instrument_id]
-    
+
     @property
     def sensor_name(self):
         """
@@ -52,7 +51,20 @@ class UvvisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, 
         : str
           instrument name
         """
-        return "UVVIS"
+        filter = self.label["IsisCube"]['BandBin']['FilterName']
+        return "CLEM_" + super().instrument_id + "_" + filter
+
+    @property
+    def spacecraft_name(self):
+        """
+        Returns the name of the spacecraft
+
+        Returns
+        -------
+        : str
+          spacecraft name
+        """
+        return super().spacecraft_name.replace(" ", "_")
 
     @property
     def sensor_model_version(self):
@@ -67,38 +79,22 @@ class UvvisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, 
         return 1
 
     @property
-    def spacecraft_clock_start_count(self):
-        """
-        The spacecraft clock start count, frequently used to determine the start time
-        of the image.
-
-        Returns
-        -------
-        : str
-          spacecraft clock start count
-        """
-        if "SpacecraftClockStartCount" in self.label["IsisCube"]["Instrument"]:
-            return str(
-                self.label["IsisCube"]["Instrument"]["SpacecraftClockStartCount"])
-        else:
-            return None
-
+    def ephemeris_start_time(self):
+        return spice.utc2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
+        
     @property
-    def spacecraft_clock_stop_count(self):
+    def ephemeris_stop_time(self):
         """
-        The spacecraft clock stop count, frequently used to determine the stop time
-        of the image.
-
+        Returns the sum of the starting ephemeris time and the exposure duration.
+        Expects ephemeris start time and exposure duration to be defined. These
+        should be double precision numbers containing the ephemeris start and
+        exposure duration of the image.
         Returns
         -------
-        : str
-          spacecraft clock stop count
+        : double
+          Ephemeris stop time for an image
         """
-        if "SpacecraftClockStopCount" in self.label["IsisCube"]["Instrument"]:
-            return str(
-                self.label["IsisCube"]["Instrument"]["SpacecraftClockStopCount"])
-        else:
-            return None
+        return self.ephemeris_start_time + self.exposure_duration
 
     @property
     def ikid(self):
