@@ -1,4 +1,5 @@
 import warnings
+import asyncio
 
 import numpy as np
 import pyspiceql
@@ -9,7 +10,7 @@ import ale
 from ale.base import spiceql_mission_map
 from ale.transformation import FrameChain
 from ale.rotation import TimeDependentRotation
-from ale import kernel_access
+from ale import spiceql_access
 from ale import util
 
 class NaifSpice():
@@ -108,7 +109,9 @@ class NaifSpice():
     @property
     def search_kernels(self):
         if not hasattr(self, "_search_kernels"):
-            self._search_kernels = self.kernels == []
+            self._search_kernels = False
+            if not self.kernels and self.use_web:
+                self._search_kernels = True
         return self._search_kernels
                 
     @property
@@ -455,32 +458,35 @@ class NaifSpice():
             # location of the target. For more information, see:
             # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
             if self.correct_lt_to_surface and self.light_time_correction.upper() == 'LT+S':
-                obs_tars = self.spiceql_call("getTargetStates",{"ets": ephem,
-                                                                "target": target,
-                                                                "observer": observer,
-                                                                "frame": "J2000",
-                                                                "abcorr": self.light_time_correction,
-                                                                "mission": self.spiceql_mission})
+                kwargs = {"target": target,
+                          "observer": observer,
+                          "frame": "J2000",
+                          "abcorr": self.light_time_correctio,
+                          "mission": self.spiceql_mission,
+                          "searchKernels": self.search_kernels}
+                obs_tars = asyncio.run(spiceql_access.get_ephem_data(ephem, "getTargetStates", **kwargs, web=self.use_web))
                 obs_tar_lts = np.array(obs_tars)[:,-1]
 
                 # ssb to spacecraft
-                ssb_obs = self.spiceql_call("getTargetStates",{"ets": ephem,
-                                                               "target": target,
-                                                               "observer": "SSB",
-                                                               "frame": "J2000",
-                                                               "abcorr": "NONE",
-                                                               "mission": self.spiceql_mission})
+                kwargs = {"target": target,
+                          "observer": "SSB",
+                          "frame": "J2000",
+                          "abcorr": "NONE",
+                          "mission": self.spiceql_mission,
+                          "searchKernels": self.search_kernels}
+                ssb_obs = asyncio.run(spiceql_access.get_ephem_data(ephem, "getTargetStates", **kwargs, web=self.use_web))
                 ssb_obs_states = np.array(ssb_obs)[:,0:6]
 
                 radius_lt = (self.target_body_radii[2] + self.target_body_radii[0]) / 2 / (scipy.constants.c/1000.0)
                 adjusted_time = np.array(ephem) - obs_tar_lts + radius_lt
 
-                ssb_tars = self.spiceql_call("getTargetStates",{"ets": adjusted_time,
-                                                                "target": target,
-                                                                "observer": "SSB",
-                                                                "frame": "J2000",
-                                                                "abcorr": "NONE",
-                                                                "mission": self.spiceql_mission})
+                kwargs = {"target": target,
+                          "observer": "SSB",
+                          "frame": "J2000",
+                          "abcorr": "NONE",
+                          "mission": self.spiceql_mission,
+                          "searchKernels": self.search_kernels}
+                ssb_tars = asyncio.run(spiceql_access.get_ephem_data(adjusted_time, "getTargetStates", **kwargs, web=self.use_web))
                 ssb_tar_state = np.array(ssb_tars)[:,0:6]
                 _states = ssb_tar_state - ssb_obs_states
                 states = []
@@ -489,12 +495,13 @@ class NaifSpice():
                     state = spice.mxvg(matrix, state)
                     states.append(state)
             else:
-                states = self.spiceql_call("getTargetStates",{"ets": ephem,
-                                                              "target": target,
-                                                              "observer": observer,
-                                                              "frame": self.reference_frame,
-                                                              "abcorr": self.light_time_correction,
-                                                              "mission": self.spiceql_mission})
+                kwargs = {"target": target,
+                          "observer": observer,
+                          "frame": self.reference_frame,
+                          "abcorr": self.light_time_correction,
+                          "mission": self.spiceql_mission,
+                          "searchKernels": self.search_kernels}
+                states = asyncio.run(spiceql_access.get_ephem_data(ephem, "getTargetStates", **kwargs, web=self.use_web))
                 states = np.array(states)[:,0:6]
 
             for state in states:
@@ -737,7 +744,7 @@ class NaifSpice():
         : json
           Json data from the SpiceQL call
         """
-        # Ideally this would work if a user passed no kernels but still
-        # set ISISDATA
+        # This will work if a user passed no kernels but still set ISISDATA
+        # just might take a bit
         function_args["searchKernels"] = self.search_kernels
-        return kernel_access.spiceql_call(function_name, function_args, self.use_web)
+        return spiceql_access.spiceql_call(function_name, function_args, self.use_web)

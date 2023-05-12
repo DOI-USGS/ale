@@ -1,9 +1,15 @@
+import asyncio
+import aiohttp
+
 import numpy as np
 from numpy.polynomial.polynomial import polyval
 import networkx as nx
 from networkx.algorithms.shortest_paths.generic import shortest_path
+import spiceypy as spice
 
-from ale.kernel_access import spiceql_call
+import pyspiceql
+
+from ale.spiceql_access import get_ephem_data, async_spiceql_call, spiceql_call
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
 def create_rotations(rotation_table):
@@ -117,8 +123,13 @@ class FrameChain(nx.DiGraph):
         sensor_times = []
         if exact_ck_times and len(ephemeris_times) > 1 and not nadir:
             try:
-                sensor_times = cls.extract_exact_ck_times(ephemeris_times[0] + inst_time_bias, ephemeris_times[-1] + inst_time_bias, sensor_frame)
+                sensor_times = spiceql_call("extractExactCkTimes", {"observStart": ephemeris_times[0] + inst_time_bias, 
+                                                                    "observStop": ephemeris_times[-1] + inst_time_bias, 
+                                                                    "targetFrame": sensor_frame,
+                                                                    "searchKernels": frame_chain.search_kernels})
             except Exception as e:
+                print("BANANANANA \n\n")
+                print(e)
                 pass
 
         if (len(sensor_times) == 0):
@@ -126,16 +137,9 @@ class FrameChain(nx.DiGraph):
             if isinstance(sensor_times, np.ndarray):
                 sensor_times = sensor_times.tolist()
 
-        sensor_time_dependent_frames, sensor_constant_frames = spiceql_call("frameTrace", {"et": center_ephemeris_time, 
-                                                                                           "initialFrame": sensor_frame,
-                                                                                           "mission": mission,
-                                                                                           "searchKernels": frame_chain.search_kernels},
-                                                                                           frame_chain.use_web)
-        target_time_dependent_frames, target_constant_frames = spiceql_call("frameTrace", {"et": center_ephemeris_time, 
-                                                                                           "initialFrame": target_frame,
-                                                                                           "mission": mission,
-                                                                                           "searchKernels": frame_chain.search_kernels},
-                                                                                           frame_chain.use_web)
+        frames = asyncio.run(frame_chain.frame_trace(center_ephemeris_time, sensor_frame, target_frame, mission))
+        sensor_time_dependent_frames, sensor_constant_frames = frames[0]
+        target_time_dependent_frames, target_constant_frames = frames[1]
 
         sensor_time_dependent_frames = list(zip(sensor_time_dependent_frames[:-1], sensor_time_dependent_frames[1:]))
         constant_frames = list(zip(sensor_constant_frames[:-1], sensor_constant_frames[1:]))
@@ -145,86 +149,38 @@ class FrameChain(nx.DiGraph):
         constant_frames.extend(target_constant_frames)
 
         # Add all time dependent frame chains to the graph
-        frame_chain.compute_time_dependent_rotiations(sensor_time_dependent_frames, sensor_times, inst_time_bias, mission, use_web=use_web)
-        frame_chain.compute_time_dependent_rotiations(target_time_dependent_frames, target_times, 0, mission, use_web=use_web)
-
-        # Add all constant frame chains to the graph
-        for s, d in constant_frames:
-            quats = np.zeros(4)
-            quat_and_av = spiceql_call("getTargetOrientations",{"ets": [ephemeris_times[0]],
-                                                                "toFrame": d,
-                                                                "refFrame": s,
-                                                                "mission": mission,
-                                                                "searchKernels": frame_chain.search_kernels},
-                                                                use_web=use_web)[0]
-            quats[:3] = quat_and_av[1:4]
-            quats[3] = quat_and_av[0]
-
-            rotation = ConstantRotation(quats, s, d)
-
-            frame_chain.add_edge(rotation=rotation)
+        asyncio.run(frame_chain.generate_time_dependent_rotiations(sensor_time_dependent_frames, sensor_times, inst_time_bias, mission))
+        asyncio.run(frame_chain.generate_time_dependent_rotiations(target_time_dependent_frames, target_times, 0, mission))
+        asyncio.run(frame_chain.generate_constant_rotations(constant_frames, ephemeris_times[0], mission))
 
         return frame_chain
 
-    @staticmethod
-    def frame_trace(reference_frame, ephemeris_time, nadir=False):
-        if nadir:
-            return [], []
-
-        frame_codes = [reference_frame]
-        _, frame_type, _ = spice.frinfo(frame_codes[-1])
-        frame_types = [frame_type]
-
-
-        while(frame_codes[-1] != 1):
-            try:
-                center, frame_type, frame_type_id = spice.frinfo(frame_codes[-1])
-            except Exception as e:
-                print(e)
-                break
-
-            if frame_type == 1 or frame_type == 2:
-                frame_code = 1
-
-            elif frame_type == 3:
-                try:
-                    matrix, frame_code = spice.ckfrot(frame_type_id, ephemeris_time)
-                except:
-                    raise Exception(f"The ck rotation from frame {frame_codes[-1]} can not " +
-                                    f"be found due to no pointing available at requested time {ephemeris_time} " +
-                                     "or a problem with the frame")
-            elif frame_type == 4:
-                try:
-                    matrix, frame_code = spice.tkfram(frame_type_id)
-                except:
-                    raise Exception(f"The tk rotation from frame {frame_codes[-1]} can not " +
-                                     "be found")
-            elif frame_type == 5:
-                matrix, frame_code = spice.zzdynrot(frame_type_id, center, ephemeris_time)
-
-            else:
-                raise Exception(f"The frame {frame_codes[-1]} has a type {frame_type_id} " +
-                                  "not supported by your version of Naif Spicelib. " +
-                                  "You need to update.")
-
-            frame_codes.append(frame_code)
-            frame_types.append(frame_type)
-        constant_frames = []
-        while frame_codes:
-            if frame_types[0] == 4:
-                constant_frames.append(frame_codes.pop(0))
-                frame_types.pop(0)
-            else:
-                break
-
-        time_dependent_frames = []
-        if len(constant_frames) != 0:
-            time_dependent_frames.append(constant_frames[-1])
-
-        while frame_codes:
-            time_dependent_frames.append(frame_codes.pop(0))
-
-        return time_dependent_frames, constant_frames
+    async def frame_trace(self, time, sensorFrame, targetFrame, mission, nadir=False):
+        if not self.use_web:
+            results = [pyspiceql.frameTrace(time, sensorFrame, mission, searchKernels=self.search_kernels)]
+            results.append(pyspiceql.frameTrace(time, targetFrame, mission, searchKernels=self.search_kernels))
+            return results
+        tasks = []
+        async with aiohttp.ClientSession() as session:
+            tasks.append(asyncio.create_task(async_spiceql_call(session,
+                                                                "frameTrace", 
+                                                                {"et": time, 
+                                                                 "initialFrame": sensorFrame,
+                                                                 "mission": mission,
+                                                                 "searchKernels": self.search_kernels},
+                                                                 use_web=self.use_web)))
+            tasks.append(asyncio.create_task(async_spiceql_call(session,
+                                                                "frameTrace", 
+                                                                {"et": time, 
+                                                                 "initialFrame": targetFrame,
+                                                                 "mission": mission,
+                                                                 "searchKernels": self.search_kernels},
+                                                                 use_web=self.use_web)))
+            responses = await asyncio.gather(*tasks)
+        results = []
+        for response in responses:
+            results.append(response)
+        return results
 
     @classmethod
     def from_isis_tables(cls, *args, inst_pointing={}, body_orientation={}, **kwargs):
@@ -327,15 +283,18 @@ class FrameChain(nx.DiGraph):
         """
         times = []
 
-        FILESIZ = 128;
-        TYPESIZ = 32;
-        SOURCESIZ = 128;
+        FILESIZ = 128
+        TYPESIZ = 32
+        SOURCESIZ = 128
 
         currentTime = observStart
 
         count = spice.ktotal("ck")
         if (count > 1):
             msg = "Unable to get exact CK record times when more than 1 CK is loaded, Aborting"
+            raise Exception(msg)
+        elif (count < 1):
+            msg = "No CK kernels loaded, Aborting"
             raise Exception(msg)
 
         _, _, _, handle = spice.kdata(0, "ck", FILESIZ, TYPESIZ, SOURCESIZ)
@@ -407,7 +366,7 @@ class FrameChain(nx.DiGraph):
 
         return times
 
-    def compute_time_dependent_rotiations(self, frames, times, time_bias, mission="", use_web=False):
+    async def generate_time_dependent_rotiations(self, frames, times, time_bias, mission=""):
         """
         Computes the time dependent rotations based on a list of tuples that define the
         relationships between frames as (source, destination) and a list of times to
@@ -420,15 +379,16 @@ class FrameChain(nx.DiGraph):
         times : list
                 A list of times to compute the rotation at
         """
+        frame_tasks = []
         for s, d in frames:
+            kwargs = {"toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels}
+            frame_tasks.append(asyncio.create_task(get_ephem_data(times, "getTargetOrientations", **kwargs, web=self.use_web)))
+        quats_and_avs_per_frame = await asyncio.gather(*frame_tasks)
+
+        for i, frame in enumerate(frames):
+            quats_and_avs = quats_and_avs_per_frame[i]
             quats = np.zeros((len(times), 4))
             avs = []
-            quats_and_avs = spiceql_call("getTargetOrientations",{"ets": times,
-                                                                  "toFrame": d,
-                                                                  "refFrame": s,
-                                                                  "mission": mission,
-                                                                  "searchKernels": self.search_kernels},
-                                                                  use_web=self.use_web)
             _quats = np.array(quats_and_avs)[:, 0:4]
             for j, quat in enumerate(_quats):
                 quats[j,:3] = quat[1:]
@@ -440,5 +400,23 @@ class FrameChain(nx.DiGraph):
             if len(avs) == 0:
                 avs = None
             biased_times = [time - time_bias for time in times]
-            rotation = TimeDependentRotation(quats, biased_times, s, d, av=avs)
+            rotation = TimeDependentRotation(quats, biased_times, frame[0], frame[1], av=avs)
+            self.add_edge(rotation=rotation)
+
+    async def generate_constant_rotations(self, frames, time, mission):
+        frame_tasks = []
+        for s, d in frames:
+            kwargs = {"toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels}
+            frame_tasks.append(asyncio.create_task(get_ephem_data([time], "getTargetOrientations", **kwargs, web=self.use_web)))
+        quats_and_avs_per_frame = await asyncio.gather(*frame_tasks)
+
+        # Add all constant frame chains to the graph
+        for i, frame in enumerate(frames):
+            quats = np.zeros(4)
+            quat_and_av = quats_and_avs_per_frame[i][0]
+            quats[:3] = quat_and_av[1:4]
+            quats[3] = quat_and_av[0]
+
+            rotation = ConstantRotation(quats, frame[0], frame[1])
+
             self.add_edge(rotation=rotation)
