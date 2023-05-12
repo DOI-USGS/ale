@@ -578,7 +578,7 @@ class MroHiRiseIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radia
 
             # The -74999 is the code to select the transformation from
             # high-precision MRO SCLK to ET
-            start_time = spice.scs2e(-74999, self.spacecraft_clock_start_count)
+            start_time = self.spiceql_call("strSclkToEt", {"frameCode": -74999, "sclk": self.spacecraft_clock_start_count, "mission": self.spiceql_mission})
             # Adjust the start time so that it is the effective time for
             # the first line in the image file.  Note that on 2006-03-29, this
             # time is now subtracted as opposed to adding it.  The computed start
@@ -618,7 +618,7 @@ class MroHiRiseIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radia
         """
         if not hasattr(self, "_ccd_ikid"):
             ccd_number = hirise_ccd_lookup[self.label["IsisCube"]["Instrument"]["CpmmNumber"]]
-            self._ccd_ikid = spice.bods2c("MRO_HIRISE_CCD{}".format(ccd_number))
+            self._ccd_ikid = self.spiceql_call("translateNameToCode", {"frame": "MRO_HIRISE_CCD{}".format(ccd_number), "mission": self.spiceql_mission})
         return self._ccd_ikid
 
     @property
@@ -672,7 +672,7 @@ class MroHiRiseIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radia
         : dict
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
-        return {**super().naif_keywords, **util.query_kernel_pool(f"*{self.ccd_ikid}*")}
+        return {**super().naif_keywords, **self.spiceql_call("findMissionKeywords", {"key": f"*{self.ccd_ikid}*", "mission": self.spiceql_mission})}
 
     @property
     def sensor_model_version(self):

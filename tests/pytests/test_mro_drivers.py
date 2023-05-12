@@ -1,7 +1,7 @@
 import os
 import json
 import unittest
-from unittest.mock import PropertyMock, patch
+from unittest.mock import PropertyMock, patch, call
 
 import pytest
 
@@ -127,14 +127,20 @@ class test_ctx_isis_naif(unittest.TestCase):
         assert self.driver.sensor_name == "CONTEXT CAMERA"
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.mro_drivers.spice.scs2e', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-74, 12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12345
-            scs2e.assert_called_with(-74, '0928283918:060')
+            calls = [call('translateNameToCode', {'frame': 'MRO', 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': -74, 'sclk': '0928283918:060', 'mission': 'ctx', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            spiceql_call.call_count == 2
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.drivers.mro_drivers.spice.scs2e', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-74, 12345]) as spiceql_call:
             assert self.driver.ephemeris_stop_time == (12345 + self.driver.exposure_duration * self.driver.image_lines)
-            scs2e.assert_called_with(-74, '0928283918:060')
+            calls = [call('translateNameToCode', {'frame': 'MRO', 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': -74, 'sclk': '0928283918:060', 'mission': 'ctx', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            spiceql_call.call_count == 2
 
     def test_spacecraft_name(self):
         assert self.driver.spacecraft_name == "MRO"
@@ -143,10 +149,15 @@ class test_ctx_isis_naif(unittest.TestCase):
         assert self.driver.detector_start_sample == 0
 
     def test_detector_center_sample(self):
-        with patch('ale.drivers.mro_drivers.spice.bods2c', return_value='-499') as bodsc, \
-             patch('ale.drivers.mro_drivers.spice.gdpool', return_value=[12345]) as gdpool:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-499, {"frameCode":[-499]}, -74021, {'INS-74021_BORESIGHT_SAMPLE': 12345}, {}]) as spiceql_call:
             assert self.driver.detector_center_sample == 12345 - .5
-            gdpool.assert_called_with('INS-499_BORESIGHT_SAMPLE', 0, 1)
+            calls = [call('translateNameToCode', {'frame': 'Mars', 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('getTargetFrameInfo', {'targetId': -499, 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('translateNameToCode', {'frame': 'MRO_CTX', 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('findMissionKeywords', {'key': '*-74021*', 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('findTargetKeywords', {'key': '*-499*', 'mission': 'ctx', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            spiceql_call.call_count == 5
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
@@ -168,10 +179,15 @@ class test_ctx_pds_naif(unittest.TestCase):
         assert self.driver.detector_start_sample == 0
 
     def test_detector_center_sample(self):
-        with patch('ale.drivers.mro_drivers.spice.bods2c', return_value='-499') as bodsc, \
-             patch('ale.drivers.mro_drivers.spice.gdpool', return_value=[12345]) as gdpool:
-             assert self.driver.detector_center_sample == 12345 - .5
-             gdpool.assert_called_with('INS-499_BORESIGHT_SAMPLE', 0, 1)
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-499, {"frameCode":[-499]}, -74021, {'INS-74021_BORESIGHT_SAMPLE': 12345}, {}]) as spiceql_call:
+            assert self.driver.detector_center_sample == 12345 - .5
+            calls = [call('translateNameToCode', {'frame': 'MARS', 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('getTargetFrameInfo', {'targetId': -499, 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('translateNameToCode', {'frame': 'MRO_CTX', 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('findMissionKeywords', {'key': '*-74021*', 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('findTargetKeywords', {'key': '*-499*', 'mission': 'ctx', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            spiceql_call.call_count == 5
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
@@ -197,17 +213,17 @@ class test_hirise_isis_naif(unittest.TestCase):
         assert self.driver.un_binned_rate == 0.0000836875
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.mro_drivers.spice.scs2e', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12344.997489375
-            scs2e.assert_called_with(-74999, '848201291:62546')
+            spiceql_call.assert_called_with('strSclkToEt', {'frameCode': -74999, 'sclk': '848201291:62546', 'mission': 'hirise', 'searchKernels': False}, False)
 
     def test_exposure_duration(self):
         assert self.driver.exposure_duration == 0.00033475
 
     def test_ccd_ikid(self):
-        with patch('ale.drivers.mro_drivers.spice.bods2c', return_value=12345) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', return_value=12345) as spiceql_call:
             assert self.driver.ccd_ikid == 12345
-            bods2c.assert_called_with('MRO_HIRISE_CCD12')
+            spiceql_call.assert_called_with('translateNameToCode', {'frame': 'MRO_HIRISE_CCD12', 'mission': 'hirise', 'searchKernels': False}, False)
 
     def test_sensor_frame_id(self):
         assert self.driver.sensor_frame_id == -74690
