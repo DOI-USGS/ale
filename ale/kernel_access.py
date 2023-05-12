@@ -1,15 +1,19 @@
+from collections import OrderedDict
 from glob import glob
-from itertools import groupby
+from itertools import groupby, chain
 import os
 from os import path
-import requests
+import re
 import warnings
 
 import numpy as np
-import pyspiceql
+import pvl
 
 from ale import spice_root
 from ale.util import get_isis_preferences
+from ale.util import get_isis_mission_translations
+from ale.util import read_pvl
+from ale.util import search_isis_db
 
 def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=set()):
     """
@@ -140,6 +144,30 @@ def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
         raise KeyError(f'{cubelabel}, Could not find kernels group, input cube [{cube}] may not be spiceinited')
 
     return get_kernels_from_isis_pvl(kernel_group, expand, format_as)
+
+
+def dict_to_lower(d):
+    return {k.lower():v if not isinstance(v, dict) else dict_to_lower(v) for k,v in d.items()}
+
+
+def expandvars(path, env_dict=os.environ, default=None, case_sensitive=True):
+    if env_dict != os.environ:
+        env_dict = dict_merge(env_dict, os.environ)
+
+    while "$" in path:
+        user_dict = env_dict if case_sensitive else dict_to_lower(env_dict)
+
+        def replace_var(m):
+            group1 = m.group(1) if case_sensitive else m.group(1).lower()
+            val = user_dict.get(m.group(2) or group1 if default is None else default)
+            if not val:
+                raise KeyError(f"Failed to evaluate {m.group(0)} from env_dict. " + 
+                               f"Should {m.group(0)} be an environment variable?")
+
+            return val
+        reVar = r'\$(\w+|\{([^}]*)\})'
+        path = re.sub(reVar, replace_var, path)
+    return path
 
 
 def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
@@ -309,69 +337,37 @@ def find_kernels(cube, isis_data, format_as=dict):
         return kernels
 
 
-def spiceql_call(function_name = "", function_args = {}, use_web=False):
-    """
-    Interface to SpiceQL (Spice Query Library) for both Offline and Online use
+def write_metakernel_from_cube(cube, mkpath=None):
+    # add ISISPREF paths as path_symbols and path_values to avoid custom expand logic
+    pvlprefs = get_isis_preferences()
 
-    This function will access the value passed through props defined as `web`. This
-    value determines the access pattern for spice data. When set to Online, you will
-    access the SpiceQL service provided through the USGS Astro AWS platform. This service
-    performs kernel and data aquisition. If set to Offline, you will access locally loaded
-    kernels, and SpiceQL will do no searching for you.
+    kernels = generate_kernels_from_cube(cube)
 
-    Parameters
-    ----------
-    functions_name : str
-                        String defineing the function to call, properly exposed SpiceQL
-                        functions should map 1-to-1 with endpoints on the service
-                    
-    function_args : dict
-                    Dictionary of arguments used by the function
+    # make sure kernels are mk strings
+    kernels = ["'"+k+"'" for k in kernels]
 
-    Returns : any
-                Any return from a SpiceQL function
-    """
-    if not use_web:
-        func = getattr(pyspiceql, function_name)
+    paths = OrderedDict(pvlprefs['DataDirectory'])
+    path_values = ["'"+os.path.expandvars(path)+"'" for path in paths.values()]
+    path_symbols = ["'"+symbol.lower()+"'" for symbol in paths.keys()]
 
-        # Ensure that in offline mode we anticipate the user loading/passing their own kernels
-        # to ALE
-        return func(**function_args)
+    body = '\n\n'.join([
+        'KPL/MK',
+        f'Metakernel Generated from an ISIS cube: {cube}',
+        '\\begindata',
+        'PATH_VALUES = (',
+        '\n'.join(path_values),
+        ')',
+        'PATH_SYMBOLS = (',
+        '\n'.join(path_symbols),
+        ')',
+        'KERNELS_TO_LOAD = (',
+        '\n'.join(kernels),
+        ')',
+        '\\begintext'
+    ])
 
-    url = "https://spiceql-dev.prod-asc.chs.usgs.gov/v1/"
-    url += function_name
-    headers = {
-        'accept': '*/*',
-        'Content-Type': 'application/json'
-    }
+    if mkpath is not None:
+        with open(mkpath, 'w') as f:
+            f.write(body)
 
-    # Convert any lists being passed over the wire to strings
-    clean_function_args = function_args
-    for key, value in function_args.items():
-        if isinstance(value, list) or isinstance(value, np.ndarray):
-            clean_function_args[key] = str(value)
-
-    r = requests.get(url, params=clean_function_args, headers=headers, verify=False)
-    r.raise_for_status()
-    response = r.json()
-
-    if r.status_code != 200:
-        raise requests.HTTPError(f"Recieved code {response['statusCode']} from spice server, with error: {response}")
-    elif response["statusCode"] != 200:
-        raise requests.HTTPError(f"Recieved code {response['statusCode']} from spice server, with error: {response}")
-    return response["body"]["return"]
-
-    # Code for accessing SpiceQL docker container
-    # try:
-    #     url = "http://localhost:9000/2015-03-31/functions/function/invocations"
-    #     headers = {
-    #         'Content-Type': 'application/x-www-form-urlencoded',
-    #     }
-    #     function_args["func"] = function_name
-    #     r = requests.get(url, data=json.dumps(function_args), headers=headers, verify=False)
-    #     r.raise_for_status()
-    #     if r.json()["statusCode"] != 200:
-    #         raise requests.HTTPError(f"Recieved code {r.json()['statusCode']} from spice server, with error: {r.json()}")
-    #     return r.json()["body"]["return"]
-    # except requests.exceptions.HTTPError as err:
-    #     raise err
+    return body
