@@ -1,3 +1,4 @@
+import spiceypy as spice
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
@@ -22,7 +23,7 @@ class HayabusaAmicaIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Radial
     @property
     def sensor_model_version(self):
         """
-        The ISIS Sensor model number for HiRise in ISIS. This is likely just 1
+        The ISIS Sensor model number for Hayabusa Amica in ISIS. This is likely just 1
 
         Returns
         -------
