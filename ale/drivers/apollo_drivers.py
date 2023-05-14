@@ -107,7 +107,7 @@ class ApolloMetricIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDisto
         : str
           Spacecraft clock start count
         """
-        return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")) + self.exposure_duration
+        return self.ephemeris_start_time + self.exposure_duration
 
     @property
     def detector_center_line(self):
