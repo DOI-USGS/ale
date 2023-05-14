@@ -21,8 +21,8 @@
   "starting_ephemeris_time": 487928588.0336103,
   "center_ephemeris_time": 487928745.5376103,
   "radii": {
-    "semimajor": 1195.0,
-    "semiminor": 1195.0,
+    "semimajor": 1188.3,
+    "semiminor": 1188.3,
     "unit": "km"
   },
   "body_rotation": {
@@ -4527,9 +4527,9 @@
   },
   "naif_keywords": {
     "BODY999_RADII": [
-      1195.0,
-      1195.0,
-      1195.0
+      1188.3,
+      1188.3,
+      1188.3
     ],
     "BODY_FRAME_CODE": 10019,
     "BODY_CODE": 999,

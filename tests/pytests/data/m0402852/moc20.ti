@@ -1,0 +1,887 @@
+KPL/IK
+
+MOC Instrument Kernel
+===========================================================================
+ 
+   This Mars Orbiter Camera (MOC) instrument kernel (I-kernel) contains
+   the instrument mounting offset, fields-of-view specifications, and optics 
+   and detector parameters. 
+
+
+Version and Date
+--------------------------------------------------------
+ 
+   Version 2.0 -- September 6, 2001
+
+      Substantially changed the kernel, including:
+
+         -- assigned unique ID codes to NA, WA/RED and WA/BLUE cameras;
+
+         -- replaced all keywords using old MOC ID with new keywords 
+            using new individual camera IDs;
+
+         -- incorporated in-flight calibrated mounting offsets;
+
+         -- defined and described individual camera frames and filled
+            the definitions with in-flight calibrated mounting offsets;
+
+         -- incorporated in-flight calibrated optical distortion models;
+
+         -- included additional optics and detector parameters;
+
+         -- added SPICE FOV definition for each camera;
+
+   Version 1.3 -- September 18, 1998
+     
+      A few typos were corrected.
+ 
+   Version 1.2 -- August 11, 1997
+
+      Frame definition was corrected to represent the correct
+      transformation sense.
+
+   Version 1.1 -- June 19, 1997
+
+      The MOC frame definition section was added to support utilization of 
+      the SPICE system FRAMES capabilities. 
+
+   Version 1.0 -- November 26, 1996
+
+      Initial Release.
+
+
+References
+--------------------------------------------------------
+
+   1.   ``MGS Alignment Transformation'', by Richard A. Hund, 
+        November 26, 1996.
+
+   2.   ``MGS Payload Data Sheet'' by C.Kloss, October 31, 1995,
+
+   3.   ``C-kernel Required Reading''
+
+   4.   ``Kernel Pool Required Reading''
+
+   5.   ``Frames Required Reading''
+
+   6.   ``Mars Global Surveyor Project Mission Plan'', Final Version,
+        Rev. A (MGS 542-405), July 1996
+
+   7.   R.L.Kirk et al. ``Geometric Calibration of the Mars Orbiter
+        Cameras and Coalignment with Mars Orbiter Laser Altimeter.''
+        LPSC XXXII (2001)
+
+   8 .  M.Caplinger. ``Mars Orbiter Camera'' PDS Instrument Template. 
+        1998-11-02  
+ 
+   9 .  "Pre-environmental Acceptance Test Procedure, Mars
+        Observer Camera, Flight Unit Test Report, Appendix 4, S/N 2", OCA
+        document, 8/24/94.
+
+   10.  R.L.Kirk. MOCWRB_LOOKVEC.XLS Spreadsheet. July 2001
+ 
+   11.  M.Caplinger. Personal communications. July-August 2001
+
+   12.  R.L.Kirk. Review Comments. August 2001
+ 
+ 
+Implementation Notes
+--------------------------------------------------------
+ 
+   This file is used by the SPICE system as follows: programs that make
+   use of this I-kernel must `load' the kernel, normally during program
+   initialization. Loading the kernel associates data items with their
+   names in a data structure called the `kernel pool'. The SPICELIB
+   routine FURNSH loads a kernel file into the pool as shown below.
+
+      CALL FURNSH ( I_kernel_name )
+
+   In order for a program to extract data from the pool, the SPICELIB 
+   routines GDPOOL and GIPOOL are used. See [4] for more details.
+
+   This file was created and may be updated with a text editor or word
+   processor.
+
+
+MOC Camera NAIF IDs
+--------------------------------------------------------
+
+   The following NAIF IDs are assigned to individual MOC cameras:
+
+      Camera              NAIF ID
+      ---------------------------
+      Narrow angle        -94031
+      Wide angle red      -94032
+      Wide angle blue     -94033
+      ---------------------------
+
+   These replace the previous assignment of MOC camera -94030.
+      
+   The keywords in this data block make this name/ID mapping available 
+   within the SPICE toolkit.   
+
+      \begindata
+
+      NAIF_BODY_NAME                += ( 'MGS_MOC_NA' )
+      NAIF_BODY_CODE                += ( -94031 )
+
+      NAIF_BODY_NAME                += ( 'MGS_MOC_WA_RED' )
+      NAIF_BODY_CODE                += ( -94032 )
+
+      NAIF_BODY_NAME                += ( 'MGS_MOC_WA_BLUE' )
+      NAIF_BODY_CODE                += ( -94033 )
+
+      \begintext
+
+ 
+Keyword Naming Conventions
+--------------------------------------------------------
+ 
+   All names referencing values in this I-kernel start with the
+   characters `INS' followed by the NAIF ID of the camera. The remainder
+   of the name is an underscore character followed by the unique name of
+   the data item. For example, the focal length of the MOC NA telescope
+   is specified by
+
+      INS-94031_FOCAL_LENGTH
+
+   The upper bound on the length of the name of any data item is 32
+   characters.
+
+   If the same item is included in more then one file, or if the same
+   item appears more than once within a single file, the latest value
+   supersedes any earlier values.
+ 
+ 
+MOC mounting offset
+--------------------------------------------------------
+ 
+   This section describes the offset of the individual MOC camera frames
+   relative to the Mars Global Surveyor spacecraft frame. From the
+   offset, given as three rotation angles -- ROLL, PITCH and YAW, a
+   rotation matrix can be constructed that will transform the components
+   of a vector expressed in the spacecraft frame to components expressed
+   in the MOC camera fixed frame. For example, if x y and z are the
+   components of a vector expressed in the spacecraft frame, X Y and Z
+   will be the components of the same vector expressed in the MOC
+   camera frame:
+
+      [ X ]    [     ]  [ x ]
+      | Y |  = | ROT |  | y |
+      [ Z ]    [     ]  [ z ]
+
+   where ROT is the rotation matrix constructed from the rotation angles
+   as follows:
+
+      [     ]   [     ]  [       ]  [      ]
+      [ ROT ] = [ YAW ]  [ PITCH ]  [ ROLL ]
+      [     ]   [     ]  [       ]  [      ]
+                       Z          Y         X
+
+   where each of three matrixes on the right side represent a coordinate
+   frame rotation by the given angle around the indicated axis. See the
+   SPICELIB routine EUL2M for more information about constructing
+   a rotation matrix from a set of rotation angles.
+
+   The keywords INS-#_EULER_ANGLES contains the rotation angle values, in 
+   radians, in the following order:
+
+      INS-#_EULER_ANGLES = (  ``ROLL''  ``PITCH''  ``YAW''  )
+
+   The keywords INS-#_EULER_AXES contain integer codes of the 
+   corresponding axes of rotations (1 = X, 2 = Y, 3 = Z).
+     
+      INS-#_EULER_AXES   = (     1          2         3     )
+
+   
+In-flight Calibrated Mounting Offsets
+
+   An Updated set of MOC camera alignment angles was derived by USGS as the  
+   result of extensive analysis of the in-flight MOC images. These values, 
+   provided in the Table 2 of [7], were:
+        
+      ----------------------------------------------------------------
+       Instrument        Roll, deg       Pitch, deg        Yaw, deg
+      ----------------------------------------------------------------
+       MOC-NA            0.11463          -0.07162          0.18000
+       MOC-WA/RED  (*)   1.04764          -0.45229         -0.78644 
+       MOC-WA/BLUE (*)   1.01022          -0.35472         -0.30189
+
+   (*) The boresight direction defined by these angles for the WA/RED
+       and WA/BLUE cameras corresponds to the pixel closest to the optical
+       axis rather than to the central pixel of the line detector. For 
+       the WA/RED camera it's pixel 1673.65; for the WA/BLUE camera it's
+       pixel 1687.58. For both WA cameras these angles define the frame
+       with respect to which the radial distortion function provided in
+       the section "WA Radial Distortion" is specified.
+
+   The keywords in the data section below contain these values.
+
+      \begindata
+
+      INS-94031_EULER_ANGLES = ( 0.0020006709 -0.0012500048  0.0031415927 )
+      INS-94031_EULER_AXES   = ( 1             2             3            )
+
+      INS-94032_EULER_ANGLES = ( 0.0182847674 -0.0078939497 -0.0137259674 )
+      INS-94032_EULER_AXES   = ( 1             2             3            )
+
+      INS-94033_EULER_ANGLES = ( 0.0176316652 -0.0061910319 -0.0052689745 )
+      INS-94033_EULER_AXES   = ( 1             2             3            )
+
+      \begintext
+
+
+Pre-flight Measured Mounting Offset
+ 
+   The following pre-flight measured values of ROLL, PITCH and YAW provided 
+   in [1] were in the earlier versions -- 1.0 through 1.3 -- of this IK 
+   file (November 1996 through April 2001):
+
+      ROLL  =   359.933 (degrees) 
+      PITCH =     0.012 (degrees)
+      YAW   =     0.180 (degrees)
+
+   The keyword assignments containing pre-flight values were:
+
+      INS-94030_EULER_ANGLES = ( 6.282015936581 0.000209439510 0.003141592654 )
+      INS-94030_EULER_AXES   = ( 1              2              3              )
+
+   These old values are provided for the record; they are not enclosed
+   between \begindata \begintext markers and, therefore, are not
+   available to the SPICE Toolkit when this IK file is loaded.
+
+
+Instrument Frame Definition
+--------------------------------------------------------
+
+   These definitions will be utilized by the SPICE FRAMES subsystem to
+   provide automatic state transformations to/from MOC instrument frames.
+
+   The NA camera frame is defined as follows:
+
+      -- +Z is the camera boresight, looking outwards (based on the view 
+         direction from the detector line central pixel);
+
+      -- +Y is along the camera detector line and points in the same 
+         direction as the s/c +Y axis;
+
+      -- +X completes the right hand frame (X cross Y = Z);
+
+   The WA camera frames are defined as follows:
+
+      -- +Z is the camera optical boresight, looking outwards (based on 
+         the view direction from the pixel closest to the optical axis 
+         of the camera -- pixel 1673.6 for WA/RED and pixel 1687.58 for 
+         WA/BLUE.);
+
+      -- +Y is along the camera detector line and points in the same 
+         direction as the s/c +Y axis;
+
+      -- +X completes the right hand frame (X cross Y = Z);
+
+   This picture illustrates the NA, WA_RED and WA_BLUE camera frames:
+
+                                 ^+Zmoc
+                                 |
+                                 |
+                           +Xmoc.|.      +Ymoc
+                                |o------> 
+      ._________________.  .____|_|.  ._________________.
+      |                  \ |       | /                  |
+      |                   o|       |o                   |
+      |                  / |   ^+Zsc \                  |
+      ._________________.  .___|___.  ._________________.
+                            |  |  |
+                            /__|__\                 +Xsc and +Xmoc 
+                             /_o------> +Ysc      are out of the page
+                              +Xsc
+ 
+
+Frame Definitions Based on In-flight Calibrated Mounting Offsets
+
+   The following three frames:
+
+         'MGS_MOC_NA'
+         'MGS_MOC_WA_RED'
+         'MGS_MOC_WA_BLUE'
+
+   defined in the data section below incorporate the in-flight calibrated 
+   alignment angles provided in the section ``In-flight Calibrated 
+   Mounting Offset'' above.
+
+      \begindata
+
+      FRAME_MGS_MOC_NA         = -94031
+      FRAME_-94031_NAME        = 'MGS_MOC_NA'
+      FRAME_-94031_CLASS       = 4
+      FRAME_-94031_CLASS_ID    = -94031
+      FRAME_-94031_CENTER      = -94
+      TKFRAME_-94031_SPEC      = 'ANGLES'
+      TKFRAME_-94031_RELATIVE  = 'MGS_SPACECRAFT'
+      TKFRAME_-94031_ANGLES    = ( -0.0020006709 0.0012500048 -0.0031415927 )
+      TKFRAME_-94031_AXES      = (  1,           2,            3            )
+      TKFRAME_-94031_UNITS     = 'RADIANS'
+
+      FRAME_MGS_MOC_WA_RED     = -94032
+      FRAME_-94032_NAME        = 'MGS_MOC_WA_RED'
+      FRAME_-94032_CLASS       = 4
+      FRAME_-94032_CLASS_ID    = -94032
+      FRAME_-94032_CENTER      = -94
+      TKFRAME_-94032_SPEC      = 'ANGLES'
+      TKFRAME_-94032_RELATIVE  = 'MGS_SPACECRAFT'
+      TKFRAME_-94032_ANGLES    = ( -0.0182847674 0.0078939497  0.0137259674 )
+      TKFRAME_-94032_AXES      = (  1,           2,            3            )
+      TKFRAME_-94032_UNITS     = 'RADIANS'
+
+      FRAME_MGS_MOC_WA_BLUE    = -94033
+      FRAME_-94033_NAME        = 'MGS_MOC_WA_BLUE'
+      FRAME_-94033_CLASS       = 4
+      FRAME_-94033_CLASS_ID    = -94033
+      FRAME_-94033_CENTER      = -94
+      TKFRAME_-94033_SPEC      = 'ANGLES'
+      TKFRAME_-94033_RELATIVE  = 'MGS_SPACECRAFT'
+      TKFRAME_-94033_ANGLES    = ( -0.0176316652 0.0061910319  0.0052689745 )
+      TKFRAME_-94033_AXES      = (  1,           2,            3            )
+      TKFRAME_-94033_UNITS     = 'RADIANS'
+
+      \begintext
+
+
+Frame Definition Based on Pre-flight Measured Mounting Offset
+
+   The following frame definition based on the pre-flight measured alignment 
+   angles provided in the section ``Pre-flight Measured Mounting Offset'' 
+   above was provided in the earlier versions -- 1.2 through 1.3 -- of this 
+   IK file (August 1997 through April 2001):
+
+      FRAME_MGS_MOC            = -94030
+      FRAME_-94030_NAME        = 'MGS_MOC'
+      FRAME_-94030_CLASS       = 4
+      FRAME_-94030_CLASS_ID    = -94030
+      FRAME_-94030_CENTER      = -94
+      TKFRAME_-94030_SPEC      = 'ANGLES'
+      TKFRAME_-94030_RELATIVE  = 'MGS_SPACECRAFT'
+      TKFRAME_-94030_ANGLES    = ( -6.282015936581, 
+                                   -0.000209439510, 
+                                   -0.003141592654 )
+      TKFRAME_-94030_AXES      = (   1,            2,              3 )
+      TKFRAME_-94030_UNITS     = 'RADIANS'
+
+   This old definition is included for the record; it is not enclosed 
+   between \begindata \begintext markers and, therefore, is not available 
+   to the SPICE Toolkit when this IK file is loaded.
+
+
+Camera Optics Parameters
+--------------------------------------------------------
+ 
+   The following table from [8] summarizes MOC individual camera optics 
+   parameters:
+ 
+      Camera           Focal Length, cm     Aperture       F number
+      ---------------------------------------------------------------
+      Narrow angle          350.0            0.35 m          10   
+      Wide angle red          1.1            1.7 mm           6.4 
+      Wide angle blue         1.14           1.8 mm           6.3 
+      ---------------------------------------------------------------
+
+   The actual measured values for WA/RED and WA/BLUE from [9] are as 
+   follows:
+
+      Camera           Focal Length, cm     Aperture       F number
+      ---------------------------------------------------------------
+      Wide angle red          1.122          1.7526 mm      f/6.40
+      Wide angle blue         1.111          1.778 mm       f/6.25
+      ---------------------------------------------------------------
+
+   For NA the 3.5m focal length is a nominal value and the actual may
+   vary by as much as 2% from that. ([11])
+
+   These values are incorporated in the keywords below; focal lengths
+   and aperture are converted to meters.
+
+      \begindata
+
+      INS-94031_FOCAL_LENGTH = (  3.500     ) 
+      INS-94031_APERTURE     = (  0.350     )
+      INS-94031_F_NUMBER     = ( 10.0       )
+      
+      INS-94032_FOCAL_LENGTH = (  0.01122   )
+      INS-94032_APERTURE     = (  0.0017526 )
+      INS-94032_F_NUMBER     = (  6.40      )
+      
+      INS-94033_FOCAL_LENGTH = (  0.01111   )
+      INS-94033_APERTURE     = (  0.001778  )
+      INS-94033_F_NUMBER     = (  6.25      )
+      
+      \begintext
+
+   In [12] Randy Kirk pointed pointed out that:
+
+     "The ``focal length'' of the WA cameras is not a very meaningful/useful
+      parameter because their distortion is so strong. The focal length
+      relates to the pixel scale at the very center of the field of view but
+      the pixel scale elsewhere is quite different. This leads to two other
+      statements. First, the pixel-angle calculation in the next section
+      does NOT use any of the focal length data in this section.  Second,
+      just for interest, it is possible to derive a focal length from the
+      leading coefficient of the distortion fit [and doing this would yield
+      in] 1.1205 cm for red, 1.1225 for blue."
+   
+
+Camera Detector Parameters
+--------------------------------------------------------
+ 
+   The following table based on [8] summarizes MOC individual camera  
+   detector parameters. As these data show the detectors are all line 
+   arrays.
+ 
+      Camera                 Lines      Pixels    Pixel Size, microns
+      ---------------------------------------------------------------
+      Narrow angle             1         2048            13
+      Wide angle red           1         3456             7
+      Wide angle blue          1         3456             7
+      ---------------------------------------------------------------
+
+   These values are incorporated in the keywords below; pixel sizes 
+   are converted to meters.
+
+      \begindata
+
+      INS-94031_PIXEL_SAMPLES  = ( 2048        )
+      INS-94031_PIXEL_LINES    = ( 1           )
+      INS-94031_CENTER         = ( 1023.5, 0.5 )       
+      INS-94031_PIXEL_SIZE     = ( 0.000013    )
+
+      INS-94032_PIXEL_SAMPLES  = ( 3456        )
+      INS-94032_PIXEL_LINES    = ( 1           )
+      INS-94032_CENTER         = ( 1727.5, 0.5 )       
+      INS-94032_PIXEL_SIZE     = ( 0.000007    )
+      
+      INS-94033_PIXEL_SAMPLES  = ( 3456        )
+      INS-94033_PIXEL_LINES    = ( 1           )
+      INS-94033_CENTER         = ( 1727.5, 0.5 )       
+      INS-94033_PIXEL_SIZE     = ( 0.000007    )
+      
+      \begintext
+
+
+WA and NA Radial Distortion
+--------------------------------------------------------
+
+   Radial distortion functions for MOC WA/RED and WA/BLUE cameras were
+   derived by USGS as the result of extensive analysis of the complete
+   set of preflight geometric calibration observations as well as of
+   inflight images ([7], [10]), or, to be more precise, the radial
+   distortion function came from the preflight data and the other
+   alignment parameters (A, S) from the inflight data. 
+
+   These functions map pixel coordinates into 3D pixel view direction in
+   the camera frame and have the following form:
+
+      (1) Find scaled pixel coordinates in cross-track and along track 
+          directions:
+  
+                     ( P - Pb ) 
+             C'  = S ----------
+                        1000
+       
+                     A
+             A'  = ------
+                    1000
+
+      (2) Compute scaled pixel distance from the boresight direction:
+
+                        ------------------
+                   _   /       2         2
+             R   =  \ /  ( C' )  + ( A' )
+                     V       
+
+      (3) Convert scaled pixel distance to angle:
+     
+                    _            i
+             Phi = \  C  * ( R )
+                   /_  i
+                    i
+
+      (4) compute pixel 3D view vector components:
+ 
+                                      A'
+             X   =   SIN ( | Phi | ) ----
+                                      R
+
+                                      C'
+             Y   = - SIN (   Phi   ) ----
+                                      R
+
+             
+             Z   =   COS (   Phi   )
+
+   where:
+
+      P     -- pixel coordinate
+      Pb    -- the pixel closest to the optical axis
+      S     -- scale correction
+      A     -- along-track shift in pixels
+      C'    -- scaled pixel coordinate in cross-track direction
+      A'    -- scaled pixel coordinate in along-track direction
+      R     -- scaled pixel distance from the boresight direction
+      Ci    -- polynomial coefficients
+      phi   -- pixel direction offset angle, degrees
+      (XYZ) -- view vector direction
+
+   In [12] Randy Kirk noted that:
+
+     "The form of the radial distortion calculation is not the standard one
+      in photogrammetry, namely pixel given as a polynomial in f tan(phi).
+      The reason is that the very large field of view and strong distortion
+      of the WA cameras cause polynomials for pixel vs. f tan(phi) to
+      require a great many terms for convergence. The given relations (phi
+      vs. pixel) can be used to generate pairs of numbers (phi,pixel) to
+      which users can fit any desired functional form over as much or as
+      little of the detector as they wish. The given relations agree with
+      the preflight calibration data to within a fraction of a pixel across
+      the entire detector so fitting to such pairs will be just as accurate
+      as fitting to the original calibration data. ...  In particular, for
+      the NA camera, the ``standard'' fit will have (pixel -1023.5) = -f
+      tan(phi) with the appropriate focal length and the minus sign to
+      reverse the detector."
+
+   This diagram showing WA camera line detector in the camera frame XY plane
+   illustrates the meaning of the parameters from the formulas above:
+
+
+                                     +X (~along-track)
+                                    ^
+                        |           |
+                        |<- C', Y ->|
+                      P |           | Pb
+                        *...........@........    
+                ....'''' `.         | A  ^   ````....... 
+      ......''''           `.       |    |              ````.........
+      Pixel Line             `.     |  A', X
+        Array           R, Phi `.   |    |
+                                 `. |    V
+                                    x---------------> +Y (~cross-track)
+
+                             +Z (boresight)
+                              into the page       
+
+
+   The central pixel, polynomial coefficients (only odd terms were
+   determined as part of the analysis), scale factor and along-track
+   shift values provided in the Table 1 and Table 3 of of [7] were:
+
+       ------------------------------------------------
+       Parameter        MOC-WA/RED        MOC-WA/BLUE
+       ------------------------------------------------
+
+       Pb             1673.65             1687.58
+
+       C01              35.79268           -35.71426
+       C03               1.414317           -1.701521
+       C05              -0.1539636           0.132872
+       C07               0.2145501          -0.3508769
+       C09              -0.093066            0.220457
+       C11               0.0154483          -0.0688193
+       C13                                   0.0081001
+
+       S                 1.0                 1.000452
+
+       A                 6.7785             -0.8486
+       ------------------------------------------------
+
+   Note that the C01 in the WA/BLUE function is negative, which essentially 
+   "un-flips" the flipped raw images for this camera. 
+    
+   The keywords in the data section below contain these values. The 
+   even degree coefficients of the polynomials are set to zero for 
+   both cameras.  
+   
+      \begindata 
+
+      INS-94032_RD_PB = ( 1673.65 )
+      INS-94032_RD_C  = ( 
+                            35.79268,      0.0,
+                             1.414317,     0.0,
+                            -0.1539636,    0.0,
+                             0.2145501,    0.0,
+                            -0.093066,     0.0,
+                             0.0154483
+                        )
+      INS-94032_RD_S  = ( 1.0 )
+      INS-94032_RD_A  = ( 6.7785 )
+
+      INS-94033_RD_PB = ( 1687.58 )
+      INS-94033_RD_C  = ( 
+                           -35.71426,      0.0,
+                            -1.701521,     0.0,
+                             0.132872,     0.0,
+                            -0.3508769,    0.0,
+                             0.220457,     0.0,
+                            -0.0688193,    0.0,
+                             0.0081001,
+                        )
+      INS-94033_RD_S  = (  1.000452 )
+      INS-94033_RD_A  = ( -0.8486 )
+
+      \begintext
+
+   Because of the long focal length and narrow field of view of the MOC
+   NA, it should have negligible radial distortion. Therefore, the set of
+   parameters implementing the model for this camera essentially makes a
+   linear mapping of the NA pixels to angles with C01 set to the
+   individual pixel angular size in units of 0.001 degree. As with the
+   WA/BLUE, the NA C01 coefficient is negative to "un-flip" the flipped
+   raw images for this camera.
+   
+      \begindata
+
+      INS-94031_RD_PB = ( 1023.5 )
+      INS-94031_RD_C  = ( 
+                          -0.212812895
+                        )
+      INS-94031_RD_S  = ( 1.0 )
+      INS-94031_RD_A  = ( 0.0 )
+
+      \begintext
+
+   This small fragment of FORTRAN code demonstrates how the pixel direction
+   vector in the camera frame can be computed for a given pixel using 
+   radial distortion model described above. All routines used in the example
+   are SPICELIB routines.  
+
+            IMPLICIT              NONE
+
+            CHARACTER*(256)       ERROR
+            CHARACTER*(256)       FNAME
+            CHARACTER*(32)        CNAME
+            CHARACTER*(32)        PIXSTR
+
+            DOUBLE PRECISION      C      ( 20 )
+            DOUBLE PRECISION      PB
+            DOUBLE PRECISION      PHI
+            DOUBLE PRECISION      PIXEL
+            DOUBLE PRECISION      S
+            DOUBLE PRECISION      VECTOR ( 3 )
+            DOUBLE PRECISION      A
+            DOUBLE PRECISION      CP
+            DOUBLE PRECISION      AP
+            DOUBLE PRECISION      R
+
+            INTEGER               I
+            INTEGER               N
+            INTEGER               NC
+            INTEGER               PTR
+
+            LOGICAL               FND1
+            LOGICAL               FND2
+            LOGICAL               FND3
+            LOGICAL               FND4
+
+            DOUBLE PRECISION      RPD
+            LOGICAL               EQSTR
+
+      C
+      C     Prompt for the name of and load MOC IK file.
+      C
+            CALL PROMPT( 'Enter IK file name > ', FNAME )
+            CALL FURNSH( FNAME )
+
+      C
+      C     Prompt for the name of the camera and buffer distortion
+      C     function parameters for it.
+      C
+            CALL PROMPT( 'Enter Camera Name  > ', CNAME )
+
+            IF      ( CNAME .EQ. 'MGS_MOC_WA_RED'  ) THEN
+
+               CALL GDPOOL ( 'INS-94032_RD_PB', 1,  1,  N, PB, FND1 )
+               CALL GDPOOL ( 'INS-94032_RD_C',  1, 20, NC, C,  FND2 )
+               CALL GDPOOL ( 'INS-94032_RD_S',  1,  1,  N, S,  FND3 )
+               CALL GDPOOL ( 'INS-94032_RD_A',  1,  1,  N, A,  FND4 )
+
+            ELSE IF ( CNAME .EQ. 'MGS_MOC_WA_BLUE' ) THEN
+
+               CALL GDPOOL ( 'INS-94033_RD_PB', 1,  1,  N, PB, FND1 )
+               CALL GDPOOL ( 'INS-94033_RD_C',  1, 20, NC, C,  FND2 )
+               CALL GDPOOL ( 'INS-94033_RD_S',  1,  1,  N, S,  FND3 )
+               CALL GDPOOL ( 'INS-94033_RD_A',  1,  1,  N, A,  FND4 )
+
+            ELSE IF ( CNAME .EQ. 'MGS_MOC_NA'      ) THEN
+
+               CALL GDPOOL ( 'INS-94031_RD_PB', 1,  1,  N, PB, FND1 )
+               CALL GDPOOL ( 'INS-94031_RD_C',  1, 20, NC, C,  FND2 )
+               CALL GDPOOL ( 'INS-94031_RD_S',  1,  1,  N, S,  FND3 )
+               CALL GDPOOL ( 'INS-94031_RD_A',  1,  1,  N, A,  FND4 )
+
+            ELSE
+               CALL SIGERR( 'CANNOT RECOGNIZE CAMERA' )
+            END IF
+
+            IF ( .NOT. ( FND1 .AND. FND2 .AND. FND3 .AND. FND4 ) ) THEN
+               CALL SIGERR( 'IK DATA NOT AVAILABLE' ) 
+            END IF
+
+      C
+      C     Prompt for pixel index and compute view direction in the 
+      C     camera frame for it.
+      C
+            CALL PROMPT( 'Enter Pixel Index  > ', PIXSTR )
+
+            DO WHILE ( .NOT. EQSTR( PIXSTR, 'DONE' ) )
+
+      C
+      C        Convert pixel index to DP number.
+      C
+               CALL NPARSD ( PIXSTR, PIXEL, ERROR, PTR )
+               IF ( PTR .NE. 0 ) THEN
+                  CALL SIGERR( 'BAD PIXEL INDEX' )
+               END IF
+
+      C 
+      C        Compute scaled cross-track and down-track coordinates.
+      C 
+               CP = S * ( PIXEL - PB ) / 1000.0D0
+               AP =                  A / 1000.0D0
+
+      C
+      C        Compute scaled pixel distance from the boresight direction.
+      C
+               R = DSQRT( CP * CP + AP * AP )
+
+      C
+      C        Convert scaled pixel distance to angle. Note that this
+      C        way to evaluate the distortion polynomial is a bad idea 
+      C        from the standpoint of efficiency but probably a simpler 
+      C        way to show what is going on. There are certainly more 
+      C        efficient ways to evaluate a polynomial. ([12])
+      C
+               PHI = 0.0D0
+
+               DO I = 1, NC
+                  PHI = PHI +  C(I) * R**(I)
+               END DO
+
+      C
+      C        Compute vector from offset angle.
+      C
+               PHI = PHI * RPD()
+
+               IF ( R .NE. 0.D0 ) THEN
+                  VECTOR(1) =   DSIN( DABS( PHI ) ) * ( AP / R ) 
+                  VECTOR(2) = - DSIN(       PHI   ) * ( CP / R )
+                  VECTOR(3) =   DCOS(       PHI   )
+               ELSE
+                  VECTOR(1) = 0.D0
+                  VECTOR(2) = 0.D0
+                  VECTOR(3) = 1.D0
+               END IF
+
+      C
+      C        Print pixel view vector.
+      C
+               WRITE(*,*) '           VECTOR = ', VECTOR 
+
+      C
+      C        Prompt for the next pixel index.
+      C
+               CALL PROMPT( 'Enter Pixel Index  > ', PIXSTR )
+
+            END DO
+
+            END
+
+
+
+Camera FOV Definitions
+--------------------------------------------------------
+
+   This section defines the field of view (FOV) for each camera, using a
+   rectangular shape. Since the cameras are both line-scan cameras, this
+   sounds odd, but the SPICE system does not (yet) include a line as a
+   FOV model. Instead, a rectangle whose "height" is the thickness of a
+   pixel and whose "width" is the length of the line array is used.
+
+      -- The FOV edges are defined by the outer corners of pixel "0" and 
+         of pixel "2047" for the NA camera or pixel "3455" for the WA/RED and
+         WA/BLUE camera, mapped from two-dimensional image coordinates
+         (line/pixel) to three-dimensional real world space (x, y, z). The
+         mapping was done using the distortion model provided above.
+
+      -- The vector provided by INS-*_BORESIGHT defines the view 
+         direction of the central pixel as specified in the INS-#_CENTER 
+         keyword ("1023.5" for NA, "1727.5" for WA/RED and WA/BLUE), 
+         computed using the distortion models provided above. Note that 
+         although the keyword name contains the word 'BORESIGHT', for 
+         the WA cameras the vector assigned to it is NOT the same vector 
+         as the one that is called boresight in the radial distortion model 
+         description above. 
+
+   In [12] Randy Kirk noted that:
+
+     "The definition of ``FOV shape'' as a RECTANGLE is a little misleading.
+      Because of the along-track offset combined with the optical
+      distortion, the footprint of the detector array on the ground is
+      curved. ... The degree of curvature is a few pixels compared to
+      thousands, of course, so the rectangle definition may be good enough
+      for many applications.  But ... if exact results are desired it's
+      necessary to use the distortion model, not just the corner
+      coordinates.
+
+   The FOVs are defined with respect to the corresponding camera frames.
+
+      \begindata 
+
+          INS-94031_FOV_FRAME            = 'MGS_MOC_NA'
+          INS-94031_FOV_SHAPE            = 'RECTANGLE'
+          INS-94031_BORESIGHT            = (
+           0.0000000000000000  0.0000000000000000  1.0000000000000000
+                                           )
+          INS-94031_FOV_BOUNDARY_CORNERS = (
+           0.0000018571383810 -0.0038015622659203  0.9999927740343374
+           0.0000018571383810  0.0038015622659203  0.9999927740343374
+          -0.0000018571383810  0.0038015622659203  0.9999927740343374
+          -0.0000018571383810 -0.0038015622659203  0.9999927740343374
+                                           )
+
+          INS-94032_FOV_FRAME            = 'MGS_MOC_WA_RED'
+          INS-94032_FOV_SHAPE            = 'RECTANGLE'
+          INS-94032_BORESIGHT            = (
+           0.0042342108998623 -0.0336375683348214  0.9994251274880854
+                                           )
+          INS-94032_FOV_BOUNDARY_CORNERS = (
+           0.0040112435001605  0.9223628060786733  0.3863039786078550
+           0.0039125456711058 -0.9575617546505816  0.2882016273667983
+           0.0033750005332111 -0.9575626662157566  0.2882053948856133
+           0.0034601379682684  0.9223636076439348  0.3863073941038482
+                                           )
+
+          INS-94033_FOV_FRAME            = 'MGS_MOC_WA_BLUE'
+          INS-94033_FOV_SHAPE            = 'RECTANGLE'
+          INS-94033_BORESIGHT            = (
+          -0.0005289445869359  0.0248939572259930  0.9996899574924489
+                                           )
+          INS-94033_FOV_BOUNDARY_CORNERS = (
+          -0.0001944397097933 -0.9417122242472757  0.3364194538020177
+          -0.0001903856051231  0.9657011482676540  0.2596560339908472
+          -0.0007365289477493  0.9657010133025037  0.2596555611413450
+          -0.0007522127400691 -0.9417121113401115  0.3364189850935037
+                                           )
+
+      \begintext 
+
+
+Platform ID
+--------------------------------------------------------
+ 
+   This number is the NAIF instrument ID of the platform on which the
+   instrument is mounted.
+
+      \begindata
+
+      INS-94031_PLATFORM_ID  = ( -94000 )
+      INS-94032_PLATFORM_ID  = ( -94000 )
+      INS-94033_PLATFORM_ID  = ( -94000 )
+
+      \begintext

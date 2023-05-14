@@ -73,11 +73,9 @@ def test_load_mes_from_metakernels(tmpdir, monkeypatch, mess_kernels):
         mk_file.write(mk_str)
 
     usgscsm_isd_obj = ale.load(label_file, verbose=True)
-
     assert usgscsm_isd_obj['name_platform'] == 'MESSENGER'
     assert usgscsm_isd_obj['name_sensor'] == 'MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA'
     assert usgscsm_isd_obj['name_model'] == 'USGS_ASTRO_FRAME_SENSOR_MODEL'
-
 
 def test_load_mes_with_no_metakernels(tmpdir, monkeypatch, mess_kernels):
     monkeypatch.setenv('ALESPICEROOT', str(tmpdir))

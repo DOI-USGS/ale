@@ -51,6 +51,9 @@ def to_usgscsm(driver):
         'unit' : 'm'
     }
 
+    isd_data["projection"] = driver.projection
+    isd_data["geotransform"] = driver.geotransform
+
     # shared isd keywords for Framer and Linescanner
     if isinstance(driver, LineScanner) or isinstance(driver, Framer):
         # exterior orientation for just Framer and LineScanner

@@ -1,0 +1,80 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 256
+    TileLines   = 1536
+
+    Group = Dimensions
+      Samples = 256
+      Lines   = 1536
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = UnsignedByte
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName        = "MARS GLOBAL SURVEYOR"
+    InstrumentId          = MOC-NA
+    TargetName            = Mars
+    StartTime             = 1999-08-24T14:12:13.64
+    StopTime              = 1999-08-24T14:12:19.56
+    CrosstrackSumming     = 8
+    DowntrackSumming      = 8
+    FocalPlaneTemperature = 262.1
+    GainModeId            = 0A
+    LineExposureDuration  = 0.482100 <milliseconds>
+    MissionPhaseName      = MAPPING
+    OffsetModeId          = 38
+    SpacecraftClockCount  = 619971158:28
+    RationaleDesc         = "South Pole 3 degree ring"
+    OrbitNumber           = 2063
+    FirstLineSample       = 1
+  End_Group
+
+  Group = Archive
+    DataSetId           = MGS-M-MOC-NA/WA-2-DSDP-L0-V1.0
+    ProductId           = M04/02852
+    ProducerId          = MGS_MOC_TEAM
+    ProductCreationTime = 2000-06-01T00:15:28
+    SoftwareName        = "makepds 1.7"
+    UploadId            = UNK
+    DataQualityDesc     = OK
+    ImageNumber         = 923602852
+    ImageKeyId          = 6199702852
+  End_Group
+
+  Group = BandBin
+    FilterName   = BROAD_BAND
+    OriginalBand = 1
+    Center       = 0.7 <micrometers>
+    Width        = 0.4 <micrometers>
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode = -94031
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 458753
+  Bytes     = 463
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 459216
+  Bytes     = 1607
+End_Object
+End
