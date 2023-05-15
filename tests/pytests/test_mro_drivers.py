@@ -59,6 +59,8 @@ def test_mro_ctx_load(test_ctx_kernels, label_type, kernel_type):
 
     if label_type == 'isis3' and kernel_type == 'naif':
         compare_isd['image_samples'] = 5000
+        compare_isd["projection"] = '+proj=sinu +lon_0=148.36859083039 +x_0=0 +y_0=0 +R=3396190 +units=m +no_defs'
+        compare_isd["geotransform"] = [-219771.1526456, 1455.4380969907, 0.0, 5175537.8728989, 0.0, -1455.4380969907]
 
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []

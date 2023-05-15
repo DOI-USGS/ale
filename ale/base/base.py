@@ -336,26 +336,27 @@ class Driver():
                 self._projection = ""
                 return self._projection
 
+            geodata = None
             if isinstance(self._file, pvl.PVLModule):
                 # save it to a temp folder
                 with tempfile.NamedTemporaryFile() as tmp:
                     tmp.write(pvl.dumps(self._file)) 
 
                     geodata = gdal.Open(tempfile.name)
-                    self._projection = geodata.GetSpatialRef()
             else: 
                 # should be a path
                 if not os.path.exists(self._file): 
                     self._projection = "" 
                 else: 
                     geodata = gdal.Open(self._file)
-                    self._projection = geodata.GetSpatialRef()
+   
 
-            # is None if not projected
-            if self._projection: 
-                self._projection = self._projection.ExportToProj4()
-            else: 
-                self._projection = "" 
+            # Try to get the projection, if we are unsuccessful set it
+            # to empty
+            try:
+              self._projection = geodata.GetSpatialRef().ExportToProj4()
+            except:
+              self._projection = "" 
         return self._projection
     
 
