@@ -35,8 +35,6 @@ release.
 
 ## [Unreleased]
 
-### Added
-- Apollo Metric drivers, tests, and data
 ### Fixed
 - Kaguya IsisLabelIsisSpice now calculates the right exposure_duration and focal2pixel_lines [#487](https://github.com/DOI-USGS/ale/pull/487)
 - Logging from generate_isd now correctly limits logging information [#487](https://github.com/DOI-USGS/ale/pull/487)
@@ -48,3 +46,4 @@ release.
 - Projection information (through GDAL) will be attached to the ISD if a projected product is processed through ALE [#524](https://github.com/DOI-USGS/ale/pull/524)
 - Kaguya IsisLabelNaifSpice driver, tests, and test data [#487](https://github.com/DOI-USGS/ale/pull/487)
 - Hayabusa Amica IsisLabelNaifSpice driver, tests and test data [#521](https://github.com/DOI-USGS/ale/pull/521)
+- Apollo Metric drivers, tests, and data [#533](https://github.com/DOI-USGS/ale/pull/533)
