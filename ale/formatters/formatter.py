@@ -196,8 +196,9 @@ def to_isd(driver):
 
     meta_data['sun_position'] = sun_position
 
-    meta_data["projection"] = driver.projection 
-    meta_data["geotransform"] = driver.geotransform 
+    if (driver.projection != ""):
+        meta_data["projection"] = driver.projection
+        meta_data["geotransform"] = driver.geotransform
 
     # check that there is a valid sensor model name
     if 'name_model' not in meta_data:

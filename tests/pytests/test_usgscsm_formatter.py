@@ -348,16 +348,16 @@ def test_line_scan_sun_position(test_line_scan_driver):
 def test_no_projection(test_frame_driver):
     isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
     # isn't using real projection so it should be None
-    assert isd['projection'] == None
+    assert isd.get("projection", None) == None
 
 def test_isis_projection():
     isd = usgscsm_formatter.to_usgscsm(TestLineScanner(get_image_label('B10_013341_1010_XN_79S172W', "isis3")))
-    assert isd["projection"] == "+proj=sinu +lon_0=148.36859083039 +x_0=0 +y_0=0 +R=3396190 +units=m +no_defs"
+    assert isd.get("projection", None) == "+proj=sinu +lon_0=148.36859083039 +x_0=0 +y_0=0 +R=3396190 +units=m +no_defs"
 
 
 def test_isis_geotransform():
     isd = usgscsm_formatter.to_usgscsm(TestLineScanner(get_image_label('B10_013341_1010_XN_79S172W', "isis3")))
     expected = (-219771.1526456, 1455.4380969907, 0.0, 5175537.8728989, 0.0, -1455.4380969907)
-    for value, truth in zip(isd["geotransform"], expected):
+    for value, truth in zip(isd.get("geotransform", None), expected):
         pytest.approx(value, truth)
 
