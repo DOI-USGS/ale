@@ -35,3 +35,4 @@ release.
 
 ## [Unreleased]
 
+- Hayabusa NIRS IsisLabelNaifSpice driver, tests and test data [#532](https://github.com/DOI-USGS/ale/pull/532)
