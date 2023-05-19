@@ -35,6 +35,8 @@ release.
 
 ## [Unreleased]
 
+## [0.9.0] - 2023-04-19
+
 ### Fixed
 - Kaguya IsisLabelIsisSpice now calculates the right exposure_duration and focal2pixel_lines [#487](https://github.com/DOI-USGS/ale/pull/487)
 - Logging from generate_isd now correctly limits logging information [#487](https://github.com/DOI-USGS/ale/pull/487)
