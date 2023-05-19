@@ -41,7 +41,7 @@ release.
 
 ### Changed
 - Projection information is only written to the ISD if a projection is present instead of writing an empty projection [#528](https://github.com/DOI-USGS/ale/pull/528/)
-- Disabled MSI drivers until tests are added [#534](https://github.com/DOI-USGS/ale/pull/534/)
+- Disabled MSI drivers until tests are added [#526](https://github.com/DOI-USGS/ale/pull/526/)
 
 ### Added
 - Projection information (through GDAL) will be attached to the ISD if a projected product is processed through ALE [#524](https://github.com/DOI-USGS/ale/pull/524)
