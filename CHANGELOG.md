@@ -41,8 +41,13 @@ release.
 
 ### Changed
 - Projection information is only written to the ISD if a projection is present instead of writing an empty projection [#528](https://github.com/DOI-USGS/ale/pull/528/)
+- Disabled MSI drivers until tests are added [#526](https://github.com/DOI-USGS/ale/pull/526/)
 
 ### Added
 - Projection information (through GDAL) will be attached to the ISD if a projected product is processed through ALE [#524](https://github.com/DOI-USGS/ale/pull/524)
 - Kaguya IsisLabelNaifSpice driver, tests, and test data [#487](https://github.com/DOI-USGS/ale/pull/487)
 - Hayabusa Amica IsisLabelNaifSpice driver, tests and test data [#521](https://github.com/DOI-USGS/ale/pull/521)
+- Msi IsisLabelNaifSpice Driver [#511](https://github.com/DOI-USGS/ale/pull/511)
+- MGS MOC WAC IsisLabelNaifSpice driver, tests, and test data [#516](https://github.com/DOI-USGS/ale/pull/516)
+- Chandrayaan1_mrffr IsisLabelNaifSpice driver, tests and test data [#519](https://github.com/DOI-USGS/ale/pull/519)
+- MGS MOC Narrow Angle IsisLabelNaifSpice driver, tests, and test data [#517](https://github.com/DOI-USGS/ale/pull/517)
