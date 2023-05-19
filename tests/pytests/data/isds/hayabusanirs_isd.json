@@ -256,14 +256,5 @@
       ]
     ],
     "reference_frame": 1
-  },
-  "projection": "",
-  "geotransform": [
-    0.0,
-    1.0,
-    0.0,
-    0.0,
-    0.0,
-    1.0
-  ]
+  }
 }
