@@ -64,8 +64,8 @@
     },
 
     "homepageURL": "https://code.usgs.gov/astrogeology/ale/",
-    "downloadURL": "https://code.usgs.gov/astrogeology/ale/-/archive/0.9/ale-main.zip",
-    "disclaimerURL": "https://code.usgs.gov/astrogeology/ale/-/raw/0.9/DISCLAIMER.md",
+    "downloadURL": "https://code.usgs.gov/astrogeology/ale/-/archive/0.9.0/ale-main.zip",
+    "disclaimerURL": "https://code.usgs.gov/astrogeology/ale/-/raw/0.9.0/DISCLAIMER.md",
     "repositoryURL": "https://code.usgs.gov/astrogeology/ale.git",
     "vcs": "git",
 
