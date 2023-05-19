@@ -81,8 +81,7 @@ class LoHighCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialD
     def ikid(self):
         """
         Overridden to grab the ikid from the Isis Cube since there is no way to
-        obtain this value with a spice bods2c call. Isis sets this value during
-        ingestion, based on the original IMG file.
+        obtain this value with a spice bods2c call.
 
         Returns
         -------
@@ -90,3 +89,31 @@ class LoHighCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialD
           Naif ID used to for identifying the instrument in Spice kernels
         """
         return self.label["IsisCube"]["Kernels"]["NaifFrameCode"]
+    
+    @property
+    def detector_center_line(self):
+        """
+        Returns the center detector line. This is a placeholder for use within
+        Isis. Since Isis does not use much of the ISD this value allows the as
+        accurate ISD for use in Isis but will be inaccurate for USGSCSM.
+
+        Returns
+        -------
+        : float
+          Detector sample of the principal point
+        """
+        return 0
+    
+    @property
+    def detector_center_sample(self):
+        """
+        Returns the center detector sample. This is a placeholder for use within
+        Isis. Since Isis does not use much of the ISD this value allows the as
+        accurate ISD for use in Isis but will be inaccurate for USGSCSM.
+
+        Returns
+        -------
+        : float
+          Detector line of the principal point
+        """
+        return 0
