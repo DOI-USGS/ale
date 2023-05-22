@@ -170,14 +170,22 @@ class IsisLabel():
         : str
           Spacecraft clock start count
         """
-        if 'SpacecraftClockStartCount' in self.label['IsisCube']['Instrument']:
-            return str(self.label['IsisCube']['Instrument']['SpacecraftClockStartCount'])
-        elif 'SpacecraftClockCount' in self.label['IsisCube']['Instrument']:
-            return str(self.label['IsisCube']['Instrument']['SpacecraftClockCount'])
-        elif 'SpacecraftClockStartCount' in self.label['IsisCube']['Archive']:
-            return str(self.label['IsisCube']['Archive']['SpacecraftClockStartCount'])
-        else:
-            return None
+        if not hasattr(self, "_clock_start_count"):
+            if 'SpacecraftClockStartCount' in self.label['IsisCube']['Instrument']:
+                self._clock_start_count = self.label['IsisCube']['Instrument']['SpacecraftClockStartCount']
+            elif 'SpacecraftClockCount' in self.label['IsisCube']['Instrument']:
+                self._clock_start_count = self.label['IsisCube']['Instrument']['SpacecraftClockCount']
+            elif 'SpacecraftClockStartCount' in self.label['IsisCube']['Archive']:
+                self._clock_start_count = self.label['IsisCube']['Instrument']['SpacecraftClockStartCount']
+            else:
+                self._clock_start_count = None
+
+            if isinstance(self._clock_start_count, pvl.Quantity):
+                self._clock_start_count = self._clock_start_count.value
+
+            self._clock_start_count = str(self._clock_start_count)
+
+        return self._clock_start_count
 
     @property
     def spacecraft_clock_stop_count(self):
@@ -190,12 +198,20 @@ class IsisLabel():
         : str
           Spacecraft clock stop count
         """
-        if 'SpacecraftClockStopCount' in self.label['IsisCube']['Instrument']:
-            return self.label['IsisCube']['Instrument']['SpacecraftClockStopCount']
-        elif 'SpacecraftClockStopCount' in self.label['IsisCube']['Archive']:
-            return self.label['IsisCube']['Archive']['SpacecraftClockStopCount']
-        else:
-            return None
+        if not hasattr(self, "_clock_stop_count"):
+            if 'SpacecraftClockStopCount' in self.label['IsisCube']['Instrument']:
+                self._clock_stop_count = self.label['IsisCube']['Instrument']['SpacecraftClockStopCount']
+            elif 'SpacecraftClockStopCount' in self.label['IsisCube']['Archive']:
+                self._clock_stop_count = self.label['IsisCube']['Archive']['SpacecraftClockStopCount']
+            else:
+                self._clock_stop_count = None
+
+            if isinstance(self._clock_stop_count, pvl.Quantity):
+                self._clock_stop_count = self._clock_stop_count.value
+
+            self._clock_stop_count = str(self._clock_stop_count)
+
+        return self._clock_stop_count
 
     @property
     def utc_start_time(self):

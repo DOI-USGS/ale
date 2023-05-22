@@ -34,6 +34,8 @@ namespace ale {
   std::string getPlatformName(nlohmann::json isd);
   std::string getLogFile(nlohmann::json isd);
   std::string getIsisCameraVersion(nlohmann::json isd);
+  std::string getProjection(nlohmann::json isd);
+  
   int getTotalLines(nlohmann::json isd);
   int getTotalSamples(nlohmann::json isd);
   double getStartingTime(nlohmann::json isd);
@@ -45,6 +47,7 @@ namespace ale {
   double getFocalLengthUncertainty(nlohmann::json isd);
   std::vector<double> getFocal2PixelLines(nlohmann::json isd);
   std::vector<double> getFocal2PixelSamples(nlohmann::json isd);
+  std::vector<double> getGeoTransform(nlohmann::json isd);
   double getDetectorCenterLine(nlohmann::json isd);
   double getDetectorCenterSample(nlohmann::json isd);
   double getDetectorStartingLine(nlohmann::json isd);

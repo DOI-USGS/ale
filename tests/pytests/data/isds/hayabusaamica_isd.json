@@ -1,0 +1,278 @@
+{
+  "isis_camera_version": 1,
+  "image_lines": 1024,
+  "image_samples": 1024,
+  "name_platform": "HAYABUSA",
+  "name_sensor": "HAYABUSA_AMICA",
+  "reference_height": {
+    "maxheight": 1000,
+    "minheight": -1000,
+    "unit": "m"
+  },
+  "name_model": "USGS_ASTRO_FRAME_SENSOR_MODEL",
+  "center_ephemeris_time": 182502855.87767982,
+  "radii": {
+    "semimajor": 0.274,
+    "semiminor": 0.138,
+    "unit": "km"
+  },
+  "body_rotation": {
+    "time_dependent_frames": [
+      2025143,
+      1
+    ],
+    "ck_table_start_time": 182502855.87767982,
+    "ck_table_end_time": 182502855.87767982,
+    "ck_table_original_size": 1,
+    "ephemeris_times": [
+      182502855.87767982
+    ],
+    "quaternions": [
+      [
+        -0.08077042629450831,
+        -0.3978802006010579,
+        0.8955645826414776,
+        0.1820207749792905
+      ]
+    ],
+    "angular_velocities": [
+      [
+        -2.512589340256263e-08,
+        5.61469404198439e-05,
+        -0.00013244767067246732
+      ]
+    ],
+    "reference_frame": 1
+  },
+  "instrument_pointing": {
+    "time_dependent_frames": [
+      -130000,
+      1
+    ],
+    "ck_table_start_time": 182502855.87767982,
+    "ck_table_end_time": 182502855.87767982,
+    "ck_table_original_size": 1,
+    "ephemeris_times": [
+      182502855.87767982
+    ],
+    "quaternions": [
+      [
+        -0.35631878528559185,
+        0.6008590807630156,
+        0.37126158431750983,
+        0.6116944697537136
+      ]
+    ],
+    "angular_velocities": [
+      [
+        -3.8262173581753043e-07,
+        -7.423354754135573e-06,
+        -4.099140843147822e-05
+      ]
+    ],
+    "reference_frame": 1,
+    "constant_frames": [
+      -130102,
+      -130101,
+      -130000
+    ],
+    "constant_rotation": [
+      0.006635481026673982,
+      0.9999756648566065,
+      0.002154085915888306,
+      0.9999768321090574,
+      -0.006632187003876368,
+      -0.0015327559101681021,
+      -0.0015184323097166528,
+      0.002164206583021168,
+      -0.9999965052804872
+    ]
+  },
+  "naif_keywords": {
+    "BODY2025143_RADII": [
+      0.274,
+      0.156,
+      0.138
+    ],
+    "BODY_FRAME_CODE": 2025143,
+    "BODY_CODE": 2025143,
+    "TKFRAME_-130102_AXES": [
+      1.0,
+      2.0,
+      3.0
+    ],
+    "TKFRAME_-130102_SPEC": "ANGLES",
+    "TKFRAME_-130102_RELATIVE": "HAYABUSA_AMICA_IDEAL",
+    "INS-130102_FOCAL_LENGTH": 0.1208,
+    "FRAME_-130102_NAME": "HAYABUSA_AMICA",
+    "FRAME_-130102_CLASS_ID": -130102.0,
+    "INS-130102_PIXEL_LINES": 1024.0,
+    "INS-130102_CENTER": [
+      511.5,
+      511.5
+    ],
+    "INS-130102_LT_SURFACE_CORRECT": "FALSE",
+    "INS-130102_F_NUMBER": 8.0,
+    "INS-130102_PIXEL_SIZE": 1.2e-05,
+    "INS-130102_SWAP_OBSERVER_TARGET": "TRUE",
+    "INS-130102_PIXEL_SAMPLES": 1024.0,
+    "FRAME_-130102_CLASS": 4.0,
+    "INS-130102_ITRANSL": [
+      0.0,
+      0.0,
+      -83.33333333
+    ],
+    "INS-130102_LIGHTTIME_CORRECTION": "NONE",
+    "INS-130102_FOV_BOUNDARY_CORNERS": [
+      0.006144,
+      0.006144,
+      0.1204711614,
+      -0.006144,
+      0.006144,
+      0.1204711614,
+      -0.006144,
+      -0.006144,
+      0.1204711614,
+      0.006144
+    ],
+    "INS-130102_ITRANSS": [
+      0.0,
+      83.33333333,
+      0.0
+    ],
+    "INS-130102_BORESIGHT": [
+      0.0,
+      0.0,
+      1.0
+    ],
+    "INS-130102_UPVECTOR": [
+      0.0,
+      -1.0,
+      0.0
+    ],
+    "INS-130102_BORESIGHT_LINE": 511.5,
+    "INS-130102_BORESIGHT_SAMPLE": 511.5,
+    "TKFRAME_-130102_UNITS": "DEGREES",
+    "INS-130102_PIXEL_PITCH": 0.012,
+    "INS-130102_FOV_SHAPE": "POLYGON",
+    "INS-130102_TRANSX": [
+      0.0,
+      0.012,
+      0.0
+    ],
+    "INS-130102_TRANSY": [
+      0.0,
+      0.0,
+      -0.012
+    ],
+    "INS-130102_OD_K": [
+      0.0,
+      2.8e-05,
+      0.0
+    ],
+    "INS-130102_FOV_FRAME": "HAYABUSA_AMICA",
+    "TKFRAME_-130102_ANGLES": [
+      -0.087,
+      -0.124,
+      -0.38
+    ],
+    "FRAME_-130102_CENTER": -130.0,
+    "OBJECT_2025143_FRAME": "ITOKAWA_FIXED",
+    "FRAME_2025143_CLASS": 2.0,
+    "BODY2025143_PM": [
+      129.73,
+      712.1437611,
+      0.0
+    ],
+    "BODY2025143_POLE_RA": [
+      90.02564,
+      0.0,
+      0.0
+    ],
+    "FRAME_2025143_CLASS_ID": 2025143.0,
+    "BODY2025143_POLE_DEC": [
+      -67.02704,
+      0.0,
+      0.0
+    ],
+    "FRAME_2025143_CENTER": 2025143.0,
+    "BODY2025143_LONG_AXIS": 0.0,
+    "FRAME_2025143_NAME": "ITOKAWA_FIXED"
+  },
+  "detector_sample_summing": 1,
+  "detector_line_summing": 1,
+  "focal_length_model": {
+    "focal_length": 0.1208
+  },
+  "detector_center": {
+    "line": 511.5,
+    "sample": 511.5
+  },
+  "focal2pixel_lines": [
+    0.0,
+    0.0,
+    -83.33333333
+  ],
+  "focal2pixel_samples": [
+    0.0,
+    83.33333333,
+    0.0
+  ],
+  "optical_distortion": {
+    "radial": {
+      "coefficients": [
+        0.0,
+        2.8e-05,
+        0.0
+      ]
+    }
+  },
+  "starting_detector_line": 0,
+  "starting_detector_sample": 0,
+  "instrument_position": {
+    "spk_table_start_time": 182502855.87767982,
+    "spk_table_end_time": 182502855.87767982,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
+      182502855.87767982
+    ],
+    "positions": [
+      [
+        8.86672985554185,
+        0.2413099824695155,
+        0.0807100049795115
+      ]
+    ],
+    "velocities": [
+      [
+        -1.7052270063544483e-07,
+        3.570752676118616e-07,
+        2.8761355905130292e-06
+      ]
+    ],
+    "reference_frame": 1
+  },
+  "sun_position": {
+    "spk_table_start_time": 182502855.87767982,
+    "spk_table_end_time": 182502855.87767982,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
+      182502855.87767982
+    ],
+    "positions": [
+      [
+        154700502.11551195,
+        5443988.583930893,
+        -2054766.29920961
+      ]
+    ],
+    "velocities": [
+      [
+        -6.6574479060899465,
+        28.813387859292327,
+        13.032393923917786
+      ]
+    ],
+    "reference_frame": 1
+  }
+}

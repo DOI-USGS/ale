@@ -1,0 +1,64 @@
+Instrument Addendum Kernel for the Kaguya Multiband Imagers VIS and NIR
+
+MI FocalPlaneMap constants  transform back and forth between detector and focal plane
+
+These are a little odd for the Kaguya sensors because the principle point offsets
+(commonly refered to as boresite measurement) are applyed within the distortion map.
+      \begindata
+
+      INS-131331_TRANSX   =  ( 0.0 , 0.0 , 0.0 )
+      INS-131331_TRANSY   =  ( 0.0 , -0.013 , 0.0 )
+
+      INS-131331_ITRANSS   =  ( 0.0 , 0.0 , -76.923076923076900 )
+      INS-131331_ITRANSL   =  ( 0.0 , -76.923076923076900 , 0.0 )
+
+      INS-131332_TRANSX   =  ( 0.0 , 0.0 , 0.0 )
+      INS-131332_TRANSY   =  ( 0.0 , -0.013 , 0.0 )
+
+      INS-131332_ITRANSS   =  ( 0.0 , 0.0 , -76.923076923076900 )
+      INS-131332_ITRANSL   =  ( 0.0 , -76.923076923076900 , 0.0 )
+
+      INS-131333_TRANSX   =  ( 0.0 , 0.0 , 0.0 )
+      INS-131333_TRANSY   =  ( 0.0 , -0.013 , 0.0 )
+
+      INS-131333_ITRANSS   =  ( 0.0 , 0.0 , -76.923076923076900 )
+      INS-131333_ITRANSL   =  ( 0.0 , -76.923076923076900 , 0.0 )
+
+      INS-131334_TRANSX   =  ( 0.0 , 0.0 , 0.0 )
+      INS-131334_TRANSY   =  ( 0.0 , -0.013 , 0.0 )
+
+      INS-131334_ITRANSS   =  ( 0.0 , 0.0 , -76.923076923076900 )
+      INS-131334_ITRANSL   =  ( 0.0 , -76.923076923076900 , 0.0 )
+
+      INS-131335_TRANSX   =  ( 0.0 , 0.0 , 0.0 )
+      INS-131335_TRANSY   =  ( 0.0 , -0.013 , 0.0 )
+
+      INS-131335_ITRANSS   =  ( 0.0 , 0.0 , -76.923076923076900 )
+      INS-131335_ITRANSL   =  ( 0.0 , -76.923076923076900 , 0.0 )
+
+      INS-131341_TRANSX   =  ( 0.0 , 0.0 , 0.0 )
+      INS-131341_TRANSY   =  ( 0.0 , -0.040 , 0.0 )
+
+      INS-131341_ITRANSS   =  ( 0.0 , 0.0 , -25 )
+      INS-131341_ITRANSL   =  ( 0.0 , -25 , 0.0 )
+
+      INS-131342_TRANSX   =  ( 0.0 , 0.0 , 0.0 )
+      INS-131342_TRANSY   =  ( 0.0 , -0.040 , 0.0 )
+
+      INS-131342_ITRANSS   =  ( 0.0 , 0.0 , -25 )
+      INS-131342_ITRANSL   =  ( 0.0 , -25 , 0.0 )
+
+      INS-131343_TRANSX   =  ( 0.0 , 0.0 , 0.0 )
+      INS-131343_TRANSY   =  ( 0.0 , -0.040 , 0.0 )
+
+      INS-131343_ITRANSS   =  ( 0.0 , 0.0 , -25 )
+      INS-131343_ITRANSL   =  ( 0.0 , -25 , 0.0 )
+
+      INS-131344_TRANSX   =  ( 0.0 , 0.0 , 0.0 )
+      INS-131344_TRANSY   =  ( 0.0 , -0.040 , 0.0 )
+
+      INS-131344_ITRANSS   =  ( 0.0 , 0.0 , -25 )
+      INS-131344_ITRANSL   =  ( 0.0 , -25 , 0.0 )
+
+      \begintext
+

@@ -104,7 +104,7 @@ class FrameChain(nx.DiGraph):
         if len(target_times) > 1:
             target_times = np.asarray([ephemeris_times[0], ephemeris_times[-1]])
 
-        if exact_ck_times and not nadir:
+        if exact_ck_times and len(ephemeris_times) > 1 and not nadir:
             try:
                 sensor_times = cls.extract_exact_ck_times(ephemeris_times[0], ephemeris_times[-1], sensor_frame)
             except Exception as e:
