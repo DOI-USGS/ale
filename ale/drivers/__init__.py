@@ -27,7 +27,8 @@ __disabled_drivers__ = ["ody_drivers",
                         "hayabusa2_drivers",
                         "juno_drivers",
                         "tgo_drivers",
-                        "msi_drivers"]
+                        "msi_drivers",
+                        "mgs_drivers"]
 
 # dynamically load drivers
 __all__ = [os.path.splitext(os.path.basename(d))[0] for d in glob(os.path.join(os.path.dirname(__file__), '*_drivers.py'))]
