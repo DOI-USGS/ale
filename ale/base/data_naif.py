@@ -428,7 +428,8 @@ class NaifSpice():
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
                                                       ephemeris_times=self.ephemeris_time,
-                                                      nadir=nadir, exact_ck_times=exact_ck_times)
+                                                      nadir=nadir, exact_ck_times=exact_ck_times,
+                                                      inst_time_bias=self.instrument_time_bias)
 
             if nadir:
                 # Logic for nadir calculation was taken from ISIS3
@@ -589,3 +590,17 @@ class NaifSpice():
                 pass
 
         return self._naif_keywords
+
+    @property
+    def instrument_time_bias(self):
+        """
+        Time bias used for generating sensor orientations
+
+        The default is 0 for not time bias
+
+        Returns
+        -------
+        : int
+          Time bias in ephemeris time
+        """
+        return 0
