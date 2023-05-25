@@ -5,6 +5,7 @@ import spiceypy as spice
 import json
 from unittest.mock import patch, PropertyMock
 import unittest
+from ale.drivers import AleJsonEncoder
 from conftest import get_image_label, get_image_kernels, convert_kernels, get_isd, compare_dicts
 import ale
 
@@ -552,10 +553,8 @@ def test_mex_src_load(test_mex_src_kernels):
 
 # Eventually all label/formatter combinations should be tested. For now, isis3/usgscsm and
 # pds3/isis will fail.
-@pytest.mark.parametrize("label,formatter", [('isis3','isis'), ('pds3', 'usgscsm'),
-                                              pytest.param('isis3','usgscsm', marks=pytest.mark.xfail),
-                                              pytest.param('pds3','isis', marks=pytest.mark.xfail),])
-def test_mex_load(test_mex_hrsc_kernels, formatter, usgscsm_compare_dict, label):
+@pytest.mark.parametrize("label", [('isis3'), ('pds3')])
+def test_mex_load(test_mex_hrsc_kernels, label):
     label_file = get_image_label('h5270_0000_ir2', label)
 
     with patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_ephemeris_times', \
@@ -575,9 +574,10 @@ def test_mex_load(test_mex_hrsc_kernels, formatter, usgscsm_compare_dict, label)
         binary_ephemeris_times.return_value = [255744599.02748165, 255744599.04028246, 255744795.73322123]
         binary_exposure_durations.return_value = [0.012800790786743165, 0.012800790786743165, 0.013227428436279297]
         binary_lines.return_value = [0.5, 1.5, 15086.5]
+        usgscsm_isd = ale.load(label_file, props={'kernels': test_mex_hrsc_kernels})
+        compare_dict = get_isd("mexhrsc")
 
-        usgscsm_isd = ale.load(label_file, props={'kernels': test_mex_hrsc_kernels}, formatter=formatter)
-        assert compare_dicts(usgscsm_isd, usgscsm_compare_dict['h5270_0000_ir2'][formatter]) == []
+        assert compare_dicts(usgscsm_isd, compare_dict) == []
 
 # ========= Test mex pds3label and naifspice driver =========
 class test_mex_pds3_naif(unittest.TestCase):

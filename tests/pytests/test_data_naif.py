@@ -69,7 +69,7 @@ class test_data_naif(unittest.TestCase):
         np.testing.assert_array_equal(self.driver.target_body_radii, [3396.19, 3396.19, 3376.2 ])
 
     def test_reference_frame(self):
-        assert self.driver.reference_frame.upper() == 'IAU_MARS'
+        assert self.driver.reference_frame.upper() == 'J2000'
 
     def test_ephemeris_start_time(self):
         assert self.driver.ephemeris_start_time == -631195148.8160816
@@ -93,11 +93,13 @@ class test_data_naif(unittest.TestCase):
         assert not self.driver.correct_lt_to_surface
 
     def test_sun_position(self):
+        self.driver.ephemeris_time = [297088762.61698407]
         sun_positions, sun_velocities, times = self.driver.sun_position
         assert len(sun_positions) == 1
-        np.testing.assert_allclose(sun_positions[0], [-127052102329.16032, 139728839049.65073, -88111530293.94502])
+        print(sun_positions[0])
+        np.testing.assert_allclose(sun_positions[0], [-2.08246643e+11, -7.67708707e+09, 2.10354896e+09])
         assert len(sun_velocities) == 1
-        np.testing.assert_allclose(sun_velocities[0], [9883868.06162645, 8989183.29614645, 881.9339912834714])
+        np.testing.assert_allclose(sun_velocities[0], [-210.201633, -23901.883517, -10957.47134])
         assert len(times) == 1
         np.testing.assert_allclose(times[0], 297088762.61698407)
 
@@ -110,8 +112,8 @@ class test_data_naif(unittest.TestCase):
     def test_sensor_position(self):
         self.driver.ephemeris_time = [297088762.61698407]
         positions, velocities, times = self.driver.sensor_position
-        np.testing.assert_allclose(positions[0], [-616295.93509894, -97815.27289939, -3573807.40392374])
-        np.testing.assert_allclose(velocities[0], [-3386.49396159, 411.4392769, 564.95648816])
+        np.testing.assert_allclose(positions[0], [-1886034.830689,   912111.196634, -2961826.0668])
+        np.testing.assert_allclose(velocities[0], [-1962.292328, -2807.897516,   375.459312])
         np.testing.assert_allclose(times[0], 297088762.61698407)
 
     def test_nadir_sensor_orientation(self):

@@ -432,13 +432,13 @@ class NaifSpice():
             if nadir:
                 # Logic for nadir calculation was taken from ISIS3
                 #  SpiceRotation::setEphemerisTimeNadir
-                rotation = self._frame_chain.compute_rotation(self.target_frame_id, 1)
+                # rotation = self._frame_chain.compute_rotation(self.target_frame_id, 1)
                 p_vec, v_vec, times = self.sensor_position
-                rotated_positions = rotation.apply_at(p_vec, times)
-                rotated_velocities = rotation.rotate_velocity_at(p_vec, v_vec, times)
+                # rotated_positions = rotation.apply_at(p_vec, times)
+                # rotated_velocities = rotation.rotate_velocity_at(p_vec, v_vec, times)
 
-                p_vec = rotated_positions
-                v_vec = rotated_velocities
+                # p_vec = rotated_positions
+                # v_vec = rotated_velocities
 
                 velocity_axis = 2
                 # Get the default line translation with no potential flipping

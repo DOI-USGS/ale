@@ -140,12 +140,12 @@ def rotate_state(table, rotation):
     else:
         raise ValueError('No positions are available in the input table.')
 
-    rotated_pos = rotation.apply_at(positions, ephemeris_times)
-    if velocities is not None:
-        rotated_vel = rotation.rotate_velocity_at(positions, velocities, ephemeris_times)
-    else:
-        rotated_vel = None
-    return rotated_pos, rotated_vel, ephemeris_times
+    # rotated_pos = rotation.apply_at(positions, ephemeris_times)
+    # if velocities is not None:
+    #     rotated_vel = rotation.rotate_velocity_at(positions, velocities, ephemeris_times)
+    # else:
+    #     rotated_vel = None
+    return positions, velocities, ephemeris_times
 
 class IsisSpice():
     """Mixin class for reading from an ISIS cube that has been spiceinit'd
