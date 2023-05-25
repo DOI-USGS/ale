@@ -17,9 +17,9 @@ clone_github:
     script:
         - echo $SOURCE_REPOSITORY
         - git config --global http.sslVerify false # Epic....
-        - rm -rf isis  # Needed to allow multiple CI runs
-        - git clone --mirror $SOURCE_REPOSITORY isis
-        - cd isis
+        - rm -rf ale  # Needed to allow multiple CI runs
+        - git clone --mirror $SOURCE_REPOSITORY ale
+        - cd ale
         - git remote remove origin
         - git remote add origin $DESTINATION_REPOSITORY
         - git push -f --prune --all

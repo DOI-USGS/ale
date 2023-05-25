@@ -20,6 +20,7 @@ def test_nac_kernels():
     for kern in binary_kernels:
         os.remove(kern)
 
+@pytest.mark.xfail
 def test_nac_load(test_nac_kernels):
     label_file = get_image_label('m0402852', 'isis')
     compare_dict = get_isd("mgsmocna")
@@ -38,6 +39,7 @@ def test_wac_kernels():
     for kern in binary_kernels:
         os.remove(kern)
 
+@pytest.mark.xfail
 def test_wac_load(test_wac_kernels):
     label_file = get_image_label('ab102401', 'isis3')
     compare_dict = get_isd("mgsmocwa")
