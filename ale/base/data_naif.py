@@ -307,10 +307,7 @@ class NaifSpice():
         String name of the target reference frame
         """
         if not hasattr(self, "_reference_frame"):
-            try:
-                self._reference_frame = spice.cidfrm(spice.bodn2c(self.target_name))[1]
-            except:
-                self._reference_frame = 'IAU_{}'.format(self.target_name)
+            self._reference_frame = "J2000"
         return self._reference_frame
 
     @property
