@@ -213,4 +213,12 @@ def convert_kernels(kernels):
             except:
                 warnings.warn(f"Unable to convert {path} to binary kernel")
         updated_kernels.append(kernel)
+    
+    # Sort Kernels
+    # Ensure that the ISIS Addendum kernel is last in case it overrides
+    # some values from the default Instrument kernel
+    # Sorts planetary constants kernel first so it can be overridden by more specific kernels
+    updated_kernels = sorted(updated_kernels, key=lambda x: "Addendum" in x)
+    updated_kernels = sorted(updated_kernels, key=lambda x: "pck00" in x, reverse=True)
+    
     return updated_kernels, binary_kernels

@@ -1,0 +1,34 @@
+\begintext
+The focal length was calculated from f# = 1 and aperture = 27.2 mm 
+See: http://sbn.psi.edu/pds/asteroid/HAY_A_NIRS_3_NIRSCAL_V1_0/document/nirscalpaper.pdf
+The units for focal length are meters and the units for pixel pitch are mm. 
+
+\begindata
+ INS-130200_FOCAL_LENGTH      = 0.0272
+
+ INS-130200_PIXEL_PITCH       = 0.047472922
+ INS-130200_BORESIGHT_SAMPLE  = 0.0
+ INS-130200_BORESIGHT_LINE    = 0.0
+
+\begintext
+  The NIRS orientientiation in ISIS camera model implemenation is
+  +Y = +SAMPLE, +X = -LINE, Z = +Z
+ 
+  ITRANSS and ITRANSL were calculated using the camcoeffs application.
+
+\begindata
+
+ INS-130200_TRANSX  = (0.0, 0.0, -0.047472922)
+ INS-130200_TRANSY  = (0.0, 0.047472922, 0.0)
+ INS-130200_ITRANSS = (0.0, 0.0, 21.064639754005)
+ INS-130200_ITRANSL = (0.0, -21.064639754005, 0.0)
+
+\begintext
+NIRS is very close to Itokawa so light time correction 
+and target/observer perspective are set as follows.
+
+\begindata 
+
+INS-130200_SWAP_OBSERVER_TARGET = 'TRUE'
+INS-130200_LIGHTTIME_CORRECTION = 'NONE'
+INS-130200_LT_SURFACE_CORRECT = 'FALSE'
