@@ -62,9 +62,10 @@ def test_mex_load(test_mex_hrsc_kernels, label):
         binary_lines.return_value = [0.5, 6664.5, 6665.5]
 
         usgscsm_isd = ale.load(label_file, props={'kernels': test_mex_hrsc_kernels})
-        # with open("/Users/acpaquette/repos/ale/tests/pytests/data/isds/mexhrsc_isd.json", "w") as fp:
-        #   json.dump(usgscsm_isd, fp, indent=2, cls=AleJsonEncoder)
-        compare_isd = get_isd('mexhrsc')
+        if label == "isis3":
+          compare_isd = get_isd('mexhrsc_isis')
+        else:
+          compare_isd = get_isd('mexhrsc')
         assert compare_dicts(usgscsm_isd, compare_isd) == []
 
 # ========= Test mex pds3label and naifspice driver =========
