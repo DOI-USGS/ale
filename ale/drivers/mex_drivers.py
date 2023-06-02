@@ -91,19 +91,6 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, NoDistortion
     """
 
     @property
-    def odtk(self):
-        """
-        The coefficients for the distortion model
-
-        Returns
-        -------
-        : list
-          Radial distortion coefficients. There is only one coefficient for LROC NAC l/r
-        """
-        return [0.0, 0.0, 0.0]
-
-
-    @property
     def ikid(self):
         """
         Returns the Naif ID code for the HRSC head instrument
@@ -725,19 +712,6 @@ class MexSrcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortion, Driv
     Driver for a PDS3 Mars Express (Mex) High Resolution Stereo Camera (HRSC) - Super Resolution 
     Channel (SRC) image.
     """
-
-    @property
-    def odtk(self):
-        """
-        The coefficients for the distortion model. No distortion model, so pass in all zeroes.
-
-        Returns
-        -------
-        : list
-          Radial distortion coefficients.
-        """
-        return [0.0, 0.0, 0.0]
-
 
     @property
     def ikid(self):
