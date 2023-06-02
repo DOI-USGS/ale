@@ -5,7 +5,7 @@ import json
 import pvl
 
 import numpy as np
-from ale.drivers import co_drivers
+from ale.drivers import AleJsonEncoder, co_drivers
 from ale.formatters.isis_formatter import to_isis
 from ale.formatters.formatter import to_isd
 from ale.base.data_isis import IsisSpice
@@ -53,6 +53,7 @@ def test_nhleisa_load(test_kernels, image):
     isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
     compare_isd = image_dict[image]
     isd_obj = json.loads(isd_str)
+    print(json.dumps(isd_obj, indent=2, cls=AleJsonEncoder))
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
 
@@ -64,6 +65,7 @@ def test_nhmvic_load(test_kernels, image):
     compare_isd = image_dict[image]
 
     isd_obj = json.loads(isd_str)
+    print(json.dumps(isd_obj, indent=2, cls=AleJsonEncoder))
     assert compare_dicts(isd_obj, compare_isd) == []
 
 # Test load of nh leisa labels
@@ -73,6 +75,7 @@ def test_nhmvictdi_load(test_kernels, image):
     isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
     compare_isd = image_dict[image]
     isd_obj = json.loads(isd_str)
+    print(json.dumps(isd_obj, indent=2, cls=AleJsonEncoder))
     assert compare_dicts(isd_obj, compare_isd) == []
 
 

@@ -60,6 +60,7 @@ def test_load_minirf(test_kernels):
     label_file = get_image_label('03821_16N196_S1', 'isis3')
     isd_str = ale.loads(label_file, props={'kernels': test_kernels['03821_16N196_S1']})
     isd_obj = json.loads(isd_str)
+    print(json.dumps(isd_obj, indent=2))
     comparison = compare_dicts(isd_obj, image_dict['03821_16N196_S1'])
     assert comparison == []
 

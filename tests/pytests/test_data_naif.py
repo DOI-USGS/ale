@@ -93,6 +93,7 @@ class test_data_naif(unittest.TestCase):
         assert not self.driver.correct_lt_to_surface
 
     def test_sun_position(self):
+        self.driver.ephemeris_time = [297088762.61698407]
         sun_positions, sun_velocities, times = self.driver.sun_position
         assert len(sun_positions) == 1
         np.testing.assert_allclose(sun_positions[0], [-127052102329.16032, 139728839049.65073, -88111530293.94502])
