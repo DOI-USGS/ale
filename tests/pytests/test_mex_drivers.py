@@ -78,9 +78,6 @@ class test_mex_pds3_naif(unittest.TestCase):
     def test_short_mission_name(self):
         assert self.driver.short_mission_name=='mex'
 
-    def test_odtk(self):
-        assert self.driver.odtk == [0.0, 0.0, 0.0]
-
     def test_ikid(self):
         with patch('ale.drivers.mex_drivers.spice.bods2c', return_value=12345) as bods2c:
             assert self.driver.ikid == 12345
@@ -245,9 +242,6 @@ class test_mex_src_pds3_naif(unittest.TestCase):
 
     def test_short_mission_name(self):
         assert self.driver.short_mission_name=='mex'
-
-    def test_odtk(self):
-        assert self.driver.odtk == [0.0, 0.0, 0.0]
 
     def test_ikid(self):
         with patch('ale.drivers.mex_drivers.spice.bods2c', return_value=12345) as bods2c:
