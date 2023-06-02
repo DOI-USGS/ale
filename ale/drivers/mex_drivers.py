@@ -16,7 +16,7 @@ from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import LineScanner
 from ale.base.type_sensor import Framer
-from ale.base.type_distortion import RadialDistortion
+from ale.base.type_distortion import NoDistortion
 
 FILTER_SPECIFIC_LOOKUP = {
     # This table contains the filter specific information from the ISIS iak kernel. The format is as follows:
@@ -69,7 +69,7 @@ FILTER_SPECIFIC_LOOKUP = {
             [-8569.5561557859, 0.068566503695773, 142.857126402363]],
 }
 
-class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistortion, Driver):
+class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, NoDistortion, Driver):
     """
     Driver for a PDS3 Mars Express (Mex) High Resolution Stereo Camera (HRSC) images.
 
@@ -89,19 +89,6 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
       making up the float containing that line's exposure duration.
 
     """
-
-    @property
-    def odtk(self):
-        """
-        The coefficients for the distortion model
-
-        Returns
-        -------
-        : list
-          Radial distortion coefficients. There is only one coefficient for LROC NAC l/r
-        """
-        return [0.0, 0.0, 0.0]
-
 
     @property
     def ikid(self):
@@ -417,8 +404,8 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         with open(self._file, 'rb') as image_file:
             bytes_per_record = self.label['RECORD_BYTES']
             num_records = self.label['FILE_RECORDS']
-            img_start_record = self.label['^IMAGE']
-            img_start_byte = bytes_per_record * (img_start_record - 1) # Offset by one for zero-based records
+            img_start_record = self.label['^IMAGE'] - 1 # Offset by one for zero-based records
+            img_start_byte = bytes_per_record * img_start_record 
             num_img_records = num_records - img_start_record
             image_file.seek(img_start_byte)
 
@@ -437,6 +424,16 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
 
 
     @property
+    def ephemeris_start_time(self):
+        """
+        Returns
+        -------
+        : float
+          starting ephemeris time
+        """
+        return self.binary_ephemeris_times[0]
+
+    @property
     def ephemeris_stop_time(self):
         """
         Returns the ephemeris stop time.
@@ -449,6 +446,20 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
           Ephemeris stop time
         """
         return self.binary_ephemeris_times[-1] + self.binary_exposure_durations[-1]
+
+    @property
+    def sampling_factor(self):
+        """
+        Returns the summing factor from the PDS3 label. For example a return value of 2
+        indicates that 2 lines and 2 samples (4 pixels) were summed and divided by 4
+        to produce the output pixel value.
+
+        Returns
+        -------
+        : int
+          Number of samples and lines combined from the original data to produce a single pixel in this image
+        """
+        return self.label.get('MACROPIXEL_SIZE', 1)
 
 
     # TODO We need to confirm that returning nothing here does not affect
@@ -482,7 +493,7 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistor
         return 1
 
 
-class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDistortion, Driver):
+class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
   
   @property
   def instrument_id(self):
@@ -525,7 +536,6 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
       Detector line of the principal point
     """
     return 0.0
-
 
   @property
   def detector_center_sample(self):
@@ -576,7 +586,11 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
         list of lines, list of ephemeris times, and list of exposure
         times
       """
-      return self.times_table['LineStart'], self.times_table['EphemerisTime'], self.times_table['ExposureTime']
+      times = self.times_table['EphemerisTime']
+      times = [time - self.center_ephemeris_time for time in times]
+      start_lines = self.times_table['LineStart']
+      start_lines = [line - .5 for line in start_lines]
+      return start_lines, times, self.times_table['ExposureTime']
 
   @property
   def ephemeris_start_time(self):
@@ -613,7 +627,6 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
       """
       return spice.bods2c("MEX_HRSC_HEAD")
 
-
   @property
   def fikid(self):
       """
@@ -632,8 +645,28 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
       return spice.bods2c(self.instrument_id)
 
   @property
+  def focal_length(self):
+      """
+      Returns the focal length of the filter-specific sensor
+
+      Expects fikid to be defined. This must be the integer Naif id code of
+      the filter-specific instrument.
+
+      NOTE: These values are pulled from ISIS iak kernels.
+
+      Returns
+      -------
+      : float
+        focal length
+      """
+      return FILTER_SPECIFIC_LOOKUP[self.fikid][0]
+
+  @property
   def focal2pixel_lines(self):
       """
+      Expects fikid to be defined. This must be the integer Naif id code of
+      the filter-specific instrument.
+
       NOTE: These values are pulled from ISIS iak kernels.
 
       Returns
@@ -641,12 +674,15 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
       : list<double>
         focal plane to detector lines
       """
-      return [0.0, 0.0, 111.111111111111]
+      return FILTER_SPECIFIC_LOOKUP[self.fikid][4]
 
 
   @property
   def focal2pixel_samples(self):
       """
+      Expects fikid to be defined. This must be the integer Naif id code of
+      the filter-specific instrument.
+
       NOTE: These values are pulled from ISIS iak kernels.
 
       Returns
@@ -654,26 +690,28 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialD
       : list<double>
         focal plane to detector samples
       """
-      return [0.0, 111.111111111111, 0.0]
+      return FILTER_SPECIFIC_LOOKUP[self.fikid][3]
 
-class MexSrcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDistortion, Driver):
+  @property
+  def sampling_factor(self):
+      """
+      Returns the summing factor from the PDS3 label. For example a return value of 2
+      indicates that 2 lines and 2 samples (4 pixels) were summed and divided by 4
+      to produce the output pixel value.
+
+      Returns
+      -------
+      : int
+        Number of samples and lines combined from the original data to produce a single pixel in this image
+      """
+      summing = self.label['IsisCube']['Instrument'].get("Summing", 1)
+      return summing
+
+class MexSrcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortion, Driver):
     """
     Driver for a PDS3 Mars Express (Mex) High Resolution Stereo Camera (HRSC) - Super Resolution 
     Channel (SRC) image.
     """
-
-    @property
-    def odtk(self):
-        """
-        The coefficients for the distortion model. No distortion model, so pass in all zeroes.
-
-        Returns
-        -------
-        : list
-          Radial distortion coefficients.
-        """
-        return [0.0, 0.0, 0.0]
-
 
     @property
     def ikid(self):

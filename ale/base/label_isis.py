@@ -107,7 +107,7 @@ class IsisLabel():
     @property
     def sampling_factor(self):
         """
-        Returns the summing factor from the PDS3 label. For example a return value of 2
+        Returns the summing factor from the ISIS label. For example a return value of 2
         indicates that 2 lines and 2 samples (4 pixels) were summed and divided by 4
         to produce the output pixel value.
 

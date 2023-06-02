@@ -3,7 +3,7 @@
   "image_lines": 15088,
   "image_samples": 1288,
   "name_platform": "MARS EXPRESS",
-  "name_sensor": "HIGH RESOLUTION STEREO CAMERA",
+  "name_sensor": "MEX_HRSC_IR",
   "reference_height": {
     "maxheight": 1000,
     "minheight": -1000,
@@ -14,17 +14,22 @@
   "line_scan_rate": [
     [
       0.5,
-      -98.35948351025581,
+      -98.36609682440758,
       0.012800790786743165
     ],
     [
+      6664.5,
+      -13.06160032749176,
+      0.012907449722290038
+    ],
+    [
       6665.5,
-      98.34625607728958,
+      -13.048532903194427,
       0.013227428436279297
     ]
   ],
   "starting_ephemeris_time": 255744599.02748165,
-  "center_ephemeris_time": 255744697.38696516,
+  "center_ephemeris_time": 255744697.39357847,
   "radii": {
     "semimajor": 3396.19,
     "semiminor": 3376.2,
@@ -354,24 +359,24 @@
     "reference_frame": 1
   },
   "sun_position": {
-    "spk_table_start_time": 255744697.38696516,
-    "spk_table_end_time": 255744697.38696516,
+    "spk_table_start_time": 255744697.39357847,
+    "spk_table_end_time": 255744697.39357847,
     "spk_table_original_size": 1,
     "ephemeris_times": [
-      255744697.38696516
+      255744697.39357847
     ],
     "positions": [
       [
-        99139014.67821987,
-        -200427816.2457205,
-        -94608347.52240176
+        99139014.81802115,
+        -200427816.19745806,
+        -94608347.50384377
       ]
     ],
     "velocities": [
       [
-        21.199131828075274,
-        7.3343154546823355,
-        2.7913498057574033
+        21.19913182204962,
+        7.334315465997904,
+        2.7913498135665433
       ]
     ],
     "reference_frame": 1

@@ -35,6 +35,9 @@ release.
 
 ## [Unreleased]
 
+### Fixed
+- MexHrscIsisLabelNaifSpice and MexHrscPds3NaifSpice have had there ephemeris times changed and sampling factor updated. MexHrscIsisLabelNaifSpice has also had it's focal length, and focal plane translation updated to reflect those found in the MexHrscPds3NaifSpice driver [#541](https://github.com/DOI-USGS/ale/pull/541)
+
 ## [0.9.0] - 2023-04-19
 
 ### Fixed
