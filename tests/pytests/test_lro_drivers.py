@@ -51,7 +51,6 @@ def test_load(test_kernels, label_type, image, kernel_type):
         compare_isd = get_isd('lro_isis')
 
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
 
