@@ -328,7 +328,9 @@ class NaifSpice():
         : (sun_positions, sun_velocities)
           a tuple containing a list of sun positions, a list of sun velocities
         """
-        times = [self.center_ephemeris_time]
+        times = self.ephemeris_time
+        if len(times) > 1:
+            times = [times[0], times[-1]]
         positions = []
         velocities = []
 
