@@ -44,7 +44,6 @@ def test_wac_load(test_wac_kernels):
 
     isd_str = ale.loads(label_file, props={'kernels': test_wac_kernels})
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
     assert compare_dicts(isd_obj, compare_dict) == []
 
 
