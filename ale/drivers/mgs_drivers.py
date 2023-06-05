@@ -130,6 +130,20 @@ class MgsMocNarrowAngleCameraIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, Na
         """
         return [0, 0.0131240578522949, 0.0131240578522949]
 
+    @property
+    def instrument_time_bias(self):
+      """
+      Defines the time bias for Mars Global Survayor instrument rotation information.
+
+      This shifts the sensor orientation window back by 1.15 seconds in ephemeris time.
+
+      Returns
+      -------
+      : int
+        Time bias adjustment
+      """
+      return -1.15
+
 class MgsMocWideAngleCameraIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDistortion, Driver):
     """
     Driver for reading MGS MOC WA ISIS labels.
@@ -268,3 +282,17 @@ class MgsMocWideAngleCameraIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, Naif
             return [0, -.007, .007]
         else:
             return [0, .007, .007]
+
+    @property
+    def instrument_time_bias(self):
+      """
+      Defines the time bias for Mars Global Survayor instrument rotation information.
+
+      This shifts the sensor orientation window back by 1.15 seconds in ephemeris time.
+
+      Returns
+      -------
+      : int
+        Time bias adjustment
+      """
+      return -1.15
