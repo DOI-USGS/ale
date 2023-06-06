@@ -35,6 +35,8 @@ release.
 
 ## [Unreleased]
 
+## [0.9.1] - 2023-06-05
+
 ### Changed
 - The NaifSpice class now gets two sun positions/velocities when a driver has more than one ephemeris time [#542](https://github.com/DOI-USGS/ale/pull/542)
 
