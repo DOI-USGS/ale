@@ -20,7 +20,6 @@ def test_nac_kernels():
     for kern in binary_kernels:
         os.remove(kern)
 
-@pytest.mark.xfail
 def test_nac_load(test_nac_kernels):
     label_file = get_image_label('m0402852', 'isis')
     compare_dict = get_isd("mgsmocna")
@@ -39,14 +38,12 @@ def test_wac_kernels():
     for kern in binary_kernels:
         os.remove(kern)
 
-@pytest.mark.xfail
 def test_wac_load(test_wac_kernels):
     label_file = get_image_label('ab102401', 'isis3')
     compare_dict = get_isd("mgsmocwa")
 
     isd_str = ale.loads(label_file, props={'kernels': test_wac_kernels})
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
     assert compare_dicts(isd_obj, compare_dict) == []
 
 

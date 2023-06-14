@@ -3,7 +3,7 @@
   "image_lines": 15088,
   "image_samples": 1288,
   "name_platform": "MARS EXPRESS",
-  "name_sensor": "HIGH RESOLUTION STEREO CAMERA",
+  "name_sensor": "MEX_HRSC_IR",
   "reference_height": {
     "maxheight": 1000,
     "minheight": -1000,
@@ -14,17 +14,22 @@
   "line_scan_rate": [
     [
       0.5,
-      -98.35948351025581,
+      -98.36609682440758,
       0.012800790786743165
     ],
     [
+      6664.5,
+      -13.06160032749176,
+      0.012907449722290038
+    ],
+    [
       6665.5,
-      98.34625607728958,
+      -13.048532903194427,
       0.013227428436279297
     ]
   ],
   "starting_ephemeris_time": 255744599.02748165,
-  "center_ephemeris_time": 255744697.38696516,
+  "center_ephemeris_time": 255744697.39357847,
   "radii": {
     "semimajor": 3396.19,
     "semiminor": 3376.2,

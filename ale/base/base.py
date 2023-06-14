@@ -359,7 +359,6 @@ class Driver():
               self._projection = "" 
         return self._projection
     
-
     @property 
     def geotransform(self):
         if not hasattr(self, "_geotransform"): 
