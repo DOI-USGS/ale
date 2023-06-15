@@ -1,0 +1,371 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 832
+      Lines   = 700
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = UnsignedByte
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName   = Mariner_10
+    InstrumentId     = M10_VIDICON_A
+    TargetName       = Mercury
+    StartTime        = 1974-03-29T17:56:26.396
+    ExposureDuration = 22.799999 <milliseconds>
+  End_Group
+
+  Group = Archive
+    GMT         = 1974:088:18:04:52
+    ImageNumber = 27265
+    Encounter   = Mercury_1
+  End_Group
+
+  Group = BandBin
+    FilterName   = CLEAR
+    FilterNumber = 5
+    OriginalBand = 1
+    Center       = 0.487 <micrometers>
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -76110
+    LeapSecond                = $base/kernels/lsk/naif0009.tls
+    TargetAttitudeShape       = $base/kernels/pck/pck00009.tpc
+    TargetPosition            = (Table, $base/kernels/spk/de405.bsp)
+    InstrumentPointing        = (Table,
+                                 $mariner10/kernels/ck/MARINER_10_A_gem.bc,
+                                 $mariner10/kernels/fk/mariner10.0001.tf)
+    Instrument                = Null
+    SpacecraftClock           = $mariner10/kernels/sclk/mariner10.0001.tsc
+    InstrumentPosition        = (Table,
+                                 $mariner10/kernels/spk/MARINER_10_A_gem.bsp)
+    InstrumentAddendum        = $mariner10/kernels/iak/mariner10Addendum002.ti
+    ShapeModel                = Null
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
+  End_Group
+
+  Group = Reseaus
+    Line     = (24.0, 18.6, 12.6, 11.2, 12.0, 13.2, 14.8, 19.0, 22.0, 101.6,
+                97.2, 93.4, 93.8, 95.4, 96.2, 98.0, 100.2, 102.0, 222.6, 221.4,
+                220.4, 221.0, 222.6, 224.6, 226.0, 227.0, 228.2, 347.0, 346.8,
+                346.8, 348.2, 349.6, 351.2, 353.0, 353.6, 353.6, 472.2, 472.8,
+                473.8, 475.0, 476.0, 478.2, 479.2, 479.0, 479.4, 598.4, 599.2,
+                601.6, 602.8, 604.0, 605.2, 606.2, 605.4, 604.4, 678.4, 681.0,
+                684.8, 687.2, 688.0, 689.2, 689.0, 686.4, 683.8, 61.0, 54.0,
+                50.6, 50.6, 52.4, 53.6, 55.8, 60.0, 159.2, 155.6, 155.4, 156.8,
+                158.2, 159.4, 161.0, 162.8, 283.8, 282.6, 283.2, 284.4, 287.0,
+                287.8, 289.0, 292.0, 410.8, 410.6, 411.4, 412.8, 414.4, 416.2,
+                417.6, 418.0, 536.6, 538.6, 539.8, 541.0, 542.2, 544.0, 544.2,
+                543.0, 639.8, 643.8, 645.8, 647.0, 648.2, 649.2, 649.0, 642.6)
+    Sample   = (26.4, 69.2, 182.6, 301.0, 420.4, 539.2, 657.2, 770.4, 815.0,
+                19.0, 65.8, 180.8, 300.2, 419.6, 539.0, 657.6, 772.8, 819.0,
+                15.0, 61.8, 178.8, 298.0, 418.4, 538.0, 656.8, 774.0, 821.2,
+                12.0, 59.8, 176.8, 296.6, 416.0, 535.6, 655.0, 772.8, 821.0,
+                12.0, 58.8, 175.2, 294.2, 413.8, 532.8, 653.2, 771.0, 819.4,
+                14.4, 59.4, 173.8, 292.2, 411.8, 531.8, 651.2, 768.8, 816.0,
+                20.2, 62.0, 174.2, 291.6, 410.8, 530.0, 649.6, 767.0, 814.2,
+                23.4, 123.0, 240.6, 360.4, 479.6, 598.8, 715.8, 817.2, 17.2,
+                121.4, 239.2, 359.4, 479.0, 597.8, 716.2, 820.6, 13.4, 118.6,
+                237.6, 357.2, 477.4, 596.4, 715.0, 820.2, 11.6, 116.8, 235.8,
+                355.0, 475.4, 594.6, 713.6, 820.6, 13.0, 115.8, 233.4, 352.4,
+                472.8, 592.4, 712.0, 818.8, 16.8, 116.2, 232.6, 351.8, 471.2,
+                591.6, 709.8, 816.8)
+    Type     = (4, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5,
+                5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5,
+                5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 6,
+                4, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5,
+                5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 6, 4, 5, 5, 5, 5, 5, 5, 6, 4, 5,
+                5, 5, 5, 5, 5, 6)
+    Valid    = (1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1,
+                0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0,
+                1, 1, 1, 1, 0, 1)
+    Template = $mariner10/reseaus/mar10a.template.cub
+    Status   = Refined
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 770724
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-76000, 1)
+  CkTableStartTime    = -812916168.41835
+  CkTableEndTime      = -812916168.41835
+  CkTableOriginalSize = 1
+  Description         = "Created by spiceinit"
+  Kernels             = ($mariner10/kernels/ck/MARINER_10_A_gem.bc,
+                         $mariner10/kernels/fk/mariner10.0001.tf)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 770788
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = -812916168.41835
+  SpkTableEndTime      = -812916168.41835
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = $mariner10/kernels/spk/MARINER_10_A_gem.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 770844
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (10011, 1)
+  CkTableStartTime    = -812916168.41835
+  CkTableEndTime      = -812916168.41835
+  CkTableOriginalSize = 1
+  Description         = "Created by spiceinit"
+  Kernels             = ($base/kernels/spk/de405.bsp,
+                         $base/kernels/pck/pck00009.tpc)
+  SolarLongitude      = 153.10811993588
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 770908
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = -812916168.41835
+  SpkTableEndTime      = -812916168.41835
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = $base/kernels/spk/de405.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 770964
+  Bytes     = 1832
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 754145
+  Bytes     = 15431
+End_Object
+
+Object = NaifKeywords
+  BODY199_RADII              = (2439.7, 2439.7, 2439.7)
+  INS-76110_FOCAL_LENGTH     = 1493.6
+  INS-76110_PIXEL_PITCH      = 0.013333333
+  INS-76110_TRANSX           = (0.0, 0.013333333, 0.0)
+  INS-76110_TRANSY           = (0.0, 0.0, 0.013333333)
+  INS-76110_ITRANSS          = (0.0, 75.0, 0.0)
+  INS-76110_ITRANSL          = (0.0, 0.0, 75.0)
+  INS-76110_BORESIGHT_SAMPLE = 475.0
+  INS-76110_BORESIGHT_LINE   = 400.0
+End_Object
+End
