@@ -30,7 +30,7 @@ class test_mariner10_isis_naif(unittest.TestCase):
         self.driver = Mariner10IsisLabelNaifSpiceDriver(label)
 
     def test_instrument_id(self):
-        assert self.driver.instrument_id == "M10_VIDICON_A"
+        assert self.driver.instrument_id == "M10_SPACECRAFT"
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1

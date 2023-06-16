@@ -18,8 +18,8 @@ class Mariner10IsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistorti
           Name of the instrument
         """
         inst_id_lookup = {
-            "M10_VIDICON_A": "M10_VIDICON_A",
-            "M10_VIDICON_B": "M10_VIDICON_B"
+            "M10_VIDICON_A": "M10_SPACECRAFT",
+            "M10_VIDICON_B": "M10_SPACECRAFT"
         }
         return inst_id_lookup[super().instrument_id]
 
