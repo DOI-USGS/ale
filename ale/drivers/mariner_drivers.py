@@ -22,10 +22,6 @@ class Mariner10IsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistorti
             "M10_VIDICON_B": "M10_VIDICON_B"
         }
         return inst_id_lookup[super().instrument_id]
-    
-    @property
-    def spacecraft_name(self):
-        return self.label['IsisCube']['Instrument']['SpacecraftName']
 
     @property
     def sensor_model_version(self):
@@ -49,7 +45,7 @@ class Mariner10IsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistorti
         : str
           Name of the sensor
         """
-        return self.instrument_id
+        return super().instrument_id
     
     @property
     def sensor_frame_id(self):
