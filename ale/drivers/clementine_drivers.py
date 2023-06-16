@@ -17,7 +17,7 @@ from ale.base.type_distortion import NoDistortion
 from ale import util
 
 
-class UvvisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
+class ClementineUvvisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
     """
     Driver for reading Ultra-violet Invisible Spectrum ISIS3 Labels
     """
