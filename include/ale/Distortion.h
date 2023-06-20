@@ -8,7 +8,8 @@ namespace ale {
     KAGUYALISM,
     DAWNFC,
     LROLROCNAC,
-    CAHVOR
+    CAHVOR,
+    LUNARORBITER
   };
 }
 

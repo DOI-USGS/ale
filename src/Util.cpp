@@ -360,6 +360,8 @@ DistortionType getDistortionModel(json isd) {
       return DistortionType::LROLROCNAC;
     } else if (distortion.compare("cahvor") == 0) {
       return DistortionType::CAHVOR;
+    } else if (distortion.compare("lunarorbiter") == 0) {
+      return DistortionType::LUNARORBITER;
     }
   } catch (...) {
     throw std::runtime_error("Could not parse the distortion model.");
@@ -373,129 +375,159 @@ std::vector<double> getDistortionCoeffs(json isd) {
   DistortionType distortion = getDistortionModel(isd);
 
   switch (distortion) {
-  case DistortionType::TRANSVERSE: {
-    try {
-      std::vector<double> coefficientsX, coefficientsY;
+    case DistortionType::TRANSVERSE: {
+      try {
+        std::vector<double> coefficientsX, coefficientsY;
 
-      coefficientsX = isd.at("optical_distortion")
-                          .at("transverse")
-                          .at("x")
+        coefficientsX = isd.at("optical_distortion")
+                            .at("transverse")
+                            .at("x")
+                            .get<std::vector<double>>();
+        coefficientsX.resize(10, 0.0);
+
+        coefficientsY = isd.at("optical_distortion")
+                            .at("transverse")
+                            .at("y")
+                            .get<std::vector<double>>();
+        coefficientsY.resize(10, 0.0);
+
+        coefficients = coefficientsX;
+
+        coefficients.insert(coefficients.end(), coefficientsY.begin(),
+                            coefficientsY.end());
+        return coefficients;
+      } catch (...) {
+        throw std::runtime_error(
+            "Could not parse a set of transverse distortion model coefficients.");
+        coefficients = std::vector<double>(20, 0.0);
+        coefficients[1] = 1.0;
+        coefficients[12] = 1.0;
+      }
+    } break;
+    case DistortionType::RADIAL: {
+      try {
+        coefficients = isd.at("optical_distortion")
+                          .at("radial")
+                          .at("coefficients")
                           .get<std::vector<double>>();
-      coefficientsX.resize(10, 0.0);
 
-      coefficientsY = isd.at("optical_distortion")
-                          .at("transverse")
-                          .at("y")
+        return coefficients;
+      } catch (...) {
+        throw std::runtime_error(
+            "Could not parse the radial distortion model coefficients.");
+        coefficients = std::vector<double>(3, 0.0);
+      }
+    } break;
+    case DistortionType::KAGUYALISM: {
+      try {
+
+        std::vector<double> coefficientsX = isd.at("optical_distortion")
+                                                .at("kaguyalism")
+                                                .at("x")
+                                                .get<std::vector<double>>();
+        std::vector<double> coefficientsY = isd.at("optical_distortion")
+                                                .at("kaguyalism")
+                                                .at("y")
+                                                .get<std::vector<double>>();
+        double boresightX = isd.at("optical_distortion")
+                                .at("kaguyalism")
+                                .at("boresight_x")
+                                .get<double>();
+        double boresightY = isd.at("optical_distortion")
+                                .at("kaguyalism")
+                                .at("boresight_y")
+                                .get<double>();
+
+        coefficientsX.resize(4, 0.0);
+        coefficientsY.resize(4, 0.0);
+        coefficientsX.insert(coefficientsX.begin(), boresightX);
+        coefficientsY.insert(coefficientsY.begin(), boresightY);
+        coefficientsX.insert(coefficientsX.end(), coefficientsY.begin(),
+                            coefficientsY.end());
+
+        return coefficientsX;
+      } catch (...) {
+        throw std::runtime_error("Could not parse a set of Kaguya LISM "
+                                "distortion model coefficients.");
+        coefficients = std::vector<double>(8, 0.0);
+      }
+    } break;
+    case DistortionType::DAWNFC: {
+      try {
+        coefficients = isd.at("optical_distortion")
+                          .at("dawnfc")
+                          .at("coefficients")
                           .get<std::vector<double>>();
-      coefficientsY.resize(10, 0.0);
 
-      coefficients = coefficientsX;
-
-      coefficients.insert(coefficients.end(), coefficientsY.begin(),
-                          coefficientsY.end());
-      return coefficients;
-    } catch (...) {
-      throw std::runtime_error(
-          "Could not parse a set of transverse distortion model coefficients.");
-      coefficients = std::vector<double>(20, 0.0);
-      coefficients[1] = 1.0;
-      coefficients[12] = 1.0;
-    }
-  } break;
-  case DistortionType::RADIAL: {
-    try {
-      coefficients = isd.at("optical_distortion")
-                         .at("radial")
-                         .at("coefficients")
-                         .get<std::vector<double>>();
-
-      return coefficients;
-    } catch (...) {
-      throw std::runtime_error(
-          "Could not parse the radial distortion model coefficients.");
-      coefficients = std::vector<double>(3, 0.0);
-    }
-  } break;
-  case DistortionType::KAGUYALISM: {
-    try {
-
-      std::vector<double> coefficientsX = isd.at("optical_distortion")
-                                              .at("kaguyalism")
-                                              .at("x")
-                                              .get<std::vector<double>>();
-      std::vector<double> coefficientsY = isd.at("optical_distortion")
-                                              .at("kaguyalism")
-                                              .at("y")
-                                              .get<std::vector<double>>();
-      double boresightX = isd.at("optical_distortion")
-                              .at("kaguyalism")
-                              .at("boresight_x")
-                              .get<double>();
-      double boresightY = isd.at("optical_distortion")
-                              .at("kaguyalism")
-                              .at("boresight_y")
-                              .get<double>();
-
-      coefficientsX.resize(4, 0.0);
-      coefficientsY.resize(4, 0.0);
-      coefficientsX.insert(coefficientsX.begin(), boresightX);
-      coefficientsY.insert(coefficientsY.begin(), boresightY);
-      coefficientsX.insert(coefficientsX.end(), coefficientsY.begin(),
-                           coefficientsY.end());
-
-      return coefficientsX;
-    } catch (...) {
-      throw std::runtime_error("Could not parse a set of Kaguya LISM "
-                               "distortion model coefficients.");
-      coefficients = std::vector<double>(8, 0.0);
-    }
-  } break;
-  case DistortionType::DAWNFC: {
-    try {
-      coefficients = isd.at("optical_distortion")
-                         .at("dawnfc")
-                         .at("coefficients")
-                         .get<std::vector<double>>();
-
-      return coefficients;
-    } catch (...) {
-      throw std::runtime_error(
-          "Could not parse the dawn radial distortion model coefficients.");
-      coefficients = std::vector<double>(1, 0.0);
-    }
-  } break;
-  case DistortionType::LROLROCNAC: {
-    try {
-      coefficients = isd.at("optical_distortion")
-                         .at("lrolrocnac")
-                         .at("coefficients")
-                         .get<std::vector<double>>();
-      return coefficients;
-    } catch (...) {
-      throw std::runtime_error(
-          "Could not parse the lrolrocnac distortion model coefficients.");
-      coefficients = std::vector<double>(1, 0.0);
-    }
-  } break;
-  case DistortionType::CAHVOR:
-  {
-    try
+        return coefficients;
+      } catch (...) {
+        throw std::runtime_error(
+            "Could not parse the dawn radial distortion model coefficients.");
+        coefficients = std::vector<double>(1, 0.0);
+      }
+    } break;
+    case DistortionType::LROLROCNAC: {
+      try {
+        coefficients = isd.at("optical_distortion")
+                          .at("lrolrocnac")
+                          .at("coefficients")
+                          .get<std::vector<double>>();
+        return coefficients;
+      } catch (...) {
+        throw std::runtime_error(
+            "Could not parse the lrolrocnac distortion model coefficients.");
+        coefficients = std::vector<double>(1, 0.0);
+      }
+    } break;
+    case DistortionType::CAHVOR:
     {
-      coefficients = isd.at("optical_distortion")
-                         .at("cahvor")
-                         .at("coefficients")
-                         .get<std::vector<double>>();
+      try
+      {
+        coefficients = isd.at("optical_distortion")
+                          .at("cahvor")
+                          .at("coefficients")
+                          .get<std::vector<double>>();
 
-      return coefficients;
-    }
-    catch (...)
+        return coefficients;
+      }
+      catch (...)
+      {
+        throw std::runtime_error(
+            "Could not parse the cahvor distortion model coefficients.");
+        coefficients = std::vector<double>(5, 0.0);
+      }
+    } break;
+    case DistortionType::LUNARORBITER:
     {
-      throw std::runtime_error(
-          "Could not parse the cahvor distortion model coefficients.");
-      coefficients = std::vector<double>(5, 0.0);
-    }
-  }
-  break;
+      try
+      {
+        double perspectiveX = isd.at("optical_distortion")
+                                 .at("lunarorbiter")
+                                 .at("perspective_x")
+                                 .get<double>();
+        double perspectiveY = isd.at("optical_distortion")
+                                 .at("lunarorbiter")
+                                 .at("perspective_y")
+                                 .get<double>();
+        double centerPointX = isd.at("optical_distortion")
+                                 .at("lunarorbiter")
+                                 .at("center_point_x")
+                                 .get<double>();
+        double centerPointY = isd.at("optical_distortion")
+                                 .at("lunarorbiter")
+                                 .at("center_point_y")
+                                 .get<double>();
+
+        coefficients = {perspectiveX, perspectiveY, centerPointX, centerPointY};
+        return coefficients;
+      }
+      catch (...)
+      {
+        throw std::runtime_error(
+          "Could not parse the Lunar Orbiter distortion model coefficients.");
+        coefficients = std::vector<double>(4, 0.0);
+      }
+    } break;
   }
   throw std::runtime_error(
       "Could not parse the distortion model coefficients.");

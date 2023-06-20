@@ -1,0 +1,321 @@
+{
+  "isis_camera_version": 1,
+  "image_lines": 8750,
+  "image_samples": 11800,
+  "name_platform": "Lunar Orbiter 3",
+  "name_sensor": "LO3_HIGH_RESOLUTION_CAMERA",
+  "reference_height": {
+    "maxheight": 1000,
+    "minheight": -1000,
+    "unit": "m"
+  },
+  "name_model": "USGS_ASTRO_FRAME_SENSOR_MODEL",
+  "center_ephemeris_time": -1037072690.2047702,
+  "radii": {
+    "semimajor": 1737.4,
+    "semiminor": 1737.4,
+    "unit": "km"
+  },
+  "body_rotation": {
+    "time_dependent_frames": [
+      310002,
+      1
+    ],
+    "ck_table_start_time": -1037072690.2047702,
+    "ck_table_end_time": -1037072690.2047702,
+    "ck_table_original_size": 1,
+    "ephemeris_times": [
+      -1037072690.2047702
+    ],
+    "quaternions": [
+      [
+        -0.7529989008598739,
+        0.15440708623042565,
+        0.11703630920453152,
+        -0.6288510231791256
+      ]
+    ],
+    "angular_velocities": [
+      [
+        -4.755409190644792e-08,
+        -1.008865502267475e-06,
+        2.4626598215594005e-06
+      ]
+    ],
+    "constant_frames": [
+      310001,
+      310003,
+      310000,
+      310002
+    ],
+    "constant_rotation": [
+      0.9999998785270937,
+      -0.00030978912711655305,
+      0.00038337513559243597,
+      0.00030978942161770135,
+      0.9999999520150048,
+      -7.087975496937869e-07,
+      -0.0003833748976184077,
+      8.275630251118771e-07,
+      0.9999999265114988
+    ],
+    "reference_frame": 1
+  },
+  "instrument_pointing": {
+    "time_dependent_frames": [
+      -533000,
+      1
+    ],
+    "ck_table_start_time": -1037072690.2047702,
+    "ck_table_end_time": -1037072690.2047702,
+    "ck_table_original_size": 1,
+    "ephemeris_times": [
+      -1037072690.2047702
+    ],
+    "quaternions": [
+      [
+        -0.44803516849075137,
+        0.3546150834674495,
+        0.5666230859062249,
+        -0.5936757607406126
+      ]
+    ],
+    "angular_velocities": [
+      [
+        -0.0,
+        -0.0,
+        -0.0
+      ]
+    ],
+    "reference_frame": 1,
+    "constant_frames": [
+      -533001,
+      -533000
+    ],
+    "constant_rotation": [
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  "naif_keywords": {
+    "BODY301_RADII": [
+      1737.4,
+      1737.4,
+      1737.4
+    ],
+    "BODY_FRAME_CODE": 310001,
+    "BODY_CODE": 301,
+    "INS-533001_PIXEL_PITCH": 0.006944,
+    "INS-533001_SPK_TIME_BIAS": 0.0,
+    "INS-533001_EULER_AXES": [
+      1.0,
+      2.0,
+      3.0
+    ],
+    "INS-533001_OD_K": [
+      0.00027963,
+      -2.869e-08,
+      0.0
+    ],
+    "FRAME_-533001_CLASS": 4.0,
+    "INS-533001_FOCAL_LENGTH": 609.28,
+    "INS-533001_CK_FRAME_ID": -533000.0,
+    "FRAME_-533001_CENTER": -533.0,
+    "TKFRAME_-533001_SPEC": "MATRIX",
+    "TKFRAME_-533001_MATRIX": [
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "FRAME_-533001_NAME": "LO3_HIGH_RESOLUTION_CAMERA",
+    "INS-533001_EULER_ANGLES": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "INS-533001_POINT_OF_SYMMETRY": [
+      -1.11,
+      0.3
+    ],
+    "INS-533001_PERSPECTIVE_FACTORS": [
+      -3e-06,
+      8e-07
+    ],
+    "INS-533001_PLATFORM_ID": -533000.0,
+    "INS-533001_CK_REFERENCE_ID": 1.0,
+    "INS-533001_CK_TIME_TOLERANCE": 1.0,
+    "TKFRAME_-533001_RELATIVE": "LUNAR_ORBITER_3",
+    "FRAME_-533001_CLASS_ID": -533001.0,
+    "INS-533001_CK_TIME_BIAS": 0.0,
+    "BODY301_POLE_RA": [
+      269.9949,
+      0.0031,
+      0.0
+    ],
+    "BODY301_NUT_PREC_PM": [
+      3.561,
+      0.1208,
+      -0.0642,
+      0.0158,
+      0.0252,
+      -0.0066,
+      -0.0047,
+      -0.0046,
+      0.0028,
+      0.0052
+    ],
+    "BODY301_NUT_PREC_RA": [
+      -3.8787000000000003,
+      -0.1204,
+      0.07,
+      -0.0172,
+      0.0,
+      0.0072,
+      0.0,
+      0.0,
+      0.0,
+      -0.0052
+    ],
+    "BODY301_LONG_AXIS": 0.0,
+    "BODY301_NUT_PREC_DEC": [
+      1.5419,
+      0.0239,
+      -0.0278,
+      0.0068,
+      0.0,
+      -0.0029,
+      0.0009,
+      0.0,
+      0.0,
+      0.0008
+    ],
+    "BODY301_POLE_DEC": [
+      66.5392,
+      0.013,
+      0.0
+    ],
+    "BODY301_PM": [
+      38.3213,
+      13.17635815,
+      -1.3999999999999999e-12
+    ],
+    "OBJECT_301_FRAME": "LUNAR_MEAN_EARTH",
+    "INS-533001_TRANSX": [
+      115.50954565137394,
+      -0.006953956655748381,
+      -3.945326343250231e-06
+    ],
+    "INS-533001_TRANSY": [
+      -31.50245193387461,
+      -2.8238081535064857e-06,
+      0.0069466064358475335
+    ],
+    "INS-533001_ITRANSS": [
+      16608.04530570599,
+      -143.80299143001824,
+      -0.08167293419694324
+    ],
+    "INS-533001_ITRANSL": [
+      4541.692430539061,
+      -0.05845617762411283,
+      143.95514969883214
+    ]
+  },
+  "detector_sample_summing": 1,
+  "detector_line_summing": 1,
+  "focal_length_model": {
+    "focal_length": 609.28
+  },
+  "detector_center": {
+    "line": 0,
+    "sample": 0
+  },
+  "focal2pixel_lines": [
+    4541.692430539061,
+    -0.05845617762411283,
+    143.95514969883214
+  ],
+  "focal2pixel_samples": [
+    16608.04530570599,
+    -143.80299143001824,
+    -0.08167293419694324
+  ],
+  "optical_distortion": {
+    "lunarorbiter": {
+      "perspective_x": -3e-06,
+      "perspective_y": 8e-07,
+      "center_point_x": -1.11,
+      "center_point_y": 0.3
+    }
+  },
+  "starting_detector_line": 0,
+  "starting_detector_sample": 0,
+  "instrument_position": {
+    "spk_table_start_time": -1037072690.2047702,
+    "spk_table_end_time": -1037072690.2047702,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
+      -1037072690.2047702
+    ],
+    "positions": [
+      [
+        -202.57206189209032,
+        -1605.7463485204432,
+        -747.2111184246384
+      ]
+    ],
+    "velocities": [
+      [
+        1.7869560397439908,
+        0.0574339083382552,
+        -0.6936285545554077
+      ]
+    ],
+    "reference_frame": 1
+  },
+  "sun_position": {
+    "spk_table_start_time": -1037072690.2047702,
+    "spk_table_end_time": -1037072690.2047702,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
+      -1037072690.2047702
+    ],
+    "positions": [
+      [
+        129967953.4269641,
+        -65169478.80929284,
+        -28288237.92059088
+      ]
+    ],
+    "velocities": [
+      [
+        15.723623364229773,
+        24.245486821769155,
+        10.460575206418508
+      ]
+    ],
+    "reference_frame": 1
+  },
+  "projection": "",
+  "geotransform": [
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0
+  ]
+}
