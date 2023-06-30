@@ -83,3 +83,18 @@ class Mariner10IsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistorti
         """
         return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")) - (self.exposure_duration / 2.0)
     
+    @property
+    def light_time_correction(self):
+        """
+        Returns the type of light time correction and abberation correction to
+        use in NAIF calls.
+
+        Returns
+        -------
+        : str
+          The light time and abberation correction string for use in NAIF calls.
+          See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/abcorr.html
+          for the different options available.
+        """
+        return 'NONE'
+    
