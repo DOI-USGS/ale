@@ -15,7 +15,7 @@ dependencies:
   - pytz
   - python
   - python-dateutil
-  - scipy>=1.4.0
+  - scipy>=1.4.0,<1.11
   - spiceypy>=5.1.0
   - pyyaml
   - pytest
