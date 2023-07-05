@@ -90,3 +90,4 @@ jobs:
           name: ale
           path: |
             D:\a\ale\ale\build\Release\ale.dll
+            D:\a\ale\ale\build\Release\ale.lib
