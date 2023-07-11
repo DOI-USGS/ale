@@ -62,9 +62,9 @@ jobs:
           pwd
           ls
           conda install doxygen
-          doxygen docs/Doxyfile
           ls docs/
           cd docs
+          doxygen ./Doxyfile
           make html SOURCEDIR=.
           ls docs/
 
