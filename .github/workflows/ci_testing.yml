@@ -62,7 +62,6 @@ jobs:
           cd docs
           make html SOURCEDIR=.
 
-
   # Build-and-Test-Win:
   #   runs-on: windows-2019
   #   strategy:
