@@ -14,8 +14,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-       os: [ubuntu-latest] #, macos-latest]
-       python-version: ["3.8"] #["3.8", "3.9", "3.10", "3.11"]
+       os: [ubuntu-latest, macos-latest]
+       python-version: ["3.8", "3.9", "3.10", "3.11"]
     defaults:
       run:
         shell: bash -l {0}
@@ -37,36 +37,31 @@ jobs:
       - name: Install Python Package
         run: |
           python setup.py install
-      # - name: Test Python Package
-      #   run: |
-      #      pytest --cov-report=xml --cov=ale tests/pytests -vv
+      - name: Test Python Package
+        run: |
+           pytest --cov-report=xml --cov=ale tests/pytests -vv
       - name: Build C++ Package
         run: |
           mkdir -p build
           cd build
           cmake -DCMAKE_BUILD_TYPE=RELEASE -DCOVERAGE=ON ..
           cmake --build .
-      # - name: Test C++ Package
-      #   run: |
-      #     cd build
-      #     ctest -VV
-      # - name: Upload Coverage
-      #   uses: codecov/codecov-action@v1
-      #   with:
-      #     token: ${{ secrets.CODECOV_TOKEN }}
-      #     fail_ci_if_error: true
-      #     verbose: true
-      #   if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9'
+      - name: Test C++ Package
+        run: |
+          cd build
+          ctest -VV
+      - name: Upload Coverage
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+          verbose: true
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9'
       - name: Build Docs
         run: |
-          pwd
-          ls
           conda install doxygen
-          ls docs/
-          cd docs
           doxygen ./Doxyfile
           make html SOURCEDIR=.
-          ls
 
   # Build-and-Test-Win:
   #   runs-on: windows-2019
