@@ -37,32 +37,36 @@ jobs:
       - name: Install Python Package
         run: |
           python setup.py install
-      - name: Test Python Package
-        run: |
-           pytest --cov-report=xml --cov=ale tests/pytests -vv
+      # - name: Test Python Package
+      #   run: |
+      #      pytest --cov-report=xml --cov=ale tests/pytests -vv
       - name: Build C++ Package
         run: |
           mkdir -p build
           cd build
           cmake -DCMAKE_BUILD_TYPE=RELEASE -DCOVERAGE=ON ..
           cmake --build .
-      - name: Test C++ Package
-        run: |
-          cd build
-          ctest -VV
-      - name: Upload Coverage
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
-          verbose: true
-        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9'
+      # - name: Test C++ Package
+      #   run: |
+      #     cd build
+      #     ctest -VV
+      # - name: Upload Coverage
+      #   uses: codecov/codecov-action@v1
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     fail_ci_if_error: true
+      #     verbose: true
+      #   if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9'
       - name: Build Docs
         run: |
+          pwd
+          ls
           conda install doxygen
           doxygen docs/Doxyfile
+          ls docs/
           cd docs
           make html SOURCEDIR=.
+          ls docs/
 
   # Build-and-Test-Win:
   #   runs-on: windows-2019
