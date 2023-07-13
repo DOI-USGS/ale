@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
        os: [ubuntu-latest, macos-latest]
-       python-version: ["3.10", "3.11"] #["3.8", "3.9", "3.10", "3.11"]
+       python-version: ["3.11"] #["3.8", "3.9", "3.10", "3.11"]
     defaults:
       run:
         shell: bash -l {0}
@@ -64,6 +64,15 @@ jobs:
           cd docs
           doxygen ./Doxyfile
           make html SOURCEDIR=.
+      - name: Set AWS credentials for upload
+        uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+      - name: Test S3 Connection
+        run: | 
+          aws s3 ls s3://asc-public-docs
 
   # Build-and-Test-Win:
   #   runs-on: windows-2019
