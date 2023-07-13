@@ -3,10 +3,10 @@ name: Pull-Request-CI
 on:
   pull_request:
     branches:
-      - main
+      - finalize_docs_workflow #main
   push:
     branches:
-      - main
+      - finalize_docs_workflow #docs_workflow
 
 jobs:
   Build-and-Test-LinuxOsx:
@@ -14,8 +14,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-       os: [ubuntu-latest, macos-latest]
-       python-version: ["3.8", "3.9", "3.10", "3.11"]
+       os: [ubuntu-latest] #, macos-latest]
+       python-version: ["3.11"] #["3.8", "3.9", "3.10", "3.11"]
     defaults:
       run:
         shell: bash -l {0}
@@ -57,37 +57,53 @@ jobs:
           fail_ci_if_error: true
           verbose: true
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9'
+      - name: Build Docs
+        if: github.event.pull_request.merged == true && matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
+        run: |
+          conda install doxygen
+          cd docs
+          doxygen ./Doxyfile
+          make html SOURCEDIR=.
+      - name: Set AWS credentials for upload
+        uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+      - name: Test S3 Connection
+        run: | 
+          aws s3 ls s3://asc-public-docs
 
-  Build-and-Test-Win:
-    runs-on: windows-2019
-    strategy:
-      matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
-    steps:
-      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
-        with:
-          submodules: recursive
-      - uses: conda-incubator/setup-miniconda@3b0f2504dd76ef23b6d31f291f4913fb60ab5ff3
-        with:
-          miniconda-version: "latest"
-          activate-environment: ale
-          environment-file: environment.yml
-          auto-activate-base: false
-          auto-update-conda: true
-          python-version: ${{ matrix.python-version }}
-      - name: Check build environment
-        run: |
-          conda list
-      - name: Build Package
-        run: |
-          mkdir -p build
-          cd build
-          cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON -G "Visual Studio 16 2019" -A x64 -DALE_BUILD_TESTS=OFF ..
-          cmake --build . --target ALL_BUILD --config Release
-          ls D:\a\ale\ale\build\Release
-      - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce
-        with:
-          name: ale
-          path: |
-            D:\a\ale\ale\build\Release\ale.dll
-            D:\a\ale\ale\build\Release\ale.lib
+  # Build-and-Test-Win:
+  #   runs-on: windows-2019
+  #   strategy:
+  #     matrix:
+  #       python-version: ["3.8", "3.9", "3.10", "3.11"]
+  #   steps:
+  #     - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
+  #       with:
+  #         submodules: recursive
+  #     - uses: conda-incubator/setup-miniconda@3b0f2504dd76ef23b6d31f291f4913fb60ab5ff3
+  #       with:
+  #         miniconda-version: "latest"
+  #         activate-environment: ale
+  #         environment-file: environment.yml
+  #         auto-activate-base: false
+  #         auto-update-conda: true
+  #         python-version: ${{ matrix.python-version }}
+  #     - name: Check build environment
+  #       run: |
+  #         conda list
+  #     - name: Build Package
+  #       run: |
+  #         mkdir -p build
+  #         cd build
+  #         cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON -G "Visual Studio 16 2019" -A x64 -DALE_BUILD_TESTS=OFF ..
+  #         cmake --build . --target ALL_BUILD --config Release
+  #         ls D:\a\ale\ale\build\Release
+  #     - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce
+  #       with:
+  #         name: ale
+  #         path: |
+  #           D:\a\ale\ale\build\Release\ale.dll
+  #           D:\a\ale\ale\build\Release\ale.lib
