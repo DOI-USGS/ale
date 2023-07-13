@@ -128,7 +128,6 @@ class FrameChain(nx.DiGraph):
                                                                     "targetFrame": sensor_frame,
                                                                     "searchKernels": frame_chain.search_kernels})
             except Exception as e:
-                print("BANANANANA \n\n")
                 print(e)
                 pass
 
@@ -365,6 +364,7 @@ class FrameChain(nx.DiGraph):
             found = spice.daffna()   # Find next forward array in current daf
 
         return times
+
 
     async def generate_time_dependent_rotiations(self, frames, times, time_bias, mission=""):
         """

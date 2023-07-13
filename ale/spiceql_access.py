@@ -1,6 +1,7 @@
 import asyncio
 import math
 import requests
+import time
 
 import aiohttp
 import numpy as np
@@ -134,6 +135,7 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
 
     response = requests.get(url, params=clean_function_args, headers=headers, verify=False)
     check_response(response)
+
     return response.json()["body"]["return"]
 
 async def get_ephem_data(times, function_name, batch_size=400, web=False, **kwargs):
@@ -195,4 +197,6 @@ async def get_ephem_data(times, function_name, batch_size=400, web=False, **kwar
     results = []
     for response in responses:
         results += response
+    
+    
     return results
