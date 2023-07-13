@@ -3,10 +3,10 @@ name: Pull-Request-CI
 on:
   pull_request:
     branches:
-      - main
+      - finalize_docs_workflow #main
   push:
     branches:
-      - docs_workflow
+      - finalize_docs_workflow #docs_workflow
 
 jobs:
   Build-and-Test-LinuxOsx:
@@ -16,9 +16,6 @@ jobs:
       matrix:
        os: [ubuntu-latest] #, macos-latest]
        python-version: ["3.11"] #["3.8", "3.9", "3.10", "3.11"]
-    permissions:
-      id-token: write
-      contents: read
     defaults:
       run:
         shell: bash -l {0}
@@ -61,16 +58,12 @@ jobs:
           verbose: true
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9'
       - name: Build Docs
-        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
+        if: github.event.pull_request.merged == true && matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
         run: |
           conda install doxygen
           cd docs
           doxygen ./Doxyfile
           make html SOURCEDIR=.
-      - name: Setup Hugo
-        uses: actions/setup-node@a4fcaaf314b117a40d694a35ee36461f8ff3c6e6
-        with:
-          node-version: 17.3.0
       - name: Set AWS credentials for upload
         uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
         with:
