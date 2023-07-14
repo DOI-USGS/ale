@@ -72,7 +72,7 @@ jobs:
           aws-region: us-west-2
       - name: Test S3 Connection
         run: | 
-          aws s3 ls s3://asc-public-docs
+          aws s3 ls s3://asc-public-docs --no-sign-request
 
   # Build-and-Test-Win:
   #   runs-on: windows-2019
