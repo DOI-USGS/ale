@@ -58,7 +58,7 @@ jobs:
           verbose: true
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9'
       - name: Build Docs
-        if: github.event.pull_request.merged == true && matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
         run: |
           conda install doxygen
           cd docs
@@ -71,8 +71,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
       - name: Test S3 Connection
-        run: | 
-          aws s3 ls s3://asc-public-docs --no-sign-request
+        run: aws s3 sync --delete docs/build s3://asc-public-docs/ale --no-sign-request
 
   # Build-and-Test-Win:
   #   runs-on: windows-2019
