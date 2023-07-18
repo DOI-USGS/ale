@@ -1,0 +1,4 @@
+This CK is for testing with the image: /testdata/mariner10-driver/27265.isis.cub
+
+This CK was generated using the following command: {}
+ckslicer -LSK /isis_data/base/kernels/lsk/naif0012.tls -SCLK /isis_data/mariner10/kernels/sclk/mariner10.0001.tsc -INPUTCK /isis_data/mariner10/kernels/ck/MARINER_10_A_gem.bc -OUTPUTCK /testdata/mariner10-driver/generated-kernels/MARINER_10_A_gem_0_sliced_-76000.bc -ID -76000 -TIMETYPE SCLK -START 1/012678626:623 -STOP 1/012679121:800
