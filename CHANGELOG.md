@@ -35,6 +35,18 @@ release.
 
 ## [Unreleased]
 
+### Added
+- Mariner10 IsisLabelNaifSpice driver, tests, and test data [#547](https://github.com/DOI-USGS/ale/pull/547) 
+
+## [0.9.1] - 2023-06-05
+
+### Changed
+- The NaifSpice class now gets two sun positions/velocities when a driver has more than one ephemeris time [#542](https://github.com/DOI-USGS/ale/pull/542)
+
+### Fixed
+- MexHrscIsisLabelNaifSpice and MexHrscPds3NaifSpice have had there ephemeris times changed and sampling factor updated. MexHrscIsisLabelNaifSpice has also had it's focal length, and focal plane translation updated to reflect those found in the MexHrscPds3NaifSpice driver [#541](https://github.com/DOI-USGS/ale/pull/541)
+- MGS drivers now account for a time bias in the ephemeris data [#538](https://github.com/DOI-USGS/ale/pull/538)
+
 ## [0.9.0] - 2023-04-19
 
 ### Fixed
@@ -54,3 +66,4 @@ release.
 - MGS MOC WAC IsisLabelNaifSpice driver, tests, and test data [#516](https://github.com/DOI-USGS/ale/pull/516)
 - Chandrayaan1_mrffr IsisLabelNaifSpice driver, tests and test data [#519](https://github.com/DOI-USGS/ale/pull/519)
 - MGS MOC Narrow Angle IsisLabelNaifSpice driver, tests, and test data [#517](https://github.com/DOI-USGS/ale/pull/517)
+- Hayabusa NIRS IsisLabelNaifSpice driver, tests and test data [#532](https://github.com/DOI-USGS/ale/pull/532)

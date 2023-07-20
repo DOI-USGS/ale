@@ -1,0 +1,184 @@
+KPL/IK
+
+\beginlabel
+PDS_VERSION_ID               = PDS3
+RECORD_TYPE                  = STREAM
+RECORD_BYTES                 = "N/A"
+^SPICE_KERNEL                = "nirs10.ti"
+MISSION_NAME                 = HAYABUSA
+SPACECRAFT_NAME              = HAYABUSA
+DATA_SET_ID                  = "HAY-A-SPICE-6-V1.0"
+KERNEL_TYPE_ID               = IK
+PRODUCT_ID                   = "nirs10.ti"
+PRODUCT_CREATION_TIME        = 2009-11-30T13:50:42
+PRODUCER_ID                  = JAXA
+MISSION_PHASE_NAME           = "N/A"
+PRODUCT_VERSION_TYPE         = ACTUAL
+PLATFORM_OR_MOUNTING_NAME    = "HAYABUSA SPACECRAFT BUS"
+START_TIME                   = "N/A"
+STOP_TIME                    = "N/A"
+SPACECRAFT_CLOCK_START_COUNT = "N/A"
+SPACECRAFT_CLOCK_STOP_COUNT  = "N/A"
+TARGET_NAME                  = "25143 ITOKAWA"
+INSTRUMENT_NAME              = "NEAR INFRARED SPECTROMETER"
+NAIF_INSTRUMENT_ID           = -130200
+SOURCE_PRODUCT_ID            = "N/A"
+NOTE                         = "See comments in the file for details"
+OBJECT                       = SPICE_KERNEL
+  INTERCHANGE_FORMAT         = ASCII
+  KERNEL_TYPE                = INSTRUMENT
+  DESCRIPTION                = "SPICE I-Kernel (IK) file containing FOV and
+reference frame definitions for the Hayabusa Near InfraRed Spectrometer
+(NIRS) instrument, created by the Hayabusa Joint Science Team. "
+END_OBJECT                   = SPICE_KERNEL
+\endlabel
+
+
+Hayabusa NIRS Instrument and Frame Kernel Kile
+===========================================================================
+
+   This instrument kernel (I-kernel) contains the frames and FOV 
+   definitions for Hayabusa Near-Infrared Spectrometer (NIRS).
+
+
+Version and Date
+---------------------------------------------------------------------------
+
+   Version 1.0 by Boris Semenov, NAIF/JPL 23 Sep. 2009
+
+      Corrected _RELATIVE frame in the _NIRS_IDEAL frame definition
+      (HAYABUSA_SC_BUS -> HAYABUSA_SC_BUS_PRIME). Added miscellaneous
+      comments. File name and version were not changed.
+
+   Version 1.0 by Shinsuke Abe, Kobe Univ. 9 Sep. 2005
+
+   Version 0.0 (prototype) by Masanao Abe, ISAS/JAXA, 4 June 2005
+
+
+Implementation Notes
+---------------------------------------------------------------------------
+
+   Applications that need SPICE I-kernel data must ``load'' the
+   I-kernel file, normally during program initialization. Loading the
+   kernel using the SPICELIB routine FURNSH causes the data items and
+   their associated values present in the kernel to become associated
+   with a data structure called the ``kernel pool''. The application
+   program may then obtain the value(s) for any IK data item using the
+   SPICELIB routines GDPOOL, GIPOOL, GCPOOL. Routine GETFOV may be used
+   if the file contains instrument field-of-view (FOV) specification.
+   The frame definitions information is accessed via any interfaces
+   utilizing SPICE frames subsystem (PXFORM, etc).
+
+   This file was created with, and can be updated with a text editor or
+   word processor.
+
+
+Conventions for Specifying Data
+---------------------------------------------------------------------------
+
+   Instrument data items are specified using ``keyword=value''
+   assignments. All keywords referencing instrument values in this
+   I-kernel start with the characters `INS' followed by the NAIF
+   instrument ID code for NIRS, -130200. The remainder of the keyword
+   is an underscore character followed by the unique name of the data
+   item. For example, NIRS boresight vector is specified by
+
+               INS-130200_BORESIGHT
+
+   The upper bound on the length of all keywords is 32 characters.
+
+
+Hayabusa Spacecraft Frame Definition
+---------------------------------------------------------------------------
+
+   This HAYABUSA_SC_BUS_PRIME frame definition is a copy of the
+   definition provided in the main Hayabusa FK file. It is included in
+   this IK file for historical reasons.
+
+\begindata
+
+   FRAME_HAYABUSA_SC_BUS_PRIME  = -130000
+   FRAME_-130000_NAME        = 'HAYABUSA_SC_BUS_PRIME'
+   FRAME_-130000_CLASS       = 3
+   FRAME_-130000_CLASS_ID    = -130000
+   FRAME_-130000_CENTER      = -130
+   CK_-130000_SCLK           = -130
+   CK_-130000_SPK            = -130
+
+\begintext
+
+
+NIRS Frame Definitions
+---------------------------------------------------------------------------
+
+   Two frames are defined for NIRS: HAYABUSA_NIRS_IDEAL and
+   HAYABUSA_NIRS. 
+
+   The HAYABUSA_NIRS_IDEAL frame incorporates the ideal fixed
+   instrument alignment relative to the spacecraft frame,
+   HAYABUSA_SC_BUS_PRIME. The +Z axis of the HAYABUSA_NIRS_IDEAL frame
+   is along the ideally-mounted instrument boresight.
+
+   The HAYABUSA_NIRS frame incorporates the the actual instrument
+   misalignment relative to its ideal orientation represented by the
+   HAYABUSA_NIRS_IDEAL frame. The +Z axis of this frame is along the
+   actual instrument boresight.
+
+   Both frames are defined as fixed offset frames with their
+   orientation specified using Euler angles.
+ 
+   Note that angles in the frame definitions are specified for "from
+   instrument to base (relative to) frame" transformation.
+
+\begindata
+
+   FRAME_HAYABUSA_NIRS       = -130200
+   FRAME_-130200_NAME        = 'HAYABUSA_NIRS'
+   FRAME_-130200_CLASS       = 4
+   FRAME_-130200_CLASS_ID    = -130200
+   FRAME_-130200_CENTER      = -130
+   TKFRAME_-130200_SPEC      = 'ANGLES'
+   TKFRAME_-130200_RELATIVE  = 'HAYABUSA_NIRS_IDEAL'
+   TKFRAME_-130200_ANGLES    = ( -0.1140, -0.0012,  0.0 ) 
+   TKFRAME_-130200_AXES      = (    1,     2,     3 )
+   TKFRAME_-130200_UNITS     = 'DEGREES'
+
+   FRAME_HAYABUSA_NIRS_IDEAL = -130201
+   FRAME_-130201_NAME        = 'HAYABUSA_NIRS_IDEAL'
+   FRAME_-130201_CLASS       = 4
+   FRAME_-130201_CLASS_ID    = -130201
+   FRAME_-130201_CENTER      = -130
+   TKFRAME_-130201_SPEC      = 'ANGLES'
+   TKFRAME_-130201_RELATIVE  = 'HAYABUSA_SC_BUS_PRIME'
+   TKFRAME_-130201_ANGLES    = (  0.0, 180.0, -90.0 )
+   TKFRAME_-130201_AXES      = (     1,     2,    3 )
+   TKFRAME_-130201_UNITS     = 'DEGREES'
+
+\begintext
+   
+
+NIRS Field-Of-View Definition
+---------------------------------------------------------------------------
+
+   The NIRS FOV is defined using a corner-style definition as a 0.1 by
+   0.1 degree square pyramid centered around the boresight that points
+   along the +Z axis of the HAYABUSA_NIRS frame. The FOV shape is set
+   to 'POLYGON'; it could also have been set to 'RECTANGLE'.  The
+   corner direction vectors are given counterclockwise as seen from
+   boresight.
+ 
+\begindata
+        
+   INS-130200_FOV_FRAME  = 'HAYABUSA_NIRS'
+   INS-130200_FOV_SHAPE  = 'POLYGON'
+   INS-130200_BORESIGHT  = ( 0.0   0.0   1.0 )
+   INS-130200_FOV_BOUNDARY_CORNERS = (
+                                         0.000872664    0.000872664   1.0
+                                        -0.000872664    0.000872664   1.0
+                                        -0.000872664   -0.000872664   1.0
+                                         0.000872664   -0.000872664   1.0
+                                       )
+
+\begintext
+
+End of IK file.

@@ -96,7 +96,7 @@ class FrameChain(nx.DiGraph):
                      of frame rotations in the frame chain
     """
     @classmethod
-    def from_spice(cls, sensor_frame, target_frame, center_ephemeris_time, ephemeris_times=[], nadir=False, exact_ck_times=False):
+    def from_spice(cls, sensor_frame, target_frame, center_ephemeris_time, ephemeris_times=[], nadir=False, exact_ck_times=False, inst_time_bias=0):
         frame_chain = cls()
         sensor_times = []
         # Default assume one time
@@ -106,7 +106,7 @@ class FrameChain(nx.DiGraph):
 
         if exact_ck_times and len(ephemeris_times) > 1 and not nadir:
             try:
-                sensor_times = cls.extract_exact_ck_times(ephemeris_times[0], ephemeris_times[-1], sensor_frame)
+                sensor_times = cls.extract_exact_ck_times(ephemeris_times[0] + inst_time_bias, ephemeris_times[-1] + inst_time_bias, sensor_frame)
             except Exception as e:
                 pass
 
@@ -123,8 +123,8 @@ class FrameChain(nx.DiGraph):
 
         constant_frames.extend(target_constant_frames)
 
-        frame_chain.compute_time_dependent_rotiations(sensor_time_dependent_frames, sensor_times)
-        frame_chain.compute_time_dependent_rotiations(target_time_dependent_frames, target_times)
+        frame_chain.compute_time_dependent_rotiations(sensor_time_dependent_frames, sensor_times, inst_time_bias)
+        frame_chain.compute_time_dependent_rotiations(target_time_dependent_frames, target_times, 0)
 
         for s, d in constant_frames:
             quats = np.zeros(4)
@@ -380,7 +380,7 @@ class FrameChain(nx.DiGraph):
 
         return times
 
-    def compute_time_dependent_rotiations(self, frames, times):
+    def compute_time_dependent_rotiations(self, frames, times, time_bias):
         """
         Computes the time dependent rotations based on a list of tuples that define the
         relationships between frames as (source, destination) and a list of times to
@@ -409,5 +409,6 @@ class FrameChain(nx.DiGraph):
 
             if not avs:
                 avs = None
-            rotation = TimeDependentRotation(quats, times, s, d, av=avs)
+            biased_times = [time - time_bias for time in times]
+            rotation = TimeDependentRotation(quats, biased_times, s, d, av=avs)
             self.add_edge(rotation=rotation)
