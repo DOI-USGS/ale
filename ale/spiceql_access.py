@@ -8,6 +8,7 @@ import numpy as np
 
 import pyspiceql
 
+
 def stringify_web_args(function_args):
     """
     Takes a dictionary of args and converts them into web acceptable strings
@@ -40,13 +41,15 @@ def check_response(response):
     : obj
       Request response object
     """
+    
     response.raise_for_status()
 
     if response.status_code != 200:
-        raise requests.HTTPError(f"Recieved code {response['statusCode']} from spice server, with error: {response}")
+        raise requests.HTTPError(f"Recieved code {response.status_code} from spice server, with error: {response.json()}")
 
     if response.json()["statusCode"] != 200:
-        raise requests.HTTPError(f"Recieved code {response['statusCode']} from spice server, with error: {response}")
+        raise requests.HTTPError(f"Recieved code {response.json()['statusCode']} from spice server, with error: {response.json()}")
+
 
 async def async_spiceql_call(session, function_name = "", function_args = {}, use_web=False):
     """
@@ -81,7 +84,10 @@ async def async_spiceql_call(session, function_name = "", function_args = {}, us
     if use_web == False:
         func = getattr(pyspiceql, function_name)
         return func(**function_args)
+    
     url = "https://spiceql-dev.prod-asc.chs.usgs.gov/v1/"
+    # url = "https://d68posrslrzct.cloudfront.net/api/spiceql/"
+    
     url += function_name
     headers = {
         'accept': '*/*',
@@ -92,6 +98,7 @@ async def async_spiceql_call(session, function_name = "", function_args = {}, us
     async with session.get(url, params=clean_function_args, headers=headers, ssl=False) as response:
         web_response = await response.json()
     return web_response["body"]["return"]
+
 
 def spiceql_call(function_name = "", function_args = {}, use_web=False):
     """
@@ -122,7 +129,7 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
     if use_web == False:
         func = getattr(pyspiceql, function_name)
         return func(**function_args)
-
+    
     url = "https://spiceql-dev.prod-asc.chs.usgs.gov/v1/"
     url += function_name
     headers = {

@@ -8,6 +8,7 @@ from ale.base.label_isis import IsisLabel
 from ale.base.type_distortion import RadialDistortion, NoDistortion
 from ale.base.type_sensor import LineScanner
 from ale.base.type_distortion import NoDistortion
+from ale.util import CachedDict
 
 from ale import util
 
@@ -672,7 +673,10 @@ class MroHiRiseIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radia
         : dict
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
-        return {**super().naif_keywords, **self.spiceql_call("findMissionKeywords", {"key": f"*{self.ccd_ikid}*", "mission": self.spiceql_mission})}
+        if not hasattr(self, "_mrohirise_naif_keywords"):
+            _mrohirise_naif_keywords = {**super().naif_keywords, **self.spiceql_call("findMissionKeywords", {"key": f"*{self.ccd_ikid}*", "mission": self.spiceql_mission})}
+        return _mrohirise_naif_keywords
+
 
     @property
     def sensor_model_version(self):

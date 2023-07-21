@@ -21,6 +21,144 @@ from networkx.algorithms.shortest_paths.generic import shortest_path
 
 import spiceypy as spice
 
+
+
+class CachedDict():
+    """
+    A subclass of dict that tracks the accessed keys.
+    """
+
+    def __init__(self, **kwargs):
+        """
+        Initialize the CachedDict object.
+
+        Parameters
+        ----------
+        *args : positional arguments
+            Variable length argument list.
+        **kwargs : keyword arguments
+            Arbitrary keyword arguments.
+        """
+        self.data = dict(**kwargs)
+        self.accessed_keys = set()
+    
+
+    def __str__(self): 
+        """
+        to string function 
+
+        Returns
+        -------
+        str
+           str representation of dictionary with filtered items
+        """
+        return str(self.to_dict)
+ 
+
+    def __getitem__(self, key):
+        """
+        Get the value corresponding to the given key.
+
+        Parameters
+        ----------
+        key
+            The key to retrieve the value for.
+
+        Returns
+        -------
+        value
+            The value corresponding to the key.
+        """
+        self.accessed_keys.add(key)
+        return self.data.__getitem__(key)
+
+    def __setitem__(self, key, value):
+        """
+        Set the value for the given key.
+
+        Parameters
+        ----------
+        key
+            The key to set the value for.
+        value
+            The value to be set.
+        """
+        return self.data.__setitem__(key, value)
+
+    def __delitem__(self, key):
+        """
+        Delete the value corresponding to the given key.
+
+        Parameters
+        ----------
+        key
+            The key to delete.
+        """
+        self.accessed_keys.remove(key)
+        return self.data.__delitem__(key)
+
+    def keys(self):
+        """
+        Get the list of keys that have been accessed.
+
+        Returns
+        -------
+        list
+            A list of keys.
+        """
+        return list(self.accessed_keys)
+
+    def values(self):
+        """
+        Get the list of values corresponding to the accessed keys.
+
+        Returns
+        -------
+        list
+            A list of values.
+        """
+        return [self[key] for key in self.accessed_keys if key in self]
+
+    def items(self):
+        """
+        Get the list of key-value pairs corresponding to the accessed keys.
+
+        Returns
+        -------
+        list
+            A list of key-value pairs.
+        """
+        return [(key, self.data[key]) for key in self.accessed_keys if key in self]
+
+    def is_key_accessed(self, key):
+        """
+        Check if a key has been accessed or not.
+
+        Parameters
+        ----------
+        key
+            The key to check.
+
+        Returns
+        -------
+        bool
+            True if the key has been accessed, False otherwise.
+        """
+        return key in self.accessed_keys
+
+
+    def to_dict(self): 
+        """
+        returns a dictionary of only keys accessed
+        
+        Returns 
+        -------
+        dict 
+            Dictionary of just the keys accessed     
+        """
+        return dict(zip(self.keys(), self.values()))
+
+
 def find_latest_metakernel(path, year):
     metakernel = None
     mks = sorted(glob(os.path.join(path,'*.[Tt][Mm]')))

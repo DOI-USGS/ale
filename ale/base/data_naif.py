@@ -13,6 +13,7 @@ from ale.rotation import TimeDependentRotation
 from ale import spiceql_access
 from ale import util
 
+
 class NaifSpice():
     """
     Mix-in for reading data from NAIF SPICE Kernels.
@@ -748,3 +749,4 @@ class NaifSpice():
         # just might take a bit
         function_args["searchKernels"] = self.search_kernels
         return spiceql_access.spiceql_call(function_name, function_args, self.use_web)
+    
