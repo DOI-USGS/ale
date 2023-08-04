@@ -22,7 +22,7 @@ def test_high_kernels():
         os.remove(kern)
 
 def test_high_load(test_high_kernels):
-    # Exception: No Such Driver for Label
+    
     label_file = get_image_label('3133_high_res_1', 'isis')
     compare_dict = get_isd("lohighcamera")
 
