@@ -186,10 +186,13 @@ def expandvars(path, env_dict=os.environ, default=None, case_sensitive=True):
         user_dict = env_dict if case_sensitive else dict_to_lower(env_dict)
 
         def replace_var(m):
-            group0 = m.group(0) if case_sensitive else m.group(0).lower()
             group1 = m.group(1) if case_sensitive else m.group(1).lower()
+            val = user_dict.get(m.group(2) or group1 if default is None else default)
+            if not val:
+                raise KeyError(f"Failed to evaluate {m.group(0)} from env_dict. " + 
+                               f"Should {m.group(0)} be an environment variable?")
 
-            return user_dict.get(m.group(2) or group1, group0 if default is None else default)
+            return val
         reVar = r'\$(\w+|\{([^}]*)\})'
         path = re.sub(reVar, replace_var, path)
     return path
