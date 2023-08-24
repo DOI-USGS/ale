@@ -109,7 +109,29 @@
     "repositoryURL": "https://code.usgs.gov/astrogeology/ale.git",
     "vcs": "git",
 
-    "laborHours": 480
+    "laborHours": 480,
+
+    "tags": [
+      "Planetary",
+      "Remote Sensing",
+      "Data Processing",
+      "Ephemerides",
+      "Community Sensor Model"
+    ],
+
+    "languages": [
+      "C++",
+      "Python"
+    ],
+
+    "contact": {
+      "name": "Adam Paquette",
+      "email": "acpaquette@usgs.gov"
+    },
+
+    "date": {
+      "metadataLastUpdated": "2023-04-19"
+    }
 
   },
   {
