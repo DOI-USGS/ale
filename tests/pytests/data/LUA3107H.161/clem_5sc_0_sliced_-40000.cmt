@@ -1,4 +1,0 @@
-This CK is for testing with the image: /Users/ahibl/astro_efs/test_imgs/uvvis/LUA3107H.161.clem.cub
-
-This CK was generated using the following command: {}
-ckslicer -LSK /Users/ahibl/astro_efs/base/kernels/lsk/naif0012.tls -SCLK /Users/ahibl/astro_efs/Clementine1/kernels/sclk/dspse002.tsc -INPUTCK /Users/ahibl/astro_efs/Clementine1/kernels/ck/clem_5sc.bck -OUTPUTCK uvvis/clem_5sc_0_sliced_-40000.bck -ID -40000 -TIMETYPE SCLK -START 1/16154.06620.44193 -STOP 1/16154.06650.03236
