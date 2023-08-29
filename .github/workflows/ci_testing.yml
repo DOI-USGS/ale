@@ -72,8 +72,8 @@ jobs:
           aws-region: us-west-2
       - name: Upload to S3
         run: |
-          aws s3 ls s3://asc-public-docs
-          #aws s3 sync --delete docs/build s3://asc-public-docs/ale
+          aws s3 ls s3://asc-docs
+#          aws s3 sync --delete docs/build s3://asc-public-docs/ale
 
   # Build-and-Test-Win:
   #   runs-on: windows-2019
