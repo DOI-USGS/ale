@@ -60,10 +60,11 @@ jobs:
       - name: Build Docs
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
         run: |
-          conda install doxygen
-          cd docs
-          doxygen ./Doxyfile
-          make html SOURCEDIR=.
+          sphinx-build -b html docs public
+          # conda install doxygen
+          # cd docs
+          # doxygen ./Doxyfile
+          # make html SOURCEDIR=.
       - name: Set AWS credentials for upload
         uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
         with:
@@ -72,7 +73,7 @@ jobs:
           aws-region: us-west-2
       - name: Upload to S3
         run: |
-          aws s3 sync --delete docs/build s3://asc-docs/ale
+          aws s3 sync --delete public s3://asc-docs/ale
 #          aws s3 ls s3://asc-docs
 
   # Build-and-Test-Win:
