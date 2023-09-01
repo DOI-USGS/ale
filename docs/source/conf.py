@@ -11,9 +11,9 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-import sys
+# import sys
 import subprocess
-sys.path.insert(0, os.path.abspath('../ale'))
+# sys.path.insert(0, os.path.abspath('../ale'))
 
 
 # -- Project information -----------------------------------------------------
@@ -62,9 +62,9 @@ html_static_path = ['_static']
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
 if read_the_docs_build:
-    subprocess.call('doxygen', shell=True)
+    subprocess.call('cd ..; doxygen Doxyfile', shell=True)
     
 # -- Breathe Configuration ----------------------------------------------------
 
-breathe_projects = { "ALE": "doxyxml/" }
+breathe_projects = { "ALE": "../xml/" }
 breathe_default_project = "ALE"
