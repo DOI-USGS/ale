@@ -35,7 +35,7 @@ jobs:
         run: |
           cd docs
           doxygen Doxyfile.in
-          sphinx-build -b html source public
+          sphinx-build -b html . public
             
       - name: Set AWS credentials for upload
         uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83

@@ -63,9 +63,9 @@ html_theme = 'alabaster'
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
 if read_the_docs_build:
-    subprocess.call('cd ..; doxygen Doxyfile', shell=True)
+    subprocess.call('doxygen Doxyfile', shell=True)
     
 # -- Breathe Configuration ----------------------------------------------------
 
-breathe_projects = { "ALE": "../xml/" }
+breathe_projects = { "ALE": "xml/" }
 breathe_default_project = "ALE"
