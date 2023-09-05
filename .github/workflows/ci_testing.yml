@@ -82,7 +82,7 @@ jobs:
         run: |
           cd docs
           doxygen Doxyfile.in
-          sphinx-build -b html source public
+          sphinx-build -b html . public
 
   Build-and-Test-Win:
     runs-on: windows-2019
