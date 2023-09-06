@@ -122,22 +122,6 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         """
         return [0, -1/self.pixel_size, 0]
 
-    # The detector_center_line() and detector_center_sample()
-    # functions from Cahvor() will be invoked. There is no need to
-    # reimplement them here.
-
-    @property
-    def detector_start_line(self):
-        # Do not return self.label["IMAGE_REQUEST_PARMS"]["FIRST_LINE"]
-        # The value 0 is consistent with the Cahvor camera model.
-        return 0
-
-    @property
-    def detector_start_sample(self):
-        # Do not return self.label["IMAGE_REQUEST_PARMS"]["FIRST_LINE_SAMPLE"])
-        # The value 0 is consistent with the Cahvor camera model.
-        return 0
-
     @property
     def sensor_model_version(self):
         """
