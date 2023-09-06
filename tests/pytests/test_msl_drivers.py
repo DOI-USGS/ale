@@ -20,6 +20,11 @@ class test_mastcam_pds_naif(unittest.TestCase):
     def test_exposure_duration(self):
         np.testing.assert_almost_equal(self.driver.exposure_duration, 0.0102)
 
+    def test_final_inst_frame(self):
+        with patch('ale.drivers.msl_drivers.spice.bods2c', new_callable=PropertyMock, return_value=-76562) as bods2c:
+            assert self.driver.final_inst_frame == -76562
+            bods2c.assert_called_with("MSL_RSM_HEAD")
+
     def test_cahvor_camera_dict(self):
         cahvor_camera_dict = self.driver.cahvor_camera_dict
         assert len(cahvor_camera_dict) == 4
