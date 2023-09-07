@@ -20,6 +20,11 @@ class test_mastcam_pds_naif(unittest.TestCase):
     def test_exposure_duration(self):
         np.testing.assert_almost_equal(self.driver.exposure_duration, 0.0102)
 
+    def test_final_inst_frame(self):
+        with patch('ale.drivers.msl_drivers.spice.bods2c', new_callable=PropertyMock, return_value=-76562) as bods2c:
+            assert self.driver.final_inst_frame == -76562
+            bods2c.assert_called_with("MSL_RSM_HEAD")
+
     def test_cahvor_camera_dict(self):
         cahvor_camera_dict = self.driver.cahvor_camera_dict
         assert len(cahvor_camera_dict) == 4
@@ -36,13 +41,13 @@ class test_mastcam_pds_naif(unittest.TestCase):
     def test_focal2pixel_lines(self):
         with patch('ale.drivers.msl_drivers.spice.bods2c', new_callable=PropertyMock, return_value=-76220) as bods2c, \
              patch('ale.drivers.msl_drivers.spice.gdpool', new_callable=PropertyMock, return_value=[100]) as gdpool:
-            np.testing.assert_allclose(self.driver.focal2pixel_lines, [0, 137.96844341513602, 0])
+            np.testing.assert_allclose(self.driver.focal2pixel_lines, [0, 0, 137.96844341513602])
             bods2c.assert_called_with('MSL_MASTCAM_RIGHT')
             gdpool.assert_called_with('INS-76220_FOCAL_LENGTH', 0, 1)
 
     def test_focal2pixel_samples(self):
         with patch('ale.drivers.msl_drivers.spice.bods2c', new_callable=PropertyMock, return_value=-76220) as bods2c, \
              patch('ale.drivers.msl_drivers.spice.gdpool', new_callable=PropertyMock, return_value=[100]) as gdpool:
-            np.testing.assert_allclose(self.driver.focal2pixel_samples, [0, 0, 137.96844341513602])
+            np.testing.assert_allclose(self.driver.focal2pixel_samples, [0, -137.96844341513602, 0])
             bods2c.assert_called_with('MSL_MASTCAM_RIGHT')
             gdpool.assert_called_with('INS-76220_FOCAL_LENGTH', 0, 1)

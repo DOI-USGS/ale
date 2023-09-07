@@ -68,6 +68,12 @@ def main():
         help="Only use drivers that generate fresh spice data"
     )
     parser.add_argument(
+        "-l", "--local",
+        action="store_true",
+        help="Generate local spice data, or image that is unaware of itself relative to "
+             "target body. This is largely used for landed/rover data."
+    )
+    parser.add_argument(
         '--version',
         action='version',
         version=f"ale version {ale.__version__}",
@@ -97,7 +103,7 @@ def main():
 
     if len(args.input) == 1:
         try:
-            file_to_isd(args.input[0], args.out, kernels=k, log_level=log_level, only_isis_spice=args.only_isis_spice, only_naif_spice=args.only_naif_spice)
+            file_to_isd(args.input[0], args.out, kernels=k, log_level=log_level, only_isis_spice=args.only_isis_spice, only_naif_spice=args.only_naif_spice, local=args.local)
         except Exception as err:
             # Seriously, this just throws a generic Exception?
             sys.exit(f"File {args.input[0]}: {err}")
@@ -107,7 +113,11 @@ def main():
         ) as executor:
             futures = {
                 executor.submit(
-                    file_to_isd, f, **{"kernels": k, "log_level": log_level, "only_isis_spice": args.only_isis_spice, "only_naif_spice": args.only_naif_spice}
+                    file_to_isd, f, **{"kernels": k, 
+                                       "log_level": log_level, 
+                                       "only_isis_spice": args.only_isis_spice, 
+                                       "only_naif_spice": args.only_naif_spice,
+                                       "local": args.local}
                 ): f for f in args.input
             }
             for f in concurrent.futures.as_completed(futures):
@@ -127,7 +137,8 @@ def file_to_isd(
     kernels: list = None,
     log_level=logging.WARNING,
     only_isis_spice=False,
-    only_naif_spice=False
+    only_naif_spice=False,
+    local=False
 ):
     """
     Returns nothing, but acts as a thin wrapper to take the *file* and generate
@@ -152,6 +163,10 @@ def file_to_isd(
 
     logger.info(f"Reading: {file}")
     props = {}
+
+    if local:
+        props['landed'] = local
+
     if kernels is not None:
         kernels = [str(PurePath(p)) for p in kernels]
         props["kernels"] = kernels
