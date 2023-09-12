@@ -1,15 +1,39 @@
+import json
 import numpy as np
+import os
+import pytest
 import unittest
 
+import ale
+from conftest import get_image, get_image_label, get_isd, get_image_kernels, convert_kernels, compare_dicts
 from ale.drivers.msl_drivers import MslMastcamPds3NaifSpiceDriver
 
 from conftest import get_image_label
 from unittest.mock import PropertyMock, patch
 
+
+@pytest.fixture(scope='module')
+def test_mastcam_kernels():
+    kernels = get_image_kernels('2264ML0121141200805116C00_DRCL')
+    updated_kernels, binary_kernels = convert_kernels(kernels)
+    yield updated_kernels
+    for kern in binary_kernels:
+        os.remove(kern)
+
+def test_msl_mastcam_load(test_mastcam_kernels):
+    label_file = get_image_label('2264ML0121141200805116C00_DRCL', "pds3")
+    compare_dict = get_isd("msl")
+
+    isd_str = ale.loads(label_file, props={'kernels': test_mastcam_kernels})
+    isd_obj = json.loads(isd_str)
+    assert compare_dicts(isd_obj, compare_dict) == []
+
+
 class test_mastcam_pds_naif(unittest.TestCase):
     def setUp(self):
         label = get_image_label("1664MR0086340000802438C00_DRCL", "pds3")
         self.driver = MslMastcamPds3NaifSpiceDriver(label)
+
 
     def test_instrument_id(self):
         assert self.driver.instrument_id == "MSL_MASTCAM_RIGHT"
