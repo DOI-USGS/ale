@@ -398,8 +398,6 @@ class Cahvor():
     def sensor_position(self):
       positions, velocities, times = super().sensor_position
       positions += self.cahvor_camera_dict["C"]
-      # normalized_positions = positions / np.linalg.norm(positions)
-      # positions += normalized_positions * 1000
       if self._props.get("landed", False):
         positions = np.array([[0, 0, 0]] * len(times))
         velocities = np.array([[0, 0, 0]] * len(times))
