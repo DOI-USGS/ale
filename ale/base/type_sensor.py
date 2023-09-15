@@ -1,10 +1,11 @@
 import math
 
 import numpy as np
+import spiceypy as spice
 from scipy.spatial.transform import Rotation
 
 from ale.transformation import FrameChain
-from ale.transformation import ConstantRotation
+from ale.transformation import ConstantRotation, TimeDependentRotation
 
 class LineScanner():
     """
@@ -397,6 +398,8 @@ class Cahvor():
     def sensor_position(self):
       positions, velocities, times = super().sensor_position
       positions += self.cahvor_camera_dict["C"]
+      # normalized_positions = positions / np.linalg.norm(positions)
+      # positions += normalized_positions * 1000
       if self._props.get("landed", False):
         positions = np.array([[0, 0, 0]] * len(times))
         velocities = np.array([[0, 0, 0]] * len(times))
@@ -468,9 +471,9 @@ class Cahvor():
             H_prime = (self.cahvor_camera_dict['H'] - h_c * self.cahvor_camera_dict['A'])/h_s
             V_prime = (self.cahvor_camera_dict['V'] - v_c * self.cahvor_camera_dict['A'])/v_s
             if self._props.get("landed", False):
-              self._cahvor_rotation_matrix = np.array([H_prime, -V_prime, -self.cahvor_camera_dict['A']])
+              self._cahvor_rotation_matrix = np.array([-H_prime, -V_prime, self.cahvor_camera_dict['A']])
             else:
-              self._cahvor_rotation_matrix = np.array([H_prime, V_prime, self.cahvor_camera_dict['A']])
+              self._cahvor_rotation_matrix = np.array([H_prime, V_prime, -self.cahvor_camera_dict['A']])
         return self._cahvor_rotation_matrix
 
     @property
@@ -485,12 +488,39 @@ class Cahvor():
           A networkx frame chain object
         """
         if not hasattr(self, '_frame_chain'):
+            nadir = self._props.get("nadir", False)
             self._frame_chain = FrameChain.from_spice(sensor_frame=self.final_inst_frame,
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
                                                       ephemeris_times=self.ephemeris_time,
-                                                      nadir=False, exact_ck_times=False)
+                                                      nadir=nadir, exact_ck_times=False)
             cahvor_quats = Rotation.from_matrix(self.cahvor_rotation_matrix).as_quat()
+            
+            if nadir:
+                # Logic for nadir calculation was taken from ISIS3
+                #  SpiceRotation::setEphemerisTimeNadir
+                rotation = self._frame_chain.compute_rotation(self.target_frame_id, 1)
+                p_vec, v_vec, times = self.sensor_position
+                rotated_positions = rotation.apply_at(p_vec, times)
+                rotated_velocities = rotation.rotate_velocity_at(p_vec, v_vec, times)
+
+                p_vec = rotated_positions
+                v_vec = rotated_velocities
+
+                velocity_axis = 2
+                # Get the default line translation with no potential flipping
+                # from the driver
+                trans_x = np.array(self.focal2pixel_lines)
+
+                if (trans_x[0] < trans_x[1]):
+                    velocity_axis = 1
+
+                quats = [spice.m2q(spice.twovec(-p_vec[i], 3, v_vec[i], velocity_axis)) for i, time in enumerate(times)]
+                quats = np.array(quats)[:,[1,2,3,0]]
+
+                rotation = TimeDependentRotation(quats, times, 1, self.final_inst_frame)
+                self._frame_chain.add_edge(rotation)
+
             # If we are landed we only care about the final cahvor frame relative to the target
             if self._props.get("landed", False):
               cahvor_rotation = ConstantRotation(cahvor_quats, self.target_frame_id, self.sensor_frame_id)

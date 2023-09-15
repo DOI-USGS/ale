@@ -108,7 +108,10 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         : list<double>
           focal plane to detector lines
         """
-        return [0, 0, 1/self.pixel_size]
+        if self._props.get("landed", False):
+            return [0, 0, -1/self.pixel_size]
+        else:
+            return [0, 0, 1/self.pixel_size]
     
     @property
     def focal2pixel_samples(self):
@@ -120,7 +123,10 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         : list<double>
           focal plane to detector samples
         """
-        return [0, -1/self.pixel_size, 0]
+        if (self._props.get("nadir", False)):
+            return [0, 1/self.pixel_size, 0]
+        else:
+            return [0, -1/self.pixel_size, 0]
 
     @property
     def sensor_model_version(self):
