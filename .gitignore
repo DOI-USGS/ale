@@ -222,3 +222,8 @@ dmypy.json
 *.CUB
 *.img
 *.IMG
+
+msl_images/*
+marci_data/*
+kaguyatc/*
+mvic_data/*
