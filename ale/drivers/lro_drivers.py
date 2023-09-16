@@ -840,6 +840,18 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         """
         return self.label['IsisCube']['Instrument']['LookDirection'].lower()
 
+    @property
+    def sensor_frame_id(self):
+        """
+        Returns the Naif ID code for the sensor reference frame
+        We replace this with the target frame ID because the sensor operates
+        entirely in the target reference frame
+        Returns
+        -------
+        : int
+          Naif ID code for the sensor frame
+        """
+        return self.target_frame_id
 
     @property
     def naif_keywords(self):
