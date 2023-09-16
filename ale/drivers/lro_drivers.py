@@ -856,11 +856,11 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
     @property
     def naif_keywords(self):
         naif_keywords = super().naif_keywords
-        groundRangeResolution = self.label['IsisCube']['Instrument']["ScaledPixelHeight"]
+        ground_range_resolution = self.label['IsisCube']['Instrument']["ScaledPixelHeight"]
         icode = "INS" + str(self.ikid)
-        naif_keywords[icode + "_TRANSX"] = [-1.0 * groundRangeResolution, groundRangeResolution, 0.0]
+        naif_keywords[icode + "_TRANSX"] = [-1.0 * ground_range_resolution, ground_range_resolution, 0.0]
         naif_keywords[icode + "_TRANSY"] = [0.0, 0.0, 0.0]
-        naif_keywords[icode + "_ITRANSS"] = [1.0, 1.0 / groundRangeResolution, 0.0]
+        naif_keywords[icode + "_ITRANSS"] = [1.0, 1.0 / ground_range_resolution, 0.0]
         naif_keywords[icode + "_ITRANSL"] = [0.0, 0.0, 0.0]
         return naif_keywords
 
