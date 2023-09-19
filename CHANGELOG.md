@@ -36,7 +36,8 @@ release.
 ## [Unreleased]
 
 ### Added
-- Mariner10 IsisLabelNaifSpice driver, tests, and test data [#547](https://github.com/DOI-USGS/ale/pull/547) 
+- Mariner10 IsisLabelNaifSpice driver, tests, and test data [#547](https://github.com/DOI-USGS/ale/pull/547)
+- Apollo Metric drivers, tests, and data [#533](https://github.com/DOI-USGS/ale/pull/533)
 
 ## [0.9.1] - 2023-06-05
 
@@ -61,7 +62,6 @@ release.
 - Projection information (through GDAL) will be attached to the ISD if a projected product is processed through ALE [#524](https://github.com/DOI-USGS/ale/pull/524)
 - Kaguya IsisLabelNaifSpice driver, tests, and test data [#487](https://github.com/DOI-USGS/ale/pull/487)
 - Hayabusa Amica IsisLabelNaifSpice driver, tests and test data [#521](https://github.com/DOI-USGS/ale/pull/521)
-- Apollo Metric drivers, tests, and data [#533](https://github.com/DOI-USGS/ale/pull/533)
 - Msi IsisLabelNaifSpice Driver [#511](https://github.com/DOI-USGS/ale/pull/511)
 - MGS MOC WAC IsisLabelNaifSpice driver, tests, and test data [#516](https://github.com/DOI-USGS/ale/pull/516)
 - Chandrayaan1_mrffr IsisLabelNaifSpice driver, tests and test data [#519](https://github.com/DOI-USGS/ale/pull/519)
