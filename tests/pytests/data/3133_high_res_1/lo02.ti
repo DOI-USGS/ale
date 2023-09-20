@@ -1,0 +1,255 @@
+KPL/IK
+
+LO Instrument Kernel
+===========================================================================
+ 
+   This Lunar Orbiter (LO) instrument kernel (I-kernel) contains
+   the instrument mounting offset, fields-of-view specifications, and optics 
+   and detector parameters. 
+
+
+Version and Date
+--------------------------------------------------------
+ 
+   Version 1.0 -- June 22, 2007
+
+      Initial Release.
+
+   Version 2.0 -- September 19, 2011
+
+      Shortened keyword to the 32 character limit
+
+
+References
+--------------------------------------------------------
+
+   1.   
+
+   2.   
+
+ 
+ 
+Implementation Notes
+--------------------------------------------------------
+ 
+   This file is used by the SPICE system as follows: programs that make
+   use of this I-kernel must `load' the kernel, normally during program
+   initialization. Loading the kernel associates data items with their
+   names in a data structure called the `kernel pool'. The SPICELIB
+   routine FURNSH loads a kernel file into the pool as shown below.
+
+      CALL FURNSH ( I_kernel_name )
+
+   In order for a program to extract data from the pool, the SPICELIB 
+   routines GDPOOL and GIPOOL are used. See [4] for more details.
+
+   This file was created and may be updated with a text editor or word
+   processor.
+
+
+LO Camera NAIF IDs
+--------------------------------------------------------
+
+   The following NAIF IDs are assigned to individual LO platforms and cameras:
+
+      Camera                                        NAIF ID
+      -------------------------------------------------------
+      Lunar Orbiter 1 Platform                      -531000
+      Lunar Orbiter 1 High Resolution Camera        -531001
+      Lunar Orbiter 1 Medium Resolution Camera      -531002
+      Lunar Orbiter 2 Platform                      -532000
+      Lunar Orbiter 2 High Resolution Camera        -532001
+      Lunar Orbiter 2 Medium Resolution Camera      -532002
+      Lunar Orbiter 3 Platform                      -533000
+      Lunar Orbiter 3 High Resolution Camera        -533001
+      Lunar Orbiter 3 Medium Resolution Camera      -533002
+      Lunar Orbiter 4 Platform                      -534000
+      Lunar Orbiter 4 High Resolution Camera        -534001
+      Lunar Orbiter 4 Medium Resolution Camera      -534002
+      Lunar Orbiter 5 Platform                      -535000
+      Lunar Orbiter 5 High Resolution Camera        -535001
+      Lunar Orbiter 5 Medium Resolution Camera      -535002
+      ---------------------------
+
+   The keywords in this data block make this name/ID mapping available 
+   within the SPICE toolkit.   
+
+      \begindata
+
+      NAIF_BODY_NAME                += ( 'LO_1' )
+      NAIF_BODY_CODE                += ( -531 )
+
+      NAIF_BODY_NAME                += ( 'LO_2' )
+      NAIF_BODY_CODE                += ( -532 )
+
+      NAIF_BODY_NAME                += ( 'LO_3' )
+      NAIF_BODY_CODE                += ( -533 )
+
+      NAIF_BODY_NAME                += ( 'LO_4' )
+      NAIF_BODY_CODE                += ( -534 )
+
+      NAIF_BODY_NAME                += ( 'LO_5' )
+      NAIF_BODY_CODE                += ( -535 )
+
+
+   \begintext
+      The Lunar Orbiter 3 Spacecraft frame is kernel based.
+   \begindata
+      FRAME_LUNAR_ORBITER_3        = -533000
+      FRAME_-533000_NAME           = 'LUNAR_ORBITER_3'
+      FRAME_-533000_CLASS          =  3
+      FRAME_-533000_CLASS_ID       =  -533000
+      FRAME_-533000_CENTER         =  -533
+      CK_-533000_SCLK              = -533
+      CK_-533000_SPK               = -533
+ 
+   \begintext
+      Lunar Orbiter 3 High Resolution Camera Frame
+      This frame is identical to the Lunar Orbiter 3 spacecraft frame. 
+
+   \begindata
+ 
+      FRAME_LO3_HIGH_RESOLUTION_CAMERA            = -533001
+      FRAME_-533001_NAME                          = 'LO3_HIGH_RESOLUTION_CAMERA'
+      FRAME_-533001_CLASS                         = 4
+      FRAME_-533001_CLASS_ID                      = -533001
+      FRAME_-533001_CENTER                        = -533
+
+      TKFRAME_-533001_SPEC                        = 'MATRIX'
+      TKFRAME_-533001_RELATIVE                    = 'LUNAR_ORBITER_3'
+      TKFRAME_-533001_MATRIX                      = ( 1 0 0
+                                                      0 1 0
+                                                      0 0 1 )
+
+   \begintext
+      Lunar Orbiter 3 Medium Resolution Camera Frame
+      This frame is identical to the Lunar Orbiter 3 spacecraft frame. 
+
+   \begindata
+ 
+      FRAME_LO3_MED_RESOLUTION_CAMERA            = -533002
+      FRAME_-533002_NAME                          = 'LO3_MED_RESOLUTION_CAMERA'
+      FRAME_-533002_CLASS                         = 4
+      FRAME_-533002_CLASS_ID                      = -533001
+      FRAME_-533002_CENTER                        = -533
+
+      TKFRAME_-533002_SPEC                        = 'MATRIX'
+      TKFRAME_-533002_RELATIVE                    = -533000
+      TKFRAME_-533002_MATRIX                      = ( 1 0 0
+                                                      0 1 0
+                                                      0 0 1 )
+
+   \begintext
+      The Lunar Orbiter 4 Spacecraft frame is kernel based.
+   \begindata
+      FRAME_LUNAR_ORBITER_4        = -534000
+      FRAME_-534000_NAME           = 'LUNAR_ORBITER_4'
+      FRAME_-534000_CLASS          =  3
+      FRAME_-534000_CLASS_ID       =  -534000
+      FRAME_-534000_CENTER         =  -534
+      CK_-534000_SCLK              = -534
+      CK_-534000_SPK               = -534
+ 
+   \begintext
+      Lunar Orbiter 4 High Resolution Camera Frame
+      This frame is identical to the Lunar Orbiter 4 spacecraft frame. 
+
+   \begindata
+ 
+      FRAME_LO4_HIGH_RESOLUTION_CAMERA            = -534001
+      FRAME_-534001_NAME                          = 'LO4_HIGH_RESOLUTION_CAMERA'
+      FRAME_-534001_CLASS                         = 4
+      FRAME_-534001_CLASS_ID                      = -534001
+      FRAME_-534001_CENTER                        = -534
+
+      TKFRAME_-534001_SPEC                        = 'MATRIX'
+      TKFRAME_-534001_RELATIVE                    = 'LUNAR_ORBITER_4'
+      TKFRAME_-534001_MATRIX                      = ( 1 0 0
+                                                      0 1 0
+                                                      0 0 1 )
+
+   \begintext
+      Lunar Orbiter 4 Medium Resolution Camera Frame
+      This frame is identical to the Lunar Orbiter 4 spacecraft frame. 
+
+   \begindata
+ 
+      FRAME_LO4_MED_RESOLUTION_CAMERA            = -534002
+      FRAME_-534002_NAME                          = 'LO4_MED_RESOLUTION_CAMERA'
+      FRAME_-534002_CLASS                         = 4
+      FRAME_-534002_CLASS_ID                      = -534001
+      FRAME_-534002_CENTER                        = -534
+
+      TKFRAME_-534002_SPEC                        = 'MATRIX'
+      TKFRAME_-534002_RELATIVE                    = -534000
+      TKFRAME_-534002_MATRIX                      = ( 1 0 0
+                                                      0 1 0
+                                                      0 0 1 )
+
+   \begintext
+      The Lunar Orbiter 5 Spacecraft frame is kernel based.
+   \begindata
+      FRAME_LUNAR_ORBITER_5        = -535000
+      FRAME_-535000_NAME           = 'LUNAR_ORBITER_5'
+      FRAME_-535000_CLASS          =  3
+      FRAME_-535000_CLASS_ID       =  -535000
+      FRAME_-535000_CENTER         =  -535
+      CK_-535000_SCLK              = -535
+      CK_-535000_SPK               = -535
+ 
+   \begintext
+      Lunar Orbiter 5 High Resolution Camera Frame
+      This frame is identical to the Lunar Orbiter 5 spacecraft frame. 
+
+   \begindata
+ 
+      FRAME_LO5_HIGH_RESOLUTION_CAMERA            = -535001
+      FRAME_-535001_NAME                          = 'LO5_HIGH_RESOLUTION_CAMERA'
+      FRAME_-535001_CLASS                         = 4
+      FRAME_-535001_CLASS_ID                      = -535001
+      FRAME_-535001_CENTER                        = -535
+
+      TKFRAME_-535001_SPEC                        = 'MATRIX'
+      TKFRAME_-535001_RELATIVE                    = 'LUNAR_ORBITER_5'
+      TKFRAME_-535001_MATRIX                      = ( 1 0 0
+                                                      0 1 0
+                                                      0 0 1 )
+
+   \begintext
+      Lunar Orbiter 5 Medium Resolution Camera Frame
+      This frame is identical to the Lunar Orbiter 5 spacecraft frame. 
+
+   \begindata
+ 
+      FRAME_LO5_MED_RESOLUTION_CAMERA            = -535002
+      FRAME_-535002_NAME                          = 'LO5_MED_RESOLUTION_CAMERA'
+      FRAME_-535002_CLASS                         = 4
+      FRAME_-535002_CLASS_ID                      = -535001
+      FRAME_-535002_CENTER                        = -535
+
+      TKFRAME_-535002_SPEC                        = 'MATRIX'
+      TKFRAME_-535002_RELATIVE                    = -535000
+      TKFRAME_-535002_MATRIX                      = ( 1 0 0
+                                                      0 1 0
+                                                      0 0 1 )
+ 
+   \begintext
+Keyword Naming Conventions
+--------------------------------------------------------
+ 
+   All names referencing values in this I-kernel start with the
+   characters `INS' followed by the NAIF ID of the camera. The remainder
+   of the name is an underscore character followed by the unique name of
+   the data item. For example, the focal length of the LO HIGH resolution
+   camera is specified by
+
+      INS-531001_FOCAL_LENGTH
+
+   The upper bound on the length of the name of any data item is 32
+   characters.
+
+   If the same item is included in more then one file, or if the same
+   item appears more than once within a single file, the latest value
+   supersedes any earlier values.
+ 
+ 

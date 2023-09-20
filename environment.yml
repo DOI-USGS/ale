@@ -22,3 +22,6 @@ dependencies:
   - pytest-cov
   - networkx
   - breathe
+  - pip
+  - pip:
+    - affine6p
