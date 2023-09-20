@@ -1,0 +1,73 @@
+DSPSE SPICE SCLK Kernel
+--------------------------------------------------------
+ 
+     This file contains the data necessary to convert between DSPSE
+     spacecraft clock time (SCLK) and ephemeris time.
+ 
+     NAIF suggests that you do not modify this file. If you do modify it,
+     be sure to indicate this in the `Version' section below.
+ 
+ 
+Version
+--------------------------------------------------------
+
+     This file is DSPSE version 1, released 18-JAN-1994.
+
+
+Implementation notes
+--------------------------------------------------------
+ 
+     You must load this file into the kernel pool before using any of the
+     SPICELIB SCLK routines. The code fragment
+ 
+        CALL LDPOOL ( < name of this file > )
+ 
+     performs this task. To convert between ET and UTC, you will also need
+     to load a leapseconds kernel. The additional call to LDPOOL,
+ 
+        CALL LDPOOL ( < name of your leapsecond file > )
+ 
+     will accomplish this. Note that you must supply the actual names of
+     the files used on your system as arguments to LDPOOL. Because the file
+     names are system dependent, we do not list them here.
+ 
+     For more information, consult your SPICELIB required reading files.
+     The following areas are covered:
+ 
+        SCLK system                     SCLK required reading
+        Time systems and conversion     TIME required reading
+        Kernel pool                     KERNEL required reading
+ 
+ 
+Kernel data
+--------------------------------------------------------
+
+The DSPSE clock zero count occurs at 1-JAN-1950/00:00:00 UTC. Nominally,
+the clock will advance at UTC time. When a leapsecond occurs, the clock
+will be adjusted accordingly. When this event occurs, a new partition
+must be added to this file. To account for leapseconds prior to the
+launch of the spacecraft, the begin time below is
+1-JAN-1950/00:00:19.000.
+
+
+\begindata
+
+SCLK_KERNEL_ID           = ( @1994-01-18 )
+
+SCLK_DATA_TYPE_40        = ( 1 )
+SCLK01_TIME_SYSTEM_40    = ( 2 )
+SCLK01_N_FIELDS_40       = ( 3 )
+SCLK01_MODULI_40         = ( 65536 10546.875 65536 )
+SCLK01_OFFSETS_40        = ( 0 0 0 )
+SCLK01_OUTPUT_DELIM_40   = ( 1 )
+
+SCLK_PARTITION_START_40  = ( 0.0000000000000E+00 )
+
+SCLK_PARTITION_END_40    = ( 4.5298483199999E+13 )
+
+SCLK01_COEFFICIENTS_40   = (
+ 
+    0.0000000000000E+00    -1.5778799398160E+09    8.6400000000000E+04 )
+
+\begintext
+

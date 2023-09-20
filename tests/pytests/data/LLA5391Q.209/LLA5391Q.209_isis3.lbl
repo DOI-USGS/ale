@@ -1,0 +1,359 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 128
+      Lines   = 128
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = UnsignedByte
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName           = "CLEMENTINE 1"
+    InstrumentId             = LWIR
+    TargetName               = MOON
+    StartTime                = 1994-04-04T17:17:51.263
+    OrbitNumber              = 209
+    FocalPlaneTemperature    = 368.619 <K>
+    ExposureDuration         = 0.1440 <ms>
+    OffsetModeID             = 5
+    GainModeID               = 30
+    CryocoolerDuration       = 6569 <s>
+    EncodingCompressionRatio = 1.00
+    EncodingFormat           = N/A
+  End_Group
+
+  Group = Archive
+    ProductID    = LLA5391Q.209
+    MissionPhase = "LUNAR MAPPING"
+  End_Group
+
+  Group = BandBin
+    FilterName = A
+    Center     = 8.75 <micrometers>
+    Width      = 1.5 <micrometers>
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -40004
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = ($base/kernels/pck/pck00009.tpc,
+                                 $base/kernels/pck/lunar_de403_1950-2199_pa.bp-
+                                 c, $base/kernels/fk/lunarMeanEarth001.tf)
+    TargetPosition            = (Table, $base/kernels/spk/de430.bsp)
+    InstrumentPointing        = (Table, $Clementine1/kernels/ck/clem_2mn.bck,
+                                 $Clementine1/kernels/ck/clem_5sc.bck,
+                                 $clementine1/kernels/fk/clem_v12.tf)
+    Instrument                = Null
+    SpacecraftClock           = $Clementine1/kernels/sclk/dspse002.tsc
+    InstrumentPosition        = (Table,
+                                 $Clementine1/kernels/spk/SPKMERGE_940219_9405-
+                                 04_CLEMV001b.bsp)
+    InstrumentAddendum        = $Clementine1/kernels/iak/lwirAddendum002.ti
+    ShapeModel                = $base/dems/ldem_128ppd_Mar2011_clon180_radius-
+                                _pad.cub
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
+    Source                    = isis
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 87835
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-40000, 1)
+  ConstantFrames      = (-40004, -40000)
+  ConstantRotation    = (-0.9999999805517, -1.05674820127574e-07,
+                         1.97222175890321e-04, -3.23108908602599e-15,
+                         -0.99999985645057, -5.35816054721301e-04,
+                         1.97222204201455e-04, -5.35816044300591e-04,
+                         0.99999983700227)
+  CkTableStartTime    = -181248068.55127
+  CkTableEndTime      = -181248068.55127
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = ($Clementine1/kernels/ck/clem_2mn.bck,
+                         $Clementine1/kernels/ck/clem_5sc.bck,
+                         $clementine1/kernels/fk/clem_v12.tf)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 87899
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = -181248068.55127
+  SpkTableEndTime      = -181248068.55127
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = $Clementine1/kernels/spk/SPKMERGE_940219_940504_CLEM-
+                         V001b.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 87955
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (310002, 1)
+  ConstantFrames      = (310001, 310003, 310000, 310002)
+  ConstantRotation    = (0.99999987852709, -3.09789127116553e-04,
+                         3.83375135592436e-04, 3.09789421617701e-04,
+                         0.999999952015, -7.08797549693787e-07,
+                         -3.83374897618408e-04, 8.27563025111877e-07,
+                         0.9999999265115)
+  CkTableStartTime    = -181248068.55127
+  CkTableEndTime      = -181248068.55127
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 6
+  Description         = "Created by spiceinit"
+  Kernels             = ($base/kernels/spk/de430.bsp,
+                         $base/kernels/pck/pck00009.tpc,
+                         $base/kernels/pck/lunar_de403_1950-2199_pa.bpc,
+                         $base/kernels/fk/lunarMeanEarth001.tf)
+  SolarLongitude      = 141.66554544407
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 88019
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = -181248068.55127
+  SpkTableEndTime      = -181248068.55127
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = $base/kernels/spk/de430.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 88075
+  Bytes     = 1458
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 82417
+  Bytes     = 5418
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE                  = 301
+  BODY301_RADII              = (1737.4, 1737.4, 1737.4)
+  BODY_FRAME_CODE            = 310001
+  INS-40004_FOCAL_LENGTH     = 350.0
+  INS-40004_PIXEL_PITCH      = 0.05
+  INS-40004_TRANSX           = (0.0, 0.05, 0.0)
+  INS-40004_TRANSY           = (0.0, 0.0, 0.05)
+  INS-40004_ITRANSS          = (0.0, 20.0, 0.0)
+  INS-40004_ITRANSL          = (0.0, 0.0, 20.0)
+  INS-40004_BORESIGHT_SAMPLE = 64.5
+  INS-40004_BORESIGHT_LINE   = 64.5
+End_Object
+End
