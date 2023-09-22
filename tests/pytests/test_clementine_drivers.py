@@ -6,7 +6,7 @@ from unittest.mock import patch
 import pytest
 
 import ale
-from ale.drivers.clementine_drivers import ClementineUvvisIsisLabelNaifSpiceDriver, ClementineHiresIsisLabelNaifSpiceDriver, ClementineNirIsisLabelNaifSpiceDriver, ClementineLwirIsisLabelNaifSpiceDriver
+from ale.drivers.clementine_drivers import ClementineIsisLabelNaifSpiceDriver
 
 from conftest import get_image_kernels, get_isd, convert_kernels, get_image_label, compare_dicts
 
@@ -76,7 +76,7 @@ class test_uvvis_isis_naif(unittest.TestCase):
 
     def setUp(self):
         label = get_image_label("LUA3107H.161", "isis3")
-        self.driver = ClementineUvvisIsisLabelNaifSpiceDriver(label)
+        self.driver = ClementineIsisLabelNaifSpiceDriver(label)
 
     def test_instrument_id(self):
         assert self.driver.instrument_id == "ULTRAVIOLET/VISIBLE CAMERA"
@@ -107,7 +107,7 @@ class test_hires_isis_naif(unittest.TestCase):
 
     def setUp(self):
         label = get_image_label("LHA0775Q.001", "isis3")
-        self.driver = ClementineHiresIsisLabelNaifSpiceDriver(label)
+        self.driver = ClementineIsisLabelNaifSpiceDriver(label)
 
     def test_instrument_id(self):
         assert self.driver.instrument_id == "High Resolution Camera"
@@ -138,7 +138,7 @@ class test_nir_isis_naif(unittest.TestCase):
 
     def setUp(self):
         label = get_image_label("LNB4653M.093", "isis3")
-        self.driver = ClementineNirIsisLabelNaifSpiceDriver(label)
+        self.driver = ClementineIsisLabelNaifSpiceDriver(label)
 
     def test_instrument_id(self):
         assert self.driver.instrument_id == "Near Infrared Camera"
@@ -172,7 +172,7 @@ class test_lwir_isis_naif(unittest.TestCase):
 
     def setUp(self):
         label = get_image_label("LLA5391Q.209", "isis3")
-        self.driver = ClementineLwirIsisLabelNaifSpiceDriver(label)
+        self.driver = ClementineIsisLabelNaifSpiceDriver(label)
 
     def test_instrument_id(self):
         assert self.driver.instrument_id == "Long Wave Infrared Camera"
