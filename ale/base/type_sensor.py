@@ -471,7 +471,7 @@ class Cahvor():
             if self._props.get("landed", False):
               self._cahvor_rotation_matrix = np.array([-H_prime, -V_prime, self.cahvor_camera_dict['A']])
             else:
-              self._cahvor_rotation_matrix = np.array([H_prime, V_prime, -self.cahvor_camera_dict['A']])
+              self._cahvor_rotation_matrix = np.array([H_prime, -V_prime, -self.cahvor_camera_dict['A']])
         return self._cahvor_rotation_matrix
 
     @property
