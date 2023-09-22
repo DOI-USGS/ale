@@ -1,25 +1,16 @@
-import os
 import spiceypy as spice
-import json
-import numpy as np
-import pvl
 
 import ale
 from ale.base import Driver
 from ale.base.label_isis import IsisLabel
 from ale.base.data_naif import NaifSpice
-from ale.base.type_distortion import RadialDistortion, NoDistortion
-from ale.base.type_sensor import Framer, LineScanner
-from ale.util import generate_kernels_from_cube
-from ale.base.type_sensor import Framer
 from ale.base.type_distortion import NoDistortion
+from ale.base.type_sensor import Framer
 
-from ale import util
 
-
-class ClementineUvvisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
+class ClementineIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
     """
-    Driver for reading Ultra-violet Invisible Spectrum ISIS3 Labels
+    Driver for reading UUVIS, HIRES, NIR, and LWIR ISIS3 Labels
     """
     
     @property
@@ -37,7 +28,10 @@ class ClementineUvvisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDi
           instrument id
         """
         lookup_table = {
-        "UVVIS": "ULTRAVIOLET/VISIBLE CAMERA"
+        "UVVIS": "ULTRAVIOLET/VISIBLE CAMERA",
+        "NIR": "Near Infrared Camera",
+        "HIRES": "High Resolution Camera",
+        "LWIR": "Long Wave Infrared Camera"
         }
         return lookup_table[super().instrument_id]
 
@@ -51,8 +45,7 @@ class ClementineUvvisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDi
         : str
           instrument name
         """
-        filter = self.label["IsisCube"]['BandBin']['FilterName']
-        return "CLEM_" + super().instrument_id + "_" + filter
+        return super().instrument_id
 
     @property
     def spacecraft_name(self):
@@ -109,3 +102,29 @@ class ClementineUvvisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDi
           Naif ID used to for identifying the instrument in Spice kernels
         """
         return self.label["IsisCube"]["Kernels"]["NaifFrameCode"]
+    
+    @property
+    def focal_length(self):
+        """
+        NIR manually sets focal length based on filter.
+
+        Returns
+        -------
+        : float
+          focal length
+        """
+        if (self.instrument_id == "Near Infrared Camera"):
+          filter = self.label["IsisCube"]['BandBin']['FilterName']
+
+          lookup_table = {
+          "A": 2548.2642,
+          "B": 2530.8958,
+          "C": 2512.6589,
+          "D": 2509.0536,
+          "E": 2490.7378,
+          "F": 2487.8694
+          }
+
+          return lookup_table[filter.upper()] * 0.038
+        
+        return super().focal_length

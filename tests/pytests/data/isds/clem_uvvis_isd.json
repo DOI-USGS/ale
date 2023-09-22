@@ -3,7 +3,7 @@
   "image_lines": 288,
   "image_samples": 384,
   "name_platform": "CLEMENTINE 1",
-  "name_sensor": "CLEM_UVVIS_A",
+  "name_sensor": "UVVIS",
   "reference_height": {
     "maxheight": 1000,
     "minheight": -1000,
