@@ -819,7 +819,9 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
     @property
     def ephemeris_stop_time(self):
         """
-        Returns the stop ephemeris time for the image.
+        Returns the stop ephemeris time for the image. This is computed from 
+        the start time plus the line exposure per line, plue the line exposure
+        removed from the start time, plus the line exposure for the final line.
 
         Returns
         -------
@@ -855,6 +857,18 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
 
     @property
     def naif_keywords(self):
+        """
+        Adds the correct TRANSX/Y and ITRANS/L values for use in ISIS. By default
+        these values are placeholders in the ISIS iaks and need to be computed manully
+        from the ground range resolution. See RadarGroundRangeMap.cpp in ISIS for
+        the calculations.
+
+        Returns
+        -------
+          : dict
+            An updated dictionary of NAIF keywords with the correct TRANSX/Y and ITRANSS/L
+            values computed
+        """
         naif_keywords = super().naif_keywords
         ground_range_resolution = self.label['IsisCube']['Instrument']["ScaledPixelHeight"]
         icode = "INS" + str(self.ikid)
