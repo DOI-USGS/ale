@@ -1,6 +1,8 @@
-import pvl
+import re
 import spiceypy as spice
 import os
+import math
+import numpy as np
 
 from glob import glob
 
@@ -9,13 +11,19 @@ from ale.base import Driver
 from ale.base.label_isis import IsisLabel
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
+from ale.base.label_isis import IsisLabel
+from ale.base.type_sensor import Framer, LineScanner
 from ale.base.type_distortion import NoDistortion
-from ale.base.type_sensor import Framer
+from ale.base.data_isis import read_table_data
+from ale.base.data_isis import parse_table
+from ale.transformation import ConstantRotation, FrameChain
 
 ID_LOOKUP = {
     "FC1" : "DAWN_FC1",
     "FC2" : "DAWN_FC2"
 }
+
+degs_per_rad = 57.2957795
 
 class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
     """
@@ -202,194 +210,162 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         """
         return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[1]) + 0.5
 
-class DawnFcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
-    """
-    Driver for reading Dawn ISIS3 Labels. These are Labels that have been ingested
-    into ISIS from PDS EDR images but have not been spiceinit'd yet.
-    """
 
+class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
     @property
     def instrument_id(self):
         """
-        Returns an instrument id for uniquely identifying the instrument,
-        but often also used to be piped into Spice Kernels to acquire
-        IKIDS. Therefor they are the same ID that Spice expects in bods2c
-        calls. Expect instrument_id to be defined in the IsisLabel mixin.
-        This should be a string of the form
+        Returns the ID of the instrument
 
         Returns
         -------
         : str
-          instrument id
+          Name of the instrument
         """
-        if not hasattr(self, "_instrument_id"):
-          instrument_id = super().instrument_id
-          filter_number = self.filter_number
-          self._instrument_id = "{}_FILTER_{}".format(ID_LOOKUP[instrument_id], filter_number)
-
-        return self._instrument_id
+        lookup_table = {'VIR': 'Visual and Infrared Spectrometer'}
+        return lookup_table[super().instrument_id]
     
-    @property
-    def filter_number(self):
-        """
-        Returns the instrument filter number from the ISIS bandbin group.
-        This filter number is used in the instrument id to identify
-        which filter was used when aquiring the data.
-
-        Returns
-        -------
-         : int
-           The filter number from the instrument
-        """
-        return self.label["IsisCube"]["BandBin"]["FilterNumber"]
-
-    @property
-    def spacecraft_name(self):
-        """
-        Returns the name of the spacecraft
-
-        Returns
-        -------
-        : str
-          spacecraft name
-        """
-        return self.label["IsisCube"]["Instrument"]["SpacecraftName"]
-
     @property
     def sensor_name(self):
         """
-        Returns the sensor name
+        Returns the name of the instrument
 
         Returns
         -------
         : str
-          sensor name
+          Name of the sensor
         """
-        return self.instrument_id
-
+        return self.label["IsisCube"]["Instrument"]["InstrumentId"]
+    
     @property
-    def sensor_model_version(self):
-        """
-        Returns ISIS sensor model version
+    def exposure_duration(self):
+      """
+      The exposure duration of the image, in seconds
 
-        Returns
-        -------
-        : int
-          ISIS sensor model version
-        """
-        return 1
-
+      Returns
+      -------
+      : float
+        Exposure duration in seconds
+      """
+      return self.label["IsisCube"]["Instrument"]["FrameParameter"][0]
+    
     @property
     def ikid(self):
         """
-        Overridden to grab the ikid from the Isis Cube since there is no way to
-        obtain this value with a spice bods2c call. Isis sets this value during
-        ingestion, based on the original fits file.
+        Returns the Naif ID code for the instrument
+        Expects the instrument_id to be defined. This must be a string containing
+        the short name of the instrument.
 
         Returns
         -------
         : int
           Naif ID used to for identifying the instrument in Spice kernels
         """
-        return self.label["IsisCube"]["Kernels"]["NaifFrameCode"]
-
-    def filter_name(self):
+        lookup_table = {
+          'VIS': -203211,
+          "IR": -203213
+        }
+        return lookup_table[self.label["IsisCube"]["Instrument"]["ChannelId"]]
+    
+    @property
+    def housekeeping_table(self):
         """
-        Returns the filter used to identify the image
+        This table named, "VIRHouseKeeping", contains four fields: ScetTimeClock, ShutterStatus,
+        MirrorSin, and MirrorCos.  These fields contain the scan line time in SCLK, status of 
+        shutter - open, closed (dark), sine and cosine of the scan mirror, respectively.
 
         Returns
         -------
-        : str
-          filter name
+        : dict
+          Dictionary with ScetTimeClock, ShutterStatus, MirrorSin, and MirrorCos
         """
-        return self.label["IsisCube"]["BandBin"]["FilterName"]
+        isis_bytes = read_table_data(self.label['Table'], self._file)
+
+        return parse_table(self.label['Table'], isis_bytes)
+    
+    @property
+    def line_scan_rate(self):
+
+        line_times = []
+        for line_midtime in self.line_midtimes:
+          line_times.append(line_midtime - (self.exposure_duration / 2.0))
+
+        return [len(line_times)], [line_times], [self.exposure_duration]
 
     @property
-    def detector_center_sample(self):
+    def sensor_model_version(self):
         """
-        Returns center detector sample acquired from Spice Kernels.
-        Expects ikid to be defined. This should be the integer Naif ID code for
-        the instrument.
-
-        We have to add 0.5 to the CCD Center because the Dawn IK defines the
-        detector pixels as 0.0 being the center of the first pixel so they are
-        -0.5 based.
-
         Returns
         -------
-        : float
-          center detector sample
+        : int
+          ISIS sensor model version
         """
-        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[0]) + 0.5
-
+        return 1
+    
     @property
-    def detector_center_line(self):
-        """
-        Returns center detector line acquired from Spice Kernels.
-        Expects ikid to be defined. This should be the integer Naif ID code for
-        the instrument.
+    def optical_angles(self):
+      hk_dict = self.housekeeping_table
+      
+      lines = []
+      for index, mirror_sin in enumerate(hk_dict["MirrorSin"]):
+          
+          mirror_cos = hk_dict["MirrorCos"][index]
 
-        We have to add 0.5 to the CCD Center because the Dawn IK defines the
-        detector pixels as 0.0 being the center of the first pixel so they are
-        -0.5 based.
+          scan_elec_deg = math.atan(mirror_sin/mirror_cos) * degs_per_rad
+          opt_ang = ((scan_elec_deg - 3.7996979) * 0.25/0.257812) / 1000
 
-        Returns
-        -------
-        : float
-          center detector line
-        """
-        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[1]) + 0.5
+          # if (hk_dict["ShutterStatus"][index].lower() == "closed"):
+            # opt_ang = angFit.Evaluate(a+1, NumericalApproximation::NearestEndpoint)
+            
+          lines.append(opt_ang)
 
+      return lines
+    
     @property
-    def ephemeris_start_time(self):
-        """
-        Compute the starting ephemeris time for a Dawn Frame camera. This is done
-        via a spice call but 193 ms needs to be added to
-        account for the CCD being discharged or cleared.
+    def line_midtimes(self):
 
-        Returns
-        -------
-        : float
-          ephemeris start time
-        """
-        if not hasattr(self, '_ephemeris_start_time'):
-            sclock = self.spacecraft_clock_start_count
-            self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
-            self._ephemeris_start_time += 193.0 / 1000.0
-        return self._ephemeris_start_time
+        line_times = []
+        scet_times = self.housekeeping_table["ScetTimeClock"]
+        for scet in scet_times:
+          line_midtime = spice.scs2e(self.spacecraft_id, scet)
+          line_times.append(line_midtime)
 
+        return line_times
+    
     @property
-    def exposure_duration_ms(self):
-        """
-        Return the exposure duration in ms for a Dawn Frame camera.
+    def is_calibrated(self):
+        return self.label['IsisCube']['Instrument']['ProcessingLevelID'] > 2
 
-        Returns
-        -------
-        : float
-          exposure duration
-        """
-        return self.exposure_duration / 1000
-
+    @property 
+    def has_articulation_kernel(self):
+        regex = re.compile('.*dawn_vir_[0-9]{9}_[0-9]{1}.BC')
+        return any([re.match(regex, i) for i in self.kernels])
+    
     @property
-    def ephemeris_stop_time(self):
-        """
-        Compute the ephemeris stop time for a Dawn Frame camera
+    def frame_chain(self):
+        if not hasattr(self, '_frame_chain'):
+            if self.has_articulation_kernel and self.is_calibrated:
+                self._frame_chain = super().frame_chain
+            else:
+                self._frame_chain = super().frame_chain
+                vir_rotation = ConstantRotation([1,0,0,0], self.sensor_frame_id, self.sensor_frame_id)
+                self._frame_chain.add_edge(rotation = vir_rotation)
+                self._frame_chain.compute_time_dependent_rotiations([(1, self.sensor_frame_id)], self.ephemeris_time, 0)
 
-        Returns
-        -------
-        : float
-          ephemeris stop time
-        """
-        return self.ephemeris_start_time + self.exposure_duration_ms
-
-    @property
-    def ephemeris_center_time(self):
-        """
-        Compute the center ephemeris time for a Dawn Frame camera.
-
-        Returns
-        -------
-        : float
-          center ephemeris time
-        """
-        return self.ephemeris_start_time + (self.exposure_duration_ms / 2.0)
+                rot = self._frame_chain[1][self.sensor_frame_id]['rotation']
+                quats = np.zeros((len(rot.times), 4))
+                matrix = rot._rots.as_matrix()
+                avs = []
+                for opt_ang in self.optical_angles:
+                    for i, matrix in enumerate(rot._rots.as_matrix()):
+                      s_matrix = spice.rav2xf(matrix, rot.av[i])
+                      xform = spice.eul2xf([0, -opt_ang, 0, 0, 0, 0], 1, 2, 3)
+                      xform2 = spice.mxmg(xform, s_matrix)
+                      rot_mat, av = spice.xf2rav(xform2)
+                      avs.append(av)
+                      quat_from_rotation = spice.m2q(rot_mat)
+                      quats[i,:3] = quat_from_rotation[1:]
+                      quats[i,3] = quat_from_rotation[0]
+                rot.quats = quats
+                rot.av = avs
+        return self._frame_chain
