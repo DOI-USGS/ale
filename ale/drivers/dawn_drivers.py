@@ -199,3 +199,137 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
           center detector line
         """
         return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[1]) + 0.5
+
+class DawnFcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
+    """
+    Driver for reading Dawn ISIS3 Labels. These are Labels that have been ingested
+    into ISIS from PDS EDR images but have not been spiceinit'd yet.
+    """
+
+    @property
+    def instrument_id(self):
+        """
+        Returns an instrument id for uniquely identifying the instrument,
+        but often also used to be piped into Spice Kernels to acquire
+        IKIDS. Therefor they are the same ID that Spice expects in bods2c
+        calls. Expect instrument_id to be defined in the IsisLabel mixin.
+        This should be a string of the form
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
+        return self.label["IsisCube"]["Instrument"]["InstrumentId"]
+
+    @property
+    def spacecraft_name(self):
+        """
+        Returns the name of the spacecraft
+
+        Returns
+        -------
+        : str
+          spacecraft name
+        """
+        return self.label["IsisCube"]["Instrument"]["SpacecraftName"]
+
+    @property
+    def sensor_name(self):
+        """
+        Returns the sensor name
+
+        Returns
+        -------
+        : str
+          sensor name
+        """
+        filter = self.label["IsisCube"]["BandBin"]["FilterName"]
+        return self.spacecraft_name + "_" + self.instrument_id + "_" + filter
+
+    @property
+    def sensor_model_version(self):
+        """
+        Returns ISIS sensor model version
+
+        Returns
+        -------
+        : int
+          ISIS sensor model version
+        """
+        return 1
+
+    @property
+    def ikid(self):
+        """
+        Overridden to grab the ikid from the Isis Cube since there is no way to
+        obtain this value with a spice bods2c call. Isis sets this value during
+        ingestion, based on the original fits file.
+
+        Returns
+        -------
+        : int
+          Naif ID used to for identifying the instrument in Spice kernels
+        """
+        return self.label["IsisCube"]["Kernels"]["NaifFrameCode"]
+
+    def filter_name(self):
+        """
+        Returns the filter used to identify the image
+
+        Returns
+        -------
+        : str
+          filter name
+        """
+        return self.label["IsisCube"]["BandBin"]["FilterName"]
+
+    @property
+    def detector_center_sample(self):
+        """
+        Returns center detector sample acquired from Spice Kernels.
+        Expects ikid to be defined. This should be the integer Naif ID code for
+        the instrument.
+
+        We have to add 0.5 to the CCD Center because the Dawn IK defines the
+        detector pixels as 0.0 being the center of the first pixel so they are
+        -0.5 based.
+
+        Returns
+        -------
+        : float
+          center detector sample
+        """
+        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[0]) + 0.5
+
+    @property
+    def detector_center_line(self):
+        """
+        Returns center detector line acquired from Spice Kernels.
+        Expects ikid to be defined. This should be the integer Naif ID code for
+        the instrument.
+
+        We have to add 0.5 to the CCD Center because the Dawn IK defines the
+        detector pixels as 0.0 being the center of the first pixel so they are
+        -0.5 based.
+
+        Returns
+        -------
+        : float
+          center detector line
+        """
+        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[1]) + 0.5
+
+    @property
+    def ephemeris_start_time(self):
+        """
+        Compute the center ephemeris time for a Dawn Frame camera. This is done
+        via a spice call but 193 ms needs to be added to
+        account for the CCD being discharged or cleared.
+        """
+        if not hasattr(self, '_ephemeris_start_time'):
+            sclock = self.spacecraft_clock_start_count
+            self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
+            self._ephemeris_start_time += 193.0 / 1000.0
+        return self._ephemeris_start_time
+
