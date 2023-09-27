@@ -10,7 +10,8 @@ from unittest.mock import patch
 from conftest import get_image_label, get_image_kernels, get_isd, convert_kernels, compare_dicts
 
 import ale
-from ale.drivers.dawn_drivers import DawnFcPds3NaifSpiceDriver
+from ale.drivers.dawn_drivers import DawnFcPds3NaifSpiceDriver, DawnFcIsisLabelNaifSpiceDriver
+
 
 @pytest.fixture(scope="module", autouse=True)
 def test_kernels():
@@ -91,3 +92,10 @@ class test_pds3_naif(unittest.TestCase):
             assert self.driver.detector_center_line == 100.5
             bods2c.assert_called_with('DAWN_FC2_FILTER_6')
             gdpool.assert_called_with('INS54321_CCD_CENTER', 0, 2)
+
+# ========= Test isis3label and naifspice driver =========
+class test_isis3_naif(unittest.TestCase):
+
+    def setUp(self):
+        label = get_image_label("FC21A0038582_15170161546F6F'", "isis3");
+        self.driver = DawnFcIsisLabelNaifSpiceDriver(label);
