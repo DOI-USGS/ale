@@ -325,9 +325,14 @@ class DawnFcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
     @property
     def ephemeris_start_time(self):
         """
-        Compute the center ephemeris time for a Dawn Frame camera. This is done
+        Compute the starting ephemeris time for a Dawn Frame camera. This is done
         via a spice call but 193 ms needs to be added to
         account for the CCD being discharged or cleared.
+
+        Returns
+        -------
+        : float
+          ephemeris start time
         """
         if not hasattr(self, '_ephemeris_start_time'):
             sclock = self.spacecraft_clock_start_count
@@ -335,3 +340,38 @@ class DawnFcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
             self._ephemeris_start_time += 193.0 / 1000.0
         return self._ephemeris_start_time
 
+    @property
+    def exposure_duration(self):
+        """
+        Return the exposure duration in ms for a Dawn Frame camera.
+
+        Returns
+        -------
+        : float
+          exposure duration
+        """
+        return self._exposure_duration / 1000
+
+    @property
+    def ephemeris_stop_time(self):
+        """
+        Compute the ephemeris stop time for a Dawn Frame camera
+
+        Returns
+        -------
+        : float
+          ephemeris stop time
+        """
+        return self.ephemeris_start_time + self.exposure_duration
+
+    @property
+    def ephemeris_center_time(self):
+        """
+        Compute the center ephemeris time for a Dawn Frame camera.
+
+        Returns
+        -------
+        : float
+          center ephemeris time
+        """
+        return self.ephemeris_start_time + (self.exposure_duration / 2.0)
