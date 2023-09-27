@@ -99,3 +99,21 @@ class test_isis3_naif(unittest.TestCase):
     def setUp(self):
         label = get_image_label("FC21A0038582_15170161546F6F'", "isis3");
         self.driver = DawnFcIsisLabelNaifSpiceDriver(label);
+
+    def test_short_mission_name(self):
+        assert self.driver.short_mission_name == 'dawn'
+
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == 'DAWN_FC2_FILTER_6'
+
+    def test_spacecraft_name(self):
+        assert self.driver.spacecraft_name == 'DAWN'
+
+    def test_target_name(self):
+        assert self.driver.target_name == 'CERES'
+
+    def test_ephemeris_start_time(self):
+        with patch('ale.drivers.dawn_drivers.spice.scs2e', return_value=12345) as scs2e:
+            assert self.driver.ephemeris_start_time == 12345.193
+            scs2e.assert_called_with(-203, '488002612:246')
+
