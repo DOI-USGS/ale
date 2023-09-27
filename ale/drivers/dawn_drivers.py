@@ -341,7 +341,7 @@ class DawnFcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
         return self._ephemeris_start_time
 
     @property
-    def exposure_duration(self):
+    def exposure_duration_ms(self):
         """
         Return the exposure duration in ms for a Dawn Frame camera.
 
@@ -350,7 +350,7 @@ class DawnFcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
         : float
           exposure duration
         """
-        return self._exposure_duration / 1000
+        return self.exposure_duration / 1000
 
     @property
     def ephemeris_stop_time(self):
@@ -362,7 +362,7 @@ class DawnFcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
         : float
           ephemeris stop time
         """
-        return self.ephemeris_start_time + self.exposure_duration
+        return self.ephemeris_start_time + self.exposure_duration_ms
 
     @property
     def ephemeris_center_time(self):
@@ -374,4 +374,4 @@ class DawnFcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
         : float
           center ephemeris time
         """
-        return self.ephemeris_start_time + (self.exposure_duration / 2.0)
+        return self.ephemeris_start_time + (self.exposure_duration_ms / 2.0)
