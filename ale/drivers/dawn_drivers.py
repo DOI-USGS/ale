@@ -4,7 +4,7 @@ import os
 import math
 import numpy as np
 
-from glob import glob
+from scipy.interpolate import CubicSpline
 
 import ale
 from ale.base import Driver
@@ -16,7 +16,7 @@ from ale.base.type_sensor import Framer, LineScanner
 from ale.base.type_distortion import NoDistortion
 from ale.base.data_isis import read_table_data
 from ale.base.data_isis import parse_table
-from ale.transformation import ConstantRotation, FrameChain
+from ale.transformation import ConstantRotation
 
 ID_LOOKUP = {
     "FC1" : "DAWN_FC1",
@@ -238,7 +238,7 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
         return self.label["IsisCube"]["Instrument"]["InstrumentId"]
     
     @property
-    def exposure_duration(self):
+    def line_exposure_duration(self):
       """
       The exposure duration of the image, in seconds
 
@@ -268,6 +268,14 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
         return lookup_table[self.label["IsisCube"]["Instrument"]["ChannelId"]]
     
     @property
+    def vir_zero_id(self):
+        lookup_table = {
+          'VIS': -203221,
+          "IR": -203223
+        }
+        return lookup_table[self.label["IsisCube"]["Instrument"]["ChannelId"]]
+    
+    @property
     def housekeeping_table(self):
         """
         This table named, "VIRHouseKeeping", contains four fields: ScetTimeClock, ShutterStatus,
@@ -280,17 +288,32 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
           Dictionary with ScetTimeClock, ShutterStatus, MirrorSin, and MirrorCos
         """
         isis_bytes = read_table_data(self.label['Table'], self._file)
-
         return parse_table(self.label['Table'], isis_bytes)
     
     @property
     def line_scan_rate(self):
-
+        """
+        Returns
+        -------
+        : list
+          Start lines
+        : list
+          Line times
+        : list
+          Exposure durations
+        """
         line_times = []
-        for line_midtime in self.line_midtimes:
-          line_times.append(line_midtime - (self.exposure_duration / 2.0))
+        start_lines = []
 
-        return [len(line_times)], [line_times], [self.exposure_duration]
+        line_no = 1
+
+        for line_midtime in self.ephemeris_times:
+          if not self.is_calibrated:
+            line_times.append(line_midtime - (self.line_exposure_duration / 2.0))
+            start_lines.append(line_no)
+            line_no += 1
+
+        return start_lines, line_times, [self.line_exposure_duration]
 
     @property
     def sensor_model_version(self):
@@ -304,25 +327,37 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
     
     @property
     def optical_angles(self):
-      hk_dict = self.housekeeping_table
-      
-      lines = []
-      for index, mirror_sin in enumerate(hk_dict["MirrorSin"]):
-          
+        hk_dict = self.housekeeping_table
+        
+        opt_angles = []
+        x = np.array([])
+        y = np.array([])
+        for index, mirror_sin in enumerate(hk_dict["MirrorSin"]):
+          is_dark = hk_dict["ShutterStatus"][index].lower() == "closed"    
           mirror_cos = hk_dict["MirrorCos"][index]
 
           scan_elec_deg = math.atan(mirror_sin/mirror_cos) * degs_per_rad
           opt_ang = ((scan_elec_deg - 3.7996979) * 0.25/0.257812) / 1000
 
-          # if (hk_dict["ShutterStatus"][index].lower() == "closed"):
-            # opt_ang = angFit.Evaluate(a+1, NumericalApproximation::NearestEndpoint)
-            
-          lines.append(opt_ang)
+          if not is_dark:
+              x = np.append(x, index + 1)
+              y = np.append(y, opt_ang)
 
-      return lines
+          if not self.is_calibrated:
+              opt_angles.append(opt_ang)
+
+        cs = CubicSpline(x, y)
+
+        for index, opt_ang in enumerate(opt_angles):
+          is_dark = hk_dict["ShutterStatus"][index].lower() == "closed"
+
+          if (is_dark):
+              opt_angles[index] = cs(index + 1)
+
+        return opt_angles
     
     @property
-    def line_midtimes(self):
+    def ephemeris_times(self):
 
         line_times = []
         scet_times = self.housekeeping_table["ScetTimeClock"]
@@ -333,8 +368,25 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
         return line_times
     
     @property
+    def ephemeris_start_time(self):
+        try:
+            # first line's middle et - 1/2 exposure duration = cube start time
+            return self.ephemeris_times[0] - (self.line_exposure_duration / 2)
+        except:
+            return spice.scs2e(self.spacecraft_id, self.label['IsisCube']['Instrument']['SpacecraftClockStartCount'])
+
+
+    @property
+    def ephemeris_stop_time(self):
+        try:
+            #  last line's middle et + 1/2 exposure duration = cube end time
+            return self.ephemeris_times[-1] + (self.line_exposure_duration / 2)
+        except:
+            return spice.scs2e(self.spacecraft_id, self.label['IsisCube']['Instrument']['SpacecraftClockStopCount'])
+    
+    @property
     def is_calibrated(self):
-        return self.label['IsisCube']['Instrument']['ProcessingLevelID'] > 2
+        return self.label['IsisCube']['Archive']['ProcessingLevelId'] > 2
 
     @property 
     def has_articulation_kernel(self):
@@ -348,24 +400,36 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
                 self._frame_chain = super().frame_chain
             else:
                 self._frame_chain = super().frame_chain
-                vir_rotation = ConstantRotation([1,0,0,0], self.sensor_frame_id, self.sensor_frame_id)
-                self._frame_chain.add_edge(rotation = vir_rotation)
-                self._frame_chain.compute_time_dependent_rotiations([(1, self.sensor_frame_id)], self.ephemeris_time, 0)
+                target_times = np.asarray([self.ephemeris_times[0], self.ephemeris_times[-1]])
+                sensor_times = np.array(self.ephemeris_times)
 
-                rot = self._frame_chain[1][self.sensor_frame_id]['rotation']
-                quats = np.zeros((len(rot.times), 4))
-                matrix = rot._rots.as_matrix()
-                avs = []
-                for opt_ang in self.optical_angles:
-                    for i, matrix in enumerate(rot._rots.as_matrix()):
-                      s_matrix = spice.rav2xf(matrix, rot.av[i])
-                      xform = spice.eul2xf([0, -opt_ang, 0, 0, 0, 0], 1, 2, 3)
-                      xform2 = spice.mxmg(xform, s_matrix)
-                      rot_mat, av = spice.xf2rav(xform2)
-                      avs.append(av)
-                      quat_from_rotation = spice.m2q(rot_mat)
-                      quats[i,:3] = quat_from_rotation[1:]
-                      quats[i,3] = quat_from_rotation[0]
-                rot.quats = quats
-                rot.av = avs
+                sensor_time_dependent_frames, sensor_constant_frames = self._frame_chain.frame_trace(self.sensor_frame_id, self.center_ephemeris_time, self._props.get('nadir', False))
+                target_time_dependent_frames, target_constant_frames = self._frame_chain.frame_trace(self.target_frame_id, self.center_ephemeris_time)
+
+                sensor_time_dependent_frames = list(zip(sensor_time_dependent_frames[:-1], sensor_time_dependent_frames[1:]))
+                constant_frames = list(zip(sensor_constant_frames[:-1], sensor_constant_frames[1:]))
+                target_time_dependent_frames = list(zip(target_time_dependent_frames[:-1], target_time_dependent_frames[1:]))
+                target_constant_frames = list(zip(target_constant_frames[:-1], target_constant_frames[1:]))
+
+                constant_frames.extend(target_constant_frames)
+                self._frame_chain.compute_time_dependent_rotiations(sensor_time_dependent_frames, sensor_times, 0)
+                self._frame_chain.compute_time_dependent_rotiations(target_time_dependent_frames, target_times, 0)
+
+                quats = np.zeros((len(self.optical_angles), 4))
+                for i, opt_angle in enumerate(self.optical_angles):
+                  
+                  rotation_matrix = spice.pxform("J2000", spice.frmnam(self.vir_zero_id), self.ephemeris_times[i])
+                  state_matrix = spice.rav2xf(rotation_matrix, [0, 0, 0])
+                  xform = spice.eul2xf([0, -opt_angle, 0, 0, 0, 0], 1, 2, 3)
+                  xform2 = spice.mxmg(xform, state_matrix)
+                  rot_mat, av = spice.xf2rav(xform2)
+                  
+                  quat_from_rotation = spice.m2q(rot_mat)
+                  quats[i,:3] = quat_from_rotation[1:]
+                  quats[i, 3] = quat_from_rotation[0]
+
+                  rotation = ConstantRotation(quats[i], spice.namfrm("J2000"), self.vir_zero_id)
+
+                  self._frame_chain.add_edge(rotation=rotation)
+
         return self._frame_chain
