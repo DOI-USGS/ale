@@ -9,6 +9,7 @@ from ale.base import Driver
 from ale.base.label_isis import IsisLabel
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
+from ale.base.type_distortion import NoDistortion
 from ale.base.type_sensor import Framer
 
 ID_LOOKUP = {
