@@ -820,7 +820,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
     def ephemeris_stop_time(self):
         """
         Returns the stop ephemeris time for the image. This is computed from 
-        the start time plus the line exposure per line, plue the line exposure
+        the start time plus the line exposure per line, plus the line exposure
         removed from the start time, plus the line exposure for the final line.
 
         Returns
