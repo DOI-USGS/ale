@@ -119,7 +119,7 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         : list
           Radial distortion coefficients
         """
-        return self.naif_keywords['INS{}_RAD_DIST_COEFF'.format(self.ikid)].tolist()
+        return self.naif_keywords['INS{}_RAD_DIST_COEFF'.format(self.ikid)]
 
     # TODO: Update focal2pixel samples and lines to reflect the rectangular
     #       nature of dawn pixels

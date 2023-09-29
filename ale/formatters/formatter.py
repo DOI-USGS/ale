@@ -199,8 +199,8 @@ def to_isd(driver):
     isd['sun_position'] = sun_position
 
     if (driver.projection != ""):
-        isd["projection"] = driver.projection
-        isd["geotransform"] = driver.geotransform
+        isd["projection"] = driver_data["projection"]
+        isd["geotransform"] = driver_data["geotransform"]
 
     # check that there is a valid sensor model name
     if 'name_model' not in isd:

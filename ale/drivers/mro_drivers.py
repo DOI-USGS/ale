@@ -219,7 +219,7 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
         : list<double>
           focal plane to detector samples
         """
-        return list(self.naif_keywords['INS{}_ITRANSS'.format(self.base_ikid)])
+        return self.naif_keywords['INS{}_ITRANSS'.format(self.base_ikid)]
 
     @property
     def focal2pixel_lines(self):
@@ -231,7 +231,7 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
         : list<double>
           focal plane to detector lines
         """
-        return list(self.naif_keywords['INS{}_ITRANSL'.format(self.base_ikid)])
+        return self.naif_keywords['INS{}_ITRANSL'.format(self.base_ikid)]
 
     @property
     def naif_keywords(self):

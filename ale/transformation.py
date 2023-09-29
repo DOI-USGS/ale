@@ -127,9 +127,9 @@ class FrameChain(nx.DiGraph):
                                                                     "targetFrame": sensor_frame,
                                                                     "mission": mission,
                                                                     "ckQuality": "",
-                                                                    "searchKernels": frame_chain.search_kernels})
+                                                                    "searchKernels": frame_chain.search_kernels},
+                                                                    use_web=frame_chain.use_web)
             except Exception as e:
-                print(e)
                 pass
 
         if (len(sensor_times) == 0):
@@ -137,7 +137,7 @@ class FrameChain(nx.DiGraph):
             if isinstance(sensor_times, np.ndarray):
                 sensor_times = sensor_times.tolist()
 
-        frames = frame_chain.frame_trace(center_ephemeris_time, sensor_frame, target_frame, mission)
+        frames = frame_chain.frame_trace(center_ephemeris_time, sensor_frame, target_frame, nadir, mission)
         sensor_time_dependent_frames, sensor_constant_frames = frames[0]
         target_time_dependent_frames, target_constant_frames = frames[1]
 
@@ -155,16 +155,13 @@ class FrameChain(nx.DiGraph):
 
         return frame_chain
 
-    def frame_trace(self, time, sensorFrame, targetFrame, mission, nadir=False):
-        if not self.use_web:
-            results = [pyspiceql.frameTrace(time, sensorFrame, mission, searchKernels=self.search_kernels)]
-            results.append(pyspiceql.frameTrace(time, targetFrame, mission, searchKernels=self.search_kernels))
-            return results
+    def frame_trace(self, time, sensorFrame, targetFrame, nadir=False, mission=""):
         jobs = []
-        jobs.append({"et": time, 
-                     "initialFrame": sensorFrame,
-                     "mission": mission,
-                     "searchKernels": self.search_kernels})
+        if not nadir:
+            jobs.append({"et": time, 
+                        "initialFrame": sensorFrame,
+                        "mission": mission,
+                        "searchKernels": self.search_kernels})
         jobs.append({"et": time, 
                      "initialFrame": targetFrame,
                      "mission": mission,
@@ -172,6 +169,9 @@ class FrameChain(nx.DiGraph):
         with ThreadPool() as pool:
             jobs = pool.starmap_async(spiceql_call, [("frameTrace", job, self.use_web)for job in jobs])
             results = jobs.get()
+
+        if nadir:
+            results.insert(0, [[], []])
 
         return results
 

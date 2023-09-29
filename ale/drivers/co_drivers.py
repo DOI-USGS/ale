@@ -359,7 +359,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
           focal plane to detector samples
         """
         # Microns to mm
-        pixel_size = float(self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)][0]) * .001
+        pixel_size = float(self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]) * .001
         return [0.0, 1/pixel_size, 0.0]
 
     @property
@@ -373,7 +373,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         : list<double>
           focal plane to detector lines
         """
-        pixel_size = float(self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)][0]) * .001
+        pixel_size = float(self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]) * .001
         return [0.0, 0.0, 1/pixel_size]
 
     @property

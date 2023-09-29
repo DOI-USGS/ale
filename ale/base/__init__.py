@@ -1,7 +1,8 @@
 from ale.base.base import Driver
 
 spiceql_mission_map = {
-    "CHANDRAYAAN-1_M3": "",
+    "CHANDRAYAAN-1_M3": "m3",
+    "CHANDRAYAAN-1_MRFFR": "mrffr",
     "CASSINI_ISS_NAC": "cassini",
     "CASSINI_ISS_WAC": "cassini",
     "DAWN_FC2_FILTER_1": "",
@@ -72,5 +73,9 @@ spiceql_mission_map = {
     "VG1_ISSNA": "",
     "VG1_ISSWA": "",
     "VG2_ISSNA": "",
-    "VG2_ISSWA": ""
+    "VG2_ISSWA": "",
+    "ULTRAVIOLET/VISIBLE CAMERA": "uvvis",
+    "Near Infrared Camera": "nir",
+    "High Resolution Camera": "clementine1",
+    "Long Wave Infrared Camera": "clementine1",
 }

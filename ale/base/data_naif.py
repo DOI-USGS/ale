@@ -454,7 +454,6 @@ class NaifSpice():
 
             target = self.spacecraft_name
             observer = self.target_name
-            print(target, observer)
             ## Check for ISIS flag to fix target and observer swapping
             if self.swap_observer_target:
                 target = self.target_name
@@ -473,15 +472,6 @@ class NaifSpice():
                 obs_tars = spiceql_access.get_ephem_data(ephem, "getTargetStates", **kwargs, web=self.use_web)
                 obs_tar_lts = np.array(obs_tars)[:,-1]
 
-                time = ephem[0]
-                print("{:.16f}".format(time))
-                obs_tar_state, obs_tar_lt = spice.spkezr(target,
-                                                        time,
-                                                        'J2000',
-                                                        self.light_time_correction,
-                                                        observer)
-                print("{:.16f}, {:.16f}".format(obs_tar_lts[0], obs_tar_lt))
-
                 # ssb to spacecraft
                 kwargs = {"target": observer,
                           "observer": "SSB",
@@ -492,23 +482,10 @@ class NaifSpice():
                 ssb_obs = spiceql_access.get_ephem_data(ephem, "getTargetStates", **kwargs, web=self.use_web)
                 ssb_obs_states = np.array(ssb_obs)[:,0:6]
 
-                # ssb to spacecraft
-                ssb_obs_state, ssb_obs_lt = spice.spkezr(observer,
-                                                             time,
-                                                             'J2000',
-                                                             'NONE',
-                                                             'SSB')
-
-
-                print("{:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}".format(*ssb_obs_states[0]))
-                print("{:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}".format(*ssb_obs_state))
 
                 radius_lt = (self.target_body_radii[2] + self.target_body_radii[0]) / 2 / (scipy.constants.c/1000.0)
                 adjusted_time = np.array(ephem) - obs_tar_lts + radius_lt
 
-                print("{:.16f}".format(adjusted_time[0]))
-                print("{:.16f}".format(time - obs_tar_lt + radius_lt))
-                
                 kwargs = {"target": target,
                           "observer": "SSB",
                           "frame": "J2000",
@@ -518,33 +495,14 @@ class NaifSpice():
                 ssb_tars = spiceql_access.get_ephem_data(adjusted_time, "getTargetStates", **kwargs, web=self.use_web)
                 ssb_tar_states = np.array(ssb_tars)[:,0:6]
 
-                ssb_tar_state, ssb_tar_lt = spice.spkezr(target,
-                                                        time - obs_tar_lt + radius_lt,
-                                                        'J2000',
-                                                        'NONE',
-                                                        'SSB')
-            
-                print("{:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}".format(*ssb_tar_states[0]))
-                print(len(ssb_tar_state))
-                print("{:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}".format(*ssb_tar_state))
-
-                old_state = ssb_tar_state - ssb_obs_state
                 _states = ssb_tar_states - ssb_obs_states
 
-                print("{:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}".format(*_states[0]))
-                print("{:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}".format(*old_state))
 
                 states = []
                 for i, state in enumerate(_states):
                     matrix = spice.sxform("J2000", self.reference_frame, ephem[i])
                     rotated_state = spice.mxvg(matrix, state)
                     states.append(rotated_state)
-                
-                matrix = spice.sxform("J2000", self.reference_frame, time)
-                old_state = spice.mxvg(matrix, old_state)
-
-                print("{:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}".format(*states[0]))
-                print("{:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}".format(*old_state))
             else:
                 kwargs = {"target": target,
                           "observer": observer,
@@ -590,6 +548,8 @@ class NaifSpice():
                 #  SpiceRotation::setEphemerisTimeNadir
                 rotation = self._frame_chain.compute_rotation(self.target_frame_id, 1)
                 p_vec, v_vec, times = self.sensor_position
+                print(rotation)
+                print(p_vec[0], v_vec[0], times[0])
                 rotated_positions = rotation.apply_at(p_vec, times)
                 rotated_velocities = rotation.rotate_velocity_at(p_vec, v_vec, times)
 
@@ -709,7 +669,12 @@ class NaifSpice():
         if not hasattr(self, "_swap_observer_target"):
             try:
                 swap = self.naif_keywords['INS{}_SWAP_OBSERVER_TARGET'.format(self.ikid)]
-                self._swap_observer_target = swap.upper() == "TRUE"
+                if isinstance(swap, str):
+                    self._swap_observer_target = swap.upper() == "TRUE"
+                elif isinstance(swap, bool):
+                    self._swap_observer_target = swap
+                else:
+                    raise Exception(f"Cannot decode swap observer target value {swap}")
             except:
                 self._swap_observer_target = False
         return self._swap_observer_target
@@ -734,7 +699,6 @@ class NaifSpice():
                 else:
                     raise Exception(f"Cannot decode LT surface correct value {surface_correct}")
             except Exception as e:
-                print
                 self._correct_lt_to_surface = False
         return self._correct_lt_to_surface
 

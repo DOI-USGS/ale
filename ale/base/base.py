@@ -52,21 +52,9 @@ class Driver():
                   properties.append(attr)
 
         data = {}
-        if "naif_keywords" in properties:
-            properties.remove("naif_keywords")
-        data["naif_keywords"] = getattr(self, "naif_keywords")
-        if "frame_chain" in properties:
-            properties.remove("frame_chain")
-        data["frame_chain"] = getattr(self, "frame_chain")
 
-      
-        with ThreadPool() as pool:
-            jobs = pool.starmap_async(get_property, [(name,) for name in properties])
-            results = jobs.get()
-
-        for result, property_name in zip(results, properties):
-            data[property_name] = result
-
+        for prop in properties:
+            data[prop] = get_property(prop)
         return data 
     
     @property
