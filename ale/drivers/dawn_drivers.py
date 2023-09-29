@@ -304,6 +304,7 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
         """
         line_times = []
         start_lines = []
+        exposure_durations = []
 
         line_no = 1
 
@@ -311,9 +312,10 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
           if not self.is_calibrated:
             line_times.append(line_midtime - (self.line_exposure_duration / 2.0))
             start_lines.append(line_no)
+            exposure_durations.append(self.line_exposure_duration)
             line_no += 1
 
-        return start_lines, line_times, [self.line_exposure_duration]
+        return start_lines, line_times, exposure_durations
 
     @property
     def sensor_model_version(self):
@@ -333,7 +335,9 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
         x = np.array([])
         y = np.array([])
         for index, mirror_sin in enumerate(hk_dict["MirrorSin"]):
-          is_dark = hk_dict["ShutterStatus"][index].lower() == "closed"    
+          shutter_status = hk_dict["ShutterStatus"][index].lower().replace(" ", "")
+          is_dark = (shutter_status == "closed")   
+
           mirror_cos = hk_dict["MirrorCos"][index]
 
           scan_elec_deg = math.atan(mirror_sin/mirror_cos) * degs_per_rad
@@ -346,13 +350,14 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
           if not self.is_calibrated:
               opt_angles.append(opt_ang)
 
-        cs = CubicSpline(x, y)
+        cs = CubicSpline(x, y, extrapolate="periodic")
 
         for index, opt_ang in enumerate(opt_angles):
-          is_dark = hk_dict["ShutterStatus"][index].lower() == "closed"
+          shutter_status = hk_dict["ShutterStatus"][index].lower().replace(" ", "")
+          is_dark = (shutter_status == "closed")
 
           if (is_dark):
-              opt_angles[index] = cs(index + 1)
+            opt_ang = cs(index + 1)
 
         return opt_angles
     
