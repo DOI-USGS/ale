@@ -4,6 +4,7 @@ import asyncio
 import numpy as np
 import pyspiceql
 import scipy.constants
+from scipy.spatial.transform import Rotation as R
 import spiceypy as spice
 
 import ale
@@ -11,6 +12,7 @@ from ale.base import spiceql_mission_map
 from ale.transformation import FrameChain
 from ale.rotation import TimeDependentRotation
 from ale import spiceql_access
+from ale import spice_root
 from ale import util
 
 
@@ -26,6 +28,7 @@ class NaifSpice():
         """
         if self.kernels:
             [pyspiceql.KernelPool.getInstance().load(k) for k in self.kernels]
+            [spice.furnsh(k) for k in self.kernels]
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -36,6 +39,7 @@ class NaifSpice():
         """
         if self.kernels:
             [pyspiceql.KernelPool.getInstance().unload(k) for k in self.kernels]
+            [spice.unload(k) for k in self.kernels]
 
     @property
     def kernels(self):
@@ -135,7 +139,7 @@ class NaifSpice():
         """
         if not hasattr(self, "_light_time_correction"):
             try:
-                self._light_time_correction = self.naif_keywords['INS{}_LIGHTTIME_CORRECTION'.format(self.ikid)][0]
+                self._light_time_correction = self.naif_keywords['INS{}_LIGHTTIME_CORRECTION'.format(self.ikid)]
             except:
                 self._light_time_correction = 'LT+S'
         return self._light_time_correction
@@ -462,39 +466,42 @@ class NaifSpice():
                 kwargs = {"target": target,
                           "observer": observer,
                           "frame": "J2000",
-                          "abcorr": self.light_time_correctio,
+                          "abcorr": self.light_time_correction,
                           "mission": self.spiceql_mission,
                           "searchKernels": self.search_kernels}
-                obs_tars = asyncio.run(spiceql_access.get_ephem_data(ephem, "getTargetStates", **kwargs, web=self.use_web))
+                obs_tars = spiceql_access.get_ephem_data(ephem, "getTargetStates", **kwargs, web=self.use_web)
                 obs_tar_lts = np.array(obs_tars)[:,-1]
 
                 # ssb to spacecraft
-                kwargs = {"target": target,
+                kwargs = {"target": observer,
                           "observer": "SSB",
                           "frame": "J2000",
                           "abcorr": "NONE",
                           "mission": self.spiceql_mission,
                           "searchKernels": self.search_kernels}
-                ssb_obs = asyncio.run(spiceql_access.get_ephem_data(ephem, "getTargetStates", **kwargs, web=self.use_web))
+                ssb_obs = spiceql_access.get_ephem_data(ephem, "getTargetStates", **kwargs, web=self.use_web)
                 ssb_obs_states = np.array(ssb_obs)[:,0:6]
 
                 radius_lt = (self.target_body_radii[2] + self.target_body_radii[0]) / 2 / (scipy.constants.c/1000.0)
                 adjusted_time = np.array(ephem) - obs_tar_lts + radius_lt
-
+                
                 kwargs = {"target": target,
                           "observer": "SSB",
                           "frame": "J2000",
                           "abcorr": "NONE",
                           "mission": self.spiceql_mission,
                           "searchKernels": self.search_kernels}
-                ssb_tars = asyncio.run(spiceql_access.get_ephem_data(adjusted_time, "getTargetStates", **kwargs, web=self.use_web))
-                ssb_tar_state = np.array(ssb_tars)[:,0:6]
-                _states = ssb_tar_state - ssb_obs_states
+                ssb_tars = spiceql_access.get_ephem_data(adjusted_time, "getTargetStates", **kwargs, web=self.use_web)
+                ssb_tar_states = np.array(ssb_tars)[:,0:6]
+
+                # print("{:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}".format(*ssb_tar_state, ssb_tar_lt))
+                _states = ssb_tar_states - ssb_obs_states
+
                 states = []
-                for state in _states:
-                    matrix = spice.sxform("J2000", self.reference_frame, ephem)
-                    state = spice.mxvg(matrix, state)
-                    states.append(state)
+                for i, state in enumerate(_states):
+                    matrix = spice.sxform("J2000", self.reference_frame, ephem[i])
+                    rotated_state = spice.mxvg(matrix, state)
+                    states.append(rotated_state)
             else:
                 kwargs = {"target": target,
                           "observer": observer,
@@ -502,7 +509,7 @@ class NaifSpice():
                           "abcorr": self.light_time_correction,
                           "mission": self.spiceql_mission,
                           "searchKernels": self.search_kernels}
-                states = asyncio.run(spiceql_access.get_ephem_data(ephem, "getTargetStates", **kwargs, web=self.use_web))
+                states = spiceql_access.get_ephem_data(ephem, "getTargetStates", **kwargs, web=self.use_web)
                 states = np.array(states)[:,0:6]
 
             for state in states:
@@ -517,7 +524,8 @@ class NaifSpice():
             # By default, SPICE works in km, so convert to m
             self._position = 1000 * np.asarray(pos)
             self._velocity = 1000 * np.asarray(vel)
-        return self._position, self._velocity, ephem
+            self._ephem = ephem
+        return self._position, self._velocity, self._ephem
 
     @property
     def frame_chain(self):
@@ -676,8 +684,14 @@ class NaifSpice():
         if not hasattr(self, "_correct_lt_to_surface"):
             try:
                 surface_correct = self.naif_keywords['INS{}_LT_SURFACE_CORRECT'.format(self.ikid)]
-                self._correct_lt_to_surface = surface_correct.upper() == "TRUE"
-            except:
+                if isinstance(surface_correct, str):
+                    self._correct_lt_to_surface = surface_correct.upper() == "TRUE"
+                elif isinstance(surface_correct, bool):
+                    self._correct_lt_to_surface = surface_correct
+                else:
+                    raise Exception(f"Cannot decode LT surface correct value {surface_correct}")
+            except Exception as e:
+                print
                 self._correct_lt_to_surface = False
         return self._correct_lt_to_surface
 
@@ -748,5 +762,16 @@ class NaifSpice():
         # This will work if a user passed no kernels but still set ISISDATA
         # just might take a bit
         function_args["searchKernels"] = self.search_kernels
+        
+        # Bodge solution for memo funcs in offline mode
+        memo_funcs = ["translateNameToCode", "translateCodeToName"]
+        
+        try:
+            data_dir = pyspiceql.getDataDirectory()
+        except Exception as e:
+            data_dir = ""
+
+        if function_name in memo_funcs and data_dir == "" and self.use_web == False:
+            function_name = f"NonMemo_{function_name}"
         return spiceql_access.spiceql_call(function_name, function_args, self.use_web)
     

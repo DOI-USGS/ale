@@ -52,7 +52,7 @@ def test_mro_ctx_load(test_ctx_kernels, label_type, kernel_type):
         isd_str = ale.loads(label_file)
         compare_isd = get_isd('ctx_isis')
     else:
-        isd_str = ale.loads(label_file, props={'kernels': test_ctx_kernels})
+        isd_str = ale.loads(label_file, props={'kernels': test_ctx_kernels}, verbose=False)
         compare_isd = get_isd('ctx')
 
     isd_obj = json.loads(isd_str)

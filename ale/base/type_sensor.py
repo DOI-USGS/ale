@@ -43,7 +43,7 @@ class LineScanner():
           Exposure durations
         """
         t0_ephemeris = self.ephemeris_start_time - self.center_ephemeris_time
-        return [0.5], [t0_ephemeris], [self.exposure_duration]
+        return [[0.5], [t0_ephemeris], [self.exposure_duration]]
 
     @property
     def ephemeris_time(self):

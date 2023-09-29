@@ -7,6 +7,7 @@ import numpy as np
 
 import pytest
 from ale.drivers import AleJsonEncoder
+from ale.formatters.formatter import to_isd
 from conftest import get_isd, get_image_label, get_image_kernels, convert_kernels, compare_dicts
 
 import ale
@@ -42,8 +43,11 @@ def test_kaguya_load(test_kernels, label_type, image):
         compare_isd = get_isd(image_dict[image])
     label_file = get_image_label(image, label_type)
 
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]}, verbose=False)
-    isd_obj = json.loads(isd_str)
+    # isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]}, verbose=False)
+    driver = KaguyaTcIsisLabelNaifSpiceDriver(label_file, props={'kernels': test_kernels[image]})
+    with driver as active_driver:
+        isd_obj = to_isd(active_driver)
+    # isd_obj = json.loads(isd_str)
 
     assert compare_dicts(isd_obj, compare_isd) == []
 

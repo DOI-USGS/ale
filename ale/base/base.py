@@ -38,10 +38,10 @@ class Driver():
             self._label = parsed_label
 
     def to_dict(self, properties=[]):
-        def get_property(prop_name): 
+        def get_property(prop_name):
             try:
                 return getattr(self, prop_name)
-            except:
+            except Exception as e:
                 return None
 
         if not properties:
@@ -50,13 +50,21 @@ class Driver():
                   properties.append(attr)
 
         data = {}
+        if "naif_keywords" in properties:
+            properties.remove("naif_keywords")
+        data["naif_keywords"] = getattr(self, "naif_keywords")
+        if "frame_chain" in properties:
+            properties.remove("frame_chain")
+        data["frame_chain"] = getattr(self, "frame_chain")
+
       
         with ThreadPool() as pool:
             jobs = pool.starmap_async(get_property, [(name,) for name in properties])
-            jobs = jobs.get()
+            results = jobs.get()
 
-            for result, property_name in zip(jobs, properties):
-                data[property_name] = result
+        for result, property_name in zip(results, properties):
+            data[property_name] = result
+
         return data 
     
     @property

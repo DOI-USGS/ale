@@ -54,7 +54,7 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
           Naif ID used to for identifying the instrument in Spice kernels
         """
         if not hasattr(self, "_base_ikid"):
-            self._base_ikid = spice.bods2c("MRO_MARCI")
+            self._base_ikid = self.spiceql_call("translateNameToCode", {"frame": "MRO_MARCI", "mission": self.spiceql_mission})
         return self._base_ikid
 
     @property
@@ -219,7 +219,7 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
         : list<double>
           focal plane to detector samples
         """
-        return list(spice.gdpool('INS{}_ITRANSS'.format(self.base_ikid), 0, 3))
+        return list(self.naif_keywords['INS{}_ITRANSS'.format(self.base_ikid)])
 
     @property
     def focal2pixel_lines(self):
@@ -231,7 +231,7 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
         : list<double>
           focal plane to detector lines
         """
-        return list(spice.gdpool('INS{}_ITRANSL'.format(self.base_ikid), 0, 3))
+        return list(self.naif_keywords['INS{}_ITRANSL'.format(self.base_ikid)])
 
     @property
     def naif_keywords(self):
@@ -726,7 +726,9 @@ class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
         : double
           Starting ephemeris time of the image
         """
-        return spice.scs2e(-74999, self.spacecraft_clock_start_count)
+        if not hasattr(self, "_ephemeris_start_time"):
+            self._ephemeris_start_time = self.spiceql_call("strSclkToEt", {"frameCode": -74999, "sclk": self.spacecraft_clock_start_count, "mission": self.spiceql_mission})
+        return self._ephemeris_start_time
 
     @property
     def ephemeris_stop_time(self):
@@ -741,7 +743,9 @@ class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
         : double
           Ephemeris stop time of the image
         """
-        return spice.scs2e(-74999, self.spacecraft_clock_stop_count)
+        if not hasattr(self, "_ephemeris_stop_time"):
+            self._ephemeris_stop_time = self.spiceql_call("strSclkToEt", {"frameCode": -74999, "sclk": self.spacecraft_clock_stop_count, "mission": self.spiceql_mission})
+        return self._ephemeris_stop_time
 
     @property
     def spacecraft_name(self):

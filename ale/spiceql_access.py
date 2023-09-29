@@ -3,7 +3,7 @@ import math
 import requests
 import time
 
-import aiohttp
+from multiprocessing.pool import ThreadPool
 import numpy as np
 
 import pyspiceql
@@ -145,7 +145,7 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
 
     return response.json()["body"]["return"]
 
-async def get_ephem_data(times, function_name, batch_size=400, web=False, **kwargs):
+def get_ephem_data(times, function_name, batch_size=400, web=False, **kwargs):
     """
     This function provides access to ephemeris data aquisition in spiceql. 
     For the web service there is a limited number of times that can be
@@ -189,21 +189,34 @@ async def get_ephem_data(times, function_name, batch_size=400, web=False, **kwar
     if not web:
       function_args = {**kwargs}
       function_args["ets"] = times
-      rotation = spiceql_call(function_name, function_args, web)
-      return rotation
+      ephemeris_data = spiceql_call(function_name, function_args, web)
+      return ephemeris_data
     
-    tasks = []
     batches = math.ceil(len(times) / batch_size)
-    async with aiohttp.ClientSession() as session:
-        for i in range(1, batches+1):
-            batch_times = times[(i - 1) * batch_size: i * batch_size]
-            function_args = {**kwargs}
-            function_args["ets"] = batch_times
-            tasks.append(asyncio.create_task(async_spiceql_call(session, function_name, function_args, use_web=web)))
-        responses = await asyncio.gather(*tasks)
-    results = []
-    for response in responses:
-        results += response
-    
-    
+    job_args_list = []
+    for i in range(1, batches+1):
+        batch_times = times[(i - 1) * batch_size: i * batch_size]
+        function_args = {**kwargs}
+        function_args["ets"] = batch_times
+        job_args_list.append(function_args)
+    with ThreadPool() as pool:
+        jobs = pool.starmap_async(spiceql_call, job_args_list)
+        results = jobs.get()
+
     return results
+
+    # tasks = []
+
+    # async with aiohttp.ClientSession() as session:
+    #     for i in range(1, batches+1):
+    #         batch_times = times[(i - 1) * batch_size: i * batch_size]
+    #         function_args = {**kwargs}
+    #         function_args["ets"] = batch_times
+    #         tasks.append(asyncio.create_task(async_spiceql_call(session, function_name, function_args, use_web=web)))
+    #     responses = await asyncio.gather(*tasks)
+    # results = []
+    # for response in responses:
+    #     results += response
+    
+    
+    # return results

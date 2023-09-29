@@ -24,8 +24,6 @@ alt_id_lookup = {
 
 class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
 
-
-
     @property
     def instrument_id(self):
         """
@@ -108,15 +106,19 @@ class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
         : float
           ephemeris start time of the image
         """
-        ephemeris_start_time = pyspiceql.sclkToEt(self.alt_ikid, str(self.spacecraft_clock_start_count))
+        if not hasattr(self, "_ephemeris_start_time"):
+            self._ephemeris_start_time = self.spiceql_call("strSclkToEt", {"frame": self.alt_ikid, 
+                                                                           "sclk": self.spacecraft_clock_start_count, 
+                                                                           "mission": self.spiceql_mission})
+            if self.exposure_duration <= .420:
+                offset1 = 7.0 / 8.0 * 4.48
+            else:
+                offset1 = 3.0 / 8.0 * 4.48
+            offset2 = 1.0 / 64.0 * 4.48
 
-        if self.exposure_duration <= .420:
-            offset1 = 7.0 / 8.0 * 4.48
-        else:
-            offset1 = 3.0 / 8.0 * 4.48
-        offset2 = 1.0 / 64.0 * 4.48
+            self._ephemeris_start_time += offset1 + offset2
 
-        return ephemeris_start_time + offset1 + offset2
+        return self._ephemeris_start_time
 
     @property
     def focal_length(self):

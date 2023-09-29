@@ -164,7 +164,9 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
         : float
           start time
         """
-        return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))[0]
+        if not hasattr(self, "_ephemeris_start_time"):
+            self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+        return self._ephemeris_start_time
 
     @property
     def center_ephemeris_time(self):
@@ -214,7 +216,7 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
             try:
                 default_focal_len = super(CassiniIssPds3LabelNaifSpiceDriver, self).focal_length
             except:
-                default_focal_len = float(spice.gdpool('INS{}_DEFAULT_FOCAL_LENGTH'.format(self.ikid), 0, 2)[0])
+                default_focal_len = float(self.naif_keywords['INS{}_DEFAULT_FOCAL_LENGTH'.format(self.ikid)])
 
             filters = tuple(self.label["IsisCube"]["BandBin"]['FilterName'].split("/"))
 
@@ -275,9 +277,9 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
             try:
                 # Call frinfo to check if the ISIS iak has been loaded with the
                 # additional reference frame. Otherwise, Fail and add it manually
-                _ = spice.frinfo(self.sensor_frame_id)
+                _ = self.spiceql_call("getFrameInfo", {"frame": self.sensor_frame_id, "mission": self.spiceql_mission})
                 self._frame_chain = super().frame_chain
-            except spice.utils.exceptions.NotFoundError as e:
+            except Exception as e:
                 self._frame_chain = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
                                                           target_frame=self.target_frame_id,
                                                           center_ephemeris_time=self.center_ephemeris_time,
@@ -330,7 +332,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         : float
           focal epsilon
         """
-        return float(pyspiceql.getKernelVectorValue('INS{}_FL_UNCERTAINTY'.format(self.ikid))[0])
+        return float(self.naif_keywords['INS{}_FL_UNCERTAINTY'.format(self.ikid)][0])
 
     @property
     def spacecraft_name(self):
@@ -357,7 +359,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
           focal plane to detector samples
         """
         # Microns to mm
-        pixel_size = float(pyspiceql.getKernelVectorValue('INS{}_PIXEL_SIZE'.format(self.ikid))[0]) * .001
+        pixel_size = float(self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)][0]) * .001
         return [0.0, 1/pixel_size, 0.0]
 
     @property
@@ -371,7 +373,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         : list<double>
           focal plane to detector lines
         """
-        pixel_size = float(pyspiceql.getKernelVectorValue('INS{}_PIXEL_SIZE'.format(self.ikid))[0]) * .001
+        pixel_size = float(self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)][0]) * .001
         return [0.0, 0.0, 1/pixel_size]
 
     @property
@@ -447,7 +449,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         try:
             default_focal_len = super(CassiniIssPds3LabelNaifSpiceDriver, self).focal_length
         except:
-            default_focal_len = float(pyspiceql.getKernelVectorValue('INS{}_FOV_CENTER_PIXEL'.format(self.ikid))[0])
+            default_focal_len = float(self.naif_keywords['INS{}_FOV_CENTER_PIXEL'.format(self.ikid)][0])
 
         filters = tuple(self.label['FILTER_NAME'])
 
@@ -507,9 +509,9 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
             try:
                 # Call frinfo to check if the ISIS iak has been loaded with the
                 # additional reference frame. Otherwise, Fail and add it manually
-                _ = spice.frinfo(self.sensor_frame_id)
+                _ = self.spiceql_call("getFrameInfo", {"frame": self.sensor_frame_id, "mission": self.spiceql_mission})
                 self._frame_chain = super().frame_chain
-            except spice.utils.exceptions.NotFoundError as e:
+            except Exception as e:
                 self._frame_chain = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
                                                           target_frame=self.target_frame_id,
                                                           center_ephemeris_time=self.center_ephemeris_time,

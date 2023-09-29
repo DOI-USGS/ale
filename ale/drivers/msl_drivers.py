@@ -113,7 +113,7 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         """
         if not hasattr(self, "_site_frame_id"):
           site_frame = "MSL_SITE_" + str(self.label["GEOMETRIC_CAMERA_MODEL_PARMS"]["REFERENCE_COORD_SYSTEM_INDEX"][0])
-          self._site_frame_id= spice.bods2c(site_frame)
+          self._site_frame_id = self.spiceql_call("translateNameToCode", {"frame": site_frame, "mission": self.spiceql_mission})
         return self._site_frame_id
 
     @property
