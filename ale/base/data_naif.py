@@ -552,6 +552,8 @@ class NaifSpice():
                 print(p_vec[0], v_vec[0], times[0])
                 rotated_positions = rotation.apply_at(p_vec, times)
                 rotated_velocities = rotation.rotate_velocity_at(p_vec, v_vec, times)
+                print(rotated_positions[0])
+                print(rotated_velocities[0])
 
                 p_vec = rotated_positions
                 v_vec = rotated_velocities
@@ -559,7 +561,7 @@ class NaifSpice():
                 velocity_axis = 2
                 # Get the default line translation with no potential flipping
                 # from the driver
-                trans_x = np.array(self.focal2pixel_lines)
+                trans_x = self.naif_keywords['INS{}_ITRANSL'.format(self.ikid)]
 
                 if (trans_x[0] < trans_x[1]):
                     velocity_axis = 1
@@ -568,6 +570,7 @@ class NaifSpice():
                 quats = np.array(quats)[:,[1,2,3,0]]
 
                 rotation = TimeDependentRotation(quats, times, 1, self.sensor_frame_id)
+                print(rotation)
                 self._frame_chain.add_edge(rotation)
 
         return self._frame_chain
