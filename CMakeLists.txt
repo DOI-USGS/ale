@@ -7,7 +7,7 @@
 # Specify the required version of CMake.
 # cmake 3.15 required for findPython virtualenv configuration
 cmake_minimum_required(VERSION 3.15)
-project(ale VERSION 0.9.0 DESCRIPTION "Abstraction Library for Ephemerides ")
+project(ale VERSION 0.9.1 DESCRIPTION "Abstraction Library for Ephemerides ")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
