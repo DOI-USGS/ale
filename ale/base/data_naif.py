@@ -473,6 +473,7 @@ class NaifSpice():
                 obs_tar_lts = np.array(obs_tars)[:,-1]
 
                 time = ephem[0]
+                print("{:.16f}".format(time))
                 obs_tar_state, obs_tar_lt = spice.spkezr(target,
                                                         time,
                                                         'J2000',
