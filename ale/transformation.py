@@ -1,5 +1,4 @@
-import asyncio
-import aiohttp
+from multiprocessing.pool import ThreadPool
 
 import numpy as np
 from numpy.polynomial.polynomial import polyval
@@ -124,8 +123,10 @@ class FrameChain(nx.DiGraph):
         if exact_ck_times and len(ephemeris_times) > 1 and not nadir:
             try:
                 sensor_times = spiceql_call("extractExactCkTimes", {"observStart": ephemeris_times[0] + inst_time_bias, 
-                                                                    "observStop": ephemeris_times[-1] + inst_time_bias, 
+                                                                    "observEnd": ephemeris_times[-1] + inst_time_bias, 
                                                                     "targetFrame": sensor_frame,
+                                                                    "mission": mission,
+                                                                    "ckQuality": "",
                                                                     "searchKernels": frame_chain.search_kernels})
             except Exception as e:
                 print(e)
@@ -136,7 +137,7 @@ class FrameChain(nx.DiGraph):
             if isinstance(sensor_times, np.ndarray):
                 sensor_times = sensor_times.tolist()
 
-        frames = asyncio.run(frame_chain.frame_trace(center_ephemeris_time, sensor_frame, target_frame, mission))
+        frames = frame_chain.frame_trace(center_ephemeris_time, sensor_frame, target_frame, mission)
         sensor_time_dependent_frames, sensor_constant_frames = frames[0]
         target_time_dependent_frames, target_constant_frames = frames[1]
 
@@ -148,37 +149,30 @@ class FrameChain(nx.DiGraph):
         constant_frames.extend(target_constant_frames)
 
         # Add all time dependent frame chains to the graph
-        asyncio.run(frame_chain.generate_time_dependent_rotiations(sensor_time_dependent_frames, sensor_times, inst_time_bias, mission))
-        asyncio.run(frame_chain.generate_time_dependent_rotiations(target_time_dependent_frames, target_times, 0, mission))
-        asyncio.run(frame_chain.generate_constant_rotations(constant_frames, ephemeris_times[0], mission))
+        frame_chain.generate_time_dependent_rotiations(sensor_time_dependent_frames, sensor_times, inst_time_bias, mission)
+        frame_chain.generate_time_dependent_rotiations(target_time_dependent_frames, target_times, 0, mission)
+        frame_chain.generate_constant_rotations(constant_frames, ephemeris_times[0], mission)
 
         return frame_chain
 
-    async def frame_trace(self, time, sensorFrame, targetFrame, mission, nadir=False):
+    def frame_trace(self, time, sensorFrame, targetFrame, mission, nadir=False):
         if not self.use_web:
             results = [pyspiceql.frameTrace(time, sensorFrame, mission, searchKernels=self.search_kernels)]
             results.append(pyspiceql.frameTrace(time, targetFrame, mission, searchKernels=self.search_kernels))
             return results
-        tasks = []
-        async with aiohttp.ClientSession() as session:
-            tasks.append(asyncio.create_task(async_spiceql_call(session,
-                                                                "frameTrace", 
-                                                                {"et": time, 
-                                                                 "initialFrame": sensorFrame,
-                                                                 "mission": mission,
-                                                                 "searchKernels": self.search_kernels},
-                                                                 use_web=self.use_web)))
-            tasks.append(asyncio.create_task(async_spiceql_call(session,
-                                                                "frameTrace", 
-                                                                {"et": time, 
-                                                                 "initialFrame": targetFrame,
-                                                                 "mission": mission,
-                                                                 "searchKernels": self.search_kernels},
-                                                                 use_web=self.use_web)))
-            responses = await asyncio.gather(*tasks)
-        results = []
-        for response in responses:
-            results.append(response)
+        jobs = []
+        jobs.append({"et": time, 
+                     "initialFrame": sensorFrame,
+                     "mission": mission,
+                     "searchKernels": self.search_kernels})
+        jobs.append({"et": time, 
+                     "initialFrame": targetFrame,
+                     "mission": mission,
+                     "searchKernels": self.search_kernels})
+        with ThreadPool() as pool:
+            jobs = pool.starmap_async(spiceql_call, [("frameTrace", job, self.use_web)for job in jobs])
+            results = jobs.get()
+
         return results
 
     @classmethod
@@ -366,7 +360,7 @@ class FrameChain(nx.DiGraph):
         return times
 
 
-    async def generate_time_dependent_rotiations(self, frames, times, time_bias, mission=""):
+    def generate_time_dependent_rotiations(self, frames, times, time_bias, mission=""):
         """
         Computes the time dependent rotations based on a list of tuples that define the
         relationships between frames as (source, destination) and a list of times to
@@ -379,11 +373,13 @@ class FrameChain(nx.DiGraph):
         times : list
                 A list of times to compute the rotation at
         """
-        frame_tasks = []
+        quats_and_avs_per_frame = []
         for s, d in frames:
             kwargs = {"toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels}
-            frame_tasks.append(asyncio.create_task(get_ephem_data(times, "getTargetOrientations", **kwargs, web=self.use_web)))
-        quats_and_avs_per_frame = await asyncio.gather(*frame_tasks)
+            quats_and_avs_per_frame.append(get_ephem_data(times, "getTargetOrientations", **kwargs, web=self.use_web))
+        # with ThreadPool() as pool:
+        #     jobs = pool.starmap_async(get_ephem_data, frame_tasks)
+        #     quats_and_avs_per_frame = jobs.get()
 
         for i, frame in enumerate(frames):
             quats_and_avs = quats_and_avs_per_frame[i]
@@ -403,12 +399,17 @@ class FrameChain(nx.DiGraph):
             rotation = TimeDependentRotation(quats, biased_times, frame[0], frame[1], av=avs)
             self.add_edge(rotation=rotation)
 
-    async def generate_constant_rotations(self, frames, time, mission):
-        frame_tasks = []
+    def generate_constant_rotations(self, frames, time, mission):
+        quats_and_avs_per_frame = []
         for s, d in frames:
             kwargs = {"toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels}
-            frame_tasks.append(asyncio.create_task(get_ephem_data([time], "getTargetOrientations", **kwargs, web=self.use_web)))
-        quats_and_avs_per_frame = await asyncio.gather(*frame_tasks)
+            quats_and_avs_per_frame.append(get_ephem_data([time], "getTargetOrientations", **kwargs, web=self.use_web))
+        # frame_tasks = []
+        # for s, d in frames:
+        #     frame_tasks.append([[time], "getTargetOrientations", d, s, mission, self.search_kernels, self.use_web])
+        # with ThreadPool() as pool:
+        #     jobs = pool.starmap_async(get_ephem_data, frame_tasks)
+        #     quats_and_avs_per_frame = jobs.get()
 
         # Add all constant frame chains to the graph
         for i, frame in enumerate(frames):
