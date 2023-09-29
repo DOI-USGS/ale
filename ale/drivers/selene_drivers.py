@@ -132,9 +132,10 @@ class KaguyaTcIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, Kaguya
         : list
           focal plane to detector lines
         """
-        focal2pixel_lines = super().focal2pixel_lines
-        focal2pixel_lines[1] = -focal2pixel_lines[1]
-        return focal2pixel_lines
+        if not hasattr(self, "_focal2pixel_lines"):
+          self._focal2pixel_lines = super().focal2pixel_lines
+          self._focal2pixel_lines[1] = -self._focal2pixel_lines[1]
+        return self._focal2pixel_lines
 
     @property
     def sensor_model_version(self):
@@ -320,8 +321,6 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           focal plane to detector samples
         """
         if not hasattr(self, "_focal2pixel_samples"):
-          print('INS{}_PIXEL_SIZE'.format(self.ikid))
-          print(self.naif_keywords)
           pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]
           self._focal2pixel_samples = [0, 0, -1/pixel_size]
         return self._focal2pixel_samples
@@ -341,7 +340,6 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
         """
         if not hasattr(self, "_focal2pixel_lines"):
           pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]
-          print(pixel_size)
           self._focal2pixel_lines = [0, 1/pixel_size, 0]
         return self._focal2pixel_lines
 
@@ -703,7 +701,7 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
           focal plane to detector lines
         """
         if not hasattr(self, "_focal2pixel_lines"):
-          pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)][0]
+          pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]
           self._focal2pixel_lines = [0, 1/pixel_size, 0]
         return self._focal2pixel_lines
 
@@ -721,7 +719,7 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
           focal plane to detector samples
         """
         if not hasattr(self, "_focal2pixel_samples"):
-          pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)][0]
+          pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]
           self._focal2pixel_samples = [0, 0, -1/pixel_size]
         return self._focal2pixel_samples
 

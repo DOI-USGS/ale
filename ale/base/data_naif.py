@@ -405,7 +405,7 @@ class NaifSpice():
           a tuple containing a list of sun positions, a list of sun velocities
         """
         if not hasattr(self, "_sun_position"):
-            times = [self.center_ephemeris_time]
+            times = self.ephemeris_time
             if len(times) > 1:
                 times = [times[0], times[-1]]
             positions = []
@@ -472,6 +472,14 @@ class NaifSpice():
                 obs_tars = spiceql_access.get_ephem_data(ephem, "getTargetStates", **kwargs, web=self.use_web)
                 obs_tar_lts = np.array(obs_tars)[:,-1]
 
+                time = ephem[0]
+                obs_tar_state, obs_tar_lt = spice.spkezr(target,
+                                                        time,
+                                                        'J2000',
+                                                        self.light_time_correction,
+                                                        observer)
+                print("{:.16f}, {:.16f}".format(obs_tar_lts[0], obs_tar_lt))
+
                 # ssb to spacecraft
                 kwargs = {"target": observer,
                           "observer": "SSB",
@@ -482,8 +490,22 @@ class NaifSpice():
                 ssb_obs = spiceql_access.get_ephem_data(ephem, "getTargetStates", **kwargs, web=self.use_web)
                 ssb_obs_states = np.array(ssb_obs)[:,0:6]
 
+                # ssb to spacecraft
+                ssb_obs_state, ssb_obs_lt = spice.spkezr(observer,
+                                                             time,
+                                                             'J2000',
+                                                             'NONE',
+                                                             'SSB')
+
+
+                print("{:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}".format(*ssb_obs_states[0]))
+                print("{:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}".format(*ssb_obs_state))
+
                 radius_lt = (self.target_body_radii[2] + self.target_body_radii[0]) / 2 / (scipy.constants.c/1000.0)
                 adjusted_time = np.array(ephem) - obs_tar_lts + radius_lt
+
+                print("{:.16f}".format(adjusted_time[0]))
+                print("{:.16f}".format(time - obs_tar_lt + radius_lt))
                 
                 kwargs = {"target": target,
                           "observer": "SSB",
@@ -494,14 +516,33 @@ class NaifSpice():
                 ssb_tars = spiceql_access.get_ephem_data(adjusted_time, "getTargetStates", **kwargs, web=self.use_web)
                 ssb_tar_states = np.array(ssb_tars)[:,0:6]
 
-                # print("{:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}".format(*ssb_tar_state, ssb_tar_lt))
+                ssb_tar_state, ssb_tar_lt = spice.spkezr(target,
+                                                        time - obs_tar_lt + radius_lt,
+                                                        'J2000',
+                                                        'NONE',
+                                                        'SSB')
+            
+                print("{:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}".format(*ssb_tar_states[0]))
+                print(len(ssb_tar_state))
+                print("{:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}".format(*ssb_tar_state))
+
+                old_state = ssb_tar_state - ssb_obs_state
                 _states = ssb_tar_states - ssb_obs_states
+
+                print("{:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}".format(*_states[0]))
+                print("{:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}".format(*old_state))
 
                 states = []
                 for i, state in enumerate(_states):
                     matrix = spice.sxform("J2000", self.reference_frame, ephem[i])
                     rotated_state = spice.mxvg(matrix, state)
                     states.append(rotated_state)
+                
+                matrix = spice.sxform("J2000", self.reference_frame, time)
+                old_state = spice.mxvg(matrix, old_state)
+
+                print("{:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}".format(*states[0]))
+                print("{:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}, {:.16f}".format(*old_state))
             else:
                 kwargs = {"target": target,
                           "observer": observer,

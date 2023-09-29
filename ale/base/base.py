@@ -4,6 +4,8 @@ import tempfile
 import os 
 from multiprocessing.pool import ThreadPool
 
+import pvl
+
 class Driver():
     """
     Base class for all Drivers.

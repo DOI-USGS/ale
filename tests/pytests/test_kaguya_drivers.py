@@ -46,6 +46,7 @@ def test_kaguya_load(test_kernels, label_type, image):
     # isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]}, verbose=False)
     driver = KaguyaTcIsisLabelNaifSpiceDriver(label_file, props={'kernels': test_kernels[image]})
     with driver as active_driver:
+        print(active_driver.sun_position)
         isd_obj = to_isd(active_driver)
     # isd_obj = json.loads(isd_str)
 
