@@ -94,7 +94,7 @@ class LroLrocNacPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driv
         : list
           Radial distortion coefficients. There is only one coefficient for LROC NAC l/r
         """
-        return self.naif_keywords['INS{}_OD_K'.format(self.ikid)].tolist()
+        return self.naif_keywords['INS{}_OD_K'.format(self.ikid)]
 
     @property
     def light_time_correction(self):
@@ -140,7 +140,7 @@ class LroLrocNacPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driv
         : list<double>
           focal plane to detector lines
         """
-        focal2pixel_lines = np.array(list(self.naif_keywords['INS{}_ITRANSL'.format(self.ikid)])) / self.sampling_factor
+        focal2pixel_lines = np.array(self.naif_keywords['INS{}_ITRANSL'.format(self.ikid)]) / self.sampling_factor
         if self.spacecraft_direction < 0:
             return -focal2pixel_lines
         else:
@@ -343,7 +343,7 @@ class LroLrocNacIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driv
         : list
           Radial distortion coefficients. There is only one coefficient for LROC NAC l/r
         """
-        return self.naif_keywords['INS{}_OD_K'.format(self.ikid)].tolist()
+        return self.naif_keywords['INS{}_OD_K'.format(self.ikid)]
 
     @property
     def light_time_correction(self):
@@ -421,7 +421,7 @@ class LroLrocNacIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driv
         : list<double>
           focal plane to detector lines
         """
-        focal2pixel_lines = np.array(list(self.naif_keywords['INS{}_ITRANSL'.format(self.ikid)])) / self.sampling_factor
+        focal2pixel_lines = np.array(self.naif_keywords['INS{}_ITRANSL'.format(self.ikid)]) / self.sampling_factor
         if self.spacecraft_direction < 0:
             return -focal2pixel_lines
         else:
@@ -513,18 +513,27 @@ class LroLrocNacIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driv
         """
         if not hasattr(self, "_spacecraft_direction"):
           frame_chain = self.frame_chain
+          print("Banan")
           lro_bus_id = self.spiceql_call("translateNameToCode", {'frame': 'LRO_SC_BUS', 'mission': self.spiceql_mission})
+          print(lro_bus_id)
           time = self.ephemeris_start_time
-          lt_state = self.spiceql_call("getTargetState", {'et': time, 
-                                                          'target': self.target_name, 
-                                                          'observer': self.spacecraft_name, 
-                                                          'frame': 'J2000', 
-                                                          'abcorr': 'None'})
-          state = lt_state.starg
-          velocity = state[3:]
+          print(time, self.target_name, self.spacecraft_name)
+          states = self.spiceql_call("getTargetStates", {'ets': [time], 
+                                                         'target': self.spacecraft_name, 
+                                                         'observer': self.target_name, 
+                                                         'frame': 'J2000', 
+                                                         'abcorr': 'None',
+                                                         'mission': self.spiceql_mission,
+                                                         'ckQuality': "",
+                                                         'spkQuality': ""})
+          velocity = states[0][3:6]
+          print(velocity)
           rotation = frame_chain.compute_rotation(1, lro_bus_id)
+          print(rotation._rots.as_matrix()[0])
           rotated_velocity = spice.mxv(rotation._rots.as_matrix()[0], velocity)
+          print(rotated_velocity[0])
           self._spacecraft_direction = rotated_velocity[0]
+          print(self._spacecraft_direction)
         return self._spacecraft_direction
 
 
@@ -1139,7 +1148,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : list
           Radial distortion coefficients.
         """
-        coeffs = self.naif_keywords['INS{}_OD_K'.format(self.fikid)].tolist()
+        coeffs = self.naif_keywords['INS{}_OD_K'.format(self.fikid)]
         coeffs = [x * -1 for x in coeffs]
         return coeffs
 
@@ -1300,7 +1309,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : list<double>
           focal plane to detector lines
         """
-        return list(self.naif_keywords['INS{}_ITRANSL'.format(self.fikid)])
+        return self.naif_keywords['INS{}_ITRANSL'.format(self.fikid)]
 
     @property
     def focal2pixel_samples(self):
@@ -1312,7 +1321,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : list<double>
           focal plane to detector samples
         """
-        return list(self.naif_keywords['INS{}_ITRANSS'.format(self.fikid)])
+        return self.naif_keywords['INS{}_ITRANSS'.format(self.fikid)]
 
 
     @property

@@ -548,12 +548,8 @@ class NaifSpice():
                 #  SpiceRotation::setEphemerisTimeNadir
                 rotation = self._frame_chain.compute_rotation(self.target_frame_id, 1)
                 p_vec, v_vec, times = self.sensor_position
-                print(rotation)
-                print(p_vec[0], v_vec[0], times[0])
                 rotated_positions = rotation.apply_at(p_vec, times)
                 rotated_velocities = rotation.rotate_velocity_at(p_vec, v_vec, times)
-                print(rotated_positions[0])
-                print(rotated_velocities[0])
 
                 p_vec = rotated_positions
                 v_vec = rotated_velocities
@@ -561,7 +557,9 @@ class NaifSpice():
                 velocity_axis = 2
                 # Get the default line translation with no potential flipping
                 # from the driver
-                trans_x = self.naif_keywords['INS{}_ITRANSL'.format(self.ikid)]
+                trans_x_key = f"INS{self.ikid}_ITRANSL"
+                trans_x = self.spiceql_call("findMissionKeywords", {"key": trans_x_key, 
+                                                                    "mission": self.spiceql_mission})[trans_x_key]
 
                 if (trans_x[0] < trans_x[1]):
                     velocity_axis = 1
@@ -570,7 +568,6 @@ class NaifSpice():
                 quats = np.array(quats)[:,[1,2,3,0]]
 
                 rotation = TimeDependentRotation(quats, times, 1, self.sensor_frame_id)
-                print(rotation)
                 self._frame_chain.add_edge(rotation)
 
         return self._frame_chain

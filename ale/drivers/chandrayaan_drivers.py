@@ -235,12 +235,14 @@ class Chandrayaan1MRFFRIsisLabelNaifSpiceDriver(Radar, IsisLabel, NaifSpice, Cha
         : dict
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
-        transx = [-1 * self.scaled_pixel_height, self.scaled_pixel_height, 0.0]
-        transy = [0.0 ,0.0 , 0.0]
-        transs = [1.0, 1.0 / self.scaled_pixel_height, 0.0]
-        transl = [0.0, 0.0, 0.0]
-        return {**super().naif_keywords,
-                f"INS{self.ikid}_TRANSX": transx,
-                f"INS{self.ikid}_TRANSY": transy,
-                f"INS{self.ikid}_ITRANSS": transs,
-                f"INS{self.ikid}_ITRANSL": transl}
+        if not hasattr(self, "_naif_keywords"):
+          transx = [-1 * self.scaled_pixel_height, self.scaled_pixel_height, 0.0]
+          transy = [0.0 ,0.0 , 0.0]
+          transs = [1.0, 1.0 / self.scaled_pixel_height, 0.0]
+          transl = [0.0, 0.0, 0.0]
+          self._naif_keywords = {**super().naif_keywords,
+                                 f"INS{self.ikid}_TRANSX": transx,
+                                 f"INS{self.ikid}_TRANSY": transy,
+                                 f"INS{self.ikid}_ITRANSS": transs,
+                                 f"INS{self.ikid}_ITRANSL": transl}
+        return self._naif_keywords
