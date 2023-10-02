@@ -1,10 +1,6 @@
 import numpy as np
-import spiceypy as spice
 import pvl
 
-from ale import util
-
-from pyspiceql import pyspiceql
 from ale.base import Driver
 from ale.base.type_distortion import NoDistortion, LegendreDistortion
 from ale.base.data_naif import NaifSpice
@@ -321,7 +317,7 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
         : list
           Optical distortion x coefficients
         """
-        return self.naif_keywords['INS{}_DISTORTION_COEF_X'.format(self.parent_id)].tolist()
+        return self.naif_keywords['INS{}_DISTORTION_COEF_X'.format(self.parent_id)]
 
 
     @property
@@ -334,7 +330,7 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
         : list
           Optical distortion y coefficients
         """
-        return self.naif_keywords['INS{}_DISTORTION_COEF_Y'.format(self.parent_id)].tolist()
+        return self.naif_keywords['INS{}_DISTORTION_COEF_Y'.format(self.parent_id)]
 
     @property
     def band_times(self):
@@ -408,9 +404,10 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
         : dict
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
-        return {**super().naif_keywords,
-                f"INS{self.parent_id}_DISTORTION_COEF_X": self.odtx,
-                f"INS{self.parent_id}_DISTORTION_COEF_Y": self.odty}
+        if not hasattr(self, "_naif_keywords"):
+            self._naif_keywords = {**super().naif_keywords,
+                                   **self.spiceql_call("findMissionKeywords", {"key": f"INS{self.parent_id}_DISTORTION_COEF_*", "mission": self.spiceql_mission})}
+        return self._naif_keywords
 
 class NewHorizonsMvicTdiIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, LegendreDistortion, Driver):
     """
@@ -546,9 +543,10 @@ class NewHorizonsMvicTdiIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpi
         : dict
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
-        return {**super().naif_keywords,
-                f"INS{self.parent_id}_DISTORTION_COEF_X": self.odtx,
-                f"INS{self.parent_id}_DISTORTION_COEF_Y": self.odty}
+        if not hasattr(self, "_naif_keywords"):
+            self._naif_keywords = {**super().naif_keywords,
+                                   **self.spiceql_call("findMissionKeywords", {"key": f"INS{self.parent_id}_DISTORTION_COEF_*", "mission": self.spiceql_mission})}
+        return self._naif_keywords
 
     @property
     def sensor_model_version(self):

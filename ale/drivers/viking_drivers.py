@@ -107,7 +107,7 @@ class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
           ephemeris start time of the image
         """
         if not hasattr(self, "_ephemeris_start_time"):
-            self._ephemeris_start_time = self.spiceql_call("strSclkToEt", {"frame": self.alt_ikid, 
+            self._ephemeris_start_time = self.spiceql_call("strSclkToEt", {"frameCode": self.alt_ikid, 
                                                                            "sclk": self.spacecraft_clock_start_count, 
                                                                            "mission": self.spiceql_mission})
             if self.exposure_duration <= .420:

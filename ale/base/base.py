@@ -39,14 +39,15 @@ class Driver():
         if parsed_label:
             self._label = parsed_label
 
-    def to_dict(self, properties=[]):
+    def to_dict(self, properties=None):
         def get_property(prop_name):
             try:
                 return getattr(self, prop_name)
             except Exception as e:
                 return None
 
-        if not properties:
+        if properties is None:
+            properties = []
             for attr in dir(self):
               if isinstance(getattr(self.__class__, attr, None), property):
                   properties.append(attr)

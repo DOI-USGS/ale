@@ -733,7 +733,7 @@ class MexSrcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortion, Driv
           Naif ID used to for identifying the instrument in Spice kernels
         """
         if not hasattr(self, "_ikid"):
-            self._ikid = self.spiceql_call("translateNameToCode", {"frame": "MEX_HRSC_HEAD", "mission": self.spiceql_mission})
+            self._ikid = self.spiceql_call("translateNameToCode", {"frame": "MEX_HRSC_SRC", "mission": self.spiceql_mission})
         return self._ikid
 
 

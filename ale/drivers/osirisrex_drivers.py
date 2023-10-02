@@ -78,7 +78,7 @@ class OsirisRexCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Radi
         : int
           The detector line of the principle point
         """
-        return float(self.naif_keywords['INS{}_CCD_CENTER'.format(self.ikid)])
+        return float(self.naif_keywords['INS{}_CCD_CENTER'.format(self.ikid)][1])
 
     @property
     def detector_center_sample(self):
@@ -92,7 +92,7 @@ class OsirisRexCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Radi
           The detector sample of the principle point
         """
 
-        return float(self.naif_keywords['INS{}_CCD_CENTER'.format(self.ikid)])
+        return float(self.naif_keywords['INS{}_CCD_CENTER'.format(self.ikid)][0])
 
     @property
     def filter_name(self):
@@ -118,6 +118,6 @@ class OsirisRexCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Radi
           Radial distortion coefficients
         """
         if self.filter_name == "UNKNOWN":
-            return self.naif_keywords['INS{}_OD_K'.format(self.ikid)]
+            return self.naif_keywords['INS{}_OD_K'.format(self.ikid)][0:3]
         else:
-            return self.naif_keywords['INS{ikid}_OD_K_{filter}'.format(ikid = self.ikid, filter = self.filter_name)]
+            return self.naif_keywords['INS{ikid}_OD_K_{filter}'.format(ikid = self.ikid, filter = self.filter_name)][0:3]

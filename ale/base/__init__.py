@@ -23,6 +23,8 @@ spiceql_mission_map = {
     "LRO_LROCWAC_UV": "lroc",
     "LRO_LROCWAC_VIS": "lroc",
     "LRO_MINIRF": "",
+    "M10_VIDICON_A": "m10_vidicon_a",
+    "M10_VIDICON_B": "m10_vidicon_b",
     "MSGR_MDIS_WAC": "mdis",
     "MSGR_MDIS_NAC": "mdis",
     "MEX_HRSC_SRC": "src",

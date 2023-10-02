@@ -2,13 +2,8 @@ import pytest
 import ale
 import os
 import json
-import pvl
 
 import numpy as np
-from ale.drivers import co_drivers
-from ale.formatters.isis_formatter import to_isis
-from ale.formatters.formatter import to_isd
-from ale.base.data_isis import IsisSpice
 import unittest
 from unittest.mock import patch
 
@@ -24,8 +19,8 @@ image_dict = {
     'mc3_0034948318_0x536_sci_1': get_isd("nhmvic_tdi")
 }
 
-@pytest.fixture()
-def test_kernels(scope="module"):
+@pytest.fixture(scope="module")
+def test_kernels():
     updated_kernels = {}
     binary_kernels = {}
     for image in image_dict.keys():
