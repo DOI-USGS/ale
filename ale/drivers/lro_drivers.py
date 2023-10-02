@@ -513,11 +513,8 @@ class LroLrocNacIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driv
         """
         if not hasattr(self, "_spacecraft_direction"):
           frame_chain = self.frame_chain
-          print("Banan")
           lro_bus_id = self.spiceql_call("translateNameToCode", {'frame': 'LRO_SC_BUS', 'mission': self.spiceql_mission})
-          print(lro_bus_id)
           time = self.ephemeris_start_time
-          print(time, self.target_name, self.spacecraft_name)
           states = self.spiceql_call("getTargetStates", {'ets': [time], 
                                                          'target': self.spacecraft_name, 
                                                          'observer': self.target_name, 
@@ -527,13 +524,9 @@ class LroLrocNacIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driv
                                                          'ckQuality': "",
                                                          'spkQuality': ""})
           velocity = states[0][3:6]
-          print(velocity)
           rotation = frame_chain.compute_rotation(1, lro_bus_id)
-          print(rotation._rots.as_matrix()[0])
           rotated_velocity = spice.mxv(rotation._rots.as_matrix()[0], velocity)
-          print(rotated_velocity[0])
           self._spacecraft_direction = rotated_velocity[0]
-          print(self._spacecraft_direction)
         return self._spacecraft_direction
 
 
