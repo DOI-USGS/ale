@@ -1,0 +1,122 @@
+KPL/PCK
+
+Asteroid Ceres SPICE PCK file, DAWN SPG 2016-01-07 Solution
+===========================================================================
+
+
+Pedigree and Intended Usage
+--------------------------------------------------------
+
+     This PCK file contains Ceres rotation values that were determined
+     during the stereo photogrammetric analysis of Dawn images during
+     the creation of the HAMO DTM (see [1]). Users of this DTM should
+     also use this planetary constants kernel for SPICE based image
+     processing.
+
+
+Organization
+--------------------------------------------------------
+
+     The sections of this file are as follows.
+
+     Introductory Information:
+
+         --   Version description
+
+         --   Disclaimer
+
+         --   Sources
+
+     Pck Data:
+
+         --   Orientation constants for asteroid Ceres
+
+         --   Radii for asteroid Ceres
+
+         --   GM for asteroid Ceres
+
+
+Version Description
+--------------------------------------------------------
+
+
+     Version 1.0 -- August 29, 2016  -- Steve Joy, IGPP/UCLA
+                                        Boris Semenov, NAIF/JPL
+
+        Initial version.
+
+
+Disclaimer
+--------------------------------------------------------
+
+     This constants file may not contain the parameter values that you
+     prefer. Note that this file may be readily modified by you or
+     anyone else. NAIF suggests that you inspect this file visually
+     before proceeding with any critical or extended data processing.
+
+     NAIF requests that you update the ``Version Description'' section
+     if you modify the file.
+
+
+Sources
+--------------------------------------------------------
+
+     The sources for the constants listed in this are:
+
+        1) ``Dawn at Ceres - Shape Model and Rotational State'',
+            Frank Preusker, et al., Lunar and Planet. Sci.
+            Conf. abs. 1954, 2016.
+
+        2) Official DAWN project PCK ``dawn_ceres_v05.tpc''
+
+
+Orientation constants for asteroid Ceres
+--------------------------------------------------------
+
+     The inertial reference frame for Ceres constants is J2000; this is
+     the default reference frame for PCK orientation data.
+
+     The epoch of the constants is J2000; this is Julian ephemeris date
+     (JED) 2451545.0.
+
+     The NAIF integer code for Ceres is 2000001. See the NAIF_IDs
+     required reading for further information on NAIF integer codes.
+
+     The Ceres rotation constants provided below are from [1].
+
+     \begindata
+
+        BODY2000001_POLE_RA    = ( 291.431     0.0          0.0 )
+        BODY2000001_POLE_DEC   = (  66.761     0.0          0.0 )
+        BODY2000001_PM         = ( 170.488    952.15323     0.0 )
+
+     \begintext
+
+
+Radii for asteroid Ceres
+--------------------------------------------------------
+
+     The Ceres radii values provided below are from [2]. They are
+     included in this PCK for completeness.
+
+     \begindata
+
+        BODY2000001_RADII      = ( 482     482     446    )
+
+     \begintext
+
+
+GM for asteroid Ceres
+--------------------------------------------------------
+
+     The Ceres GM value provided below is from [2]. It is included in
+     this PCK for completeness.
+
+     \begindata
+
+        BODY2000001_GM         = ( 62.6325 )
+
+     \begintext
+
+
+End of PCK file.

@@ -1,0 +1,850 @@
+KPL/IK
+
+Dawn Framing Camera Instrument kernel
+==============================================================================
+
+   This instrument kernel (I-kernel) contains Framing Camera 1 (FC1) and
+   Framing Camera 2 (FC2) optics, detector, and field-of-view parameters.
+
+
+Version and Date
+------------------------------------------------------------------------------
+
+   Version 1.0 -- Sep 3, 2013 -- Stefan Schroeder, DLR
+
+      Updated pixel sizes in the "CCD Parameters" section according to [7]
+
+   Version 0.3 -- Oct 25, 2012 -- Stefan Schroeder, MPS
+
+      Updated the FC1 parameters in the "Optical Distortion" section
+
+      Updated the F1 bandwidth (FWHM) for both cameras in the "Filter
+      Parameters" section
+
+   Version 0.2 -- May 26, 2011 -- Stefan Schroeder, MPS;
+                                  Boris Semenov, NAIF/JPL
+
+      Updated "Conventions for Specifying Data" section to include
+      ID/name mapping for filters.
+ 
+      Updated "Apparent FOV Layout" section to show actual CCD - frame
+      relationship on the FOV layout diagram.
+ 
+      Updated "Optical Parameters" section to have correct value for
+      generic optical parameters and to contain actual optical
+      parameters for each filter.
+ 
+      Updated "CCD Parameters" section to include keywords with CCD
+      parameters for each filter.
+ 
+      Filled in description and keywords in "Filter Parameters"
+      section.
+ 
+      Updated "FOV Definitions" section to include FOV for individual
+      filters.
+ 
+      Filled in description and keywords in "Optical Distortion"
+      section.
+ 
+      Deleted obsolete section "Platform ID".
+
+      Spell-checked.
+
+   Version 0.1 -- May 9, 2005 -- Boris Semenov, NAIF/JPL
+
+      Added radiator FOVs.
+
+   Version 0.0 -- October 12, 2004 -- Boris Semenov, NAIF/JPL
+
+      Initial release.
+
+
+References
+------------------------------------------------------------------------------
+
+   1. ``Kernel Pool Required Reading''
+
+   2. ``C-kernel Required Reading''
+
+   3. FC ICD/MICD, latest version as of 10/12/04.
+
+   4. Dawn Frames Definition Kernel (FK), latest version.
+  
+   5. ``Calibration Pipeline'', Schroeder & Gutierrez-Marques,
+      DA-FC-MPAE-RP-272 issue 2, March 2011.
+   
+   6. ``The Dawn Framing Camera'', Sierks et al., Space Sci Rev.,
+      DOI 10.1007/s11214-011-9745-4.
+
+   7. ``In-flight Calibration of the Dawn Framing Camera'', Schroeder et al.,
+      Icarus, DOI 10.1016/j.icarus.2013.07.036.
+
+Implementation Notes
+------------------------------------------------------------------------------
+
+   Applications that need SPICE I-kernel data must ``load'' the I-kernel file,
+   normally during program initialization.
+
+   Loading the kernel using the SPICELIB routine FURNSH causes the data items 
+   and their associated values present in the kernel to become associated with
+   a data structure called the ``kernel pool''. The application program may 
+   then obtain the value(s) for any IK data item using the SPICELIB routines 
+   GDPOOL, GIPOOL, GCPOOL. Routine GETFOV may be used if the file contains 
+   instrument field-of-view (FOV) specification. See [1] for details.
+
+   This file was created with, and can be updated with a text editor or word 
+   processor.
+
+
+Conventions for Specifying Data
+------------------------------------------------------------------------------
+
+   Data items are specified using ``keyword=value'' assignments [1]. All 
+   keywords referencing values in this I-kernel start with the characters 
+   `INS' followed by the NAIF Dawn instrument ID code, constructed using the 
+   spacecraft ID number (-203) followed by the NAIF three digit ID number. 
+   This number identifies the generic FC1 or FC2, one of the filters, or the 
+   radiator. Generic entries for FC1 of FC2 are identical to those of filter 1
+   for this is the filter most often used. The ID numbers are defined in [4]
+   as follows:
+
+               Instrument name          ID
+               --------------------   -------
+               DAWN_FC1               -203110
+               DAWN_FC1_FILTER_1      -203111
+               DAWN_FC1_FILTER_2      -203112
+               DAWN_FC1_FILTER_3      -203113
+               DAWN_FC1_FILTER_4      -203114
+               DAWN_FC1_FILTER_5      -203115
+               DAWN_FC1_FILTER_6      -203116
+               DAWN_FC1_FILTER_7      -203117
+               DAWN_FC1_FILTER_8      -203118
+               DAWN_FC1_RAD           -203119
+
+               DAWN_FC2               -203120
+               DAWN_FC2_FILTER_1      -203121
+               DAWN_FC2_FILTER_2      -203122
+               DAWN_FC2_FILTER_3      -203123
+               DAWN_FC2_FILTER_4      -203124
+               DAWN_FC2_FILTER_5      -203125
+               DAWN_FC2_FILTER_6      -203126
+               DAWN_FC2_FILTER_7      -203127
+               DAWN_FC2_FILTER_8      -203128
+               DAWN_FC2_RAD           -203129
+
+   The remainder of the keyword is an underscore character followed by the 
+   unique name of the data item. For example, the f/ratio of the FC1 is
+   specified by
+
+               INS-203110_F/RATIO
+
+   The upper bound on the length of all keywords is 32 characters.
+
+   If a keyword is included in more than one file, or if the same keyword 
+   appears more than once within a single file, the last assignment supersedes
+   any earlier assignments.
+
+
+Overview
+------------------------------------------------------------------------------
+
+   From [5] and [6]:
+
+   The Dawn Framing Camera comprises a refractive lens system, a set of 7 
+   band-pass filters and a clear filter with wheel mechanism, a baffle with a 
+   door in front of the optics tube, a CCD at the focal plane, a thermal 
+   stabilization system, and supporting electronics. The active area of the 
+   Atmel/Thomson TH7888A CCD is sized 1024 x 1024 pixels or 14.34 x 14.34 mm 
+   (14.00 x 14.00 micron per pixel).
+
+
+Mounting Alignment
+------------------------------------------------------------------------------
+
+   Refer to the latest version of the Dawn Frames Definition Kernel (FK) [4]
+   for the FC reference frame definitions and mounting alignment information.
+
+
+Apparent FOV Layout
+------------------------------------------------------------------------------
+
+   This section provides a diagram illustrating the FC1 and FC2 apparent FOV
+   layout in the corresponding reference frames. Pixel (0,0) is in the lower
+   left corner of the image, and pixel (1023,1023) is in the top right corner.
+   +X, +Y, +Z axes are defined in the Dawn Frames Definition Kernel (FK) [4].
+   
+
+                        |      5.47 deg     |      Boresight (+Z axis)
+                        |<----------------->|       is into the page
+                        |                   |
+                          1024 pixels/line
+       ---              +-------------------+
+        ^               |                   |
+        |               |                   |
+        |               |       +Zfc1       |
+        |               |       +Zfc2       |
+        |5.47 deg  1024 |         x-------------> +Xfc1
+        |         lines |         |         |     +Xfc2
+        |               |         |         |
+        |               |         |         |
+        v               |         |         |
+       ---            (0,0)-------|---------+
+                      Pixel       |
+                                  | +Yfc1
+                                  v +Yfc2
+
+
+Optical Parameters
+------------------------------------------------------------------------------
+
+   The following FC1 and FC2 nominal first order optical parameters are, 
+   from [5]:
+
+      ------------------------------------------------------------------
+             parameter                    FC1                 FC2
+      ------------------------------------------------------------------
+      Focal Length, mm                    150.0               150.0
+      f/ratio                             f/7.5               f/7.5
+      IFOV, rad/pixel                     0.0000932           0.0000932
+      Field of view, deg                  5.47                5.47
+      ------------------------------------------------------------------
+
+   In reality, the pixels are not square, being slightly larger in the X 
+   direction than the Y direction. Focal lengths are also different for each 
+   filter.
+   
+   The keywords below provide the optical parameters for each filter of both 
+   cameras. Angular size values are given in radians. Focal length is given in
+   mm, and its uncertainty is 0.01 mm. The FOV is calculated from the focal 
+   length given here and the pixel dimensions specified in the ``CCD 
+   Parameters'' section; it does not include the radial distortion described 
+   in the ``Optical Distortion'' section. The first vector element of the IFOV
+   and FOV angular size keywords refers to the X direction, the second to the 
+   Y direction. 
+
+   FC1 filters
+
+      \begindata
+
+         INS-203110_FOCAL_LENGTH       = ( 150.07                   )
+         INS-203110_IFOV               = ( 0.000093242, 0.000093184 )
+         INS-203110_FOV_ANGULAR_SIZE   = ( 0.095480, 0.095420       )
+         INS-203110_F/RATIO            = ( 7.5                      )
+
+         INS-203111_FOCAL_LENGTH       = ( 150.07                   )
+         INS-203111_IFOV               = ( 0.000093242, 0.000093184 )
+         INS-203111_FOV_ANGULAR_SIZE   = ( 0.095480, 0.095420       )
+         INS-203111_F/RATIO            = ( 7.5                      )
+
+         INS-203112_FOCAL_LENGTH       = ( 150.11                   )
+         INS-203112_IFOV               = ( 0.000093223, 0.000093165 )
+         INS-203112_FOV_ANGULAR_SIZE   = ( 0.095461, 0.095401       )
+         INS-203112_F/RATIO            = ( 7.5                      )
+
+         INS-203113_FOCAL_LENGTH       = ( 150.04                   )
+         INS-203113_IFOV               = ( 0.000093261, 0.000093202 )
+         INS-203113_FOV_ANGULAR_SIZE   = ( 0.095499, 0.095439       )
+         INS-203113_F/RATIO            = ( 7.5                      )
+
+         INS-203114_FOCAL_LENGTH       = ( 150.12                   )
+         INS-203114_IFOV               = ( 0.000093215, 0.000093156 )
+         INS-203114_FOV_ANGULAR_SIZE   = ( 0.095452, 0.095392       )
+         INS-203114_F/RATIO            = ( 7.5                      )
+
+         INS-203115_FOCAL_LENGTH       = ( 150.16                   )
+         INS-203115_IFOV               = ( 0.000093190, 0.000093132 )
+         INS-203115_FOV_ANGULAR_SIZE   = ( 0.095427, 0.095367       )
+         INS-203115_F/RATIO            = ( 7.5                      )
+
+         INS-203116_FOCAL_LENGTH       = ( 150.08                   )
+         INS-203116_IFOV               = ( 0.000093238, 0.000093179 )
+         INS-203116_FOV_ANGULAR_SIZE   = ( 0.095476, 0.095416       )
+         INS-203116_F/RATIO            = ( 7.5                      )
+
+         INS-203117_FOCAL_LENGTH       = ( 150.06                   )
+         INS-203117_IFOV               = ( 0.000093254, 0.000093196 )
+         INS-203117_FOV_ANGULAR_SIZE   = ( 0.095492, 0.095432       )
+         INS-203117_F/RATIO            = ( 7.5                      )
+
+         INS-203118_FOCAL_LENGTH       = ( 150.38                   )
+         INS-203118_IFOV               = ( 0.000093053, 0.000092994 )
+         INS-203118_FOV_ANGULAR_SIZE   = ( 0.095286, 0.095226       )
+         INS-203118_F/RATIO            = ( 7.5                      )
+
+      \begintext
+
+   FC2 filters
+
+      \begindata
+
+         INS-203120_FOCAL_LENGTH       = ( 150.07                   )
+         INS-203120_IFOV               = ( 0.000093242, 0.000093184 )
+         INS-203120_FOV_ANGULAR_SIZE   = ( 0.095480, 0.095420       )
+         INS-203120_F/RATIO            = ( 7.5                      )
+
+         INS-203121_FOCAL_LENGTH       = ( 150.07                   )
+         INS-203121_IFOV               = ( 0.000093242, 0.000093184 )
+         INS-203121_FOV_ANGULAR_SIZE   = ( 0.095480, 0.095420       )
+         INS-203121_F/RATIO            = ( 7.5                      )
+
+         INS-203122_FOCAL_LENGTH       = ( 150.11                   )
+         INS-203122_IFOV               = ( 0.000093223, 0.000093165 )
+         INS-203122_FOV_ANGULAR_SIZE   = ( 0.095461, 0.095401       )
+         INS-203122_F/RATIO            = ( 7.5                      )
+
+         INS-203123_FOCAL_LENGTH       = ( 150.04                   )
+         INS-203123_IFOV               = ( 0.000093261, 0.000093202 )
+         INS-203123_FOV_ANGULAR_SIZE   = ( 0.095499, 0.095439       )
+         INS-203123_F/RATIO            = ( 7.5                      )
+
+         INS-203124_FOCAL_LENGTH       = ( 150.12                   )
+         INS-203124_IFOV               = ( 0.000093215, 0.000093156 )
+         INS-203124_FOV_ANGULAR_SIZE   = ( 0.095452, 0.095392       )
+         INS-203124_F/RATIO            = ( 7.5                      )
+
+         INS-203125_FOCAL_LENGTH       = ( 150.16                   )
+         INS-203125_IFOV               = ( 0.000093190, 0.000093132 )
+         INS-203125_FOV_ANGULAR_SIZE   = ( 0.095427, 0.095367       )
+         INS-203125_F/RATIO            = ( 7.5                      )
+
+         INS-203126_FOCAL_LENGTH       = ( 150.08                   )
+         INS-203126_IFOV               = ( 0.000093238, 0.000093179 )
+         INS-203126_FOV_ANGULAR_SIZE   = ( 0.095476, 0.095416       )
+         INS-203126_F/RATIO            = ( 7.5                      )
+
+         INS-203127_FOCAL_LENGTH       = ( 150.06                   )
+         INS-203127_IFOV               = ( 0.000093254, 0.000093196 )
+         INS-203127_FOV_ANGULAR_SIZE   = ( 0.095492, 0.095432       )
+         INS-203127_F/RATIO            = ( 7.5                      )
+
+         INS-203128_FOCAL_LENGTH       = ( 150.38                   )
+         INS-203128_IFOV               = ( 0.000093053, 0.000092994 )
+         INS-203128_FOV_ANGULAR_SIZE   = ( 0.095286, 0.095226       )
+         INS-203128_F/RATIO            = ( 7.5                      )
+
+      \begintext
+
+
+CCD Parameters
+------------------------------------------------------------------------------
+
+   The FC1 and FC2 use a CCD detector of the same type with the following
+   nominal geometry parameters, from [5]. Note that the pixels are not 
+   perfectly square, as described in the ``Optical Parameters'' section.
+
+      --------------------------------------------
+             parameter                     value  
+      --------------------------------------------
+      Pixel Size, microns                    14.00
+      Detector Array Size                  1024
+      Detector Array Center                 511.5
+      --------------------------------------------
+
+   The values are given in microns for PIXEL_SIZE keywords and in counts for
+   PIXEL_SAMPLES, PIXEL_LINES, and CENTER keywords.
+
+   FC1 filters
+
+      \begindata
+
+         INS-203110_PIXEL_SIZE         = ( 14.004, 13.995 )
+         INS-203110_PIXEL_SAMPLES      = ( 1024           )
+         INS-203110_PIXEL_LINES        = ( 1024           )
+         INS-203110_CCD_CENTER         = ( 511.5,  511.5  )
+                                                          
+         INS-203111_PIXEL_SIZE         = ( 14.004, 13.995 )
+         INS-203111_PIXEL_SAMPLES      = ( 1024           )
+         INS-203111_PIXEL_LINES        = ( 1024           )
+         INS-203111_CCD_CENTER         = ( 511.5,  511.5  )
+
+         INS-203112_PIXEL_SIZE         = ( 14.004, 13.995 )
+         INS-203112_PIXEL_SAMPLES      = ( 1024           )
+         INS-203112_PIXEL_LINES        = ( 1024           )
+         INS-203112_CCD_CENTER         = ( 511.5,  511.5  )
+
+         INS-203113_PIXEL_SIZE         = ( 14.004, 13.995 )
+         INS-203113_PIXEL_SAMPLES      = ( 1024           )
+         INS-203113_PIXEL_LINES        = ( 1024           )
+         INS-203113_CCD_CENTER         = ( 511.5,  511.5  )
+
+         INS-203114_PIXEL_SIZE         = ( 14.004, 13.995 )
+         INS-203114_PIXEL_SAMPLES      = ( 1024           )
+         INS-203114_PIXEL_LINES        = ( 1024           )
+         INS-203114_CCD_CENTER         = ( 511.5,  511.5  )
+
+         INS-203115_PIXEL_SIZE         = ( 14.004, 13.995 )
+         INS-203115_PIXEL_SAMPLES      = ( 1024           )
+         INS-203115_PIXEL_LINES        = ( 1024           )
+         INS-203115_CCD_CENTER         = ( 511.5,  511.5  )
+
+         INS-203116_PIXEL_SIZE         = ( 14.004, 13.995 )
+         INS-203116_PIXEL_SAMPLES      = ( 1024           )
+         INS-203116_PIXEL_LINES        = ( 1024           )
+         INS-203116_CCD_CENTER         = ( 511.5,  511.5  )
+
+         INS-203117_PIXEL_SIZE         = ( 14.004, 13.995 )
+         INS-203117_PIXEL_SAMPLES      = ( 1024           )
+         INS-203117_PIXEL_LINES        = ( 1024           )
+         INS-203117_CCD_CENTER         = ( 511.5,  511.5  )
+
+         INS-203118_PIXEL_SIZE         = ( 14.004, 13.995 )
+         INS-203118_PIXEL_SAMPLES      = ( 1024           )
+         INS-203118_PIXEL_LINES        = ( 1024           )
+         INS-203118_CCD_CENTER         = ( 511.5,  511.5  )
+
+      \begintext
+
+   FC2 filters
+   
+      \begindata
+
+         INS-203120_PIXEL_SIZE         = ( 14.004, 13.995 )
+         INS-203120_PIXEL_SAMPLES      = ( 1024           )
+         INS-203120_PIXEL_LINES        = ( 1024           )
+         INS-203120_CCD_CENTER         = ( 511.5,  511.5  )
+
+         INS-203121_PIXEL_SIZE         = ( 14.004, 13.995 )
+         INS-203121_PIXEL_SAMPLES      = ( 1024           )
+         INS-203121_PIXEL_LINES        = ( 1024           )
+         INS-203121_CCD_CENTER         = ( 511.5,  511.5  )
+
+         INS-203122_PIXEL_SIZE         = ( 14.004, 13.995 )
+         INS-203122_PIXEL_SAMPLES      = ( 1024           )
+         INS-203122_PIXEL_LINES        = ( 1024           )
+         INS-203122_CCD_CENTER         = ( 511.5,  511.5  )
+
+         INS-203123_PIXEL_SIZE         = ( 14.004, 13.995 )
+         INS-203123_PIXEL_SAMPLES      = ( 1024           )
+         INS-203123_PIXEL_LINES        = ( 1024           )
+         INS-203123_CCD_CENTER         = ( 511.5,  511.5  )
+
+         INS-203124_PIXEL_SIZE         = ( 14.004, 13.995 )
+         INS-203124_PIXEL_SAMPLES      = ( 1024           )
+         INS-203124_PIXEL_LINES        = ( 1024           )
+         INS-203124_CCD_CENTER         = ( 511.5,  511.5  )
+
+         INS-203125_PIXEL_SIZE         = ( 14.004, 13.995 )
+         INS-203125_PIXEL_SAMPLES      = ( 1024           )
+         INS-203125_PIXEL_LINES        = ( 1024           )
+         INS-203125_CCD_CENTER         = ( 511.5,  511.5  )
+
+         INS-203126_PIXEL_SIZE         = ( 14.004, 13.995 )
+         INS-203126_PIXEL_SAMPLES      = ( 1024           )
+         INS-203126_PIXEL_LINES        = ( 1024           )
+         INS-203126_CCD_CENTER         = ( 511.5,  511.5  )
+
+         INS-203127_PIXEL_SIZE         = ( 14.004, 13.995 )
+         INS-203127_PIXEL_SAMPLES      = ( 1024           )
+         INS-203127_PIXEL_LINES        = ( 1024           )
+         INS-203127_CCD_CENTER         = ( 511.5,  511.5  )
+
+         INS-203128_PIXEL_SIZE         = ( 14.004, 13.995 )
+         INS-203128_PIXEL_SAMPLES      = ( 1024           )
+         INS-203128_PIXEL_LINES        = ( 1024           )
+         INS-203128_CCD_CENTER         = ( 511.5,  511.5  )
+
+      \begintext
+
+
+Filter Parameters
+------------------------------------------------------------------------------
+
+   This section contains FC1 and FC2 filter parameters. The FC has a single 
+   broad band filter (F1) and 7 narrow band (color) filters (F2-F8).
+
+   The following filter band center, band width, and effective wavelength (all
+   in nm) data are taken from [5]. FWHM is the Full Width at Half Maximum. The
+   effective wavelength is defined as the integral over the product of the 
+   wavelength and the solar spectrum, divided by the integral over the solar 
+   spectrum.
+
+      -------------------------------------------
+      filter      band       FWHM      effective
+        #        center                wavelength
+      -------------------------------------------
+        1         735         682         732
+        2         548         43          555
+        3         749         44          749
+        4         918         45          917
+        5         978         85          965
+        6         829         36          829
+        7         650         42          653
+        8         428         40          438
+      -------------------------------------------
+
+   Given below are the center wavelength (BANDCENTER), the FWHM (BANDWIDTH), 
+   and effective wavelength (EFF_WAVELENGTH) for each of the filters, all in 
+   nm. The nominal values are those for filter 1.
+
+ 
+   FC1 filters
+
+      \begindata
+
+         INS-203110_BANDCENTER         = ( 735 )
+         INS-203110_BANDWIDTH          = ( 682 )
+         INS-203110_EFF_WAVELENGTH     = ( 732 )
+
+         INS-203111_BANDCENTER         = ( 735 )
+         INS-203111_BANDWIDTH          = ( 682 )
+         INS-203111_EFF_WAVELENGTH     = ( 732 )
+
+         INS-203112_BANDCENTER         = ( 548 )
+         INS-203112_BANDWIDTH          = ( 43  )
+         INS-203112_EFF_WAVELENGTH     = ( 555 )
+
+         INS-203113_BANDCENTER         = ( 749 )
+         INS-203113_BANDWIDTH          = ( 44  )
+         INS-203113_EFF_WAVELENGTH     = ( 749 )
+
+         INS-203114_BANDCENTER         = ( 918 )
+         INS-203114_BANDWIDTH          = ( 45  )
+         INS-203114_EFF_WAVELENGTH     = ( 917 )
+
+         INS-203115_BANDCENTER         = ( 978 )
+         INS-203115_BANDWIDTH          = ( 85  )
+         INS-203115_EFF_WAVELENGTH     = ( 965 )
+
+         INS-203116_BANDCENTER         = ( 829 )
+         INS-203116_BANDWIDTH          = ( 36  )
+         INS-203116_EFF_WAVELENGTH     = ( 829 )
+
+         INS-203117_BANDCENTER         = ( 650 )
+         INS-203117_BANDWIDTH          = ( 42  )
+         INS-203117_EFF_WAVELENGTH     = ( 653 )
+
+         INS-203118_BANDCENTER         = ( 428 )
+         INS-203118_BANDWIDTH          = ( 40  )
+         INS-203118_EFF_WAVELENGTH     = ( 438 )
+
+      \begintext
+
+   FC2 filters
+
+      \begindata
+
+         INS-203120_BANDCENTER         = ( 735 )
+         INS-203120_BANDWIDTH          = ( 682 )
+         INS-203120_EFF_WAVELENGTH     = ( 732 )
+
+         INS-203121_BANDCENTER         = ( 735 )
+         INS-203121_BANDWIDTH          = ( 682 )
+         INS-203121_EFF_WAVELENGTH     = ( 732 )
+
+         INS-203122_BANDCENTER         = ( 548 )
+         INS-203122_BANDWIDTH          = ( 43  )
+         INS-203122_EFF_WAVELENGTH     = ( 555 )
+
+         INS-203123_BANDCENTER         = ( 749 )
+         INS-203123_BANDWIDTH          = ( 44  )
+         INS-203123_EFF_WAVELENGTH     = ( 749 )
+
+         INS-203124_BANDCENTER         = ( 918 )
+         INS-203124_BANDWIDTH          = ( 45  )
+         INS-203124_EFF_WAVELENGTH     = ( 917 )
+
+         INS-203125_BANDCENTER         = ( 978 )
+         INS-203125_BANDWIDTH          = ( 85  )
+         INS-203125_EFF_WAVELENGTH     = ( 965 )
+
+         INS-203126_BANDCENTER         = ( 829 )
+         INS-203126_BANDWIDTH          = ( 36  )
+         INS-203126_EFF_WAVELENGTH     = ( 829 )
+
+         INS-203127_BANDCENTER         = ( 650 )
+         INS-203127_BANDWIDTH          = ( 42  )
+         INS-203127_EFF_WAVELENGTH     = ( 653 )
+
+         INS-203128_BANDCENTER         = ( 428 )
+         INS-203128_BANDWIDTH          = ( 40  )
+         INS-203128_EFF_WAVELENGTH     = ( 438 )
+
+      \begintext
+
+
+FOV Definitions
+------------------------------------------------------------------------------
+
+   This section contains definitions for the FC1 and FC2 FOVs. These 
+   definitions are provided in a format required by the SPICE (CSPICE) 
+   function GETFOV (getfov_c).
+   
+   The set of assignments in the data section below defines the FC1 and FC2
+   FOVs with respect to the corresponding frames to be a rectangle with the
+   corners defined by the first and last pixels of the first and last lines of
+   the CCD and the boresight along the +Z axis. This FOV definition uses the
+   FOV_ANGULAR_SIZE values from the ``Optical Parameters'' section above
+   converted to degrees.
+
+   FC1 filters
+
+      \begindata
+
+         INS-203110_FOV_FRAME          = 'DAWN_FC1'
+         INS-203110_FOV_SHAPE          = 'RECTANGLE'
+         INS-203110_BORESIGHT          = ( 0.0, 0.0, 150.07 )
+         INS-203110_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203110_FOV_REF_VECTOR     = ( 1.0, 0.0, 0.0    )
+         INS-203110_FOV_REF_ANGLE      = ( 2.7353005        )
+         INS-203110_FOV_CROSS_ANGLE    = ( 2.7335816        )
+         INS-203110_FOV_ANGLE_UNITS    = 'DEGREES'
+  
+         INS-203111_FOV_FRAME          = 'DAWN_FC1'
+         INS-203111_FOV_SHAPE          = 'RECTANGLE'
+         INS-203111_BORESIGHT          = ( 0.0, 0.0, 150.07 )
+         INS-203111_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203111_FOV_REF_VECTOR     = ( 1.0, 0.0, 0.0    )
+         INS-203111_FOV_REF_ANGLE      = ( 2.7353005        )
+         INS-203111_FOV_CROSS_ANGLE    = ( 2.7335816        )
+         INS-203111_FOV_ANGLE_UNITS    = 'DEGREES'
+  
+         INS-203112_FOV_FRAME          = 'DAWN_FC1'
+         INS-203112_FOV_SHAPE          = 'RECTANGLE'
+         INS-203112_BORESIGHT          = ( 0.0, 0.0, 150.11 )
+         INS-203112_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203112_FOV_REF_VECTOR     = ( 1.0, 0.0, 0.0    )
+         INS-203112_FOV_REF_ANGLE      = ( 2.7347562        )
+         INS-203112_FOV_CROSS_ANGLE    = ( 2.7330373        )
+         INS-203112_FOV_ANGLE_UNITS    = 'DEGREES'
+  
+         INS-203113_FOV_FRAME          = 'DAWN_FC1'
+         INS-203113_FOV_SHAPE          = 'RECTANGLE'
+         INS-203113_BORESIGHT          = ( 0.0, 0.0, 150.04 )
+         INS-203113_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203113_FOV_REF_VECTOR     = ( 1.0, 0.0, 0.0    )
+         INS-203113_FOV_REF_ANGLE      = ( 2.7358448        )
+         INS-203113_FOV_CROSS_ANGLE    = ( 2.7341260        )
+         INS-203113_FOV_ANGLE_UNITS    = 'DEGREES'
+  
+         INS-203114_FOV_FRAME          = 'DAWN_FC1'
+         INS-203114_FOV_SHAPE          = 'RECTANGLE'
+         INS-203114_BORESIGHT          = ( 0.0, 0.0, 150.12 )
+         INS-203114_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203114_FOV_REF_VECTOR     = ( 1.0, 0.0, 0.0    )
+         INS-203114_FOV_REF_ANGLE      = ( 2.7344984        )
+         INS-203114_FOV_CROSS_ANGLE    = ( 2.7327795        )
+         INS-203114_FOV_ANGLE_UNITS    = 'DEGREES'
+  
+         INS-203115_FOV_FRAME          = 'DAWN_FC1'
+         INS-203115_FOV_SHAPE          = 'RECTANGLE'
+         INS-203115_BORESIGHT          = ( 0.0, 0.0, 150.16 )
+         INS-203115_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203115_FOV_REF_VECTOR     = ( 1.0, 0.0, 0.0    )
+         INS-203115_FOV_REF_ANGLE      = ( 2.7337822        )
+         INS-203115_FOV_CROSS_ANGLE    = ( 2.7320633        )
+         INS-203115_FOV_ANGLE_UNITS    = 'DEGREES'
+  
+         INS-203116_FOV_FRAME          = 'DAWN_FC1'
+         INS-203116_FOV_SHAPE          = 'RECTANGLE'
+         INS-203116_BORESIGHT          = ( 0.0, 0.0, 150.08 )
+         INS-203116_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203116_FOV_REF_VECTOR     = ( 1.0, 0.0, 0.0    )
+         INS-203116_FOV_REF_ANGLE      = ( 2.7351859        )
+         INS-203116_FOV_CROSS_ANGLE    = ( 2.7334670        )
+         INS-203116_FOV_ANGLE_UNITS    = 'DEGREES'
+  
+         INS-203117_FOV_FRAME          = 'DAWN_FC1'
+         INS-203117_FOV_SHAPE          = 'RECTANGLE'
+         INS-203117_BORESIGHT          = ( 0.0, 0.0, 150.06 )
+         INS-203117_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203117_FOV_REF_VECTOR     = ( 1.0, 0.0, 0.0    )
+         INS-203117_FOV_REF_ANGLE      = ( 2.7356443        )
+         INS-203117_FOV_CROSS_ANGLE    = ( 2.7339254        )
+         INS-203117_FOV_ANGLE_UNITS    = 'DEGREES'
+  
+         INS-203118_FOV_FRAME          = 'DAWN_FC1'
+         INS-203118_FOV_SHAPE          = 'RECTANGLE'
+         INS-203118_BORESIGHT          = ( 0.0, 0.0, 150.38 )
+         INS-203118_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203118_FOV_REF_VECTOR     = ( 1.0, 0.0, 0.0    )
+         INS-203118_FOV_REF_ANGLE      = ( 2.7297428        )
+         INS-203118_FOV_CROSS_ANGLE    = ( 2.7280239        )
+         INS-203118_FOV_ANGLE_UNITS    = 'DEGREES'
+  
+      \begintext
+      
+   FC2 filters
+
+      \begindata
+  
+         INS-203120_FOV_FRAME          = 'DAWN_FC2'
+         INS-203120_FOV_SHAPE          = 'RECTANGLE'
+         INS-203120_BORESIGHT          = ( 0.0, 0.0, 150.07 )
+         INS-203120_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203120_FOV_REF_VECTOR     = ( 1.0, 0.0, 0.0    )
+         INS-203120_FOV_REF_ANGLE      = ( 2.7353005        )
+         INS-203120_FOV_CROSS_ANGLE    = ( 2.7335816        )
+         INS-203120_FOV_ANGLE_UNITS    = 'DEGREES'
+  
+         INS-203121_FOV_FRAME          = 'DAWN_FC2'
+         INS-203121_FOV_SHAPE          = 'RECTANGLE'
+         INS-203121_BORESIGHT          = ( 0.0, 0.0, 150.07 )
+         INS-203121_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203121_FOV_REF_VECTOR     = ( 1.0, 0.0, 0.0    )
+         INS-203121_FOV_REF_ANGLE      = ( 2.7353005        )
+         INS-203121_FOV_CROSS_ANGLE    = ( 2.7335816        )
+         INS-203121_FOV_ANGLE_UNITS    = 'DEGREES'
+  
+         INS-203122_FOV_FRAME          = 'DAWN_FC2'
+         INS-203122_FOV_SHAPE          = 'RECTANGLE'
+         INS-203122_BORESIGHT          = ( 0.0, 0.0, 150.11 )
+         INS-203122_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203122_FOV_REF_VECTOR     = ( 1.0, 0.0, 0.0    )
+         INS-203122_FOV_REF_ANGLE      = ( 2.7347562        )
+         INS-203122_FOV_CROSS_ANGLE    = ( 2.7330373        )
+         INS-203122_FOV_ANGLE_UNITS    = 'DEGREES'
+  
+         INS-203123_FOV_FRAME          = 'DAWN_FC2'
+         INS-203123_FOV_SHAPE          = 'RECTANGLE'
+         INS-203123_BORESIGHT          = ( 0.0, 0.0, 150.04 )
+         INS-203123_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203123_FOV_REF_VECTOR     = ( 1.0, 0.0, 0.0    )
+         INS-203123_FOV_REF_ANGLE      = ( 2.7358448        )
+         INS-203123_FOV_CROSS_ANGLE    = ( 2.7341260        )
+         INS-203123_FOV_ANGLE_UNITS    = 'DEGREES'
+  
+         INS-203124_FOV_FRAME          = 'DAWN_FC2'
+         INS-203124_FOV_SHAPE          = 'RECTANGLE'
+         INS-203124_BORESIGHT          = ( 0.0, 0.0, 150.12 )
+         INS-203124_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203124_FOV_REF_VECTOR     = ( 1.0, 0.0, 0.0    )
+         INS-203124_FOV_REF_ANGLE      = ( 2.7344984        )
+         INS-203124_FOV_CROSS_ANGLE    = ( 2.7327795        )
+         INS-203124_FOV_ANGLE_UNITS    = 'DEGREES'
+  
+         INS-203125_FOV_FRAME          = 'DAWN_FC2'
+         INS-203125_FOV_SHAPE          = 'RECTANGLE'
+         INS-203125_BORESIGHT          = ( 0.0, 0.0, 150.16 )
+         INS-203125_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203125_FOV_REF_VECTOR     = ( 1.0, 0.0, 0.0    )
+         INS-203125_FOV_REF_ANGLE      = ( 2.7337822        )
+         INS-203125_FOV_CROSS_ANGLE    = ( 2.7320633        )
+         INS-203125_FOV_ANGLE_UNITS    = 'DEGREES'
+  
+         INS-203126_FOV_FRAME          = 'DAWN_FC2'
+         INS-203126_FOV_SHAPE          = 'RECTANGLE'
+         INS-203126_BORESIGHT          = ( 0.0, 0.0, 150.08 )
+         INS-203126_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203126_FOV_REF_VECTOR     = ( 1.0, 0.0, 0.0    )
+         INS-203126_FOV_REF_ANGLE      = ( 2.7351859        )
+         INS-203126_FOV_CROSS_ANGLE    = ( 2.7334670        )
+         INS-203126_FOV_ANGLE_UNITS    = 'DEGREES'
+  
+         INS-203127_FOV_FRAME          = 'DAWN_FC2'
+         INS-203127_FOV_SHAPE          = 'RECTANGLE'
+         INS-203127_BORESIGHT          = ( 0.0, 0.0, 150.06 )
+         INS-203127_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203127_FOV_REF_VECTOR     = ( 1.0, 0.0, 0.0    )
+         INS-203127_FOV_REF_ANGLE      = ( 2.7356443        )
+         INS-203127_FOV_CROSS_ANGLE    = ( 2.7339254        )
+         INS-203127_FOV_ANGLE_UNITS    = 'DEGREES'
+  
+         INS-203128_FOV_FRAME          = 'DAWN_FC2'
+         INS-203128_FOV_SHAPE          = 'RECTANGLE'
+         INS-203128_BORESIGHT          = ( 0.0, 0.0, 150.38 )
+         INS-203128_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203128_FOV_REF_VECTOR     = ( 1.0, 0.0, 0.0    )
+         INS-203128_FOV_REF_ANGLE      = ( 2.7297428        )
+         INS-203128_FOV_CROSS_ANGLE    = ( 2.7280239        )
+         INS-203128_FOV_ANGLE_UNITS    = 'DEGREES'
+
+      \begintext
+
+
+Radiator Sun Avoidance FOV Definitions
+------------------------------------------------------------------------------
+
+   The Sun avoidance FOV for the FC1 and FC2 radiators is a 175 degree cone
+   centered on the spacecraft -X axis [3].
+
+      \begindata
+
+         INS-203119_FOV_FRAME          = 'DAWN_SPACECRAFT'
+         INS-203119_FOV_SHAPE          = 'CIRCLE'
+         INS-203119_BORESIGHT          = ( -1.0, 0.0, 0.0 )
+         INS-203119_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203119_FOV_REF_VECTOR     = ( 0.0, 1.0, 0.0  )
+         INS-203119_FOV_REF_ANGLE      = ( 87.5           )
+         INS-203119_FOV_ANGLE_UNITS    = 'DEGREES'
+
+         INS-203129_FOV_FRAME          = 'DAWN_SPACECRAFT'
+         INS-203129_FOV_SHAPE          = 'CIRCLE'
+         INS-203129_BORESIGHT          = ( -1.0, 0.0, 0.0 )
+         INS-203129_FOV_CLASS_SPEC     = 'ANGLES'
+         INS-203129_FOV_REF_VECTOR     = ( 0.0, 1.0, 0.0  )
+         INS-203129_FOV_REF_ANGLE      = ( 87.5           )
+         INS-203129_FOV_ANGLE_UNITS    = 'DEGREES'
+
+      \begintext
+
+
+Optical Distortion
+------------------------------------------------------------------------------
+
+   This section provides optical distortion and geometric calibration data for
+   FC1 and FC2, taken from [5].
+
+   A 3d vector (P) in the camera frame is mapped into sample and line (S,L)
+   coordinates in pixels through these equations:
+
+          ( X )    FL    ( P(1) )
+          (   ) = ------ (      )
+          ( Y )   P(3)   ( P(2) )
+
+   where X and Y are the horizontal and vertical distance in millimeters from 
+   the center of the CCD. The X and Y directions are defined in the ``Apparent
+   FOV Layout'' section. FL is the focal length in millimeters.
+  
+            R*R = X*X + Y*Y
+          
+          ( dX )      ( X*R*R )
+          (    ) = E1 (       ) 
+          ( dY )      ( Y*R*R )
+
+          ( S )   ( Kx  0  ) ( X + dX )   ( S0 )
+          (   ) = (        ) (        ) + (    )
+          ( L )   ( 0   Ky ) ( Y + dY )   ( L0 )
+
+   S0 and L0 refer to the position of the optical axis on the CCD in pixels, 
+   and are equal to the elements of the CCD_CENTER keyword defined in the 
+   ``CCD Parameters'' section. The constants Kx and Ky map millimeters to 
+   pixels in the focal plane X and Y directions. They are identical to the 
+   inverse of the pixel size in millimeters in the X and Y directions. The 
+   pixel size in microns is defined by the PIXEL_SIZE keyword in the ``CCD 
+   Parameters'' section. E1 is the first radial distortion coefficient. It is 
+   a function of wavelength, and as such different for each filter. It has 
+   units of 1/(mm*mm). The generic value below is that for filter 1.
+
+   FC1 filters
+
+      \begindata
+      
+         INS-203110_RAD_DIST_COEFF     = ( 0.0000076 )
+         INS-203111_RAD_DIST_COEFF     = ( 0.0000077 )
+         INS-203112_RAD_DIST_COEFF     = ( 0.0000077 )
+         INS-203113_RAD_DIST_COEFF     = ( 0.0000077 )
+         INS-203114_RAD_DIST_COEFF     = ( 0.0000077 )
+         INS-203115_RAD_DIST_COEFF     = ( 0.0000077 )
+         INS-203116_RAD_DIST_COEFF     = ( 0.0000077 )
+         INS-203117_RAD_DIST_COEFF     = ( 0.0000077 )
+         INS-203118_RAD_DIST_COEFF     = ( 0.0000015 )
+
+      \begintext
+
+   FC2 filters
+
+      \begindata
+      
+         INS-203120_RAD_DIST_COEFF     = ( 0.0000084 )
+         INS-203121_RAD_DIST_COEFF     = ( 0.0000084 )
+         INS-203122_RAD_DIST_COEFF     = ( 0.0000067 )
+         INS-203123_RAD_DIST_COEFF     = ( 0.0000084 )
+         INS-203124_RAD_DIST_COEFF     = ( 0.0000100 )
+         INS-203125_RAD_DIST_COEFF     = ( 0.0000103 )
+         INS-203126_RAD_DIST_COEFF     = ( 0.0000092 )
+         INS-203127_RAD_DIST_COEFF     = ( 0.0000076 )
+         INS-203128_RAD_DIST_COEFF     = ( 0.0000056 )
+
+      \begintext
+
+End of IK file.

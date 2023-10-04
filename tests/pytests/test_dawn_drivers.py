@@ -97,14 +97,14 @@ class test_pds3_naif(unittest.TestCase):
 class test_isis3_naif(unittest.TestCase):
 
     def setUp(self):
-        label = get_image_label("FC21A0038582_15170161546F6F'", "isis3");
+        label = get_image_label("FC21A0038582_15170161546F6G", "isis3");
         self.driver = DawnFcIsisLabelNaifSpiceDriver(label);
 
     def test_short_mission_name(self):
         assert self.driver.short_mission_name == 'dawn'
 
     def test_instrument_id(self):
-        assert self.driver.instrument_id == 'DAWN_FC2_FILTER_6'
+        assert self.driver.instrument_id == 'FC2'
 
     def test_spacecraft_name(self):
         assert self.driver.spacecraft_name == 'DAWN'
