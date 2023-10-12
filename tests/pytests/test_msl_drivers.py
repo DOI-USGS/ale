@@ -5,7 +5,7 @@ import pytest
 import unittest
 
 import ale
-from conftest import get_image, get_image_label, get_isd, get_image_kernels, convert_kernels, compare_dicts
+from conftest import get_image_label, get_isd, get_image_kernels, convert_kernels, compare_dicts
 from ale.drivers.msl_drivers import MslMastcamPds3NaifSpiceDriver
 
 from conftest import get_image_label
@@ -20,11 +20,19 @@ def test_mastcam_kernels():
     for kern in binary_kernels:
         os.remove(kern)
 
-def test_msl_mastcam_load(test_mastcam_kernels):
+def test_msl_mastcam_load_local(test_mastcam_kernels):
     label_file = get_image_label('2264ML0121141200805116C00_DRCL', "pds3")
     compare_dict = get_isd("msl")
 
-    isd_str = ale.loads(label_file, props={'kernels': test_mastcam_kernels})
+    isd_str = ale.loads(label_file, props={'kernels': test_mastcam_kernels, 'local': True})
+    isd_obj = json.loads(isd_str)
+    assert compare_dicts(isd_obj, compare_dict) == []
+
+def test_msl_mastcam_load_nadir(test_mastcam_kernels):
+    label_file = get_image_label('2264ML0121141200805116C00_DRCL', "pds3")
+    compare_dict = get_isd("msl_nadir")
+
+    isd_str = ale.loads(label_file, props={'kernels': test_mastcam_kernels, 'nadir': True})
     isd_obj = json.loads(isd_str)
     assert compare_dicts(isd_obj, compare_dict) == []
 

@@ -70,8 +70,14 @@ def main():
     parser.add_argument(
         "-l", "--local",
         action="store_true",
-        help="Generate local spice data, or image that is unaware of itself relative to "
+        help="Generate local spice data, an isd that is unaware of itself relative to "
              "target body. This is largely used for landed/rover data."
+    )
+    parser.add_argument(
+        "-N", "--nadir",
+        action="store_true",
+        help="Generate nadir spice pointing, an isd that has pointing directly towards "
+             "the center of the target body."
     )
     parser.add_argument(
         '--version',
@@ -117,7 +123,8 @@ def main():
                                        "log_level": log_level, 
                                        "only_isis_spice": args.only_isis_spice, 
                                        "only_naif_spice": args.only_naif_spice,
-                                       "local": args.local}
+                                       "local": args.local,
+                                       "nadir": args.nadir}
                 ): f for f in args.input
             }
             for f in concurrent.futures.as_completed(futures):
@@ -138,7 +145,8 @@ def file_to_isd(
     log_level=logging.WARNING,
     only_isis_spice=False,
     only_naif_spice=False,
-    local=False
+    local=False,
+    nadir=False
 ):
     """
     Returns nothing, but acts as a thin wrapper to take the *file* and generate
@@ -166,6 +174,9 @@ def file_to_isd(
 
     if local:
         props['landed'] = local
+
+    if nadir:
+        props['nadir'] = nadir
 
     if kernels is not None:
         kernels = [str(PurePath(p)) for p in kernels]
