@@ -6,7 +6,7 @@ DAFETF NAIF DAF ENCODED TRANSFER FILE
 BEGIN_ARRAY 1 10
 'DAWN FC2 ALIGNMENT, 10/22/15            '
 '1D164E0701^A'
-'1D3274ACDF^A'
+'1D165BE029^A'
 '-31970'
 '-318F8'
 '2'
@@ -21,11 +21,11 @@ BEGIN_ARRAY 1 10
 '0^0'
 '1000000602F071^-1'
 '1D164E0701^A'
-'1D3274ACDF^A'
+'1D165BE029^A'
 END_ARRAY 1 10
 TOTAL_ARRAYS 1
  ~NAIF/SPC BEGIN COMMENTS~
-This CK is for testing with the image: /Users/ahibl/astro_efs/test_imgs/dawn/arc/2/ISIS3-FC21A0038582_15170161546F6G.cub
+This CK is for testing with the image: ../tests/pytests/data/FC21A0038582_15170161546F6F/FC21A0038582_15170161546F6G_isis3.lbl
 
 This CK was generated using the following command: {}
  ~NAIF/SPC END COMMENTS~

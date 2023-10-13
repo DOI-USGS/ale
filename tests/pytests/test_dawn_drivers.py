@@ -7,6 +7,7 @@ import json
 
 import unittest
 from unittest.mock import patch
+from ale.drivers import AleJsonEncoder
 from conftest import get_image_label, get_image_kernels, get_isd, convert_kernels, compare_dicts
 
 import ale
@@ -21,9 +22,16 @@ def test_kernels():
     for kern in binary_kernels:
         os.remove(kern)
 
-def test_load(test_kernels):
-    label_file = get_image_label('FC21A0038582_15170161546F6F')
-    compare_dict = get_isd("dawnfc")
+@pytest.mark.parametrize("label_type", ['pds3', 'isis3'])
+def test_load(test_kernels, label_type):
+    if label_type == 'isis3':
+        label_prefix_file = "FC21A0038582_15170161546F6G"
+        compare_dict = get_isd("dawnfc_isis")
+    else:
+        label_prefix_file = "FC21A0038582_15170161546F6F"
+        compare_dict = get_isd("dawnfc")
+
+    label_file = get_image_label(label_prefix_file, label_type=label_type)
 
     isd_str = ale.loads(label_file, props={'kernels': test_kernels})
     isd_obj = json.loads(isd_str)
