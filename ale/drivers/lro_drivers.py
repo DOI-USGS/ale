@@ -814,21 +814,19 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         : float
           start time
         """
-        return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")) - self.line_exposure_duration
+        return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
 
     @property
     def ephemeris_stop_time(self):
         """
-        Returns the stop ephemeris time for the image. This is computed from 
-        the start time plus the line exposure per line, plus the line exposure
-        removed from the start time, plus the line exposure for the final line.
+        Returns the stop ephemeris time for the image.
 
         Returns
         -------
         : float
           stop time
         """
-        return self.ephemeris_start_time + (self.image_lines * self.line_exposure_duration) + (self.line_exposure_duration * 2)
+        return spice.str2et(self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
 
     @property
     def look_direction(self):
@@ -848,6 +846,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         Returns the Naif ID code for the sensor reference frame
         We replace this with the target frame ID because the sensor operates
         entirely in the target reference frame
+
         Returns
         -------
         : int
@@ -855,28 +854,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         """
         return self.target_frame_id
 
-    @property
-    def naif_keywords(self):
-        """
-        Adds the correct TRANSX/Y and ITRANS/L values for use in ISIS. By default
-        these values are placeholders in the ISIS iaks and need to be computed manully
-        from the ground range resolution. See RadarGroundRangeMap.cpp in ISIS for
-        the calculations.
 
-        Returns
-        -------
-          : dict
-            An updated dictionary of NAIF keywords with the correct TRANSX/Y and ITRANSS/L
-            values computed
-        """
-        naif_keywords = super().naif_keywords
-        ground_range_resolution = self.label['IsisCube']['Instrument']["ScaledPixelHeight"]
-        icode = "INS" + str(self.ikid)
-        naif_keywords[icode + "_TRANSX"] = [-1.0 * ground_range_resolution, ground_range_resolution, 0.0]
-        naif_keywords[icode + "_TRANSY"] = [0.0, 0.0, 0.0]
-        naif_keywords[icode + "_ITRANSS"] = [1.0, 1.0 / ground_range_resolution, 0.0]
-        naif_keywords[icode + "_ITRANSL"] = [0.0, 0.0, 0.0]
-        return naif_keywords
 
 class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, RadialDistortion, Driver):
     @property
