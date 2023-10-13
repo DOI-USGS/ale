@@ -6,7 +6,7 @@
       482.0,
       446.0
     ],
-    "BODY_FRAME_CODE": 10101,
+    "BODY_FRAME_CODE": 2000001,
     "BODY_CODE": 2000001,
     "TKFRAME_-203126_SPEC": "ANGLES",
     "INS-203126_FOV_FRAME": "DAWN_FC2",
@@ -86,11 +86,16 @@
       3.0
     ],
     "BODY2000001_GM": 62.6325,
+    "FRAME_2000001_CENTER": 2000001.0,
+    "FRAME_2000001_NAME": "CERES_FIXED",
+    "OBJECT_2000001_FRAME": "CERES_FIXED",
+    "FRAME_2000001_CLASS": 2.0,
     "BODY2000001_PM": [
       170.65,
       952.1532,
       0.0
     ],
+    "FRAME_2000001_CLASS_ID": 2000001.0,
     "BODY2000001_POLE_DEC": [
       66.764,
       0.0,
@@ -193,7 +198,7 @@
   "body_rotation": {
     "reference_frame" : 1,
     "time_dependent_frames": [
-      10101,
+      2000001,
       1
     ],
     "ck_table_start_time": 488002614.62294483,
