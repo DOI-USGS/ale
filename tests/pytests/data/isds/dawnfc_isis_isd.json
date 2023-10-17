@@ -3,7 +3,7 @@
   "image_lines": 1024,
   "image_samples": 1024,
   "name_platform": "DAWN",
-  "name_sensor": "DAWN_FC2_NIR_F6",
+  "name_sensor": "DAWN_FC2_FILTER_6",
   "reference_height": {
     "maxheight": 1000,
     "minheight": -1000,

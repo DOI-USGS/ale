@@ -222,7 +222,26 @@ class DawnFcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
         : str
           instrument id
         """
-        return self.label["IsisCube"]["Instrument"]["InstrumentId"]
+        if not hasattr(self, "_instrument_id"):
+          instrument_id = super().instrument_id
+          filter_number = self.filter_number
+          self._instrument_id = "{}_FILTER_{}".format(ID_LOOKUP[instrument_id], filter_number)
+
+        return self._instrument_id
+    
+    @property
+    def filter_number(self):
+        """
+        Returns the instrument filter number from the ISIS bandbin group.
+        This filter number is used in the instrument id to identify
+        which filter was used when aquiring the data.
+
+        Returns
+        -------
+         : int
+           The filter number from the instrument
+        """
+        return self.label["IsisCube"]["BandBin"]["FilterNumber"]
 
     @property
     def spacecraft_name(self):
@@ -246,8 +265,7 @@ class DawnFcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
         : str
           sensor name
         """
-        filter = self.label["IsisCube"]["BandBin"]["FilterName"]
-        return self.spacecraft_name + "_" + self.instrument_id + "_" + filter
+        return self.instrument_id
 
     @property
     def sensor_model_version(self):

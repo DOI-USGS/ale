@@ -35,7 +35,7 @@ def test_load(test_kernels, label_type):
 
     isd_str = ale.loads(label_file, props={'kernels': test_kernels})
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
+    # print(json.dumps(isd_obj, indent=2))
     assert compare_dicts(isd_obj, compare_dict) == []
 
 # ========= Test pds3label and naifspice driver =========
@@ -112,7 +112,7 @@ class test_isis3_naif(unittest.TestCase):
         assert self.driver.short_mission_name == 'dawn'
 
     def test_instrument_id(self):
-        assert self.driver.instrument_id == 'FC2'
+        assert self.driver.instrument_id == 'DAWN_FC2_FILTER_6'
 
     def test_spacecraft_name(self):
         assert self.driver.spacecraft_name == 'DAWN'
