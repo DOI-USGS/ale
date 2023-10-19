@@ -37,6 +37,7 @@ release.
 
 ### Added
 - Mariner10 IsisLabelNaifSpice driver, tests, and test data [#547](https://github.com/DOI-USGS/ale/pull/547)
+- DawnFC IsisLabelNaifSpice driver, tests, and test data [#567](https://github.com/DOI-USGS/ale/pull/567)
 
 ### Fixed
 - Fixed LRO MiniRF drivers naif keywords focal to pixel and pixel to focal translations to be correct. [#563](https://github.com/DOI-USGS/ale/pull/563)
