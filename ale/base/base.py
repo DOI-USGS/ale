@@ -4,6 +4,7 @@ import tempfile
 import os 
 from multiprocessing.pool import ThreadPool
 
+import time
 import pvl
 
 class Driver():
@@ -44,6 +45,7 @@ class Driver():
             try:
                 return getattr(self, prop_name)
             except Exception as e:
+                print(prop_name, e)
                 return None
 
         if properties is None:
@@ -52,11 +54,53 @@ class Driver():
               if isinstance(getattr(self.__class__, attr, None), property):
                   properties.append(attr)
 
-        data = {}
+        spice_props = ["ikid", 
+                       "ephemeris_start_time", 
+                       "ephemeris_stop_time", 
+                       "spacecraft_id", 
+                       "target_id", 
+                       "target_frame_id",
+                       "reference_frame",
+                       "sensor_frame_id"]
 
+        # Remove position and orientation properties
+        ephemeris_props = ["sensor_position", "sun_position", "frame_chain"]
+        for prop in ephemeris_props or prop in spice_props:
+            properties.remove(prop)
+
+        if "fikid" in properties:
+            properties.remove("fikid")
+            spice_props.append("fikid")
+        properties.remove("sensor_orientation")
+
+        data = {}
+        
+        start = time.time()
+        with ThreadPool() as pool:
+          jobs = pool.starmap_async(get_property, [(name,) for name in spice_props])
+          jobs = jobs.get()
+
+          for result, property_name in zip(jobs, spice_props):
+              data[property_name] = result
+        end = time.time()
+        print(f"TOTAL SPICE TIME: {end - start}")
+        
+        start = time.time()
         for prop in properties:
             data[prop] = get_property(prop)
-        return data 
+        end = time.time()
+        print(f"TOTAL OTHER TIME: {end - start}")
+
+        start = time.time()
+        with ThreadPool() as pool:
+          jobs = pool.starmap_async(get_property, [(name,) for name in ephemeris_props])
+          jobs = jobs.get()
+
+          for result, property_name in zip(jobs, ephemeris_props):
+              data[property_name] = result
+        end = time.time()
+        print(f"TOTAL EPHEM TIME: {end - start}")
+        return data
     
     @property
     def image_lines(self):

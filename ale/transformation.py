@@ -6,9 +6,7 @@ import networkx as nx
 from networkx.algorithms.shortest_paths.generic import shortest_path
 import spiceypy as spice
 
-import pyspiceql
-
-from ale.spiceql_access import get_ephem_data, async_spiceql_call, spiceql_call
+from ale.spiceql_access import get_ephem_data, spiceql_call
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
 def create_rotations(rotation_table):
@@ -148,10 +146,18 @@ class FrameChain(nx.DiGraph):
 
         constant_frames.extend(target_constant_frames)
 
-        # Add all time dependent frame chains to the graph
-        frame_chain.generate_time_dependent_rotiations(sensor_time_dependent_frames, sensor_times, inst_time_bias, mission)
-        frame_chain.generate_time_dependent_rotiations(target_time_dependent_frames, target_times, 0, mission)
-        frame_chain.generate_constant_rotations(constant_frames, ephemeris_times[0], mission)
+        frame_tasks = []
+        # Add all time dependent frame edges to the graph
+        frame_tasks.append([sensor_time_dependent_frames, sensor_times, inst_time_bias, mission])
+        frame_tasks.append([target_time_dependent_frames, target_times, 0, mission])
+
+        # Add all constant frames to the graph
+        frame_tasks.append([constant_frames, [ephemeris_times[0]], 0, mission])
+
+        # Build graph async
+        with ThreadPool() as pool:
+            jobs = pool.starmap_async(frame_chain.generate_rotations, frame_tasks)
+            jobs.get()
 
         return frame_chain
 
@@ -167,7 +173,7 @@ class FrameChain(nx.DiGraph):
                      "mission": mission,
                      "searchKernels": self.search_kernels})
         with ThreadPool() as pool:
-            jobs = pool.starmap_async(spiceql_call, [("frameTrace", job, self.use_web)for job in jobs])
+            jobs = pool.starmap_async(spiceql_call, [("frameTrace", job, self.use_web) for job in jobs])
             results = jobs.get()
 
         if nadir:
@@ -360,7 +366,7 @@ class FrameChain(nx.DiGraph):
         return times
 
 
-    def generate_time_dependent_rotiations(self, frames, times, time_bias, mission=""):
+    def generate_rotations(self, frames, times, time_bias, mission=""):
         """
         Computes the time dependent rotations based on a list of tuples that define the
         relationships between frames as (source, destination) and a list of times to
@@ -373,13 +379,13 @@ class FrameChain(nx.DiGraph):
         times : list
                 A list of times to compute the rotation at
         """
-        quats_and_avs_per_frame = []
+        frame_tasks = []
         for s, d in frames:
-            kwargs = {"toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels}
-            quats_and_avs_per_frame.append(get_ephem_data(times, "getTargetOrientations", **kwargs, web=self.use_web))
-        # with ThreadPool() as pool:
-        #     jobs = pool.starmap_async(get_ephem_data, frame_tasks)
-        #     quats_and_avs_per_frame = jobs.get()
+            function_args = {"toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels}
+            frame_tasks.append([times, "getTargetOrientations", 400, self.use_web, function_args])
+        with ThreadPool() as pool:
+            jobs = pool.starmap_async(get_ephem_data, frame_tasks)
+            quats_and_avs_per_frame = jobs.get()
 
         for i, frame in enumerate(frames):
             quats_and_avs = quats_and_avs_per_frame[i]
@@ -396,28 +402,8 @@ class FrameChain(nx.DiGraph):
             if len(avs) == 0:
                 avs = None
             biased_times = [time - time_bias for time in times]
-            rotation = TimeDependentRotation(quats, biased_times, frame[0], frame[1], av=avs)
-            self.add_edge(rotation=rotation)
-
-    def generate_constant_rotations(self, frames, time, mission):
-        quats_and_avs_per_frame = []
-        for s, d in frames:
-            kwargs = {"toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels}
-            quats_and_avs_per_frame.append(get_ephem_data([time], "getTargetOrientations", **kwargs, web=self.use_web))
-        # frame_tasks = []
-        # for s, d in frames:
-        #     frame_tasks.append([[time], "getTargetOrientations", d, s, mission, self.search_kernels, self.use_web])
-        # with ThreadPool() as pool:
-        #     jobs = pool.starmap_async(get_ephem_data, frame_tasks)
-        #     quats_and_avs_per_frame = jobs.get()
-
-        # Add all constant frame chains to the graph
-        for i, frame in enumerate(frames):
-            quats = np.zeros(4)
-            quat_and_av = quats_and_avs_per_frame[i][0]
-            quats[:3] = quat_and_av[1:4]
-            quats[3] = quat_and_av[0]
-
-            rotation = ConstantRotation(quats, frame[0], frame[1])
-
+            if len(biased_times) > 1:
+                rotation = TimeDependentRotation(quats, biased_times, frame[0], frame[1], av=avs)
+            else:
+                rotation = ConstantRotation(quats[0], frame[0], frame[1])
             self.add_edge(rotation=rotation)

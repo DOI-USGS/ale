@@ -1,5 +1,5 @@
 import warnings
-import asyncio
+from multiprocessing.pool import ThreadPool
 
 import numpy as np
 import pyspiceql
@@ -463,14 +463,14 @@ class NaifSpice():
             # location of the target. For more information, see:
             # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
             if self.correct_lt_to_surface and self.light_time_correction.upper() == 'LT+S':
+                position_tasks = []
                 kwargs = {"target": target,
                           "observer": observer,
                           "frame": "J2000",
                           "abcorr": self.light_time_correction,
                           "mission": self.spiceql_mission,
                           "searchKernels": self.search_kernels}
-                obs_tars = spiceql_access.get_ephem_data(ephem, "getTargetStates", **kwargs, web=self.use_web)
-                obs_tar_lts = np.array(obs_tars)[:,-1]
+                position_tasks.append([ephem, "getTargetStates", 400, self.use_web, kwargs])
 
                 # ssb to spacecraft
                 kwargs = {"target": observer,
@@ -479,9 +479,17 @@ class NaifSpice():
                           "abcorr": "NONE",
                           "mission": self.spiceql_mission,
                           "searchKernels": self.search_kernels}
-                ssb_obs = spiceql_access.get_ephem_data(ephem, "getTargetStates", **kwargs, web=self.use_web)
-                ssb_obs_states = np.array(ssb_obs)[:,0:6]
+                position_tasks.append([ephem, "getTargetStates", 400, self.use_web, kwargs])
 
+                # Build graph async
+                with ThreadPool() as pool:
+                    jobs = pool.starmap_async(spiceql_access.get_ephem_data, position_tasks)
+                    results = jobs.get()
+
+                obs_tars, ssb_obs = results
+
+                obs_tar_lts = np.array(obs_tars)[:,-1]
+                ssb_obs_states = np.array(ssb_obs)[:,0:6]
 
                 radius_lt = (self.target_body_radii[2] + self.target_body_radii[0]) / 2 / (scipy.constants.c/1000.0)
                 adjusted_time = np.array(ephem) - obs_tar_lts + radius_lt
@@ -492,7 +500,7 @@ class NaifSpice():
                           "abcorr": "NONE",
                           "mission": self.spiceql_mission,
                           "searchKernels": self.search_kernels}
-                ssb_tars = spiceql_access.get_ephem_data(adjusted_time, "getTargetStates", **kwargs, web=self.use_web)
+                ssb_tars = spiceql_access.get_ephem_data(adjusted_time, "getTargetStates", web=self.use_web, function_args=kwargs)
                 ssb_tar_states = np.array(ssb_tars)[:,0:6]
 
                 _states = ssb_tar_states - ssb_obs_states
@@ -510,7 +518,7 @@ class NaifSpice():
                           "abcorr": self.light_time_correction,
                           "mission": self.spiceql_mission,
                           "searchKernels": self.search_kernels}
-                states = spiceql_access.get_ephem_data(ephem, "getTargetStates", **kwargs, web=self.use_web)
+                states = spiceql_access.get_ephem_data(ephem, "getTargetStates", web=self.use_web, function_args=kwargs)
                 states = np.array(states)[:,0:6]
 
             for state in states:

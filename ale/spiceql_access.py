@@ -48,57 +48,7 @@ def check_response(response):
         raise requests.HTTPError(f"Recieved code {response.status_code} from spice server, with error: {response.json()}")
 
     if response.json()["statusCode"] != 200:
-        raise requests.HTTPError(f"Recieved code {response.json()['statusCode']} from spice server, with error: {response.json()}")
-
-
-async def async_spiceql_call(session, function_name = "", function_args = {}, use_web=False):
-    """
-    Interface to SpiceQL (Spice Query Library) for both Offline and Online use
-
-    This function will access the value passed through props defined as `web`. This
-    value determines the access pattern for spice data. When set to Online, you will
-    access the SpiceQL service provided through the USGS Astro AWS platform. This service
-    performs kernel and data aquisition. If set to Offline, you will access locally loaded
-    kernels, and SpiceQL will do no searching for you. The async version of the function
-    allows for asynchronous spiceql calls.
-
-    Parameters
-    ----------
-    session : obj
-              aiohttp client session object
-
-    functions_name : str
-                        String defineing the function to call, properly exposed SpiceQL
-                        functions should map 1-to-1 with endpoints on the service
-                    
-    function_args : dict
-                    Dictionary of arguments used by the function
-
-    use_web : bool
-              Boolean value to either use the USGS web service when set to True
-              or local data when set to False
-
-    Returns : any
-                Any return from a SpiceQL function
-    """
-    if use_web == False:
-        func = getattr(pyspiceql, function_name)
-        return func(**function_args)
-    
-    url = "https://spiceql-dev.prod-asc.chs.usgs.gov/v1/"
-    # url = "https://d68posrslrzct.cloudfront.net/api/spiceql/"
-    
-    url += function_name
-    headers = {
-        'accept': '*/*',
-        'Content-Type': 'application/json'
-    }
-
-    clean_function_args = stringify_web_args(function_args)
-    async with session.get(url, params=clean_function_args, headers=headers, ssl=False) as response:
-        web_response = await response.json()
-    return web_response["body"]["return"]
-
+        raise requests.HTTPError(f"Recieved code {response.json()['statusCode']} from spice server, with error: {response.json()['body']}")
 
 def spiceql_call(function_name = "", function_args = {}, use_web=False):
     """
@@ -139,13 +89,12 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
 
     # Convert any args being passed over the wire to strings
     clean_function_args = stringify_web_args(function_args)
-
     response = requests.get(url, params=clean_function_args, headers=headers, verify=False)
     check_response(response)
 
     return response.json()["body"]["return"]
 
-def get_ephem_data(times, function_name, batch_size=400, web=False, **kwargs):
+def get_ephem_data(times, function_name, batch_size=400, web=False, function_args={}):
     """
     This function provides access to ephemeris data aquisition in spiceql. 
     For the web service there is a limited number of times that can be
@@ -187,36 +136,23 @@ def get_ephem_data(times, function_name, batch_size=400, web=False, **kwargs):
         raise ValueError(f"The function name {function_name} is not supported "
                           "by this function please pass one of the following: " + str(valid_functions))
     if not web:
-      function_args = {**kwargs}
-      function_args["ets"] = times
-      ephemeris_data = spiceql_call(function_name, function_args, web)
+      func_args = {**function_args}
+      func_args["ets"] = times
+      ephemeris_data = spiceql_call(function_name, func_args, web)
       return ephemeris_data
     
     batches = math.ceil(len(times) / batch_size)
     job_args_list = []
     for i in range(1, batches+1):
         batch_times = times[(i - 1) * batch_size: i * batch_size]
-        function_args = {**kwargs}
-        function_args["ets"] = batch_times
-        job_args_list.append(function_args)
+        func_args = {**function_args}
+        func_args["ets"] = batch_times
+        job_args_list.append([function_name, func_args, web])
     with ThreadPool() as pool:
         jobs = pool.starmap_async(spiceql_call, job_args_list)
         results = jobs.get()
 
-    return results
-
-    # tasks = []
-
-    # async with aiohttp.ClientSession() as session:
-    #     for i in range(1, batches+1):
-    #         batch_times = times[(i - 1) * batch_size: i * batch_size]
-    #         function_args = {**kwargs}
-    #         function_args["ets"] = batch_times
-    #         tasks.append(asyncio.create_task(async_spiceql_call(session, function_name, function_args, use_web=web)))
-    #     responses = await asyncio.gather(*tasks)
-    # results = []
-    # for response in responses:
-    #     results += response
-    
-    
-    # return results
+    flat_results = []
+    for i in results:
+        flat_results.extend(i)
+    return flat_results
