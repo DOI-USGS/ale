@@ -9,7 +9,8 @@ namespace ale {
     DAWNFC,
     LROLROCNAC,
     CAHVOR,
-    LUNARORBITER
+    LUNARORBITER,
+    RADTAN
   };
 }
 
