@@ -99,7 +99,9 @@ jobs:
           submodules: recursive
       - uses: conda-incubator/setup-miniconda@3b0f2504dd76ef23b6d31f291f4913fb60ab5ff3
         with:
-          miniconda-version: "latest"
+          miniforge-version: latest
+          use-mamba: true
+          channels: conda-forge
           activate-environment: ale
           environment-file: environment.yml
           auto-activate-base: false
