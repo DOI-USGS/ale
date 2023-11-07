@@ -1,0 +1,10 @@
+name: ale
+channels:
+  - conda-forge
+  - default
+
+dependencies:
+  - breathe
+  - cmake>=3.12
+  - doxygen
+  - nlohmann_json

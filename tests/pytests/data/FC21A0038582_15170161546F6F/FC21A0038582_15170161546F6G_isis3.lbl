@@ -1,0 +1,372 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 512
+    TileLines   = 512
+
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 1024
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName            = DAWN
+    InstrumentId              = FC2
+    SpacecraftClockStartCount = 488002612:246
+    SpacecraftClockStopCount  = 488002614:244
+    StartTime                 = 2015-170T16:15:46.345
+    StopTime                  = 2015-170T16:15:48.337
+    ExposureDuration          = 1800.000 <millisecond>
+    PixelAveragingWidth       = 1
+    PixelAveragingHeight      = 1
+    TargetName                = CERES
+    OriginalTargetName        = "1 CERES"
+    OrbitNumber               = 0
+    FirstLine                 = 17
+    FirstLineSample           = 35
+  End_Group
+
+  Group = Archive
+    FileName                = FC21A0038582_15170161546F6G.IMG
+    SoftwareName            = TRAP
+    SoftwareVersionId       = "Trap v4.16"
+    DataSetName             = "DAWN FC2 RAW (EDR) CERES IMAGES V1.0"
+    DataSetId               = DAWN-A-FC2-2-EDR-CERES-IMAGES-V1.0
+    ProductId               = 0038582
+    ProductType             = DATA
+    StandardDataProductId   = FC_IMAGE
+    ObservationId           = FC2_CSS_C5NadirSouthColor_001
+    ProducerFullName        = "PABLO GUTIERREZ-MARQUES"
+    ProducerInstitutionName = "MAX PLANCK INSTITUT FUER SONNENSYSTEMFORSCHUNG"
+    ProductCreationTime     = 2017-11-25T21:56:50.000
+    ProductVersionId        = G
+    ReleaseId               = N/A
+  End_Group
+
+  Group = BandBin
+    FilterNumber = 6
+    Center       = 829
+    Width        = 33
+    FilterName   = NIR_F6
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -203126
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = ($base/kernels/pck/pck00009.tpc,
+                                 $dawn/kernels/pck/dawn_ceres_SPG20160107.tpc,
+                                 $dawn/kernels/pck/dawn_ceres_v00.tf)
+    TargetPosition            = (Table, $dawn/kernels/tspk/de421.bsp,
+                                 $dawn/kernels/tspk/sb_ceres_140724.bsp)
+    InstrumentPointing        = (Table,
+                                 $dawn/kernels/ck/dawn_sc_150615_150621.bc,
+                                 $dawn/kernels/fk/dawn_v15.tf,
+                                 $dawn/kernels/fk/dawn_fc_v3.bc)
+    Instrument                = $dawn/kernels/ik/dawn_fc_v10.ti
+    SpacecraftClock           = $dawn/kernels/sclk/DAWN_203_SCLKSCET.00091.tsc
+    InstrumentPosition        = (Table,
+                                 $dawn/kernels/spk/dawn_rec_150509-150630_1507-
+                                 30_v1.bsp)
+    InstrumentAddendum        = $dawn/kernels/iak/dawnfcAddendum002.ti
+    ShapeModel                = $base/dems/Ceres_Dawn_FC_HAMO_DTM_DLR_Global_-
+                                60ppd_Oct2016_prep.cub
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 2
+    Source                    = isis
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 4272584
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-203120, -203000, 1)
+  ConstantFrames      = (-203126, -203120)
+  ConstantRotation    = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+  CkTableStartTime    = 488002614.62294
+  CkTableEndTime      = 488002614.62294
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = ($dawn/kernels/ck/dawn_sc_150615_150621.bc,
+                         $dawn/kernels/fk/dawn_v15.tf,
+                         $dawn/kernels/fk/dawn_fc_v3.bc)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 4272648
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 488002614.62294
+  SpkTableEndTime      = 488002614.62294
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = $dawn/kernels/spk/dawn_rec_150509-150630_150730_v1.b-
+                         sp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 4272704
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (2000001, 1)
+  CkTableStartTime    = 488002614.62294
+  CkTableEndTime      = 488002614.62294
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 2
+  PoleRa              = (291.431, 0.0, 0.0)
+  PoleDec             = (66.761, 0.0, 0.0)
+  PrimeMeridian       = (170.488, 952.15323, 0.0)
+  Description         = "Created by spiceinit"
+  Kernels             = ($dawn/kernels/tspk/de421.bsp,
+                         $dawn/kernels/tspk/sb_ceres_140724.bsp,
+                         $base/kernels/pck/pck00009.tpc,
+                         $dawn/kernels/pck/dawn_ceres_SPG20160107.tpc,
+                         $dawn/kernels/pck/dawn_ceres_v00.tf)
+  SolarLongitude      = 83.441085180005
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 4272768
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 488002614.62294
+  SpkTableEndTime      = 488002614.62294
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = ($dawn/kernels/tspk/de421.bsp,
+                          $dawn/kernels/tspk/sb_ceres_140724.bsp)
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 4272824
+  Bytes     = 2010
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 4259841
+  Bytes     = 11656
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE                            = 2000001
+  BODY2000001_RADII                    = (482.0, 482.0, 446.0)
+  BODY_FRAME_CODE                      = 2000001
+  INS-203126_FOCAL_LENGTH              = 150.08
+  INS-203126_PIXEL_SIZE                = (14.004, 13.995)
+  INS-203126_TRANSX                    = (0.0, 0.0140088, 0.0)
+  INS-203126_TRANSY                    = (0.0, 0.0, 0.014)
+  INS-203126_ITRANSS                   = (0.0, 71.383701673234, 0.0)
+  INS-203126_ITRANSL                   = (0.0, 0.0, 71.428571428571)
+  INS-203126_CCD_CENTER                = (511.5, 511.5)
+  INS-203126_RAD_DIST_COEFF            = 9.2e-06
+  CLOCK_ET_-203_488002612:246_COMPUTED = 76aa87355416bd41
+End_Object
+End
