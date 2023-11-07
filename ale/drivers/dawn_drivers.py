@@ -320,7 +320,7 @@ class DawnFcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
         : float
           center detector sample
         """
-        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[0]) + 0.5
+        return float(self.naif_keywords['INS{}_CCD_CENTER'.format(self.ikid)][0]) + 0.5
 
     @property
     def detector_center_line(self):
@@ -338,7 +338,7 @@ class DawnFcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
         : float
           center detector line
         """
-        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[1]) + 0.5
+        return float(self.naif_keywords['INS{}_CCD_CENTER'.format(self.ikid)][1]) + 0.5
 
     @property
     def ephemeris_start_time(self):
@@ -353,8 +353,7 @@ class DawnFcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
           ephemeris start time
         """
         if not hasattr(self, '_ephemeris_start_time'):
-            sclock = self.spacecraft_clock_start_count
-            self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
+            self._ephemeris_start_time = super().ephemeris_start_time
             self._ephemeris_start_time += 193.0 / 1000.0
         return self._ephemeris_start_time
 
