@@ -71,7 +71,8 @@ class Driver():
         if "fikid" in properties:
             properties.remove("fikid")
             spice_props.append("fikid")
-        properties.remove("sensor_orientation")
+        if "sensor_orientation" in properties:
+            properties.remove("sensor_orientation")
 
         data = {}
         
