@@ -218,8 +218,8 @@
     ],
 
     "contact": {
-      "name": "Jason Laura",
-      "email": "jlaura@usgs.gov"
+      "name": "Kelvin Rodriguez",
+      "email": "krodriguez@usgs.gov"
     },
 
     "date": {
@@ -244,7 +244,7 @@
     },
 
     "homepageURL": "https://code.usgs.gov/astrogeology/ale/-/tree/1.0.0",
-    "downloadURL": "https://code.usgs.gov/astrogeology/ale/-/archive/0.8.7/ale-1.0.0.zip",
+    "downloadURL": "https://code.usgs.gov/astrogeology/ale/-/archive/1.0.0/ale-1.0.0.zip",
     "disclaimerURL": "https://code.usgs.gov/astrogeology/ale/-/raw/1.0.0/DISCLAIMER.md",
     "repositoryURL": "https://code.usgs.gov/astrogeology/ale.git",
     "vcs": "git",
@@ -265,8 +265,8 @@
     ],
 
     "contact": {
-      "name": "Jason Laura",
-      "email": "jlaura@usgs.gov"
+      "name": "Kelvin Rodriguez",
+      "email": "krodriguez@usgs.gov"
     },
 
     "date": {
