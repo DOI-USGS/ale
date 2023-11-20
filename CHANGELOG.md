@@ -35,9 +35,12 @@ release.
 
 ## [Unreleased]
 
+## [1.0.0] - 2023-11-15 
+
 ### Added
 - Mariner10 IsisLabelNaifSpice driver, tests, and test data [#547](https://github.com/DOI-USGS/ale/pull/547)
 - DawnFC IsisLabelNaifSpice driver, tests, and test data [#567](https://github.com/DOI-USGS/ale/pull/567)
+- Updated the spiceypy version used in environment.yml [#552]
 
 ### Fixed
 - Fixed LRO MiniRF drivers naif keywords focal to pixel and pixel to focal translations to be correct. [#569](https://github.com/DOI-USGS/ale/pull/569)
