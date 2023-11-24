@@ -97,6 +97,7 @@ class FrameChain(nx.DiGraph):
     """
     @classmethod
     def from_spice(cls, sensor_frame, target_frame, center_ephemeris_time, ephemeris_times=[], nadir=False, exact_ck_times=False):
+        #print("--Computing frame chain, sensor frame is ", sensor_frame, "=", spice.frmnam(sensor_frame), " target frame is ", target_frame, "=", spice.frmnam(target_frame)) 
         frame_chain = cls()
         sensor_times = []
         # Default assume one time
@@ -122,13 +123,16 @@ class FrameChain(nx.DiGraph):
         target_constant_frames = list(zip(target_constant_frames[:-1], target_constant_frames[1:]))
 
         constant_frames.extend(target_constant_frames)
-
-        frame_chain.compute_time_dependent_rotiations(sensor_time_dependent_frames, sensor_times)
-        frame_chain.compute_time_dependent_rotiations(target_time_dependent_frames, target_times)
+        #print("doing time dependent sensor frames")
+        frame_chain.compute_time_dependent_rotations(sensor_time_dependent_frames, sensor_times)
+        #print("doing time dependent target frames")
+        frame_chain.compute_time_dependent_rotations(target_time_dependent_frames, target_times)
 
         for s, d in constant_frames:
+            #print("--constant frames are ", s, d)
             quats = np.zeros(4)
             rotation_matrix = spice.pxform(spice.frmnam(s), spice.frmnam(d), ephemeris_times[0])
+            #print("frames: s=", s, '=', spice.frmnam(s), ", d=", d, '=', spice.frmnam(d), " rotation: ", rotation_matrix.flatten())
             quat_from_rotation = spice.m2q(rotation_matrix)
             quats[:3] = quat_from_rotation[1:]
             quats[3] = quat_from_rotation[0]
@@ -235,6 +239,8 @@ class FrameChain(nx.DiGraph):
         """
         if source == destination:
             return ConstantRotation(np.array([0, 0, 0, 1]), source, destination)
+        #print("---now in compute rotation from ", source, " to ", destination)
+        #print("--names are ", spice.frmnam(source), " to ", spice.frmnam(destination))
 
         path = shortest_path(self, source, destination)
         rotations = [self.edges[path[i], path[i+1]]['rotation'] for i in range(len(path) - 1)]
@@ -262,6 +268,7 @@ class FrameChain(nx.DiGraph):
           Returns the source node id, destination node id, and edge dictionary
           which contains the rotation from source to destination.
         """
+        #("--now in last time dependent frame between ", source, " and ", destination)
         path = shortest_path(self, source, destination)
         # Reverse the path to search bottom up to find the last time dependent
         # frame between the source and destination
@@ -379,7 +386,7 @@ class FrameChain(nx.DiGraph):
 
         return times
 
-    def compute_time_dependent_rotiations(self, frames, times):
+    def compute_time_dependent_rotations(self, frames, times):
         """
         Computes the time dependent rotations based on a list of tuples that define the
         relationships between frames as (source, destination) and a list of times to
@@ -399,9 +406,11 @@ class FrameChain(nx.DiGraph):
                 try:
                     state_matrix = spice.sxform(spice.frmnam(s), spice.frmnam(d), time)
                     rotation_matrix, av = spice.xf2rav(state_matrix)
+                    #print("try frame s =", s, '=', sspice.frmnam(s), ", d=", d, '=', spice.frmnam(d), " rotation ", rotation_matrix.flatten())
                     avs.append(av)
                 except:
                     rotation_matrix = spice.pxform(spice.frmnam(s), spice.frmnam(d), time)
+                    #print("except frame s =", s, '=', spice.frmnam(s), ", d=", d, '=', spice.frmnam(d), " rotation ", rotation_matrix.flatten())
                 quat_from_rotation = spice.m2q(rotation_matrix)
                 quats[j,:3] = quat_from_rotation[1:]
                 quats[j,3] = quat_from_rotation[0]

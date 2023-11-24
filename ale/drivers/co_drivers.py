@@ -205,7 +205,7 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
         """
         NAC uses multiple filter pairs, each filter combination has a different focal length.
         NAIF's Cassini kernels do not contain focal lengths for NAC filters and
-        so we aquired updated NAC filter data from ISIS's IAK kernel.
+        so we acquired updated NAC filter data from ISIS's IAK kernel.
 
         """
         # default focal defined by IAK kernel
@@ -277,11 +277,12 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
                 _ = spice.frinfo(self.sensor_frame_id)
                 self._frame_chain = super().frame_chain
             except spice.utils.exceptions.NotFoundError as e:
-                self._frame_chain = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
-                                                          target_frame=self.target_frame_id,
-                                                          center_ephemeris_time=self.center_ephemeris_time,
-                                                          ephemeris_times=self.ephemeris_time,
-                                                          exact_ck_times=True)
+                self._frame_chain = \
+                FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
+                                      target_frame=self.target_frame_id,
+                                      center_ephemeris_time=self.center_ephemeris_time,
+                                      ephemeris_times=self.ephemeris_time,
+                                      exact_ck_times=True)
 
                 rotation = ConstantRotation([[0, 0, 1, 0]], self.sensor_frame_id, self._original_naif_sensor_frame_id)
 
@@ -506,11 +507,12 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
                 _ = spice.frinfo(self.sensor_frame_id)
                 self._frame_chain = super().frame_chain
             except spice.utils.exceptions.NotFoundError as e:
-                self._frame_chain = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
-                                                          target_frame=self.target_frame_id,
-                                                          center_ephemeris_time=self.center_ephemeris_time,
-                                                          ephemeris_times=self.ephemeris_time,
-                                                          exact_ck_times=True)
+                self._frame_chain = \
+                FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
+                                      target_frame=self.target_frame_id,
+                                      center_ephemeris_time=self.center_ephemeris_time,
+                                      ephemeris_times=self.ephemeris_time,
+                                      exact_ck_times=True)
 
                 rotation = ConstantRotation([[0, 0, 1, 0]], self.sensor_frame_id, self._original_naif_sensor_frame_id)
 

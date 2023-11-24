@@ -81,6 +81,7 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         : int
           Naif frame code for MSL_RSM_HEAD
         """
+        print("----final inst frame is ", spice.bods2c("MSL_RSM_HEAD"))
         return spice.bods2c("MSL_RSM_HEAD")
 
     @property
@@ -98,6 +99,7 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         if not hasattr(self, "_site_frame_id"):
           site_frame = "MSL_SITE_" + str(self.label["GEOMETRIC_CAMERA_MODEL_PARMS"]["REFERENCE_COORD_SYSTEM_INDEX"][0])
           self._site_frame_id= spice.bods2c(site_frame)
+        print("----sensor frame id is ", self._site_frame_id)
         return self._site_frame_id
 
     @property

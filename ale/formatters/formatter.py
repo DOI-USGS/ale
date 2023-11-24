@@ -98,6 +98,7 @@ def to_isd(driver):
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
         body_rotation['time_dependent_frames'] = shortest_path(frame_chain, source_frame, 1)
+        print("--compute rotation from 1 to source_frame")
         time_dependent_rotation = frame_chain.compute_rotation(1, source_frame)
         body_rotation['ck_table_start_time'] = time_dependent_rotation.times[0]
         body_rotation['ck_table_end_time'] = time_dependent_rotation.times[-1]
@@ -107,29 +108,45 @@ def to_isd(driver):
         body_rotation['angular_velocities'] = time_dependent_rotation.av
 
         # Find the rotation from ECEF to the rover frame
+        #print("----Find rotation from IAU_MARS to MSL_ROVER")
+        #time_dependent_rotation = frame_chain.compute_rotation(10014, -76000)
+        #time_dependent_rotation = frame_chain.compute_rotation(-76000, 10014)
+        #time_dependent_rotation = frame_chain.compute_rotation(10014, -76205)
+        #time_dependent_rotation = frame_chain.compute_rotation(-76205, 10014)
         EcefToRover = Rotation.from_quat(time_dependent_rotation.quats).as_matrix()
+        #print("Unadjusted EcefToRover is ", EcefToRover)
         # It was found empirically that an additional rotation is needed
         # TODO(oalexan1): Must read the NAIF doc and do an honest job.
+        print("--temporary2")
         EcefToRover = np.matmul(driver.rover_frame_rotation, EcefToRover)
+        print("--temporary3")
 
     if source_frame != target_frame:
+        print("----will reverse the frame order")
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
         body_rotation['constant_frames'] = shortest_path(frame_chain, target_frame, source_frame)
         constant_rotation = frame_chain.compute_rotation(source_frame, target_frame)
         body_rotation['constant_rotation'] = constant_rotation.rotation_matrix().flatten()
+    else:
+        print("----will not reverse the frame order")
 
+    print("--now here 11")
     body_rotation["reference_frame"] = destination_frame
     meta_data['body_rotation'] = body_rotation
+    print("--now here 12")
 
     # sensor orientation
+    print("--now here 13")
     sensor_frame = driver.sensor_frame_id
-
+    print("--now here 14")
     instrument_pointing = {}
     source_frame, destination_frame, time_dependent_sensor_frame = frame_chain.last_time_dependent_frame_between(1, sensor_frame)
+    print("--now here 15")
 
     # Reverse the frame order because ISIS orders frames as
     # (destination, intermediate, ..., intermediate, source)
+    print("--now here 6")
     instrument_pointing['time_dependent_frames'] = shortest_path(frame_chain, destination_frame, 1)
     time_dependent_rotation = frame_chain.compute_rotation(1, destination_frame)
     instrument_pointing['ck_table_start_time'] = time_dependent_rotation.times[0]
@@ -164,7 +181,7 @@ def to_isd(driver):
         meta_data['starting_detector_sample'] = driver.detector_start_sample
 
     j2000_rotation = frame_chain.compute_rotation(target_frame, 1)
-
+    print("--now here 5")    
     # Reverse the frame order because ISIS orders frames as
     # (destination, intermediate, ..., intermediate, source)
     instrument_pointing['constant_frames'] = shortest_path(frame_chain, sensor_frame, destination_frame)
@@ -172,8 +189,15 @@ def to_isd(driver):
     roverToCamera = driver.cahvor_rotation_matrix
     EcefToCamera = np.matmul(roverToCamera, EcefToRover)
     instrument_pointing['constant_rotation'] = EcefToCamera.flatten()
+    print("--now here 6")
+    #constant_rotation = frame_chain.compute_rotation(destination_frame, sensor_frame)
+    #instrument_pointing['constant_rotation'] = constant_rotation.rotation_matrix().flatten()
+    #print("new rotation is ", EcefToCamera)
+    #print("Will compute rotation from destination_frame to sensor_frame")
+    #print("old rotation (same as cahvor) is ", frame_chain.compute_rotation#(destination_frame, sensor_frame).rotation_matrix())
+    # Looks like frame_chain.compute_rotation(destination_frame, sensor_frame) is same as cahvor rotation matrix
     meta_data['instrument_pointing'] = instrument_pointing
-    
+
     instrument_position = {}
     positions, velocities, times = driver.sensor_position
 
