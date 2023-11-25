@@ -504,40 +504,30 @@ class Cahvor():
         : object
           A networkx frame chain object
         """
+        MSL_ROVER  = -76000   # rover frame (way before cahvor frame) 
+        MSL_RSM_HEAD = -76205 # final frame before cahvor frame
+        #final_frame = MSL_RSM_HEAD
+        final_frame = MSL_ROVER
         if not hasattr(self, '_frame_chain'):
             self._frame_chain \
-              = FrameChain.from_spice(#sensor_frame=self.spacecraft_id * 1000,
-                                      sensor_frame=self.final_inst_frame,
+              = FrameChain.from_spice(sensor_frame=final_frame,
                                       target_frame=self.target_frame_id,
                                       center_ephemeris_time=self.center_ephemeris_time,
                                       ephemeris_times=self.ephemeris_time,
                                       nadir=False, exact_ck_times=False)
               
-            #print("target frame is ", self.target_frame_id, "=", spice.frmnam(self.target_frame_id))  
-            
             cahvor_quats = Rotation.from_matrix(self.cahvor_rotation_matrix).as_quat() 
             # use instead the identity
-            #print("--temporarily using identity matrix for cahvor rotation")
             #cahvor_quats = Rotation.from_matrix(np.identity(3)).as_quat()
-            #cahvor_rotation = ConstantRotation(cahvor_quats, 
-            #                                   self.target_frame_id, self.sensor_frame_id)
             
-            # If we are landed we only care about the final cahvor frame relative to the target
+            # If we are landed we only care about the final cahvor frame
+            # relative to the target
             if self._props.get("landed", False):
               cahvor_rotation = ConstantRotation(cahvor_quats, self.target_frame_id, self.sensor_frame_id)
             else:
-              #cahvor_rotation = ConstantRotation(cahvor_quats, self.target_frame_id, self.sensor_frame_id)
-              s = self.final_inst_frame # MSL_RSM_HEAD
-              d = self.sensor_frame_id
               #print("should s and d be reversed here?")
-              print("++--constant rot s =", s, '=', spice.frmnam(s), "d=", d, '=', spice.frmnam(d))
-              cahvor_rotation = ConstantRotation(cahvor_quats, self.final_inst_frame, self.sensor_frame_id)
-              
-              print("----------temporary2")
-              print("1sensor frame is ", self.sensor_frame_id)
-              MSL_ROVER  = -76000 
-              cahvor_rotation = ConstantRotation(cahvor_quats, MSL_ROVER, 
-                                                 self.sensor_frame_id)
+              cahvor_rotation = ConstantRotation(cahvor_quats,
+                                                 final_frame, self.sensor_frame_id)
               
             self._frame_chain.add_edge(rotation = cahvor_rotation)
             
