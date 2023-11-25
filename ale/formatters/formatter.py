@@ -102,7 +102,7 @@ def to_isd(driver):
         # (destination, intermediate, ..., intermediate, source)
         body_rotation['time_dependent_frames'] \
             = shortest_path(frame_chain, source_frame, J2000)
-        time_dependent_rotation = frame_chain.compute_rotation(J200, source_frame)
+        time_dependent_rotation = frame_chain.compute_rotation(J2000, source_frame)
         body_rotation['ck_table_start_time'] = time_dependent_rotation.times[0]
         body_rotation['ck_table_end_time'] = time_dependent_rotation.times[-1]
         body_rotation['ck_table_original_size'] = len(time_dependent_rotation.times)
