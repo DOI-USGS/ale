@@ -1,6 +1,7 @@
 import json, os
 import numpy as np
 from scipy.interpolate import interp1d, BPoly
+import spiceypy as spice
 
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
@@ -92,19 +93,26 @@ def to_isd(driver):
 
     body_rotation = {}
     source_frame, destination_frame, time_dependent_target_frame = frame_chain.last_time_dependent_frame_between(target_frame, 1)
-
+    print("source frame is ", source_frame, spice.frmnam(source_frame)) 
+    print("destination frame is ", destination_frame, spice.frmnam(destination_frame))
+    
+    IAU_MARS = 10014 # frame
+    J2000 = 1 # frame
     EcefToRover = []
     if source_frame != 1:
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
         body_rotation['time_dependent_frames'] = shortest_path(frame_chain, source_frame, 1)
         print("--compute rotation from 1 to source_frame")
+        # Below is compute_rotation(J2000, IAU_MARS) from J2000 to IAU_MARS
         time_dependent_rotation = frame_chain.compute_rotation(1, source_frame)
         body_rotation['ck_table_start_time'] = time_dependent_rotation.times[0]
         body_rotation['ck_table_end_time'] = time_dependent_rotation.times[-1]
         body_rotation['ck_table_original_size'] = len(time_dependent_rotation.times)
         body_rotation['ephemeris_times'] = time_dependent_rotation.times
         body_rotation['quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
+        #print("--temporary 1")
+        #body_rotation['quaternions'] = [[0, 0, 0, 1]]
         body_rotation['angular_velocities'] = time_dependent_rotation.av
 
         # Find the rotation from ECEF to the rover frame
@@ -113,13 +121,11 @@ def to_isd(driver):
         #time_dependent_rotation = frame_chain.compute_rotation(-76000, 10014)
         #time_dependent_rotation = frame_chain.compute_rotation(10014, -76205)
         #time_dependent_rotation = frame_chain.compute_rotation(-76205, 10014)
-        EcefToRover = Rotation.from_quat(time_dependent_rotation.quats).as_matrix()
+        #EcefToRover = Rotation.from_quat(time_dependent_rotation.quats).as_matrix()
         #print("Unadjusted EcefToRover is ", EcefToRover)
         # It was found empirically that an additional rotation is needed
         # TODO(oalexan1): Must read the NAIF doc and do an honest job.
-        print("--temporary2")
-        EcefToRover = np.matmul(driver.rover_frame_rotation, EcefToRover)
-        print("--temporary3")
+        #EcefToRover = np.matmul(driver.rover_frame_rotation, EcefToRover)
 
     if source_frame != target_frame:
         print("----will reverse the frame order")
@@ -131,23 +137,26 @@ def to_isd(driver):
     else:
         print("----will not reverse the frame order")
 
-    print("--now here 11")
     body_rotation["reference_frame"] = destination_frame
     meta_data['body_rotation'] = body_rotation
-    print("--now here 12")
 
     # sensor orientation
-    print("--now here 13")
     sensor_frame = driver.sensor_frame_id
-    print("--now here 14")
     instrument_pointing = {}
     source_frame, destination_frame, time_dependent_sensor_frame = frame_chain.last_time_dependent_frame_between(1, sensor_frame)
-    print("--now here 15")
-
+    
+    print("----------temporary1")
+    MSL_ROVER  = -76000 
+    destination_frame = MSL_ROVER
+    
     # Reverse the frame order because ISIS orders frames as
     # (destination, intermediate, ..., intermediate, source)
-    print("--now here 6")
     instrument_pointing['time_dependent_frames'] = shortest_path(frame_chain, destination_frame, 1)
+    #print("destination frame is ", destination_frame, spice.frmnam(destination_frame))
+    # destination frame is MSL_RSM_EL
+    # source frame is MSL_RSM_ZERO_EL
+    # print source frame
+    #print("4source frame is ", source_frame, spice.frmnam(source_frame))
     time_dependent_rotation = frame_chain.compute_rotation(1, destination_frame)
     instrument_pointing['ck_table_start_time'] = time_dependent_rotation.times[0]
     instrument_pointing['ck_table_end_time'] = time_dependent_rotation.times[-1]
@@ -155,7 +164,8 @@ def to_isd(driver):
     instrument_pointing['ephemeris_times'] = time_dependent_rotation.times
     instrument_pointing['quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
     instrument_pointing['angular_velocities'] = time_dependent_rotation.av
-
+    #print("--temporary 5")
+    #instrument_pointing['quaternions'] = [[0, 0, 0, 1]]
     # reference frame should be the last frame in the chain
     instrument_pointing["reference_frame"] = instrument_pointing['time_dependent_frames'][-1]
 
@@ -181,17 +191,22 @@ def to_isd(driver):
         meta_data['starting_detector_sample'] = driver.detector_start_sample
 
     j2000_rotation = frame_chain.compute_rotation(target_frame, 1)
-    print("--now here 5")    
     # Reverse the frame order because ISIS orders frames as
     # (destination, intermediate, ..., intermediate, source)
     instrument_pointing['constant_frames'] = shortest_path(frame_chain, sensor_frame, destination_frame)
     # Find rotation from ECEF to camera. See rover_frame_rotation() for an explanation.
-    roverToCamera = driver.cahvor_rotation_matrix
-    EcefToCamera = np.matmul(roverToCamera, EcefToRover)
-    instrument_pointing['constant_rotation'] = EcefToCamera.flatten()
-    print("--now here 6")
-    #constant_rotation = frame_chain.compute_rotation(destination_frame, sensor_frame)
-    #instrument_pointing['constant_rotation'] = constant_rotation.rotation_matrix().flatten()
+    #roverToCamera = driver.cahvor_rotation_matrix
+    #EcefToCamera = np.matmul(roverToCamera, EcefToRover)
+    #instrument_pointing['constant_rotation'] = EcefToCamera.flatten()
+    # Set this to identity for now
+    #print("--temporary 6")
+    #instrument_pointing['constant_rotation'] = np.identity(3).flatten()
+    print("++destination_frame is ", destination_frame, spice.frmnam(destination_frame))
+    print("+2sensor_frame is ", sensor_frame)
+    # below we have mast to camera
+    constant_rotation = frame_chain.compute_rotation(destination_frame, sensor_frame)
+    print("---2sensor frame is ", sensor_frame)
+    instrument_pointing['constant_rotation'] = constant_rotation.rotation_matrix().flatten()
     #print("new rotation is ", EcefToCamera)
     #print("Will compute rotation from destination_frame to sensor_frame")
     #print("old rotation (same as cahvor) is ", frame_chain.compute_rotation#(destination_frame, sensor_frame).rotation_matrix())
@@ -205,8 +220,8 @@ def to_isd(driver):
     # to be on different locations on the rover. Get the CAHVOR center, and 
     # convert it from that camera's coordinates to ECEF, then add it to the
     # rover position.
-    camCtrEcef = np.matmul(np.linalg.inv(EcefToRover), driver.cahvor_center)[0]
-    positions[0] += camCtrEcef
+    #camCtrEcef = np.matmul(np.linalg.inv(EcefToRover), driver.cahvor_center)[0]
+    #positions[0] += camCtrEcef
 
     # This is a fix for the fact that the height above datum can suddenly change
     # by about 60 meters. If the user sets HEIGHT_ABOVE_DATUM then we will shift

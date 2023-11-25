@@ -97,7 +97,7 @@ class FrameChain(nx.DiGraph):
     """
     @classmethod
     def from_spice(cls, sensor_frame, target_frame, center_ephemeris_time, ephemeris_times=[], nadir=False, exact_ck_times=False):
-        #print("--Computing frame chain, sensor frame is ", sensor_frame, "=", spice.frmnam(sensor_frame), " target frame is ", target_frame, "=", spice.frmnam(target_frame)) 
+        print("--Computing frame chain, sensor frame is ", sensor_frame, "=", spice.frmnam(sensor_frame), " target frame is ", target_frame, "=", spice.frmnam(target_frame)) 
         frame_chain = cls()
         sensor_times = []
         # Default assume one time
@@ -132,7 +132,7 @@ class FrameChain(nx.DiGraph):
             #print("--constant frames are ", s, d)
             quats = np.zeros(4)
             rotation_matrix = spice.pxform(spice.frmnam(s), spice.frmnam(d), ephemeris_times[0])
-            #print("frames: s=", s, '=', spice.frmnam(s), ", d=", d, '=', spice.frmnam(d), " rotation: ", rotation_matrix.flatten())
+            print("constant frames: s=", s, '=', spice.frmnam(s), ", d=", d, '=', spice.frmnam(d))
             quat_from_rotation = spice.m2q(rotation_matrix)
             quats[:3] = quat_from_rotation[1:]
             quats[3] = quat_from_rotation[0]
@@ -400,13 +400,16 @@ class FrameChain(nx.DiGraph):
                 A list of times to compute the rotation at
         """
         for s, d in frames:
+
+            print("time dependent frame s =", s, '=', spice.frmnam(s), "d=", d, '=', spice.frmnam(d))
+        
             quats = np.zeros((len(times), 4))
             avs = []
             for j, time in enumerate(times):
                 try:
+                    #print("---1")
                     state_matrix = spice.sxform(spice.frmnam(s), spice.frmnam(d), time)
                     rotation_matrix, av = spice.xf2rav(state_matrix)
-                    #print("try frame s =", s, '=', sspice.frmnam(s), ", d=", d, '=', spice.frmnam(d), " rotation ", rotation_matrix.flatten())
                     avs.append(av)
                 except:
                     rotation_matrix = spice.pxform(spice.frmnam(s), spice.frmnam(d), time)

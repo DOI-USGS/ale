@@ -6,6 +6,7 @@ from scipy.spatial.transform import Rotation
 import scipy.spatial.transform.rotation as rot
 from ale.transformation import FrameChain
 from ale.transformation import ConstantRotation
+import spiceypy as spice
 
 class LineScanner():
     """
@@ -460,7 +461,6 @@ class Cahvor():
             H_prime = (self.cahvor_camera_dict['H'] - h_c * self.cahvor_camera_dict['A'])/h_s
             V_prime = (self.cahvor_camera_dict['V'] - v_c * self.cahvor_camera_dict['A'])/v_s
             self._cahvor_rotation_matrix = np.array([H_prime, V_prime, self.cahvor_camera_dict['A']])
-        print("----cahvor rotation matrix is ", self._cahvor_rotation_matrix)
         return self._cahvor_rotation_matrix
 
     @property
@@ -504,20 +504,21 @@ class Cahvor():
         : object
           A networkx frame chain object
         """
-        print("---temporary1")
         if not hasattr(self, '_frame_chain'):
             self._frame_chain \
-              = FrameChain.from_spice(sensor_frame=self.spacecraft_id * 1000,
-                                      #sensor_frame=self.final_inst_frame,
+              = FrameChain.from_spice(#sensor_frame=self.spacecraft_id * 1000,
+                                      sensor_frame=self.final_inst_frame,
                                       target_frame=self.target_frame_id,
                                       center_ephemeris_time=self.center_ephemeris_time,
                                       ephemeris_times=self.ephemeris_time,
                                       nadir=False, exact_ck_times=False)
               
+            #print("target frame is ", self.target_frame_id, "=", spice.frmnam(self.target_frame_id))  
+            
             cahvor_quats = Rotation.from_matrix(self.cahvor_rotation_matrix).as_quat() 
             # use instead the identity
-            # print("--temporarily using identity matrix for cahvor rotation")
-            # cahvor_quats = Rotation.from_matrix(np.identity(3)).as_quat()
+            #print("--temporarily using identity matrix for cahvor rotation")
+            #cahvor_quats = Rotation.from_matrix(np.identity(3)).as_quat()
             #cahvor_rotation = ConstantRotation(cahvor_quats, 
             #                                   self.target_frame_id, self.sensor_frame_id)
             
@@ -525,9 +526,18 @@ class Cahvor():
             if self._props.get("landed", False):
               cahvor_rotation = ConstantRotation(cahvor_quats, self.target_frame_id, self.sensor_frame_id)
             else:
-              print("---temporary2")
-              cahvor_rotation = ConstantRotation(cahvor_quats, self.target_frame_id, self.sensor_frame_id)
-              #cahvor_rotation = ConstantRotation(cahvor_quats, self.final_inst_frame, self.sensor_frame_id)
+              #cahvor_rotation = ConstantRotation(cahvor_quats, self.target_frame_id, self.sensor_frame_id)
+              s = self.final_inst_frame # MSL_RSM_HEAD
+              d = self.sensor_frame_id
+              #print("should s and d be reversed here?")
+              print("++--constant rot s =", s, '=', spice.frmnam(s), "d=", d, '=', spice.frmnam(d))
+              cahvor_rotation = ConstantRotation(cahvor_quats, self.final_inst_frame, self.sensor_frame_id)
+              
+              print("----------temporary2")
+              print("1sensor frame is ", self.sensor_frame_id)
+              MSL_ROVER  = -76000 
+              cahvor_rotation = ConstantRotation(cahvor_quats, MSL_ROVER, 
+                                                 self.sensor_frame_id)
               
             self._frame_chain.add_edge(rotation = cahvor_rotation)
             
