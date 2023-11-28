@@ -74,15 +74,14 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
     @property
     def final_inst_frame(self):
         """
-        Defines MSLs last naif frame before the cahvor model frame
+        Defines the MSL naif frame relative to which the cahvor model is defined.
 
         Returns
         -------
         : int
-          Naif frame code for MSL_RSM_HEAD
+          Naif frame code for MSL_ROVER
         """
-        print("----final inst frame is ", spice.bods2c("MSL_RSM_HEAD"))
-        return spice.bods2c("MSL_RSM_HEAD")
+        return spice.bods2c("MSL_ROVER")
 
     @property
     def sensor_frame_id(self):
@@ -99,7 +98,6 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         if not hasattr(self, "_site_frame_id"):
           site_frame = "MSL_SITE_" + str(self.label["GEOMETRIC_CAMERA_MODEL_PARMS"]["REFERENCE_COORD_SYSTEM_INDEX"][0])
           self._site_frame_id= spice.bods2c(site_frame)
-        print("----sensor frame id is ", self._site_frame_id)
         return self._site_frame_id
 
     @property
@@ -112,10 +110,7 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         : list<double>
           focal plane to detector lines
         """
-        #return [0, 1/self.pixel_size, 0] # test
         return [0, 0, -1/self.pixel_size]
-    
-    
     
     @property
     def focal2pixel_samples(self):
@@ -127,7 +122,6 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         : list<double>
           focal plane to detector samples
         """
-        #return [0, 0, 1/self.pixel_size] # test
         return [0, -1/self.pixel_size, 0]
     
     # The detector_center_line() and detector_center_sample()
@@ -155,3 +149,20 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
           ISIS sensor model version
         """
         return 1
+
+    @property
+    def light_time_correction(self):
+        """
+        Returns the type of light time correction and aberration correction to
+        use in NAIF calls.
+
+        For MSL using such a correction returns wrong results, so turn it off.
+        
+        Returns
+        -------
+        : str
+          The light time and aberration correction string for use in NAIF calls.
+          See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/abcorr.html
+          for the different options available.
+        """
+        return 'NONE'

@@ -90,13 +90,15 @@ def to_isd(driver):
 
     frame_chain = driver.frame_chain
     target_frame = driver.target_frame_id
+    print("target frame is ", target_frame, spice.frmnam(target_frame)) 
 
-    body_rotation = {}
-    source_frame, destination_frame, time_dependent_target_frame = frame_chain.last_time_dependent_frame_between(target_frame, 1)
-    print("source frame is ", source_frame, spice.frmnam(source_frame)) 
-    print("destination frame is ", destination_frame, spice.frmnam(destination_frame))
-    
     J2000 = 1 # J200 frame id
+    body_rotation = {}
+    source_frame, destination_frame, time_dependent_target_frame = frame_chain.last_time_dependent_frame_between(target_frame, J2000)
+    print("source frame is ", source_frame, spice.frmnam(source_frame)) 
+    print("55destination frame is ", destination_frame, spice.frmnam(destination_frame))
+    print("55 target frame is ", target_frame, spice.frmnam(target_frame))
+    
     if source_frame != J2000:
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
@@ -117,8 +119,6 @@ def to_isd(driver):
         body_rotation['constant_frames'] = shortest_path(frame_chain, target_frame, source_frame)
         constant_rotation = frame_chain.compute_rotation(source_frame, target_frame)
         body_rotation['constant_rotation'] = constant_rotation.rotation_matrix().flatten()
-    else:
-        print("----will not reverse the frame order")
 
     body_rotation["reference_frame"] = destination_frame
     meta_data['body_rotation'] = body_rotation
@@ -130,6 +130,11 @@ def to_isd(driver):
     print("--last source frame is ", source_frame, spice.frmnam(source_frame))
     print("--last destination frame is ", destination_frame, spice.frmnam(destination_frame))
     
+    # Rover body to IAU_MARS frame
+    rover2planet_rotation = frame_chain.compute_rotation(destination_frame, target_frame)
+    print("computed rotation from ", spice.frmnam(destination_frame), " to ", spice.frmnam(target_frame))
+    cam_ctr = driver.cahvor_center
+    
     # Reverse the frame order because ISIS orders frames as
     # (destination, intermediate, ..., intermediate, source)
     instrument_pointing['time_dependent_frames'] = shortest_path(frame_chain, destination_frame, J2000)
@@ -140,7 +145,6 @@ def to_isd(driver):
     instrument_pointing['ephemeris_times'] = time_dependent_rotation.times
     instrument_pointing['quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
     instrument_pointing['angular_velocities'] = time_dependent_rotation.av
-    #instrument_pointing['quaternions'] = [[0, 0, 0, 1]]
     # reference frame should be the last frame in the chain
     instrument_pointing["reference_frame"] = instrument_pointing['time_dependent_frames'][-1]
 
@@ -186,19 +190,11 @@ def to_isd(driver):
     # TODO(oalexan1): This must move to type_sensor.py
     #camCtrEcef = np.matmul(np.linalg.inv(EcefToRover), driver.cahvor_center)[0]
     #positions[0] += camCtrEcef
-
-    # This is a fix for the fact that the height above datum can suddenly change
-    # by about 60 meters. If the user sets HEIGHT_ABOVE_DATUM then we will shift
-    # the position vertically to match this value.
-    # TODO(oalexan1): Must wipe this
-    key = 'HEIGHT_ABOVE_DATUM'
-    if key in os.environ:
-        x = positions[0]
-        datum_ht = 3396190
-        radius = np.sqrt(x[0]*x[0] + x[1]*x[1] + x[2]*x[2])
-        radius2 = float(os.environ[key]) + datum_ht
-        for it in range(3):
-            positions[0][it] = positions[0][it] * radius2 / radius
+    cam_ctr = rover2planet_rotation.apply_at([cam_ctr], times)[0]
+    print("relative to planet, cam_ctr is ", cam_ctr)
+    print("positions is ", positions)
+    positions[0] += cam_ctr
+    print("after adding cam_ctr, positions is ", positions)
 
     instrument_position['spk_table_start_time'] = times[0]
     instrument_position['spk_table_end_time'] = times[-1]

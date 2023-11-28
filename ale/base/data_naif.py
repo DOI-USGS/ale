@@ -89,7 +89,7 @@ class NaifSpice():
         Returns
         -------
         : str
-          The light time and abberation correction string for use in NAIF calls.
+          The light time and aberration correction string for use in NAIF calls.
           See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/abcorr.html
           for the different options available.
         """

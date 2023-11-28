@@ -374,9 +374,8 @@ class RollingShutter():
 
 class Cahvor():
     """
-    Mixin for largely ground based sensors to add an
-    extra step in the frame chain to go from ground camera to
-    the Camera
+    Mixin for largely ground based sensors to add to the position and rotation
+    the components going from rover frame to camera frame.
     """
 
     @property
@@ -476,24 +475,6 @@ class Cahvor():
         return self.cahvor_camera_dict['C']  
     
     @property
-    def rover_frame_rotation(self):
-        """
-        Estimate the rotation X in the rover coordinates, such that the transform
-        from Mars ECEF coordinates to camera coordinates is given by
-        cahvor_rotation * X * EcefToRover
-        """
-
-        # Experiment with adjusting the rover to camera rotation. Need to look 
-        # at the MSL NAIF documentation and find the right way to do this.
-        r = Rotation.from_euler("zyx", [20, -20, 20], degrees=True)
-        X = "-0.13005758  0.79616099  0.59095196 -0.46804661 -0.57473784  0.67126629  0.87404766 -0.1893059   0.44742102"
-        X = np.array(X.split(),  dtype=np.float64)
-        X = X.reshape(3, 3)
-        X = np.matmul(r.as_matrix(), X)
-        print("----rover frame rotation is ", X)
-        return X
-
-    @property
     def frame_chain(self):
         """
         Returns a modified frame chain with the cahvor models extra rotation
@@ -504,10 +485,10 @@ class Cahvor():
         : object
           A networkx frame chain object
         """
-        MSL_ROVER  = -76000   # rover frame (way before cahvor frame) 
-        MSL_RSM_HEAD = -76205 # final frame before cahvor frame
+        # MSL_ROVER = -76000   # rover frame (way before cahvor frame) 
+        #MSL_RSM_HEAD = -76205 # final frame before cahvor frame
         #final_frame = MSL_RSM_HEAD
-        final_frame = MSL_ROVER
+        final_frame = self.final_inst_frame
         if not hasattr(self, '_frame_chain'):
             self._frame_chain \
               = FrameChain.from_spice(sensor_frame=final_frame,
@@ -517,15 +498,12 @@ class Cahvor():
                                       nadir=False, exact_ck_times=False)
               
             cahvor_quats = Rotation.from_matrix(self.cahvor_rotation_matrix).as_quat() 
-            # use instead the identity
-            #cahvor_quats = Rotation.from_matrix(np.identity(3)).as_quat()
             
             # If we are landed we only care about the final cahvor frame
             # relative to the target
             if self._props.get("landed", False):
               cahvor_rotation = ConstantRotation(cahvor_quats, self.target_frame_id, self.sensor_frame_id)
             else:
-              #print("should s and d be reversed here?")
               cahvor_rotation = ConstantRotation(cahvor_quats,
                                                  final_frame, self.sensor_frame_id)
               
