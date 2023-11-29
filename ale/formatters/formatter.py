@@ -90,14 +90,10 @@ def to_isd(driver):
 
     frame_chain = driver.frame_chain
     target_frame = driver.target_frame_id
-    print("target frame is ", target_frame, spice.frmnam(target_frame)) 
 
     J2000 = 1 # J200 frame id
     body_rotation = {}
     source_frame, destination_frame, time_dependent_target_frame = frame_chain.last_time_dependent_frame_between(target_frame, J2000)
-    print("source frame is ", source_frame, spice.frmnam(source_frame)) 
-    print("55destination frame is ", destination_frame, spice.frmnam(destination_frame))
-    print("55 target frame is ", target_frame, spice.frmnam(target_frame))
     
     if source_frame != J2000:
         # Reverse the frame order because ISIS orders frames as
@@ -110,7 +106,6 @@ def to_isd(driver):
         body_rotation['ck_table_original_size'] = len(time_dependent_rotation.times)
         body_rotation['ephemeris_times'] = time_dependent_rotation.times
         body_rotation['quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
-        #body_rotation['quaternions'] = [[0, 0, 0, 1]]
         body_rotation['angular_velocities'] = time_dependent_rotation.av
 
     if source_frame != target_frame:
@@ -127,13 +122,6 @@ def to_isd(driver):
     sensor_frame = driver.sensor_frame_id
     instrument_pointing = {}
     source_frame, destination_frame, time_dependent_sensor_frame = frame_chain.last_time_dependent_frame_between(J2000, sensor_frame)
-    print("--last source frame is ", source_frame, spice.frmnam(source_frame))
-    print("--last destination frame is ", destination_frame, spice.frmnam(destination_frame))
-    
-    # Rover body to IAU_MARS frame
-    rover2planet_rotation = frame_chain.compute_rotation(destination_frame, target_frame)
-    print("computed rotation from ", spice.frmnam(destination_frame), " to ", spice.frmnam(target_frame))
-    cam_ctr = driver.cahvor_center
     
     # Reverse the frame order because ISIS orders frames as
     # (destination, intermediate, ..., intermediate, source)
@@ -170,31 +158,16 @@ def to_isd(driver):
         meta_data['starting_detector_sample'] = driver.detector_start_sample
 
     j2000_rotation = frame_chain.compute_rotation(target_frame, J2000)
+
     # Reverse the frame order because ISIS orders frames as
     # (destination, intermediate, ..., intermediate, source)
     instrument_pointing['constant_frames'] = shortest_path(frame_chain, sensor_frame, destination_frame)
-    print("++destination_frame is ", destination_frame, spice.frmnam(destination_frame))
-    print("+2sensor_frame is ", sensor_frame)
-    # below we have mast to camera
     constant_rotation = frame_chain.compute_rotation(destination_frame, sensor_frame)
     instrument_pointing['constant_rotation'] = constant_rotation.rotation_matrix().flatten()
     meta_data['instrument_pointing'] = instrument_pointing
 
     instrument_position = {}
     positions, velocities, times = driver.sensor_position
-
-    # This is a bugfix for the fact that the left and right cameras are supposed
-    # to be on different locations on the rover. Get the CAHVOR center, and 
-    # convert it from that camera's coordinates to ECEF, then add it to the
-    # rover position.
-    # TODO(oalexan1): This must move to type_sensor.py
-    #camCtrEcef = np.matmul(np.linalg.inv(EcefToRover), driver.cahvor_center)[0]
-    #positions[0] += camCtrEcef
-    cam_ctr = rover2planet_rotation.apply_at([cam_ctr], times)[0]
-    print("relative to planet, cam_ctr is ", cam_ctr)
-    print("positions is ", positions)
-    positions[0] += cam_ctr
-    print("after adding cam_ctr, positions is ", positions)
 
     instrument_position['spk_table_start_time'] = times[0]
     instrument_position['spk_table_end_time'] = times[-1]

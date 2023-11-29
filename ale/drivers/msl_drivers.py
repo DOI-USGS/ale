@@ -166,3 +166,37 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
           for the different options available.
         """
         return 'NONE'
+        
+    @property
+    def sensor_position(self):
+        """
+        Find the rover position, then add the camera position relative to the
+        rover. The returned position is in ECEF.
+        
+        Returns
+        -------
+        : (positions, velocities, times)
+          a tuple containing a list of positions, a list of velocities, and a
+          list of times.
+        """
+        
+        # Rover position in ECEF    
+        positions, velocities, times = super().sensor_position
+
+        # Rover-to-camera offset in rover frame
+        cam_ctr = self.cahvor_center
+        
+        # Rover-to-camera offset in ECEF
+        ecef_frame  = self.target_frame_id        
+        rover_frame = self.final_inst_frame
+        frame_chain = self.frame_chain
+        rover2ecef_rotation = \
+          frame_chain.compute_rotation(rover_frame, ecef_frame)
+        cam_ctr = rover2ecef_rotation.apply_at([cam_ctr], times)[0]
+
+        # Go from rover position to camera position
+        positions[0] += cam_ctr
+
+        return positions, velocities, times
+      
+
