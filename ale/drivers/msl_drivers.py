@@ -43,11 +43,27 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         lookup = {
           "MAST_RIGHT": 'MASTCAM_RIGHT',
           "MAST_LEFT": 'MASTCAM_LEFT',
-          "NAV_RIGHT_B": 'MASTCAM_RIGHT',
-          "NAV_LEFT_B": 'MASTCAM_LEFT'
+          "NAV_RIGHT_B": 'NAVCAM_RIGHT_B',
+          "NAV_LEFT_B": 'NAVCAM_LEFT_B'
         }
         return self.instrument_host_id + "_" + lookup[super().instrument_id]
 
+    @property
+    def is_navcam(self):
+        """
+        Returns True if the camera is a nav cam, False otherwise.
+        Need to handle nav cam differently as its focal length
+        cannot be looked up in the spice data. Use instead
+        a focal length in pixels computed from the CAHVOR model, 
+        and a pixel size of 1.
+        
+        Returns
+        -------
+        : bool
+          True if the camera is a nav cam, False otherwise
+        """
+        return 'NAVCAM' in self.instrument_id
+        
     @property
     def cahvor_camera_dict(self):
         """
@@ -154,13 +170,35 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
     @property
     def focal_length(self):
         """
-        Returns the focal length of the sensor
-        Returns the opposite of what spice returns. This was tested to work
-        with MSL.
+        Returns the focal length of the sensor with a negative sign.
+        This was tested to work with MSL mast and nav cams. 
 
         Returns
         -------
         : float
           focal length
         """
-        return -1 * super().focal_length 
+        if self.is_navcam:
+            # Focal length in pixel as computed for a cahvor model.
+            # See is_navcam() for an explanation.
+            return -(self.compute_h_s() + self.compute_v_s())/2.0
+        
+        # For mast cam    
+        return -super().focal_length 
+
+    @property
+    def pixel_size(self):
+        """
+        Returns the pixel size. 
+
+        Returns
+        -------
+        : float
+          pixel size
+        """
+        if self.is_navcam:
+            # See is_navcam() for an explanation.
+            return 1.0
+            
+        # For mast cam    
+        return super().pixel_size 
