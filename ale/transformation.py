@@ -123,8 +123,8 @@ class FrameChain(nx.DiGraph):
 
         constant_frames.extend(target_constant_frames)
 
-        frame_chain.compute_time_dependent_rotiations(sensor_time_dependent_frames, sensor_times, inst_time_bias)
-        frame_chain.compute_time_dependent_rotiations(target_time_dependent_frames, target_times, 0)
+        frame_chain.compute_time_dependent_rotations(sensor_time_dependent_frames, sensor_times, inst_time_bias)
+        frame_chain.compute_time_dependent_rotations(target_time_dependent_frames, target_times, 0)
 
         for s, d in constant_frames:
             quats = np.zeros(4)
@@ -380,7 +380,7 @@ class FrameChain(nx.DiGraph):
 
         return times
 
-    def compute_time_dependent_rotiations(self, frames, times, time_bias):
+    def compute_time_dependent_rotations(self, frames, times, time_bias):
         """
         Computes the time dependent rotations based on a list of tuples that define the
         relationships between frames as (source, destination) and a list of times to
