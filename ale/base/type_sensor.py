@@ -406,8 +406,14 @@ class Cahvor():
           list of times.
         """
         
-        # Rover position in ECEF    
+        # Rover position in ECEF
         positions, velocities, times = super().sensor_position
+        
+        nadir = self._props.get("nadir", False)
+        if nadir:
+          # For nadir applying the rover-to-camera offset runs into 
+          # problems, so return early. TBD 
+          return positions, velocities, times
 
         # Rover-to-camera offset in rover frame
         cam_ctr = self.cahvor_center
