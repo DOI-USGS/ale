@@ -77,3 +77,8 @@ release.
 - Chandrayaan1_mrffr IsisLabelNaifSpice driver, tests and test data [#519](https://github.com/DOI-USGS/ale/pull/519)
 - MGS MOC Narrow Angle IsisLabelNaifSpice driver, tests, and test data [#517](https://github.com/DOI-USGS/ale/pull/517)
 - Hayabusa NIRS IsisLabelNaifSpice driver, tests and test data [#532](https://github.com/DOI-USGS/ale/pull/532)
+
+## In development
+
+- Bugfix for position and orientation for MSL cameras (driver MslMastcamPds3NaifSpiceDriver). Validated that left and ritht Nav cameras and left and right Mast LBL files produce correctly positioned and oriented CSM cameras, that are self-consistent and consistent with a prior DEM for the site. [#580](https://github.com/DOI-USGS/ale/pull/580) 
+
