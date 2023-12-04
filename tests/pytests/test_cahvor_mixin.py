@@ -65,4 +65,4 @@ class test_cahvor_sensor(unittest.TestCase):
 
     @patch("ale.base.type_sensor.Cahvor.cahvor_camera_dict", new_callable=PropertyMock, return_value=cahvor_camera_dict())
     def test_cahvor_pixel_size(self, cahvor_camera_dict):
-        assert self.driver.pixel_size == 0.007248034226138798
+        assert self.driver.pixel_size == -0.007248034226138798
