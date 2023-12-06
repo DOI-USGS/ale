@@ -1,6 +1,5 @@
 import spiceypy as spice
 import numpy as np
-import affine6p
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
@@ -156,17 +155,25 @@ class LoHighCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, LoDisto
           p_fidYCoords = self.label['IsisCube']['Instrument']['FiducialYCoordinates'].value
 
           # Create Affine Transformation
-          
           p_src = [p_fidSamples, p_fidLines]
           p_dst = [p_fidXCoords, p_fidYCoords]
 
-          # format the fiducial coordinatens as [ [x, y], [x, y]...]
+          # Format the fiducial coordinates as [ [x, y], [x, y]...]
           p_src = np.rot90(np.array([p_fidSamples, p_fidLines]))
           p_dst = np.rot90(np.array([p_fidXCoords, p_fidYCoords]))
 
-          # find a best match for the transformation based on source and destination coordinates
-          tr_mat = affine6p.estimate(p_src, p_dst).get_matrix()
+          # Pad data with ones so that the transformation allows translations 
+          pad = lambda x: np.hstack([x, np.ones((x.shape[0], 1))])
+          X = pad(p_src)
+          Y = pad(p_dst)
 
+          # Solve the least squares problem X * A = Y to find our transformation matrix A
+          A, res, rank, s = np.linalg.lstsq(X, Y)
+
+          # Transpose matrix and convert to list
+          tr_mat = np.transpose(A).tolist()
+
+          # Compute inverse of transformation matrix
           tr_mat_inv = np.linalg.inv(tr_mat)
 
           # X and Y, Inverse S and L components of transformation
@@ -175,7 +182,7 @@ class LoHighCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, LoDisto
           itranss = tr_mat_inv[0]
           itransl = tr_mat_inv[1]
 
-          # move the last item to the front to get the ordering standard in ISIS
+          # Move the last item to the front to get the ordering standard in ISIS
           transx.insert(0, transx.pop())
           transy.insert(0, transy.pop())
           itranss = np.roll(itranss, 1).tolist()

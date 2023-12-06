@@ -373,9 +373,8 @@ class RollingShutter():
 
 class Cahvor():
     """
-    Mixin for largely ground based sensors to add an
-    extra step in the frame chain to go from ground camera to
-    the Camera
+    Mixin for ground-based sensors to add to the position and rotation
+    the components going from rover frame to camera frame.
     """
 
     @property
@@ -396,17 +395,50 @@ class Cahvor():
 
     @property
     def sensor_position(self):
-      positions, velocities, times = super().sensor_position
-      positions += self.cahvor_camera_dict["C"]
-      if self._props.get("landed", False):
-        positions = np.array([[0, 0, 0]] * len(times))
-        velocities = np.array([[0, 0, 0]] * len(times))
-      return positions, velocities, times
+        """
+        Find the rover position, then add the camera position relative to the
+        rover. The returned position is in ECEF.
+        
+        Returns
+        -------
+        : (positions, velocities, times)
+          a tuple containing a list of positions, a list of velocities, and a
+          list of times.
+        """
+        
+        # Rover position in ECEF
+        positions, velocities, times = super().sensor_position
+        
+        nadir = self._props.get("nadir", False)
+        if nadir:
+          # For nadir applying the rover-to-camera offset runs into 
+          # problems, so return early. TBD 
+          return positions, velocities, times
+
+        # Rover-to-camera offset in rover frame
+        cam_ctr = self.cahvor_center
+        
+        # Rover-to-camera offset in ECEF
+        ecef_frame  = self.target_frame_id        
+        rover_frame = self.final_inst_frame
+        frame_chain = self.frame_chain
+        rover2ecef_rotation = \
+          frame_chain.compute_rotation(rover_frame, ecef_frame)
+        cam_ctr = rover2ecef_rotation.apply_at([cam_ctr], times)[0]
+
+        # Go from rover position to camera position
+        positions[0] += cam_ctr
+
+        if self._props.get("landed", False):
+          positions = np.array([[0, 0, 0]] * len(times))
+          velocities = np.array([[0, 0, 0]] * len(times))
+        
+        return positions, velocities, times
 
     def compute_h_c(self):
         """
         Computes the h_c element of a cahvor model for the conversion
-        to a photogrametric model
+        to a photogrammetric model
 
         Returns
         -------
@@ -418,7 +450,7 @@ class Cahvor():
     def compute_h_s(self):
         """
         Computes the h_s element of a cahvor model for the conversion
-        to a photogrametric model
+        to a photogrammetric model
 
         Returns
         -------
@@ -430,7 +462,7 @@ class Cahvor():
     def compute_v_c(self):
         """
         Computes the v_c element of a cahvor model for the conversion
-        to a photogrametric model
+        to a photogrammetric model
 
         Returns
         -------
@@ -442,7 +474,7 @@ class Cahvor():
     def compute_v_s(self):
         """
         Computes the v_s element of a cahvor model for the conversion
-        to a photogrametric model
+        to a photogrammetric model
 
         Returns
         -------
@@ -474,6 +506,18 @@ class Cahvor():
               self._cahvor_rotation_matrix = np.array([H_prime, V_prime, self.cahvor_camera_dict['A']])
         return self._cahvor_rotation_matrix
 
+    @property
+    def cahvor_center(self):
+        """
+        Computes the cahvor center for the sensor relative to the rover frame
+
+        Returns
+        -------
+        : array
+          Cahvor center as a 1D numpy array
+        """
+        return self.cahvor_camera_dict['C']  
+    
     @property
     def frame_chain(self):
         """
@@ -566,6 +610,6 @@ class Cahvor():
         Returns
         -------
         : float
-          Focal length of a cahvor model instrument
+          Pixel size of a cahvor model instrument
         """
-        return self.focal_length/self.compute_h_s()
+        return -self.focal_length/self.compute_h_s()

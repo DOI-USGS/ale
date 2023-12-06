@@ -35,12 +35,19 @@ release.
 
 ## [Unreleased]
 
+## [1.0.0] - 2023-11-15 
+
 ### Added
 - Mariner10 IsisLabelNaifSpice driver, tests, and test data [#547](https://github.com/DOI-USGS/ale/pull/547)
 - DawnFC IsisLabelNaifSpice driver, tests, and test data [#567](https://github.com/DOI-USGS/ale/pull/567)
+- Updated the spiceypy version used in environment.yml [#552]
 
 ### Fixed
-- Fixed LRO MiniRF drivers naif keywords focal to pixel and pixel to focal translations to be correct. [#563](https://github.com/DOI-USGS/ale/pull/563)
+- Fixed LRO MiniRF drivers naif keywords focal to pixel and pixel to focal translations to be correct. [#569](https://github.com/DOI-USGS/ale/pull/569)
+- Bugfix for position and orientation for MSL cameras (driver MslMastcamPds3NaifSpiceDriver). Validated that Nav and Mast LBL files (for both left and right sensor) produce correctly positioned and oriented CSM cameras, that are self-consistent and consistent with a prior DEM for the site. [#580](https://github.com/DOI-USGS/ale/pull/580) 
+
+### Changed
+- Removed the affine6p library and replaced affine6p's affine transformation with a numpy solution [#579](https://github.com/DOI-USGS/ale/pull/579) 
 
 
 ## [0.9.1] - 2023-06-05
@@ -71,3 +78,6 @@ release.
 - Chandrayaan1_mrffr IsisLabelNaifSpice driver, tests and test data [#519](https://github.com/DOI-USGS/ale/pull/519)
 - MGS MOC Narrow Angle IsisLabelNaifSpice driver, tests, and test data [#517](https://github.com/DOI-USGS/ale/pull/517)
 - Hayabusa NIRS IsisLabelNaifSpice driver, tests and test data [#532](https://github.com/DOI-USGS/ale/pull/532)
+
+
+

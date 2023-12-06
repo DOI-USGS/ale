@@ -98,7 +98,6 @@ class test_high_isis3_naif(unittest.TestCase):
             namfrm.assert_called_with("LO3_HIGH_RESOLUTION_CAMERA")
 
     def test_naif_keywords(self):
-
         with patch('ale.drivers.lo_drivers.LoHighCameraIsisLabelNaifSpiceDriver.ikid', new_callable=PropertyMock) as ikid, \
             patch('ale.base.data_naif.spice.bodvrd', return_value=[1737.4, 1737.4, 1737.4]) as bodvrd:
 
@@ -114,6 +113,22 @@ class test_high_isis3_naif(unittest.TestCase):
                 "INS-533001_ITRANSL" : [4541.692430539061, -0.05845617762411283, 143.95514969883214]
             }
             
-            assert self.driver.naif_keywords == naif_keywords
+            assert self.driver.naif_keywords["BODY_CODE"] == naif_keywords["BODY_CODE"]
+            assert self.driver.naif_keywords["BODY301_RADII"] == naif_keywords["BODY301_RADII"]
+            assert self.driver.naif_keywords["BODY_FRAME_CODE"] == naif_keywords["BODY_FRAME_CODE"]
+
+            np.testing.assert_almost_equal(np.asarray(self.driver.naif_keywords["INS-533001_TRANSX"]), 
+                                           np.asarray(naif_keywords["INS-533001_TRANSX"]), 
+                                           decimal=10)
+            np.testing.assert_almost_equal(np.asarray(self.driver.naif_keywords["INS-533001_TRANSY"]), 
+                                           np.asarray(naif_keywords["INS-533001_TRANSY"]), 
+                                           decimal=10)
+            np.testing.assert_almost_equal(np.asarray(self.driver.naif_keywords["INS-533001_ITRANSS"]), 
+                                           np.asarray(naif_keywords["INS-533001_ITRANSS"]), 
+                                           decimal=10)
+            np.testing.assert_almost_equal(np.asarray(self.driver.naif_keywords["INS-533001_ITRANSL"]), 
+                                           np.asarray(naif_keywords["INS-533001_ITRANSL"]), 
+                                           decimal=10)
+
             bodvrd.assert_called_with('Moon', 'RADII', 3)
   

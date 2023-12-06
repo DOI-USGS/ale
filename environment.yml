@@ -16,12 +16,9 @@ dependencies:
   - python
   - python-dateutil
   - scipy>=1.4.0,<1.11
-  - spiceypy>=5.1.0
+  - spiceypy>=6.0.0
   - pyyaml
   - pytest
   - pytest-cov
   - networkx
   - breathe
-  - pip
-  - pip:
-    - affine6p
