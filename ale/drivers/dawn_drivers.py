@@ -9,14 +9,14 @@ from scipy.interpolate import CubicSpline
 import ale
 from ale.base import Driver
 from ale.base.label_isis import IsisLabel
-from ale.base.data_naif import NaifSpice
+from ale.base.data_naif import NaifSpice, FrameChain
 from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer, LineScanner
 from ale.base.type_distortion import NoDistortion
 from ale.base.data_isis import read_table_data
 from ale.base.data_isis import parse_table
-from ale.transformation import ConstantRotation
+from ale.transformation import TimeDependentRotation, ConstantRotation
 
 ID_LOOKUP = {
     "FC1" : "DAWN_FC1",
@@ -250,6 +250,10 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
       return self.label["IsisCube"]["Instrument"]["FrameParameter"][0]
     
     @property
+    def focal_length(self):
+      return float(spice.gdpool('INS{}_FOCAL_LENGTH'.format(self.ikid), 0, 1)[0])
+    
+    @property
     def ikid(self):
         """
         Returns the Naif ID code for the instrument
@@ -268,7 +272,7 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
         return lookup_table[self.label["IsisCube"]["Instrument"]["ChannelId"]]
     
     @property
-    def vir_zero_id(self):
+    def sensor_frame_id(self):
         lookup_table = {
           'VIS': -203221,
           "IR": -203223
@@ -352,12 +356,17 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
 
         cs = CubicSpline(x, y, extrapolate="periodic")
 
-        for index, opt_ang in enumerate(opt_angles):
-          shutter_status = hk_dict["ShutterStatus"][index].lower().replace(" ", "")
+        for i, opt_ang in enumerate(opt_angles):
+          shutter_status = hk_dict["ShutterStatus"][i].lower().replace(" ", "")
           is_dark = (shutter_status == "closed")
 
           if (is_dark):
-            opt_ang = cs(index + 1)
+            if (i == 0):
+              opt_angles[i] = opt_angles[i+1]
+            elif (i == len(opt_angles) - 1):
+              opt_angles[i] = opt_angles[i-1]
+            else:
+              opt_angles[i] = cs(i+1)
 
         return opt_angles
     
@@ -404,37 +413,46 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
             if self.has_articulation_kernel and self.is_calibrated:
                 self._frame_chain = super().frame_chain
             else:
-                self._frame_chain = super().frame_chain
-                target_times = np.asarray([self.ephemeris_times[0], self.ephemeris_times[-1]])
-                sensor_times = np.array(self.ephemeris_times)
+                self._frame_chain = FrameChain()
 
-                sensor_time_dependent_frames, sensor_constant_frames = self._frame_chain.frame_trace(self.sensor_frame_id, self.center_ephemeris_time, self._props.get('nadir', False))
                 target_time_dependent_frames, target_constant_frames = self._frame_chain.frame_trace(self.target_frame_id, self.center_ephemeris_time)
-
-                sensor_time_dependent_frames = list(zip(sensor_time_dependent_frames[:-1], sensor_time_dependent_frames[1:]))
-                constant_frames = list(zip(sensor_constant_frames[:-1], sensor_constant_frames[1:]))
                 target_time_dependent_frames = list(zip(target_time_dependent_frames[:-1], target_time_dependent_frames[1:]))
-                target_constant_frames = list(zip(target_constant_frames[:-1], target_constant_frames[1:]))
 
-                constant_frames.extend(target_constant_frames)
-                self._frame_chain.compute_time_dependent_rotiations(sensor_time_dependent_frames, sensor_times, 0)
-                self._frame_chain.compute_time_dependent_rotiations(target_time_dependent_frames, target_times, 0)
+                self._frame_chain.compute_time_dependent_rotiations(target_time_dependent_frames, self.ephemeris_times, 0)
 
-                quats = np.zeros((len(self.optical_angles), 4))
-                for i, opt_angle in enumerate(self.optical_angles):
+                time_dep_quats = np.zeros((len(self.ephemeris_times), 4))
+                const_quats = np.zeros(4)
+                avs = []
+
+                const_rot_matrix = spice.pxform("J2000", spice.frmnam(self.sensor_frame_id), self.ephemeris_times[0])
+                const_quat_from_rot = spice.m2q(const_rot_matrix)
+                const_quats[:3] = const_quat_from_rot[1:]
+                const_quats[3] = const_quat_from_rot[0]
+
+                const_rotation = ConstantRotation(const_quats, 1, self.sensor_frame_id)
+                self._frame_chain.add_edge(rotation=const_rotation)
+
+                for i, time in enumerate(self.ephemeris_times):
+                  try:
+                    state_matrix = spice.sxform("J2000", spice.frmnam(self.sensor_frame_id), time)
+                  except:
+                    rotation_matrix = spice.pxform("J2000", spice.frmnam(self.sensor_frame_id), time)
+                    state_matrix = spice.rav2xf(rotation_matrix, [0, 0, 0])
+
+                  opt_angle = self.optical_angles[i]
                   
-                  rotation_matrix = spice.pxform("J2000", spice.frmnam(self.vir_zero_id), self.ephemeris_times[i])
-                  state_matrix = spice.rav2xf(rotation_matrix, [0, 0, 0])
                   xform = spice.eul2xf([0, -opt_angle, 0, 0, 0, 0], 1, 2, 3)
                   xform2 = spice.mxmg(xform, state_matrix)
+
                   rot_mat, av = spice.xf2rav(xform2)
-                  
+                  avs.append(av)
+
                   quat_from_rotation = spice.m2q(rot_mat)
-                  quats[i,:3] = quat_from_rotation[1:]
-                  quats[i, 3] = quat_from_rotation[0]
+                  time_dep_quats[i,:3] = quat_from_rotation[1:]
+                  time_dep_quats[i, 3] = quat_from_rotation[0]
 
-                  rotation = ConstantRotation(quats[i], spice.namfrm("J2000"), self.vir_zero_id)
+                time_dep_rot = TimeDependentRotation(time_dep_quats, self.ephemeris_times, 1, self.sensor_frame_id, av=avs)
+                self._frame_chain.add_edge(rotation=time_dep_rot)
 
-                  self._frame_chain.add_edge(rotation=rotation)
 
         return self._frame_chain
