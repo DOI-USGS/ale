@@ -42,7 +42,7 @@ def create_rotations(rotation_table):
                            rotation_table['AV2'],
                            rotation_table['AV3']]).T
         else:
-            av = None
+            av = []
         time_dep_rot = TimeDependentRotation(quats,
                                              rotation_table['ET'],
                                              root_frame,
@@ -148,11 +148,11 @@ class FrameChain(nx.DiGraph):
 
         frame_tasks = []
         # Add all time dependent frame edges to the graph
-        frame_tasks.append([sensor_time_dependent_frames, sensor_times, inst_time_bias, mission])
-        frame_tasks.append([target_time_dependent_frames, target_times, 0, mission])
+        frame_tasks.append([sensor_time_dependent_frames, sensor_times, inst_time_bias, TimeDependentRotation, mission])
+        frame_tasks.append([target_time_dependent_frames, target_times, 0, TimeDependentRotation, mission])
 
         # Add all constant frames to the graph
-        frame_tasks.append([constant_frames, [ephemeris_times[0]], 0, mission])
+        frame_tasks.append([constant_frames, [ephemeris_times[0]], 0, ConstantRotation, mission])
 
         # Build graph async
         with ThreadPool() as pool:
@@ -366,9 +366,9 @@ class FrameChain(nx.DiGraph):
         return times
 
 
-    def generate_rotations(self, frames, times, time_bias, mission=""):
+    def generate_rotations(self, frames, times, time_bias, rotation_type, mission=""):
         """
-        Computes the time dependent rotations based on a list of tuples that define the
+        Computes the rotations based on a list of tuples that define the
         relationships between frames as (source, destination) and a list of times to
         compute the rotation at. The rotations are then appended to the frame chain
         object
@@ -399,10 +399,8 @@ class FrameChain(nx.DiGraph):
             if (len(quats_and_avs[0]) > 4):
                 avs = np.array(quats_and_avs)[:, 4:]
 
-            if len(avs) == 0:
-                avs = None
             biased_times = [time - time_bias for time in times]
-            if len(biased_times) > 1:
+            if rotation_type == TimeDependentRotation:
                 rotation = TimeDependentRotation(quats, biased_times, frame[0], frame[1], av=avs)
             else:
                 rotation = ConstantRotation(quats[0], frame[0], frame[1])
