@@ -1,3 +1,5 @@
+import time
+
 import json
 
 from ale.rotation import ConstantRotation, TimeDependentRotation
