@@ -408,13 +408,19 @@ class Driver():
                 with tempfile.NamedTemporaryFile() as tmp:
                     tmp.write(pvl.dumps(self._file)) 
 
-                    geodata = gdal.Open(tempfile.name)
+                    try:
+                        geodata = gdal.Open(tempfile.name)
+                    except:
+                        geodata = None
             else: 
                 # should be a path
                 if not os.path.exists(self._file): 
                     self._projection = "" 
                 else: 
-                    geodata = gdal.Open(self._file)
+                    try:
+                        geodata = gdal.Open(self._file)
+                    except:
+                        geodata = None
    
 
             # Try to get the projection, if we are unsuccessful set it
@@ -427,26 +433,32 @@ class Driver():
     
     @property 
     def geotransform(self):
-        if not hasattr(self, "_geotransform"): 
+        if not hasattr(self, "_geotransform"):
+            self._geotransform = (0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
             try: 
-              from osgeo import gdal 
+                from osgeo import gdal 
             except: 
-                self._geotransform = (0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
                 return self._geotransform
 
+            geodata = None
             if isinstance(self._file, pvl.PVLModule):
                 # save it to a temp folder
                 with tempfile.NamedTemporaryFile() as tmp:
                     tmp.write(pvl.dumps(self._file)) 
-
-                    geodata = gdal.Open(tempfile.name)
-                    self._geotransform = geodata.GetGeoTransform()
+                    try:
+                        geodata = gdal.Open(tempfile.name)
+                    except:
+                        geodata = None
             else: 
                 # should be a path
                 if not os.path.exists(self._file): 
-                    self._geotransform = (0.0, 1.0, 0.0, 0.0, 0.0, 1.0) 
-                else: 
-                    geodata = gdal.Open(self._file)
-                    self._geotransform = geodata.GetGeoTransform()
-                
+                    self._geotransform = (0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+                else:
+                    try:
+                        geodata = gdal.Open(self._file)
+                    except:
+                        geodata = None
+        
+        if geodata != None:
+            self._geotransform = geodata.GetGeoTransform()
         return self._geotransform
