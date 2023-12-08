@@ -14,6 +14,7 @@ from ale.util import get_isis_preferences
 from ale.util import get_isis_mission_translations
 from ale.util import read_pvl
 from ale.util import search_isis_db
+from ale.util import dict_merge
 
 def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=set()):
     """
