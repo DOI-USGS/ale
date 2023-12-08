@@ -273,10 +273,16 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
     
     @property
     def sensor_frame_id(self):
-        lookup_table = {
-          'VIS': -203221,
-          "IR": -203223
-        }
+        if self.has_articulation_kernel:
+          lookup_table = {
+            'VIS': -203211,
+            "IR": -203213
+         }
+        else:
+          lookup_table = {
+            'VIS': -203221,
+            "IR": -203223
+          }
         return lookup_table[self.label["IsisCube"]["Instrument"]["ChannelId"]]
     
     @property
@@ -408,51 +414,30 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
         return any([re.match(regex, i) for i in self.kernels])
     
     @property
-    def frame_chain(self):
-        if not hasattr(self, '_frame_chain'):
-            if self.has_articulation_kernel and self.is_calibrated:
-                self._frame_chain = super().frame_chain
-            else:
-                self._frame_chain = FrameChain()
+    def inst_pointing_rotation(self):
 
-                target_time_dependent_frames, target_constant_frames = self._frame_chain.frame_trace(self.target_frame_id, self.center_ephemeris_time)
-                target_time_dependent_frames = list(zip(target_time_dependent_frames[:-1], target_time_dependent_frames[1:]))
+        time_dep_quats = np.zeros((len(self.ephemeris_times), 4))
+        avs = []
 
-                self._frame_chain.compute_time_dependent_rotiations(target_time_dependent_frames, self.ephemeris_times, 0)
+        for i, time in enumerate(self.ephemeris_times):
+          try:
+            state_matrix = spice.sxform("J2000", spice.frmnam(self.sensor_frame_id), time)
+          except:
+            rotation_matrix = spice.pxform("J2000", spice.frmnam(self.sensor_frame_id), time)
+            state_matrix = spice.rav2xf(rotation_matrix, [0, 0, 0])
 
-                time_dep_quats = np.zeros((len(self.ephemeris_times), 4))
-                const_quats = np.zeros(4)
-                avs = []
+          opt_angle = self.optical_angles[i]
+          
+          xform = spice.eul2xf([0, -opt_angle, 0, 0, 0, 0], 1, 2, 3)
+          xform2 = spice.mxmg(xform, state_matrix)
 
-                const_rot_matrix = spice.pxform("J2000", spice.frmnam(self.sensor_frame_id), self.ephemeris_times[0])
-                const_quat_from_rot = spice.m2q(const_rot_matrix)
-                const_quats[:3] = const_quat_from_rot[1:]
-                const_quats[3] = const_quat_from_rot[0]
+          rot_mat, av = spice.xf2rav(xform2)
+          avs.append(av)
 
-                const_rotation = ConstantRotation(const_quats, 1, self.sensor_frame_id)
-                self._frame_chain.add_edge(rotation=const_rotation)
+          quat_from_rotation = spice.m2q(rot_mat)
+          time_dep_quats[i,:3] = quat_from_rotation[1:]
+          time_dep_quats[i, 3] = quat_from_rotation[0]
 
-                for i, time in enumerate(self.ephemeris_times):
-                  try:
-                    state_matrix = spice.sxform("J2000", spice.frmnam(self.sensor_frame_id), time)
-                  except:
-                    rotation_matrix = spice.pxform("J2000", spice.frmnam(self.sensor_frame_id), time)
-                    state_matrix = spice.rav2xf(rotation_matrix, [0, 0, 0])
+        time_dep_rot = TimeDependentRotation(time_dep_quats, self.ephemeris_times, 1, self.sensor_frame_id, av=avs)
 
-                  opt_angle = self.optical_angles[i]
-                  
-                  xform = spice.eul2xf([0, -opt_angle, 0, 0, 0, 0], 1, 2, 3)
-                  xform2 = spice.mxmg(xform, state_matrix)
-
-                  rot_mat, av = spice.xf2rav(xform2)
-                  avs.append(av)
-
-                  quat_from_rotation = spice.m2q(rot_mat)
-                  time_dep_quats[i,:3] = quat_from_rotation[1:]
-                  time_dep_quats[i, 3] = quat_from_rotation[0]
-
-                time_dep_rot = TimeDependentRotation(time_dep_quats, self.ephemeris_times, 1, self.sensor_frame_id, av=avs)
-                self._frame_chain.add_edge(rotation=time_dep_rot)
-
-
-        return self._frame_chain
+        return time_dep_rot

@@ -2,6 +2,8 @@ import json
 import numpy as np
 from scipy.interpolate import interp1d, BPoly
 
+import spiceypy as spice
+
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
 from ale.transformation import FrameChain
@@ -121,25 +123,45 @@ def to_isd(driver):
     instrument_pointing = {}
     source_frame, destination_frame, _ = frame_chain.last_time_dependent_frame_between(1, sensor_frame)
 
-    # Reverse the frame order because ISIS orders frames as
-    # (destination, intermediate, ..., intermediate, source)
-    instrument_pointing['time_dependent_frames'] = shortest_path(frame_chain, destination_frame, J2000)
-    time_dependent_rotation = frame_chain.compute_rotation(J2000, destination_frame)
-    instrument_pointing['ck_table_start_time'] = time_dependent_rotation.times[0]
-    instrument_pointing['ck_table_end_time'] = time_dependent_rotation.times[-1]
-    instrument_pointing['ck_table_original_size'] = len(time_dependent_rotation.times)
-    instrument_pointing['ephemeris_times'] = time_dependent_rotation.times
-    instrument_pointing['quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
-    instrument_pointing['angular_velocities'] = time_dependent_rotation.av
 
-    # reference frame should be the last frame in the chain
-    instrument_pointing["reference_frame"] = instrument_pointing['time_dependent_frames'][-1]
+    #manually input instrument pointing for Dawn Vir with no articulation kernels
+    if sensor_frame == -203221 or sensor_frame == -203223: 
+        instrument_pointing['time_dependent_frames'] = [sensor_frame, -203200, -203000, 1]
+        time_dependent_rotation = driver.inst_pointing_rotation
+        instrument_pointing['ck_table_start_time'] = driver.ephemeris_start_time
+        instrument_pointing['ck_table_end_time'] = driver.ephemeris_stop_time
+        instrument_pointing['ck_table_original_size'] = len(time_dependent_rotation.times)
+        instrument_pointing['ephemeris_times'] = time_dependent_rotation.times
+        instrument_pointing['quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
+        instrument_pointing['angular_velocities'] = time_dependent_rotation.av
 
-    # Reverse the frame order because ISIS orders frames as
-    # (destination, intermediate, ..., intermediate, source)
-    instrument_pointing['constant_frames'] = shortest_path(frame_chain, sensor_frame, destination_frame)
-    constant_rotation = frame_chain.compute_rotation(destination_frame, sensor_frame)
-    instrument_pointing['constant_rotation'] = constant_rotation.rotation_matrix().flatten()
+        instrument_pointing["reference_frame"] = instrument_pointing['time_dependent_frames'][-1]
+
+        instrument_pointing['constant_frames'] = [sensor_frame, sensor_frame]
+        instrument_pointing['constant_rotation'] = spice.ident().flatten()
+
+
+    else:
+        # Reverse the frame order because ISIS orders frames as
+        # (destination, intermediate, ..., intermediate, source)
+        instrument_pointing['time_dependent_frames'] = shortest_path(frame_chain, destination_frame, 1)
+        time_dependent_rotation = frame_chain.compute_rotation(1, destination_frame)
+        instrument_pointing['ck_table_start_time'] = time_dependent_rotation.times[0]
+        instrument_pointing['ck_table_end_time'] = time_dependent_rotation.times[-1]
+        instrument_pointing['ck_table_original_size'] = len(time_dependent_rotation.times)
+        instrument_pointing['ephemeris_times'] = time_dependent_rotation.times
+        instrument_pointing['quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
+        instrument_pointing['angular_velocities'] = time_dependent_rotation.av
+
+        # reference frame should be the last frame in the chain
+        instrument_pointing["reference_frame"] = instrument_pointing['time_dependent_frames'][-1]
+
+        # Reverse the frame order because ISIS orders frames as
+        # (destination, intermediate, ..., intermediate, source)
+        instrument_pointing['constant_frames'] = shortest_path(frame_chain, sensor_frame, destination_frame)
+        constant_rotation = frame_chain.compute_rotation(destination_frame, sensor_frame)
+        instrument_pointing['constant_rotation'] = constant_rotation.rotation_matrix().flatten()
+    
     meta_data['instrument_pointing'] = instrument_pointing
 
     # interior orientation
