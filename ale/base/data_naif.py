@@ -11,6 +11,7 @@ import ale
 from ale.base import spiceql_mission_map
 from ale.transformation import FrameChain
 from ale.rotation import TimeDependentRotation
+from ale import kernel_access
 from ale import spiceql_access
 from ale import spice_root
 from ale import util
@@ -74,11 +75,11 @@ class NaifSpice():
         if not hasattr(self, '_kernels'):
             if 'kernels' in self._props.keys():
                 try:
-                    self._kernels = util.get_kernels_from_isis_pvl(self._props['kernels'])
+                    self._kernels = kernel_access.get_kernels_from_isis_pvl(self._props['kernels'])
                 except Exception as e:
                     self._kernels =  self._props['kernels']
             elif ale.spice_root:
-                search_results = util.get_metakernels(ale.spice_root, missions=self.short_mission_name, years=self.utc_start_time.year, versions='latest')
+                search_results = kernel_access.get_metakernels(ale.spice_root, missions=self.short_mission_name, years=self.utc_start_time.year, versions='latest')
 
                 if search_results['count'] == 0:
                     raise ValueError(f'Failed to find metakernels. mission: {self.short_mission_name}, year:{self.utc_start_time.year}, versions="latest" spice root = "{ale.spice_root}"')
@@ -308,7 +309,7 @@ class NaifSpice():
         detector to focal plane x
         """
         if not hasattr(self, "_pixel2focal_x"):
-            self._pixel2focal_x = self.naif_keywords['INS{}_ITRANSX'.format(self.ikid)]
+            self._pixel2focal_x = self.naif_keywords['INS{}_TRANSX'.format(self.ikid)]
         return self._pixel2focal_x
 
     @property
@@ -322,7 +323,7 @@ class NaifSpice():
         detector to focal plane y
         """
         if not hasattr(self, "_pixel2focal_y"):
-            self._pixel2focal_y = self.naif_keywords['INS{}_ITRANSY'.format(self.ikid)]
+            self._pixel2focal_y = self.naif_keywords['INS{}_TRANSY'.format(self.ikid)]
         return self._pixel2focal_y
 
     @property
@@ -350,7 +351,7 @@ class NaifSpice():
         : float pixel size
         """
         if not hasattr(self, "_pixel_size"):
-            self._pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)] * 0.001
+            self._pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)][0] * 0.001
         return self._pixel_size
 
     @property
@@ -443,7 +444,9 @@ class NaifSpice():
         : (positions, velocities, times)
           a tuple containing a list of positions, a list of velocities, and a list of times
         """
-        if not hasattr(self, '_position'):
+        if not hasattr(self, '_position') or \
+           not hasattr(self, '_velocity') or \
+           not hasattr(self, '_ephem'):
             ephem = self.ephemeris_time
 
             if isinstance(ephem, np.ndarray):
