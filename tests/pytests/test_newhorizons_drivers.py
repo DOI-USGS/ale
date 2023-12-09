@@ -5,7 +5,7 @@ import json
 
 import numpy as np
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, call
 
 from conftest import get_image_label, get_image_kernels, convert_kernels, compare_dicts, get_isd
 
@@ -84,14 +84,20 @@ class test_leisa_isis_naif(unittest.TestCase):
             assert self.driver.ikid == -98901
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.nh_drivers.spice.scs2e', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-98, 12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12345
-            scs2e.assert_called_with(-98, '0296962438:00000')
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'NEW HORIZONS', 'mission': 'leisa', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': -98, 'sclk': '0296962438:00000', 'mission': 'leisa', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 2
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.drivers.nh_drivers.spice.scs2e', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-98, 12345]) as spiceql_call:
             assert self.driver.ephemeris_stop_time == (12345 + self.driver.exposure_duration * self.driver.image_lines)
-            scs2e.assert_called_with(-98, '0296962438:00000')
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'NEW HORIZONS', 'mission': 'leisa', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': -98, 'sclk': '0296962438:00000', 'mission': 'leisa', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 2
 
     def test_detector_center_sample(self):
         assert self.driver.detector_center_sample == 0
@@ -121,14 +127,34 @@ class test_mvic_framer_isis3_naif(unittest.TestCase):
         assert self.driver.sensor_model_version == 1
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.nh_drivers.spice.utc2et', return_value=12345) as utc2et:
+        with patch('ale.spiceql_access.spiceql_call', return_value=12345) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12345
-            utc2et.assert_called_with("2015-06-03 04:06:32.848000")
+            calls = [call('utcToEt', {'utc': '2015-06-03 04:05:59.624000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:03.777000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:07.930000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:12.083000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:16.236000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:20.389000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:24.542000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:28.695000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:32.848000', 'searchKernels': False}, False),]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 9
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.drivers.nh_drivers.spice.utc2et', return_value=12345) as utc2et:
+        with patch('ale.spiceql_access.spiceql_call', return_value=12345) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12345
-            utc2et.assert_called_with("2015-06-03 04:06:32.848000")
+            calls = [call('utcToEt', {'utc': '2015-06-03 04:05:59.624000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:03.777000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:07.930000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:12.083000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:16.236000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:20.389000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:24.542000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:28.695000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:32.848000', 'searchKernels': False}, False),]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 9
 
     def test_detector_center_line(self):
         assert self.driver.detector_center_line == -1
@@ -140,9 +166,20 @@ class test_mvic_framer_isis3_naif(unittest.TestCase):
         assert self.driver.sensor_name == 'NEW HORIZONS'
 
     def test_band_times(self):
-        with patch('ale.drivers.nh_drivers.spice.utc2et', return_value=12345) as utc2et:
-            assert self.driver.ephemeris_start_time == 12345
-            utc2et.assert_called_with("2015-06-03 04:06:32.848000")
+        with patch('ale.spiceql_access.spiceql_call', return_value=12345) as spiceql_call:
+            assert len(self.driver.band_times) == 9
+            assert sum(self.driver.band_times)/len(self.driver.band_times) == 12345
+            calls = [call('utcToEt', {'utc': '2015-06-03 04:05:59.624000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:03.777000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:07.930000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:12.083000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:16.236000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:20.389000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:24.542000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:28.695000', 'searchKernels': False}, False),
+                     call('utcToEt', {'utc': '2015-06-03 04:06:32.848000', 'searchKernels': False}, False),]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 9
 
 class test_mvictdi_isis_naif(unittest.TestCase):
     def setUp(self):
