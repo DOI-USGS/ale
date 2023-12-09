@@ -2,12 +2,11 @@ import pytest
 import numpy as np
 import os
 import unittest
-from unittest.mock import PropertyMock, patch
+from unittest.mock import PropertyMock, patch, call
 
 import json
 
 import ale
-from ale import util
 from ale.formatters.formatter import to_isd
 from ale.drivers.ody_drivers import OdyThemisVisIsisLabelNaifSpiceDriver, OdyThemisIrIsisLabelNaifSpiceDriver
 
@@ -57,10 +56,13 @@ class test_themisir_isis_naif(unittest.TestCase):
         assert self.driver.line_exposure_duration == 0.0332871
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=0) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-53, 0]) as spiceql_call:
             self.driver.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"] = 10
             assert self.driver.ephemeris_start_time == 10
-            scs2e.assert_called_with(-53, '1220641481.102')
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'MARS ODYSSEY', 'mission': 'odyssey', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': -53, 'sclk': '1220641481.102', 'mission': 'odyssey', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 2
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
@@ -81,10 +83,13 @@ class test_themisvis_isis_naif(unittest.TestCase):
         assert self.driver.line_exposure_duration == 0.0048
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.mro_drivers.spice.scs2e', return_value=0) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-53, 0]) as spiceql_call:
             self.driver.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"] = 10
             assert self.driver.ephemeris_start_time == (10 - self.driver.line_exposure_duration/2)
-            scs2e.assert_called_with(-53, '1023406812.23')
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'MARS ODYSSEY', 'mission': 'odyssey', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': -53, 'sclk': '1023406812.23', 'mission': 'odyssey', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 2
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
