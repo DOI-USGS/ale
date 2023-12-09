@@ -1,12 +1,10 @@
 import pytest
 import os
 import numpy as np
-import spiceypy as spice
-from importlib import reload
 import json
 
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, call
 from conftest import data_root, get_image, get_isd, get_image_label, get_image_kernels, convert_kernels, compare_dicts
 
 import ale
@@ -301,12 +299,16 @@ class test_isis_naif(unittest.TestCase):
         assert self.driver.alt_ikid == -27999
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.viking_drivers.spice.scs2e', return_value=54321) as scs2e:
-             assert self.driver.ephemeris_start_time == 54324.99
-             scs2e.assert_called_with(-27999, '40031801')
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[54321]) as spiceql_call:
+            assert self.driver.ephemeris_start_time == 54324.99
+            calls = [call('strSclkToEt', {'frameCode': -27999, 'sclk': '40031801', 'mission': 'viking1', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     @patch('ale.base.label_isis.IsisLabel.exposure_duration', 0.43)
     def test_ephemeris_start_time_different_exposure(self):
-        with patch('ale.drivers.viking_drivers.spice.scs2e', return_value=54321) as scs2e:
-             assert self.driver.ephemeris_start_time == 54322.75
-             scs2e.assert_called_with(-27999, '40031801')
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[54321]) as spiceql_call:
+            assert self.driver.ephemeris_start_time == 54322.75
+            calls = [call('strSclkToEt', {'frameCode': -27999, 'sclk': '40031801', 'mission': 'viking1', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
