@@ -308,6 +308,19 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
         return self._ephemeris_start_time
 
     @property
+    def pixel_size(self):
+        """
+        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+
+        Returns
+        -------
+        : float pixel size
+        """
+        if not hasattr(self, "_pixel_size"):
+            self._pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]
+        return self._pixel_size
+
+    @property
     def focal2pixel_samples(self):
         """
         Calculated using 1/pixel_pitch
@@ -321,8 +334,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           focal plane to detector samples
         """
         if not hasattr(self, "_focal2pixel_samples"):
-          pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]
-          self._focal2pixel_samples = [0, 0, -1/pixel_size]
+          self._focal2pixel_samples = [0, 0, -1/self.pixel_size]
         return self._focal2pixel_samples
 
     @property
@@ -339,8 +351,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           focal plane to detector lines
         """
         if not hasattr(self, "_focal2pixel_lines"):
-          pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]
-          self._focal2pixel_lines = [0, 1/pixel_size, 0]
+          self._focal2pixel_lines = [0, 1/self.pixel_size, 0]
         return self._focal2pixel_lines
 
     @property
@@ -688,6 +699,19 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
         return start_sample - 0.5
 
     @property
+    def pixel_size(self):
+        """
+        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+
+        Returns
+        -------
+        : float pixel size
+        """
+        if not hasattr(self, "_pixel_size"):
+            self._pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]
+        return self._pixel_size
+
+    @property
     def focal2pixel_lines(self):
         """
         Calculated using 1/pixel_pitch
@@ -701,8 +725,7 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
           focal plane to detector lines
         """
         if not hasattr(self, "_focal2pixel_lines"):
-          pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]
-          self._focal2pixel_lines = [0, 1/pixel_size, 0]
+          self._focal2pixel_lines = [0, 1/self.pixel_size, 0]
         return self._focal2pixel_lines
 
     @property
@@ -719,8 +742,7 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
           focal plane to detector samples
         """
         if not hasattr(self, "_focal2pixel_samples"):
-          pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]
-          self._focal2pixel_samples = [0, 0, -1/pixel_size]
+          self._focal2pixel_samples = [0, 0, -1/self.pixel_size]
         return self._focal2pixel_samples
 
     @property
@@ -982,6 +1004,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
                                                                          "sclk": self.spacecraft_clock_start_count, 
                                                                          "mission": self.spiceql_mission})
         return self._ephemeris_start_time
+
     @property
     def detector_center_line(self):
         """
@@ -1019,6 +1042,19 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
         return self._detector_center_sample
 
     @property
+    def pixel_size(self):
+        """
+        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+
+        Returns
+        -------
+        : float pixel size
+        """
+        if not hasattr(self, "_pixel_size"):
+            self._pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]
+        return self._pixel_size
+
+    @property
     def focal2pixel_samples(self):
         """
         Calculated using 1/pixel_pitch
@@ -1032,8 +1068,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           focal plane to detector samples
         """
         if not hasattr(self, "_focal2pixel_samples"):
-          pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)[0]]
-          self._focal2pixel_samples = [0, 0, -1/pixel_size]
+          self._focal2pixel_samples = [0, 0, -1/self.pixel_size]
         return self._focal2pixel_samples
 
     @property
@@ -1050,8 +1085,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           focal plane to detector lines
         """
         if not hasattr(self, "_focal2pixel_lines"):
-          pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)[0]]
-          self._focal2pixel_lines = [0, 1/pixel_size, 0]
+          self._focal2pixel_lines = [0, 1/self.pixel_size, 0]
         return self._focal2pixel_lines
 
     @property
@@ -1444,6 +1478,19 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
             return self.label['IsisCube']['Instrument']['CorrectedSamplingInterval'].value * 0.001  # Scale to seconds
 
     @property
+    def pixel_size(self):
+        """
+        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+
+        Returns
+        -------
+        : float pixel size
+        """
+        if not hasattr(self, "_pixel_size"):
+            self._pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]
+        return self._pixel_size
+
+    @property
     def focal2pixel_samples(self):
         """
         Calculated using 1/pixel_pitch
@@ -1457,8 +1504,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
           focal plane to detector samples
         """
         if not hasattr(self, "_focal2pixel_samples"):
-          pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]
-          self._focal2pixel_samples = [0, 0, -1/pixel_size]
+          self._focal2pixel_samples = [0, 0, -1/self.pixel_size]
         return self._focal2pixel_samples
 
     @property
@@ -1475,6 +1521,5 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
           focal plane to detector lines
         """
         if not hasattr(self, "_focal2pixel_lines"):
-          pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]
-          self._focal2pixel_lines = [0, 1/pixel_size, 0]
+          self._focal2pixel_lines = [0, 1/self.pixel_size, 0]
         return self._focal2pixel_lines
