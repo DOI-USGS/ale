@@ -8,7 +8,7 @@ import numpy as np
 from ale.drivers import co_drivers
 from ale.formatters.formatter import to_isd
 import unittest
-from unittest.mock import PropertyMock, patch
+from unittest.mock import PropertyMock, patch, call
 import json
 from conftest import get_image_label, get_image_kernels, get_isd, convert_kernels, compare_dicts, get_table_data
 
@@ -34,7 +34,7 @@ def test_chandrayaan_load(m3_kernels):
     label_file = get_image_label("M3T20090630T083407_V03_RDN", label_type="isis")
     compare_dict = get_isd("chandrayannM3")
 
-    isd_str = ale.loads(label_file, props={"kernels": m3_kernels}, verbose=True)
+    isd_str = ale.loads(label_file, props={"kernels": m3_kernels}, verbose=False)
     isd_obj = json.loads(isd_str)
     x = compare_dicts(isd_obj, compare_dict)
     assert x == []
@@ -43,11 +43,10 @@ def test_chandrayaan_mrffr_load(mrffr_kernels):
     label_file = get_image_label("fsb_00720_1cd_xhu_84n209_v1", label_type="isis3")
     compare_dict = get_isd("chandrayaan_mrffr")
 
-    isd_str = ale.loads(label_file, props={"kernels": mrffr_kernels, "nadir": True}, verbose=False)
+    isd_str = ale.loads(label_file, props={"kernels": mrffr_kernels, "nadir": True}, verbose=True)
     isd_obj = json.loads(isd_str)
     x = compare_dicts(isd_obj, compare_dict)
     assert x == []
-    assert False
 
 # ========= Test chandrayaan isislabel and naifspice driver =========
 class test_chandrayaan_isis_naif(unittest.TestCase):
@@ -82,12 +81,18 @@ class test_chandrayaan_mrffr_isis_naif(unittest.TestCase):
         assert self.driver.sensor_name == "CHANDRAYAAN-1_MRFFR"
 
     def test_ephemeris_start_time(self):
-        with patch("ale.drivers.chandrayaan_drivers.spice.str2et", return_value=12345) as utc2et:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12345
+            calls = [call('utcToEt', {'utc': '2009-01-07 16:35:29.466477', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_ephemeris_stop_time(self):
-        with patch("ale.drivers.chandrayaan_drivers.spice.str2et", return_value=12345) as utc2et:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ephemeris_stop_time == 12345
+            calls = [call('utcToEt', {'utc': '2009-01-07 16:38:07.171000', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_ikid(self):
         assert self.driver.ikid == -86001
