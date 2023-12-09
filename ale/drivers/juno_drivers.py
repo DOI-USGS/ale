@@ -68,4 +68,4 @@ class JunoJunoCamIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistor
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
         filter_code = self.label['IsisCube']['BandBin']['NaifIkCode']
-        return {**super().naif_keywords, **util.query_kernel_pool(f"*{filter_code}*")}
+        return {**super().naif_keywords, **self.spiceql_call("findMissionKeywords", {"key": f"*{filter_code}*", "mission": self.spiceql_mission})}

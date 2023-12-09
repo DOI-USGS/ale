@@ -1,15 +1,12 @@
 import os
 import json
 import unittest
-from unittest.mock import patch, PropertyMock
+from unittest.mock import patch, PropertyMock, call
 
 import pytest
-import numpy as np
-import spiceypy as spice
 
 import ale
 from ale.drivers.juno_drivers import JunoJunoCamIsisLabelNaifSpiceDriver
-from ale.base.data_naif import NaifSpice
 
 from conftest import get_image_kernels, convert_kernels, get_image_label, compare_dicts, get_isd
 
@@ -42,12 +39,15 @@ class test_isis_naif(unittest.TestCase):
         assert self.driver.instrument_id == "JUNO_JUNOCAM"
 
     def test_ephemeris_start_time(self):
-        with patch('ale.base.data_naif.spice.scs2e', return_value=12345) as scs2e, \
-             patch('ale.drivers.juno_drivers.JunoJunoCamIsisLabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-61500) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-61, 12345, -61500]) as spiceql_call, \
+             patch('ale.drivers.juno_drivers.JunoJunoCamIsisLabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {'INS-61500_INTERFRAME_DELTA': .1, 'INS-61500_START_TIME_BIAS': .1}
             assert self.driver.ephemeris_start_time == 12348.446
-            scs2e.assert_called_with(-61500, '525560580:87')
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'JUNO', 'mission': 'juno', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': -61, 'sclk': '525560580:87', 'mission': 'juno', 'searchKernels': False}, False),
+                     call('NonMemo_translateNameToCode', {'frame': 'JUNO_JUNOCAM', 'mission': 'juno', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 3
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
