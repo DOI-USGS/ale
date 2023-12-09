@@ -497,7 +497,6 @@ class MexHrscPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, NoDistortion
         """
         return 1
 
-
 class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
   
   @property
@@ -685,7 +684,6 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDisto
       """
       return FILTER_SPECIFIC_LOOKUP[self.fikid][4]
 
-
   @property
   def focal2pixel_samples(self):
       """
@@ -715,6 +713,7 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDisto
       """
       summing = self.label['IsisCube']['Instrument'].get("Summing", 1)
       return summing
+
 
 class MexSrcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortion, Driver):
     """
