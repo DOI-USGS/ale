@@ -2,7 +2,6 @@ import numpy as np
 import spiceypy as spice
 
 from pyspiceql import pyspiceql
-from ale.util import query_kernel_pool
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
@@ -271,13 +270,15 @@ class LroLrocNacPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driv
           frame_chain = self.frame_chain
           lro_bus_id = self.spiceql_call("translateNameToCode", {'frame': 'LRO_SC_BUS', 'mission': self.spiceql_mission})
           time = self.ephemeris_start_time
-          lt_state = self.spiceql_call("getTargetState", {'et': time, 
-                                                          'target': self.target_name, 
-                                                          'observer': self.spacecraft_name, 
-                                                          'frame': 'J2000', 
-                                                          'abcorr': 'None'})
-          state = lt_state.starg
-          velocity = state[3:]
+          lt_states = self.spiceql_call("getTargetStates", {'ets': [time], 
+                                                           'target': self.spacecraft_name, 
+                                                           'observer': self.target_name, 
+                                                           'frame': 'J2000', 
+                                                           'abcorr': 'None',
+                                                           'mission': self.spiceql_mission,
+                                                           'ckQuality': "",
+                                                           'spkQuality': ""})
+          velocity = lt_states[0][3:6]
           rotation = frame_chain.compute_rotation(1, lro_bus_id)
           rotated_velocity = spice.mxv(rotation._rots.as_matrix()[0], velocity)
           self._spacecraft_direction = rotated_velocity[0]
@@ -515,16 +516,18 @@ class LroLrocNacIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driv
           frame_chain = self.frame_chain
           lro_bus_id = self.spiceql_call("translateNameToCode", {'frame': 'LRO_SC_BUS', 'mission': self.spiceql_mission})
           time = self.ephemeris_start_time
-          states = self.spiceql_call("getTargetStates", {'ets': [time], 
-                                                         'target': self.spacecraft_name, 
-                                                         'observer': self.target_name, 
-                                                         'frame': 'J2000', 
-                                                         'abcorr': 'None',
-                                                         'mission': self.spiceql_mission,
-                                                         'ckQuality': "",
-                                                         'spkQuality': ""})
-          velocity = states[0][3:6]
+          print(time)
+          lt_states = self.spiceql_call("getTargetStates", {'ets': [time], 
+                                                           'target': self.spacecraft_name, 
+                                                           'observer': self.target_name, 
+                                                           'frame': 'J2000', 
+                                                           'abcorr': 'None',
+                                                           'mission': self.spiceql_mission,
+                                                           'ckQuality': "",
+                                                           'spkQuality': ""})
+          velocity = lt_states[0][3:6]
           rotation = frame_chain.compute_rotation(1, lro_bus_id)
+          print(rotation._rots.as_matrix()[0], velocity)
           rotated_velocity = spice.mxv(rotation._rots.as_matrix()[0], velocity)
           self._spacecraft_direction = rotated_velocity[0]
         return self._spacecraft_direction
@@ -1158,12 +1161,12 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
         _naifKeywords = {**super().naif_keywords,
-                         **query_kernel_pool("*_FOCAL_LENGTH"),
-                         **query_kernel_pool("*_BORESIGHT_SAMPLE"),
-                         **query_kernel_pool("*_BORESIGHT_LINE"),
-                         **query_kernel_pool("*_TRANS*"),
-                         **query_kernel_pool("*_ITRANS*"),
-                         **query_kernel_pool("*_OD_K")}
+                         **self.spiceql_call("findMissionKeywords", {"key": f"*_FOCAL_LENGTH", "mission": self.spiceql_mission}),
+                         **self.spiceql_call("findMissionKeywords", {"key": f"*_BORESIGHT_SAMPLE", "mission": self.spiceql_mission}),
+                         **self.spiceql_call("findMissionKeywords", {"key": f"*_BORESIGHT_LINE", "mission": self.spiceql_mission}),
+                         **self.spiceql_call("findMissionKeywords", {"key": f"*_TRANS*", "mission": self.spiceql_mission}),
+                         **self.spiceql_call("findMissionKeywords", {"key": f"*_ITRANS*", "mission": self.spiceql_mission}),
+                         **self.spiceql_call("findMissionKeywords", {"key": f"*_OD_K", "mission": self.spiceql_mission})}
         return _naifKeywords
 
 
