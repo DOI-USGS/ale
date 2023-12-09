@@ -159,14 +159,16 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortio
         : double
           focal length in meters
         """
-        coeffs = self.naif_keywords['INS{}_FL_TEMP_COEFFS'.format(self.fikid)]
+        if not hasattr(self, "_focal_length"):
+          coeffs = self.naif_keywords['INS{}_FL_TEMP_COEFFS'.format(self.fikid)]
 
-        # reverse coeffs, MDIS coeffs are listed a_0, a_1, a_2 ... a_n where
-        # numpy wants them a_n, a_n-1, a_n-2 ... a_0
-        f_t = np.poly1d(coeffs[::-1])
+          # reverse coeffs, MDIS coeffs are listed a_0, a_1, a_2 ... a_n where
+          # numpy wants them a_n, a_n-1, a_n-2 ... a_0
+          f_t = np.poly1d(coeffs[::-1])
 
-        # eval at the focal_plane_temperature
-        return f_t(self.label['FOCAL_PLANE_TEMPERATURE'].value)
+          # eval at the focal_plane_temperature
+          self._focal_length = f_t(self.label['FOCAL_PLANE_TEMPERATURE'].value)
+        return self._focal_length
 
     @property
     def detector_center_sample(self):
@@ -241,7 +243,9 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortio
         -------
         : float pixel size
         """
-        return self.naif_keywords['INS{}_PIXEL_PITCH'.format(self.ikid)]
+        if not hasattr(self, "_pixel_size"):
+          self._pixel_size = self.naif_keywords['INS{}_PIXEL_PITCH'.format(self.ikid)]
+        return self._pixel_size
 
 class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDistortion, Driver):
     """
@@ -335,13 +339,16 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
         : double
           focal length in meters
         """
-        coeffs = self.naif_keywords['INS{}_FL_TEMP_COEFFS'.format(self.fikid)]
-        # reverse coeffs, MDIS coeffs are listed a_0, a_1, a_2 ... a_n where
-        # numpy wants them a_n, a_n-1, a_n-2 ... a_0
-        f_t = np.poly1d(coeffs[::-1])
+        if not hasattr(self, "_focal_length"):
 
-        # eval at the focal_plane_temperature
-        return f_t(self.label['IsisCube']['Instrument']['FocalPlaneTemperature'].value)
+          coeffs = self.naif_keywords['INS{}_FL_TEMP_COEFFS'.format(self.fikid)]
+          # reverse coeffs, MDIS coeffs are listed a_0, a_1, a_2 ... a_n where
+          # numpy wants them a_n, a_n-1, a_n-2 ... a_0
+          f_t = np.poly1d(coeffs[::-1])
+
+          # eval at the focal_plane_temperature
+          self._focal_length = f_t(self.label['IsisCube']['Instrument']['FocalPlaneTemperature'].value)
+        return self._focal_length
 
     @property
     def detector_center_sample(self):
@@ -358,7 +365,9 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
         : float
           detector center sample
         """
-        return float(self.naif_keywords['INS{}_CCD_CENTER'.format(self.ikid)][0]) - 0.5
+        if not hasattr(self, "_detector_center_sample"):
+          self._detector_center_sample = float(self.naif_keywords['INS{}_CCD_CENTER'.format(self.ikid)][0]) - 0.5
+        return self._detector_center_sample
 
 
     @property
@@ -376,7 +385,9 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
         : float
           detector center line
         """
-        return float(self.naif_keywords['INS{}_CCD_CENTER'.format(self.ikid)][1]) - 0.5
+        if not hasattr(self, "_detector_center_line"):
+          self._detector_center_line = float(self.naif_keywords['INS{}_CCD_CENTER'.format(self.ikid)][1]) - 0.5
+        return self._detector_center_line
 
     @property
     def sensor_model_version(self):
@@ -398,7 +409,9 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
         -------
         : float pixel size
         """
-        return self.naif_keywords['INS{}_PIXEL_PITCH'.format(self.ikid)]
+        if not hasattr(self, "_pixel_size"):
+          self._pixel_size = self.naif_keywords['INS{}_PIXEL_PITCH'.format(self.ikid)]
+        return self._pixel_size
 
     @property
     def sampling_factor(self):
