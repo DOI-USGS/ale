@@ -516,7 +516,6 @@ class LroLrocNacIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driv
           frame_chain = self.frame_chain
           lro_bus_id = self.spiceql_call("translateNameToCode", {'frame': 'LRO_SC_BUS', 'mission': self.spiceql_mission})
           time = self.ephemeris_start_time
-          print(time)
           lt_states = self.spiceql_call("getTargetStates", {'ets': [time], 
                                                            'target': self.spacecraft_name, 
                                                            'observer': self.target_name, 
@@ -527,7 +526,6 @@ class LroLrocNacIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driv
                                                            'spkQuality': ""})
           velocity = lt_states[0][3:6]
           rotation = frame_chain.compute_rotation(1, lro_bus_id)
-          print(rotation._rots.as_matrix()[0], velocity)
           rotated_velocity = spice.mxv(rotation._rots.as_matrix()[0], velocity)
           self._spacecraft_direction = rotated_velocity[0]
         return self._spacecraft_direction
@@ -838,6 +836,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         """
         if not hasattr(self, "_ephemeris_start_time"):
             self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+            self._ephemeris_start_time -= self.line_exposure_duration
         return self._ephemeris_start_time
 
     @property
@@ -868,18 +867,18 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         """
         return self.label['IsisCube']['Instrument']['LookDirection'].lower()
 
-    @property
-    def sensor_frame_id(self):
-        """
-        Returns the Naif ID code for the sensor reference frame
-        We replace this with the target frame ID because the sensor operates
-        entirely in the target reference frame
-        Returns
-        -------
-        : int
-          Naif ID code for the sensor frame
-        """
-        return self.target_frame_id
+    # @property
+    # def sensor_frame_id(self):
+    #     """
+    #     Returns the Naif ID code for the sensor reference frame
+    #     We replace this with the target frame ID because the sensor operates
+    #     entirely in the target reference frame
+    #     Returns
+    #     -------
+    #     : int
+    #       Naif ID code for the sensor frame
+    #     """
+    #     return self.target_frame_id
 
     @property
     def naif_keywords(self):

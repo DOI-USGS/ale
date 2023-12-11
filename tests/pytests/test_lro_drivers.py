@@ -8,6 +8,7 @@ import json
 
 import ale
 from ale import util
+from ale.drivers import AleJsonEncoder
 from ale.drivers.lro_drivers import LroLrocNacPds3LabelNaifSpiceDriver
 from ale.drivers.lro_drivers import LroLrocNacIsisLabelNaifSpiceDriver
 from ale.drivers.lro_drivers import LroLrocWacIsisLabelNaifSpiceDriver
@@ -282,15 +283,15 @@ class test_miniRf(unittest.TestCase):
 
     def test_ephmeris_start_time(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
-            assert self.driver.ephemeris_start_time == 12345
+            assert self.driver.ephemeris_start_time == 12344.995295578527
             calls = [call('utcToEt', {'utc': '2010-04-25 04:22:31.244874', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
     def test_ephmeris_stop_time(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
-            assert self.driver.ephemeris_stop_time == 12345
-            calls = [call('utcToEt', {'utc': '2010-04-25 04:22:34.537874', 'searchKernels': False}, False)]
+            assert self.driver.ephemeris_stop_time == 12348.297799453276
+            calls = [call('utcToEt', {'utc': '2010-04-25 04:22:31.244874', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 

@@ -156,8 +156,8 @@ def to_isd(driver):
         isd['focal2pixel_samples'] = driver_data["focal2pixel_samples"]
         isd['optical_distortion'] = driver_data["usgscsm_distortion_model"]
 
-        isd['starting_detector_line'] = driver_data.detector_start_line
-        isd['starting_detector_sample'] = driver_data.detector_start_sample
+        isd['starting_detector_line'] = driver_data["detector_start_line"]
+        isd['starting_detector_sample'] = driver_data["detector_start_sample"]
 
     j2000_rotation = frame_chain.compute_rotation(target_frame, J2000)
 
