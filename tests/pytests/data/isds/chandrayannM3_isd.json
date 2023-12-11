@@ -188,8 +188,8 @@
     "INS-86520_CK_REFERENCE_ID": 1.0,
     "INS-86520_PLATFORM_ID": -86000.0,
     "TKFRAME_-86520_UNITS": "DEGREES",
-    "INS-86520_LT_SURFACE_CORRECT": "TRUE",
-    "INS-86520_SWAP_OBSERVER_TARGET": "TRUE",
+    "INS-86520_LT_SURFACE_CORRECT": true,
+    "INS-86520_SWAP_OBSERVER_TARGET": true,
     "TKFRAME_-86520_ANGLES": [
       0.0,
       0.0,
@@ -243,7 +243,10 @@
       -0.0047,
       -0.0046,
       0.0028,
-      0.0052
+      0.0052,
+      0.004,
+      0.0019,
+      -0.0044
     ],
     "BODY301_NUT_PREC_RA": [
       -3.8787000000000003,
@@ -255,7 +258,10 @@
       0.0,
       0.0,
       0.0,
-      -0.0052
+      -0.0052,
+      0.0,
+      0.0,
+      0.0043
     ],
     "BODY301_LONG_AXIS": 0.0,
     "BODY301_NUT_PREC_DEC": [
@@ -268,7 +274,10 @@
       0.0009,
       0.0,
       0.0,
-      0.0008
+      0.0008,
+      0.0,
+      0.0,
+      -0.0009
     ],
     "BODY301_POLE_DEC": [
       66.5392,
