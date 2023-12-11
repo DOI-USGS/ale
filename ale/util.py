@@ -184,6 +184,8 @@ def dict_merge(dct, merge_dct):
 
     return new_dct
 
+def dict_to_lower(d):
+    return {k.lower():v if not isinstance(v, dict) else dict_to_lower(v) for k,v in d.items()}
 
 def get_isis_preferences(isis_preferences=None):
     """
@@ -687,3 +689,23 @@ def search_isis_db(dbobj, labelobj, isis_data):
     if any(types):
         kernels["types"] = types
     return kernels
+
+
+def expandvars(path, env_dict=os.environ, default=None, case_sensitive=True):
+    if env_dict != os.environ:
+        env_dict = dict_merge(env_dict, os.environ)
+
+    while "$" in path:
+        user_dict = env_dict if case_sensitive else dict_to_lower(env_dict)
+
+        def replace_var(m):
+            group1 = m.group(1) if case_sensitive else m.group(1).lower()
+            val = user_dict.get(m.group(2) or group1 if default is None else default)
+            if not val:
+                raise KeyError(f"Failed to evaluate {m.group(0)} from env_dict. " + 
+                               f"Should {m.group(0)} be an environment variable?")
+
+            return val
+        reVar = r'\$(\w+|\{([^}]*)\})'
+        path = re.sub(reVar, replace_var, path)
+    return path

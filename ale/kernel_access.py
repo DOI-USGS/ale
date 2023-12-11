@@ -15,6 +15,8 @@ from ale.util import get_isis_mission_translations
 from ale.util import read_pvl
 from ale.util import search_isis_db
 from ale.util import dict_merge
+from ale.util import dict_to_lower
+from ale.util import expandvars
 
 def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=set()):
     """
@@ -145,30 +147,6 @@ def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
         raise KeyError(f'{cubelabel}, Could not find kernels group, input cube [{cube}] may not be spiceinited')
 
     return get_kernels_from_isis_pvl(kernel_group, expand, format_as)
-
-
-def dict_to_lower(d):
-    return {k.lower():v if not isinstance(v, dict) else dict_to_lower(v) for k,v in d.items()}
-
-
-def expandvars(path, env_dict=os.environ, default=None, case_sensitive=True):
-    if env_dict != os.environ:
-        env_dict = dict_merge(env_dict, os.environ)
-
-    while "$" in path:
-        user_dict = env_dict if case_sensitive else dict_to_lower(env_dict)
-
-        def replace_var(m):
-            group1 = m.group(1) if case_sensitive else m.group(1).lower()
-            val = user_dict.get(m.group(2) or group1 if default is None else default)
-            if not val:
-                raise KeyError(f"Failed to evaluate {m.group(0)} from env_dict. " + 
-                               f"Should {m.group(0)} be an environment variable?")
-
-            return val
-        reVar = r'\$(\w+|\{([^}]*)\})'
-        path = re.sub(reVar, replace_var, path)
-    return path
 
 
 def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
