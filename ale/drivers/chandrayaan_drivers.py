@@ -24,19 +24,6 @@ class Chandrayaan1M3IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, 
         return inst_id_lookup[super().instrument_id] 
     
     @property
-    def ikid(self):
-        """
-        Returns the ikid/frame code from the ISIS label. This is attached
-        via chan1m3 on ingestion into an ISIS cube
-        
-        Returns
-        -------
-        : int
-          ikid for chandrayaan moon mineralogy mapper
-        """
-        return spice.namfrm(self.instrument_id)
-    
-    @property
     def sensor_model_version(self):
         """
         The ISIS Sensor model number for Chandrayaan1M3 in ISIS. This is likely just 1
@@ -89,7 +76,9 @@ class Chandrayaan1MRFFRIsisLabelNaifSpiceDriver(Radar, IsisLabel, NaifSpice, Cha
         : float
           start time
         """
-        return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
+        if not hasattr(self, "_ephemeris_start_time"):
+            self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+        return self._ephemeris_start_time
 
     @property
     def ephemeris_stop_time(self):
@@ -101,7 +90,9 @@ class Chandrayaan1MRFFRIsisLabelNaifSpiceDriver(Radar, IsisLabel, NaifSpice, Cha
         : float
           stop time
         """
-        return spice.str2et(self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
+        if not hasattr(self, "_ephemeris_stop_time"):
+            self._ephemeris_stop_time = self.spiceql_call("utcToEt", {"utc": self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+        return self._ephemeris_stop_time
 
 
     @property
@@ -192,9 +183,10 @@ class Chandrayaan1MRFFRIsisLabelNaifSpiceDriver(Radar, IsisLabel, NaifSpice, Cha
         : List
           times for range conversion coefficients
         """
-        range_coefficients_utc = self.label['IsisCube']['Instrument']['RangeCoefficientSet']
-        range_coefficients_et = [spice.str2et(elt[0]) for elt in range_coefficients_utc]
-        return range_coefficients_et
+        if not hasattr(self, "range_coefficients_et"):
+          range_coefficients_utc = self.label['IsisCube']['Instrument']['RangeCoefficientSet']
+          self._range_coefficients_et = [self.spiceql_call("utcToEt", {"utc": elt[0]}) for elt in range_coefficients_utc]
+        return self._range_coefficients_et
 
 
     @property
@@ -243,12 +235,14 @@ class Chandrayaan1MRFFRIsisLabelNaifSpiceDriver(Radar, IsisLabel, NaifSpice, Cha
         : dict
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
-        transx = [-1* self.scaled_pixel_height, self.scaled_pixel_height, 0.0]
-        transy = [0,0,0]
-        transs = [1.0, 1.0 / self.scaled_pixel_height, 0.0]
-        transl = [0.0, 0.0, 0.0]
-        return {**super().naif_keywords,
-                f"INS{self.ikid}_TRANSX": transx,
-                f"INS{self.ikid}_TRANSY": transy,
-                f"INS{self.ikid}_ITRANSS": transs,
-                f"INS{self.ikid}_ITRANSL": transl}
+        if not hasattr(self, "_naif_keywords"):
+          transx = [-1 * self.scaled_pixel_height, self.scaled_pixel_height, 0.0]
+          transy = [0.0 ,0.0 , 0.0]
+          transs = [1.0, 1.0 / self.scaled_pixel_height, 0.0]
+          transl = [0.0, 0.0, 0.0]
+          self._naif_keywords = {**super().naif_keywords,
+                                 f"INS{self.ikid}_TRANSX": transx,
+                                 f"INS{self.ikid}_TRANSY": transy,
+                                 f"INS{self.ikid}_ITRANSS": transs,
+                                 f"INS{self.ikid}_ITRANSL": transl}
+        return self._naif_keywords

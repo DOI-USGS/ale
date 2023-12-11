@@ -1,4 +1,3 @@
-import spiceypy as spice
 import numpy as np
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
@@ -65,8 +64,9 @@ class LoHighCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, LoDisto
         : float
           ephemeris time of the image
         """
-        
-        return spice.utc2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
+        if not hasattr(self, "_ephemeris_start_time"):
+          self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+        return self._ephemeris_start_time
     
     @property
     def ephemeris_stop_time(self):
@@ -82,21 +82,6 @@ class LoHighCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, LoDisto
         """
         
         return self.ephemeris_start_time
-    
-
-    
-    @property
-    def ikid(self):
-        """
-        Overridden to grab the ikid from the Isis Cube since there is no way to
-        obtain this value with a spice bods2c call.
-
-        Returns
-        -------
-        : int
-          Naif ID used to for identifying the instrument in Spice kernels
-        """
-        return spice.namfrm(self.instrument_id)
     
     @property
     def detector_center_line(self):
@@ -125,15 +110,6 @@ class LoHighCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, LoDisto
           Detector line of the principal point
         """
         return 0
-    
-    @property
-    def focal2pixel_samples(self):
-        return self.naif_keywords[f"INS{self.ikid}_ITRANSS"]
-
-    @property
-    def focal2pixel_lines(self):
-        return self.naif_keywords[f"INS{self.ikid}_ITRANSL"]
-    
 
     @property
     def naif_keywords(self):

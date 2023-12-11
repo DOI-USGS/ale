@@ -1,6 +1,6 @@
 import os
 import unittest
-from unittest.mock import PropertyMock, patch
+from unittest.mock import PropertyMock, patch, call
 
 import pytest
 import json
@@ -48,25 +48,31 @@ class test_osirisrex_isis_naif(unittest.TestCase):
         assert self.driver.sensor_frame_id == -64000
 
     def test_detector_center_sample(self):
-        with patch('ale.drivers.osirisrex_drivers.spice.gdpool', return_value=np.array([12345, 100])) as gdpool, \
-             patch('ale.drivers.osirisrex_drivers.spice.bods2c', return_value=54321) as bods2c:
-             assert self.driver.detector_center_sample == 12345
-             bods2c.assert_called_with('ORX_OCAMS_MAPCAM')
-             gdpool.assert_called_with('INS54321_CCD_CENTER', 0, 2)
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-54321]) as spiceql_call, \
+             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-54321_CCD_CENTER": [12345, 100]}
+            assert self.driver.detector_center_sample == 12345
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'ORX_OCAMS_MAPCAM', 'mission': '', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_detector_center_line(self):
-        with patch('ale.drivers.osirisrex_drivers.spice.gdpool', return_value=np.array([12345, 100])) as gdpool, \
-             patch('ale.drivers.osirisrex_drivers.spice.bods2c', return_value=54321) as bods2c:
-             assert self.driver.detector_center_line == 100
-             bods2c.assert_called_with('ORX_OCAMS_MAPCAM')
-             gdpool.assert_called_with('INS54321_CCD_CENTER', 0, 2)
-
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-54321]) as spiceql_call, \
+             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-54321_CCD_CENTER": [12345, 100]}
+            assert self.driver.detector_center_line == 100
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'ORX_OCAMS_MAPCAM', 'mission': '', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_filter_name(self):
         assert self.driver.filter_name == "PAN"
 
     def test_odtk(self):
-        with patch('ale.drivers.osirisrex_drivers.spice.bods2c', return_value=54321) as bods2c, \
-             patch('ale.drivers.osirisrex_drivers.spice.gdpool', return_value=np.array([2.21e-05, 1.71e-04, 5.96e-05])) as gdpool:
-             assert self.driver.odtk == [2.21e-05, 1.71e-04, 5.96e-05]
-             gdpool.assert_called_with("INS54321_OD_K_PAN", 0, 3)
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-54321]) as spiceql_call, \
+             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-54321_OD_K_PAN": [2.21e-05, 1.71e-04, 5.96e-05]}
+            assert self.driver.odtk == [2.21e-05, 1.71e-04, 5.96e-05]
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'ORX_OCAMS_MAPCAM', 'mission': '', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1

@@ -1,8 +1,5 @@
 import numpy as np
-import spiceypy as spice
 import pvl
-
-from ale import util
 
 from ale.base import Driver
 from ale.base.type_distortion import NoDistortion, LegendreDistortion
@@ -67,7 +64,7 @@ class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoD
         list :
             The center of the CCD formatted as line, sample
         """
-        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0])
+        return float(self.naif_keywords['INS{}_BORESIGHT'.format(self.ikid)][0])
 
     @property
     def detector_center_sample(self):
@@ -81,7 +78,7 @@ class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoD
         list :
             The center of the CCD formatted as line, sample
         """
-        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
+        return float(self.naif_keywords['INS{}_BORESIGHT'.format(self.ikid)][1])
 
     @property
     def sensor_name(self):
@@ -135,20 +132,6 @@ class NewHorizonsLeisaIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
           Naif ID used to for identifying the instrument in Spice kernels
         """
         return self.label['IsisCube']['Kernels']['NaifFrameCode'][0]
-
-    @property
-    def ephemeris_start_time(self):
-        """
-        Returns the ephemeris start time of the image.
-        Expects spacecraft_id to be defined. This should be the integer
-        Naif ID code for the spacecraft.
-
-        Returns
-        -------
-        : float
-          ephemeris start time of the image
-        """
-        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_start_count)
 
     @property
     def ephemeris_stop_time(self):
@@ -334,7 +317,7 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
         : list
           Optical distortion x coefficients
         """
-        return spice.gdpool('INS{}_DISTORTION_COEF_X'.format(self.parent_id),0, 20).tolist()
+        return self.naif_keywords['INS{}_DISTORTION_COEF_X'.format(self.parent_id)]
 
 
     @property
@@ -347,7 +330,7 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
         : list
           Optical distortion y coefficients
         """
-        return spice.gdpool('INS{}_DISTORTION_COEF_Y'.format(self.parent_id), 0, 20).tolist()
+        return self.naif_keywords['INS{}_DISTORTION_COEF_Y'.format(self.parent_id)]
 
     @property
     def band_times(self):
@@ -357,7 +340,7 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
             for time in band_times:
                 if type(time) is pvl.Quantity:
                    time = time.value
-                self._ephem_band_times.append(spice.utc2et(time.strftime("%Y-%m-%d %H:%M:%S.%f")))
+                self._ephem_band_times.append(self.spiceql_call("utcToEt", {"utc": time.strftime("%Y-%m-%d %H:%M:%S.%f")}))
         return self._ephem_band_times
 
 
@@ -421,9 +404,10 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
         : dict
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
-        return {**super().naif_keywords,
-                f"INS{self.parent_id}_DISTORTION_COEF_X": self.odtx,
-                f"INS{self.parent_id}_DISTORTION_COEF_Y": self.odty}
+        if not hasattr(self, "_naif_keywords"):
+            self._naif_keywords = {**super().naif_keywords,
+                                   **self.spiceql_call("findMissionKeywords", {"key": f"INS{self.parent_id}_DISTORTION_COEF_*", "mission": self.spiceql_mission})}
+        return self._naif_keywords
 
 class NewHorizonsMvicTdiIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, LegendreDistortion, Driver):
     """
@@ -470,7 +454,7 @@ class NewHorizonsMvicTdiIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpi
             # Attempt to get the frame code using frame name,
             # If that fails, try to get it directly from the cube label
             try:
-                self._ikid = spice.frmname(self.instrument_id)
+                self._ikid = self.spiceql_call("translateNameToCode", {"frame": self.instrument_id, "mission": self.spiceql_mission})
             except:
                 self._ikid = self.label["IsisCube"]["Kernels"]["NaifFrameCode"].value
         return self._ikid
@@ -535,7 +519,7 @@ class NewHorizonsMvicTdiIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpi
         : list
           Optical distortion x coefficients
         """
-        return spice.gdpool('INS{}_DISTORTION_COEF_X'.format(self.parent_id),0, 20).tolist()
+        return self.naif_keywords['INS{}_DISTORTION_COEF_X'.format(self.parent_id)]
 
     @property
     def odty(self):
@@ -547,7 +531,7 @@ class NewHorizonsMvicTdiIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpi
         : list
           Optical distortion y coefficients
         """
-        return spice.gdpool('INS{}_DISTORTION_COEF_Y'.format(self.parent_id), 0, 20).tolist()
+        return self.naif_keywords['INS{}_DISTORTION_COEF_Y'.format(self.parent_id)]
 
     @property
     def naif_keywords(self):
@@ -559,9 +543,10 @@ class NewHorizonsMvicTdiIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpi
         : dict
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
-        return {**super().naif_keywords,
-                f"INS{self.parent_id}_DISTORTION_COEF_X": self.odtx,
-                f"INS{self.parent_id}_DISTORTION_COEF_Y": self.odty}
+        if not hasattr(self, "_naif_keywords"):
+            self._naif_keywords = {**super().naif_keywords,
+                                   **self.spiceql_call("findMissionKeywords", {"key": f"INS{self.parent_id}_DISTORTION_COEF_*", "mission": self.spiceql_mission})}
+        return self._naif_keywords
 
     @property
     def sensor_model_version(self):

@@ -27,6 +27,9 @@ class test_cahvor_sensor(unittest.TestCase):
         self.driver.target_frame_id = 10014
         self.driver.center_ephemeris_time = 0
         self.driver.ephemeris_time = [0]
+        self.driver.spiceql_mission = "msl"
+        self.driver.use_web = False
+        self.driver.search_kernels = False
         self.driver._props = {}
 
     @patch("ale.base.type_sensor.Cahvor.cahvor_camera_dict", new_callable=PropertyMock, return_value=cahvor_camera_dict())
@@ -51,7 +54,7 @@ class test_cahvor_sensor(unittest.TestCase):
       assert len(frame_chain.nodes()) == 2
       assert -76000 in frame_chain.nodes()
       assert -76562 in frame_chain.nodes()
-      from_spice.assert_called_with(center_ephemeris_time=0, ephemeris_times=[0], sensor_frame=-76000, target_frame=10014, nadir=False, exact_ck_times=False)
+      from_spice.assert_called_with(center_ephemeris_time=0, ephemeris_times=[0], sensor_frame=-76000, target_frame=10014, nadir=False, exact_ck_times=False, mission='msl', use_web=False, search_kernels=False)
       print(frame_chain[-76562][-76000]['rotation'].quat[3])
       np.testing.assert_allclose(frame_chain[-76562][-76000]['rotation'].quat, [-0.09914206260782343, 0.3330938313054434, 0.8940825953723198, -0.28255205470925904])
 
