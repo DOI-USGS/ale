@@ -6,7 +6,8 @@ from importlib import reload
 import json
 
 import unittest
-from unittest.mock import PropertyMock, patch
+from unittest import mock
+from unittest.mock import patch
 from ale.drivers import AleJsonEncoder
 from conftest import get_image_label, get_image_kernels, get_isd, convert_kernels, compare_dicts
 
@@ -196,6 +197,7 @@ class test_dawn_vir_isis3_naif(unittest.TestCase):
         assert self.driver.ikid == -203213
 
     def test_sensor_frame_id(self):
+        ale.spice_root = "/foo/bar"
         assert self.driver.sensor_frame_id == -203223
 
     def test_line_scan_rate(self):
@@ -254,6 +256,6 @@ class test_dawn_vir_isis3_naif(unittest.TestCase):
         assert self.driver.is_calibrated == False
 
     def test_has_articulation_kernel(self):
-        os.environ['ALESPICEROOT'] = '/foo/bar'
+        ale.spice_root = "/foo/bar"
         assert self.driver.has_articulation_kernel == False
 
