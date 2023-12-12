@@ -1,0 +1,574 @@
+KPL/IK
+
+VIR Instrument kernel
+===========================================================================
+
+   This instrument kernel (I-kernel) contains Dawn VIR optics,
+   detector, and field-of-view parameters.
+
+
+Version and Date
+---------------------------------------------------------------------------
+
+   Version 0.5 -- March 2, 2011 -- Boris Semenov, NAIF
+
+     Rearranged comments and data blocks in the "FOV Definitions"
+     section to have all FOVs defined for full and partial scan mirror
+     sweeps described in a single comment block and defined in a
+     single data block to more clearly separate them from actual,
+     non-sweep FOV definitions.
+
+     NO CHANGES WERE MADE TO ANY KEYWORD VALUES. 
+
+   Version 0.4 -- October 7, 2009 -- Dr. Federico Tosi, INAF - IFSI
+                                     Boris Semenov, NAIF
+
+      Changed the reference frame for the full and partial VIS sweep
+      FOVs associated with IDs -203212, -203215 ... -203219 to
+      DAWN_VIR_VIS_ZERO.
+
+      Changed the reference frame for the full IR sweep FOV associated
+      with IDs -203214 to DAWN_VIR_IR_ZERO.
+
+      Replaced -226 with -203 in the keywords in the ``Platform ID''
+      section.
+
+      Replaced cross-track/along-track with along-slit/cross-slit
+      in all comments.
+
+      Filled in instrument description.
+
+   Version 0.3 -- July 3, 2009 -- Boris Semenov
+
+      Extended comments to cover partial VIS scan FOVs added by Steve
+      Joy.
+
+   Version 0.2T2 -- June 23, 2009 -- Steven Joy
+
+      Added FOVs for VIR_VIS_96 (-203218) and VIR_VIS_32 (-203219)
+
+   Version 0.2T -- April 09, 2009 -- Steven Joy
+
+      Added FOVs for VIR_VIS_16 (-203217)
+
+   Version 0.2 -- June 24, 2008 -- Steven Joy, DSC with Boris Semenov, NAIF/JPL
+
+      Added FOVs for VIR_VIS_128 (-203215) and VIR_VIS_64 (-203216).
+
+   Version 0.1 -- May 9, 2005 -- Boris Semenov, NAIF/JPL
+
+      Added radiator FOV.
+
+   Version 0.0 -- October 12, 2004 -- Boris Semenov, NAIF/JPL
+
+      Initial release.
+
+
+References
+---------------------------------------------------------------------------
+
+   1. ``Kernel Pool Required Reading''
+
+   2. ``C-kernel Required Reading''
+
+   3. VIR ICD/MICD, latest version as of 10/12/04
+
+   4. Dawn Frames Definition Kernel (FK), latest version.
+
+   5. VIR CDR Presentations
+
+   6. Rosetta VIRTIS Documentation (ROS-EST-RS-30015/EID B and RO-VIR-UM-001)
+
+   7. VIR Home Page http://www.ifsi-roma.inaf.it/vir/; accessed 10/07/09
+
+
+Implementation Notes
+--------------------------------------------------------
+
+   Applications that need SPICE I-kernel data must ``load'' the I-kernel
+   file, normally during program initialization.
+
+   Loading the kernel using the SPICELIB routine FURNSH causes the data
+   items and their associated values present in the kernel to become
+   associated with a data structure called the ``kernel pool''. The
+   application program may then obtain the value(s) for any IK data
+   item using the SPICELIB routines GDPOOL, GIPOOL, GCPOOL. Routine
+   GETFOV may be used if the file contains instrument field-of-view
+   (FOV) specification. See [1] for details.
+
+   This file was created with, and can be updated with a text editor or
+   word processor.
+
+
+Conventions for Specifying Data
+--------------------------------------------------------
+
+   Data items are specified using ``keyword=value'' assignments [1].
+   All keywords referencing values in this I-kernel start with the
+   characters `INS' followed by the NAIF Dawn instrument ID code,
+   constructed using the spacecraft ID number (-226) followed by the
+   NAIF three digit ID number for VIR module. These IDs are defined in
+   [4] as follows:
+
+               Instrument name          ID
+               --------------------   -------
+               DAWN_VIR               -203200
+               DAWN_VIR_SCAN          -203201
+               DAWN_VIR_VIS           -203211
+               DAWN_VIR_IR            -203213
+
+               DAWN_VIR_VIS_SCAN      -203212 (*)
+               DAWN_VIR_IR_SCAN       -203214 (*)
+               DAWN_VIR_VIS_128       -203215 (*)
+               DAWN_VIR_VIS_64        -203216 (*)
+               DAWN_VIR_VIS_16        -203217 (*)
+               DAWN_VIR_VIS_96        -203218 (*)
+               DAWN_VIR_VIS_32        -203219 (*)
+
+               DAWN_VIR_RAD           -203209
+
+   (*) _SCAN, _128, _64, _16, _96 and _32 names/IDs are defined to
+       allow specifying FOVs circumscribing full or partial side scans
+       of the VIR scan mirror. These frames are used only for planning
+       purposes and have nothing to do with the real angular aperture
+       (FOV) of the VIR instrument.
+
+   The remainder of the keyword is an underscore character followed by
+   the unique name of the data item. For example, the focal length of
+   the VIR VIS optics is specified by
+
+               INS-203211_FOCAL_LENGTH
+
+   The upper bound on the length of all keywords is 32 characters.
+
+   If a keyword is included in more than one file, or if the same
+   keyword appears more than once within a single file, the last
+   assignment supersedes any earlier assignments.
+
+
+Overview
+--------------------------------------------------------
+
+   From [7]:
+
+      What is VIR?
+                
+      The Dawn mapping spectrometer VIR is a Visual and Infrared
+      Imaging Spectrometer that produces spectral images in the 0.25-1
+      mkm and 1-5 mkm ranges. VIR is a rebuild of the VIRTIS mapping
+      spectrometer on board the ESA Rosetta mission and it also derives
+      much design heritage from the Cassini VIMS spectrometer. The
+      design of the instrument fully accomplishes the mission's
+      scientific and measurement objectives with a simple
+      space-qualified low risk approach and high performance,
+      reliability, heritage and cost effectiveness.
+
+      Some technical details
+
+      VIR is a Visual and Infrared Imaging Spectrometer in a single
+      optical head. A Shafer telescope is mated to an Offner slit
+      spectrometer. Spectral images are formed on two matrix detectors
+      to cover the 0.25-1 mkm and 1-5 mkm ranges. The design uses a
+      dual arm optical and focal design with mapping ability to 5
+      mkm.The Dawn mapping spectrometer (VIR) is a rebuild of the
+      VIRTIS mapping spectrometer on board the ESA Rosetta mission with
+      an operational durations of 2y and flight time of 13y. The MS
+      spectrometer will only use the - M channel of VIRTIS, thus
+      allowing a great mass reduction. VIR also derives much of its
+      design from the Cassini VIMS spectrometer with an operational
+      lifetime of >4y and a mission life>10y.
+
+      VIR modules
+
+      The spectrometer consists of only three modules: the optical
+      system, 5.0 kg mass; the proximity electronics, 3.0 kg and 5 W;
+      the cryocooler including driving electronics, 1.3 kg and 12.6 W.
+      A mechanical and thermal mounting of 5.0 kg mass accommodates the
+      spectrometer subsystems. The optical system, which includes
+      foreoptics, dispersive elements, filters, focal plane assemblies
+      as well as the cryocooler and proximity electronics is a complete
+      re-build of the VIRTIS M instrument The data processing unit box
+      (DPU) is shared with the framing camera to save mass. The DPU
+      handles the data for both camera and spectrometer, compresses and
+      buffers them, and controls both the FCs and MS. Flight software
+      is based on Rosetta VIRTIS and ROLIS developments. The camera is
+      operated only when the spectrometer is not operating. As
+      VIRTIS-M, VIR does not use beam-splitters. Two different groove
+      densities are ruled on a single grating. The central part of the
+      grating (about 30% of the pupil) is ruled with a higher groove
+      density, which generate the higher spectral resolution needed in
+      the visible channel. The infrared channel utilizes the outer 70%
+      of the grating, which is ruled with a lower groove density. The
+      larger collecting area in the IR compensates for the lower solar
+      irradiance in this region. The visible detector array is based on
+      the Thomson-CSF type TH 7896 CCD detector. The IR detector used
+      in the MS is based on a bidimensional array of IR-sensitive
+      photovoltaic Mercury Cadmium Telluride coupled to silicon CMOS
+      multiplexer. This detector can operate at temperatures of the
+      order of 75 K. For this reason cryocoolers have to be used. The
+      calibration unit will make use of the cover, which -inside is
+      coated. It will diffuse the light coming from two internal
+      calibration lamps (one for the VISFPA and one for the IR-FPA),
+      calibrated at IAS.
+
+
+Mounting Alignment
+--------------------------------------------------------
+
+   Refer to the latest version of the Dawn Frames Definition Kernel
+   (FK) [4] for the VIR reference frame definitions and mounting
+   alignment information.
+
+
+Apparent FOV Layout
+--------------------------------------------------------
+
+   WARNING --- the description/diagram below have not been verified
+
+   This diagram illustrates the VIR apparent FOV layout for "zero"
+   scan mirror position in the corresponding reference frame.
+
+
+                                  ^ +Xvis
+                                  | +Xir
+        |                         |
+        | ~0.014 degrees          |
+        |                         |
+        v         Pixel 1         |      Pixel 256
+       ---              +---------|---------+
+        |       1 line  |         x-------------> +Yvis
+       ---              +-------------------+     +Yir
+        ^                   256 pixels/line
+        |
+                        |   ~3.67 degrees   |
+                        |<----------------->|
+                        |                   |      Boresight (+Z axis)
+                                                    is into the page
+
+
+   This diagram illustrates the VIR apparent FOV layout resulting from
+   a full, 256 step, +/- 1.83 degree scan mirror sweep about Y axis.
+   For partial scans of 16, 32, 64, 96, or 128 lines the cross-slit
+   FOV extent is proportionally decreased to 0.23, 0.46, 0.92, 1.38,
+   and 1.84 degrees correspondingly.
+
+
+                                  ^ +Xvis
+                                  | +Xir
+        |        Pixel 1,1        |
+       ---              *---------|---------+
+        ^               |         |         |
+        |  ~3.67        |         |         |
+        | degrees       |         |         |
+        |               |         |         |
+        |     256 lines |         x-------------> +Yvis
+        |     (each for |                   |     +Yir
+        |     a step in |                   |
+        |     scan seq.)|                   |
+        V               |                   |
+       ---              +-------------------+
+        |                  256 pixels/line
+
+
+                        |   ~3.67 degrees   |
+                        |<----------------->|
+                        |                   |      Boresight (+Z axis)
+                                                    is into the page
+
+
+Optical Parameters
+--------------------------------------------------------
+
+   The following VIR VIS and IR nominal first order optical parameters
+   are included in the data section below, from [6]:
+
+      -----------------------------------------------------------------
+             parameter            VIR/VIS        VIR/IR
+      -----------------------------------------------------------------
+      Focal Length, mm            152.0          152.0
+      f/ratio                     f/5.6          f/3.2
+      IFOV, rad/pixel
+          along-slit              0.00025        0.00025
+          cross-slit              0.00025        0.00025
+      Field of view (deg)
+          along-slit              3.6669         3.6669
+          cross-slit              0.0143         0.0143
+      Field of view (deg) - scan
+          along-slit              3.6669         3.6669
+          cross-slit              3.6669         3.6669
+      -----------------------------------------------------------------
+
+   The keywords below provide nominal values from the table above.
+   Angular size values in the keywords are given radians, with the
+   along-slit size being the first value and the cross-slit size
+   being the second value in each pair.
+
+      \begindata
+
+         INS-203211_FOCAL_LENGTH       = ( 152.0                )
+         INS-203211_F/RATIO            = (   5.6                )
+         INS-203211_FOV_ANGULAR_SIZE   = (   0.064000, 0.000250 )
+         INS-203211_IFOV               = (   0.000250, 0.000250 )
+
+         INS-203213_FOCAL_LENGTH       = ( 152.0                )
+         INS-203213_F/RATIO            = (   3.2                )
+         INS-203213_FOV_ANGULAR_SIZE   = (   0.064000, 0.000250 )
+         INS-203213_IFOV               = (   0.000250, 0.000250 )
+
+      \begintext
+
+
+Detector Parameters
+--------------------------------------------------------
+
+   The nominal VIR detector parameters from [6] are:
+
+      -----------------------------------------------------------------
+             parameter                VIR/VIS      VIR/IR
+      -----------------------------------------------------------------
+      Detector Array Size/Physical
+          along-slit                  508          270
+          cross-slit                 1024          436
+      Detector Array Size/Spatial
+          along-slit                  256 (1)      256 (2)
+          cross-slit                    1            1
+      Detector Array Center/Spatial
+          along-slit                  127.5        127.5
+          cross-slit                    0.5          0.5
+      Pixel Size, microns/Spatial
+          along-slit                   38 (3)       38
+          cross-slit                   38           38
+      -----------------------------------------------------------------
+
+   (1) VIS CCD pixels are 2x2 binned at detector level
+
+   (2) assuming IR reads out the same number of pixels as VIS
+
+   (3) size of a 2x2 binned pixel
+
+   The values are given in microns for PIXEL_SIZE keywords and in counts
+   for PIXEL_SAMPLES, PIXEL_LINES, and CENTER keywords.
+
+      \begindata
+
+         INS-203211_PIXEL_SIZE         = ( 38, 38 )
+         INS-203211_PIXEL_SAMPLES      = ( 256 )
+         INS-203211_PIXEL_LINES        = (   1 )
+         INS-203211_CCD_CENTER         = ( 127.5, 0.5 )
+
+         INS-203213_PIXEL_SIZE         = ( 38, 38 )
+         INS-203213_PIXEL_SAMPLES      = ( 256 )
+         INS-203213_PIXEL_LINES        = (   1 )
+         INS-203213_CCD_CENTER         = ( 127.5, 0.5 )
+
+      \begintext
+
+
+FOV Definitions
+---------------------------------------------------------------------------
+
+   This section contains definitions for the VIR FOVs. These
+   definitions are provided in a format required by the SPICE (CSPICE)
+   function GETFOV (getfov_c).
+
+   The set of assignments in the data section below defines the VIR VIS
+   and IR actual slit FOVs with respect to the corresponding moving
+   frames to be a rectangles with the corners defined by the first and
+   last pixels of the spatial line along +Y and the boresight along the
+   +Z axis. These FOV definitions use angular extent style
+   specification with the cross and along track angular sizes taken
+   from the ``Optics Parameters'' section above.
+
+      \begindata
+
+         INS-203211_FOV_FRAME                 = 'DAWN_VIR_VIS'
+         INS-203211_FOV_SHAPE                 = 'RECTANGLE'
+         INS-203211_BORESIGHT                 = (
+                                            0.000000     0.000000   152.000000
+                                                )
+         INS-203211_FOV_CLASS_SPEC            = 'ANGLES'
+         INS-203211_FOV_REF_VECTOR            = (
+                                            1.000000     0.000000     0.000000
+                                                )
+         INS-203211_FOV_REF_ANGLE             = ( 0.00716197 )
+         INS-203211_FOV_CROSS_ANGLE           = ( 1.83346494 )
+         INS-203211_FOV_ANGLE_UNITS           = 'DEGREES'
+
+
+         INS-203213_FOV_FRAME                 = 'DAWN_VIR_IR'
+         INS-203213_FOV_SHAPE                 = 'RECTANGLE'
+         INS-203213_BORESIGHT                 = (
+                                            0.000000     0.000000   152.000000
+                                                )
+         INS-203213_FOV_CLASS_SPEC            = 'ANGLES'
+         INS-203213_FOV_REF_VECTOR            = (
+                                            1.000000     0.000000     0.000000
+                                                )
+         INS-203213_FOV_REF_ANGLE             = ( 0.00716197 )
+         INS-203213_FOV_CROSS_ANGLE           = ( 1.83346494 )
+         INS-203213_FOV_ANGLE_UNITS           = 'DEGREES'
+
+      \begintext
+
+
+   The set of assignments in the data section below defines the VIR VIS
+   apparent FOVs resulting from a full, 256-step and partial 128-, 64-,
+   16-, 96-, and 32- step scan mirror sweeps about Y axis with respect
+   to the non-moving frame 'DAWN_VIR_VIS_ZERO' to be a rectangles with the
+   corners defined by the first and last pixels of the spatial line in
+   the first and last scan positions and the boresight along the +Z
+   axis. These FOV definitions use angular extent style specification
+   with the angular sizes taken from the ``Optics Parameters'' section
+   above.
+
+   Note that FOVs defined below are used only for planning purposes and 
+   have nothing to do with the real angular aperture (FOV) of the VIR 
+   instrument; therefore they should not be used to reproduce the geometry
+   of real VIR acquisitions.
+
+      \begindata
+
+         INS-203212_FOV_FRAME                 = 'DAWN_VIR_VIS_ZERO'
+         INS-203212_FOV_SHAPE                 = 'RECTANGLE'
+         INS-203212_BORESIGHT                 = (
+                                            0.000000     0.000000   152.000000
+                                                )
+         INS-203212_FOV_CLASS_SPEC            = 'ANGLES'
+         INS-203212_FOV_REF_VECTOR            = (
+                                            1.000000     0.000000     0.000000
+                                                )
+         INS-203212_FOV_REF_ANGLE             = ( 1.83346494 )
+         INS-203212_FOV_CROSS_ANGLE           = ( 1.83346494 )
+         INS-203212_FOV_ANGLE_UNITS           = 'DEGREES'
+
+
+         INS-203214_FOV_FRAME                 = 'DAWN_VIR_IR_ZERO'
+         INS-203214_FOV_SHAPE                 = 'RECTANGLE'
+         INS-203214_BORESIGHT                 = (
+                                            0.000000     0.000000   152.000000
+                                                )
+         INS-203214_FOV_CLASS_SPEC            = 'ANGLES'
+         INS-203214_FOV_REF_VECTOR            = (
+                                            1.000000     0.000000     0.000000
+                                                )
+         INS-203214_FOV_REF_ANGLE             = ( 1.83346494 )
+         INS-203214_FOV_CROSS_ANGLE           = ( 1.83346494 )
+         INS-203214_FOV_ANGLE_UNITS           = 'DEGREES'
+
+
+         INS-203215_FOV_FRAME                 = 'DAWN_VIR_VIS_ZERO'
+         INS-203215_FOV_SHAPE                 = 'RECTANGLE'
+         INS-203215_BORESIGHT                 = (
+                                            0.000000     0.000000   152.000000
+                                                )
+         INS-203215_FOV_CLASS_SPEC            = 'ANGLES'
+         INS-203215_FOV_REF_VECTOR            = (
+                                            1.000000     0.000000     0.000000
+                                                )
+         INS-203215_FOV_REF_ANGLE             = ( 0.91673247 )
+         INS-203215_FOV_CROSS_ANGLE           = ( 1.83346494 )
+         INS-203215_FOV_ANGLE_UNITS           = 'DEGREES'
+
+
+         INS-203216_FOV_FRAME                 = 'DAWN_VIR_VIS_ZERO'
+         INS-203216_FOV_SHAPE                 = 'RECTANGLE'
+         INS-203216_BORESIGHT                 = (
+                                            0.000000     0.000000   152.000000
+                                                )
+         INS-203216_FOV_CLASS_SPEC            = 'ANGLES'
+         INS-203216_FOV_REF_VECTOR            = (
+                                            1.000000     0.000000     0.000000
+                                                )
+         INS-203216_FOV_REF_ANGLE             = ( 0.45836624 )
+         INS-203216_FOV_CROSS_ANGLE           = ( 1.83346494 )
+         INS-203216_FOV_ANGLE_UNITS           = 'DEGREES'
+
+
+         INS-203217_FOV_FRAME                 = 'DAWN_VIR_VIS_ZERO'
+         INS-203217_FOV_SHAPE                 = 'RECTANGLE'
+         INS-203217_BORESIGHT                 = (
+                                            0.000000     0.000000   152.000000
+                                                )
+         INS-203217_FOV_CLASS_SPEC            = 'ANGLES'
+         INS-203217_FOV_REF_VECTOR            = (
+                                            1.000000     0.000000     0.000000
+                                                )
+         INS-203217_FOV_REF_ANGLE             = ( 0.11459156 )
+         INS-203217_FOV_CROSS_ANGLE           = ( 1.83346494 )
+         INS-203217_FOV_ANGLE_UNITS           = 'DEGREES'
+
+
+         INS-203218_FOV_FRAME                 = 'DAWN_VIR_VIS_ZERO'
+         INS-203218_FOV_SHAPE                 = 'RECTANGLE'
+         INS-203218_BORESIGHT                 = (
+                                            0.000000     0.000000   152.000000
+                                                )
+         INS-203218_FOV_CLASS_SPEC            = 'ANGLES'
+         INS-203218_FOV_REF_VECTOR            = (
+                                            1.000000     0.000000     0.000000
+                                                )
+         INS-203218_FOV_REF_ANGLE             = ( 0.68754935 )
+         INS-203218_FOV_CROSS_ANGLE           = ( 1.83346494 )
+         INS-203218_FOV_ANGLE_UNITS           = 'DEGREES'
+
+
+         INS-203219_FOV_FRAME                 = 'DAWN_VIR_VIS_ZERO'
+         INS-203219_FOV_SHAPE                 = 'RECTANGLE'
+         INS-203219_BORESIGHT                 = (
+                                            0.000000     0.000000   152.000000
+                                                )
+         INS-203219_FOV_CLASS_SPEC            = 'ANGLES'
+         INS-203219_FOV_REF_VECTOR            = (
+                                            1.000000     0.000000     0.000000
+                                                )
+         INS-203219_FOV_REF_ANGLE             = ( 0.22918312 )
+         INS-203219_FOV_CROSS_ANGLE           = ( 1.83346494 )
+         INS-203219_FOV_ANGLE_UNITS           = 'DEGREES'
+
+
+      \begintext
+
+
+Radiator Sun Avoidance FOV Definition
+--------------------------------------------------------
+
+   Sun avoidance for VIR radiator is 175 degree cone centered on
+   spacecraft -X axis [3].
+
+      \begindata
+
+         INS-203209_FOV_FRAME                 = 'DAWN_SPACECRAFT'
+         INS-203209_FOV_SHAPE                 = 'CIRCLE'
+         INS-203209_BORESIGHT                 = (
+                                           -1.000000     0.000000     0.000000
+                                                )
+         INS-203209_FOV_CLASS_SPEC            = 'ANGLES'
+         INS-203209_FOV_REF_VECTOR            = (
+                                            0.000000     1.000000     0.000000
+                                                )
+         INS-203209_FOV_REF_ANGLE             = ( 87.5 )
+         INS-203209_FOV_ANGLE_UNITS           = 'DEGREES'
+
+      \begintext
+
+
+Optical Distortion
+--------------------------------------------------------
+
+   [TBD]
+
+
+Platform ID
+---------------------------------------------------------------------------
+
+   This number is the NAIF instrument ID of the platform on which the
+   instrument mounted. All VIR components it is the spacecraft.
+
+      \begindata
+
+      INS-203200_PLATFORM_ID  = ( -203000 )
+      INS-203211_PLATFORM_ID  = ( -203000 )
+      INS-203213_PLATFORM_ID  = ( -203000 )
+
+      \begintext
+

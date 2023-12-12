@@ -464,6 +464,14 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
     
     @property
     def sensor_frame_id(self):
+        """
+        Returns the FRAME_DAWN_VIR_{VIS/IR}_ZERO Naif ID code if there are no associated articulation kernels. 
+        Otherwise the original Naif ID code is returned.
+        Returns
+        -------
+        : int
+          Naif ID code for the sensor frame
+        """
         if self.has_articulation_kernel:
           lookup_table = {
             'VIS': -203211,
@@ -580,33 +588,67 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
     
     @property
     def ephemeris_start_time(self):
-        try:
-            # first line's middle et - 1/2 exposure duration = cube start time
-            return self.ephemeris_times[0] - (self.line_exposure_duration / 2)
-        except:
-            return spice.scs2e(self.spacecraft_id, self.label['IsisCube']['Instrument']['SpacecraftClockStartCount'])
+        """
+        Returns the starting ephemeris time of the image using the first et time from
+        the housekeeping table minus the line exposure duration / 2. 
+
+        Returns
+        -------
+        : double
+          Starting ephemeris time of the image
+        """
+        return self.ephemeris_times[0] - (self.line_exposure_duration / 2)
 
 
     @property
     def ephemeris_stop_time(self):
-        try:
-            #  last line's middle et + 1/2 exposure duration = cube end time
-            return self.ephemeris_times[-1] + (self.line_exposure_duration / 2)
-        except:
-            return spice.scs2e(self.spacecraft_id, self.label['IsisCube']['Instrument']['SpacecraftClockStopCount'])
+        """
+        Returns the ephemeris stop time of the image using the last et time from
+        the housekeeping table plus the line exposure duration / 2. 
+
+        Returns
+        -------
+        : double
+          Ephemeris stop time of the image
+        """
+        return self.ephemeris_times[-1] + (self.line_exposure_duration / 2)
     
     @property
     def is_calibrated(self):
+        """
+        Checks if image is calibrated.
+
+        Returns
+        -------
+        : bool
+        """
         return self.label['IsisCube']['Archive']['ProcessingLevelId'] > 2
 
     @property 
     def has_articulation_kernel(self):
-        regex = re.compile('.*dawn_vir_[0-9]{9}_[0-9]{1}.BC')
-        return any([re.match(regex, i) for i in self.kernels])
+        """
+        Checks if articulation kernel exists in pool of kernels.
+
+        Returns
+        -------
+        : bool
+        """
+        try:
+          regex = re.compile('.*dawn_vir_[0-9]{9}_[0-9]{1}.BC')
+          return any([re.match(regex, i) for i in self.kernels])
+        except ValueError:
+          return False
     
     @property
     def inst_pointing_rotation(self):
+        """
+        Returns a time dependent instrument pointing rotation for -203221 and -203223 sensor frame ids.
 
+        Returns
+        -------
+        : TimeDependentRotation
+          Instrument pointing rotation
+        """
         time_dep_quats = np.zeros((len(self.ephemeris_times), 4))
         avs = []
 
