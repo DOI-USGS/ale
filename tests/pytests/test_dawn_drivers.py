@@ -254,5 +254,6 @@ class test_dawn_vir_isis3_naif(unittest.TestCase):
         assert self.driver.is_calibrated == False
 
     def test_has_articulation_kernel(self):
+        os.environ['ALESPICEROOT'] = '/foo/bar'
         assert self.driver.has_articulation_kernel == False
 
