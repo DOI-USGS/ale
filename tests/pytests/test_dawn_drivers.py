@@ -208,7 +208,7 @@ class test_dawn_vir_isis3_naif(unittest.TestCase):
                                                                 'MirrorSin': [0.066178, -0.037118, -0.037118], \
                                                                 'MirrorCos': [0.997557, 0.999266, 0.999266]}) as parse_table:
             
-            assert self.driver.line_scan_rate == ([1, 2, 3], [362681649.3634113, 362681649.3634113, 362681649.3634113], [0.5, 0.5, 0.5])
+            assert self.driver.line_scan_rate == ([0.5, 1.5, 2.5, 3.5], [-0.25, -0.25, -0.25, 15.75], [16, 16, 16, 16])
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
@@ -222,7 +222,7 @@ class test_dawn_vir_isis3_naif(unittest.TestCase):
             
             assert self.driver.optical_angles == [-0.005747392247876606, -0.005747392247876606, -0.005747392247876606]
 
-    def test_ephemeris_times(self):
+    def test_hk_ephemeris_time(self):
         with patch('ale.drivers.dawn_drivers.read_table_data', return_value=12345) as read_table_data, \
              patch('ale.drivers.dawn_drivers.spice.scs2e', return_value=362681633.8634121) as scs2e, \
              patch('ale.drivers.dawn_drivers.parse_table', return_value={'ScetTimeClock': ['362681634.09', '362681650.09', '362681666.09'], \
@@ -230,7 +230,7 @@ class test_dawn_vir_isis3_naif(unittest.TestCase):
                                                                 'MirrorSin': [0.066178, -0.037118, -0.037118], \
                                                                 'MirrorCos': [0.997557, 0.999266, 0.999266]}) as parse_table:
             
-            assert self.driver.ephemeris_times == [362681633.8634121, 362681633.8634121, 362681633.8634121]
+            assert self.driver.hk_ephemeris_time == [362681633.8634121, 362681633.8634121, 362681633.8634121]
 
     def test_ephemeris_start_time(self):
         with patch('ale.drivers.dawn_drivers.read_table_data', return_value=12345) as read_table_data, \
