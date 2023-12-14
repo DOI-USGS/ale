@@ -12,7 +12,7 @@ from ale.drivers import AleJsonEncoder
 from conftest import get_image_label, get_image_kernels, get_isd, convert_kernels, compare_dicts
 
 import ale
-from ale.drivers.dawn_drivers import DawnFcPds3NaifSpiceDriver, DawnFcIsisLabelNaifSpiceDriver, DawnVirIsisNaifSpiceDriver
+from ale.drivers.dawn_drivers import DawnFcPds3NaifSpiceDriver, DawnFcIsisLabelNaifSpiceDriver, DawnVirIsisLabelNaifSpiceDriver
 
 housekeeping_dict = {'ScetTimeClock': ['362681634.09', '362681650.09', '362681666.09', '362681682.09', '362681698.09', '362681714.09', 
                                        '362681730.09', '362681746.09', '362681762.09', '362681778.09', '362681794.09', '362681810.09', 
@@ -81,7 +81,7 @@ def test_vir_load(vir_kernels):
 
         compare_dict = get_isd("dawnvir")
 
-        isd_str = ale.loads(label_file, props={"kernels": vir_kernels, "nadir": True}, verbose=True)
+        isd_str = ale.loads(label_file, props={"kernels": vir_kernels, "nadir": False}, verbose=False)
         isd_obj = json.loads(isd_str)
         x = compare_dicts(isd_obj, compare_dict)
         assert x == []
@@ -178,7 +178,7 @@ class test_dawn_fc_isis3_naif(unittest.TestCase):
 class test_dawn_vir_isis3_naif(unittest.TestCase):
     def setUp(self):
         label = get_image_label("VIR_IR_1A_1_362681634_1", "isis3")
-        self.driver = DawnVirIsisNaifSpiceDriver(label)
+        self.driver = DawnVirIsisLabelNaifSpiceDriver(label)
 
     def test_instrument_id(self):
         assert self.driver.instrument_id == "Visual and Infrared Spectrometer"

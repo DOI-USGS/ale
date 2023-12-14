@@ -10,12 +10,14 @@ import ale
 from ale.base import Driver
 from ale.base.label_isis import IsisLabel
 from ale.base.data_naif import NaifSpice
+from ale.base.data_isis import IsisSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.type_distortion import NoDistortion
 from ale.base.type_sensor import Framer, LineScanner
 from ale.base.data_isis import read_table_data
 from ale.base.data_isis import parse_table
 from ale.transformation import TimeDependentRotation
+from ale.transformation import ConstantRotation
 
 ID_LOOKUP = {
     "FC1" : "DAWN_FC1",
@@ -402,7 +404,7 @@ class DawnFcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
         return self.ephemeris_start_time + (self.exposure_duration_ms / 2.0)
     
 
-class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
+class DawnVirIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
     @property
     def instrument_id(self):
         """
@@ -444,6 +446,19 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
     def focal_length(self):
       return float(spice.gdpool('INS{}_FOCAL_LENGTH'.format(self.ikid), 0, 1)[0])
     
+    @property
+    def detector_center_sample(self):
+        """
+        Returns the center detector sample. Expects ikid to be defined. This should
+        be an integer containing the Naif Id code of the instrument.
+
+        Returns
+        -------
+        : float
+          Detector sample of the principal point
+        """
+        return super().detector_center_sample - 0.5
+
     @property
     def ikid(self):
         """
@@ -515,14 +530,18 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
         start_lines = []
         exposure_durations = []
 
-        line_no = 1
+        line_no = 0.5
 
-        for line_midtime in self.ephemeris_times:
+        for line_midtime in self.hk_ephemeris_time:
           if not self.is_calibrated:
-            line_times.append(line_midtime - (self.line_exposure_duration / 2.0))
+            line_times.append(line_midtime - (self.line_exposure_duration / 2.0) - self.center_ephemeris_time)
             start_lines.append(line_no)
-            exposure_durations.append(self.line_exposure_duration)
+            exposure_durations.append(self.label["IsisCube"]["Instrument"]["FrameParameter"][2])
             line_no += 1
+
+        line_times.append(line_times[-1] + self.label["IsisCube"]["Instrument"]["FrameParameter"][2])
+        start_lines.append(line_no)
+        exposure_durations.append(self.label["IsisCube"]["Instrument"]["FrameParameter"][2])
 
         return start_lines, line_times, exposure_durations
 
@@ -544,20 +563,20 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
         x = np.array([])
         y = np.array([])
         for index, mirror_sin in enumerate(hk_dict["MirrorSin"]):
-          shutter_status = hk_dict["ShutterStatus"][index].lower().replace(" ", "")
-          is_dark = (shutter_status == "closed")   
+            shutter_status = hk_dict["ShutterStatus"][index].lower().replace(" ", "")
+            is_dark = (shutter_status == "closed")   
 
-          mirror_cos = hk_dict["MirrorCos"][index]
+            mirror_cos = hk_dict["MirrorCos"][index]
 
-          scan_elec_deg = math.atan(mirror_sin/mirror_cos) * degs_per_rad
-          opt_ang = ((scan_elec_deg - 3.7996979) * 0.25/0.257812) / 1000
+            scan_elec_deg = math.atan(mirror_sin/mirror_cos) * degs_per_rad
+            opt_ang = ((scan_elec_deg - 3.7996979) * 0.25/0.257812) / 1000
 
-          if not is_dark:
-              x = np.append(x, index + 1)
-              y = np.append(y, opt_ang)
+            if not is_dark:
+                x = np.append(x, index + 1)
+                y = np.append(y, opt_ang)
 
-          if not self.is_calibrated:
-              opt_angles.append(opt_ang)
+            if not self.is_calibrated:
+                opt_angles.append(opt_ang)
 
         cs = CubicSpline(x, y, extrapolate="periodic")
 
@@ -576,7 +595,7 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
         return opt_angles
     
     @property
-    def ephemeris_times(self):
+    def hk_ephemeris_time(self):
 
         line_times = []
         scet_times = self.housekeeping_table["ScetTimeClock"]
@@ -597,7 +616,7 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
         : double
           Starting ephemeris time of the image
         """
-        return self.ephemeris_times[0] - (self.line_exposure_duration / 2)
+        return self.hk_ephemeris_time[0] - (self.line_exposure_duration / 2)
 
 
     @property
@@ -611,7 +630,11 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
         : double
           Ephemeris stop time of the image
         """
-        return self.ephemeris_times[-1] + (self.line_exposure_duration / 2)
+        return self.hk_ephemeris_time[-1] + (self.line_exposure_duration / 2)
+
+    @property
+    def center_ephemeris_time(self):
+      return self.hk_ephemeris_time[int(len(self.hk_ephemeris_time)/2)]
     
     @property
     def is_calibrated(self):
@@ -638,6 +661,12 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
           return any([re.match(regex, i) for i in self.kernels])
         except ValueError:
           return False
+
+    @property
+    def frame_chain(self):
+      frame_chain = super().frame_chain
+      frame_chain.add_edge(rotation=self.inst_pointing_rotation)
+      return frame_chain
     
     @property
     def inst_pointing_rotation(self):
@@ -649,10 +678,10 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
         : TimeDependentRotation
           Instrument pointing rotation
         """
-        time_dep_quats = np.zeros((len(self.ephemeris_times), 4))
+        time_dep_quats = np.zeros((len(self.hk_ephemeris_time), 4))
         avs = []
 
-        for i, time in enumerate(self.ephemeris_times):
+        for i, time in enumerate(self.hk_ephemeris_time):
           try:
             state_matrix = spice.sxform("J2000", spice.frmnam(self.sensor_frame_id), time)
           except:
@@ -671,7 +700,8 @@ class DawnVirIsisNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion
           time_dep_quats[i,:3] = quat_from_rotation[1:]
           time_dep_quats[i, 3] = quat_from_rotation[0]
 
-        time_dep_rot = TimeDependentRotation(time_dep_quats, self.ephemeris_times, 1, self.sensor_frame_id, av=avs)
+        time_dep_rot = TimeDependentRotation(time_dep_quats, self.hk_ephemeris_time, 1, self.sensor_frame_id, av=avs)
 
         return time_dep_rot
+
     
