@@ -125,8 +125,8 @@ def to_isd(driver):
 
     # Reverse the frame order because ISIS orders frames as
     # (destination, intermediate, ..., intermediate, source)
-    instrument_pointing['time_dependent_frames'] = shortest_path(frame_chain, destination_frame, 1)
-    time_dependent_rotation = frame_chain.compute_rotation(1, destination_frame)
+    instrument_pointing['time_dependent_frames'] = shortest_path(frame_chain, destination_frame, J2000)
+    time_dependent_rotation = frame_chain.compute_rotation(J2000, destination_frame)
     instrument_pointing['ck_table_start_time'] = time_dependent_rotation.times[0]
     instrument_pointing['ck_table_end_time'] = time_dependent_rotation.times[-1]
     instrument_pointing['ck_table_original_size'] = len(time_dependent_rotation.times)
