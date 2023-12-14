@@ -1,0 +1,306 @@
+KPL/PCK
+
+\beginlabel
+PDS_VERSION_ID               = PDS3
+RECORD_TYPE                  = STREAM
+RECORD_BYTES                 = "N/A"
+^SPICE_KERNEL                = "dawn_vesta_v06.tpc"
+MISSION_NAME                 = "DAWN MISSION TO VESTA AND CERES"
+SPACECRAFT_NAME              = DAWN
+DATA_SET_ID                  = "DAWN-M/A-SPICE-6-V1.0"
+KERNEL_TYPE_ID               = PCK
+PRODUCT_ID                   = "dawn_vesta_v06.tpc"
+PRODUCT_CREATION_TIME        = 2012-09-27T14:04:32
+PRODUCER_ID                  = "NAIF/JPL"
+MISSION_PHASE_NAME           = {
+                               "INITIAL CHECKOUT (ICO)",
+                               "EARTH-MARS CRUISE (EMC)",
+                               "MARS GRAVITY ASSIST (MGA)",
+                               "MARS-VESTA CRUISE (MVC)",
+                               "VESTA ENCOUNTER",
+                               "VESTA-CERES CRUISE (VCC)",
+                               "CERES ENCOUNTER",
+                               "END OF MISSION"
+                               }
+PRODUCT_VERSION_TYPE         = ACTUAL
+PLATFORM_OR_MOUNTING_NAME    = "N/A"
+START_TIME                   = "N/A"
+STOP_TIME                    = "N/A"
+SPACECRAFT_CLOCK_START_COUNT = "N/A"
+SPACECRAFT_CLOCK_STOP_COUNT  = "N/A"
+TARGET_NAME                  = {
+                               "4 VESTA",
+                               "1 CERES"
+                               }
+INSTRUMENT_NAME              = "N/A"
+NAIF_INSTRUMENT_ID           = "N/A"
+SOURCE_PRODUCT_ID            = "N/A"
+NOTE                         = "See comments in the file for details"
+OBJECT                       = SPICE_KERNEL
+  INTERCHANGE_FORMAT         = ASCII
+  KERNEL_TYPE                = TARGET_CONSTANTS
+  DESCRIPTION                = "SPICE PCK file containing constants for
+Vesta, created by NAIF, JPL. Vesta rotation constants provided in this PCK
+are for the ``Claudia Double-Prime'' coordinate system used in science
+products included in the DAWN Vesta mission PDS archives. "
+END_OBJECT                   = SPICE_KERNEL
+\endlabel
+
+
+Asteroid Vesta P_constants (PcK) SPICE kernel file
+===========================================================================
+ 
+ 
+Organization
+--------------------------------------------------------
+ 
+     The sections of this file are as follows.
+ 
+     Introductory Information:
+ 
+         --   Version description
+ 
+         --   Disclaimer
+ 
+         --   Sources
+ 
+     Pck Data:
+ 
+         --   Orientation constants for asteroid Vesta
+ 
+         --   Radii for asteroid Vesta
+
+
+Version description
+--------------------------------------------------------
+
+     Version 0.6 -- October 20, 2012 -- Dr. Carol Raymond, DAWN Deputy PI,
+                                        Boris Semenov, NAIF
+
+        Corrected the Claudia center longitudes provided in the comment
+        sections ``Values in the Version 0.5'' (136.7 -> 136.0) and
+        ``Values in the Version 0.6'' (146.7 -> 146.0) *WITHOUT*
+        changing the file version or file name.
+
+                    September 5, 2012  -- Dr. Carol Raymond, DAWN Deputy PI,
+                                  Dr. Steven Joy, Dawn Science Center Manager,
+                                  Boris Semenov, NAIF
+
+        Corrected W0 (295.39 -> 285.39). 
+
+     Version 0.5 -- May 2, 2012  -- Dr. Carol Raymond, DAWN Deputy PI,
+                                  Dr. Steven Joy, Dawn Science Center Manager,
+                                  Boris Semenov, NAIF
+
+        Corrected W0 (75.39 -> 295.39). 
+ 
+     Version 0.4 -- November 2, 2011 -- Dr. Carol Raymond, DAWN Deputy PI,
+                                        Boris Semenov, NAIF
+
+        Corrected W0 (76.06 -> 75.39). 
+
+     Version 0.3 -- September 29, 2011 -- Dr. Carol Raymond, DAWN Deputy PI,
+                                          Boris Semenov, NAIF
+
+        Per MCR-112436 Vesta pole orientation and prime meridian 
+        (Ra, Dec, W0) were changed to (309.031, 42.235, 76.06) degrees 
+
+     Version 0.2 -- February 25, 2011 -- Boris Semenov, NAIF
+
+        Vesta pole orientation (Ra, Dec) was changed to (305.8, 41.4)
+        degrees per MCR-111475 and "Dawn Planetary Constants and Models
+        Document" Revision 2.0, Feb 16, 2011
+
+     Version 0.1 -- October 12, 2004 -- Boris Semenov, NAIF
+
+        VESTA_FIXED frame definition was removed. It is now in the DAWN
+        Frames Kernel file.
+
+     Version 0.0 -- October 6, 2003 -- Boris Semenov, NAIF
+     
+        This is a preliminary PCK containing draft values for the pole
+        direction, prime meridian location, rotation period and shape
+        (from [1].)
+     
+ 
+Disclaimer
+--------------------------------------------------------
+ 
+     This constants file may not contain the parameter values that you
+     prefer. Note that this file may be readily modified by you or
+     anyone else. NAIF suggests that you inspect this file visually
+     before proceeding with any critical or extended data processing.
+ 
+     NAIF requests that you update the ``by line'' and date if you
+     modify the file.
+ 
+ 
+Sources
+--------------------------------------------------------
+ 
+     The sources for the constants listed in this and the earlier
+     versions of this file are:
+ 
+        1) Thomas, Peter C. et al. ``Vesta: Spin Pole, Size, and Shape
+           from HST Images.'' ICARUS 128, 1997. Article NO. IS975736. 
+           pp. 93-94.
+
+        2) "Dawn Planetary Constants and Models Document" Revision 2.0, 
+           Feb 16, 2011
+
+        3) Analysis of Data from Dawn's Survey Orbit, Sep 23, 2011.
+           (IOM attached to MCR-112436).
+
+
+Orientation constants for asteroid Vesta
+--------------------------------------------------------
+ 
+     The inertial reference frame for these constants is J2000; this is
+     the default reference frame for PCK orientation data.
+ 
+     The epoch of the constants is J2000; this is Julian ephemeris date
+     (JED) 2451545.0.
+ 
+     The NAIF integer code for Vesta is 2000004. See the NAIF_IDs
+     required reading for further information on NAIF integer codes.
+ 
+
+Values in the Versions 0.0 and 0.1
+
+     The pole direction, prime meridian location, and rotation period
+     in the versions 0.0 and 0.1 were set to the following values from
+     [1]:
+
+       "New data from the 1996 Hubble HST observations of Vesta allow a 
+        refinement of the pole solution to: RA = 301 deg, Dec = 41 deg,
+        +/- 5 deg. The prime meridian is now given by W = 292 deg +
+        1617.332776 deg * d; see Section 3a and Eq. 1. The new data,
+        and a scaling correction, change the fit radii to 289, 280,
+        229, +/- 5 km."
+
+
+Values in the Version 0.2
+
+     The pole direction, prime meridian location, and rotation period
+     in the version 0.2 were set to the following values from [2]:
+
+       "5.3 Vesta Pole and Prime Meridian
+
+        The Vesta pole and prime meridian values are shown below.
+
+        RA  Vesta = 305.8 +/- 3.1 deg      Right Ascension in EME2000 [25]
+        DEC Vesta = 41.4 +/- 1.5 deg       Declination in EME2000 [25]
+        W   Vesta = 292 + w * D deg        Prime Meridian
+        w   Vesta = 1617.332776 deg/day    Rotation rate
+
+
+        5.4 Vesta Shape Parameters
+
+        The Vesta shape is described as a triaxial ellipsoid with 
+        values 289, 280, 229 km [15] or as a sphere with a radius 
+        of 265 km [16]. ... 
+
+
+        9 References
+
+        ...
+        15. "Vesta: Spin Pole, Size, and Shape from HST Images", P. 
+            Thomas, et al., Icarus, v128, p88~94 (1997)."
+        16. "Impact Excavation on Asteroid 4 Vesta: Hubble Space 
+            Telescope Result", P. C. Thomas, et al, Science, 227, 
+            1492-1494, 1997.
+        ...
+        25. "Improved Measurement of Asteroid (4) Vesta's Rotational 
+            Axis Orientation", Jian-Yang Li, et al., Icarus, 211, 
+            528-534, 2010.."
+
+
+Values in the Version 0.3
+
+     The pole direction, prime meridian location, rotation period and
+     radii in this version are set to the following values from [3]:
+
+       "... 
+        The recommended new pole is:
+           -  RA: 309.031   Dec: 42.235
+           -  Error is estimated as +/-0.03deg 3-sigma
+
+        Data considered:
+           -  Konopoliv (Gravity)       309.029    42.225 
+           -  Preusker (DLR) Survey     309.031    42.235
+           -  OpNav                     309.025    42.245
+           -  NAV OD radio              309.025    42.247 
+
+        The rotation rate of Vesta was determined to be .222588677 +/-
+        .000000009 days/rev, which agrees very well with the weighted 
+        average of all previous determinations.
+        ...
+        A new prime meridian was chosen as defined by the small crater 
+        Claudia that is assigned a longitude of 356 deg East. This new system
+        was chosen because the old system was not well-defined and the
+        team wanted to make a clear distinction between the old and new
+        to avoid confusion. The offset between the old W0 (292) from
+        Thomas et al. (1997) and the new W0 (76.06) is about 144.06 deg."
+
+     These values are provided in the keywords below. The W1 was derived 
+     from .222588677 days/rev as follows:
+
+        W1 = 1 / 0.222588677 * 360 = 1617.3329428
+
+Values in the Version 0.4
+
+     The pole direction, rotation period, and radii in the version 0.4
+     are the same as in the version 0.3.
+
+     The W0 value is 75.39 deg (changed from 76.06 deg to match the
+     correct rotation rate while preserving the longitude of Claudia).
+     
+Values in the Version 0.5
+
+     The pole direction, rotation period, and radii in the version 0.5
+     are the same as in the previous version 0.4.
+
+     The W0 value is 295.39 deg (changed from 75.39 deg) so that the
+     prime meridian is roughly in the center of the feature originally
+     identified as Olbers and the Claudia crater is now defined to be at 
+     136.0 deg East.
+     
+        body2000004_pole_ra    = ( 309.031    0.0              0.0 )
+        body2000004_pole_dec   = (  42.235    0.0              0.0 )
+        body2000004_pm         = ( 295.39  1617.3329428        0.0 )
+
+
+Values in the Current Version 0.6
+
+     The pole direction, rotation period, and radii in the version 0.6
+     are the same as in the previous versions 0.4 and 0.5.
+
+     The W0 value is 285.39 deg (changed from 295.39 deg) to improve the
+     alignment of the prime meridian with the center of the albedo feature
+     originally identified as Olbers in the Hubble data, based on the 
+     analysis of P. Thomas and J.-Y. Li in July/August 2012. The center 
+     of Claudia crater is now defined to be at 146.0 deg East.
+
+     \begindata
+ 
+        BODY2000004_POLE_RA    = ( 309.031    0.0              0.0 )
+        BODY2000004_POLE_DEC   = (  42.235    0.0              0.0 )
+        BODY2000004_PM         = ( 285.39  1617.3329428        0.0 )
+
+     \begintext
+
+
+
+Radii for asteroid Vesta
+--------------------------------------------------------
+     
+     The Vesta radii from [2] are provided in the keyword below.
+
+     \begindata
+ 
+        BODY2000004_RADII      = ( 289.0  280.0  229.0  )
+ 
+     \begintext
+
+End of PCK file.
+

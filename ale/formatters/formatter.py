@@ -2,6 +2,8 @@ import json
 import numpy as np
 from scipy.interpolate import interp1d, BPoly
 
+import spiceypy as spice
+
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
 from ale.transformation import FrameChain
@@ -140,6 +142,7 @@ def to_isd(driver):
     instrument_pointing['constant_frames'] = shortest_path(frame_chain, sensor_frame, destination_frame)
     constant_rotation = frame_chain.compute_rotation(destination_frame, sensor_frame)
     instrument_pointing['constant_rotation'] = constant_rotation.rotation_matrix().flatten()
+    
     meta_data['instrument_pointing'] = instrument_pointing
 
     # interior orientation
