@@ -19,7 +19,6 @@ class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, The
 
         if inst_id not in ["THEMIS_IR"]:
             raise Exception(f"{inst_id} is not a valid THEMIS IR instrument name. Expecting THEMIS_IR")
-
         return inst_id
 
     @property
@@ -92,6 +91,23 @@ class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, The
           ephemeris start time of the image
         """
         return self.band_times[0]
+    
+
+    @property
+    def ephemeris_stop_time(self):
+        """
+        Returns the sum of the starting ephemeris time and the number of lines
+        times the exposure duration. Expects ephemeris start time, exposure duration
+        and image lines to be defined. These should be double precision numbers
+        containing the ephemeris start, exposure duration and number of lines of
+        the image.
+
+        Returns
+        -------
+        : double
+          Center ephemeris time for an image
+        """
+        return self.band_times[-1] + (self.image_lines * self.line_exposure_duration)
 
     @property
     def focal_length(self):
@@ -124,7 +140,7 @@ class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, The
     @property
     def sensor_name(self):
         return self.label['IsisCube']['Instrument']['SpacecraftName']
-    
+
     @property
     def band_times(self):
         self._num_bands = self.label["IsisCube"]["Core"]["Dimensions"]["Bands"]
@@ -137,7 +153,7 @@ class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, The
                 band = self.label['IsisCube']['Instrument']['ReferenceBand']
             else:
                 if isinstance(org_bands, (list, tuple)):
-                    band = org_bands[vband-1]
+                    band = org_bands[vband]
                 else:
                     band = org_bands
 

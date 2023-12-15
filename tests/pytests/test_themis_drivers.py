@@ -3,6 +3,7 @@ import numpy as np
 import os
 import unittest
 from unittest.mock import PropertyMock, patch
+from ale.drivers import AleJsonEncoder
 
 import json
 
@@ -13,34 +14,44 @@ from ale.drivers.ody_drivers import OdyThemisVisIsisLabelNaifSpiceDriver, OdyThe
 
 from conftest import get_image_label, get_image_kernels, convert_kernels, compare_dicts, get_isd
 
-
-image_dict = {
-    "V46475015EDR": get_isd("themisvis"),
-    "I74199019RDR": get_isd("themisir")
-}
+@pytest.fixture(scope='module')
+def test_ir_kernels():
+    kernels = get_image_kernels('I74199019RDR')
+    updated_kernels, binary_kernels = convert_kernels(kernels)
+    yield updated_kernels
+    for kern in binary_kernels:
+        os.remove(kern)
 
 @pytest.fixture(scope='module')
-def test_kernels():
-    updated_kernels = {}
-    binary_kernels = {}
-    for image in image_dict.keys():
-        kernels = get_image_kernels(image)
-        updated_kernels[image], binary_kernels[image] = convert_kernels(kernels)
+def test_vis_kernels():
+    kernels = get_image_kernels('V46475015EDR')
+    updated_kernels, binary_kernels = convert_kernels(kernels)
     yield updated_kernels
-    for kern_list in binary_kernels.values():
-        for kern in kern_list:
-            os.remove(kern)
+    for kern in binary_kernels:
+        os.remove(kern)
 
-@pytest.mark.xfail
-@pytest.mark.parametrize("label_type", ['isis3'])
-@pytest.mark.parametrize("image", image_dict.keys())
-def test_load(test_kernels, label_type, image):
-    label_file = get_image_label(image, label_type)
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
+@pytest.fixture(scope='module')
+def test_ir_load(test_ir_kernels):
+    label_file = get_image_label('I74199019RDR', label_type='isis3')
+    isd_str = ale.loads(label_file, props={'kernels': test_ir_kernels})
+    
+    compare_isd = get_isd("themisir")
+    
     isd_obj = json.loads(isd_str)
-    compare_dict = image_dict[image]
-    print(json.dumps(isd_obj, indent=2))
-    assert compare_dicts(isd_obj, compare_dict) == []
+    
+    comparison = compare_dicts(isd_obj, compare_isd)
+    assert comparison == []
+
+@pytest.fixture(scope='module')
+def test_vis_load(test_vis_kernels):
+    label_file = get_image_label('V46475015EDR', label_type='isis3')
+    isd_str = ale.loads(label_file, props={'kernels': test_vis_kernels})
+    
+    compare_isd = get_isd("themisvis")
+    
+    isd_obj = json.loads(isd_str)
+    comparison = compare_dicts(isd_obj, compare_isd)
+    assert comparison == []
 
 class test_themisir_isis_naif(unittest.TestCase):
     def setUp(self):
@@ -56,10 +67,10 @@ class test_themisir_isis_naif(unittest.TestCase):
     def test_line_exposure_duration(self):
         assert self.driver.line_exposure_duration == 0.0332871
 
-    def test_ephemeris_start_time(self):
+    def test_start_time(self):
         with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=0) as scs2e:
             self.driver.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"] = 10
-            assert self.driver.ephemeris_start_time == 10
+            assert self.driver.start_time == 10
             scs2e.assert_called_with(-53, '1220641481.102')
 
     def test_sensor_model_version(self):
