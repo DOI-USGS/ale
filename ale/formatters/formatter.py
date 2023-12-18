@@ -2,6 +2,8 @@ import json
 import numpy as np
 from scipy.interpolate import interp1d, BPoly
 
+import spiceypy as spice
+
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
 from ale.transformation import FrameChain
@@ -26,7 +28,7 @@ def to_isd(driver):
     meta_data = {}
 
     meta_data['isis_camera_version'] = driver.sensor_model_version
-    
+
     # general information
     meta_data['image_lines'] = driver.image_lines
     meta_data['image_samples'] = driver.image_samples
@@ -89,14 +91,15 @@ def to_isd(driver):
     frame_chain = driver.frame_chain
     target_frame = driver.target_frame_id
 
+    J2000 = 1 # J2000 frame id
     body_rotation = {}
-    source_frame, destination_frame, time_dependent_target_frame = frame_chain.last_time_dependent_frame_between(target_frame, 1)
-
-    if source_frame != 1:
+    source_frame, destination_frame, time_dependent_target_frame = frame_chain.last_time_dependent_frame_between(target_frame, J2000)
+    
+    if source_frame != J2000:
         # Reverse the frame order because ISIS orders frames as
         # (destination, intermediate, ..., intermediate, source)
-        body_rotation['time_dependent_frames'] = shortest_path(frame_chain, source_frame, 1)
-        time_dependent_rotation = frame_chain.compute_rotation(1, source_frame)
+        body_rotation['time_dependent_frames'] = shortest_path(frame_chain, source_frame, J2000)
+        time_dependent_rotation = frame_chain.compute_rotation(J2000, source_frame)
         body_rotation['ck_table_start_time'] = time_dependent_rotation.times[0]
         body_rotation['ck_table_end_time'] = time_dependent_rotation.times[-1]
         body_rotation['ck_table_original_size'] = len(time_dependent_rotation.times)
@@ -118,12 +121,12 @@ def to_isd(driver):
     sensor_frame = driver.sensor_frame_id
 
     instrument_pointing = {}
-    source_frame, destination_frame, time_dependent_sensor_frame = frame_chain.last_time_dependent_frame_between(1, sensor_frame)
+    source_frame, destination_frame, _ = frame_chain.last_time_dependent_frame_between(1, sensor_frame)
 
     # Reverse the frame order because ISIS orders frames as
     # (destination, intermediate, ..., intermediate, source)
-    instrument_pointing['time_dependent_frames'] = shortest_path(frame_chain, destination_frame, 1)
-    time_dependent_rotation = frame_chain.compute_rotation(1, destination_frame)
+    instrument_pointing['time_dependent_frames'] = shortest_path(frame_chain, destination_frame, J2000)
+    time_dependent_rotation = frame_chain.compute_rotation(J2000, destination_frame)
     instrument_pointing['ck_table_start_time'] = time_dependent_rotation.times[0]
     instrument_pointing['ck_table_end_time'] = time_dependent_rotation.times[-1]
     instrument_pointing['ck_table_original_size'] = len(time_dependent_rotation.times)
@@ -139,9 +142,10 @@ def to_isd(driver):
     instrument_pointing['constant_frames'] = shortest_path(frame_chain, sensor_frame, destination_frame)
     constant_rotation = frame_chain.compute_rotation(destination_frame, sensor_frame)
     instrument_pointing['constant_rotation'] = constant_rotation.rotation_matrix().flatten()
+    
     meta_data['instrument_pointing'] = instrument_pointing
 
-    # interiror orientation
+    # interior orientation
     meta_data['naif_keywords'] = driver.naif_keywords
 
     if isinstance(driver,LineScanner) or isinstance(driver, Framer) or isinstance(driver, PushFrame):
@@ -162,9 +166,8 @@ def to_isd(driver):
 
         meta_data['starting_detector_line'] = driver.detector_start_line
         meta_data['starting_detector_sample'] = driver.detector_start_sample
-    
 
-    j2000_rotation = frame_chain.compute_rotation(target_frame, 1)
+    j2000_rotation = frame_chain.compute_rotation(target_frame, J2000)
 
     instrument_position = {}
     positions, velocities, times = driver.sensor_position

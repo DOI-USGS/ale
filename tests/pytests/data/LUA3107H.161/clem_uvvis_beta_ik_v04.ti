@@ -1,0 +1,530 @@
+KPL/IK
+
+\beginlabel
+PDS_VERSION_ID               = PDS3
+RECORD_TYPE                  = STREAM
+RECORD_BYTES                 = "N/A"
+^SPICE_KERNEL                = "clem_uvvis_009.ti"
+MISSION_NAME                 = "DEEP SPACE PROGRAM SCIENCE EXPERIMENT"
+SPACECRAFT_NAME              = "CLEMENTINE 1"
+DATA_SET_ID                  = "CLEM1-L-SPICE-6-V1.0"
+KERNEL_TYPE_ID               = IK
+PRODUCT_ID                   = "clem_uvvis_009.ti"
+PRODUCT_CREATION_TIME        = 2017-10-01T00:00:00
+PRODUCER_ID                  = "NAIF/JPL"
+MISSION_PHASE_NAME           = "N/A"
+PRODUCT_VERSION_TYPE         = ACTUAL
+PLATFORM_OR_MOUNTING_NAME    = "CLEMENTINE SPACECRAFT"
+START_TIME                   = "N/A"
+STOP_TIME                    = "N/A"
+SPACECRAFT_CLOCK_START_COUNT = "N/A"
+SPACECRAFT_CLOCK_STOP_COUNT  = "N/A"
+TARGET_NAME                  = MOON
+INSTRUMENT_NAME              = "ULTRAVIOLET/VISIBLE CAMERA"
+NAIF_INSTRUMENT_ID           = {
+			       -40002,
+			       -40021,
+			       -40022,
+			       -40023,
+			       -40024,
+			       -40025,
+			       -40026
+			       }
+SOURCE_PRODUCT_ID            = "N/A"
+NOTE                         = "See comments in the file for details"
+OBJECT                       = SPICE_KERNEL
+  INTERCHANGE_FORMAT         = ASCII
+  KERNEL_TYPE                = INSTRUMENT
+  DESCRIPTION                = "Clementine SPICE IK file for Ultraviolet
+and Visible Imaging Camera (UVVIS) providing FOV definition and other
+geometric parameters for the instrument, created by NAIF, JPL and 
+modified by ASU "
+END_OBJECT                   = SPICE_KERNEL
+\endlabel
+
+
+UVVIS Instrument Kernel
+========================================================================
+     
+     This Clementine instrument kernel (I-kernel) contains the
+     instrument geometric parameters for the Ultraviolet and Visible
+     Imaging Camera (UVVIS).
+
+     
+Version and Date
+--------------------------------------------------------
+ 
+     Version 9.0 -- October 01, 2017 -- Emerson Speyerer, ASU
+
+        - BETA VERSION -
+	- Still in testing -
+
+	Updated IK to include band specific optical distortion 
+	parameters.
+
+	Added platform IDs
+
+	Removed Fortran code
+
+	Added documentation for loading a kernel into MICE (MATLAB SPICE
+        utility)
+
+     Version 8.0 -- June 11, 2007 -- Boris Semenov, NAIF
+
+        Updated comments. Added FOV definition. Added PLATFORM_ID.
+
+     Version 7.0 -- Feb 3, 1995
+
+ 
+References
+--------------------------------------------------------
+ 
+     1. "Models of the Clementine Spacecraft and Remote Sensing
+        Science Instruments for Geodesy, Cartography, and Dynamical
+        Sciences", Draft version 1.0, December 1993.
+
+ 
+Implementation Notes
+--------------------------------------------------------
+ 
+     This file is used by the SPICE system as follows: programs that
+     make use of this I-kernel must `load' the kernel, normally during
+     program initialization. Loading the kernel associates data items
+     with their names in a data structure called the `kernel pool'. The
+     SPICE routine FURNSH loads a kernel file into the pool as shown
+     below.
+ 
+          CALL FURNSH( 'this_kernel_name' )          in FORTRAN (SPICELIB)
+          furnsh_c ( "this_kernel_name" );           in C (CSPICE)
+          cspice_furnsh, "this_kernel_name"          in IDL (ICY)
+ 	  cspice_furnsh( 'this_kernel_name' );	     in MATLAB (MICE)
+
+ 
+Naming Conventions
+--------------------------------------------------------
+ 
+     All keywords referencing data in this I-kernel are of the form
+ 
+        INS<instrument-ID>_<data_item_name>
+     
+     The instrument ID is an negative integer value that uniquely
+     identifies an instrument or specific band. For Clementine Ultraviolet 
+     and Visible Imaging Camera the instrument ID is -40002. In addition,
+     each band also has its own NAIF ID:
+
+     	Table 1: Clementine UVVIS Instrument IDs
+	----------------   -----------  -----------------------
+          Frame Name         NAIF ID      Comments
+        ----------------   ----------   -----------------------
+          CLEM_UVVIS         -40002 	  *Deprecated*
+	  CLEM_UVVIS_A	     -40021	  Filter A: 415 nm 
+	  CLEM_UVVIS_B	     -40022	  Filter B: 750 nm
+          CLEM_UVVIS_C       -40023       Filter C: 900 nm
+          CLEM_UVVIS_D       -40024       Filter D: 950 nm
+          CLEM_UVVIS_E       -40025       Filter E: 1000 nm
+          CLEM_UVVIS_F       -40026       Filter F: Broadband
+
+ 
+     The upper bound on the length of a name is 32 characters.
+
+UVVIS Description
+---------------------------------------------------------------------------
+-- In progress
+ 
+UVVIS Geometric Calibration
+---------------------------------------------------------------------------
+-- In progress
+
+Pixel Coordinate Definition:
+---------------------------------------------------------------------------
+-- In progress
+
+UVVIS First Order Optical Parameters:
+---------------------------------------------------------------------------
+
+   The following section contains the first order optical parameters for 
+   the Clementine UVVIS camera. The values are derived from the sensor 
+   specifications and from models derived from on-orbit observations. 
+   The parameters are wavelength dependent due to chromatic aberrations 
+   in the optical system.  
+
+   Optical Parameter Definitions:
+
+         Effective Focal Length: Distance along the optical axis from the
+            perspective center to the detector (units of mm)
+   
+         F/ratio (or f-number): Ratio of the effective focal length to the
+            dimeter of the entrance pupil (effective aperture)
+   
+         Spectral Band: Wavelength range (or spectral response) of the
+            optics
+
+         Boresight Line and Sample (principal point): Point at which the
+            optical axis intersects the detector array
+            
+         IFOV (Instantaneous field of view): Angle subtended by a single
+            detector element on the axis of the optical system
+
+    Table 2: Original UVVIS Optical Parameters
+    -------------------------------   -----------
+      Parameter, Unit                   Value
+    -------------------------------   -----------
+      Focal Length (USGS), mm           90.15
+      Focal Length (NAIF), mm           90.00
+      Pixel Pitch, mm                   0.023
+      Boresight Sample, pixel           192.5
+      Boresight Line, pixel             144.5
+      Max Samples, pixels               342
+      Max Lines, pixels                 288
+      Distortion (Alpha), 1/mm**2       0
+
+    Table 3: UVVIS Focal Length
+    --------   ------------   ------------------------------
+     Filter     Wavelength      Effective Focal Length, mm
+    --------   ------------   ------------------------------
+     A	        415 nm	       
+     B         750 nm
+     C		900 nm
+     D		950 nm
+     E		1000 nm
+     F		Broadband
+
+     Deprecated Values from the USGS IAK
+
+
+
+       INS-40002_FOCAL_LENGTH     = ( 90.15  ) -- Not used
+
+       \begindata
+
+       INS-40002_PIXEL_PITCH      = ( 0.023  )
+       INS-40002_BORESIGHT_SAMPLE = ( 192.5  )
+       INS-40002_BORESIGHT_LINE   = ( 144.5  )
+       INS-40002_TRANSX		  = (0.0 0.023 0.0)
+       INS-40002_TRANSY		  = (0.0 0.0 0.023)
+       INS-40002_ITRANSS	  = (0.0 43.47826087 0.0)
+       INS-40002_ITRANSL  	  = (0.0 0.0 43.47826087)
+     
+       \begintext
+
+     Additional values from the original NAIF IK
+
+       \begindata
+
+       INS-40002_FOCAL_LENGTH     = ( 90.00   )
+       INS-40002_K                = ( 43.4783 )
+       INS-40002_S0           	  = ( 192.5   )
+       INS-40002_L0           	  = ( 144.5   )
+       INS-40002_S_MAX        	  = ( 384     )
+       INS-40002_L_MAX        	  = ( 288     )
+       INS-40002_ALPHA0       	  = ( 0.0     )
+
+       \begintext
+
+     Band Spacific Parameters
+     
+       \begindata
+       INS-40021_FOCAL_LENGTH         = 89.874444
+       INS-40021_F/RATIO              = -999.9999
+       INS-40021_BORESIGHT_SAMPLE     = 192.5
+       INS-40021_BORESIGHT_LINE       = 144.5
+       INS-40021_IFOV                 = -999.999
+       INS-40021_PIXEL_SAMPLES        = 384
+       INS-40021_PIXEL_LINES          = 288
+       INS-40021_PIXEL_PITCH          = 0.023 
+       INS-40021_PIXEL_SIZE           = ( 0.023  0.023  )
+       INS-40021_CCD_CENTER           = ( 512.5  512.5  )
+       INS-40021_FILTER_NAME          = 'A'
+       INS-40021_FILTER_BANDCENTER    = 415
+       INS-40021_FILTER_BANDWIDTH     = 40
+       INS-40021_FOV_FRAME            = 'CLEM_UVVIS_A'
+       INS-40021_FOV_SHAPE            = 'RECTANGLE'
+       INS-40021_BORESIGHT            = ( 0.0 0.0 1.0 )
+       INS-40021_FOV_CLASS_SPEC       = 'ANGLES'
+       INS-40021_FOV_REF_VECTOR       = ( 1.0 0.0 0.0 )
+       INS-40021_FOV_REF_ANGLE        = ( 2.8115 )
+       INS-40021_FOV_CROSS_ANGLE      = ( 2.1085 )
+       INS-40021_FOV_ANGLE_UNITS      = 'DEGREES'
+       INS-40021_TRANSX               = (0.0 0.023 0.0)
+       INS-40021_TRANSY               = (0.0 0.0 0.023)
+       INS-40021_ITRANSS              = (0.0 43.47826087 0.0)
+       INS-40021_ITRANSL              = (0.0 0.0 43.47826087)
+
+       INS-40022_FOCAL_LENGTH         = 89.979236
+       INS-40022_F/RATIO              = -999.9999
+       INS-40022_BORESIGHT_SAMPLE     = 192.5
+       INS-40022_BORESIGHT_LINE       = 144.5
+       INS-40022_IFOV                 = -999.999
+       INS-40022_PIXEL_SAMPLES        = 384
+       INS-40022_PIXEL_LINES          = 288
+       INS-40022_PIXEL_PITCH          = 0.023  
+       INS-40022_PIXEL_SIZE           = ( 0.023  0.023  )
+       INS-40022_CCD_CENTER           = ( 512.5  512.5  )
+       INS-40022_FILTER_NAME          = 'B'
+       INS-40022_FILTER_BANDCENTER    = 750
+       INS-40022_FILTER_BANDWIDTH     = 10
+       INS-40022_FOV_FRAME            = 'CLEM_UVVIS_B'
+       INS-40022_FOV_SHAPE            = 'RECTANGLE'
+       INS-40022_BORESIGHT            = ( 0.0 0.0 1.0 )
+       INS-40022_FOV_CLASS_SPEC       = 'ANGLES'
+       INS-40022_FOV_REF_VECTOR       = ( 1.0 0.0 0.0 )
+       INS-40022_FOV_REF_ANGLE        = ( 2.8115 )
+       INS-40022_FOV_CROSS_ANGLE      = ( 2.1085 )
+       INS-40022_FOV_ANGLE_UNITS      = 'DEGREES'
+       INS-40022_TRANSX               = (0.0 0.023 0.0)
+       INS-40022_TRANSY               = (0.0 0.0 0.023)
+       INS-40022_ITRANSS              = (0.0 43.47826087 0.0)
+       INS-40022_ITRANSL              = (0.0 0.0 43.47826087)
+
+       INS-40023_FOCAL_LENGTH         = 89.987163
+       INS-40023_F/RATIO              = -999.9999
+       INS-40023_BORESIGHT_SAMPLE     = 192.5
+       INS-40023_BORESIGHT_LINE       = 144.5
+       INS-40023_IFOV                 = -999.999
+       INS-40023_PIXEL_SAMPLES        = 384
+       INS-40023_PIXEL_LINES          = 288
+       INS-40023_PIXEL_PITCH          = 0.023  
+       INS-40023_PIXEL_SIZE           = ( 0.023  0.023  )
+       INS-40023_CCD_CENTER           = ( 512.5  512.5  )
+       INS-40023_FILTER_NAME          = 'C'
+       INS-40023_FILTER_BANDCENTER    = 900
+       INS-40023_FILTER_BANDWIDTH     = 20
+       INS-40023_FOV_FRAME            = 'CLEM_UVVIS_C'
+       INS-40023_FOV_SHAPE            = 'RECTANGLE'
+       INS-40023_BORESIGHT            = ( 0.0 0.0 1.0 )
+       INS-40023_FOV_CLASS_SPEC       = 'ANGLES'
+       INS-40023_FOV_REF_VECTOR       = ( 1.0 0.0 0.0 )
+       INS-40023_FOV_REF_ANGLE        = ( 2.8115 )
+       INS-40023_FOV_CROSS_ANGLE      = ( 2.1085 )
+       INS-40023_FOV_ANGLE_UNITS      = 'DEGREES'
+       INS-40023_TRANSX               = (0.0 0.023 0.0)
+       INS-40023_TRANSY               = (0.0 0.0 0.023)
+       INS-40023_ITRANSS              = (0.0 43.47826087 0.0)
+       INS-40023_ITRANSL              = (0.0 0.0 43.47826087)
+
+       INS-40024_FOCAL_LENGTH         = 89.991267
+       INS-40024_F/RATIO              = -999.9999
+       INS-40024_BORESIGHT_SAMPLE     = 192.5
+       INS-40024_BORESIGHT_LINE       = 144.5
+       INS-40024_IFOV                 = -999.999
+       INS-40024_PIXEL_SAMPLES        = 384
+       INS-40024_PIXEL_LINES          = 288
+       INS-40024_PIXEL_PITCH          = 0.023  
+       INS-40024_PIXEL_SIZE           = ( 0.023  0.023  )
+       INS-40024_CCD_CENTER           = ( 512.5  512.5  )
+       INS-40024_FILTER_NAME          = 'D'
+       INS-40024_FILTER_BANDCENTER    = 950
+       INS-40024_FILTER_BANDWIDTH     = 30
+       INS-40024_FOV_FRAME            = 'CLEM_UVVIS_D'
+       INS-40024_FOV_SHAPE            = 'RECTANGLE'
+       INS-40024_BORESIGHT            = ( 0.0 0.0 1.0 )
+       INS-40024_FOV_CLASS_SPEC       = 'ANGLES'
+       INS-40024_FOV_REF_VECTOR       = ( 1.0 0.0 0.0 )
+       INS-40024_FOV_REF_ANGLE        = ( 2.8115 )
+       INS-40024_FOV_CROSS_ANGLE      = ( 2.1085 )
+       INS-40024_FOV_ANGLE_UNITS      = 'DEGREES'
+       INS-40024_TRANSX               = (0.0 0.023 0.0)
+       INS-40024_TRANSY               = (0.0 0.0 0.023)
+       INS-40024_ITRANSS              = (0.0 43.47826087 0.0)
+       INS-40024_ITRANSL              = (0.0 0.0 43.47826087)
+
+       INS-40025_FOCAL_LENGTH         = 89.994013
+       INS-40025_F/RATIO              = -999.9999
+       INS-40025_BORESIGHT_SAMPLE     = 192.5
+       INS-40025_BORESIGHT_LINE       = 144.5
+       INS-40025_IFOV                 = -999.999
+       INS-40025_PIXEL_SAMPLES        = 384
+       INS-40025_PIXEL_LINES          = 288
+       INS-40025_PIXEL_PITCH          = 0.023
+       INS-40025_PIXEL_SIZE           = ( 0.023  0.023  )
+       INS-40025_CCD_CENTER           = ( 512.5  512.5  )
+       INS-40025_FILTER_NAME          = 'E'
+       INS-40025_FILTER_BANDCENTER    = 1000
+       INS-40025_FILTER_BANDWIDTH     = 30
+       INS-40025_FOV_FRAME            = 'CLEM_UVVIS_E'
+       INS-40025_FOV_SHAPE            = 'RECTANGLE'
+       INS-40025_BORESIGHT            = ( 0.0 0.0 1.0 )
+       INS-40025_FOV_CLASS_SPEC       = 'ANGLES'
+       INS-40025_FOV_REF_VECTOR       = ( 1.0 0.0 0.0 )
+       INS-40025_FOV_REF_ANGLE        = ( 2.8115 )
+       INS-40025_FOV_CROSS_ANGLE      = ( 2.1085 )
+       INS-40025_FOV_ANGLE_UNITS      = 'DEGREES'
+       INS-40025_TRANSX               = (0.0 0.023 0.0)
+       INS-40025_TRANSY               = (0.0 0.0 0.023)
+       INS-40025_ITRANSS              = (0.0 43.47826087 0.0)
+       INS-40025_ITRANSL              = (0.0 0.0 43.47826087)
+
+       INS-40026_FOCAL_LENGTH         = 90.00
+       INS-40026_F/RATIO              = -999.9999
+       INS-40026_BORESIGHT_SAMPLE     = 192.5
+       INS-40026_BORESIGHT_LINE       = 144.5
+       INS-40026_IFOV                 = -999.999
+       INS-40026_PIXEL_SAMPLES        = 384
+       INS-40026_PIXEL_LINES          = 288
+       INS-40026_PIXEL_PITCH          = 0.023
+       INS-40026_PIXEL_SIZE           = ( 0.023  0.023  )
+       INS-40026_CCD_CENTER           = ( 512.5  512.5  )
+       INS-40026_FILTER_NAME          = 'F'
+       INS-40026_FILTER_BANDCENTER    = 650
+       INS-40026_FILTER_BANDWIDTH     = 550
+       INS-40026_FOV_FRAME            = 'CLEM_UVVIS_F'
+       INS-40026_FOV_SHAPE            = 'RECTANGLE'
+       INS-40026_BORESIGHT            = ( 0.0 0.0 1.0 )
+       INS-40026_FOV_CLASS_SPEC       = 'ANGLES'
+       INS-40026_FOV_REF_VECTOR       = ( 1.0 0.0 0.0 )
+       INS-40026_FOV_REF_ANGLE        = ( 2.8115 )
+       INS-40026_FOV_CROSS_ANGLE      = ( 2.1085 )
+       INS-40026_FOV_ANGLE_UNITS      = 'DEGREES'
+       INS-40026_TRANSX               = (0.0 0.023 0.0)
+       INS-40026_TRANSY               = (0.0 0.0 0.023)
+       INS-40026_ITRANSS              = (0.0 43.47826087 0.0)
+       INS-40026_ITRANSL              = (0.0 0.0 43.47826087)
+
+       \begintext
+
+
+UVVIS Camera Model
+---------------------------------------------------------------------------
+
+    (xd, yd) = distorted image point
+    (xu, yu) = undistorted image point
+    (xp, yp) = distortion center (principal point)
+    k1= 1st radial distortion coefficient
+    k2= 2nd radial distortion coefficient
+    k3= 3rd radial distortion coefficient
+    p1= 1st tangential distortion coefficient
+    p2= 2nd tangential distortion coefficient
+
+    Step 1: remove principal point offset (xp,yp)
+       x = xd - xp;
+       y = yd - yp;
+
+    Step 2: Calculate r - distance between the principal point and the
+            measured point on the image
+       rr = x * x + y * y
+
+    Step 3: Calculate dr - radial distortion contribution
+       dr = k1 + k2 * rr + k3 * rr * rr;
+
+    Step 4: Calculate tx and ty - decentering distortion contribution
+       tx = p1 * (rr + 2.0 * x * x) + 2.0 * p2 * x * y;
+       ty = 2.0 * p1 * x * y + p2 * (rr + 2 * y * y);
+
+    Step 5: Calculate xu, yu
+       xu = xd + x * dr + tx;
+       yu = yd + y * dr + ty;
+
+    UVVIS coefficients:
+
+       PP        = (xp yp)
+       OD_K      = (k1 k2 k3)
+       DECENTER  = (p1 p2)
+
+       \begindata
+       INS-40021_PP                   = ( 0 0 )
+       INS-40022_PP                   = ( 0 0 )
+       INS-40023_PP                   = ( 0 0 )
+       INS-40024_PP                   = ( 0 0 )
+       INS-40025_PP                   = ( 0 0 )
+       INS-40026_PP                   = ( 0 0 )
+
+       INS-40021_OD_K                 = ( 0 -2.422842e-05 0 )
+       INS-40022_OD_K                 = ( 0 -3.820233e-05 0 )
+       INS-40023_OD_K                 = ( 0 -3.767127e-05 0 )
+       INS-40024_OD_K                 = ( 0 -2.398624e-05 0 )
+       INS-40025_OD_K                 = ( 0 -2.248022e-05 0 )
+       INS-40026_OD_K                 = ( 0 0 0 )
+
+       INS-40021_DECENTER             = ( +2.255006e-05 +2.108941e-05 )
+       INS-40022_DECENTER             = ( +3.203789e-07 +3.706078e-07 )
+       INS-40023_DECENTER             = ( +4.978645e-06 -3.698737e-05 )
+       INS-40024_DECENTER             = ( +1.414502e-05 -1.372645e-04 )
+       INS-40025_DECENTER             = ( +2.922347e-05 -4.655129e-05 )
+       INS-40026_DECENTER             = ( 0 0 )
+       \begintext
+
+
+
+
+Instrument Frame - Line/Sample Coordinates Diagram
+--------------------------------------------------------
+
+     This diagram illustrates the relationship of the instrument frame
+     axes and the sample/line coordinates:
+
+
+             sample                                  sample
+               1                         S            max
+               +-------------------------+-------------+
+        Line 1 |                                       |
+               |                                       |
+               |                                       |
+               |                                       |
+               |                                       |
+               |                  +Z                   |
+               |            (into the page)            |       +X
+               |                   x-------------------------->
+               |                   |(L_0,S_0)          |
+               |                   |                   |
+               |                   |                   |
+               |                   |     *             + L
+               |                   |   (L,S)           |
+               |                   |                   |
+               |                   |                   |
+      Line max +-------------------|-------------------+
+                                   |
+                                   |
+                                   |
+                                   V +Y
+
+     Assuming no optical distortion the view direction in the
+     instrument frame (X,Y,Z) for a given pixel specified by its
+     line/sample coordinates (L,S) is computed as follows:
+
+          X = (S - S_0) / K
+          Y = (L - L_0) / K
+          Z = FOCAL_LENGTH
+
+
+FOV Definition
+--------------------------------------------------------
+
+     The FOV of Ultraviolet and Visible Imaging Camera is defined below
+     in the ``CLEM_UVVIS'' reference frame as a 5.623 deg by 4.217 deg
+     rectangle with the boresight along +Z axis. (The angular extents
+     were computed using the values from the section ``Camera Optics''
+     above.)
+
+       \begindata
+
+       INS-40002_FOV_FRAME        = 'CLEM_UVVIS'
+       INS-40002_FOV_SHAPE        = 'RECTANGLE'
+       INS-40002_BORESIGHT        = ( 0.0 0.0 1.0 )
+       INS-40002_FOV_CLASS_SPEC   = 'ANGLES'
+       INS-40002_FOV_REF_VECTOR   = ( 1.0 0.0 0.0 )
+       INS-40002_FOV_REF_ANGLE    = ( 2.8115 )
+       INS-40002_FOV_CROSS_ANGLE  = ( 2.1085 )
+       INS-40002_FOV_ANGLE_UNITS  = 'DEGREES'
+
+       \begintext
+
+
+Platform ID
+--------------------------------------------------------
+
+     This number is the NAIF instrument ID of the platform on which the
+     instrument is mounted -- the spacecraft bus.
+
+       \begindata
+
+       INS-40002_PLATFORM_ID  = ( -40000 )
+       INS-40021_PLATFORM_ID  = ( -40002 )
+       INS-40022_PLATFORM_ID  = ( -40002 )
+       INS-40023_PLATFORM_ID  = ( -40002 )
+       INS-40024_PLATFORM_ID  = ( -40002 )
+       INS-40025_PLATFORM_ID  = ( -40002 )
+       INS-40026_PLATFORM_ID  = ( -40002 )
+
+       \begintext
+
+

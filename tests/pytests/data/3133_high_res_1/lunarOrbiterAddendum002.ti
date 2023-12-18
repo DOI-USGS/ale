@@ -1,0 +1,211 @@
+\begintext
+ Focal lengths are in mm and pixel pitch is in mm/pix.  Pixel pitch is
+ computed from the scanner setting of 50 microns devided by the Lunar Orbiter
+ pixel resolution for all missions of 7.2 (.05/7.2).  The detector map is
+ based on the fiducials for the high resolution camera and some of the
+ medium resolution camera frames, because the boresight was not
+ known. In some medium resolution frames, the boresight can be
+ calculated from the "implied" matching high resolution frame.  In
+ this case the boresight is read from the instrument labels.  The
+ units for CX, CY, and DISTORTION_C3 are 1/mm.
+
+ Lunar Orbiter 3 High Resolution Camera
+\begindata
+INS-533001_PLATFORM_ID = -533000
+
+INS-533001_SPK_TIME_BIAS = 0.0
+INS-533001_CK_TIME_BIAS  = 0.0
+INS-533001_CK_TIME_TOLERANCE = 1
+
+INS-533001_EULER_ANGLES = ( 0.0 0.0 0.0 )
+INS-533001_EULER_AXES = ( 1 2 3 )
+
+INS-533001_FOCAL_LENGTH = 609.28
+INS-533001_PIXEL_PITCH = .006944
+
+INS-533001_PERSPECTIVE_FACTORS = ( -0.0000030, 0.0000008)
+INS-533001_POINT_OF_SYMMETRY = ( -1.11, 0.30)
+INS-533001_OD_K = ( 0.00027963, -0.00000002869, 0.)
+
+\begintext
+These are the parameters required for writing c-kernels.  Isis will
+create ck with the same frame endpoints as the mission ck.  For 
+the Lunar Orbiter3 spacecraft the ck frame is LUNAR_ORBITER_3 (-533000),
+and the ck reference frame is J2000 (1).
+
+\begindata
+INS-533001_CK_FRAME_ID=-533000
+INS-533001_CK_REFERENCE_ID=1
+
+\begintext
+LO High distortion is different so this will need to be handled differently.
+The detector map is accomplished with the fiducials and not the standard
+Isis3 detector map.
+
+
+Lunar Orbiter 3 Medium Resolution Camera.  The detector map is
+accomplished with either fiducials as in the high or the boresight is
+calculated from a matching high frame and written to the labels.  The
+detector map will need to read the boresight from the labels in this case.
+\begindata
+INS-533002_PLATFORM_ID = -533000
+
+INS-533002_SPK_TIME_BIAS = 0.0
+INS-533002_CK_TIME_BIAS  = 0.0
+INS-533002_CK_TIME_TOLERANCE = 1
+
+INS-533002_EULER_ANGLES = ( 0.0 0.0 0.0 )
+INS-533002_EULER_AXES = ( 1 2 3 )
+
+INS-533002_FOCAL_LENGTH = 79.833
+INS-533002_PIXEL_PITCH = .006944444
+
+INS-533002_TRANSX=(0.0 -0.006944444 0.0)
+INS-533002_TRANSY=(0.0 0.0 0.006944444)
+
+INS-533002_ITRANSS=(0.0 -144.0 0.0)
+INS-533002_ITRANSL=(0.0 0.0 144.0)
+
+\begintext
+units are pixels
+
+\begindata
+INS-533002_POINT_OF_SYMMETRY = (4.608, -4.608)
+INS-533002_OD_K = (23.3145, 0.9998, -17.4798)
+
+\begintext
+These are the parameters required for writing c-kernels.  Isis will
+create ck with the same frame endpoints as the mission ck.  For 
+the Lunar Orbiter3 spacecraft the ck frame is LUNAR_ORBITER_3 (-533000),
+and the ck reference frame is J2000 (1).
+
+\begindata
+INS-533002_CK_FRAME_ID=-533000
+INS-533002_CK_REFERENCE_ID=1
+
+\begintext
+ Lunar Orbiter 4 High Resolution Camera
+\begindata
+INS-534001_PLATFORM_ID = -534000
+
+INS-534001_SPK_TIME_BIAS = 0.0
+INS-534001_CK_TIME_BIAS  = 0.0
+INS-534001_CK_TIME_TOLERANCE = 1
+
+INS-534001_EULER_ANGLES = ( 0.0 0.0 0.0 )
+INS-534001_EULER_AXES = ( 1 2 3 )
+
+INS-534001_FOCAL_LENGTH = 611.40
+INS-534001_PIXEL_PITCH = .006944444
+
+INS-534001_PERSPECTIVE_FACTORS = ( 0.0000099, -0.0000048)
+INS-534001_POINT_OF_SYMMETRY = ( 3.70, -1.79)
+INS-534001_OD_K = ( 0.00051889, -0.00000005291, 0.)
+
+
+\begintext
+These are the parameters required for writing c-kernels.  Isis will
+create ck with the same frame endpoints as the mission ck.  For 
+the Lunar Orbiter4 spacecraft the ck frame is LUNAR_ORBITER_4 (-534000),
+and the ck reference frame is J2000 (1).
+
+\begindata
+INS-534001_CK_FRAME_ID=-534000
+INS-534001_CK_REFERENCE_ID=1
+
+\begintext
+ Lunar Orbiter 4 Medium Resolution Camera. See text under lo3.
+\begindata
+INS-534002_PLATFORM_ID = -534000
+
+INS-534002_SPK_TIME_BIAS = 0.0
+INS-534002_CK_TIME_BIAS  = 0.0
+INS-534002_CK_TIME_TOLERANCE = 1
+
+INS-534002_EULER_ANGLES = ( 0.0 0.0 0.0 )
+INS-534002_EULER_AXES = ( 1 2 3 )
+
+INS-534002_FOCAL_LENGTH = 79.895
+INS-534002_PIXEL_PITCH = .006944444
+
+INS-534002_TRANSX=(0.0 -0.006944444 0.0)
+INS-534002_TRANSY=(0.0 0.0 0.006944444)
+
+INS-534002_ITRANSS=(0.0 -144.0 0.0)
+INS-534002_ITRANSL=(0.0 0.0 144.0)
+
+INS-534002_POINT_OF_SYMMETRY = (20.88, 0.288)
+INS-534002_OD_K = (22.6665, -0.3469, -15.8652)
+
+\begintext
+These are the parameters required for writing c-kernels.  Isis will
+create ck with the same frame endpoints as the mission ck.  For 
+the Lunar Orbiter3 spacecraft the ck frame is LUNAR_ORBITER_4 (-534000),
+and the ck reference frame is J2000 (1).
+
+\begindata
+INS-534002_CK_FRAME_ID=-534000
+INS-534002_CK_REFERENCE_ID=1
+
+\begintext
+ Lunar Orbiter 5 High Resolution Camera
+\begindata
+INS-535001_PLATFORM_ID = -535000
+
+INS-535001_SPK_TIME_BIAS = 0.0
+INS-535001_CK_TIME_BIAS  = 0.0
+INS-535001_CK_TIME_TOLERANCE = 1
+
+INS-535001_EULER_ANGLES = ( 0.0 0.0 0.0 )
+INS-535001_EULER_AXES = ( 1 2 3 )
+
+INS-535001_FOCAL_LENGTH = 610.
+INS-535001_PIXEL_PITCH = .006944444
+
+INS-535001_PERSPECTIVE_FACTORS = ( 0.0000006,0.000002 )
+INS-535001_POINT_OF_SYMMETRY = ( 0.22,-0.74 )
+INS-535001_OD_K = ( 0.0001111, -0.00000001139, 0.)
+
+\begintext
+These are the parameters required for writing c-kernels.  Isis will
+create ck with the same frame endpoints as the mission ck.  For 
+the Lunar Orbiter5 spacecraft the ck frame is LUNAR_ORBITER_5 (-535000),
+and the ck reference frame is J2000 (1).
+
+\begindata
+INS-535001_CK_FRAME_ID=-535000
+INS-535001_CK_REFERENCE_ID=1
+
+\begintext
+ Lunar Orbiter 5 Medium Resolution Camera. See text under lo3.
+\begindata
+INS-535002_PLATFORM_ID = -535000
+
+INS-535002_SPK_TIME_BIAS = 0.0
+INS-535002_CK_TIME_BIAS  = 0.0
+INS-535002_CK_TIME_TOLERANCE = 1
+
+INS-535002_EULER_ANGLES = ( 0.0 0.0 0.0 )
+INS-535002_EULER_AXES = ( 1 2 3 )
+
+INS-535002_FOCAL_LENGTH = 79.842
+INS-535002_PIXEL_PITCH = .006944444
+
+INS-535002_TRANSX=(0.0 -0.006944444 0.0)
+INS-535002_TRANSY=(0.0 0.0 0.006944444)
+
+INS-535002_ITRANSS=(0.0 -144.0 0.0)
+INS-535002_ITRANSL=(0.0 0.0 144.0)
+
+INS-535002_POINT_OF_SYMMETRY = (1.296, 0.432)
+INS-535002_OD_K = (22.7525, -1.5727, -15.0578)
+
+\begintext
+These are the parameters required for writing c-kernels.  Isis will
+create ck with the same frame endpoints as the mission ck.  For 
+the Lunar Orbiter3 spacecraft the ck frame is LUNAR_ORBITER_5 (-535000),
+and the ck reference frame is J2000 (1).
+
+\begindata
+INS-535002_CK_FRAME_ID=-535000
+INS-535002_CK_REFERENCE_ID=1

@@ -205,7 +205,7 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
         """
         NAC uses multiple filter pairs, each filter combination has a different focal length.
         NAIF's Cassini kernels do not contain focal lengths for NAC filters and
-        so we aquired updated NAC filter data from ISIS's IAK kernel.
+        so we acquired updated NAC filter data from ISIS's IAK kernel.
 
         """
         # default focal defined by IAK kernel
