@@ -152,6 +152,17 @@ class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
     def detector_center_sample(self):
         return 0
 
+    @property
+    def sensor_model_version(self):
+        """
+        Returns the ISIS camera version
+
+        Returns
+        -------
+        : int
+          Camera version number
+        """
+        return 1
 
 
 class VikingIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistortion, Driver):
