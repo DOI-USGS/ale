@@ -45,7 +45,9 @@ class test_osirisrex_isis_naif(unittest.TestCase):
         np.testing.assert_almost_equal(self.driver.exposure_duration, 0.005285275)
 
     def test_sensor_frame_id(self):
-        assert self.driver.sensor_frame_id == -64000
+        with patch('ale.drivers.osirisrex_drivers.spice.bods2c', return_value=-64361) as bods2c:
+            assert self.driver.sensor_frame_id == -64361
+            bods2c.assert_called_with('ORX_OCAMS_MAPCAM')
 
     def test_detector_center_sample(self):
         with patch('ale.drivers.osirisrex_drivers.spice.gdpool', return_value=np.array([12345, 100])) as gdpool, \
