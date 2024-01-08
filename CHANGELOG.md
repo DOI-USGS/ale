@@ -35,7 +35,7 @@ release.
 
 ## [Unreleased]
 
-## [0.10.0] - 2023-11-15 
+## [0.10.0] - 2024-01-08 
 
 ### Added
 - Mariner10 IsisLabelNaifSpice driver, tests, and test data [#547](https://github.com/DOI-USGS/ale/pull/547)
