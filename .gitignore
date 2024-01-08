@@ -13,6 +13,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
+docs/
 develop-eggs/
 dist/
 downloads/
@@ -222,3 +223,4 @@ dmypy.json
 *.CUB
 *.img
 *.IMG
+print.prt
