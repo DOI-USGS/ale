@@ -35,7 +35,7 @@ release.
 
 ## [Unreleased]
 
-## [1.0.0] - 2023-11-15 
+## [0.10.0] - 2023-11-15 
 
 ### Added
 - Mariner10 IsisLabelNaifSpice driver, tests, and test data [#547](https://github.com/DOI-USGS/ale/pull/547)
@@ -49,7 +49,6 @@ release.
 
 ### Changed
 - Removed the affine6p library and replaced affine6p's affine transformation with a numpy solution [#579](https://github.com/DOI-USGS/ale/pull/579) 
-
 
 ## [0.9.1] - 2023-06-05
 
