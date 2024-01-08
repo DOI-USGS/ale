@@ -49,7 +49,7 @@ release.
 - Added Local option to isd_generate, used to generate sky based projections for rover data [#564](https://github.com/DOI-USGS/ale/pull/564)
 - Added Nadir option to isd_generate, used to generate nadir instrument pointing [#564](https://github.com/DOI-USGS/ale/pull/564)
 - Added radial and tangential distortion model [#575](https://github.com/DOI-USGS/ale/pull/575)
-- Updated the spiceypy version used in environment.yml [#552]
+- Updated the spiceypy version used in environment.yml [#552](https://github.com/DOI-USGS/ale/issues/552)
 
 ### Fixed
 - Fixed LRO MiniRF drivers naif keywords focal to pixel and pixel to focal translations to be correct. [#569](https://github.com/DOI-USGS/ale/pull/569)
