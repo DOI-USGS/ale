@@ -38,9 +38,17 @@ release.
 ## [0.10.0] - 2024-01-08 
 
 ### Added
+
 - Mariner10 IsisLabelNaifSpice driver, tests, and test data [#547](https://github.com/DOI-USGS/ale/pull/547)
+- Clementine UVVIS IsisLabelNaifSpice driver, tests, and test data [#546](https://github.com/DOI-USGS/ale/pull/546)
+- Clementine LWIR, NIR, and HIRES IsisLabelNaifSpice driver, tests, and test data [#565](https://github.com/DOI-USGS/ale/pull/565)
+- Hayabusa NIRS IsisLabelNaifSpice driver, tests and test data [#532](https://github.com/DOI-USGS/ale/pull/532)
+- LO HighCamera IsisLabelNaifSpice driver, tests and test data [#533](https://github.com/DOI-USGS/ale/pull/553)
 - DawnFC IsisLabelNaifSpice driver, tests, and test data [#567](https://github.com/DOI-USGS/ale/pull/567)
 - DawnVIR IsisLabelNaifSpice driver, tests, and test data [#566](https://github.com/DOI-USGS/ale/pull/566)
+- Added Local option to isd_generate, used to generate sky based projections for rover data [#564](https://github.com/DOI-USGS/ale/pull/564)
+- Added Nadir option to isd_generate, used to generate nadir instrument pointing [#564](https://github.com/DOI-USGS/ale/pull/564)
+- Added radial and tangential distortion model [#575](https://github.com/DOI-USGS/ale/pull/575)
 - Updated the spiceypy version used in environment.yml [#552]
 
 ### Fixed
