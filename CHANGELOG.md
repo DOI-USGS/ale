@@ -40,6 +40,7 @@ release.
 ### Added
 - Mariner10 IsisLabelNaifSpice driver, tests, and test data [#547](https://github.com/DOI-USGS/ale/pull/547)
 - DawnFC IsisLabelNaifSpice driver, tests, and test data [#567](https://github.com/DOI-USGS/ale/pull/567)
+- DawnVIR IsisLabelNaifSpice driver, tests, and test data [#566](https://github.com/DOI-USGS/ale/pull/566)
 - Updated the spiceypy version used in environment.yml [#552]
 
 ### Fixed
