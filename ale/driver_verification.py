@@ -13,6 +13,7 @@ from networkx.algorithms.shortest_paths.generic import shortest_path
 from importlib import reload
 import argparse
 import importlib
+import pvl
 import pkgutil
 import os
 ale_root = os.environ.get('ALEROOT')
@@ -194,13 +195,21 @@ def main(driver, image):
     image_isis_path = Path(f"{image}_ISIS.cub")
     shutil.copy(image, image_ale_path)
     shutil.copy(image, image_isis_path)
-        
+
     # Run spiceinit with ISIS
     run_spiceinit_isis(image_isis_path)
-        
+
+    # try ale.loads
+    isis_kerns = ale.util.generate_kernels_from_cube(image_isis_path, expand=True)
+    ale.loads(image_isis_path, props={"kernels": isis_kerns}, only_naif_spice=True)
+    
     # Run spiceinit with ALE
     run_spiceinit_ale(image_ale_path)
-        
+
+    # try ale.loads
+    ale_kerns = ale.util.generate_kernels_from_cube(image_ale_path, expand=True)
+    ale.loads(image_ale_path, props={"kernels": ale_kerns}, only_naif_spice=True)
+    
     # Generate ISD for both ALE and ISIS
     read_ale_driver = ReadIsis(image_ale_path)
     ale_json_dump = create_json_dump(read_ale_driver, read_ale_driver.sensor_frame_id, read_ale_driver.target_frame_id)
@@ -211,10 +220,6 @@ def main(driver, image):
         
     # Compare the ISDs
     compare_isds(ale_json_dump, isis_json_dump)
-
-    # Clean up duplicated images if needed
-    #image_ale_path.unlink()
-    #image_isis_path.unlink()
 
 # Set up argparse to handle command line arguments
 if __name__ == "__main__":
