@@ -73,6 +73,8 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
     when one has updated the ephemeris information on an ISIS cube.
     * ``only_naif_spice=True`` Used for example, when one has a data product or 
     an ISIS cube, but not yet obtained ephemeris information.
+    
+    Parameters
     ----------
     label : str
             String path to the given label file
