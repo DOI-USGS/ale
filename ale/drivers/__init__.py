@@ -158,16 +158,6 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
                     print("Success with: ", driver)
                     print("ISD:\n", json.dumps(isd, indent=2, cls=AleJsonEncoder))
                 return isd
-        except AttributeError:
-            res = driver(label, props=props)
-            # get instrument_id to force early failure
-            res.instrument_id
-            with res as driver:
-                isd = formatter(driver)
-                if verbose:
-                    print("Success with: ", driver)
-                    print("ISD:\n", json.dumps(isd, indent=2, cls=AleJsonEncoder))
-                return isd
         except Exception as e:
             if verbose:
                 print(f'Failed: {e}\n')
