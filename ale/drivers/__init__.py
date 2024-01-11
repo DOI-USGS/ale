@@ -73,8 +73,6 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
     when one has updated the ephemeris information on an ISIS cube.
     * ``only_naif_spice=True`` Used for example, when one has a data product or 
     an ISIS cube, but not yet obtained ephemeris information.
-
-    Parameters
     ----------
     label : str
             String path to the given label file
@@ -150,6 +148,16 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
             print(f'Trying {driver}')
         try:
             res = driver(label, props=props, parsed_label=parsed_label)
+            # get instrument_id to force early failure
+            res.instrument_id
+            with res as driver:
+                isd = formatter(driver)
+                if verbose:
+                    print("Success with: ", driver)
+                    print("ISD:\n", json.dumps(isd, indent=2, cls=AleJsonEncoder))
+                return isd
+        except AttributeError:
+            res = driver(label, props=props)
             # get instrument_id to force early failure
             res.instrument_id
             with res as driver:
