@@ -201,14 +201,16 @@ def main(driver, image):
 
     # try ale.loads
     isis_kerns = ale.util.generate_kernels_from_cube(image_isis_path, expand=True)
-    ale.loads(image_isis_path, props={"kernels": isis_kerns}, only_naif_spice=True)
+    isis_label = pvl.load(image_isis_path)
+    ale.loads(isis_label, props={"kernels": isis_kerns}, only_naif_spice=True)
     
     # Run spiceinit with ALE
     run_spiceinit_ale(image_ale_path)
 
     # try ale.loads
     ale_kerns = ale.util.generate_kernels_from_cube(image_ale_path, expand=True)
-    ale.loads(image_ale_path, props={"kernels": ale_kerns}, only_naif_spice=True)
+    ale_label = pvl.load(image_ale_path)
+    ale.loads(ale_label, props={"kernels": ale_kerns}, only_naif_spice=True)
     
     # Generate ISD for both ALE and ISIS
     read_ale_driver = ReadIsis(image_ale_path)
