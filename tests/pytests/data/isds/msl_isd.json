@@ -226,7 +226,7 @@
   "detector_sample_summing": 1,
   "detector_line_summing": 1,
   "focal_length_model": {
-    "focal_length": -34.0
+    "focal_length": 34.0
   },
   "detector_center": {
     "line": 576.4026068104001,
@@ -235,11 +235,11 @@
   "focal2pixel_lines": [
     0,
     0,
-    -136.49886775101947
+    136.49886775101947
   ],
   "focal2pixel_samples": [
     0,
-    -136.49886775101947,
+    136.49886775101947,
     0
   ],
   "optical_distortion": {

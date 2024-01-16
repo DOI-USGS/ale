@@ -612,4 +612,4 @@ class Cahvor():
         : float
           Pixel size of a cahvor model instrument
         """
-        return -self.focal_length/self.compute_h_s()
+        return self.focal_length/self.compute_h_s()
