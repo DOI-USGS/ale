@@ -5,10 +5,6 @@ from ale.base.base import Driver
 from ale.base.data_isis import IsisSpice
 from ale.base.label_isis import IsisLabel
 
-class ReadIsis(IsisSpice, IsisLabel, Driver):
-    def sensor_model_version(self):
-        return 0
-
 from networkx.algorithms.shortest_paths.generic import shortest_path
 from importlib import reload
 import argparse
@@ -23,20 +19,9 @@ import difflib
 from pathlib import Path
 import numpy as np
 
-# function to check if driver attribute exists in any given driver class file
-def driver_exists(driver_name):
-    # Find the package path
-    package_path = ale.drivers.__path__
-
-    # Iterate over all modules in the ale.drivers package
-    for _, module_name, _ in pkgutil.iter_modules(package_path):
-        full_module_name = f"ale.drivers.{module_name}"
-        module = importlib.import_module(full_module_name)
-        # Check if the driver class exists in the module
-        if hasattr(module, driver_name):
-            return getattr(module, driver_name)
-    print(f"Driver {driver_name} does not exist.")
-    return None
+class ReadIsis(IsisSpice, IsisLabel, Driver):
+    def sensor_model_version(self):
+        return 0
 
 # Define the function to run spiceinit with ISIS
 def run_spiceinit_isis(image_path):
@@ -183,12 +168,7 @@ def compare_isds(json1, json2):
     diff_and_describe(json1, json2, ["body_rotation", "angular_velocities"])
 
 # Define the main function
-def main(driver, image):
-    
-    # Check if the mission name is valid
-    driver_class = driver_exists(driver)
-    if driver_class == None:
-        raise ValueError("Invalid driver name provided.")
+def main(image):
     
     # Duplicate the image for ALE and ISIS processing
     image_ale_path = Path(f"{image}_ALE.cub")
@@ -201,24 +181,24 @@ def main(driver, image):
 
     # try ale.loads
     isis_kerns = ale.util.generate_kernels_from_cube(image_isis_path, expand=True)
-    isis_label = pvl.load(image_isis_path)
-    ale.loads(isis_label, props={"kernels": isis_kerns}, only_naif_spice=True)
+    # this can be uncommented and used when the PVL loads fix PR goes in (#587)
+    # isis_label = pvl.load(image_isis_path)
+    ale.loads(image_isis_path, props={"kernels": isis_kerns}, only_naif_spice=True)
     
     # Run spiceinit with ALE
     run_spiceinit_ale(image_ale_path)
 
     # try ale.loads
     ale_kerns = ale.util.generate_kernels_from_cube(image_ale_path, expand=True)
-    ale_label = pvl.load(image_ale_path)
-    ale.loads(ale_label, props={"kernels": ale_kerns}, only_naif_spice=True)
+    # this can be uncommented and used when the PVL loads fix PR goes in (#587)
+    # ale_label = pvl.load(image_ale_path)
+    ale.loads(image_ale_path, props={"kernels": ale_kerns}, only_naif_spice=True)
     
     # Generate ISD for both ALE and ISIS
     read_ale_driver = ReadIsis(image_ale_path)
     ale_json_dump = create_json_dump(read_ale_driver, read_ale_driver.sensor_frame_id, read_ale_driver.target_frame_id)
     read_isis_driver = ReadIsis(image_isis_path)
     isis_json_dump = create_json_dump(read_isis_driver, read_isis_driver.sensor_frame_id, read_isis_driver.target_frame_id)
-    # because there isn't isis spice drivers for every driver
-    # it is probably better to use tabledump
         
     # Compare the ISDs
     compare_isds(ale_json_dump, isis_json_dump)
@@ -226,10 +206,9 @@ def main(driver, image):
 # Set up argparse to handle command line arguments
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Script to compare ALE driver and ISIS3 driver against an image.")
-    parser.add_argument('driver', type=str, help='Name of the driver to utilize.')
     parser.add_argument('image', type=str, help='Image to process.')
     args = parser.parse_args()
 
     # Call the main function
-    main(args.driver, args.image)
+    main(args.image)
 
