@@ -126,7 +126,7 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         : list<double>
           focal plane to detector lines
         """
-        return [0, 0, -1/self.pixel_size]
+        return [0, 0, 1/self.pixel_size]
     
     @property
     def focal2pixel_samples(self):
@@ -138,7 +138,7 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         : list<double>
           focal plane to detector samples
         """
-        return [0, -1/self.pixel_size, 0]
+        return [0, 1/self.pixel_size, 0]
 
     @property
     def sensor_model_version(self):
@@ -181,10 +181,10 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         if self.is_navcam:
             # Focal length in pixel as computed for a cahvor model.
             # See is_navcam() for an explanation.
-            return -(self.compute_h_s() + self.compute_v_s())/2.0
+            return (self.compute_h_s() + self.compute_v_s())/2.0
         
-        # For mast cam    
-        return -super().focal_length 
+        # For mast cam
+        return super().focal_length 
 
     @property
     def pixel_size(self):
@@ -200,5 +200,5 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
             # See is_navcam() for an explanation.
             return 1.0
             
-        # For mast cam    
+        # For mast cam
         return super().pixel_size 
