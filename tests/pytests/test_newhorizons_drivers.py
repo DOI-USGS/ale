@@ -110,6 +110,40 @@ class test_leisa_isis_naif(unittest.TestCase):
     def test_exposure_duration(self):
         np.testing.assert_almost_equal(self.driver.exposure_duration, 0.856)
 
+# ========= Test Leisa isislabel and naifspice driver =========
+class test_lorri_isis_naif(unittest.TestCase):
+    def setUp(self):
+        label = get_image_label("lor_0034974380_0x630_sci_1", "isis")
+        self.driver = NewHorizonsLorriIsisLabelNaifSpiceDriver(label)
+
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == "NH_LORRI"
+
+    def test_ikid(self):
+            assert self.driver.ikid == -98301
+
+    def test_ephemeris_stop_time(self):
+        with patch('ale.drivers.nh_drivers.spice.scs2e', return_value=12345) as scs2e:
+            assert self.driver.ephemeris_stop_time == 12345
+            scs2e.assert_called_with(-98, '1/0034974379:47125')
+
+    def test_detector_center_sample(self):
+        with patch('ale.drivers.nh_drivers.spice.gdpool', return_value=[-1, 0, -1]) as gdpool:
+            assert self.driver.detector_center_sample == 0
+
+    def test_detector_center_line(self):
+        with patch('ale.drivers.nh_drivers.spice.gdpool', return_value=[0, -1, -1]) as gdpool:
+            assert self.driver.detector_center_line == 0
+
+    def test_sensor_name(self):
+        assert self.driver.sensor_name == "NEW HORIZONS"
+
+    def test_exposure_duration(self):
+        np.testing.assert_almost_equal(self.driver.exposure_duration, 7.5e-05)
+
+    def test_sensor_model_version(self):
+        assert self.driver.sensor_model_version == 2
+
 class test_mvic_framer_isis3_naif(unittest.TestCase):
 
     def setUp(self):
