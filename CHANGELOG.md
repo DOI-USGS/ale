@@ -35,13 +35,21 @@ release.
 
 ## [Unreleased]
 
-## [1.0.0] - 2023-11-15 
+## [0.10.0] - 2024-01-08 
 
 ### Added
+
 - Mariner10 IsisLabelNaifSpice driver, tests, and test data [#547](https://github.com/DOI-USGS/ale/pull/547)
+- Clementine UVVIS IsisLabelNaifSpice driver, tests, and test data [#546](https://github.com/DOI-USGS/ale/pull/546)
+- Clementine LWIR, NIR, and HIRES IsisLabelNaifSpice driver, tests, and test data [#565](https://github.com/DOI-USGS/ale/pull/565)
+- Hayabusa NIRS IsisLabelNaifSpice driver, tests and test data [#532](https://github.com/DOI-USGS/ale/pull/532)
+- LO HighCamera IsisLabelNaifSpice driver, tests and test data [#533](https://github.com/DOI-USGS/ale/pull/553)
 - DawnFC IsisLabelNaifSpice driver, tests, and test data [#567](https://github.com/DOI-USGS/ale/pull/567)
 - DawnVIR IsisLabelNaifSpice driver, tests, and test data [#566](https://github.com/DOI-USGS/ale/pull/566)
-- Updated the spiceypy version used in environment.yml [#552]
+- Added Local option to isd_generate, used to generate sky based projections for rover data [#564](https://github.com/DOI-USGS/ale/pull/564)
+- Added Nadir option to isd_generate, used to generate nadir instrument pointing [#564](https://github.com/DOI-USGS/ale/pull/564)
+- Added radial and tangential distortion model [#575](https://github.com/DOI-USGS/ale/pull/575)
+- Updated the spiceypy version used in environment.yml [#552](https://github.com/DOI-USGS/ale/issues/552)
 
 ### Fixed
 - Fixed LRO MiniRF drivers naif keywords focal to pixel and pixel to focal translations to be correct. [#569](https://github.com/DOI-USGS/ale/pull/569)
@@ -49,7 +57,6 @@ release.
 
 ### Changed
 - Removed the affine6p library and replaced affine6p's affine transformation with a numpy solution [#579](https://github.com/DOI-USGS/ale/pull/579) 
-
 
 ## [0.9.1] - 2023-06-05
 
