@@ -4,8 +4,6 @@ import ale
 import os
 import json
 
-from ale.drivers.clementine_drivers import ClementineIsisLabelNaifSpiceDriver
-
 from conftest import get_image_kernels, convert_kernels, get_image_label
 
 @pytest.fixture
@@ -15,7 +13,6 @@ def test_load_kernels():
     yield updated_kerns
     for kern in binary_kerns:
         os.remove(kern)
-
 
 def test_pvl_load(test_load_kernels):
     cube_label = get_image_label('LUA3107H.161', "isis3")
