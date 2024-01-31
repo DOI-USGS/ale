@@ -213,6 +213,8 @@ def parse_label(label, grammar=pvl.grammar.PVLGrammar()):
     load
     loads
     """
+    if isinstance(label, pvl.PVLModule):
+        return label
     try:
         parsed_label = pvl.loads(label, grammar=grammar)
     except Exception:
