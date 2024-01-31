@@ -10,9 +10,9 @@ class IsisLabel():
         if not hasattr(self, "_label"):
             if isinstance(self._file, pvl.PVLModule):
                 self._label = self._file
-            grammar = pvl.grammar.ISISGrammar()
-            grammar.comments+=(("#", "\n"), )
-            if not isinstance(self._file, pvl.PVLModule):
+            else:
+                grammar = pvl.grammar.ISISGrammar()
+                grammar.comments+=(("#", "\n"), )
                 try:
                     self._label = pvl.loads(self._file, grammar=grammar)
                 except Exception:
