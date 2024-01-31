@@ -1,17 +1,30 @@
-import pytest
 import pvl
 import ale
+import os
+import json
+import unittest
+from unittest.mock import patch
 
-# I need to figure out how to get some kind of test cube in the test without
-# referencing it locally
-testCube = "/Users/ahibl/astro_efs/test_imgs/uvvis/LUA3107H.161.clem.cub_ISIS.cub"
+from ale.drivers.clementine_drivers import ClementineIsisLabelNaifSpiceDriver
 
-@pytest.fixture
-def test_loads():
-    isis_kerns = ale.util.generate_kernels_from_cube(testCube, expand=True)
-    pvl_obj = pvl.load(testCube)
-    res = ale.loads(pvl_obj, props={"kernels": isis_kerns}, only_naif_spice=True)
-    return res
+from conftest import get_image_kernels, convert_kernels, get_image_label
 
-def test_pass(test_loads):
-    pass
+class test_pvl_loads(unittest.TestCase):
+
+    def setUp(self):
+        lbl = get_image_label("LUA3107H.161", "isis3")
+        self.driver = ClementineIsisLabelNaifSpiceDriver(lbl)
+        
+    def test_load_kernels(self):
+        kerns = get_image_kernels('LUA3107H.161')
+        updated_kerns, binary_kerns = convert_kernels(kerns)
+        yield updated_kerns
+        for kern in binary_kerns:
+            os.remove(kern)
+
+    def test_pvl_load(self):
+        cube_label = get_image_label('LUA3107H.161', "isis3")
+        cube_pvl_obj = pvl.load(cube_label)
+        isd = ale.loads(cube_pvl_obj, props={'kernels': self.test_load_kernels(), 'exact_ck_times': False}, only_naif_spice=True)
+        isd_obj = json.loads(isd)
+        return isd_obj
