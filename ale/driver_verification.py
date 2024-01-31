@@ -182,8 +182,12 @@ def main(image):
     # try ale.loads
     isis_kerns = ale.util.generate_kernels_from_cube(image_isis_path, expand=True)
     # this can be uncommented and used when the PVL loads fix PR goes in (#587)
-    # isis_label = pvl.load(image_isis_path)
-    ale.loads(image_isis_path, props={"kernels": isis_kerns}, only_naif_spice=True)
+    isis_label = pvl.load(image_isis_path)
+    try:
+        ale.loads(isis_label, props={"kernels": isis_kerns}, only_naif_spice=True)
+    except:
+        print("No driver for such Label")
+        exit
     
     # Run spiceinit with ALE
     run_spiceinit_ale(image_ale_path)
@@ -191,8 +195,8 @@ def main(image):
     # try ale.loads
     ale_kerns = ale.util.generate_kernels_from_cube(image_ale_path, expand=True)
     # this can be uncommented and used when the PVL loads fix PR goes in (#587)
-    # ale_label = pvl.load(image_ale_path)
-    ale.loads(image_ale_path, props={"kernels": ale_kerns}, only_naif_spice=True)
+    ale_label = pvl.load(image_ale_path)
+    ale.loads(ale_label, props={"kernels": ale_kerns}, only_naif_spice=True)
     
     # Generate ISD for both ALE and ISIS
     read_ale_driver = ReadIsis(image_ale_path)
