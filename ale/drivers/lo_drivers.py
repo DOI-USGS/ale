@@ -133,7 +133,26 @@ class LoHighCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, LoDisto
     @property
     def focal2pixel_lines(self):
         return self.naif_keywords[f"INS{self.ikid}_ITRANSL"]
-    
+
+    @property
+    def light_time_correction(self):
+        """
+        Returns the type of light time correction and abberation correction to
+        use in NAIF calls. Expects ikid to be defined. This must be the integer
+        Naif id code of the instrument.
+
+        This searches for the value of the NAIF keyword INS<ikid>_LIGHTTIME_CORRECTION.
+        If the keyword is not defined, then this defaults to light time
+        correction and abberation correction (LT+S).
+
+        Returns
+        -------
+        : str
+          The light time and abberation correction string for use in NAIF calls.
+          See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/abcorr.html
+          for the different options available.
+        """
+        return 'NONE'
 
     @property
     def naif_keywords(self):
