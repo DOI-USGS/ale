@@ -138,12 +138,9 @@ class LoHighCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, LoDisto
     def light_time_correction(self):
         """
         Returns the type of light time correction and abberation correction to
-        use in NAIF calls. Expects ikid to be defined. This must be the integer
-        Naif id code of the instrument.
+        use in NAIF calls.
 
-        This searches for the value of the NAIF keyword INS<ikid>_LIGHTTIME_CORRECTION.
-        If the keyword is not defined, then this defaults to light time
-        correction and abberation correction (LT+S).
+        ISIS has set this to NONE for all Lunar Orbitor data
 
         Returns
         -------
