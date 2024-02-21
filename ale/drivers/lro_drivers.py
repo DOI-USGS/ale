@@ -1370,3 +1370,9 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
           Detector line of the principal point
         """
         return float(spice.gdpool('INS{}_BORESIGHT_LINE'.format(self.fikid), 0, 1)[0]) - 0.5
+    
+    @property
+    def ephemeris_time(self):
+        if not hasattr(self, "_ephemeris_time"):
+            self._ephemeris_time = np.linspace(self.ephemeris_start_time, self.ephemeris_stop_time + self.interframe_delay, self.image_lines + 1)
+        return self._ephemeris_time
