@@ -1,0 +1,136 @@
+KPL/IK
+
+Apollo 15 Metric Instrument Kernel
+========================================================================
+
+   This Apollo 15 SPICE instrument kernel (I-kernel)
+   contains the instrument geometric parameters for the Metric camera
+
+
+Version and Date
+--------------------------------------------------------
+ 
+   Version 3.0 -- February 23, 2013 - Ken Edmundson 
+      Negated INS-915240_TRANSX and INS-915240_ITRANSS
+      so image coordinate system matches camera calibration 
+      report. As one looks at scanned positives on the
+      monitor, positive x is to the left and positive y is
+      down.
+
+   Version 2.0 -- March 16, 2010 - Ken Edmundson 
+      Updated the focal length in comments to match actual
+      value of 75.054. Corrected Reference #1 to 
+      "ap15_sim_index.pdf" (previously referred to Apollo
+      17). Added specific reference to original camera
+      calibration report.
+
+   Version 1.0 -- November 15, 2006 - Jacob Danton
+   
+ 
+Contact Information
+--------------------------------------------------------
+
+
+References
+--------------------------------------------------------
+ 
+   1. Apollo 15 Index: Mapping Camera and Panoramic Camera Photographs
+        (http://apollo.sese.asu.edu/SUPPORT_DATA/ap15_sim_index.pdf)
+        
+   2. Photographic Systems for Apollo
+   
+   3. APOLLO 15 SIM BAY PHOTOGRAPHIC EQUIPMENT AND MISSION SUMMARY
+         Prepared by Mapping Sciences Branch, NASA Manned Spacecraft
+         Center, Houston, Texas, August, 1971.
+ 
+
+Instrument Overview
+--------------------------------------------------------
+
+
+Optical Parameters
+--------------------------------------------------------
+
+      -------------------------------------------------
+             parameter                     value
+      -------------------------------------------------
+      Focal Length, mm                    76.054
+      f/ratio                              4.5
+      FOV Angular Size, deg               73.774 x 73.774
+      IFOV, rad/pixel                      0.000065543
+      -------------------------------------------------
+   
+   The values in the keywords are given in the same units as in the
+   table above except for angles which are given in radians.
+
+      \begindata
+
+         INS-915240_FOCAL_LENGTH       = ( 76.054 )
+         INS-915240_F/RATIO            = ( 4.5 )
+         INS-916240_FOV_ANGULAR_SIZE   = ( 1.2876, 1.2876 )
+         INS-916240_IFOV               = ( 0.000065543, 0.000065543 )
+
+      \begintext
+
+
+Detector Parameters
+--------------------------------------------------------
+
+      -----------------------------------------------
+             parameter                    value
+      -----------------------------------------------
+      Pixel size, microns                   5
+      Number of pixels/mm                  200
+
+      Detector Size (physical)        22900 x 22900
+      Detector Array Center          11450.5, 11450.5
+      -----------------------------------------------
+
+   The values in the keywords are given in the same units as in the
+   table above.
+
+      \begindata
+
+         INS-915240_PIXEL_PITCH      = ( 0.005 )
+         INS-915240_K                = ( 200.00 )
+         INS-915240_PIXEL_SAMPLES    = ( 22900 )
+         INS-915240_PIXEL_LINES      = ( 22900 )
+         INS-915240_CCD_CENTER       = ( 11450.5, 11450.5 )
+         
+         INS-915240_TRANSX = ( 0.0, -0.005, 0.0)
+         INS-915240_TRANSY = ( 0.0, 0.0, 0.005)
+         
+         INS-915240_ITRANSS = ( 0.0, -200.00, 0.0)
+         INS-915240_ITRANSL = ( 0.0, 0.0, 200.00)
+
+      \begintext
+
+
+FOV Definition
+---------------------------------------------------------------------------
+
+      \begindata
+
+         INS-915240_FOV_FRAME                 = 'A15_METRIC'
+         INS-915240_FOV_SHAPE                 = 'RECTANGLE'
+         INS-915240_BORESIGHT                 = ( 0.0 0.0 +1.0 )
+         INS-915240_FOV_CLASS_SPEC            = 'ANGLES'
+         INS-915240_FOV_REF_VECTOR            = ( +1.0 0.0 0.0 )
+         INS-915240_FOV_REF_ANGLE             = ( 37 )
+         INS-915240_FOV_CROSS_ANGLE           = ( 37 )
+         INS-915240_FOV_ANGLE_UNITS           = 'DEGREES'
+
+      \begintext
+
+Platform ID
+---------------------------------------------------------------------------
+
+   This number is the NAIF instrument ID of the platform on which the
+   camera is mounted.
+
+      \begindata
+
+      INS-915240_PLATFORM_ID  = ( -915000 )
+
+      \begintext
+
