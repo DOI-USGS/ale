@@ -23,7 +23,7 @@ class HayabusaAmicaIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Radial
     @property
     def center_ephemeris_time(self):
         """
-        Returns the average of the start and stop ephemeris times.
+        Returns the start ephemeris time plus half the exposure duration.
 
         Returns
         -------
