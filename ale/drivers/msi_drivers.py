@@ -38,6 +38,10 @@ class MsiIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Dr
         """
         lookup_table = {"MSI": "NEAR EARTH ASTEROID RENDEZVOUS"}
         return lookup_table[super().instrument_id]
+    
+    @property
+    def center_ephemeris_time(self):
+        return self.ephemeris_start_time + self.exposure_duration/2.0
 
     @property
     def sensor_name(self):
