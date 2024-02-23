@@ -19,6 +19,18 @@ class HayabusaAmicaIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Radial
         """
         lookup_table = {'AMICA': 'HAYABUSA_AMICA'}
         return lookup_table[super().instrument_id]
+    
+    @property
+    def center_ephemeris_time(self):
+        """
+        Returns the average of the start and stop ephemeris times.
+
+        Returns
+        -------
+        : double
+          Center ephemeris time for an image
+        """
+        return self.ephemeris_start_time + self.exposure_duration / 2
 
     @property
     def sensor_model_version(self):
