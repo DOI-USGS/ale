@@ -37,6 +37,11 @@ class test_amica_isis_naif(unittest.TestCase):
 
     def test_instrument_id(self):
         assert self.driver.instrument_id == "HAYABUSA_AMICA"
+
+    def test_center_ephemeris_time(self):
+        with patch('ale.drivers.hayabusa_drivers.spice.scs2e', return_value=12345) as scs2e:
+            assert self.driver.center_ephemeris_time == 12345 + 0.0109
+            scs2e.assert_called_with(-130, '2457499394')
     
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
