@@ -35,6 +35,10 @@ release.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed landed sensors to correctly project locally [#590](https://github.com/DOI-USGS/ale/pull/590)
+
 ## [0.10.0] - 2024-01-08 
 
 ### Added
