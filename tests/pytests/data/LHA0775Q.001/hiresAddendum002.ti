@@ -1,0 +1,25 @@
+\begindata
+INS-40001_PLATFORM_ID = -40000 
+INS-40001_SPK_TIME_BIAS = 0.0
+INS-40001_CK_TIME_BIAS  = 0.0
+INS-40001_CK_TIME_TOLERANCE = 1
+
+INS-40001_FOCAL_LENGTH = 1257.2
+INS-40001_PIXEL_PITCH = 0.023
+
+INS-40001_BORESIGHT_SAMPLE = 192.5
+INS-40001_BORESIGHT_LINE = 144.5
+
+INS-40001_TRANSX=(0.0 0.023 0.0)
+INS-40001_TRANSY=(0.0 0.0 0.023)
+INS-40001_ITRANSS=(0.0 43.4783 0.0)
+INS-40001_ITRANSL=(0.0 0.0 43.4783)
+\begintext
+These are the parameters required for writing c-kernels.  Isis will
+create ck with the same frame endpoints as the mission ck.  For 
+the Clementine spacecraft the ck frame is CLEM_SC_BUS (-40000), and the
+ck reference frame is J2000 (1).
+
+\begindata
+INS-40001_CK_FRAME_ID=-40000
+INS-40001_CK_REFERENCE_ID=1

@@ -77,6 +77,22 @@ TEST(Isd, LogFile) {
   EXPECT_STREQ(ale::getLogFile(j).c_str(), "fake/path");
 }
 
+
+TEST(Isd, Projection) {
+  nlohmann::json proj;
+  proj["projection"] = "totally a proj4 string";
+  proj["geotransform"] = {0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
+
+  std::vector<double> coeffs = ale::getGeoTransform(proj);
+  std::string proj4str = ale::getProjection(proj);
+  EXPECT_EQ(proj4str, "totally a proj4 string");
+  ASSERT_EQ(coeffs.size(), 6);
+  EXPECT_DOUBLE_EQ(coeffs[1], 1.0);
+  EXPECT_DOUBLE_EQ(coeffs[5], 1.0);
+  EXPECT_DOUBLE_EQ(coeffs[0], 0.0);
+}
+
+
 TEST(Isd, TransverseDistortion) {
   nlohmann::json trans;
   trans["optical_distortion"]["transverse"]["x"] = {1};
@@ -570,6 +586,21 @@ TEST(Isd, BadStartingDetector) {
     FAIL() << "Expected an Excpetion with message: \"Could not parse the detector starting line.\"";
   }
 }
+
+
+TEST(Isd, BadProjection) {
+  nlohmann::json proj;
+  proj["projection"] = NULL;
+
+  try {
+    std::string proj4str = ale::getProjection(proj);
+    FAIL() << "Expected exception to be thrown"; 
+  }
+  catch(std::exception &e) { 
+     EXPECT_EQ(std::string(e.what()), "Could not parse the projection string.");
+  }
+}
+
 
 TEST(Isd, BadFocal2Pixel) {
   std::string bad_json_str("{}");

@@ -155,7 +155,7 @@ class test_cassini_iss_pds3_naif(unittest.TestCase):
             target_frame_id.return_value = -800
             frame_chain = self.driver.frame_chain
             assert len(frame_chain.nodes()) == 0
-            from_spice.assert_called_with(center_ephemeris_time=2.4, ephemeris_times=[2.4], nadir=False, sensor_frame=14082360, target_frame=-800, exact_ck_times=True)
+            from_spice.assert_called_with(center_ephemeris_time=2.4, ephemeris_times=[2.4], nadir=False, sensor_frame=14082360, target_frame=-800, exact_ck_times=True,  inst_time_bias=0)
 
 # ========= Test cassini ISS isislabel and naifspice driver =========
 class test_cassini_iss_isis_naif(unittest.TestCase):
@@ -227,7 +227,7 @@ class test_cassini_iss_isis_naif(unittest.TestCase):
             target_frame_id.return_value = -800
             frame_chain = self.driver.frame_chain
             assert len(frame_chain.nodes()) == 0
-            from_spice.assert_called_with(center_ephemeris_time=2.4000000000000004, ephemeris_times=[2.4000000000000004], nadir=False, sensor_frame=14082360, target_frame=-800, exact_ck_times=True)
+            from_spice.assert_called_with(center_ephemeris_time=2.4000000000000004, ephemeris_times=[2.4000000000000004], nadir=False, sensor_frame=14082360, target_frame=-800, exact_ck_times=True, inst_time_bias=0)
 
 # ========= Test cassini ISS pds3label and naifspice driver =========
 class test_cassini_vims_isis_naif(unittest.TestCase):

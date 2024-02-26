@@ -6,7 +6,7 @@
 [![Build Status](https://travis-ci.org/USGS-Astrogeology/ale.svg?branch=master)](https://travis-ci.org/USGS-Astrogeology/ale)
 [![Coverage Status](https://coveralls.io/repos/github/USGS-Astrogeology/ale/badge.svg?branch=master)](https://coveralls.io/github/USGS-Astrogeology/ale?branch=master)
 [![Docs](https://readthedocs.org/projects/ale/badge/?version=latest)](https://ale.readthedocs.io/en/latest/?badge=latest)
-
+[![DOI](https://img.shields.io/badge/DOI-10.5066/P906D84L-blue)](https://www1.usgs.gov/csas/doi/#/form/doi:10.5066%2FP906D84L)
 
 
 This library allows for the position, rotation, velocity and rotational velocity tracking of

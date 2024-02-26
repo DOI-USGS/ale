@@ -1,4 +1,5 @@
 import numpy as np
+import spiceypy as spice
 
 class LegendreDistortion():
     """
@@ -165,5 +166,30 @@ class ChandrayaanMrffrDistortion():
             "ChandrayaanMrffr":{
                 "x_coefficients" : transx,
                 "y_coefficients" : transy
+            }
+        }
+    
+class LoDistortion():
+    @property
+    def usgscsm_distortion_model(self):
+
+        # From ISIS LoHighDistortionMap::SetDistortion()
+        # Get the perspective correction factors for x and y and the distortion
+        # center (point of symmetry of distortion)
+        perspective_key = 'INS{}_PERSPECTIVE_FACTORS'.format(self.ikid)
+        center_key = 'INS{}_POINT_OF_SYMMETRY'.format(self.ikid)
+        perspective_x = float(spice.gdpool(perspective_key, 0, 1)[0])
+        perspective_y = float(spice.gdpool(perspective_key, 0, 2)[1])
+        center_point_x = float(spice.gdpool(center_key, 0, 1)[0])
+        center_point_y = float(spice.gdpool(center_key, 0, 2)[1])
+
+        # Get the distortion coefficients
+        # CameraDistortionMap::SetDistortion(naifIkCode);
+        return {
+            "lunarorbiter":{
+                "perspective_x" : perspective_x,
+                "perspective_y" : perspective_y,
+                "center_point_x" : center_point_x,
+                "center_point_y" : center_point_y
             }
         }

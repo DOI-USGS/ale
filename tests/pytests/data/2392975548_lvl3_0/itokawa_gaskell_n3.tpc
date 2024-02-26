@@ -1,0 +1,115 @@
+KPL/PCK
+
+\beginlabel
+PDS_VERSION_ID               = PDS3
+RECORD_TYPE                  = STREAM
+RECORD_BYTES                 = "N/A"
+^SPICE_KERNEL                = "itokawa_gaskell_n3.tpc"
+MISSION_NAME                 = HAYABUSA
+SPACECRAFT_NAME              = HAYABUSA
+DATA_SET_ID                  = "HAY-A-SPICE-6-V1.0"
+KERNEL_TYPE_ID               = PCK
+PRODUCT_ID                   = "itokawa_gaskell_n3.tpc"
+PRODUCT_CREATION_TIME        = 2009-11-30T13:50:42
+PRODUCER_ID                  = "R.GASKELL/PSI"
+MISSION_PHASE_NAME           = "N/A"
+PRODUCT_VERSION_TYPE         = ACTUAL
+PLATFORM_OR_MOUNTING_NAME    = "N/A"
+START_TIME                   = "N/A"
+STOP_TIME                    = "N/A"
+SPACECRAFT_CLOCK_START_COUNT = "N/A"
+SPACECRAFT_CLOCK_STOP_COUNT  = "N/A"
+TARGET_NAME                  = "25143 ITOKAWA"
+INSTRUMENT_NAME              = "N/A"
+NAIF_INSTRUMENT_ID           = "N/A"
+SOURCE_PRODUCT_ID            = "N/A"
+NOTE                         = "See comments in the file for details"
+OBJECT                       = SPICE_KERNEL
+  INTERCHANGE_FORMAT         = ASCII
+  KERNEL_TYPE                = TARGET_CONSTANTS
+  DESCRIPTION                = "SPICE Planetary Constants Kernel (PCK) file
+containing the asteroid Itokawa radii values, body-fixed frame definition,
+and rotation constants derived by Dr. Robert W. Gaskell, PSI. The original
+name of this files was Itokawa_Gaskell_n3.tpc. It contains the rotation
+constants consistent with the Itokawa shape models archived in the PDS data
+set HAY-A-AMICA-5-ITOKAWASHAPE-V1.0. "
+END_OBJECT                   = SPICE_KERNEL
+\endlabel
+
+
+Asteroid Itokawa P_constants (PcK) SPICE kernel file
+===========================================================================
+
+     By Hayabusa Joint Science Team, <unknown date>; miscellaneous comments
+     added by Boris Semenov, NAIF/JPL, on September 24, 2009.
+
+
+Summary
+--------------------------------------------------------
+
+     This PCK file contains Itokawa rotation constants, radii and 
+     the definition of the Itokawa body-fixed frame, ITOKAWA_FIXED.
+
+     The Itokawa rotation constants provided in this PCK are 
+     from the data set catalog file for the Itokawa shape model 
+     data set (HAY-A-AMICA-5-ITOKAWASHAPE-V1.0) by the Dr. Robert W. 
+     Gaskell, PSI.
+
+
+Rotation constants for asteroid Itokawa
+--------------------------------------------------------
+
+     Itokawa rotation constants are provided in the keywords below.   
+ 
+     \begindata
+ 
+        BODY2025143_POLE_RA    = ( 90.02564    0.0              0.0 )
+        BODY2025143_POLE_DEC   = (-67.02704   0.0              0.0 )
+        BODY2025143_PM         = (129.73000   712.14376110          0.0 )
+ 
+     \begintext
+
+
+Radii for asteroid ITOKAWA
+--------------------------------------------------------
+     
+     The Itokawa radii are provided in the keyword below.
+
+     \begindata
+ 
+        BODY2025143_RADII      = ( 0.274  0.156  0.138  )
+ 
+     \begintext
+
+
+ITOKAWA_FIXED Frame Definition
+--------------------------------------------------------
+
+     The ITOKAWA fixed frame is defined in the same as any other PCK
+     frame:
+ 
+        *  +Z along the North pole;
+      
+        *  +X toward the prime meridian;
+      
+        *  +Y completes the right hand frame;
+      
+        *  the origin of this frame is at the center of the body.
+      
+     The orientation of this frame is computed by evaluating
+     corresponding rotation constants provided in this PCK file.
+
+     \begindata
+
+        FRAME_ITOKAWA_FIXED      =  2025143
+        FRAME_2025143_NAME     = 'ITOKAWA_FIXED'
+        FRAME_2025143_CLASS    =  2
+        FRAME_2025143_CLASS_ID =  2025143
+        FRAME_2025143_CENTER   =  2025143
+
+        OBJECT_2025143_FRAME   = 'ITOKAWA_FIXED'
+
+     \begintext
+
+
+End of PCK file.

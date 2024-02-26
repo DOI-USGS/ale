@@ -42,10 +42,28 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         """
         lookup = {
           "MAST_RIGHT": 'MASTCAM_RIGHT',
-          "MAST_LEFT": 'MASTCAM_LEFT'
+          "MAST_LEFT": 'MASTCAM_LEFT',
+          "NAV_RIGHT_B": 'NAVCAM_RIGHT_B',
+          "NAV_LEFT_B": 'NAVCAM_LEFT_B'
         }
         return self.instrument_host_id + "_" + lookup[super().instrument_id]
 
+    @property
+    def is_navcam(self):
+        """
+        Returns True if the camera is a nav cam, False otherwise.
+        Need to handle nav cam differently as its focal length
+        cannot be looked up in the spice data. Use instead
+        a focal length in pixels computed from the CAHVOR model, 
+        and a pixel size of 1.
+        
+        Returns
+        -------
+        : bool
+          True if the camera is a nav cam, False otherwise
+        """
+        return 'NAVCAM' in self.instrument_id
+        
     @property
     def cahvor_camera_dict(self):
         """
@@ -68,6 +86,18 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
                 self._cahvor_camera_params['O'] = np.array(camera_model_group["MODEL_COMPONENT_5"])
                 self._cahvor_camera_params['R'] = np.array(camera_model_group["MODEL_COMPONENT_6"])
         return self._cahvor_camera_params
+
+    @property
+    def final_inst_frame(self):
+        """
+        Defines the rover frame, relative to which the MSL cahvor camera is defined
+
+        Returns
+        -------
+        : int
+          Naif frame code for MSL_ROVER
+        """
+        return spice.bods2c("MSL_ROVER")
 
     @property
     def sensor_frame_id(self):
@@ -96,7 +126,7 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         : list<double>
           focal plane to detector lines
         """
-        return [0, 1/self.pixel_size, 0]
+        return [0, 0, 1/self.pixel_size]
     
     @property
     def focal2pixel_samples(self):
@@ -108,23 +138,7 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         : list<double>
           focal plane to detector samples
         """
-        return [0, 0, 1/self.pixel_size]
-
-    @property
-    def detector_center_line(self):
-        return self.label["INSTRUMENT_STATE_PARMS"]["DETECTOR_LINES"]/2
-
-    @property
-    def detector_center_sample(self):
-        return self.label["INSTRUMENT_STATE_PARMS"]["MSL:DETECTOR_SAMPLES"]/2
-
-    @property
-    def detector_start_line(self):
-        return self.label["IMAGE_REQUEST_PARMS"]["FIRST_LINE"]
-
-    @property
-    def detector_start_sample(self):
-        return self.label["IMAGE_REQUEST_PARMS"]["FIRST_LINE_SAMPLE"]
+        return [0, 1/self.pixel_size, 0]
 
     @property
     def sensor_model_version(self):
@@ -135,3 +149,56 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
           ISIS sensor model version
         """
         return 1
+
+    @property
+    def light_time_correction(self):
+        """
+        Returns the type of light time correction and aberration correction to
+        use in NAIF calls.
+
+        For MSL using such a correction returns wrong results, so turn it off.
+        
+        Returns
+        -------
+        : str
+          The light time and aberration correction string for use in NAIF calls.
+          See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/abcorr.html
+          for the different options available.
+        """
+        return 'NONE'
+        
+    @property
+    def focal_length(self):
+        """
+        Returns the focal length of the sensor with a negative sign.
+        This was tested to work with MSL mast and nav cams. 
+
+        Returns
+        -------
+        : float
+          focal length
+        """
+        if self.is_navcam:
+            # Focal length in pixel as computed for a cahvor model.
+            # See is_navcam() for an explanation.
+            return (self.compute_h_s() + self.compute_v_s())/2.0
+        
+        # For mast cam
+        return super().focal_length 
+
+    @property
+    def pixel_size(self):
+        """
+        Returns the pixel size. 
+
+        Returns
+        -------
+        : float
+          pixel size
+        """
+        if self.is_navcam:
+            # See is_navcam() for an explanation.
+            return 1.0
+            
+        # For mast cam
+        return super().pixel_size 

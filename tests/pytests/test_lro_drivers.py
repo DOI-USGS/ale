@@ -51,7 +51,6 @@ def test_load(test_kernels, label_type, image, kernel_type):
         compare_isd = get_isd('lro_isis')
 
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
 
@@ -262,12 +261,20 @@ class test_miniRf(unittest.TestCase):
 
     def test_ephmeris_start_time(self):
         with patch('ale.drivers.lro_drivers.spice.str2et', return_value=12345) as str2et:
-          assert self.driver.ephemeris_start_time == 12345
+          assert self.driver.ephemeris_start_time == 12344.995295578527
 
     def test_ephmeris_stop_time(self):
         with patch('ale.drivers.lro_drivers.spice.str2et', return_value=12345) as str2et:
-          assert self.driver.ephemeris_stop_time == 12345
+          assert self.driver.ephemeris_stop_time == 12348.297799453276
 
+    @patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock, return_value={})
+    def test_naif_keywords(self, naif_keywords):
+        with patch("ale.base.data_naif.spice.bods2c", return_value=12345) as bods2c:
+            print(self.driver.naif_keywords["INS12345_ITRANSL"])
+            np.testing.assert_array_almost_equal(self.driver.naif_keywords["INS12345_ITRANSL"], [0.0, 0.0, 0.0])
+            np.testing.assert_array_almost_equal(self.driver.naif_keywords["INS12345_ITRANSS"], [1.0, 0.13333333333333, 0])
+            np.testing.assert_array_almost_equal(self.driver.naif_keywords["INS12345_TRANSX"], [-7.5, 7.5, 0])
+            np.testing.assert_array_almost_equal(self.driver.naif_keywords["INS12345_TRANSY"], [0, 0, 0])
 
 # ========= Test WAC isislabel and naifspice driver =========
 class test_wac_isis_naif(unittest.TestCase):

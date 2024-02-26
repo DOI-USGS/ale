@@ -1,0 +1,274 @@
+{
+  "isis_camera_version": 1,
+  "image_lines": 1024,
+  "image_samples": 1024,
+  "name_platform": "DAWN",
+  "name_sensor": "DAWN_FC2_FILTER_6",
+  "reference_height": {
+    "maxheight": 1000,
+    "minheight": -1000,
+    "unit": "m"
+  },
+  "name_model": "USGS_ASTRO_FRAME_SENSOR_MODEL",
+  "center_ephemeris_time": 488002614.62294483,
+  "radii": {
+    "semimajor": 482.0,
+    "semiminor": 446.0,
+    "unit": "km"
+  },
+  "body_rotation": {
+    "time_dependent_frames": [
+      2000001,
+      1
+    ],
+    "ck_table_start_time": 488002614.62294483,
+    "ck_table_end_time": 488002614.62294483,
+    "ck_table_original_size": 1,
+    "ephemeris_times": [
+      488002614.62294483
+    ],
+    "quaternions": [
+      [
+        -0.7323907260895571,
+        0.1890116253358707,
+        -0.06950386369161242,
+        0.6504211272382237
+      ]
+    ],
+    "angular_velocities": [
+      [
+        2.770977343153026e-05,
+        -7.064167352871139e-05,
+        0.00017673919183794291
+      ]
+    ],
+    "reference_frame": 1
+  },
+  "instrument_pointing": {
+    "time_dependent_frames": [
+      -203120,
+      -203000,
+      1
+    ],
+    "ck_table_start_time": 488002614.62294483,
+    "ck_table_end_time": 488002614.62294483,
+    "ck_table_original_size": 1,
+    "ephemeris_times": [
+      488002614.62294483
+    ],
+    "quaternions": [
+      [
+        0.5213647259158682,
+        -0.17475033868107043,
+        0.13616771930072985,
+        -0.8240749322251953
+      ]
+    ],
+    "angular_velocities": [
+      [
+        -2.0163095864499935e-05,
+        2.0665280555081777e-08,
+        3.996105121476586e-06
+      ]
+    ],
+    "reference_frame": 1,
+    "constant_frames": [
+      -203126,
+      -203120
+    ],
+    "constant_rotation": [
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  "naif_keywords": {
+    "BODY2000001_RADII": [
+      482.0,
+      482.0,
+      446.0
+    ],
+    "BODY_FRAME_CODE": 2000001,
+    "BODY_CODE": 2000001,
+    "TKFRAME_-203126_SPEC": "ANGLES",
+    "INS-203126_FOV_FRAME": "DAWN_FC2",
+    "INS-203126_PIXEL_SIZE": [
+      14.004,
+      13.995
+    ],
+    "INS-203126_FOV_CLASS_SPEC": "ANGLES",
+    "TKFRAME_-203126_RELATIVE": "DAWN_FC2",
+    "INS-203126_ITRANSL": [
+      0.0,
+      0.0,
+      71.42857142857143
+    ],
+    "INS-203126_IFOV": [
+      9.3238e-05,
+      9.3179e-05
+    ],
+    "INS-203126_FOV_REF_VECTOR": [
+      1.0,
+      0.0,
+      0.0
+    ],
+    "INS-203126_ITRANSS": [
+      0.0,
+      71.38370167323397,
+      0.0
+    ],
+    "FRAME_-203126_NAME": "DAWN_FC2_FILTER_6",
+    "INS-203126_BANDCENTER": 829.0,
+    "TKFRAME_-203126_UNITS": "DEGREES",
+    "FRAME_-203126_CLASS_ID": -203126.0,
+    "INS-203126_TRANSX": [
+      0.0,
+      0.0140088,
+      0.0
+    ],
+    "INS-203126_TRANSY": [
+      0.0,
+      0.0,
+      0.014
+    ],
+    "INS-203126_FOV_ANGLE_UNITS": "DEGREES",
+    "INS-203126_PIXEL_LINES": 1024.0,
+    "INS-203126_FOV_REF_ANGLE": 2.7351859,
+    "TKFRAME_-203126_ANGLES": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "FRAME_-203126_CENTER": -203.0,
+    "INS-203126_CCD_CENTER": [
+      511.5,
+      511.5
+    ],
+    "INS-203126_FOV_ANGULAR_SIZE": [
+      0.095476,
+      0.095416
+    ],
+    "INS-203126_F/RATIO": 7.5,
+    "INS-203126_FOCAL_LENGTH": 150.08,
+    "INS-203126_FOV_CROSS_ANGLE": 2.733467,
+    "INS-203126_BANDWIDTH": 36.0,
+    "INS-203126_BORESIGHT": [
+      0.0,
+      0.0,
+      150.08
+    ],
+    "INS-203126_RAD_DIST_COEFF": 9.2e-06,
+    "INS-203126_PIXEL_SAMPLES": 1024.0,
+    "INS-203126_FOV_SHAPE": "RECTANGLE",
+    "FRAME_-203126_CLASS": 4.0,
+    "INS-203126_EFF_WAVELENGTH": 829.0,
+    "TKFRAME_-203126_AXES": [
+      1.0,
+      2.0,
+      3.0
+    ],
+    "BODY2000001_GM": 62.6325,
+    "FRAME_2000001_CENTER": 2000001.0,
+    "FRAME_2000001_NAME": "CERES_FIXED",
+    "OBJECT_2000001_FRAME": "CERES_FIXED",
+    "FRAME_2000001_CLASS": 2.0,
+    "BODY2000001_PM": [
+      170.65,
+      952.1532,
+      0.0
+    ],
+    "FRAME_2000001_CLASS_ID": 2000001.0,
+    "BODY2000001_POLE_DEC": [
+      66.764,
+      0.0,
+      0.0
+    ],
+    "BODY2000001_POLE_RA": [
+      291.418,
+      0.0,
+      0.0
+    ]
+  },
+  "detector_sample_summing": 1,
+  "detector_line_summing": 1,
+  "focal_length_model": {
+    "focal_length": 150.08
+  },
+  "detector_center": {
+    "line": 512.0,
+    "sample": 512.0
+  },
+  "focal2pixel_lines": [
+    0.0,
+    0.0,
+    71.42857142857143
+  ],
+  "focal2pixel_samples": [
+    0.0,
+    71.38370167323397,
+    0.0
+  ],
+  "optical_distortion": {
+    "radial": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "starting_detector_line": 0,
+  "starting_detector_sample": 0,
+  "instrument_position": {
+    "spk_table_start_time": 488002614.62294483,
+    "spk_table_end_time": 488002614.62294483,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
+      488002614.62294483
+    ],
+    "positions": [
+      [
+        -678.145360419934,
+        2026.1409618562566,
+        -4375.770027129584
+      ]
+    ],
+    "velocities": [
+      [
+        0.01836093913952242,
+        -0.10035442890342972,
+        -0.04929136913284714
+      ]
+    ],
+    "reference_frame": 1
+  },
+  "sun_position": {
+    "spk_table_start_time": 488002614.62294483,
+    "spk_table_end_time": 488002614.62294483,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
+      488002614.62294483
+    ],
+    "positions": [
+      [
+        -184987783.06715,
+        343341745.2043138,
+        199532284.61700404
+      ]
+    ],
+    "velocities": [
+      [
+        -15.334993792176247,
+        -7.083164572559297,
+        -0.21518329562060534
+      ]
+    ],
+    "reference_frame": 1
+  }
+}

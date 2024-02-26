@@ -11,9 +11,9 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-import sys
+# import sys
 import subprocess
-sys.path.insert(0, os.path.abspath('../ale'))
+# sys.path.insert(0, os.path.abspath('../ale'))
 
 
 # -- Project information -----------------------------------------------------
@@ -55,16 +55,17 @@ html_theme = 'alabaster'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
+
 
 # -- Run Doxygen for C++ API --------------------------------------------------
 
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
 if read_the_docs_build:
-    subprocess.call('doxygen', shell=True)
+    subprocess.call('doxygen Doxyfile', shell=True)
     
 # -- Breathe Configuration ----------------------------------------------------
 
-breathe_projects = { "ALE": "doxyxml/" }
+breathe_projects = { "ALE": "xml/" }
 breathe_default_project = "ALE"

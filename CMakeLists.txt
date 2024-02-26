@@ -7,7 +7,11 @@
 # Specify the required version of CMake.
 # cmake 3.15 required for findPython virtualenv configuration
 cmake_minimum_required(VERSION 3.15)
-project(ale VERSION 0.8.8 DESCRIPTION "Abstraction Library for Ephemerides ")
+project(ale VERSION 0.10.0 DESCRIPTION "Abstraction Library for Ephemerides ")
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+message(STATUS "CMake Module Path: " ${CMAKE_MODULE_PATH})
 
 # include what we need
 include(GNUInstallDirs)
@@ -131,3 +135,10 @@ install(TARGETS ale
 install(EXPORT aleTargets
         NAMESPACE ale::
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
+
+option (ALE_BUILD_DOCS "Build the ALE Docs" ON)
+if(ALE_BUILD_DOCS)
+  add_subdirectory ("docs")
+else()
+  message(STATUS "Skipping Docs")
+endif()

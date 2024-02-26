@@ -1,0 +1,401 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 1
+    TileLines   = 1
+
+    Group = Dimensions
+      Samples = 1
+      Lines   = 1
+      Bands   = 64
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName            = HAYABUSA
+    InstrumentId              = NIRS
+    SpacecraftClockStartCount = 1/2392973413.133
+    SpacecraftClockStopCount  = 1/2392975548.000
+    StartTime                 = 2005-09-20T11:06:43
+    StopTime                  = 2005-09-20T11:07:50
+    TotalIntegrationTime      = 13.10720 <SECOND>
+    IntegrationTime           = 25.6 <msec>
+    TargetName                = ITOKAWA
+  End_Group
+
+  Group = Archive
+    Pixel0Wavelength       = 787.16 <nm>
+    WavelengthInterval     = 23.56 <nm>
+    StackingEndTime        = 2392975548 <decimal>
+    SWHistMode             = Pixel
+    SWLIDARMode            = Normal
+    SWFLashMode            = Normal
+    SWRawMode              = STACK
+    SWDeviationOutput      = ON
+    SWMinMaxOutput         = ON
+    HWPower                = ON
+    HWChopper              = ON
+    HWChopperMode          = CHOP
+    HWTEC                  = ON
+    HWTECModeV             = "CLOSE:-9.5 deg" <V>
+    HWTECModeC             = -9.5 <C>
+    HWLamp                 = OFF
+    HWLED                  = OFF
+    DarkCurrentSubtraction = YES
+    YearDoy                = 2005263
+  End_Group
+
+  Group = BandBin
+    Width        = 0.02356 <micrometers>
+    Unit         = Micrometers
+    FilterNumber = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+                    18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+                    33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+                    48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62,
+                    63, 64)
+    Center       = (0.7636, 0.78716, 0.81072, 0.83428, 0.85784, 0.8814,
+                    0.90496, 0.92852, 0.95208, 0.97564, 0.9992, 1.02276,
+                    1.04632, 1.06988, 1.09344, 1.117, 1.14056, 1.16412,
+                    1.18768, 1.21124, 1.2348, 1.25836, 1.28192, 1.30548,
+                    1.32904, 1.3526, 1.37616, 1.39972, 1.42328, 1.44684,
+                    1.4704, 1.49396, 1.51752, 1.54108, 1.56464, 1.5882,
+                    1.61176, 1.63532, 1.65888, 1.68244, 1.706, 1.72956,
+                    1.75312, 1.77668, 1.80024, 1.8238, 1.84736, 1.87092,
+                    1.89448, 1.91804, 1.9416, 1.96516, 1.98872, 2.01228,
+                    2.03584, 2.0594, 2.08296, 2.10652, 2.13008, 2.15364,
+                    2.1772, 2.20076, 2.22432, 2.24788)
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -130200
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = ($base/kernels/pck/pck00009.tpc,
+                                 $hayabusa/kernels/pck/itokawa_gaskell_n3.tpc)
+    TargetPosition            = (Table, $hayabusa/kernels/tspk/de403s.bsp,
+                                 $hayabusa/kernels/tspk/sb_25143_140.bsp)
+    InstrumentPointing        = (Table,
+                                 $hayabusa/kernels/ck/hayabusa_itokawarendezvo-
+                                 us_v02n.bc,
+                                 $hayabusa/kernels/fk/hayabusa_hp.tf,
+                                 $hayabusa/kernels/fk/itokawa_fixed.tf)
+    Instrument                = $hayabusa/kernels/ik/nirs10.ti
+    SpacecraftClock           = $hayabusa/kernels/sclk/hayabusa.tsc
+    InstrumentPosition        = (Table,
+                                 $hayabusa/kernels/spk/hay_osbj_050911_051118_-
+                                 v1n.bsp)
+    InstrumentAddendum        = $hayabusa/kernels/iak/nirsAddendum002.ti
+    ShapeModel                = Null
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
+    Source                    = isis
+  End_Group
+
+  Group = MissionData
+    PhaseAngle       = 8.38 <DEGREE>
+    IncidenceAngle   = 59.38 <DEGREE>
+    EmissionAngle    = 60.91 <DEGREE>
+    CenterLatitude   = 36.23 <DEGREE>
+    CenterLongitude  = 345.79 <DEGREE>
+    CornersLatitude  = (N/A, 29.62 <DEGREE>, 30.33 <DEGREE>, N/A)
+    CornersLongitude = (N/A, 346.92 <DEGREE>, 336.00 <DEGREE>, N/A)
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 72978
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-130000, 1)
+  ConstantFrames      = (-130200, -130201, -130000)
+  ConstantRotation    = (4.16716354675321e-08, 0.99999999978068,
+                         2.09439095658742e-05, 0.99999802059666,
+                         6.12322187538694e-17, -0.0019896740344835,
+                         -0.0019896740340471, 2.09439510224007e-05,
+                         -0.99999802037734)
+  CkTableStartTime    = 180486501.50057
+  CkTableEndTime      = 180486501.50057
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = ($hayabusa/kernels/ck/hayabusa_itokawarendezvous_v02n-
+                         .bc, $hayabusa/kernels/fk/hayabusa_hp.tf,
+                         $hayabusa/kernels/fk/itokawa_fixed.tf)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 73042
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 180486501.50057
+  SpkTableEndTime      = 180486501.50057
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = $hayabusa/kernels/spk/hay_osbj_050911_051118_v1n.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 73098
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (2025143, 1)
+  CkTableStartTime    = 180486501.50057
+  CkTableEndTime      = 180486501.50057
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 2
+  PoleRa              = (90.02564, 0.0, 0.0)
+  PoleDec             = (-67.02704, 0.0, 0.0)
+  PrimeMeridian       = (129.73, 712.1437611, 0.0)
+  Description         = "Created by spiceinit"
+  Kernels             = ($hayabusa/kernels/tspk/de403s.bsp,
+                         $hayabusa/kernels/tspk/sb_25143_140.bsp,
+                         $base/kernels/pck/pck00009.tpc,
+                         $hayabusa/kernels/pck/itokawa_gaskell_n3.tpc)
+  SolarLongitude      = 104.40427844844
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 73162
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 180486501.50057
+  SpkTableEndTime      = 180486501.50057
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = ($hayabusa/kernels/tspk/de403s.bsp,
+                          $hayabusa/kernels/tspk/sb_25143_140.bsp)
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 73218
+  Bytes     = 1384
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 66287
+  Bytes     = 6691
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE                               = 2025143
+  BODY2025143_RADII                       = (0.274, 0.156, 0.138)
+  BODY_FRAME_CODE                         = 2025143
+  INS-130200_SWAP_OBSERVER_TARGET         = TRUE
+  INS-130200_LIGHTTIME_CORRECTION         = NONE
+  INS-130200_LT_SURFACE_CORRECT           = FALSE
+  INS-130200_FOCAL_LENGTH                 = 0.0272
+  INS-130200_PIXEL_PITCH                  = 0.047472922
+  CLOCK_ET_-130_1/2392973413.133_COMPUTED = 0fe04c880284a541
+  CLOCK_ET_-130_1/2392975548.000_COMPUTED = 1fb5b30d0384a541
+  INS-130200_TRANSX                       = (0.0, 0.0, -0.047472922)
+  INS-130200_TRANSY                       = (0.0, 0.047472922, 0.0)
+  INS-130200_ITRANSS                      = (0.0, 0.0, 21.064639754005)
+  INS-130200_ITRANSL                      = (0.0, -21.064639754005, 0.0)
+  INS-130200_BORESIGHT_LINE               = 0.0
+  INS-130200_BORESIGHT_SAMPLE             = 0.0
+End_Object
+End

@@ -1,0 +1,462 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 25798
+      Lines   = 25356
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName = "APOLLO 15"
+    InstrumentId   = METRIC
+    TargetName     = MOON
+    StartTime      = 1971-08-01T14:58:03.78
+  End_Group
+
+  Group = BandBin
+    FilterName = CLEAR
+    FilterId   = 1
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -915240
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = ($base/kernels/pck/pck00009.tpc,
+                                 $apollo15/kernels/pck/moon_080317.tf,
+                                 $apollo15/kernels/pck/moon_assoc_me.tf)
+    TargetPosition            = (Table,
+                                 $apollo15/kernels/tspk/moon_pa_de421_1900-205-
+                                 0.bpc, $apollo15/kernels/tspk/de421.bsp)
+    InstrumentPointing        = (Table,
+                                 $apollo15/kernels/ck/AS15_M_REV35_v2.bc,
+                                 $apollo15/kernels/fk/apollo15_v2.0002.tf)
+    Instrument                = $apollo15/kernels/ik/apollo15_metric_v2.0001.-
+                                ti
+    SpacecraftClock           = $apollo15/kernels/sclk/apollo15.0001.tsc
+    InstrumentPosition        = (Table,
+                                 $apollo15/kernels/spk/AS15_M_REV35_v2.bsp)
+    InstrumentAddendum        = $apollo15/kernels/iak/apollo15MetricAddendum0-
+                                02.ti
+    ShapeModel                = $base/dems/ldem_128ppd_Mar2011_clon180_radius-
+                                _pad.cub
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 2
+    Source                    = isis
+  End_Group
+
+  Group = Reseaus
+    Sample   = (2947.8461139999, 4952.9837110715, 6958.0176762785,
+                8963.2956120559, 10968.58551004, 12973.829250923,
+                14979.468717978, 16984.730043535, 18990.163571989,
+                20995.468261437, 23000.351021696, 2958.6310749071,
+                4963.8189028977, 6969.1191953947, 8974.1174672726,
+                10979.477084015, 12984.812025619, 14990.328920523,
+                16995.769879372, 19000.937647685, 21006.169239477,
+                23011.242333397, 2969.7291645134, 4974.7555822439,
+                6980.2129847459, 8985.0711935225, 10990.313502894,
+                12995.62443177, 15000.772129549, 17006.518247635,
+                19011.936177975, 21017.575514169, 23022.139900861,
+                2980.633578154, 4986.080209371, 6991.0679462419,
+                8996.2452106123, 11001.277245437, 13006.771805873,
+                15011.90962666, 17017.367486757, 19022.550239271,
+                21027.720267952, 23032.598092496, 2991.5290045024,
+                4996.9119885719, 7001.9895155068, 9006.9161643312,
+                11012.102126238, 13017.530429388, 15023.139550249,
+                17029.267483454, 19033.674492363, 21038.421232669,
+                23043.535304539, 3003.1471628344, 5008.1220671581,
+                7013.0809652384, 9017.834407409, 11023.07316809,
+                13028.201350566, 15033.641755109, 17039.200072131,
+                19044.481382844, 21049.536412354, 23054.592058528,
+                3013.3722103987, 5018.4617438268, 7024.1278134729,
+                9028.9086959353, 11033.89412681, 13039.08414232,
+                15044.408821504, 17050.010182451, 19055.343292069,
+                21060.705784025, 23065.821982115, 3024.2143577246,
+                5029.3572231758, 7034.4989288013, 9039.5117212857,
+                11044.638939959, 13049.929897606, 15055.201410716,
+                17060.870562742, 19066.043873783, 21070.99133738,
+                23076.340941859, 3036.0091111982, 5040.2526820649,
+                7045.3942190403, 9050.5377992221, 11055.681294424,
+                13060.825172605, 15065.836472232, 17071.164334729,
+                19076.478880515, 21081.695782642, 23086.67621246,
+                3045.9560832692, 5051.0241475294, 7056.5360226698,
+                9061.4332075886, 11066.328937769, 13071.720738952,
+                15076.864043794, 17081.768441215, 19087.309451753,
+                21092.041307022, 23098.389915148, 3057.1211345514,
+                5062.0770182069, 7067.1299054555, 9071.9811313682,
+                11076.94456556, 13082.615900567, 15087.760164442,
+                17092.69724019, 19097.782857448, 21102.771535747,
+                23108.331787976)
+    Line     = (2546.7238379665, 2535.6997275311, 2524.5473102558,
+                2513.5709193084, 2502.5133592596, 2491.646345973,
+                2480.2421223572, 2469.44026583, 2458.3356172871,
+                2447.4677197613, 2436.6241792677, 4551.2751816492,
+                4540.1561225024, 4529.3642432389, 4518.0399257819,
+                4507.0317408256, 4496.1035615381, 4485.3572818737,
+                4474.1461659425, 4463.3664157965, 4452.2846157681,
+                4441.4301201226, 6556.0209075273, 6544.9212299239,
+                6533.9366303599, 6522.8653089907, 6512.0049216193,
+                6501.0106262516, 6490.0539672709, 6478.8257201692,
+                6467.7874309489, 6456.3911285661, 6445.9009373126,
+                8560.728931259, 8549.4573840675, 8538.2207199363,
+                8527.2600636839, 8516.2231123584, 8505.1845574626,
+                8494.1472393785, 8483.1088117223, 8472.3226212155,
+                8461.0339081121, 8449.9974914317, 10565.245552898,
+                10553.75373455, 10542.785460302, 10531.6733423,
+                10520.506288362, 10509.467963179, 10498.429011104,
+                10487.101097228, 10476.353475943, 10465.590680227,
+                10454.151827903, 12569.699363899, 12558.454065216,
+                12546.942258514, 12536.127583104, 12524.965850737,
+                12513.751672958, 12502.71330582, 12491.674529881,
+                12480.81458335, 12469.599683271, 12458.562650085,
+                14574.16064792, 14562.733067675, 14551.356127388,
+                14540.30765884, 14529.242158791, 14518.11977477,
+                14506.996682265, 14495.957757092, 14484.919761944,
+                14473.881664928, 14462.84442181, 16578.528378255,
+                16567.264976535, 16555.667040671, 16544.47893294,
+                16533.499429065, 16522.561133286, 16511.703467161,
+                16500.379154122, 16488.956118891, 16478.166710773,
+                16466.754610568, 18582.810524051, 18571.790984064,
+                18560.144403632, 18549.087155135, 18538.005395493,
+                18527.03410032, 18516.032599794, 18504.52582737,
+                18493.487896582, 18481.763047069, 18471.413531913,
+                20587.786039355, 20576.700765037, 20565.054249629,
+                20553.598590226, 20542.637114279, 20531.591102652,
+                20520.454436597, 20509.059752015, 20498.153310432,
+                20486.73514225, 20475.284040898, 22592.775471198,
+                22581.456590392, 22569.638997404, 22558.176608833,
+                22546.964684515, 22536.031365854, 22525.171318405,
+                22513.859999846, 22503.038589881, 22491.161978712,
+                22480.16435999)
+    Type     = (5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+                5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+                5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+                5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+                5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+                5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5)
+    Valid    = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    Template = $apollo15/reseaus/METRIC_TEMPLATE.cub
+    Master   = $apollo15/reseaus/METRIC_MASTER.pvl
+    Status   = Nominal
+  End_Group
+
+  Group = Code
+    StartTime                 = 1971-08-01T14:58:08.717
+    SpacecraftAltitude        = 0 <meters>
+    ExposureDuration          = 0.0 <milliseconds>
+    ForwardMotionCompensation = False
+    Column1                   = (1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0,
+                                 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0,
+                                 0, 1)
+    Column2                   = (1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0,
+                                 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1,
+                                 0, 1)
+    Column3                   = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                 0, 0)
+    Column4                   = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                 0, 0)
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 2634482852
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-915240, 1400015, 2, 1)
+  CkTableStartTime    = -896821275.03674
+  CkTableEndTime      = -896821275.03674
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = ($apollo15/kernels/ck/AS15_M_REV35_v2.bc,
+                         $apollo15/kernels/fk/apollo15_v2.0002.tf)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 2634482916
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = -896821275.03674
+  SpkTableEndTime      = -896821275.03674
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = $apollo15/kernels/spk/AS15_M_REV35_v2.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 2634482972
+  Bytes               = 64
+  Records             = 1
+  ByteOrder           = Lsb
+  TimeDependentFrames = (31006, 1)
+  ConstantFrames      = (31001, 31007, 31006)
+  ConstantRotation    = (0.99999987325471, -3.29285422375571e-04,
+                         3.80869618671387e-04, 3.29286000210947e-04,
+                         0.99999994578431, -1.45444093783627e-06,
+                         -3.80869119096078e-04, 1.57985578682691e-06,
+                         0.99999992746811)
+  CkTableStartTime    = -896821275.03674
+  CkTableEndTime      = -896821275.03674
+  CkTableOriginalSize = 1
+  FrameTypeCode       = 6
+  Description         = "Created by spiceinit"
+  Kernels             = ($apollo15/kernels/tspk/moon_pa_de421_1900-2050.bpc,
+                         $apollo15/kernels/tspk/de421.bsp,
+                         $base/kernels/pck/pck00009.tpc,
+                         $apollo15/kernels/pck/moon_080317.tf,
+                         $apollo15/kernels/pck/moon_assoc_me.tf)
+  SolarLongitude      = 172.72708831528
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 2634483036
+  Bytes                = 56
+  Records              = 1
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = -896821275.03674
+  SpkTableEndTime      = -896821275.03674
+  SpkTableOriginalSize = 1.0
+  Description          = "Created by spiceinit"
+  Kernels              = ($apollo15/kernels/tspk/moon_pa_de421_1900-2050.bpc,
+                          $apollo15/kernels/tspk/de421.bsp)
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 2634483092
+  Bytes     = 4875
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 2634482085
+  Bytes     = 767
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE               = 301
+  BODY301_RADII           = (1737.4, 1737.4, 1737.4)
+  BODY_FRAME_CODE         = 31001
+  INS-915240_FOCAL_LENGTH = 76.054
+  INS-915240_PIXEL_PITCH  = 0.005
+  INS-915240_TRANSX       = (0.0, -0.005, 0.0)
+  INS-915240_TRANSY       = (0.0, 0.0, 0.005)
+  INS-915240_ITRANSS      = (0.0, -200.0, 0.0)
+  INS-915240_ITRANSL      = (0.0, 0.0, 200.0)
+  INS-915240_PP           = (-0.006, -0.002)
+  INS-915240_OD_K         = (-1.3361854e-06, 5.2261757e-10, -5.0728336e-14)
+  INS-915240_DECENTER     = (-5.4958195e-07, -4.608942e-11, 2.965907)
+End_Object
+End
