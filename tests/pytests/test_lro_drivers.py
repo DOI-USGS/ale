@@ -40,7 +40,7 @@ def test_kernels():
 @pytest.mark.parametrize("label_type, kernel_type", [('isis3', 'naif'), ('isis3', 'isis')])
 #@pytest.mark.parametrize("image", image_dict.keys()) Add this when when all are supported by ale isd.
 @pytest.mark.parametrize("image", ['M103595705LE'])
-def test_load(test_kernels, label_type, image, kernel_type):
+def test_load_lroc_nac(test_kernels, label_type, image, kernel_type):
     if kernel_type == 'naif':
         label_file = get_image_label(image, label_type)
         isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
@@ -53,6 +53,20 @@ def test_load(test_kernels, label_type, image, kernel_type):
     isd_obj = json.loads(isd_str)
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
+
+# Test load of LROC labels
+@pytest.mark.parametrize("label_type, kernel_type", [('isis3', 'naif')])
+#@pytest.mark.parametrize("image", image_dict.keys()) Add this when when all are supported by ale isd.
+@pytest.mark.parametrize("image", ['wac0000a1c4.uv.even'])
+def test_load_lroc_wac(test_kernels, label_type, image, kernel_type):
+    label_file = get_image_label(image, label_type)
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]}, verbose=True)
+    compare_isd = image_dict[image]
+
+    isd_obj = json.loads(isd_str)
+    comparison = compare_dicts(isd_obj, compare_isd)
+    assert comparison == []
+
 
 # Test load of MiniRF labels
 def test_load_minirf(test_kernels):
