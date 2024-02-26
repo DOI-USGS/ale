@@ -335,7 +335,7 @@ class CassiniVimsIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoD
     @property
     def sensor_name(self):
         """
-        ISIS doesn't propergate this to the ingested cube label, so hard-code it.
+        ISIS doesn't propagate this to the ingested cube label, so hard-code it.
         """
         return vims_name_lookup[super().instrument_id]
 
@@ -464,7 +464,7 @@ class CassiniVimsIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoD
     @property
     def sensor_name(self):
         """
-        ISIS doesn't propergate this to the ingested cube label, so hard-code it.
+        ISIS doesn't propagate this to the ingested cube label, so hard-code it.
         """
         return "Visible and Infrared Mapping Spectrometer"
 
