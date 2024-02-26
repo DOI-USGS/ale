@@ -89,8 +89,8 @@ def pvl_four_group():
     # Mock of the DataDirectory group
     return """
     Group = DataDirectory
-      Base         = $ISIS3DATA/base
-      Messenger    = $ISIS3DATA/messenger
+      Base         = $ISISDATA/base
+      Messenger    = $ISISDATA/messenger
     EndGroup
     """
 
