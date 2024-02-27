@@ -3,6 +3,8 @@ import spiceypy as spice
 import math
 import numpy as np
 from scipy.spatial.transform import Rotation
+from scipy.interpolate import CubicSpline
+
 
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
@@ -10,7 +12,7 @@ from ale.base.data_isis import read_table_data, parse_table
 from ale.base.label_isis import IsisLabel
 from ale.base.type_distortion import RadialDistortion
 from ale.base.type_sensor import LineScanner
-from ale.transformation import ConstantRotation, FrameChain
+from ale.transformation import ConstantRotation, FrameChain, TimeDependentRotation
 
 
 
@@ -25,7 +27,6 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
         : str
           Frame Reference for Rosetta VIRTIS
         """
-        fail
         inst_id_lookup = {
             "VIRTIS_M_VIS" : "ROS_VIRTIS-M_VIS",
             "VIRTIS_M_IR" : "ROS_VIRTIS-M_IR",
@@ -57,7 +58,7 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
     def ephemeris_start_time(self):
         try:
             # first line's middle et - 1/2 exposure duration = cube start time
-            return self.ephemeris_time[0] - (self.line_exposure_duration/2)
+            return self.hk_ephemeris_time[0] - (self.line_exposure_duration/2)
         except:
             return spice.scs2e(self.spacecraft_id, self.label['IsisCube']['Instrument']['SpacecraftClockStartCount'])
 
@@ -66,55 +67,72 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
     def ephemeris_stop_time(self):
         try:
             #  last line's middle et + 1/2 exposure duration = cube start time
-            return self.ephemeris_time[-1] + (self.line_exposure_duration/2)
+            return self.hk_ephemeris_time[-1] + (self.line_exposure_duration/2)
         except:
             return spice.scs2e(self.spacecraft_id, self.label['IsisCube']['Instrument']['SpacecraftClockStopCount'])
 
     @property
-    def scet(self):
-        if not hasattr(self, "_scet"):
-            binary = read_table_data(self.label['Table'], self._file)
-            data_scet = parse_table(self.label['Table'], binary)['dataSCET']
-            #self._scet = [(i, spice.scs2e(self.spacecraft_id, str(j - self.line_exposure_duration)), self.line_exposure_duration) for i,j in enumerate(data_scet)]
-            self._scet = data_scet
-        return self._scet
-
-    @property
     def housekeeping(self):
-        # @TODO unsure how to use shutter mode information for ale driver.
         if not hasattr(self, "_housekeeping"):
+            degs_per_rad = 57.2957795 
             binary = read_table_data(self.label['Table'], self._file)
-            self._data_scet = parse_table(self.label['Table'], binary)['dataSCET']
-            #shutter_mode = parse_table(self.label['Table'], binary)['Data Type__Shutter state']
-            mirror_sin = parse_table(self.label['Table'], binary)['M_MIRROR_SIN_HK']
-            mirror_cos = parse_table(self.label['Table'], binary)['M_MIRROR_COS_HK']
-            scan_elec_deg = [math.atan(i/j) * 57.2957795 for i,j in zip(mirror_sin, mirror_cos)] # 57.2957795 = deg per rad
-            opt_ang = [((i - 3.7996979) * 0.25/0.257812)/1000 for i in scan_elec_deg] # Magic numbers from isis RosettaVirtisCamera::readHouseKeeping
+            hk_table = parse_table(self.label['Table'], binary)
+            data_scet = hk_table['dataSCET']
+            shutter_mode_list = hk_table['Data Type__Shutter state']
+            mirror_sin_list = hk_table['M_MIRROR_SIN_HK']
+            mirror_cos_list = hk_table['M_MIRROR_COS_HK']
+            #scan_elec_deg = [math.atan(i/j) * degs_per_rad for i,j in zip(mirror_sin, mirror_cos)] # 57.2957795 = deg per rad
+            #opt_ang = [((i - 3.7996979) * 0.25/0.257812)/1000 for i in scan_elec_deg] # Magic numbers from isis RosettaVirtisCamera::readHouseKeeping
 
-            line_mid_times = [spice.scs2e(self.spacecraft_id, str(int(i*(10**5))/(10**5))) for i in self._data_scet]
-            #print(line_mid_time)
-            # redo with list comprehensions?  Needs these calculations per record
-            # zip all of these into a mirrordata list?
-            #print(list(zip(line_mid_time, mirror_sin, mirror_cos, opt_ang, shutter_mode)))
-            """
-            self._housekeeping = [{'scanline_mid_et': i, 'mirror_sin': j, 'mirror_cos': k,
-                                'optical_angle': l, 'dark_current': m} for i,j,k,l, m in zip(line_mid_time, mirror_sin, mirror_cos, opt_ang, shutter_mode)]
-            """
-            self._ephemeris_time = line_mid_times
-            self._opt_ang = opt_ang
+            opt_angles = []
+            x = np.array([])
+            y = np.array([])
+            for index, mirror_sin in enumerate(mirror_sin_list):
+                shutter_mode = shutter_mode_list[index]
+                is_dark = (shutter_mode == 1)   
+
+                mirror_cos = mirror_cos_list[index]
+
+                scan_elec_deg = math.atan(mirror_sin/mirror_cos) * degs_per_rad
+                opt_ang = ((scan_elec_deg - 3.7996979) * 0.25/0.257812) / 1000
+
+                if not is_dark:
+                    x = np.append(x, index + 1)
+                    y = np.append(y, opt_ang)
+
+                if not self.is_calibrated:
+                    opt_angles.append(opt_ang)
+
+            cs = CubicSpline(x, y, extrapolate="periodic")
+
+            for i, opt_ang in enumerate(opt_angles):
+                shutter_mode = shutter_mode_list[i]
+                is_dark = (shutter_mode == 1)
+
+                if (is_dark):
+                    if (i == 0):
+                        opt_angles[i] = opt_angles[i+1]
+                    elif (i == len(opt_angles) - 1):
+                        opt_angles[i] = opt_angles[i-1]
+                    else:
+                        opt_angles[i] = cs(i+1)
+
+            line_mid_times = [spice.scs2e(self.spacecraft_id, str(round(i,5))) for i in data_scet]
+            self._hk_ephemeris_time = line_mid_times
+            self._optical_angle = opt_angles
             self._housekeeping= True
 
     @property
-    def ephemeris_time(self):
-        if not hasattr(self, "_ephemeris_time"):
+    def hk_ephemeris_time(self):
+        if not hasattr(self, "_hk_ephemeris_time"):
             self.housekeeping
-        return self._ephemeris_time
+        return self._hk_ephemeris_time
 
     @property
-    def opt_ang(self):
-        if not hasattr(self, "_opt_ang"):
+    def optical_angle(self):
+        if not hasattr(self, "_optical_angle"):
             self.housekeeping
-        return self._opt_ang
+        return self._optical_angle
 
 
     @property
@@ -198,28 +216,41 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
 
     @property
     def frame_chain(self):
-        if not hasattr(self, '_frame_chain'):
-            if self.has_articulation_kernel and self.is_calibrated:
-                self._frame_chain = super().frame_chain
-            else:
-                self._frame_chain = super().frame_chain
-                virtis_rotation = ConstantRotation([1,0,0,0], self.sensor_frame_id, self.sensor_frame_id)
-                self._frame_chain.add_edge(rotation = virtis_rotation)
-                self._frame_chain.compute_time_dependent_rotiations([(1, self.sensor_frame_id)], self.ephemeris_time, 0)
+      frame_chain = super().frame_chain
+      frame_chain.add_edge(rotation=self.inst_pointing_rotation)
+      return frame_chain
 
-                rot = self._frame_chain[1][self.sensor_frame_id]['rotation']
-                quats = np.zeros((len(rot.times), 4))
-                avs = []
-                for i, matrix in enumerate(rot._rots.as_matrix()):
-                    s_matrix = spice.rav2xf(matrix, rot.av[i])
-                    opt_ang = self.opt_ang[i]
-                    xform = spice.eul2xf([0, -opt_ang, 0, 0, 0, 0], 1, 2, 3)
-                    xform2 = spice.mxmg(xform, s_matrix)
-                    rot_mat, av = spice.xf2rav(xform2)
-                    avs.append(av)
-                    quat_from_rotation = spice.m2q(rot_mat)
-                    quats[i,:3] = quat_from_rotation[1:]
-                    quats[i,3] = quat_from_rotation[0]
-                rot.quats = quats
-                rot.av = avs
-        return self._frame_chain
+    @property
+    def inst_pointing_rotation(self):
+        """
+        Returns a time dependent instrument pointing rotation for -203221 and -203223 sensor frame ids.
+        Returns
+        -------
+        : TimeDependentRotation
+          Instrument pointing rotation
+        """
+        time_dep_quats = np.zeros((len(self.hk_ephemeris_time), 4))
+        avs = []
+
+        for i, time in enumerate(self.hk_ephemeris_time):
+          try:
+            state_matrix = spice.sxform("J2000", spice.frmnam(self.sensor_frame_id), time)
+          except:
+            rotation_matrix = spice.pxform("J2000", spice.frmnam(self.sensor_frame_id), time)
+            state_matrix = spice.rav2xf(rotation_matrix, [0, 0, 0])
+
+          opt_angle = self.optical_angle[i]
+
+          xform = spice.eul2xf([0, -opt_angle, 0, 0, 0, 0], 1, 2, 3)
+          xform2 = spice.mxmg(xform, state_matrix)
+
+          rot_mat, av = spice.xf2rav(xform2)
+          avs.append(av)
+
+          quat_from_rotation = spice.m2q(rot_mat)
+          time_dep_quats[i,:3] = -quat_from_rotation[1:]
+          time_dep_quats[i, 3] = -quat_from_rotation[0]
+
+        time_dep_rot = TimeDependentRotation(time_dep_quats, self.hk_ephemeris_time, 1, self.sensor_frame_id, av=avs)
+
+        return time_dep_rot
