@@ -15,7 +15,6 @@ from ale.base.type_sensor import LineScanner
 from ale.transformation import ConstantRotation, FrameChain, TimeDependentRotation
 
 
-
 class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDistortion, Driver):
     @property
     def instrument_id(self):
@@ -56,6 +55,14 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
 
     @property
     def ephemeris_start_time(self):
+        """
+        Returns the start ephemeris time for the image.
+
+        Returns
+        -------
+        : float
+          start time
+        """
         try:
             # first line's middle et - 1/2 exposure duration = cube start time
             return self.hk_ephemeris_time[0] - (self.line_exposure_duration/2)
@@ -65,6 +72,15 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
 
     @property
     def ephemeris_stop_time(self):
+        """
+        Returns the stop ephemeris time for the image.
+
+        Returns
+        -------
+        : float
+          stop time
+        """
+
         try:
             #  last line's middle et + 1/2 exposure duration = cube start time
             return self.hk_ephemeris_time[-1] + (self.line_exposure_duration/2)
@@ -73,6 +89,13 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
 
     @property
     def housekeeping(self):
+        """
+        Read the housekeeping table from the cub and populate data.
+
+        Returns
+        -------
+        None
+        """
         if not hasattr(self, "_housekeeping"):
             degs_per_rad = 57.2957795 
             binary = read_table_data(self.label['Table'], self._file)
@@ -81,8 +104,6 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
             shutter_mode_list = hk_table['Data Type__Shutter state']
             mirror_sin_list = hk_table['M_MIRROR_SIN_HK']
             mirror_cos_list = hk_table['M_MIRROR_COS_HK']
-            #scan_elec_deg = [math.atan(i/j) * degs_per_rad for i,j in zip(mirror_sin, mirror_cos)] # 57.2957795 = deg per rad
-            #opt_ang = [((i - 3.7996979) * 0.25/0.257812)/1000 for i in scan_elec_deg] # Magic numbers from isis RosettaVirtisCamera::readHouseKeeping
 
             opt_angles = []
             x = np.array([])
@@ -124,12 +145,28 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
 
     @property
     def hk_ephemeris_time(self):
+        """
+        Ephemeris times from the housekeeping table.
+
+        Returns
+        -------
+        : list
+          Ephemeris times from the housekeeping table
+        """
         if not hasattr(self, "_hk_ephemeris_time"):
             self.housekeeping
         return self._hk_ephemeris_time
 
     @property
     def optical_angle(self):
+        """
+        Return optical angles from the housekeeping table.
+
+        Returns
+        -------
+        : list
+          Optical angles from the housekeeping table
+        """
         if not hasattr(self, "_optical_angle"):
             self.housekeeping
         return self._optical_angle
@@ -170,6 +207,11 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
 
     @property
     def scan_rate(self):
+        """
+        Returns
+        : Double
+          Scan rate
+        """
         return self.label['IsisCube']['Instrument']['FrameParameter'][2]
 
     @property
@@ -206,24 +248,47 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
 
     @property
     def is_calibrated(self):
+        """
+        Determine if this image is calibrated.
+
+        Returns
+        -------
+        : bool
+          True if calibrated else False
+        """
         return self.label['IsisCube']['Instrument']['ProcessingLevelID'] == '3'
 
     @property 
     def has_articulation_kernel(self):
+        """
+        Determine if this image has an associated articulation kernel
+
+        Returns
+        -------
+        : bool
+          True if the image has an articulation kernel else False
+        """
         regex = re.compile('.*ROS_VIRTIS_M_[0-9]{4}_[0-9]{4}_V[0-9].BC')
         return any([re.match(regex, i) for i in self.kernels])
 
 
     @property
     def frame_chain(self):
-      frame_chain = super().frame_chain
-      frame_chain.add_edge(rotation=self.inst_pointing_rotation)
-      return frame_chain
+        """
+        Construct the frame chain.  Use super to construct base chain and add edges via inst_pointing_rotation
+
+        Returns
+        -------
+        : FrameChain
+        """
+        frame_chain = super().frame_chain
+        frame_chain.add_edge(rotation=self.inst_pointing_rotation)
+        return frame_chain
 
     @property
     def inst_pointing_rotation(self):
         """
-        Returns a time dependent instrument pointing rotation for -203221 and -203223 sensor frame ids.
+        Returns a time dependent instrument pointing rotation for virtis frames
         Returns
         -------
         : TimeDependentRotation
