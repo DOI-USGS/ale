@@ -37,6 +37,9 @@ release.
 ### Added
 - Apollo Metric drivers, tests, and data [#533](https://github.com/DOI-USGS/ale/pull/533)
 
+### Changed
+- Changed how push frame sensor drivers compute the `ephemeris_time` property [#595](https://github.com/DOI-USGS/ale/pull/595)
+
 ### Fixed
 
 - Fixed landed sensors to correctly project locally [#590](https://github.com/DOI-USGS/ale/pull/590)
