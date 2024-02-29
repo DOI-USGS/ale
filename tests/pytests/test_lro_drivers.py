@@ -339,7 +339,7 @@ class test_wac_isis_naif(unittest.TestCase):
         assert self.driver.sampling_factor == 4
 
     def test_num_frames(self):
-        assert self.driver.num_frames == 260
+        assert self.driver.num_frames == 261
 
     def test_framelet_height(self):
         assert self.driver.framelet_height == 16
