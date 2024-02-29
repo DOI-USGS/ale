@@ -183,8 +183,11 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
             # See is_navcam() for an explanation.
             return (self.compute_h_s() + self.compute_v_s())/2.0
         
+        if self._props.get("landed", False):
+            return -super().focal_length
+
         # For mast cam
-        return super().focal_length 
+        return super().focal_length
 
     @property
     def pixel_size(self):
