@@ -1191,7 +1191,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : int
           Number of frames in the image
         """
-        return self.image_lines // (self.framelet_height // self.sampling_factor)
+        return (self.image_lines // (self.framelet_height // self.sampling_factor)) + 1
 
 
     @property

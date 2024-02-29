@@ -162,7 +162,7 @@ class PushFrame():
         : double
           Center ephemeris time for an image
         """
-        return self.ephemeris_start_time + (self.interframe_delay * self.num_frames + 1)
+        return self.ephemeris_start_time + (self.interframe_delay * self.num_frames)
 
 
 
