@@ -1,0 +1,31 @@
+DAFETF NAIF DAF ENCODED TRANSFER FILE
+'DAF/CK  '
+'2'
+'6'
+'DAWN FC ALIGNMENT                                           '
+BEGIN_ARRAY 1 10
+'DAWN FC2 ALIGNMENT, 10/22/15            '
+'159E1065C3^A'
+'159E194B8A^A'
+'-31970'
+'-318F8'
+'2'
+'1'
+10
+'FFFFE61784D86^0'
+'-1CE1654009A4C1^-2'
+'681F4D63A264F8^-2'
+'27DE1942838A74^-2'
+'0^0'
+'0^0'
+'0^0'
+'FFFFFFFF1C422^-2'
+'159E1065C3^A'
+'159E194B8A^A'
+END_ARRAY 1 10
+TOTAL_ARRAYS 1
+ ~NAIF/SPC BEGIN COMMENTS~
+This CK is for testing with the image: /Users/astamile/testData/ale/dawnVIR/VIR_IR_1A_1_362681634_1_isis3.cub
+
+This CK was generated using the following command: {}
+ ~NAIF/SPC END COMMENTS~

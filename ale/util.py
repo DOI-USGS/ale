@@ -131,14 +131,15 @@ def find_latest_metakernel(path, year):
 
 
 def dict_merge(dct, merge_dct):
+    new_dct = dct.copy()
     for k, v in merge_dct.items():
         if (k in dct and isinstance(dct[k], dict)
                 and isinstance(merge_dct[k], Mapping)):
-            dict_merge(dct[k], merge_dct[k])
+            new_dct[k] = dict_merge(dct[k], merge_dct[k])
         else:
-            dct[k] = merge_dct[k]
+            new_dct[k] = merge_dct[k]
 
-    return dct
+    return new_dct
 
 
 def get_isis_preferences(isis_preferences=None):
@@ -178,15 +179,23 @@ def dict_to_lower(d):
 
 
 def expandvars(path, env_dict=os.environ, default=None, case_sensitive=True):
-    user_dict = env_dict if case_sensitive else dict_to_lower(env_dict)
+    if env_dict != os.environ:
+        env_dict = dict_merge(env_dict, os.environ)
 
-    def replace_var(m):
-        group0 = m.group(0) if case_sensitive else m.group(0).lower()
-        group1 = m.group(1) if case_sensitive else m.group(1).lower()
+    while "$" in path:
+        user_dict = env_dict if case_sensitive else dict_to_lower(env_dict)
 
-        return user_dict.get(m.group(2) or group1, group0 if default is None else default)
-    reVar = r'\$(\w+|\{([^}]*)\})'
-    return re.sub(reVar, replace_var, path)
+        def replace_var(m):
+            group1 = m.group(1) if case_sensitive else m.group(1).lower()
+            val = user_dict.get(m.group(2) or group1 if default is None else default)
+            if not val:
+                raise KeyError(f"Failed to evaluate {m.group(0)} from env_dict. " + 
+                               f"Should {m.group(0)} be an environment variable?")
+
+            return val
+        reVar = r'\$(\w+|\{([^}]*)\})'
+        path = re.sub(reVar, replace_var, path)
+    return path
 
 
 def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
@@ -281,7 +290,7 @@ def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
             if not "DataDirectory" in isisprefs:
               warnings.warn("No IsisPreferences file found, is your ISISROOT env var set?")
 
-            kernels = [expandvars(expandvars(k, isisprefs['DataDirectory'], case_sensitive=False)) for k in kernels]
+            kernels = [expandvars(k, isisprefs['DataDirectory'], case_sensitive=False) for k in kernels]
         # Ensure that the ISIS Addendum kernel is last in case it overrides
         # some values from the default Instrument kernel
         # Sorts planetary constants kernel first so it can be overridden by more specific kernels
@@ -295,7 +304,7 @@ def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
             for kern_list in mk_paths:
                 for index, kern in enumerate(mk_paths[kern_list]):
                     if kern is not None:
-                        mk_paths[kern_list][index] = expandvars(expandvars(kern, isisprefs['DataDirectory'], case_sensitive=False))
+                        mk_paths[kern_list][index] = expandvars(kern, isisprefs['DataDirectory'], case_sensitive=False)
         return mk_paths
     else:
         raise Exception(f'{format_as} is not a valid return format')

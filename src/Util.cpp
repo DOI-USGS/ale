@@ -342,9 +342,9 @@ double getSemiMinorRadius(json isd) {
 // type. Defaults to transverse
 DistortionType getDistortionModel(json isd) {
   try {
-    json distoriton_subset = isd.at("optical_distortion");
+    json distortion_subset = isd.at("optical_distortion");
 
-    json::iterator it = distoriton_subset.begin();
+    json::iterator it = distortion_subset.begin();
 
     std::string distortion = (std::string)it.key();
 
@@ -362,6 +362,8 @@ DistortionType getDistortionModel(json isd) {
       return DistortionType::CAHVOR;
     } else if (distortion.compare("lunarorbiter") == 0) {
       return DistortionType::LUNARORBITER;
+    } else if (distortion.compare("radtan") == 0) {
+      return DistortionType::RADTAN;
     }
   } catch (...) {
     throw std::runtime_error("Could not parse the distortion model.");
@@ -526,6 +528,20 @@ std::vector<double> getDistortionCoeffs(json isd) {
         throw std::runtime_error(
           "Could not parse the Lunar Orbiter distortion model coefficients.");
         coefficients = std::vector<double>(4, 0.0);
+      }
+    } break;
+    case DistortionType::RADTAN: {
+      try {
+        coefficients = isd.at("optical_distortion")
+                          .at("radtan")
+                          .at("coefficients")
+                          .get<std::vector<double>>();
+
+        return coefficients;
+      } catch (...) {
+        throw std::runtime_error(
+            "Could not parse the radtan distortion model coefficients.");
+        coefficients = std::vector<double>(5, 0.0);
       }
     } break;
   }
