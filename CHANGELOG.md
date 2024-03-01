@@ -40,6 +40,7 @@ release.
 ### Fixed
 
 - Fixed landed sensors to correctly project locally [#590](https://github.com/DOI-USGS/ale/pull/590)
+- Fixed Hayabusa amica center time computation to match ISIS [#592](https://github.com/DOI-USGS/ale/pull/592)
 - Set Lunar Oribter abberation correction to None as it is in ISIS [#593](https://github.com/DOI-USGS/ale/pull/593)
 
 ## [0.10.0] - 2024-01-08 
