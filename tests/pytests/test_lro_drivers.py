@@ -305,7 +305,7 @@ class test_wac_isis_naif(unittest.TestCase):
 
     def test_ephemeris_start_time(self):
         with patch('ale.drivers.lro_drivers.spice.scs2e', return_value=321) as scs2e:
-            np.testing.assert_almost_equal(self.driver.ephemeris_start_time, 321)
+            np.testing.assert_almost_equal(self.driver.ephemeris_start_time, 321.02)
             scs2e.assert_called_with(-85, '1/274692469:15073')
 
     def test_detector_center_sample(self):
