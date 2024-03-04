@@ -68,40 +68,6 @@ class MsiIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Dr
         return 1
 
     @property
-    def spacecraft_clock_start_count(self):
-        """
-        The spacecraft clock start count, frequently used to determine the start time
-        of the image.
-
-        Returns
-        -------
-        : str
-          spacecraft clock start count
-        """
-        if "SpacecraftClockStartCount" in self.label["IsisCube"]["Instrument"]:
-            return str(
-                self.label["IsisCube"]["Instrument"]["SpacecraftClockStartCount"])
-        else:
-            return None
-
-    @property
-    def spacecraft_clock_stop_count(self):
-        """
-        The spacecraft clock stop count, frequently used to determine the stop time
-        of the image.
-
-        Returns
-        -------
-        : str
-          spacecraft clock stop count
-        """
-        if "SpacecraftClockStopCount" in self.label["IsisCube"]["Instrument"]:
-            return str(
-                self.label["IsisCube"]["Instrument"]["SpacecraftClockStopCount"])
-        else:
-            return None
-
-    @property
     def ikid(self):
         """
         Overridden to grab the ikid from the Isis Cube since there is no way to
