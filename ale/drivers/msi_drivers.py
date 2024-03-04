@@ -41,7 +41,7 @@ class MsiIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Dr
     
     @property
     def center_ephemeris_time(self):
-        return self.ephemeris_start_time + self.exposure_duration/2.0
+        return self.ephemeris_start_time + self.exposure_duration / 2.0
 
     @property
     def sensor_name(self):
