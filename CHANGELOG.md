@@ -40,7 +40,9 @@ release.
 ### Fixed
 
 - Fixed landed sensors to correctly project locally [#590](https://github.com/DOI-USGS/ale/pull/590)
-- Fixed missing sensor_model_version attribute on NewHorizonsLorriIsisLabelNaifSpiceDriver [#583](https://github.com/DOI-USGS/ale/pull/583)
+- Fixed Hayabusa amica center time computation to match ISIS [#592](https://github.com/DOI-USGS/ale/pull/592)
+- Set Lunar Oribter abberation correction to None as it is in ISIS [#593](https://github.com/DOI-USGS/ale/pull/593)
+-Fixed missing sensor_model_version attribute on NewHorizonsLorriIsisLabelNaifSpiceDriver [#583](https://github.com/DOI-USGS/ale/pull/583)
 - Fixed missing sensor_model_version attribute on VikingIsisLabelNaifSpiceDriver [#583](https://github.com/DOI-USGS/ale/pull/583)
 - Fixed incorrect distortion look up in Orex camera when working with PolyCam images [#583](https://github.com/DOI-USGS/ale/pull/583)
 
@@ -96,9 +98,3 @@ release.
 - Chandrayaan1_mrffr IsisLabelNaifSpice driver, tests and test data [#519](https://github.com/DOI-USGS/ale/pull/519)
 - MGS MOC Narrow Angle IsisLabelNaifSpice driver, tests, and test data [#517](https://github.com/DOI-USGS/ale/pull/517)
 - Hayabusa NIRS IsisLabelNaifSpice driver, tests and test data [#532](https://github.com/DOI-USGS/ale/pull/532)
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> 2c73f7da6ab8efbe056fff9c160e4458fec2f982

@@ -133,7 +133,23 @@ class LoHighCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, LoDisto
     @property
     def focal2pixel_lines(self):
         return self.naif_keywords[f"INS{self.ikid}_ITRANSL"]
-    
+
+    @property
+    def light_time_correction(self):
+        """
+        Returns the type of light time correction and abberation correction to
+        use in NAIF calls.
+
+        ISIS has set this to NONE for all Lunar Orbitor data
+
+        Returns
+        -------
+        : str
+          The light time and abberation correction string for use in NAIF calls.
+          See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/abcorr.html
+          for the different options available.
+        """
+        return 'NONE'
 
     @property
     def naif_keywords(self):
