@@ -1,3 +1,4 @@
+
 import spiceypy as spice
 
 from ale.base import Driver
@@ -1165,18 +1166,6 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
           start time
         """
         return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
-
-    # @property
-    # def ephemeris_stop_time(self):
-    #     """
-    #     Returns the start and stop ephemeris times for the image.
-
-    #     Returns
-    #     -------
-    #     : float
-    #       start time
-    #     """
-    #     return spice.str2et(self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
 
     @property
     def sensor_frame_id(self):
