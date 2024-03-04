@@ -65,7 +65,7 @@ class MsiIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Dr
         : int
           ISIS sensor model version
         """
-        return 1
+        return 2
 
     @property
     def ikid(self):

@@ -43,7 +43,7 @@ class test_msi_isis_naif(unittest.TestCase):
         assert self.driver.sensor_name == "MULTI-SPECTRAL IMAGER"
 
     def test_sensor_model_version(self):
-        assert self.driver.sensor_model_version == 1
+        assert self.driver.sensor_model_version == 2
 
     def test_ikid(self):
         assert self.driver.ikid == -93001
