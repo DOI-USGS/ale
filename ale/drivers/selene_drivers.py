@@ -1158,14 +1158,17 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
     @property
     def ephemeris_start_time(self):
         """
-        Returns the start and stop ephemeris times for the image.
+        Returns the start ephemeris time for the image. Expects utc_start_time to
+        be defined.
 
         Returns
         -------
         : float
           start time
         """
-        return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
+        if not hasattr(self, "_ephemeris_start_time"):
+           self._ephemeris_start_time = spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
+        return self._ephemeris_start_time
 
     @property
     def sensor_frame_id(self):
@@ -1182,7 +1185,6 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
           spectra = self.base_band[3]
           self._sensor_frame_id = spice.namfrm(f"LISM_MI_{spectra}_HEAD")
         return self._sensor_frame_id
-
 
     @property
     def detector_center_line(self):
