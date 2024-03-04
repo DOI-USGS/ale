@@ -40,6 +40,9 @@ release.
 ### Fixed
 
 - Fixed landed sensors to correctly project locally [#590](https://github.com/DOI-USGS/ale/pull/590)
+- Fixed missing sensor_model_version attribute on NewHorizonsLorriIsisLabelNaifSpiceDriver [#583](https://github.com/DOI-USGS/ale/pull/583)
+- Fixed missing sensor_model_version attribute on VikingIsisLabelNaifSpiceDriver [#583](https://github.com/DOI-USGS/ale/pull/583)
+- Fixed incorrect distortion look up in Orex camera when working with PolyCam images [#583](https://github.com/DOI-USGS/ale/pull/583)
 
 ## [0.10.0] - 2024-01-08 
 
@@ -59,9 +62,6 @@ release.
 
 ### Fixed
 - Fixed LRO MiniRF drivers naif keywords focal to pixel and pixel to focal translations to be correct. [#569](https://github.com/DOI-USGS/ale/pull/569)
-- Fixed missing sensor_model_version attribute on NewHorizonsLorriIsisLabelNaifSpiceDriver [#583](https://github.com/DOI-USGS/ale/pull/583)
-- Fixed missing sensor_model_version attribute on VikingIsisLabelNaifSpiceDriver [#583](https://github.com/DOI-USGS/ale/pull/583)
-- Fixed incorrect distortion look up in Orex camera when working with PolyCam images [#583](https://github.com/DOI-USGS/ale/pull/583)
 - Bugfix for position and orientation for MSL cameras (driver MslMastcamPds3NaifSpiceDriver). Validated that Nav and Mast LBL files (for both left and right sensor) produce correctly positioned and oriented CSM cameras, that are self-consistent and consistent with a prior DEM for the site. [#580](https://github.com/DOI-USGS/ale/pull/580) 
 - Bug fix for ray direction for MSL. [#589](https://github.com/DOI-USGS/ale/pull/589)
 
