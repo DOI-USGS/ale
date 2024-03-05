@@ -99,6 +99,10 @@ class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoD
     def frame_chain(self):
         self._props['exact_ck_times'] = False
         return super().frame_chain
+    
+    @property
+    def sensor_model_version(self):
+        return 2
 
 class NewHorizonsLeisaIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
     """

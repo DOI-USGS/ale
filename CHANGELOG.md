@@ -42,6 +42,9 @@ release.
 - Fixed landed sensors to correctly project locally [#590](https://github.com/DOI-USGS/ale/pull/590)
 - Fixed Hayabusa amica center time computation to match ISIS [#592](https://github.com/DOI-USGS/ale/pull/592)
 - Set Lunar Oribter abberation correction to None as it is in ISIS [#593](https://github.com/DOI-USGS/ale/pull/593)
+- Fixed missing sensor_model_version attribute on NewHorizonsLorriIsisLabelNaifSpiceDriver [#583](https://github.com/DOI-USGS/ale/pull/583)
+- Fixed missing sensor_model_version attribute on VikingIsisLabelNaifSpiceDriver [#583](https://github.com/DOI-USGS/ale/pull/583)
+- Fixed incorrect distortion look up in Orex camera when working with PolyCam images [#583](https://github.com/DOI-USGS/ale/pull/583)
 
 ## [0.10.0] - 2024-01-08 
 
