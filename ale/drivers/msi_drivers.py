@@ -29,6 +29,10 @@ class MsiIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Dr
         """
         lookup_table = {"MSI": "NEAR EARTH ASTEROID RENDEZVOUS"}
         return lookup_table[super().instrument_id]
+    
+    @property
+    def center_ephemeris_time(self):
+        return self.ephemeris_start_time + self.exposure_duration / 2.0
 
     @property
     def sensor_name(self):
@@ -52,41 +56,7 @@ class MsiIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Dr
         : int
           ISIS sensor model version
         """
-        return 1
-
-    @property
-    def spacecraft_clock_start_count(self):
-        """
-        The spacecraft clock start count, frequently used to determine the start time
-        of the image.
-
-        Returns
-        -------
-        : str
-          spacecraft clock start count
-        """
-        if "SpacecraftClockStartCount" in self.label["IsisCube"]["Instrument"]:
-            return str(
-                self.label["IsisCube"]["Instrument"]["SpacecraftClockStartCount"])
-        else:
-            return None
-
-    @property
-    def spacecraft_clock_stop_count(self):
-        """
-        The spacecraft clock stop count, frequently used to determine the stop time
-        of the image.
-
-        Returns
-        -------
-        : str
-          spacecraft clock stop count
-        """
-        if "SpacecraftClockStopCount" in self.label["IsisCube"]["Instrument"]:
-            return str(
-                self.label["IsisCube"]["Instrument"]["SpacecraftClockStopCount"])
-        else:
-            return None
+        return 2
 
     @property
     def ikid(self):

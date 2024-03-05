@@ -1,0 +1,183 @@
+KPL/IK
+
+NEAR MultiSpectral Imager (MSI) instrument and frame kernel file
+----------------------------------------------------------------
+
+   Version 1.5b by Jeannie Backer, USGS Astrogeology, 01 March 2013.
+   
+       Altered the NEAR_MSI to NEAR_SC_BUS_PRIME frame rotation to include a 
+       second rotation.
+
+   Version 1.5 by Jeff Bytof, NAIF/JPL, 10 March 2000.
+   
+       Removed tab characters from file.  Corrected comments.  
+       
+
+   Version 1.4 by Jeff Bytof, NAIF/JPL, 1 March 2000.
+   
+       Corrected field of view orientation by swapping Y and Z 
+       vector component values in INS-93001_FOV_BOUNDARY_CORNERS.     
+
+
+   Version 1.3 by Jeff Bytof, NAIF/JPL, 14 August 1998.
+
+  (1) Modified the Euler angles needed to move the NEAR_MSI reference frame 
+      into the NEAR_SC_BUS_PRIME frame.  Calibrated boresight data provided
+      by Yanping Guo (JHU/APL), dated 13 August 1998, is as follows:
+
+      -----------------------------------------------------
+      Instrument  Zenith Angle off   Azimuth Angle off 
+                  +Z S/C Axis (deg)  +X' S/C Axis (deg)
+                  -----------------  ------------------
+         MSI        89.917365          -0.0277221
+      -----------------------------------------------------
+ 
+      The zenith angle is measured from the spacecraft +Z axis to the
+      instrument boresight, and the azimuth angle is measured
+      counterclockwise from the spacecraft +X' axis to the boresight.
+
+      The NEAR_MSI boresight is defined to be identical +X unit vector 
+      of its reference frame.
+
+      Using the Euler angles given in this kernel, the components of
+      the NEAR_MSI frame relative to the NEAR_SC_BUS_PRIME frame
+      are found by the SPICE subroutine SXFORM to be as follows:
+
+      X:      .9999988429    -.0004838414     .0014422523
+      Y:      .0004838419     .9999998829     .0000000000
+      Z:     -.0014422522     .0000006978     .9999989600
+ 
+      This indicates that the NEAR_MSI boresight points towards
+      (.9999988429, -.0004838414, .0014422523) as measured in the
+      NEAR_SC_BUS_PRIME frame.
+
+  (2) Corrected the SPICE file ID word to KPL/IK. 
+
+
+   Version 1.2 (prototype) by JAB, NAIF/JPL, September 11, 1997
+
+      SC_BUS frame definitions were swapped with SC_BUS_PRIME, 
+      to follow the NEAR project's use of the code -93000 for the 
+      SC_BUS_PRIME frame.        
+
+   Version 1.1 (prototype) by BVS, NAIF/JPL, August 11, 1997
+   
+      The frame definitions were changed to reflect correct 
+      transformation sense specified by FRAMES.REQ document
+      released in SPICE toolkit N0047. 
+   
+   Version 1.0 (prototype) by BVS, NAIF/JPL, April 16, 1997
+
+   Spacecraft frame definitions. Required to support automatic 
+   frame transformations. Two frames are defined for NEAR s/c:
+
+      - s/c frame (or s/c technological frame);
+      - s/c prime frame; rotated -135 degrees around Z 
+        relative to the s/c frame;
+      
+   Orientation of the first frame is provided in CK files relative 
+   to some inertial or non-inertial frame; orientation of the second 
+   frame is a constant from the first frame offset specified in 
+   the frame definition.
+   
+   Note that these definitions are duplicated in IK files for all 
+   other NEAR instruments.
+   
+   Note that angles in the frame definitions are specified for "from
+   instrument to base (relative to) frame" transformation.
+
+\begindata
+
+   FRAME_NEAR_SC_BUS_PRIME  = -93000
+   FRAME_-93000_NAME        = 'NEAR_SC_BUS_PRIME'
+   FRAME_-93000_CLASS       = 3
+   FRAME_-93000_CLASS_ID    = -93000
+   FRAME_-93000_CENTER      = -93
+   CK_-93000_SCLK           = -93
+   CK_-93000_SPK            = -93
+
+   FRAME_NEAR_SC_BUS        = -93100
+   FRAME_-93100_NAME        = 'NEAR_SC_BUS'
+   FRAME_-93100_CLASS       = 4
+   FRAME_-93100_CLASS_ID    = -93100
+   FRAME_-93100_CENTER      = -93
+   TKFRAME_-93100_SPEC      = 'ANGLES'
+   TKFRAME_-93100_RELATIVE  = 'NEAR_SC_BUS_PRIME'
+   TKFRAME_-93100_ANGLES    = ( -135.0, 0.0, 0.0 )
+   TKFRAME_-93100_AXES      = (    3,   2,   1   )
+   TKFRAME_-93100_UNITS     = 'DEGREES'
+
+\begintext
+
+   MSI instrument frame definition. Required to support automatic 
+   frame transformations. Orientation of this frame is a constant 
+   offset from s/c prime frame specified in the frame definition.
+   
+   Note that angles in the frame definitions are specified for "from
+   instrument to base (relative to) frame" transformation.
+
+   Original rotation:
+   TKFRAME_-93001_ANGLES    = ( 0.0277221, 0.082635, 0.0 )
+   TKFRAME_-93001_AXES      = (         3,        2,   1 )
+   TKFRAME_-93001_AXES      = (         1,        2,   3 )
+   TKFRAME_-93001_UNITS     = 'DEGREES'
+
+   Second rotation:
+   TKFRAME_-93001_ANGLES    = ( 0.0, 180.0, -90.0 )
+   TKFRAME_-93001_AXES      = (   3,     1,     2 )
+   TKFRAME_-93001_UNITS     = 'DEGREES'
+
+   Combined (orginal and second) rotations:
+   TKFRAME_-93001_ANGLES    = ( 90.0, -179.972278, -0.082635 )
+   TKFRAME_-93001_AXES      = (        2,          1,     2 )
+   TKFRAME_-93001_UNITS     = 'DEGREES'
+
+\begindata
+
+   FRAME_NEAR_MSI           = -93001
+   FRAME_-93001_NAME        = 'NEAR_MSI'
+   FRAME_-93001_CLASS       = 4
+   FRAME_-93001_CLASS_ID    = -93001
+   FRAME_-93001_CENTER      = -93
+   TKFRAME_-93001_SPEC      = 'ANGLES'
+   TKFRAME_-93001_RELATIVE  = 'NEAR_SC_BUS_PRIME'
+   TKFRAME_-93001_ANGLES    = ( 90.0, -179.972278, -0.082635 )
+   TKFRAME_-93001_AXES      = (        2,          1,     2 )
+   TKFRAME_-93001_UNITS     = 'DEGREES'
+
+\begintext
+
+   
+   Instrument FOV shape/orientation definitions. Conform to 
+   specification in the header of the GETFOV subroutine. 
+   Corner directions are given counterclockwise as seen from 
+   boresight.
+   
+   FOV corner directions are defined assuming that:
+   
+    - FOV has rectangular shape with its sides along Z and Y 
+      axes of the instruments frame;
+    - FOV angular size in Y direction is 2.2623 degrees; 
+      in Z direction -- 2.9505 degrees;
+    - boresight vector intersect FOV exactly in the center of 
+      the rectangle;
+
+\begindata
+
+
+   INS-93001_FOV_FRAME            = 'NEAR_MSI'
+   INS-93001_FOV_SHAPE            = 'POLYGON'
+   INS-93001_BORESIGHT            = ( 
+                             1.0   0.0              0.0 
+                                    )
+\begindata
+                                    
+   INS-93001_FOV_BOUNDARY_CORNERS = ( 
+                             1.0   0.019744857140   0.025753661240  
+                             1.0  -0.019744857140   0.025753661240   
+                             1.0  -0.019744857140  -0.025753661240  
+                             1.0   0.019744857140  -0.025753661240  
+                                    )
+   
+\begintext
+
