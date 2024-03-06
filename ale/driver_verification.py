@@ -153,8 +153,7 @@ def diff_and_describe(json1, json2, key_array):
         json1 = json1[key]
         json2 = json2[key]
     diff = json1 - json2
-    print(len(diff), np.mean(diff, axis=(0)), np.median(diff, axis=(0)))
-
+    print(" ".join(key_array) + "\nNum records:", len(diff), "\nMean:", np.mean(diff, axis=(0)), "\nMedian:", np.median(diff, axis=(0)), "\n")
 
 # Define the function to compare ISDs
 def compare_isds(json1, json2):
@@ -194,7 +193,6 @@ def main(image):
 
     # try ale.loads
     ale_kerns = ale.util.generate_kernels_from_cube(image_ale_path, expand=True)
-    # ale_label = pvl.load(image_ale_path) # pvl.load(s) is unnecessary for testing ale drivers
     ale.loads(image_ale_path, props={"kernels": ale_kerns}, only_naif_spice=True)
     
     # Generate ISD for both ALE and ISIS
