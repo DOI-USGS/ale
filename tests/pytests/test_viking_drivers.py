@@ -291,6 +291,12 @@ class test_isis_naif(unittest.TestCase):
     def test_short_mission_name(self):
         assert self.driver.short_mission_name == 'viking'
 
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == "VISUAL_IMAGING_SUBSYSTEM_CAMERA_B"
+
+    def test_sensor_name(self):
+        assert self.driver.sensor_name == "Visual Imaging Subsystem Camera B"
+
     def test_spacecraft_name(self):
         assert self.driver.spacecraft_name == 'VIKING ORBITER 1'
 
@@ -305,8 +311,20 @@ class test_isis_naif(unittest.TestCase):
              assert self.driver.ephemeris_start_time == 54324.99
              scs2e.assert_called_with(-27999, '40031801')
 
+    def test_detector_center_line(self):
+        assert self.driver.detector_center_line == 0
+
+    def test_detector_center_sample(self):
+        assert self.driver.detector_center_sample == 0
+
+    def test_focal_length(self):
+        assert self.driver.focal_length == 474.448
+
     @patch('ale.base.label_isis.IsisLabel.exposure_duration', 0.43)
     def test_ephemeris_start_time_different_exposure(self):
         with patch('ale.drivers.viking_drivers.spice.scs2e', return_value=54321) as scs2e:
              assert self.driver.ephemeris_start_time == 54322.75
              scs2e.assert_called_with(-27999, '40031801')
+
+    def test_sensor_model_version(self):
+        assert self.driver.sensor_model_version == 1

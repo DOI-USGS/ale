@@ -1,0 +1,15 @@
+
+\begindata
+INS-915240_PP       = (-0.006, -0.002)
+INS-915240_OD_K     = (-0.13361854e-5, 0.52261757e-9, -0.50728336e-13)
+INS-915240_DECENTER = (-0.54958195e-6, -0.46089420e-10, 2.9659070)
+
+\begintext
+These are the parameters required for writing c-kernels.  Isis will
+create ck with the same frame endpoints as the mission ck.  For 
+Apollo 15 the ck instrument frame is A15_METRIC (-915240), and the
+ck reference frame is APOLLO_15_NADIR (1400015).
+
+\begindata
+INS-915240_CK_FRAME_ID=-915240
+INS-915240_CK_REFERENCE_ID=1400015

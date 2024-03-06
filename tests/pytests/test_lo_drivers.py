@@ -97,6 +97,9 @@ class test_high_isis3_naif(unittest.TestCase):
                 ]
             namfrm.assert_called_with("LO3_HIGH_RESOLUTION_CAMERA")
 
+    def test_light_time_correction(self):
+        self.driver.light_time_correction == "NONE"
+
     def test_naif_keywords(self):
         with patch('ale.drivers.lo_drivers.LoHighCameraIsisLabelNaifSpiceDriver.ikid', new_callable=PropertyMock) as ikid, \
             patch('ale.base.data_naif.spice.bodvrd', return_value=[1737.4, 1737.4, 1737.4]) as bodvrd:

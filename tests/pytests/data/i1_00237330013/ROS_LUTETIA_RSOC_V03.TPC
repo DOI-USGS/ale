@@ -1,0 +1,120 @@
+KPL/PCK
+
+Asteroid 21 Lutetia PCK File -- RSOC Solution
+===========================================================================
+
+ 
+Version and Date
+--------------------------------------------------------
+
+     Version 0.3 -- September 26, 2011 -- J. Vazquez, PSA, SRE-OS/ESA
+     
+        Updated values for the rotational period.
+
+     Version 0.2 -- September 23, 2011 -- J. Vazquez, PSA, SRE-OS/ESA
+        
+        Updated values for the orientation of the north pole.
+        
+     Version 0.1 -- October 28, 2009 -- J. Vazquez, MIG, SRE-OS/ESA
+ 
+ 
+Organization
+--------------------------------------------------------
+ 
+     The sections of this file are as follows.
+ 
+     Introductory Information:
+ 
+         --   Version description
+ 
+         --   Disclaimer
+ 
+         --   Sources
+ 
+     Pck Data:
+ 
+         --   Orientation constants for Asteroid 21 Lutetia
+ 
+         --   Radii for Asteroid 21 Lutetia
+ 
+ 
+Version description
+--------------------------------------------------------
+ 
+     This is a PCK containing values for the pole orientation, 
+     rotation period and shape obtained from [2].
+     
+ 
+Disclaimer
+--------------------------------------------------------
+ 
+     This constants file may not contain the parameter values that you
+     prefer. Note that this file may be readily modified by you or
+     anyone else. MIG suggests that you inspect this file visually
+     before proceeding with any critical or extended data processing.
+ 
+     MIG requests that you update the version section if you modify
+     the file.
+ 
+ 
+Sources
+--------------------------------------------------------
+ 
+     The sources for the constants listed in this file are:
+ 
+        1) ESA Science and Technology Server, Rosetta area,
+           http://sci.esa.int/science-e/www/object/index.cfm?
+           fobjectid=34849
+
+        2) 'PTB MAPPS Requirements Specification Cruise Phase' (Jun 6, 2008),
+           (RO-SGS-RS-0001), version 1a.
+        
+        3) Rotational Parameters of (21) Lutetia, L. Jorda & J.-B. Vincent
+
+
+Orientation constants for Asteroid 21 Lutetia
+--------------------------------------------------------
+ 
+     Right Ascension and Declination for the north pole of the asteroid are taken
+     from [3]. The W1 term was set to correspond to the period of 8.168270 hours ([3]).
+     This way, the rotational parameters of this ellipsoidal model math the ones in
+     the paper from Jorda and Vincent ([3]).
+     
+     The W0 term is 94.2 deg ([2]).
+     
+     W0 is defined as the offset (angle measured along the equator in an easterly 
+     direction from the intersection with the Earth's mean equator to the intersection 
+     with the prime meridian) at a 0 seconds ET.
+ 
+     \begindata
+ 
+        BODY2000021_POLE_RA             = (  51.80      0.0         0.0 )
+        BODY2000021_POLE_DEC            = (  10.83      0.0         0.0 )
+        BODY2000021_PM                  = (  94.2    1057.751519    0.0 )
+ 
+     \begintext
+
+
+Radii for Asteroid 21 Lutetia
+--------------------------------------------------------
+     
+     The radii provided in the keyword below correspond to the 
+     following asteroid shape
+
+          a/b/c = 130km/100km/90km
+
+     provided in [2].
+ 
+     \begindata
+ 
+        BODY2000021_RADII               = ( 65.0  50.0  45.0 )
+ 
+     \begintext
+
+
+Albedo Values for Asteroid 21 Lutetia
+--------------------------------------------------------
+
+     No values for the albedo are provided in [2].
+     
+
