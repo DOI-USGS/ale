@@ -62,6 +62,7 @@ release.
 - Added Nadir option to isd_generate, used to generate nadir instrument pointing [#564](https://github.com/DOI-USGS/ale/pull/564)
 - Added radial and tangential distortion model [#575](https://github.com/DOI-USGS/ale/pull/575)
 - Updated the spiceypy version used in environment.yml [#552](https://github.com/DOI-USGS/ale/issues/552)
+- added driver verification script that helps in comparing ALE and ISIS driver spice data usage and outputs [#584](https://github.com/DOI-USGS/ale/pull/584)
 
 ### Fixed
 - Fixed LRO MiniRF drivers naif keywords focal to pixel and pixel to focal translations to be correct. [#569](https://github.com/DOI-USGS/ale/pull/569)
