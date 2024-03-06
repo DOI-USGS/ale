@@ -46,6 +46,7 @@ release.
 - Fixed missing sensor_model_version attribute on NewHorizonsLorriIsisLabelNaifSpiceDriver [#583](https://github.com/DOI-USGS/ale/pull/583)
 - Fixed missing sensor_model_version attribute on VikingIsisLabelNaifSpiceDriver [#583](https://github.com/DOI-USGS/ale/pull/583)
 - Fixed incorrect distortion look up in Orex camera when working with PolyCam images [#583](https://github.com/DOI-USGS/ale/pull/583)
+- Brought timing in line with ISIS for the KaguyaMiIsisLabelNaifSpiceDriver [#599](https://github.com/DOI-USGS/ale/pull/599)
 
 ## [0.10.0] - 2024-01-08 
 
