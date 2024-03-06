@@ -1,0 +1,262 @@
+{
+  "isis_camera_version": 2,
+  "image_lines": 412,
+  "image_samples": 537,
+  "name_platform": "NEAR EARTH ASTEROID RENDEZVOUS",
+  "name_sensor": "MULTI-SPECTRAL IMAGER",
+  "reference_height": {
+    "maxheight": 1000,
+    "minheight": -1000,
+    "unit": "m"
+  },
+  "name_model": "USGS_ASTRO_FRAME_SENSOR_MODEL",
+  "center_ephemeris_time": 4750816.53996159,
+  "radii": {
+    "semimajor": 17.0,
+    "semiminor": 5.5,
+    "unit": "km"
+  },
+  "body_rotation": {
+    "time_dependent_frames": [
+      2000433,
+      1
+    ],
+    "ck_table_start_time": 4750816.53996159,
+    "ck_table_end_time": 4750816.53996159,
+    "ck_table_original_size": 1,
+    "ephemeris_times": [
+      4750816.53996159
+    ],
+    "quaternions": [
+      [
+        -0.21742791831046224,
+        -0.5915927720196109,
+        0.04469058688780722,
+        -0.7750779598704606
+      ]
+    ],
+    "angular_velocities": [
+      [
+        0.00031013516468020774,
+        6.225262045195156e-05,
+        9.803883131191956e-05
+      ]
+    ],
+    "reference_frame": 1
+  },
+  "instrument_pointing": {
+    "time_dependent_frames": [
+      -93000,
+      1
+    ],
+    "ck_table_start_time": 4750816.53996159,
+    "ck_table_end_time": 4750816.53996159,
+    "ck_table_original_size": 1,
+    "ephemeris_times": [
+      4750816.53996159
+    ],
+    "quaternions": [
+      [
+        -0.6037146505713888,
+        -0.2184429492380255,
+        0.26555847710047836,
+        0.7192287493237002
+      ]
+    ],
+    "angular_velocities": [
+      [
+        -1.0366620787684243e-05,
+        2.9058844213815335e-05,
+        -8.620710132728253e-06
+      ]
+    ],
+    "reference_frame": 1,
+    "constant_frames": [
+      -93001,
+      -93000
+    ],
+    "constant_rotation": [
+      -0.0014422521585655882,
+      6.97819591591179e-07,
+      0.9999989599535712,
+      -0.00048384015636002327,
+      -0.9999998829493447,
+      0.0,
+      0.9999988429030378,
+      -0.00048383965314379655,
+      0.0014422523273822038
+    ]
+  },
+  "naif_keywords": {
+    "BODY2000433_RADII": [
+      17.0,
+      5.5,
+      5.5
+    ],
+    "BODY_FRAME_CODE": 2000433,
+    "BODY_CODE": 2000433,
+    "INS-93001_PIXEL_PITCH": 0.016,
+    "INS-93001_LT_SURFACE_CORRECT": "FALSE",
+    "INS-93001_SWAP_OBSERVER_TARGET": "TRUE",
+    "INS-93001_TRANSX": [
+      0.0,
+      0.016,
+      0.0
+    ],
+    "INS-93001_TRANSY": [
+      0.0,
+      0.0,
+      -0.016
+    ],
+    "INS-93001_LIGHTTIME_CORRECTION": "LT+S",
+    "INS-93001_FOV_BOUNDARY_CORNERS": [
+      1.0,
+      0.019744857140000002,
+      0.02575366124,
+      1.0,
+      -0.019744857140000002,
+      0.02575366124,
+      1.0,
+      -0.019744857140000002,
+      -0.02575366124,
+      1.0
+    ],
+    "TKFRAME_-93001_UNITS": "DEGREES",
+    "INS-93001_FOCAL_LENGTH": 166.85,
+    "INS-93001_FOV_FRAME": "NEAR_MSI",
+    "FRAME_-93001_NAME": "NEAR_MSI",
+    "TKFRAME_-93001_AXES": [
+      2.0,
+      1.0,
+      2.0
+    ],
+    "TKFRAME_-93001_SPEC": "ANGLES",
+    "INS-93001_BORESIGHT_SAMPLE": 269.0,
+    "INS-93001_ITRANSL": [
+      0.0,
+      0.0,
+      -62.5
+    ],
+    "INS-93001_K1": -7e-05,
+    "INS-93001_ITRANSS": [
+      0.0,
+      62.5,
+      0.0
+    ],
+    "FRAME_-93001_CLASS_ID": -93001.0,
+    "INS-93001_PLATFORM_ID": -93000.0,
+    "INS-93001_BORESIGHT_LINE": 206.5,
+    "INS-93001_FRAME_ID": -93001.0,
+    "TKFRAME_-93001_RELATIVE": "NEAR_SC_BUS_PRIME",
+    "INS-93001_BORESIGHT": [
+      1.0,
+      0.0,
+      0.0
+    ],
+    "TKFRAME_-93001_ANGLES": [
+      90.0,
+      -179.972278,
+      -0.082635
+    ],
+    "FRAME_-93001_CENTER": -93.0,
+    "FRAME_-93001_CLASS": 4.0,
+    "INS-93001_FOV_SHAPE": "POLYGON",
+    "FRAME_2000433_NAME": "EROS_FIXED",
+    "FRAME_2000433_CLASS_ID": 2000433.0,
+    "BODY2000433_POLE_DEC": [
+      17.22,
+      0.0,
+      0.0
+    ],
+    "BODY2000433_PM": [
+      326.07,
+      1639.38864745,
+      0.0
+    ],
+    "FRAME_2000433_CENTER": 2000433.0,
+    "BODY2000433_LONG_AXIS": 0.0,
+    "OBJECT_2000433_FRAME": "EROS_FIXED",
+    "FRAME_2000433_CLASS": 2.0,
+    "BODY2000433_POLE_RA": [
+      11.35,
+      0.0,
+      0.0
+    ]
+  },
+  "detector_sample_summing": 1,
+  "detector_line_summing": 1,
+  "focal_length_model": {
+    "focal_length": 166.85
+  },
+  "detector_center": {
+    "line": 206.5,
+    "sample": 269.0
+  },
+  "focal2pixel_lines": [
+    0.0,
+    0.0,
+    -62.5
+  ],
+  "focal2pixel_samples": [
+    0.0,
+    62.5,
+    0.0
+  ],
+  "optical_distortion": {
+    "radial": {
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "starting_detector_line": 0,
+  "starting_detector_sample": 0,
+  "instrument_position": {
+    "spk_table_start_time": 4750816.53996159,
+    "spk_table_end_time": 4750816.53996159,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
+      4750816.53996159
+    ],
+    "positions": [
+      [
+        69.13367389282288,
+        -276.40770781355167,
+        222.2546049363491
+      ]
+    ],
+    "velocities": [
+      [
+        0.0007228575310681364,
+        -0.00018739946234992287,
+        -0.0005859505443755211
+      ]
+    ],
+    "reference_frame": 1
+  },
+  "sun_position": {
+    "spk_table_start_time": 4750816.53996159,
+    "spk_table_end_time": 4750816.53996159,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
+      4750816.53996159
+    ],
+    "positions": [
+      [
+        122682357.26743293,
+        156146522.97922137,
+        110874367.26208726
+      ]
+    ],
+    "velocities": [
+      [
+        -16.298773023439573,
+        15.981064278673381,
+        6.140837444633245
+      ]
+    ],
+    "reference_frame": 1
+  }
+}

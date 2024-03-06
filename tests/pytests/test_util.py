@@ -89,8 +89,8 @@ def pvl_four_group():
     # Mock of the DataDirectory group
     return """
     Group = DataDirectory
-      Base         = $ISIS3DATA/base
-      Messenger    = $ISIS3DATA/messenger
+      Base         = $ISISDATA/base
+      Messenger    = $ISISDATA/messenger
     EndGroup
     """
 
@@ -164,7 +164,7 @@ def test_kernel_from_cube_list(cube_kernels):
 
 def test_kernel_from_cube_list_expanded(monkeypatch, tmpdir, pvl_four_group, cube_kernels):
     monkeypatch.setenv('ISISROOT', str(tmpdir))
-    monkeypatch.setenv('ISIS3DATA', '/test/path')
+    monkeypatch.setenv('ISISDATA', '/test/path')
 
     with open(tmpdir.join('IsisPreferences'), 'w+') as pvl_isisroot_file:
         pvl_isisroot_file.write(pvl_four_group)
@@ -185,7 +185,7 @@ def test_kernel_from_cube_dict(cube_kernels):
 
 def test_kernel_from_cube_dict_expanded(monkeypatch, tmpdir, pvl_four_group, cube_kernels):
     monkeypatch.setenv('ISISROOT', str(tmpdir))
-    monkeypatch.setenv('ISIS3DATA', '/test/path')
+    monkeypatch.setenv('ISISDATA', '/test/path')
 
     with open(tmpdir.join('IsisPreferences'), 'w+') as pvl_isisroot_file:
         pvl_isisroot_file.write(pvl_four_group)

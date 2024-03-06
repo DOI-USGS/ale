@@ -500,10 +500,7 @@ class Cahvor():
             v_s = self.compute_v_s()
             H_prime = (self.cahvor_camera_dict['H'] - h_c * self.cahvor_camera_dict['A'])/h_s
             V_prime = (self.cahvor_camera_dict['V'] - v_c * self.cahvor_camera_dict['A'])/v_s
-            if self._props.get("landed", False):
-              self._cahvor_rotation_matrix = np.array([-H_prime, -V_prime, self.cahvor_camera_dict['A']])
-            else:
-              self._cahvor_rotation_matrix = np.array([H_prime, V_prime, self.cahvor_camera_dict['A']])
+            self._cahvor_rotation_matrix = np.array([H_prime, V_prime, self.cahvor_camera_dict['A']])
         return self._cahvor_rotation_matrix
 
     @property

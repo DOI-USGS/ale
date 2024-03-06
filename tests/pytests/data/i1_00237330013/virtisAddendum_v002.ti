@@ -1,0 +1,56 @@
+\begintext
+
+  The following overides the default target reference frames set by the Rosetta
+  frame kernel. This is done because the DSK shapemodels are not in the default
+  reference frames.
+
+\begindata
+
+OBJECT_2000021_FRAME = 'ROS_LUTETIA'
+OBJECT_1000012_FRAME = '67P/C-G_CK'
+
+
+\begintext
+This section provides parameters for VIRTIS_M_VIS instrument
+
+\begindata
+
+ INS-226211_PIXEL_PITCH       = 0.038
+ INS-226211_BORESIGHT_SAMPLE  = 128.5
+ INS-226211_BORESIGHT_LINE    = 128.5
+
+
+ INS-226211_TRANSX  = (0.0,  0.0,  0.038)
+ INS-226211_TRANSY  = (0.0,  0.038, 0.0)
+ INS-226211_ITRANSS = (0.0,  0.0,  26.315789473684 )
+ INS-226211_ITRANSL = (0.0, 26.315789473684,   0.0)
+
+
+ INS-226211_SWAP_OBSERVER_TARGET = 'TRUE'
+ INS-226211_LIGHTTIME_CORRECTION = 'LT+S'
+ INS-226211_LT_SURFACE_CORRECT   = 'FALSE'
+
+\begintext
+This section provides parameters for VIRTIS_M_IR instrument
+
+\begindata
+
+ INS-226213_PIXEL_PITCH       = 0.038
+ INS-226213_BORESIGHT_SAMPLE  = 128.5
+ INS-226213_BORESIGHT_LINE    = 0.5
+
+ INS-226213_TRANSX  = (0.0, 0.0, 0.038)
+ INS-226213_TRANSY  = (0.0, 0.038, 0.0)
+ INS-226213_ITRANSS = (0.0, 0.0, 26.315789473684)
+ INS-226213_ITRANSL = (0.0, 26.315789473684, 0.0)
+
+ INS-226213_SWAP_OBSERVER_TARGET = 'TRUE'
+ INS-226213_LIGHTTIME_CORRECTION = 'LT+S'
+ INS-226213_LT_SURFACE_CORRECT   = 'FALSE'
+
+
+\begintext
+
+
+
+

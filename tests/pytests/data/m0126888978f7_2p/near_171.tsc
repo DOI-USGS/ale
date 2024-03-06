@@ -1,0 +1,252 @@
+KPL/SCLK
+\begintext
+
+LABEL_START
+FILENAME ="near_171.tsc"
+MISSION_NAME ="NEAR"
+ORGANIZATION = "JHU/APL"
+AUTHOR ="SCLK update program"
+CONTACT ="david.tillman@jhuapl.edu"
+TYPE ="SCLK"
+CREATION_DATE ="12-Feb-2001"
+TARGET ="N/A"
+START_UTC ="1996-02-17T20:43:29"
+END_UTC ="N/A"
+END_DET_UTC ="N/A"
+
+SOURCE_FILES ={de403.bsp,
+eros9845.bsp,
+near_1998356_2000045_v01.bsp,
+near_2000045_2000125_v02.bsp,
+near_2000121_2000189_v01_noburn.bsp,
+near_2000181_2000242_v01.bsp,
+near_2000223_2000270_v01.bsp,
+near_2000265_2000298_v01.bsp,
+near_2000294_2000309_v01_noburn.bsp,
+near_2000302_2000341_v01.bsp,
+near_2000336_2001028_v01.bsp,
+near_2001026_2001043_v01.bsp,
+near_2001035_2001043_v01.bsp,
+naif0007.tls,
+pck00006.tpc,
+near_170.tsc}
+
+MERGED_FILES ="N/A"
+
+NUMBER_VERTICES ="N/A"
+NUMBER_PLATES ="N/A"
+
+DESCRIPTION ="
+
+This kernel uses a least-squares fit to the clock data from Nov. 1996 
+to December 1997, using a constant drift rate of -0.0164 seconds/day.  
+Coefficients covering the period January 1998 through end of mission
+are produced by the SCLK Kernel Update utility on an automatic basis.
+
+This kernel also includes the effects of time changes sent to the 
+spacecraft clock during a test on May 30, 1997, and during the 
+Mathilde flyby on June 27, 1997.  All of these time changes were 
+cancelled by later time changes, so that the spacecraft clock was 
+set back to its original timeline. 
+
+For the final touchdown of NEAR on Eros on 12 Feb 2001, the clock
+was set backwards 17 seconds.  A new partition was added to
+reflect this.
+
+This will be the final kernel produced for the NEAR mission.  "
+
+LABEL_END
+FREE FORM COMMENTS:
+
+
+Specification for a type 1 SCLK...
+Model the SCLK against the time system TDT (terrestrial
+dynamical time) TIME_SYSTEM = 2; variable names
+indicate NEAR (ID -93).
+
+
+
+This kernel was rebuilt on Tue Dec  8 20:22:10 1998 
+starting from encoded SCLK: 59023003498 as build number: 1
+
+
+This kernel was rebuilt on Thu Jan 28 14:59:12 1999 
+starting from encoded SCLK: 92272635009 as build number: 2
+
+\begindata
+SCLK_KERNEL_ID             = ( @2001-02-12T19:00:03 )
+SCLK_DATA_TYPE_93          = (        1 )
+SCLK01_TIME_SYSTEM_93      = (        2 )
+
+
+\begintext
+For NEAR, Use a single field which represents milliseconds past
+mission start time; moduli set well beyond end of mission.
+
+\begindata
+SCLK01_N_FIELDS_93         = (        1 )
+SCLK01_MODULI_93           = (  2.0e+12 )
+SCLK01_OFFSETS_93          = (        0 )
+SCLK01_OUTPUT_DELIM_93     = (        1 )
+
+
+\begintext
+Supply the partition information.  If needed,
+(e.g., switch to backup bus controller occurs), can
+add additional records (lines) to following variables to
+define new partitions; generally, the start of the
+new partition should coincide with the end of the
+previous one.
+
+\begindata
+SCLK_PARTITION_START_93    = ( 0.0000000000e+00
+                               4.0409661942e+10
+                               4.0429229946e+10
+                               4.2793916398e+10
+                               4.2808703400e+10
+                               4.2831583405e+10
+			       1.5741315200e+11
+                             )
+
+SCLK_PARTITION_END_93      = ( 4.0409721942e+10
+                               4.0429169946e+10
+                               4.2793906398e+10
+                               4.2808704400e+10
+                               4.2831592405e+10
+			       1.5741316900e+11
+                               2.0000000000e+12
+                             )
+
+\begintext
+Finally, define coefficients for starting MET (millisec),
+starting TDT (expressed in terms of date/time string
+@dd-mmm-yyyy-HH:MM:SS) and rate of change between the
+spacecraft clock and TDT, having the following property:
+
+    rate = TDT (sec) / most significant count (millisec)
+
+For NEAR, the most significant count corresponds to 1/1000 of
+a second, giving a rate of 0.001 sec/millisec in the absence
+of clock drift; in general, rate is related to the MET drift
+rate of the spacecraft clock (in millisec/sec) as follows:
+
+    rate = {1+MET drift rate (millisec/sec)/1000} / 1000
+
+The following are preliminary data; additional records (lines) should
+be added as needed to account for changes in clock drift over time;
+the new records must ensure a continuous and monotonically
+increasing relationship between MET and TDT.
+
+\begindata
+SCLK01_COEFFICIENTS_93     = ( 
+
+0.0000000000e+00    @17-FEB-1996-20:44:30.960           9.9999980900e-04
+4.0409721942e+10    @30-MAY-1997-13:39:45.184           9.9999980900e-04
+4.0429229946e+10    @30-MAY-1997-19:04:53.184           9.9999980900e-04
+4.2793906398e+10    @27-JUN-1997-03:56:09.184           9.9999980900e-04
+4.2808694400e+10    @27-JUN-1997-08:02:37.184           9.9999980900e-04
+4.2831583405e+10    @27-JUN-1997-14:24:06.184           9.9999980900e-04
+6.0125985000e+10    @13-JAN-1998-18:24:04.310           9.9999979941e-04
+6.0212390000e+10    @14-JAN-1998-18:24:09.280           9.9999965456e-04
+6.0515927000e+10    @18-JAN-1998-06:43:06.180           9.9999967129e-04
+6.0760157000e+10    @21-JAN-1998-02:33:36.105           9.9999969185e-04
+6.1092948000e+10    @24-JAN-1998-23:00:07.008           9.9999970879e-04
+6.1253334000e+10    @26-JAN-1998-19:33:12.956           9.9999967631e-04
+6.1373467000e+10    @28-JAN-1998-04:55:25.916           9.9999966669e-04
+6.1594465000e+10    @30-JAN-1998-18:18:43.841           9.9999966090e-04
+6.6859033000e+10    @01-APR-1998-16:41:29.880           9.9999962751e-04
+7.2308626000e+10    @03-JUN-1998-18:28:01.519           9.9999975022e-04
+7.4721547000e+10    @01-JUL-1998-16:43:21.823           9.9999971165e-04
+7.5132721000e+10    @06-JUL-1998-10:56:15.686           9.9999966728e-04
+7.5328509000e+10    @08-JUL-1998-17:19:23.626           9.9999969335e-04
+7.7738193000e+10    @05-AUG-1998-14:40:46.895           9.9999969645e-04
+7.8777422000e+10    @17-AUG-1998-15:21:15.572           9.9999968889e-04
+7.8952916000e+10    @19-AUG-1998-16:06:09.527           9.9999974263e-04
+7.9588468000e+10    @27-AUG-1998-00:38:41.368           9.9999975051e-04
+8.0154353000e+10    @02-SEP-1998-13:50:06.221           9.9999974042e-04
+8.1317059000e+10    @16-SEP-1998-00:48:31.925           9.9999974566e-04
+8.1805260000e+10    @21-SEP-1998-16:25:12.798           9.9999973960e-04
+8.2139807000e+10    @25-SEP-1998-13:20:59.695           9.9999969034e-04
+8.2432241000e+10    @28-SEP-1998-22:34:53.609           9.9999970785e-04
+8.3004321000e+10    @05-OCT-1998-13:29:33.450           9.9999972196e-04
+8.3637554000e+10    @12-OCT-1998-21:23:26.279           9.9999972994e-04
+8.4815021000e+10    @26-OCT-1998-12:27:52.954           9.9999972383e-04
+8.5429701000e+10    @02-NOV-1998-15:12:32.778           9.9999971380e-04
+8.5598364000e+10    @04-NOV-1998-14:03:35.735           9.9999974401e-04
+8.6208312000e+10    @11-NOV-1998-15:29:23.584           9.9999975251e-04
+8.6810662000e+10    @18-NOV-1998-14:48:33.426           9.9999973864e-04
+8.7836239000e+10    @30-NOV-1998-11:41:30.153           9.9999973342e-04
+8.8228097000e+10    @05-DEC-1998-00:32:28.043           9.9999971986e-04
+8.8438735000e+10    @07-DEC-1998-11:03:05.977           9.9999968567e-04
+8.8723522000e+10    @10-DEC-1998-18:09:32.894           9.9999970990e-04
+8.9167446000e+10    @15-DEC-1998-21:28:16.770           9.9999972121e-04
+8.9826627000e+10    @23-DEC-1998-12:34:37.577           9.9999970657e-04
+9.0351015000e+10    @29-DEC-1998-14:14:25.418           9.9999969656e-04
+9.0508753000e+10    @31-DEC-1998-10:03:23.364           9.9999965725e-04
+9.0804879000e+10    @03-JAN-1999-20:18:49.254           9.9999963003e-04
+9.0891284000e+10    @04-JAN-1999-20:18:54.125           9.9999850403e-04
+9.1051108000e+10    @06-JAN-1999-16:42:38.180           1.0000003417e-03
+9.1137521000e+10    @07-JAN-1999-16:42:51.150           9.9999965120e-04
+9.1643374000e+10    @13-JAN-1999-13:13:43.967           9.9999963823e-04
+9.2098885000e+10    @18-JAN-1999-19:45:34.837           9.9999971539e-04
+9.2272972000e+10    @20-JAN-1999-20:07:01.780           9.9999967241e-04
+9.2989875000e+10    @29-JAN-1999-03:15:24.550           9.9999967956e-04
+9.3630426000e+10    @05-FEB-1999-13:11:15.352           9.9999969096e-04
+9.3889558000e+10    @08-FEB-1999-13:10:07.278           9.9999971539e-04
+9.4235104000e+10    @12-FEB-1999-13:09:13.188           9.9999974051e-04
+9.4507432000e+10    @15-FEB-1999-16:48:01.123           9.9999975952e-04
+9.5913077000e+10    @03-MAR-1999-23:15:25.732           9.9999972150e-04
+9.6661855000e+10    @12-MAR-1999-15:15:03.495           9.9999968374e-04
+9.7087768000e+10    @17-MAR-1999-13:33:36.369           9.9999970449e-04
+9.7259103000e+10    @19-MAR-1999-13:09:11.324           9.9999973601e-04
+9.8124119000e+10    @29-MAR-1999-13:26:07.102           9.9999974347e-04
+9.8740823000e+10    @05-APR-1999-16:44:30.949           9.9999975168e-04
+9.9332844000e+10    @12-APR-1999-13:11:31.797           9.9999974315e-04
+1.0115632000e+11    @03-MAY-1999-15:42:47.324           9.9999974035e-04
+1.0192592400e+11    @12-MAY-1999-13:29:31.118           9.9999973302e-04
+1.0270511600e+11    @21-MAY-1999-13:56:02.905           9.9999972622e-04
+1.0330746400e+11    @28-MAY-1999-13:15:10.735           9.9999971703e-04
+1.0357738900e+11    @31-MAY-1999-16:13:55.653           9.9999969744e-04
+1.0428957000e+11    @08-JUN-1999-22:03:36.432           9.9999968955e-04
+1.0495320300e+11    @16-JUN-1999-14:24:09.232           9.9999969796e-04
+1.0563745000e+11    @24-JUN-1999-12:28:16.031           9.9999970644e-04
+1.0615676900e+11    @30-JUN-1999-12:43:34.873           9.9999969499e-04
+1.0759866100e+11    @17-JUL-1999-05:15:06.407           9.9999967686e-04
+1.0931735300e+11    @06-AUG-1999-02:39:57.784           9.9999963727e-04
+1.0988321800e+11    @12-AUG-1999-15:51:02.573           9.9999962675e-04
+1.1160191700e+11    @01-SEP-1999-13:16:00.888           9.9999960134e-04
+1.1274866800e+11    @14-SEP-1999-19:48:31.393           9.9999956861e-04
+1.1444949000e+11    @04-OCT-1999-12:15:32.636           9.9999955513e-04
+1.1661321300e+11    @29-OCT-1999-13:17:34.680           9.9999955809e-04
+1.1989633300e+11    @06-DEC-1999-13:16:13.361           9.9999959823e-04
+1.2007520000e+11    @08-DEC-1999-14:57:20.294           9.9999962694e-04
+1.2076756000e+11    @16-DEC-1999-15:16:40.048           9.9999964471e-04
+1.2301577300e+11    @11-JAN-2000-15:46:52.289           9.9999966231e-04
+1.2378214600e+11    @20-JAN-2000-12:39:45.036           9.9999966955e-04
+1.2474293600e+11    @31-JAN-2000-15:32:54.713           9.9999966406e-04
+1.2593273100e+11    @14-FEB-2000-10:02:49.319           9.9999966865e-04
+1.2855638600e+11    @15-MAR-2000-18:50:23.455           9.9999967057e-04
+1.3043917100e+11    @06-APR-2000-13:50:07.829           9.9999966756e-04
+1.3118129200e+11    @15-APR-2000-03:58:48.577           9.9999966077e-04
+1.3285501400e+11    @04-MAY-2000-12:54:10.014           9.9999966383e-04
+1.3328877800e+11    @09-MAY-2000-13:23:33.874           9.9999967655e-04
+1.3414737700e+11    @19-MAY-2000-11:53:32.591           9.9999967025e-04
+1.3458302500e+11    @24-MAY-2000-12:54:20.442           9.9999965803e-04
+1.3527066600e+11    @01-JUN-2000-11:55:01.201           9.9999965024e-04
+1.3630773500e+11    @13-JUN-2000-11:59:29.843           9.9999965527e-04
+1.3761435000e+11    @28-JUN-2000-14:56:24.387           9.9999965118e-04
+1.3933430600e+11    @18-JUL-2000-12:42:19.795           9.9999965580e-04
+1.3970032500e+11    @22-JUL-2000-18:22:38.674           9.9999966990e-04
+1.4036837700e+11    @30-JUL-2000-11:56:50.448           9.9999966240e-04
+1.4096962100e+11    @06-AUG-2000-10:57:34.240           9.9999965383e-04
+1.4165723100e+11    @14-AUG-2000-09:57:43.997           9.9999964633e-04
+1.4469710800e+11    @18-SEP-2000-14:22:19.927           9.9999964801e-04
+1.4625519300e+11    @06-OCT-2000-15:10:24.373           9.9999964470e-04
+1.4869368300e+11    @03-NOV-2000-20:31:53.512           9.9999964684e-04
+1.4935705700e+11    @11-NOV-2000-12:48:07.273           9.9999963914e-04
+1.5033180800e+11    @22-NOV-2000-19:33:57.927           9.9999964463e-04
+1.5385793000e+11    @02-JAN-2001-15:02:38.679           9.9999964612e-04
+1.5473045800e+11    @12-JAN-2001-17:24:46.375           9.9999965195e-04
+1.5579406100e+11    @25-JAN-2001-00:51:29.000           9.9999964722e-04
+1.5682978300e+11    @06-FEB-2001-00:33:30.629           9.9999964217e-04
+)

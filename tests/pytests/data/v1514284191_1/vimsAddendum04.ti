@@ -1,0 +1,38 @@
+\begindata
+INS-82370_TRANSX = ( 0.0, 1.0, 0.0)
+INS-82370_TRANSY = ( 0.0, 0.0, 1.0)
+INS-82370_ITRANSS = ( 0.0, 1.0, 0.0)
+INS-82370_ITRANSL = ( 0.0, 0.0, 1.0)
+
+INS-82371_TRANSX = ( 0.0, 1.0, 0.0)
+INS-82371_TRANSY = ( 0.0, 0.0, 1.0)
+INS-82371_ITRANSS = ( 0.0, 1.0, 0.0)
+INS-82371_ITRANSL = ( 0.0, 0.0, 1.0)
+
+\begintext
+These are the parameters required for writing c-kernels.  Isis will
+create ck with the same frame endpoints as the mission ck.  For 
+the Cassini spacecraft the ck frame is CASSINI_SC_COORD (-915240), and the
+ck reference frame is J2000 (1).
+
+\begindata
+INS-82371_CK_FRAME_ID=-915240
+INS-82371_CK_REFERENCE_ID=1
+INS-82370_CK_FRAME_ID=-915240
+INS-82370_CK_REFERENCE_ID=1
+
+\begintext
+The parallel arrays within the cassini vims ik kernels is not present within the 
+ISIS kernel suite. There is also a problem within the cassini ik kernels where
+VIMS_IR has code (-82370) and VIMS_V has code (-82371). Then both of those frames 
+are defined in again, where VIMS_IR is (-82371) and VIMS_V is (-82370). This is 
+a discrepency within the kernels and until resolved we will be using the 
+parallel array definition below.
+
+\begindata
+ 
+NAIF_BODY_NAME += ( 'CASSINI_VIMS_V' )
+NAIF_BODY_CODE += ( -82370 )
+ 
+NAIF_BODY_NAME += ( 'CASSINI_VIMS_IR' )
+NAIF_BODY_CODE += ( -82371 )

@@ -132,17 +132,20 @@ class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
         """
         if not hasattr(self, "_focal_length"):
             if (self.spacecraft_name == "VIKING ORBITER 1"):
-                if (self.sensor_name == "VISUAL_IMAGING_SUBSYSTEM_CAMERA_A"):
+                if (self.sensor_name == "Visual Imaging Subsystem Camera A"):
                     self._focal_length = 474.398
-                elif (self.sensor_name ==  "VISUAL_IMAGING_SUBSYSTEM_CAMERA_B"):
+                elif (self.sensor_name ==  "Visual Imaging Subsystem Camera B"):
                     self._focal_length = 474.448
+                    print("Setting focal")
             elif (self.spacecraft_name == "VIKING ORBITER 2"):
-                if (self.sensor_name == "VISUAL_IMAGING_SUBSYSTEM_CAMERA_A"):
+                if (self.sensor_name == "Visual Imaging Subsystem Camera A"):
                     self._focal_length = 474.610
-                elif (self.sensor_name ==  "VISUAL_IMAGING_SUBSYSTEM_CAMERA_B"):
+                elif (self.sensor_name ==  "Visual Imaging Subsystem Camera B"):
                     self._focal_length = 474.101
             else:
                 raise Exception(f"Unknown viking instrument to get focal length: {self.spacecraft_name}, {self.sensor_name}")
+        
+        return self._focal_length
 
     @property
     def detector_center_line(self):
@@ -152,6 +155,17 @@ class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
     def detector_center_sample(self):
         return 0
 
+    @property
+    def sensor_model_version(self):
+        """
+        Returns the ISIS camera version
+
+        Returns
+        -------
+        : int
+          Camera version number
+        """
+        return 1
 
 
 class VikingIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistortion, Driver):
