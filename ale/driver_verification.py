@@ -194,9 +194,8 @@ def main(image):
 
     # try ale.loads
     ale_kerns = ale.util.generate_kernels_from_cube(image_ale_path, expand=True)
-    # this can be uncommented and used when the PVL loads fix PR goes in (#587)
-    ale_label = pvl.load(image_ale_path)
-    ale.loads(ale_label, props={"kernels": ale_kerns}, only_naif_spice=True)
+    # ale_label = pvl.load(image_ale_path) # pvl.load(s) is unnecessary for testing ale drivers
+    ale.loads(image_ale_path, props={"kernels": ale_kerns}, only_naif_spice=True)
     
     # Generate ISD for both ALE and ISIS
     read_ale_driver = ReadIsis(image_ale_path)
