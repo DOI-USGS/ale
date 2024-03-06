@@ -5,7 +5,7 @@ from ale.base.base import Driver
 from ale.base.type_distortion import ThemisIrDistortion, NoDistortion
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
-from ale.base.type_sensor import LineScanner
+from ale.base.type_sensor import LineScanner, PushFrame
 
 import pvl
 
@@ -173,7 +173,7 @@ class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, The
         return times
 
 
-class OdyThemisVisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
+class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDistortion, Driver):
     """"
     Driver for Themis VIS ISIS cube
     """
@@ -225,30 +225,7 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, No
                 # if not milliseconds, the units are probably seconds
                 offset = offset.value
 
-        return og_start_time + offset - (self.line_exposure_duration/2)
-
-    @property
-    def line_exposure_duration(self):
-        """
-        The line exposure duration of the image, in seconds
-
-        Returns
-        -------
-        : float
-          Line exposure duration in seconds
-        """
-        line_exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration']
-        if isinstance(line_exposure_duration, pvl.collections.Quantity):
-            units = line_exposure_duration.units
-            if "ms" in units.lower():
-                line_exposure_duration = line_exposure_duration.value * 0.001
-            else:
-                # if not milliseconds, the units are probably seconds
-                line_exposure_duration = line_exposure_duration.value
-        else:
-            # if no units are available, assume the exposure duration is given in milliseconds
-            line_exposure_duration = line_exposure_duration * 0.001
-        return line_exposure_duration
+        return og_start_time + offset - ((self.exposure_duration / 1000) / 2)
 
     @property
     def focal_length(self):
@@ -256,12 +233,44 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, No
 
     @property
     def detector_center_line(self):
-        return 0
+        return 512
 
     @property
     def detector_center_sample(self):
-        return 0
-
+        return 512
+    
     @property
     def sensor_name(self):
         return self.label['IsisCube']['Instrument']['SpacecraftName']
+
+    @property
+    def num_frames(self):
+        """
+        Number of frames in the image
+
+        Returns
+        -------
+        : int
+          Number of frames in the image
+        """
+        return self.label['IsisCube']['Instrument']['NumFramelets']
+
+    @property
+    def framelet_height(self):
+        return self.image_lines / (self.num_frames / self.sampling_factor)
+    
+    @property
+    def sampling_factor(self):
+        return self.label['IsisCube']['Instrument']['SpatialSumming']
+    
+    @property
+    def filter_number(self):
+        """
+        Return the filter number from the cube label
+
+        Returns
+        -------
+        : int
+          The filter number
+        """
+        return self.label['IsisCube']['BandBin']['FilterNumber']
