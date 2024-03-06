@@ -63,14 +63,23 @@ def compare_dicts(ldict, rdict):
                 differences.append(f'Array sizes of key {key} are not equal {item} : {rdict[key]}.')
             else:
                 list_item = np.array(item).flat[0]
-                if isinstance(list_item, numbers.Number):
-                    if not np.allclose(item, rdict[key]):
+                # quaternion (q) and its additive inverse (qi) yield the same rotation.  Equivalent quaternions should pass
+                if key == 'quaternions':
+                    # Cannot compare abs, it has to be full sign flip, because (1, -1, 1, -1) != (1, 1, 1, 1), but (-1,-1,-1,-1) ~= (1,1,1,1)
+                    l = np.array(item).flat
+                    li = [-x for x in l]
+                    r = np.array(rdict[key]).flat
+                    if not (np.allclose(l, r) or np.allclose(li,r)):
                         differences.append(f'Array values of key {key} are not almost equal {item} : {rdict[key]}.')
-                elif isinstance(list_item, str):
-                    if not (np.array(item) == np.array(rdict[key])).all():
-                        differences.append(f'Array values of key {key} are not equal {item} : {rdict[key]}.')
                 else:
-                    raise TypeError("No comparison handled for underlying list type {} for key {}".format(list_item, key))
+                    if isinstance(list_item, numbers.Number):
+                        if not np.allclose(item, rdict[key]):
+                            differences.append(f'Array values of key {key} are not almost equal {item} : {rdict[key]}.')
+                    elif isinstance(list_item, str):
+                        if not (np.array(item) == np.array(rdict[key])).all():
+                            differences.append(f'Array values of key {key} are not equal {item} : {rdict[key]}.')
+                    else:
+                        raise TypeError("No comparison handled for underlying list type {} for key {}".format(list_item, key))
         elif isinstance(item, str):
             if item.lower() != rdict[key].lower():
                 differences.append(f'Values of key {key} are not equal {item} : {rdict[key]}.')

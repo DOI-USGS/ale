@@ -1,0 +1,1213 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 256
+    TileLines   = 178
+
+    Group = Dimensions
+      Samples = 256
+      Lines   = 178
+      Bands   = 432
+    End_Group
+
+    Group = Pixels
+      Type       = SignedWord
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName               = ROSETTA-ORBITER
+    InstrumentName               = "VISIBLE AND INFRARED THERMAL IMAGING
+                                    SPECTROMETER"
+    InstrumentId                 = VIRTIS
+    ChannelID                    = VIRTIS_M_IR
+    SpacecraftClockStartCount    = 1/00237330013.26134
+    SpacecraftClockStopCount     = 1/00237333561.63240
+    StartTime                    = 2010-07-09T21:00:54.352
+    StopTime                     = 2010-07-09T22:00:02.918
+    TargetName                   = LUTETIA
+    OriginalTargetName           = "21 LUTETIA"
+    TargetType                   = ASTEROID
+    ProcessingLevelID            = 2
+    InstrumentModeId             = 19
+    ScanModeId                   = 1
+    ScanParameter                = (-2.06754, 1.80502, 0.25817, 1)
+    ScanParameterDesc            = (SCAN_START_ANGLE, SCAN_STOP_ANGLE,
+                                    SCAN_STEP_ANGLE, SCAN_STEP_NUMBER)
+    FrameParameter               = (2, 1, 20, 15)
+    FrameParameterDesc           = (EXPOSURE_DURATION, FRAME_SUMMING,
+                                    EXTERNAL_REPETITION_TIME,
+                                    DARK_ACQUISITION_RATE)
+    VirIrStartXPosition          = 1
+    VirIrStartYPosition          = 7
+    MaximumInstrumentTemperature = (88.08070, 134.70799, 135.04300, 79.75090)
+    DataQualityId                = 1
+    DataQualityDesc              = "0:INCOMPLETE ; 1:COMPLETE"
+  End_Group
+
+  Group = Archive
+    SoftwareVersionId       = ("VirtisROS SW v.3.61", EGSE_SOFT_7.0,
+                               PDS_CONVERTER_7.0)
+    DataSetName             = "ROSETTA-ORBITER LUTETIA VIRTIS 2 AST2 V1.0"
+    ProductId               = I1_00237330013
+    OriginalProductId       = PIA79K59
+    ProductType             = EDR
+    StandardDataProductId   = RO-A-VIRTIS-2-AST2-V1.0
+    ProducerFullName        = CORADINI
+    ProducerInstitutionName = "ISTITUTO NAZIONALE DI ASTROFISICA"
+    ProductCreationTime     = 2012-02-01T12:05:44.99
+    MissionPhaseName        = "LUTETIA FLY-BY"
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -226213
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = ($rosetta/kernels/pck/PCK00010.TPC,
+                                 $rosetta/kernels/pck/ROS_LUTETIA_RSOC_V03.TPC,
+                                 $rosetta/kernels/fk/ROS_LUTETIA_RSOC_V03.TF)
+    TargetPosition            = (Table, $rosetta/kernels/tspk/DE405.BSP,
+                                 $rosetta/kernels/tspk/21_LUTETIA_2004_2016.BS-
+                                 P,
+                                 $rosetta/kernels/tspk/ORHS_______________0010-
+                                 9.BSP)
+    InstrumentPointing        = (Table,
+                                 $rosetta/kernels/ck/ROS_VIRTIS_ZERO_V1.BC,
+                                 $rosetta/kernels/ck/ATNR_P040302093352_00127.-
+                                 BC, $rosetta/kernels/fk/ROS_V38.TF)
+    Instrument                = $rosetta/kernels/ik/ROS_VIRTIS_V14.TI
+    SpacecraftClock           = $rosetta/kernels/sclk/ROS_160929_STEP.TSC
+    InstrumentPosition        = (Table,
+                                 $rosetta/kernels/spk/ORHR_______________00122-
+                                 .BSP)
+    InstrumentAddendum        = $rosetta/kernels/iak/virtisAddendum_v002.ti
+    ShapeModel                = Null
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Predicted
+    CameraVersion             = 1
+    Source                    = isis
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name      = VIRTISHouseKeeping
+  StartByte = 39436790
+  Bytes     = 148096
+  Records   = 178
+  ByteOrder = Lsb
+
+  Group = Field
+    Name = dataSCET
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AcquisitonID
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = NumberOfSubslices
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = FirstSerialNum
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "Data Type__Real science/Dummy"
+    Type = Integer
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "Data Type__Spectrum type"
+    Type = Integer
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "Data Type__Shutter state"
+    Type = Integer
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "Data Type__Compression Mode"
+    Type = Integer
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "Data Type__Average/summing mode"
+    Type = Integer
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "Data Type__Image type"
+    Type = Integer
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = Spare
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = HKDefaultHK
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "V_MODE__V-M operative mode"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "V_MODE__V-H operative mode"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "V_MODE__ME operative mode"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "ME_PWR_STAT__-M power converter status"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "ME_PWR_STAT__-H power converter status"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "ME_PWR_STAT__-M IFE +5V power status"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "ME_PWR_STAT__-H IFE +5V power status"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "ME_PWR_STAT__ADC power status"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "ME_PWR_STAT__EEPROM +5V power status"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ME_PWR_STAT__DPU_ID
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ME_PS_TEMP
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ME_DPU_TEMP
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ME_DHSU_VOLT
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ME_DHSU_CURR
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = EEPROM_VOLT
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = IF_ELECTR_VOLT
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = SPARE
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_ME_generalHK
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_ECA_STAT__-M ECA status"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_ECA_STAT__-M ECA power"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_COOL_STAT__-M cooler mode"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_COOL_STAT__-M cooler motor drv status"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_COOL_STAT__-M CCE +28V power"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_COOL_TIP_TEMP
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_COOL_MOT_VOLT
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_COOL_MOT_CURR
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_CCE_SEC_VOLT
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = SPARE
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = MVIS_HK_reportSCET-1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_CCD_VDR_HK
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_CCD_VDD_HK
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_+5_VOLT
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_+12_VOLT
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_-12_VOLT
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_+20_VOLT
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_+21_VOLT
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_CCD_LAMP_VOLT
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_CCD_TEMP_OFFSET
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_CCD_TEMP
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_CCD_TEMP_RES
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_RADIATOR_TEMP
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_LEDGE_TEMP
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = OM_BASE_TEMP
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = H_COOLER_TEMP
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_COOLER_TEMP
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_CCD_WIN_X1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_CCD_WIN_Y1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_CCD_WIN_X2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_CCD_WIN_Y2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_CCD_DELAY
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_CCD_EXPO
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_MIRROR_SIN_HK
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_MIRROR_COS_HK
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_VIS_FLAG_ST__CCD scan flag"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_VIS_FLAG_ST__H/K acquisition flag"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_VIS_FLAG_ST__time error flag"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_VIS_FLAG_ST__word error flag"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_VIS_FLAG_ST__VIS checkout ADC latch-up status"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_VIS_FLAG_ST__last command to CCD calibration lamp"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = SPARE
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = MIR_HK_reportSCET
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_IR_VDETCOM_HK
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_IR_VDETADJ_HK
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_IR_VPOS
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_IR_VDP
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_IR_TEMP_OFFSET
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_IR_TEMP
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_IR_TEMP_RES
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_SHUTTER_TEMP
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_GRATING_TEMP
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_SPECT_TEMP
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_TELE_TEMP
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_SU_MOTOR_TEMP
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_IR_LAMP_VOLT
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_SU_MOTOR_CURR
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_IR_WIN_Y1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_IR_WIN_Y2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_IR_DELAY
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_IR_EXPO
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_IR_LAMP_SHUTTER__last current value of IR calib. lamp"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_IR_LAMP_SHUTTER__last command to IR calib. Lamp"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_IR_LAMP_SHUTTER__last current value of shutter"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_IR_LAMP_SHUTTER__last command to shutter"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_IR_FLAG_ST_IRFPA scan flag"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_IR_FLAG_ST__H/K acquisition flag"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = M_IR_FLAG_ST__time
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_IR_FLAG_ST__IR word error flag"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_IR_FLAG_ST__scan word error flag"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_IR_FLAG_ST__IR detector status flag"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_IR_FLAG_ST__IR detector ADC latch-up status"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_IR_FLAG_ST__annealing heater last received cmd"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_IR_FLAG_ST__last cover command direction"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_IR_FLAG_ST__close position HES1"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = "M_IR_FLAG_ST__open position HES2"
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = SPARE
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 39592095
+  Bytes               = 11392
+  Records             = 178
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-226214, -226200, -226000, 1)
+  ConstantFrames      = (-226214, -226214)
+  ConstantRotation    = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+  CkTableStartTime    = 331981320.74485
+  CkTableEndTime      = 331984869.61108
+  CkTableOriginalSize = 178
+  FrameTypeCode       = 0
+  Description         = "Created by spiceinit"
+  Kernels             = ($rosetta/kernels/ck/ROS_VIRTIS_ZERO_V1.BC,
+                         $rosetta/kernels/ck/ATNR_P040302093352_00127.BC,
+                         $rosetta/kernels/fk/ROS_V38.TF)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 39603487
+  Bytes                = 168
+  Records              = 3
+  ByteOrder            = Lsb
+  CacheType            = HermiteSpline
+  SpkTableStartTime    = 331981320.74485
+  SpkTableEndTime      = 331984869.61108
+  SpkTableOriginalSize = 179.0
+  Description          = "Created by spiceinit"
+  Kernels              = $rosetta/kernels/spk/ORHR_______________00122.BSP
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 39603655
+  Bytes               = 128
+  Records             = 2
+  ByteOrder           = Lsb
+  TimeDependentFrames = (2000021, 1)
+  ConstantFrames      = (-2260021, 2000021)
+  ConstantRotation    = (-0.9645574184578, -0.26387304996537, 0.0,
+                         0.26387304996537, -0.9645574184578, 0.0, 0.0, 0.0,
+                         1.0)
+  CkTableStartTime    = 331981320.74485
+  CkTableEndTime      = 331984869.61108
+  CkTableOriginalSize = 2
+  FrameTypeCode       = 2
+  PoleRa              = (51.8, 0.0, 0.0)
+  PoleDec             = (10.83, 0.0, 0.0)
+  PrimeMeridian       = (94.2, 1057.751519, 0.0)
+  Description         = "Created by spiceinit"
+  Kernels             = ($rosetta/kernels/tspk/DE405.BSP,
+                         $rosetta/kernels/tspk/21_LUTETIA_2004_2016.BSP,
+                         $rosetta/kernels/tspk/ORHS_______________00109.BSP,
+                         $rosetta/kernels/pck/PCK00010.TPC,
+                         $rosetta/kernels/pck/ROS_LUTETIA_RSOC_V03.TPC,
+                         $rosetta/kernels/fk/ROS_LUTETIA_RSOC_V03.TF)
+  SolarLongitude      = 47.201637028582
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 39603783
+  Bytes                = 112
+  Records              = 2
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 331981320.74485
+  SpkTableEndTime      = 331984869.61108
+  SpkTableOriginalSize = 2.0
+  Description          = "Created by spiceinit"
+  Kernels              = ($rosetta/kernels/tspk/DE405.BSP,
+                          $rosetta/kernels/tspk/21_LUTETIA_2004_2016.BSP,
+                          $rosetta/kernels/tspk/ORHS_______________00109.BSP)
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 39603895
+  Bytes     = 1411
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 39584886
+  Bytes     = 7209
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE                              = 2000021
+  BODY2000021_RADII                      = (65.0, 50.0, 45.0)
+  BODY_FRAME_CODE                        = -2260021
+  INS-226213_SWAP_OBSERVER_TARGET        = TRUE
+  INS-226213_LIGHTTIME_CORRECTION        = LT+S
+  INS-226213_LT_SURFACE_CORRECT          = FALSE
+  INS-226213_FOCAL_LENGTH                = 152.0
+  INS-226213_PIXEL_PITCH                 = 0.038
+  CLOCK_ET_-226_237330013.39877_COMPUTED = d1efbe08a2c9b341
+  CLOCK_ET_-226_237330042.79588_COMPUTED = f80e5a26a2c9b341
+  CLOCK_ET_-226_237330062.80496_COMPUTED = 129b5d3aa2c9b341
+  CLOCK_ET_-226_237330082.81403_COMPUTED = 2d26614ea2c9b341
+  CLOCK_ET_-226_237330102.82327_COMPUTED = 47c26462a2c9b341
+  CLOCK_ET_-226_237330122.80217_COMPUTED = 62845c76a2c9b341
+  CLOCK_ET_-226_237330142.81125_COMPUTED = 7c10608aa2c9b341
+  CLOCK_ET_-226_237330162.82031_COMPUTED = 979a639ea2c9b341
+  CLOCK_ET_-226_237330182.79939_COMPUTED = b16e5bb2a2c9b341
+  CLOCK_ET_-226_237330202.80846_COMPUTED = ccf95ec6a2c9b341
+  CLOCK_ET_-226_237330222.81754_COMPUTED = e68562daa2c9b341
+  CLOCK_ET_-226_237330242.79662_COMPUTED = 005a5aeea2c9b341
+  CLOCK_ET_-226_237330262.80568_COMPUTED = 1ae45d02a3c9b341
+  CLOCK_ET_-226_237330282.81476_COMPUTED = 35706116a3c9b341
+  CLOCK_ET_-226_237330302.82401_COMPUTED = 4f0d652aa3c9b341
+  CLOCK_ET_-226_237330322.8029_COMPUTED  = 6889423da3c9b341
+  CLOCK_ET_-226_237330342.91597_COMPUTED = 85f98852a3c9b341
+  CLOCK_ET_-226_237330362.81204_COMPUTED = 9f606066a3c9b341
+  CLOCK_ET_-226_237330382.81313_COMPUTED = b9cd607aa3c9b341
+  CLOCK_ET_-226_237330402.8222_COMPUTED  = d24a438da3c9b341
+  CLOCK_ET_-226_237330422.80127_COMPUTED = ed2b5ca2a3c9b341
+  CLOCK_ET_-226_237330442.81035_COMPUTED = 08b85fb6a3c9b341
+  CLOCK_ET_-226_237330462.81941_COMPUTED = 234263caa3c9b341
+  CLOCK_ET_-226_237330482.79849_COMPUTED = 3d165bdea3c9b341
+  CLOCK_ET_-226_237330502.80757_COMPUTED = 58a25ef2a3c9b341
+  CLOCK_ET_-226_237330522.81664_COMPUTED = 722d6206a4c9b341
+  CLOCK_ET_-226_237330542.82571_COMPUTED = 8db8651aa4c9b341
+  CLOCK_ET_-226_237330562.80479_COMPUTED = a78c5d2ea4c9b341
+  CLOCK_ET_-226_237330582.81387_COMPUTED = c2186142a4c9b341
+  CLOCK_ET_-226_237330602.82294_COMPUTED = dba36456a4c9b341
+  CLOCK_ET_-226_237330622.80202_COMPUTED = f6775c6aa4c9b341
+  CLOCK_ET_-226_237330642.8111_COMPUTED  = 0fdd427da4c9b341
+  CLOCK_ET_-226_237330662.92419_COMPUTED = 2b318c92a4c9b341
+  CLOCK_ET_-226_237330682.82025_COMPUTED = 459763a6a4c9b341
+  CLOCK_ET_-226_237330702.79932_COMPUTED = 606a5bbaa4c9b341
+  CLOCK_ET_-226_237330722.80038_COMPUTED = 7ad45bcea4c9b341
+  CLOCK_ET_-226_237330742.80946_COMPUTED = 95605fe2a4c9b341
+  CLOCK_ET_-226_237330762.81854_COMPUTED = afec62f6a4c9b341
+  CLOCK_ET_-226_237330782.82762_COMPUTED = c978660aa5c9b341
+  CLOCK_ET_-226_237330802.8067_COMPUTED  = e2b1421da5c9b341
+  CLOCK_ET_-226_237330822.81577_COMPUTED = fed76132a5c9b341
+  CLOCK_ET_-226_237330842.82486_COMPUTED = 18656546a5c9b341
+  CLOCK_ET_-226_237330862.80392_COMPUTED = 33375d5aa5c9b341
+  CLOCK_ET_-226_237330882.813_COMPUTED   = 4c5c266da5c9b341
+  CLOCK_ET_-226_237330902.82208_COMPUTED = 684f6482a5c9b341
+  CLOCK_ET_-226_237330922.80115_COMPUTED = 82225c96a5c9b341
+  CLOCK_ET_-226_237330942.81023_COMPUTED = 9dae5faaa5c9b341
+  CLOCK_ET_-226_237330962.81931_COMPUTED = b63a63bea5c9b341
+  CLOCK_ET_-226_237330982.93239_COMPUTED = d1668fd2a5c9b341
+  CLOCK_ET_-226_237331002.82846_COMPUTED = ebcd66e6a5c9b341
+  CLOCK_ET_-226_237331022.80754_COMPUTED = 06a25efaa5c9b341
+  CLOCK_ET_-226_237331042.8166_COMPUTED  = 1f16430da6c9b341
+  CLOCK_ET_-226_237331062.81769_COMPUTED = 3b996222a6c9b341
+  CLOCK_ET_-226_237331082.82693_COMPUTED = 55356636a6c9b341
+  CLOCK_ET_-226_237331102.80585_COMPUTED = 70f95d4aa6c9b341
+  CLOCK_ET_-226_237331122.81493_COMPUTED = 8a85615ea6c9b341
+  CLOCK_ET_-226_237331142.82399_COMPUTED = a50f6572a6c9b341
+  CLOCK_ET_-226_237331162.80307_COMPUTED = bee35c86a6c9b341
+  CLOCK_ET_-226_237331182.81215_COMPUTED = d96f609aa6c9b341
+  CLOCK_ET_-226_237331202.82123_COMPUTED = f4fb63aea6c9b341
+  CLOCK_ET_-226_237331222.80031_COMPUTED = 0ed05bc2a6c9b341
+  CLOCK_ET_-226_237331242.80939_COMPUTED = 295c5fd6a6c9b341
+  CLOCK_ET_-226_237331262.81847_COMPUTED = 43e862eaa6c9b341
+  CLOCK_ET_-226_237331282.82771_COMPUTED = 5e8466fea6c9b341
+  CLOCK_ET_-226_237331302.91061_COMPUTED = 78e68612a7c9b341
+  CLOCK_ET_-226_237331322.8067_COMPUTED  = 91b44225a7c9b341
+  CLOCK_ET_-226_237331342.81578_COMPUTED = acdb613aa7c9b341
+  CLOCK_ET_-226_237331362.82486_COMPUTED = c767654ea7c9b341
+  CLOCK_ET_-226_237331382.80392_COMPUTED = e1395d62a7c9b341
+  CLOCK_ET_-226_237331402.80501_COMPUTED = fca65d76a7c9b341
+  CLOCK_ET_-226_237331422.81409_COMPUTED = 1633618aa7c9b341
+  CLOCK_ET_-226_237331442.82317_COMPUTED = 31bf649ea7c9b341
+  CLOCK_ET_-226_237331462.80225_COMPUTED = 4b935cb2a7c9b341
+  CLOCK_ET_-226_237331482.81133_COMPUTED = 661f60c6a7c9b341
+  CLOCK_ET_-226_237331502.8204_COMPUTED  = 7f3e43d9a7c9b341
+  CLOCK_ET_-226_237331522.82948_COMPUTED = 9a3667eea7c9b341
+  CLOCK_ET_-226_237331542.80856_COMPUTED = b40a5f02a8c9b341
+  CLOCK_ET_-226_237331562.81764_COMPUTED = cf966216a8c9b341
+  CLOCK_ET_-226_237331582.82672_COMPUTED = e922662aa8c9b341
+  CLOCK_ET_-226_237331602.8058_COMPUTED  = 02ad423da8c9b341
+  CLOCK_ET_-226_237331622.91888_COMPUTED = 1e238a52a8c9b341
+  CLOCK_ET_-226_237331642.81497_COMPUTED = 398c6166a8c9b341
+  CLOCK_ET_-226_237331662.82404_COMPUTED = 5317657aa8c9b341
+  CLOCK_ET_-226_237331682.80312_COMPUTED = 6eeb5c8ea8c9b341
+  CLOCK_ET_-226_237331702.81219_COMPUTED = 877660a2a8c9b341
+  CLOCK_ET_-226_237331722.82127_COMPUTED = a20264b6a8c9b341
+  CLOCK_ET_-226_237331742.82236_COMPUTED = bc6f64caa8c9b341
+  CLOCK_ET_-226_237331762.83144_COMPUTED = d7fb67dea8c9b341
+  CLOCK_ET_-226_237331782.81052_COMPUTED = f1cf5ff2a8c9b341
+  CLOCK_ET_-226_237331802.8196_COMPUTED  = 0a384305a9c9b341
+  CLOCK_ET_-226_237331822.8287_COMPUTED  = 25934319a9c9b341
+  CLOCK_ET_-226_237331842.80775_COMPUTED = 41bb5e2ea9c9b341
+  CLOCK_ET_-226_237331862.81683_COMPUTED = 5b476242a9c9b341
+  CLOCK_ET_-226_237331882.82593_COMPUTED = 76d56556a9c9b341
+  CLOCK_ET_-226_237331902.80501_COMPUTED = 8fa95d6aa9c9b341
+  CLOCK_ET_-226_237331922.81409_COMPUTED = aa35617ea9c9b341
+  CLOCK_ET_-226_237331942.92717_COMPUTED = c5618d92a9c9b341
+  CLOCK_ET_-226_237331962.82324_COMPUTED = dfc864a6a9c9b341
+  CLOCK_ET_-226_237331982.83232_COMPUTED = fa5468baa9c9b341
+  CLOCK_ET_-226_237332002.8114_COMPUTED  = 13e742cda9c9b341
+  CLOCK_ET_-226_237332022.82048_COMPUTED = 2fb563e2a9c9b341
+  CLOCK_ET_-226_237332042.82959_COMPUTED = 494467f6a9c9b341
+  CLOCK_ET_-226_237332062.80865_COMPUTED = 64165f0aaac9b341
+  CLOCK_ET_-226_237332082.80974_COMPUTED = 7d835f1eaac9b341
+  CLOCK_ET_-226_237332102.81882_COMPUTED = 980f6332aac9b341
+  CLOCK_ET_-226_237332122.8279_COMPUTED  = b18c4345aac9b341
+  CLOCK_ET_-226_237332142.80698_COMPUTED = cd6f5e5aaac9b341
+  CLOCK_ET_-226_237332162.81606_COMPUTED = e7fb616eaac9b341
+  CLOCK_ET_-226_237332182.82513_COMPUTED = 02876582aac9b341
+  CLOCK_ET_-226_237332202.80421_COMPUTED = 1c5b5d96aac9b341
+  CLOCK_ET_-226_237332222.81331_COMPUTED = 37e960aaaac9b341
+  CLOCK_ET_-226_237332242.82239_COMPUTED = 517564beaac9b341
+  CLOCK_ET_-226_237332262.93547_COMPUTED = 6ba190d2aac9b341
+  CLOCK_ET_-226_237332282.83173_COMPUTED = 851b68e6aac9b341
+  CLOCK_ET_-226_237332302.81064_COMPUTED = a0de5ffaaac9b341
+  CLOCK_ET_-226_237332322.81972_COMPUTED = ba6a630eabc9b341
+  CLOCK_ET_-226_237332342.8288_COMPUTED  = d3964321abc9b341
+  CLOCK_ET_-226_237332362.80788_COMPUTED = efca5e36abc9b341
+  CLOCK_ET_-226_237332382.81696_COMPUTED = 0a57624aabc9b341
+  CLOCK_ET_-226_237332402.82605_COMPUTED = 24e4655eabc9b341
+  CLOCK_ET_-226_237332422.82713_COMPUTED = 3f506672abc9b341
+  CLOCK_ET_-226_237332442.80621_COMPUTED = 58245e86abc9b341
+  CLOCK_ET_-226_237332462.81529_COMPUTED = 73b0619aabc9b341
+  CLOCK_ET_-226_237332482.82437_COMPUTED = 8d3c65aeabc9b341
+  CLOCK_ET_-226_237332502.83347_COMPUTED = a8ca68c2abc9b341
+  CLOCK_ET_-226_237332522.81255_COMPUTED = c29e60d6abc9b341
+  CLOCK_ET_-226_237332542.82162_COMPUTED = dd2964eaabc9b341
+  CLOCK_ET_-226_237332562.8307_COMPUTED  = f6aa43fdabc9b341
+  CLOCK_ET_-226_237332582.91379_COMPUTED = 122b8812acc9b341
+  CLOCK_ET_-226_237332602.80991_COMPUTED = 2c975f26acc9b341
+  CLOCK_ET_-226_237332622.81895_COMPUTED = 461f633aacc9b341
+  CLOCK_ET_-226_237332642.82805_COMPUTED = 60ad664eacc9b341
+  CLOCK_ET_-226_237332662.80713_COMPUTED = 7b815e62acc9b341
+  CLOCK_ET_-226_237332682.81621_COMPUTED = 950d6276acc9b341
+  CLOCK_ET_-226_237332702.8253_COMPUTED  = af754389acc9b341
+  CLOCK_ET_-226_237332722.83438_COMPUTED = cb26699eacc9b341
+  CLOCK_ET_-226_237332742.81346_COMPUTED = e5fa60b2acc9b341
+  CLOCK_ET_-226_237332762.81454_COMPUTED = 006761c6acc9b341
+  CLOCK_ET_-226_237332782.82362_COMPUTED = 1af364daacc9b341
+  CLOCK_ET_-226_237332802.83273_COMPUTED = 358268eeacc9b341
+  CLOCK_ET_-226_237332822.8118_COMPUTED  = 4def4201adc9b341
+  CLOCK_ET_-226_237332842.82088_COMPUTED = 69e16316adc9b341
+  CLOCK_ET_-226_237332862.82997_COMPUTED = 836e672aadc9b341
+  CLOCK_ET_-226_237332882.80905_COMPUTED = 9e425f3eadc9b341
+  CLOCK_ET_-226_237332902.92215_COMPUTED = b8708b52adc9b341
+  CLOCK_ET_-226_237332922.81822_COMPUTED = d3d76266adc9b341
+  CLOCK_ET_-226_237332942.8273_COMPUTED  = ec8a4379adc9b341
+  CLOCK_ET_-226_237332962.8364_COMPUTED  = 06e6438dadc9b341
+  CLOCK_ET_-226_237332982.81548_COMPUTED = 22c661a2adc9b341
+  CLOCK_ET_-226_237333002.82455_COMPUTED = 3c5165b6adc9b341
+  CLOCK_ET_-226_237333022.83366_COMPUTED = 56e068caadc9b341
+  CLOCK_ET_-226_237333042.81273_COMPUTED = 71b360deadc9b341
+  CLOCK_ET_-226_237333062.82182_COMPUTED = 8b4064f2adc9b341
+  CLOCK_ET_-226_237333082.8309_COMPUTED  = a4af4305aec9b341
+  CLOCK_ET_-226_237333102.83199_COMPUTED = c039681aaec9b341
+  CLOCK_ET_-226_237333122.81107_COMPUTED = db0d602eaec9b341
+  CLOCK_ET_-226_237333142.82016_COMPUTED = f59a6342aec9b341
+  CLOCK_ET_-226_237333162.82924_COMPUTED = 10276756aec9b341
+  CLOCK_ET_-226_237333182.80833_COMPUTED = 29fc5e6aaec9b341
+  CLOCK_ET_-226_237333202.81741_COMPUTED = 4488627eaec9b341
+  CLOCK_ET_-226_237333222.93051_COMPUTED = 5fb68e92aec9b341
+  CLOCK_ET_-226_237333242.82658_COMPUTED = 791d66a6aec9b341
+  CLOCK_ET_-226_237333262.83585_COMPUTED = 93bc69baaec9b341
+  CLOCK_ET_-226_237333282.81476_COMPUTED = ae7f61ceaec9b341
+  CLOCK_ET_-226_237333302.82385_COMPUTED = c80c65e2aec9b341
+  CLOCK_ET_-226_237333322.83293_COMPUTED = e39868f6aec9b341
+  CLOCK_ET_-226_237333342.81201_COMPUTED = fd6c600aafc9b341
+  CLOCK_ET_-226_237333362.82111_COMPUTED = 17fb631eafc9b341
+  CLOCK_ET_-226_237333382.83018_COMPUTED = 31866732afc9b341
+  CLOCK_ET_-226_237333402.80928_COMPUTED = 4c5c5f46afc9b341
+  CLOCK_ET_-226_237333422.81836_COMPUTED = 66e8625aafc9b341
+  CLOCK_ET_-226_237333442.81944_COMPUTED = 8154636eafc9b341
+  CLOCK_ET_-226_237333462.82854_COMPUTED = 9ce26682afc9b341
+  CLOCK_ET_-226_237333482.83762_COMPUTED = b66e6a96afc9b341
+  CLOCK_ET_-226_237333502.81671_COMPUTED = d14362aaafc9b341
+  CLOCK_ET_-226_237333522.82579_COMPUTED = ebcf65beafc9b341
+  CLOCK_ET_-226_237333542.93889_COMPUTED = 05fe91d2afc9b341
+  CLOCK_ET_-226_237333561.96497_COMPUTED = 1e2e9ce5afc9b341
+  INS-226213_TRANSX                      = (0.0, 0.0, 0.038)
+  INS-226213_TRANSY                      = (0.0, 0.038, 0.0)
+  INS-226213_ITRANSS                     = (0.0, 0.0, 26.315789473684)
+  INS-226213_ITRANSL                     = (0.0, 26.315789473684, 0.0)
+  INS-226213_BORESIGHT_SAMPLE            = 128.5
+  INS-226213_BORESIGHT_LINE              = 0.5
+  FRAME_ROS_VIRTIS-M_IR_ZERO             = -226214
+End_Object
+End
