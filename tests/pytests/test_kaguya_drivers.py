@@ -44,8 +44,6 @@ def test_kaguya_load(test_kernels, label_type, image):
 
     isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]}, verbose=False)
     isd_obj = json.loads(isd_str)
-    # with open("/Users/acpaquette/repos/ale/tests/pytests/data/isds/kaguyami_isis_isd.json", "w") as fp:
-    #     json.dump(isd_obj, fp, cls=ale.drivers.AleJsonEncoder, indent=2)
 
     assert compare_dicts(isd_obj, compare_isd) == []
 
