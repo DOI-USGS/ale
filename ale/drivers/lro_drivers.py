@@ -1095,7 +1095,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
 
     @property
     def sensor_model_version(self):
-        return 2
+        return 3
 
 
     @property
@@ -1111,8 +1111,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
           ephemeris start time of the image
         """
         if not hasattr(self, '_ephemeris_start_time'):
-            sclock = self.label['IsisCube']['Instrument']['SpacecraftClockStartCount']
-            self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
+            self._ephemeris_start_time = super().ephemeris_start_time + (.5 * self.exposure_duration)
         return self._ephemeris_start_time
 
 
@@ -1192,7 +1191,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : int
           Number of frames in the image
         """
-        return self.image_lines // (self.framelet_height // self.sampling_factor)
+        return (self.image_lines // (self.framelet_height // self.sampling_factor)) + 1
 
 
     @property
