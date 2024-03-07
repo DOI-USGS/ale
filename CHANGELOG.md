@@ -34,6 +34,9 @@ release.
 -->
 
 ## [Unreleased]
+### Changed
+- Enabled Hayabusa2 drivers [#596](https://github.com/DOI-USGS/ale/pull/596)
+
 ### Added
 - Apollo Metric drivers, tests, and data [#533](https://github.com/DOI-USGS/ale/pull/533)
 - Rosetta Virtis drivers, tests, and data [#520](https://github.com/DOI-USGS/ale/pull/520)
