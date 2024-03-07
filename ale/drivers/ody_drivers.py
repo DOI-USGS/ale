@@ -203,7 +203,7 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
         return self.label['IsisCube']['Kernels']['NaifFrameCode']
 
     @property
-    def ephemeris_start_time(self):
+    def start_time(self):
         """
         The starting ephemeris time, in seconds
 
@@ -214,7 +214,7 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
         : double
           Starting ephemeris time in seconds
         """
-        og_start_time = super().ephemeris_start_time
+        og_start_time = spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
 
         offset = self.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"]
         if isinstance(offset, pvl.collections.Quantity):
@@ -225,7 +225,21 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
                 # if not milliseconds, the units are probably seconds
                 offset = offset.value
 
-        return og_start_time + offset - ((self.exposure_duration / 1000) / 2)
+        return og_start_time + offset - (self.exposure_duration / 2)
+
+    @property
+    def ephemeris_start_time(self):
+        """
+        Returns the ephemeris start time of the image.
+        Expects spacecraft_id to be defined. This should be the integer
+        Naif ID code for the spacecraft.
+
+        Returns
+        -------
+        : float
+          ephemeris start time of the image
+        """
+        return self.band_times[0]
 
     @property
     def focal_length(self):
@@ -264,13 +278,29 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
         return self.label['IsisCube']['Instrument']['SpatialSumming']
     
     @property
-    def filter_number(self):
-        """
-        Return the filter number from the cube label
+    def interframe_delay(self):
+        return self.label['IsisCube']['Instrument']['InterframeDelay']
+    
+    @property
+    def band_times(self):
+        self._num_bands = self.label["IsisCube"]["Core"]["Dimensions"]["Bands"]
+        times = []
 
-        Returns
-        -------
-        : int
-          The filter number
-        """
-        return self.label['IsisCube']['BandBin']['FilterNumber']
+        org_bands = self.label["IsisCube"]["BandBin"]["FilterNumber"]
+
+        for vband in range(self._num_bands):
+            if isinstance(org_bands, (list, tuple)):
+                timeband = org_bands[vband]
+            else:
+                timeband = org_bands
+
+            if 'ReferenceBand' in self.label['IsisCube']['Instrument']:
+                ref_band = self.label['IsisCube']['Instrument']['ReferenceBand']
+                wavelength_to_timeband = [2, 5, 3, 4, 1]
+                timeband = wavelength_to_timeband[ref_band - 1]
+
+            band_offset = ((timeband - 1) * self.interframe_delay) - (self.exposure_duration / 2.0)
+
+            time = self.start_time + band_offset
+            times.append(time)
+        return times

@@ -88,11 +88,11 @@ class test_themisvis_isis_naif(unittest.TestCase):
     def test_spacecraft_name(self):
         assert self.driver.spacecraft_name == "MARS ODYSSEY"
 
-    def test_ephemeris_start_time(self):
-        with patch('ale.drivers.mro_drivers.spice.scs2e', return_value=0) as scs2e:
+    def test_start_time(self):
+        with patch("ale.drivers.ody_drivers.spice.str2et", return_value=0) as str2et:
             self.driver.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"] = 10
-            assert self.driver.ephemeris_start_time == (10 - (self.driver.exposure_duration / 1000) / 2)
-            scs2e.assert_called_with(-53, '1023406812.23')
+            assert self.driver.start_time == (10 - (self.driver.exposure_duration) / 2)
+            str2et.assert_called_with('2012-06-05 23:30:30.245000')
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
@@ -109,5 +109,5 @@ class test_themisvis_isis_naif(unittest.TestCase):
     def test_framelet_height(self):
         assert self.driver.framelet_height == 21.05263157894737
 
-    def test_filter_number(self):
-        assert self.driver.filter_number == 3
+    def interframe_delay(self):
+        assert self.driver.interframe_delay == 0.9
