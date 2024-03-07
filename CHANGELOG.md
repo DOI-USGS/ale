@@ -36,7 +36,7 @@ release.
 ## [Unreleased]
 ### Changed
 - Enabled Hayabusa2 drivers [#596](https://github.com/DOI-USGS/ale/pull/596)
-- Enabled Juno drivers [#596](https://github.com/DOI-USGS/ale/pull/596)
+- Enabled Juno drivers [#597](https://github.com/DOI-USGS/ale/pull/597)
 
 ### Added
 - Apollo Metric drivers, tests, and data [#533](https://github.com/DOI-USGS/ale/pull/533)
