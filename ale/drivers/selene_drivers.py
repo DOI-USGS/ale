@@ -1,3 +1,4 @@
+
 import spiceypy as spice
 
 from ale.base import Driver
@@ -1155,60 +1156,19 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
         return 2
 
     @property
-    def spacecraft_clock_start_count(self):
-        """
-        The original SC_CLOCK_START_COUNT key is often incorrect and cannot be trusted.
-        Therefore we get this information from CORRECTED_SC_CLOCK_START_COUNT
-
-        Returns
-        -------
-        : float
-          spacecraft clock start count in seconds
-        """
-        return self.label['IsisCube']['Instrument']['CorrectedScClockStartCount'].value
-
-    @property
-    def spacecraft_clock_stop_count(self):
-        """
-        The original SC_CLOCK_START_COUNT key is often incorrect and cannot be trusted.
-        Therefore we get this information from CORRECTED_SC_CLOCK_STOP_COUNT
-
-        Returns
-        -------
-        : float
-          spacecraft clock start count in seconds
-        """
-        return self.label['IsisCube']['Instrument']['CorrectedScClockStopCount'].value
-
-    @property
     def ephemeris_start_time(self):
         """
-        Returns the ephemeris start time of the image. Expects spacecraft_id to
-        be defined. This should be the integer naif ID code of the spacecraft.
+        Returns the start ephemeris time for the image. Expects utc_start_time to
+        be defined.
 
         Returns
         -------
         : float
-          ephemeris start time of the image
+          start time
         """
         if not hasattr(self, "_ephemeris_start_time"):
-          self._ephemeris_start_time = spice.sct2e(self.spacecraft_id, self.spacecraft_clock_start_count)
+           self._ephemeris_start_time = spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
         return self._ephemeris_start_time
-
-    @property
-    def ephemeris_stop_time(self):
-        """
-        Returns the ephemeris start time of the image. Expects spacecraft_id to
-        be defined. This should be the integer naif ID code of the spacecraft.
-
-        Returns
-        -------
-        : float
-          ephemeris start time of the image
-        """
-        if not hasattr(self, "_ephemeris_stop_time"):
-          self._ephemeris_stop_time = spice.sct2e(self.spacecraft_id, self.spacecraft_clock_stop_count)
-        return self._ephemeris_stop_time
 
     @property
     def sensor_frame_id(self):
@@ -1225,7 +1185,6 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
           spectra = self.base_band[3]
           self._sensor_frame_id = spice.namfrm(f"LISM_MI_{spectra}_HEAD")
         return self._sensor_frame_id
-
 
     @property
     def detector_center_line(self):

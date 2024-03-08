@@ -134,16 +134,15 @@ class test_kaguyami_isis3_naif(unittest.TestCase):
         assert self.driver.spacecraft_name == 'KAGUYA'
 
     def test_spacecraft_clock_start_count(self):
-        assert self.driver.spacecraft_clock_start_count ==  905631021.135959
+        assert self.driver.spacecraft_clock_start_count == '905631021.132'
 
     def test_spacecraft_clock_stop_count(self):
-        assert self.driver.spacecraft_clock_stop_count == 905631033.576935
+        assert self.driver.spacecraft_clock_stop_count == '905631033.574'
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.selene_drivers.spice.sct2e', return_value=12345) as sct2e, \
-             patch('ale.drivers.selene_drivers.spice.bods2c', return_value=-12345) as bods2c:
+        with patch('ale.drivers.selene_drivers.spice.str2et', return_value=12345) as str2et:
             assert self.driver.ephemeris_start_time == 12345
-            sct2e.assert_called_with(-12345, 905631021.135959)
+            str2et.assert_called_with('2008-09-16 20:10:30.480257')
 
     def test_detector_center_line(self):
         with patch('ale.drivers.selene_drivers.spice.gdpool', return_value=np.array([54321, 12345])) as gdpool, \
