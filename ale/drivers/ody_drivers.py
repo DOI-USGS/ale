@@ -214,7 +214,7 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
         : double
           Starting ephemeris time in seconds
         """
-        og_start_time = spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
+        og_start_time = super().ephemeris_start_time
 
         offset = self.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"]
         if isinstance(offset, pvl.collections.Quantity):
@@ -239,7 +239,21 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
         : float
           ephemeris start time of the image
         """
-        return self.band_times[0]
+        return self.start_time + self.band_offset[0]
+    
+    @property
+    def ephemeris_stop_time(self):
+        """
+        Returns the ephemeris start time of the image.
+        Expects spacecraft_id to be defined. This should be the integer
+        Naif ID code for the spacecraft.
+
+        Returns
+        -------
+        : float
+          ephemeris start time of the image
+        """
+        return super().ephemeris_stop_time + self.band_offset[-1] + self.interframe_delay
 
     @property
     def focal_length(self):
@@ -282,9 +296,9 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
         return self.label['IsisCube']['Instrument']['InterframeDelay']
     
     @property
-    def band_times(self):
+    def band_offset(self):
         self._num_bands = self.label["IsisCube"]["Core"]["Dimensions"]["Bands"]
-        times = []
+        band_offsets = []
 
         org_bands = self.label["IsisCube"]["BandBin"]["FilterNumber"]
 
@@ -300,7 +314,10 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
                 timeband = wavelength_to_timeband[ref_band - 1]
 
             band_offset = ((timeband - 1) * self.interframe_delay) - (self.exposure_duration / 2.0)
-
-            time = self.start_time + band_offset
-            times.append(time)
-        return times
+            
+            band_offsets.append(band_offset)
+        return band_offsets
+    
+    @property
+    def framelets_flipped(self):
+        return True

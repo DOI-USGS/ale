@@ -85,20 +85,40 @@ class test_themisvis_isis_naif(unittest.TestCase):
     def test_instrument_id(self):
         assert self.driver.instrument_id == "THEMIS_VIS"
 
-    def test_spacecraft_name(self):
-        assert self.driver.spacecraft_name == "MARS ODYSSEY"
-
-    def test_start_time(self):
-        with patch("ale.drivers.ody_drivers.spice.str2et", return_value=0) as str2et:
-            self.driver.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"] = 10
-            assert self.driver.start_time == (10 - (self.driver.exposure_duration) / 2)
-            str2et.assert_called_with('2012-06-05 23:30:30.245000')
-
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
 
+    def test_spacecraft_name(self):
+        assert self.driver.spacecraft_name == "MARS ODYSSEY"
+
+    def test_ikid(self):
+        assert self.driver.ikid == -53032
+
+    def test_start_time(self):
+        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=0) as scs2e:
+            self.driver.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"] = 10
+            assert self.driver.start_time == 9.9976
+            scs2e.assert_called_with(-53, '1023406812.23')
+
+    def test_ephemeris_start_time(self):
+        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=392211096.4307215) as scs2e:
+            assert self.driver.ephemeris_start_time == 392211098.2259215
+
+    def test_stop_time(self):
+        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=392211096.4307215) as scs2e:
+            assert self.driver.ephemeris_stop_time == 392211118.0235215
+
+    def test_focal_length(self):
+        assert self.driver.focal_length == 202.059
+
+    def test_detector_center_line(self):
+        assert self.driver.detector_center_line == 512
+
+    def test_detector_center_sample(self):
+        assert self.driver.detector_center_sample == 512
+    
     def test_framelets_flipped(self):
-        assert self.driver.framelets_flipped == False
+        assert self.driver.framelets_flipped == True
 
     def test_sampling_factor(self):
         assert self.driver.sampling_factor == 1
@@ -109,5 +129,8 @@ class test_themisvis_isis_naif(unittest.TestCase):
     def test_framelet_height(self):
         assert self.driver.framelet_height == 21.05263157894737
 
-    def interframe_delay(self):
+    def test_interframe_delay(self):
         assert self.driver.interframe_delay == 0.9
+
+    def test_band_offset(self):
+        assert self.driver.band_offset == [1.7976]
