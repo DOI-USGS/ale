@@ -98,15 +98,19 @@ class test_themisvis_isis_naif(unittest.TestCase):
         with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=0) as scs2e:
             self.driver.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"] = 10
             assert self.driver.start_time == 9.9976
-            scs2e.assert_called_with(-53, '1023406812.23')
+            scs2e.assert_called_with(-53, '1023406812.230')
 
     def test_ephemeris_start_time(self):
         with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=392211096.4307215) as scs2e:
             assert self.driver.ephemeris_start_time == 392211098.2259215
 
-    def test_stop_time(self):
+    def test_ephemeris_center_time(self):
         with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=392211096.4307215) as scs2e:
-            assert self.driver.ephemeris_stop_time == 392211118.0235215
+            assert self.driver.center_ephemeris_time == 392211106.33072156
+
+    def test_ephemeris_stop_time(self):
+        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=392211096.4307215) as scs2e:
+            assert self.driver.ephemeris_stop_time == 392211115.33072156
 
     def test_focal_length(self):
         assert self.driver.focal_length == 202.059
@@ -132,5 +136,6 @@ class test_themisvis_isis_naif(unittest.TestCase):
     def test_interframe_delay(self):
         assert self.driver.interframe_delay == 0.9
 
-    def test_band_offset(self):
-        assert self.driver.band_offset == [1.7976]
+    def test_band_times(self):
+        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=392211096.4307215) as scs2e:
+            assert self.driver.band_times == [392211098.2259215]

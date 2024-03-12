@@ -1,6 +1,7 @@
 import spiceypy as spice
 
 import ale
+import math
 from ale.base.base import Driver
 from ale.base.type_distortion import ThemisIrDistortion, NoDistortion
 from ale.base.data_naif import NaifSpice
@@ -15,6 +16,14 @@ class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, The
     """
     @property
     def instrument_id(self):
+        """
+        Returns the short name of the instrument
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
         inst_id = super().instrument_id
 
         if inst_id not in ["THEMIS_IR"]:
@@ -23,10 +32,23 @@ class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, The
 
     @property
     def sensor_model_version(self):
+        """
+          Returns
+        -------
+        : int
+          version of the sensor model
+        """
         return 1
 
     @property
     def spacecraft_name(self):
+        """
+        Returns the name of the spacecraft
+        Returns
+        -------
+        : str
+        Full name of the spacecraft
+        """
         name = super().spacecraft_name.replace('_', ' ')
         if name != "MARS ODYSSEY":
             raise Exception("{name} for label is not a valid Mars Odyssey spacecraft name")
@@ -34,6 +56,14 @@ class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, The
 
     @property
     def ikid(self):
+        """
+        Returns the Naif ID code for the instrument
+
+        Returns
+        -------
+        : int
+          Naif ID used to for identifying the instrument in Spice kernels
+        """
         return self.label['IsisCube']['Kernels']['NaifFrameCode']
     
     @property
@@ -65,6 +95,16 @@ class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, The
 
     @property
     def start_time(self):
+        """
+        The starting ephemeris time, in seconds
+
+        Formula derived from ISIS3's ThemisIr Camera model
+
+        Returns
+        -------
+        : double
+          Starting ephemeris time in seconds
+        """
         og_start_time = super().ephemeris_start_time
         offset = self.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"]
         if isinstance(offset, pvl.collections.Quantity):
@@ -111,26 +151,38 @@ class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, The
 
     @property
     def focal_length(self):
-        return 203.9213
-
-    @property
-    def detector_start_sample(self):
         """
-        Returns the starting detector sample for the image.
+        The focal length of the instrument
 
         Returns
         -------
-        : int
-          Starting detector sample for the image
+        float :
+            The focal length in millimeters
         """
-        return 160.5
-    
-    @property
-    def detector_center_line(self):
-        return 0
+        return 203.9213
 
     @property
     def detector_center_sample(self):
+        """
+        Returns the center detector sample.
+
+        Returns
+        -------
+        : float
+          Detector sample of the principal point
+        """
+        return 160.0
+    
+    @property
+    def detector_center_line(self):
+        """
+        Returns the center detector line.
+
+        Returns
+        -------
+        : float
+          Detector line of the principal point
+        """
         return 0
     
     @property
@@ -139,10 +191,26 @@ class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, The
     
     @property
     def sensor_name(self):
+        """
+        Returns the name of the sensor
+
+        Returns
+        -------
+        : str
+          Name of the sensor
+        """
         return self.label['IsisCube']['Instrument']['SpacecraftName']
 
     @property
     def band_times(self):
+        """
+        Computes the band offset and adds to each band's start time
+
+        Returns
+        -------
+        : list
+          Adjusted start times for each band
+        """
         self._num_bands = self.label["IsisCube"]["Core"]["Dimensions"]["Bands"]
         times = []
 
@@ -180,6 +248,14 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
 
     @property
     def instrument_id(self):
+        """
+        Returns the short name of the instrument
+
+        Returns
+        -------
+        : str
+          instrument id
+        """
         inst_id = super().instrument_id
 
         if inst_id not in ["THEMIS_VIS"]:
@@ -189,10 +265,23 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
 
     @property
     def sensor_model_version(self):
+        """
+          Returns
+        -------
+        : int
+          version of the sensor model
+        """
         return 1
 
     @property
     def spacecraft_name(self):
+        """
+        Returns the name of the spacecraft
+        Returns
+        -------
+        : str
+        Full name of the spacecraft
+        """
         name = super().spacecraft_name.replace('_', ' ')
         if name != "MARS ODYSSEY":
             raise Exception("{name} for label is not a valid Mars Odyssey spacecraft name")
@@ -200,6 +289,14 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
 
     @property
     def ikid(self):
+        """
+        Returns the Naif ID code for the instrument
+
+        Returns
+        -------
+        : int
+          Naif ID used to for identifying the instrument in Spice kernels
+        """
         return self.label['IsisCube']['Kernels']['NaifFrameCode']
 
     @property
@@ -214,7 +311,10 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
         : double
           Starting ephemeris time in seconds
         """
-        og_start_time = super().ephemeris_start_time
+        clock_start_count = self.label['IsisCube']['Instrument']['SpacecraftClockCount']
+
+        # ran into weird quirk that if clock count ends with a zero, str() will drop the last zero causing scs2e to return a different et.
+        og_start_time = spice.scs2e(self.spacecraft_id, f'{clock_start_count:.3f}')
 
         offset = self.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"]
         if isinstance(offset, pvl.collections.Quantity):
@@ -226,7 +326,7 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
                 offset = offset.value
 
         return og_start_time + offset - (self.exposure_duration / 2)
-
+    
     @property
     def ephemeris_start_time(self):
         """
@@ -239,36 +339,83 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
         : float
           ephemeris start time of the image
         """
-        return self.start_time + self.band_offset[0]
+        return self.band_times[0]
+    
+    @property
+    def center_ephemeris_time(self):
+        """
+        Returns the center ephemeris times based off the last band start time.
+        Expects spacecraft_id to be defined. This should be the integer
+        Naif ID code for the spacecraft.
+
+        Returns
+        -------
+        : double
+          Center ephemeris time for an image
+        """
+        center_frame = math.floor(self.num_frames / 2)
+        return (self.band_times[-1] + center_frame * self.interframe_delay) + self.exposure_duration
     
     @property
     def ephemeris_stop_time(self):
         """
-        Returns the ephemeris start time of the image.
+        Returns the ephemeris stop time of the image.
         Expects spacecraft_id to be defined. This should be the integer
         Naif ID code for the spacecraft.
 
         Returns
         -------
         : float
-          ephemeris start time of the image
+          ephemeris stop time of the image
         """
-        return self.ephemeris_start_time + (self.interframe_delay * self.num_frames) + self.band_offset[-1]
+        return (max(self.band_times) + self.num_frames * self.interframe_delay) + self.exposure_duration
 
     @property
     def focal_length(self):
+        """
+        The focal length of the instrument
+
+        Returns
+        -------
+        float :
+            The focal length in millimeters
+        """
         return 202.059
 
     @property
     def detector_center_line(self):
-        return 512
+        """
+        Returns the center detector line.
+
+        Returns
+        -------
+        : float
+          Detector line of the principal point
+        """
+        return 512.0
 
     @property
     def detector_center_sample(self):
-        return 512
+        """
+        Returns the center detector sample.
+
+        Returns
+        -------
+        : float
+          Detector sample of the principal point
+        """
+        return 512.0
     
     @property
     def sensor_name(self):
+        """
+        Returns the name of the sensor
+
+        Returns
+        -------
+        : str
+          Name of the sensor
+        """
         return self.label['IsisCube']['Instrument']['SpacecraftName']
 
     @property
@@ -285,20 +432,52 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
 
     @property
     def framelet_height(self):
+        """
+        Computes the framelet height based on number lines, number of frames and sampling factor
+
+        Returns
+        -------
+        : float
+          height of framelet
+        """
         return self.image_lines / (self.num_frames / self.sampling_factor)
     
     @property
     def sampling_factor(self):
+        """
+        Returns the summing factor from the PDS3 label that is defined by the SpatialSumming
+
+        Returns
+        -------
+        : int
+          Number of samples and lines combined from the original data to produce a single pixel in this image
+        """
         return self.label['IsisCube']['Instrument']['SpatialSumming']
     
     @property
     def interframe_delay(self):
+        """
+        The interframe delay in seconds
+
+        Returns
+        -------
+        : float
+          interframe delay in seconds
+        """
         return self.label['IsisCube']['Instrument']['InterframeDelay']
     
     @property
-    def band_offset(self):
+    def band_times(self):
+        """
+        Computes the band offset and adds to each band's start time
+
+        Returns
+        -------
+        : list
+          Adjusted start times for each band
+        """
         self._num_bands = self.label["IsisCube"]["Core"]["Dimensions"]["Bands"]
-        band_offsets = []
+        times = []
 
         org_bands = self.label["IsisCube"]["BandBin"]["FilterNumber"]
 
@@ -314,10 +493,19 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
                 timeband = wavelength_to_timeband[ref_band - 1]
 
             band_offset = ((timeband - 1) * self.interframe_delay) - (self.exposure_duration / 2.0)
+
+            time = self.start_time + band_offset
+            times.append(time)
             
-            band_offsets.append(band_offset)
-        return band_offsets
+        return times
     
     @property
     def framelets_flipped(self):
+        """
+        Checks if framelets are flipped
+
+        Returns
+        -------
+        : bool
+        """
         return True
