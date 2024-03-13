@@ -179,6 +179,12 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
                 line = 0.5
             self._ephemeris_stop_time = max(self.compute_marci_time(line))
         return self._ephemeris_stop_time
+    
+    @property
+    def ephemeris_time(self):
+        if not hasattr(self, "_ephemeris_time"):
+            self._ephemeris_time = np.linspace(self.ephemeris_start_time, self.ephemeris_stop_time + self.interframe_delay, self.image_lines + 1)
+        return self._ephemeris_time
 
     @property
     def detector_center_line(self):
