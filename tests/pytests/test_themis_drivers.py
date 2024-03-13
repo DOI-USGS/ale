@@ -3,6 +3,7 @@ import numpy as np
 import os
 import unittest
 from unittest.mock import PropertyMock, patch
+from ale.drivers import AleJsonEncoder
 
 import json
 
@@ -13,34 +14,44 @@ from ale.drivers.ody_drivers import OdyThemisVisIsisLabelNaifSpiceDriver, OdyThe
 
 from conftest import get_image_label, get_image_kernels, convert_kernels, compare_dicts, get_isd
 
-
-image_dict = {
-    "V46475015EDR": get_isd("themisvis"),
-    "I74199019RDR": get_isd("themisir")
-}
+@pytest.fixture(scope='module')
+def test_ir_kernels():
+    kernels = get_image_kernels('I74199019RDR')
+    updated_kernels, binary_kernels = convert_kernels(kernels)
+    yield updated_kernels
+    for kern in binary_kernels:
+        os.remove(kern)
 
 @pytest.fixture(scope='module')
-def test_kernels():
-    updated_kernels = {}
-    binary_kernels = {}
-    for image in image_dict.keys():
-        kernels = get_image_kernels(image)
-        updated_kernels[image], binary_kernels[image] = convert_kernels(kernels)
+def test_vis_kernels():
+    kernels = get_image_kernels('V46475015EDR')
+    updated_kernels, binary_kernels = convert_kernels(kernels)
     yield updated_kernels
-    for kern_list in binary_kernels.values():
-        for kern in kern_list:
-            os.remove(kern)
+    for kern in binary_kernels:
+        os.remove(kern)
 
-@pytest.mark.xfail
-@pytest.mark.parametrize("label_type", ['isis3'])
-@pytest.mark.parametrize("image", image_dict.keys())
-def test_load(test_kernels, label_type, image):
-    label_file = get_image_label(image, label_type)
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
+@pytest.fixture(scope='module')
+def test_ir_load(test_ir_kernels):
+    label_file = get_image_label('I74199019RDR', label_type='isis3')
+    isd_str = ale.loads(label_file, props={'kernels': test_ir_kernels})
+    
+    compare_isd = get_isd("themisir")
+    
     isd_obj = json.loads(isd_str)
-    compare_dict = image_dict[image]
-    print(json.dumps(isd_obj, indent=2))
-    assert compare_dicts(isd_obj, compare_dict) == []
+    
+    comparison = compare_dicts(isd_obj, compare_isd)
+    assert comparison == []
+
+@pytest.fixture(scope='module')
+def test_vis_load(test_vis_kernels):
+    label_file = get_image_label('V46475015EDR', label_type='isis3')
+    isd_str = ale.loads(label_file, props={'kernels': test_vis_kernels})
+    
+    compare_isd = get_isd("themisvis")
+    
+    isd_obj = json.loads(isd_str)
+    comparison = compare_dicts(isd_obj, compare_isd)
+    assert comparison == []
 
 class test_themisir_isis_naif(unittest.TestCase):
     def setUp(self):
@@ -56,10 +67,10 @@ class test_themisir_isis_naif(unittest.TestCase):
     def test_line_exposure_duration(self):
         assert self.driver.line_exposure_duration == 0.0332871
 
-    def test_ephemeris_start_time(self):
+    def test_start_time(self):
         with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=0) as scs2e:
             self.driver.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"] = 10
-            assert self.driver.ephemeris_start_time == 10
+            assert self.driver.start_time == 10
             scs2e.assert_called_with(-53, '1220641481.102')
 
     def test_sensor_model_version(self):
@@ -74,17 +85,57 @@ class test_themisvis_isis_naif(unittest.TestCase):
     def test_instrument_id(self):
         assert self.driver.instrument_id == "THEMIS_VIS"
 
+    def test_sensor_model_version(self):
+        assert self.driver.sensor_model_version == 1
+
     def test_spacecraft_name(self):
         assert self.driver.spacecraft_name == "MARS ODYSSEY"
 
-    def test_line_exposure_duration(self):
-        assert self.driver.line_exposure_duration == 0.0048
+    def test_ikid(self):
+        assert self.driver.ikid == -53032
+
+    def test_start_time(self):
+        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=0) as scs2e:
+            self.driver.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"] = 10
+            assert self.driver.start_time == 9.9976
+            scs2e.assert_called_with(-53, '1023406812.230')
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.mro_drivers.spice.scs2e', return_value=0) as scs2e:
-            self.driver.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"] = 10
-            assert self.driver.ephemeris_start_time == (10 - self.driver.line_exposure_duration/2)
-            scs2e.assert_called_with(-53, '1023406812.23')
+        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=392211096.4307215) as scs2e:
+            assert self.driver.ephemeris_start_time == 392211098.2259215
 
-    def test_sensor_model_version(self):
-        assert self.driver.sensor_model_version == 1
+    def test_ephemeris_center_time(self):
+        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=392211096.4307215) as scs2e:
+            assert self.driver.center_ephemeris_time == 392211106.33072156
+
+    def test_ephemeris_stop_time(self):
+        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=392211096.4307215) as scs2e:
+            assert self.driver.ephemeris_stop_time == 392211115.33072156
+
+    def test_focal_length(self):
+        assert self.driver.focal_length == 202.059
+
+    def test_detector_center_line(self):
+        assert self.driver.detector_center_line == 512
+
+    def test_detector_center_sample(self):
+        assert self.driver.detector_center_sample == 512
+    
+    def test_framelets_flipped(self):
+        assert self.driver.framelets_flipped == True
+
+    def test_sampling_factor(self):
+        assert self.driver.sampling_factor == 1
+
+    def test_num_frames(self):
+        assert self.driver.num_frames == 19
+
+    def test_framelet_height(self):
+        assert self.driver.framelet_height == 21.05263157894737
+
+    def test_interframe_delay(self):
+        assert self.driver.interframe_delay == 0.9
+
+    def test_band_times(self):
+        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=392211096.4307215) as scs2e:
+            assert self.driver.band_times == [392211098.2259215]

@@ -193,3 +193,15 @@ class LoDistortion():
                 "center_point_y" : center_point_y
             }
         }
+    
+class ThemisIrDistortion():
+    @property
+    def usgscsm_distortion_model(self):
+
+        return {
+            "themisir":{
+                "p_alpha1" : 0.00447623,
+                "p_alpha2" : 0.00107556,
+                "p_k" : 0.996005
+            }
+        }

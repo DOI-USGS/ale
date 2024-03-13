@@ -4,6 +4,7 @@
 # Docs
 docs/doxyxml/
 docs/build/*
+docs/xml/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -224,3 +225,5 @@ dmypy.json
 *.img
 *.IMG
 print.prt
+tests/ctests/default.profraw
+default.profraw
