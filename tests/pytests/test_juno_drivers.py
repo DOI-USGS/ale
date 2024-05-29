@@ -21,7 +21,6 @@ def test_kernels():
     for kern in binary_kernels:
         os.remove(kern)
 
-@pytest.mark.xfail
 @pytest.mark.parametrize("label_type", ['isis3'])
 def test_mro_load(test_kernels, label_type):
     label_file = get_image_label('JNCR_2016240_01M06152_V01', label_type)
@@ -51,3 +50,22 @@ class test_isis_naif(unittest.TestCase):
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
+
+    def test_naif_keywords(self):
+        with patch('ale.base.data_naif.spice.bodvrd', return_value=[1000, 1000, 1000]) as bodvrd, \
+             patch('ale.base.data_naif.spice.bods2c', return_value=599) as bods2c, \
+             patch('ale.base.data_naif.spice.cidfrm', return_value=(10015, 'IAU_JUPITER')) as cidfrm:
+            
+            naif_keywords = {
+                "BODY599_RADII"      : 1000,
+                "BODY_CODE"          : 599,
+                "BODY_FRAME_CODE"    : 10015
+            }
+
+            assert self.driver.naif_keywords["BODY_CODE"] == naif_keywords["BODY_CODE"]
+            assert self.driver.naif_keywords["BODY599_RADII"] == naif_keywords["BODY599_RADII"]
+            assert self.driver.naif_keywords["BODY_FRAME_CODE"] == naif_keywords["BODY_FRAME_CODE"]
+
+            bodvrd.assert_called_with('JUPITER', 'RADII', 3)
+            bods2c.assert_called_with('JUPITER')
+            cidfrm.assert_called_with(599)
