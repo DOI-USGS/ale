@@ -19,6 +19,9 @@ from pathlib import Path, PurePath
 import sys
 
 import ale
+import brotli
+import json
+from ale.drivers import AleJsonEncoder
 
 logger = logging.getLogger(__name__)
 
@@ -190,6 +193,33 @@ def file_to_isd(
 
     return
 
+def write_json_file(isd_string, json_file):
+    with open(json_file, 'w') as fp:
+        json.dump(isd_string, fp, cls = AleJsonEncoder)
+
+def compress_isd(uncompressed_isd_file):
+    if not uncompressed_isd_file.split(".")[1] == 'json':
+        raise ValueError("Inputted file {} is not a valid .json file extension".format(uncompressed_isd_file.split(".")[1]))
+    with open(uncompressed_isd_file, 'rb') as f:
+        data = f.read()
+    with open(uncompressed_isd_file, 'wb') as f:
+        f.write(brotli.compress(data))
+
+    os.rename(uncompressed_isd_file, os.path.splitext(uncompressed_isd_file)[0] + '.br')
+
+    return os.path.splitext(uncompressed_isd_file)[0] + '.br'
+
+
+def decompress_isd(compressed_isd_file):
+    if not compressed_isd_file.split(".")[1] == 'br':
+        raise ValueError("Inputted file {} is not a valid .br file extension".format(compressed_isd_file))
+    with open(compressed_isd_file, 'rb') as f:
+        data = f.read()
+    with open(compressed_isd_file, 'wb') as f:
+        f.write(brotli.decompress(data))
+    os.rename(compressed_isd_file, os.path.splitext(compressed_isd_file)[0] + '.json')
+
+    return os.path.splitext(compressed_isd_file)[0] + '.json'
 
 if __name__ == "__main__":
     try:
