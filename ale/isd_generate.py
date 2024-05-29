@@ -194,10 +194,34 @@ def file_to_isd(
     return
 
 def write_json_file(isd_string, json_file):
+    """
+    Writes out json file with inputted isd string.
+    
+    Parameters
+    ----------
+    isd_string : str
+        The ISD as a JSON formatted string
+
+    json_file : str
+        Output json file path
+    """
     with open(json_file, 'w') as fp:
         json.dump(isd_string, fp, cls = AleJsonEncoder)
 
 def compress_isd(uncompressed_isd_file):
+    """
+    Compresses inputted isd .json file.
+    
+    Parameters
+    ----------
+    uncompressed_isd_file : str
+        .json file path
+
+    Returns
+    -------
+    str
+        Compressed .br file path
+    """
     if not uncompressed_isd_file.split(".")[1] == 'json':
         raise ValueError("Inputted file {} is not a valid .json file extension".format(uncompressed_isd_file.split(".")[1]))
     with open(uncompressed_isd_file, 'rb') as f:
@@ -211,12 +235,26 @@ def compress_isd(uncompressed_isd_file):
 
 
 def decompress_isd(compressed_isd_file):
+    """
+    Decompresses inputted isd .br file.
+    
+    Parameters
+    ----------
+    compressed_isd_file : str
+        .br file path
+
+    Returns
+    -------
+    str
+        Decompressed .json file path
+    """
     if not compressed_isd_file.split(".")[1] == 'br':
         raise ValueError("Inputted file {} is not a valid .br file extension".format(compressed_isd_file))
     with open(compressed_isd_file, 'rb') as f:
         data = f.read()
     with open(compressed_isd_file, 'wb') as f:
         f.write(brotli.decompress(data))
+
     os.rename(compressed_isd_file, os.path.splitext(compressed_isd_file)[0] + '.json')
 
     return os.path.splitext(compressed_isd_file)[0] + '.json'
