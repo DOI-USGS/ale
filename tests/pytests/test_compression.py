@@ -17,9 +17,9 @@ def test_compress_decompress():
 
     isdg.write_json_file(isd_str, json_file)
 
-    compressed_file = isdg.compress_isd(json_file)
+    compressed_file = isdg.compress_json(json_file)
 
-    decompressed_file = isdg.decompress_isd(compressed_file)
+    decompressed_file = isdg.decompress_json(compressed_file)
 
     with open(decompressed_file, 'r') as fp:
         isis_dict = json.load(fp)
