@@ -85,11 +85,10 @@ class Chandrayaan1M3Pds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, NoDis
     def read_timing_data(self):
         """
         Read data from the timing file.
+
         Returns
-        : list of int
-          List of integer line numbers from the timing file
-        : list of str
-          List of strings describing center UTC Time per line
+        -------
+        None
         """
         if hasattr(self, '_utc_times'):
             return(self._lines, self._utc_times)
