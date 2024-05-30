@@ -61,6 +61,11 @@ def main():
         help="Display information as program runs."
     )
     parser.add_argument(
+        "-c", "--compress",
+        action="store_true",
+        help="Output a compressed isd json file with .br file extension."
+    )
+    parser.add_argument(
         "-i", "--only_isis_spice",
         action="store_true",
         help="Only use drivers that read from spiceinit'd ISIS cubes"
@@ -112,7 +117,7 @@ def main():
 
     if len(args.input) == 1:
         try:
-            file_to_isd(args.input[0], args.out, kernels=k, log_level=log_level, only_isis_spice=args.only_isis_spice, only_naif_spice=args.only_naif_spice, local=args.local)
+            file_to_isd(args.input[0], args.out, kernels=k, log_level=log_level, compress=args.compress, only_isis_spice=args.only_isis_spice, only_naif_spice=args.only_naif_spice, local=args.local)
         except Exception as err:
             # Seriously, this just throws a generic Exception?
             sys.exit(f"File {args.input[0]}: {err}")
@@ -146,6 +151,7 @@ def file_to_isd(
     out: os.PathLike = None,
     kernels: list = None,
     log_level=logging.WARNING,
+    compress=False,
     only_isis_spice=False,
     only_naif_spice=False,
     local=False,
@@ -190,6 +196,10 @@ def file_to_isd(
 
     logger.info(f"Writing: {isd_file}")
     isd_file.write_text(usgscsm_str)
+
+    if compress:
+        logger.info(f"Compressing: {isd_file} to {os.path.splitext(isd_file)[0] + '.br'}")
+        compress_json(isd_file)
 
     return
 
