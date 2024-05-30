@@ -63,7 +63,9 @@ def main():
     parser.add_argument(
         "-c", "--compress",
         action="store_true",
-        help="Output a compressed isd json file with .br file extension."
+        help="Output a compressed isd json file with .br file extension. "
+             "Ale uses the brotli compression algorithm. "
+             "To decompress an isd file run: python -c \"import ale.isd_generate as isdg; isdg.decompress_json('/path/to/isd.br')\""
     )
     parser.add_argument(
         "-i", "--only_isis_spice",
@@ -194,12 +196,13 @@ def file_to_isd(
     else:
         usgscsm_str = ale.loads(file, props=props, verbose=log_level>logging.INFO, only_isis_spice=only_isis_spice, only_naif_spice=only_naif_spice)
 
-    logger.info(f"Writing: {isd_file}")
     isd_file.write_text(usgscsm_str)
 
     if compress:
-        logger.info(f"Compressing: {isd_file} to {os.path.splitext(isd_file)[0] + '.br'}")
+        logger.info(f"Writing: {os.path.splitext(isd_file)[0] + '.br'}")
         compress_json(isd_file)
+    else:
+        logger.info(f"Writing: {isd_file}")  
 
     return
 
