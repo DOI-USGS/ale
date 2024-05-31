@@ -117,6 +117,27 @@ def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=
 
 
 def find_latest_metakernel(path, year):
+    """ Find the latest version of a metakernel.
+
+    Parameters
+    ----------
+    path : str
+        The string path of the directory in which to search for metakernels.
+    year : str|int
+        The year of the desired metakernel.
+
+    Returns
+    -------
+    str
+        The string filename of the latest metakernel.
+
+    Raises
+    ------
+    Exception
+        No metakernels were found in the given path.
+    Exception
+        No metakernels matching the specified year were found in the provided path.
+    """
     metakernel = None
     mks = sorted(glob(os.path.join(path,'*.[Tt][Mm]')))
     if not mks:
@@ -131,6 +152,20 @@ def find_latest_metakernel(path, year):
 
 
 def dict_merge(dct, merge_dct):
+    """ Merge the contents of two dictionaries.
+
+    Parameters
+    ----------
+    dct : dict
+        The first dictionary to merge.
+    merge_dct : dict
+        The second dictionary to merge.
+
+    Returns
+    -------
+    dict
+        The merged dictionary containing the contents of the two given dictionaries.
+    """
     new_dct = dct.copy()
     for k, v in merge_dct.items():
         if (k in dct and isinstance(dct[k], dict)
@@ -175,10 +210,45 @@ def get_isis_preferences(isis_preferences=None):
 
 
 def dict_to_lower(d):
+    """ Recursively convert all keys in the dictionary to lower-case.
+
+    Parameters
+    ----------
+    d : dict
+        The dictionary for which to convert the keys to lower-case.
+
+    Returns
+    -------
+    dict
+        The original dictionary with keys converted to lower-case.
+    """
     return {k.lower():v if not isinstance(v, dict) else dict_to_lower(v) for k,v in d.items()}
 
 
 def expandvars(path, env_dict=os.environ, default=None, case_sensitive=True):
+    """ Expand the environment variables in a given string.
+
+    Parameters
+    ----------
+    path : str
+        The string containing variables to be expanded.
+    env_dict : dict, optional
+        A dictionary containing environment variable definitions, by default os.environ
+    default : obj, optional
+        A default value for undefined environment variables, by default None
+    case_sensitive : bool, optional
+        Whether or not the output should match the case of the input, by default True
+
+    Returns
+    -------
+    str
+        The original string with expanded environment variables.
+
+    Raises
+    ------
+    KeyError
+        Raised if the value is not in the dictionary
+    """
     if env_dict != os.environ:
         env_dict = dict_merge(env_dict, os.environ)
 
@@ -240,6 +310,27 @@ def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
     return get_kernels_from_isis_pvl(kernel_group, expand, format_as)
 
 def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
+    """ Extract kernels from ISIS PVL.
+
+    Parameters
+    ----------
+    kernel_group : str
+        The target kernel group to extract
+    expand : bool, optional
+        True if values of environment variables should be expanded, by default True
+    format_as : str, optional
+        Desired output format, by default "list"
+
+    Returns
+    -------
+    list|str|obj
+        The extracted kernels in the user-specified format
+
+    Raises
+    ------
+    Exception
+        Raised if the user specifies an invalid or unsupported format.
+    """
     # enforce key order
     mk_paths = OrderedDict.fromkeys(
         ['TargetPosition', 'InstrumentPosition',
@@ -310,6 +401,20 @@ def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
         raise Exception(f'{format_as} is not a valid return format')
 
 def write_metakernel_from_cube(cube, mkpath=None):
+    """ Create a metakernel from a spiceinit'd cube.
+
+    Parameters
+    ----------
+    cube : str
+        The string filename of the cube from which to generate a metakernel.
+    mkpath : str, optional
+        The path to the output metakernel or None if not written to disk, by default None
+
+    Returns
+    -------
+    str
+        The text of the generated metakernel.
+    """
     # add ISISPREF paths as path_symbols and path_values to avoid custom expand logic
     pvlprefs = get_isis_preferences()
 
