@@ -196,55 +196,35 @@ def file_to_isd(
     else:
         usgscsm_str = ale.loads(file, props=props, verbose=log_level>logging.INFO, only_isis_spice=only_isis_spice, only_naif_spice=only_naif_spice)
 
-    isd_file.write_text(usgscsm_str)
-
     if compress:
         logger.info(f"Writing: {os.path.splitext(isd_file)[0] + '.br'}")
-        compress_json(isd_file)
+        compress_json(usgscsm_str, os.path.splitext(isd_file)[0] + '.br')
     else:
         logger.info(f"Writing: {isd_file}")  
+        isd_file.write_text(usgscsm_str)
 
     return
 
-def write_json_file(isd_string, json_file):
+def compress_json(json_data, output_file):
     """
-    Writes out json file with inputted isd string.
+    Compresses inputted JSON data using brotli compression algorithm.
     
     Parameters
     ----------
-    isd_string : str
-        The ISD as a JSON formatted string
+    json_data : str
+        JSON data
 
-    json_file : str
-        Output json file path
-    """
-    with open(json_file, 'w') as fp:
-        json.dump(isd_string, fp, cls = AleJsonEncoder)
+    output_file : str
+        The output compressed file path with .br extension.
 
-def compress_json(uncompressed_json_file):
     """
-    Compresses inputted .json file.
+    binary_json = json.dumps(json_data).encode('utf-8')
+
+    if not os.path.splitext(output_file)[1] == '.br':
+        raise ValueError("Output file {} is not a valid .br file extension".format(output_file.split(".")[1]))
     
-    Parameters
-    ----------
-    uncompressed_json_file : str
-        .json file path
-
-    Returns
-    -------
-    str
-        Compressed .br file path
-    """
-    if not os.path.splitext(uncompressed_json_file)[1] == '.json':
-        raise ValueError("Inputted file {} is not a valid .json file extension".format(uncompressed_json_file.split(".")[1]))
-    with open(uncompressed_json_file, 'rb') as f:
-        data = f.read()
-    with open(uncompressed_json_file, 'wb') as f:
-        f.write(brotli.compress(data))
-
-    os.rename(uncompressed_json_file, os.path.splitext(uncompressed_json_file)[0] + '.br')
-
-    return os.path.splitext(uncompressed_json_file)[0] + '.br'
+    with open(output_file, 'wb') as f:
+        f.write(brotli.compress(binary_json))
 
 
 def decompress_json(compressed_json_file):

@@ -13,11 +13,9 @@ def test_compress_decompress():
     label = get_image_label("EN1072174528M")
     isd_str = get_isd("messmdis_isis")
 
-    json_file = os.path.splitext(label)[0] + '.json'
+    compressed_file = os.path.splitext(label)[0] + '.br'
 
-    isdg.write_json_file(isd_str, json_file)
-
-    compressed_file = isdg.compress_json(json_file)
+    isdg.compress_json(isd_str, compressed_file)
 
     decompressed_file = isdg.decompress_json(compressed_file)
 
