@@ -7,6 +7,18 @@ class Pds3Label():
 
     @property
     def label(self):
+        """ Return the PDS3 label.
+
+        Returns
+        -------
+        pvl.PVLModule
+            The cube label as a PVLModule object.
+
+        Raises
+        ------
+        ValueError
+            Raised when an invalid label is provided.
+        """
         if not hasattr(self, "_label"):
             if isinstance(self._file, pvl.PVLModule):
                 self._label = self._file

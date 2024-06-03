@@ -602,6 +602,14 @@ class IsisSpice():
 
     @property
     def sensor_frame_id(self):
+        """Returns the Naif ID code for the sensor reference frame.
+
+        Returns
+        -------
+        : int
+          NAIF ID associated with the sensor frame
+
+        """
         if 'ConstantFrames' in self.inst_pointing_table:
             return self.inst_pointing_table['ConstantFrames'][0]
         else:
@@ -610,6 +618,13 @@ class IsisSpice():
 
     @property
     def target_frame_id(self):
+        """The NAIF ID associated with the target body.
+        
+        Returns
+        -------
+        : int
+          NAIF ID associated with the target body
+        """
         if 'ConstantFrames' in self.body_orientation_table:
             return self.body_orientation_table['ConstantFrames'][0]
         else:
