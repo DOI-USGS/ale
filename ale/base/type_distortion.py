@@ -157,6 +157,15 @@ class CahvorDistortion():
 class ChandrayaanMrffrDistortion():
     @property
     def usgscsm_distortion_model(self):
+        """
+        Returns the specification for ChandrayaanMrffr distortion in usgscsm.
+
+        Returns
+        -------
+        : dict
+          Dictionary containing the usgscsm specification for ChandrayaanMrffr distortion.
+        """
+
         transx = [-1* self.scaled_pixel_height, self.scaled_pixel_height, 0.0]
         transy = [0,0,0]
         transs = [1.0, 1.0 / self.scaled_pixel_height, 0.0]
@@ -172,7 +181,14 @@ class ChandrayaanMrffrDistortion():
 class LoDistortion():
     @property
     def usgscsm_distortion_model(self):
+        """
+        Returns the specification for Lo distortion in usgscsm.
 
+        Returns
+        -------
+        : dict
+          Dictionary containing the usgscsm specification for Lo distortion.
+        """
         # From ISIS LoHighDistortionMap::SetDistortion()
         # Get the perspective correction factors for x and y and the distortion
         # center (point of symmetry of distortion)
@@ -197,7 +213,14 @@ class LoDistortion():
 class ThemisIrDistortion():
     @property
     def usgscsm_distortion_model(self):
+        """
+        Returns the specification for ThemisIR distortion in usgscsm.
 
+        Returns
+        -------
+        : dict
+          Dictionary containing the usgscsm specification for ThemisIR distortion.
+        """
         return {
             "themisir":{
                 "p_alpha1" : 0.00447623,
