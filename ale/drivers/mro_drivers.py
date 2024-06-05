@@ -1,3 +1,4 @@
+import numpy as np
 import spiceypy as spice
 
 from ale.base import Driver
