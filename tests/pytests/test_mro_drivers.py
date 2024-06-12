@@ -1,7 +1,7 @@
 import os
 import json
 import unittest
-from unittest.mock import PropertyMock, patch
+from unittest.mock import PropertyMock, patch, call
 
 import pytest
 
@@ -52,7 +52,7 @@ def test_mro_ctx_load(test_ctx_kernels, label_type, kernel_type):
         isd_str = ale.loads(label_file)
         compare_isd = get_isd('ctx_isis')
     else:
-        isd_str = ale.loads(label_file, props={'kernels': test_ctx_kernels})
+        isd_str = ale.loads(label_file, props={'kernels': test_ctx_kernels}, verbose=True)
         compare_isd = get_isd('ctx')
 
     isd_obj = json.loads(isd_str)
@@ -69,7 +69,7 @@ def test_mro_ctx_load(test_ctx_kernels, label_type, kernel_type):
 def test_mro_hirise_load(test_hirise_kernels, label_type, kernel_type):
     label_file = get_image_label("PSP_001446_1790_BG12_0", label_type)
 
-    isd_str = ale.loads(label_file, props={'kernels': test_hirise_kernels})
+    isd_str = ale.loads(label_file, props={'kernels': test_hirise_kernels}, verbose=True)
     compare_isd = get_isd('hirise')
 
     isd_obj = json.loads(isd_str)
@@ -127,14 +127,20 @@ class test_ctx_isis_naif(unittest.TestCase):
         assert self.driver.sensor_name == "CONTEXT CAMERA"
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.mro_drivers.spice.scs2e', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-74, 12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12345
-            scs2e.assert_called_with(-74, '0928283918:060')
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'MRO', 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': -74, 'sclk': '0928283918:060', 'mission': 'ctx', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            spiceql_call.call_count == 2
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.drivers.mro_drivers.spice.scs2e', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-74, 12345]) as spiceql_call:
             assert self.driver.ephemeris_stop_time == (12345 + self.driver.exposure_duration * self.driver.image_lines)
-            scs2e.assert_called_with(-74, '0928283918:060')
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'MRO', 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': -74, 'sclk': '0928283918:060', 'mission': 'ctx', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            spiceql_call.call_count == 2
 
     def test_spacecraft_name(self):
         assert self.driver.spacecraft_name == "MRO"
@@ -143,10 +149,15 @@ class test_ctx_isis_naif(unittest.TestCase):
         assert self.driver.detector_start_sample == 0
 
     def test_detector_center_sample(self):
-        with patch('ale.drivers.mro_drivers.spice.bods2c', return_value='-499') as bodsc, \
-             patch('ale.drivers.mro_drivers.spice.gdpool', return_value=[12345]) as gdpool:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-499, {"frameCode":[-499]}, -74021, {'INS-74021_BORESIGHT_SAMPLE': 12345}, {}]) as spiceql_call:
             assert self.driver.detector_center_sample == 12345 - .5
-            gdpool.assert_called_with('INS-499_BORESIGHT_SAMPLE', 0, 1)
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'Mars', 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('getTargetFrameInfo', {'targetId': -499, 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('NonMemo_translateNameToCode', {'frame': 'MRO_CTX', 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('findMissionKeywords', {'key': '*-74021*', 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('findTargetKeywords', {'key': '*-499*', 'mission': 'ctx', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            spiceql_call.call_count == 5
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
@@ -168,10 +179,15 @@ class test_ctx_pds_naif(unittest.TestCase):
         assert self.driver.detector_start_sample == 0
 
     def test_detector_center_sample(self):
-        with patch('ale.drivers.mro_drivers.spice.bods2c', return_value='-499') as bodsc, \
-             patch('ale.drivers.mro_drivers.spice.gdpool', return_value=[12345]) as gdpool:
-             assert self.driver.detector_center_sample == 12345 - .5
-             gdpool.assert_called_with('INS-499_BORESIGHT_SAMPLE', 0, 1)
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-499, {"frameCode":[-499]}, -74021, {'INS-74021_BORESIGHT_SAMPLE': 12345}, {}]) as spiceql_call:
+            assert self.driver.detector_center_sample == 12345 - .5
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'MARS', 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('getTargetFrameInfo', {'targetId': -499, 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('NonMemo_translateNameToCode', {'frame': 'MRO_CTX', 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('findMissionKeywords', {'key': '*-74021*', 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('findTargetKeywords', {'key': '*-499*', 'mission': 'ctx', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            spiceql_call.call_count == 5
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
@@ -197,17 +213,19 @@ class test_hirise_isis_naif(unittest.TestCase):
         assert self.driver.un_binned_rate == 0.0000836875
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.mro_drivers.spice.scs2e', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12344.997489375
-            scs2e.assert_called_with(-74999, '848201291:62546')
+            spiceql_call.assert_called_with('strSclkToEt', {'frameCode': -74999, 'sclk': '848201291:62546', 'mission': 'hirise', 'searchKernels': False}, False)
+            assert spiceql_call.call_count == 1
 
     def test_exposure_duration(self):
         assert self.driver.exposure_duration == 0.00033475
 
     def test_ccd_ikid(self):
-        with patch('ale.drivers.mro_drivers.spice.bods2c', return_value=12345) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', return_value=12345) as spiceql_call:
             assert self.driver.ccd_ikid == 12345
-            bods2c.assert_called_with('MRO_HIRISE_CCD12')
+            spiceql_call.assert_called_with('NonMemo_translateNameToCode', {'frame': 'MRO_HIRISE_CCD12', 'mission': 'hirise', 'searchKernels': False}, False)
+            assert spiceql_call.call_count == 1
 
     def test_sensor_frame_id(self):
         assert self.driver.sensor_frame_id == -74690
@@ -232,9 +250,10 @@ class test_marci_isis_naif(unittest.TestCase):
         assert self.driver.instrument_id == "MRO_MARCI_VIS"
 
     def test_base_ikid(self):
-        with patch('ale.drivers.mro_drivers.spice.bods2c', return_value=12345) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', return_value=12345) as spiceql_call:
             assert self.driver.base_ikid == 12345
-            bods2c.assert_called_with("MRO_MARCI")
+            spiceql_call.assert_called_with('NonMemo_translateNameToCode', {'frame': 'MRO_MARCI', 'mission': 'marci', 'searchKernels': False}, False)
+            assert spiceql_call.call_count == 1
 
     def test_flipped_framelets(self):
         assert self.driver.flipped_framelets == True
@@ -252,11 +271,12 @@ class test_marci_isis_naif(unittest.TestCase):
             assert times[4] == 62.31875
 
     def test_start_time(self):
-        with patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c, \
-             patch('ale.drivers.mro_drivers.spice.scs2e', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345, 12345]) as spiceql_call:
             assert self.driver.start_time == 12344.99999125
-            bods2c.assert_called_with('MARS RECONNAISSANCE ORBITER')
-            scs2e.assert_called_with(-12345, '1322269479:177')
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'MARS RECONNAISSANCE ORBITER', 'mission': 'marci', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': 12345, 'sclk': '1322269479:177', 'mission': 'marci', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 2
 
     def test_ephemeris_start_time(self):
         with patch('ale.drivers.mro_drivers.MroMarciIsisLabelNaifSpiceDriver.compute_marci_time') as compute_marci_time:
@@ -277,16 +297,16 @@ class test_marci_isis_naif(unittest.TestCase):
         assert self.driver.detector_center_line == 0
 
     def test_focal2pixel_samples(self):
-        with patch('ale.drivers.mro_drivers.spice.gdpool', return_value=[0.0, 111.11111111111, 0.0]) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-             assert self.driver.focal2pixel_samples == [0.0, 111.11111111111, 0.0]
-             gdpool.assert_called_with('INS-12345_ITRANSS', 0, 3)
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, {}]) as spiceql_call, \
+             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-12345_ITRANSS": [0.0, 111.11111111111, 0.0]}
+            assert self.driver.focal2pixel_samples == [0.0, 111.11111111111, 0.0]
 
     def test_focal2pixel_lines(self):
-        with patch('ale.drivers.mro_drivers.spice.gdpool', return_value=[0.0, 0.0, 111.11111111111]) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-             assert self.driver.focal2pixel_lines == [0.0, 0.0, 111.11111111111]
-             gdpool.assert_called_with('INS-12345_ITRANSL', 0, 3)
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, {}]) as spiceql_call, \
+             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-12345_ITRANSL": [0.0, 0.0, 111.11111111111]}
+            assert self.driver.focal2pixel_lines == [0.0, 0.0, 111.11111111111]
 
     def test_sensor_name(self):
         assert self.driver.sensor_name == "COLOR IMAGER CAMERA"
@@ -305,14 +325,18 @@ class test_crism_isis_naif(unittest.TestCase):
         assert self.driver.instrument_id == "MRO_CRISM_VNIR"
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.mro_drivers.spice.scs2e', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12345
-            scs2e.assert_called_with(-74999, '2/0852246631.07190')
+            calls = [call('strSclkToEt', {'frameCode': -74999, 'sclk': '2/0852246631.07190', 'mission': 'crism', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.drivers.mro_drivers.spice.scs2e', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ephemeris_stop_time == 12345
-            scs2e.assert_called_with(-74999, '2/0852246634.55318')
+            calls = [call('strSclkToEt', {'frameCode': -74999, 'sclk': '2/0852246634.55318', 'mission': 'crism', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def spacecraft_name(self):
         assert self.driver.sensor_name == "MRO"
@@ -324,5 +348,9 @@ class test_crism_isis_naif(unittest.TestCase):
         assert self.driver.sensor_model_version == 1
 
     def test_line_exposure_duration(self):
-        with patch('ale.drivers.mro_drivers.spice.scs2e', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345, 12345]) as spiceql_call:
             assert self.driver.line_exposure_duration == 0.0
+            calls = [call('strSclkToEt', {'frameCode': -74999, 'sclk': '2/0852246634.55318', 'mission': 'crism', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': -74999, 'sclk': '2/0852246631.07190', 'mission': 'crism', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 2

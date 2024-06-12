@@ -1,4 +1,6 @@
 import pytest
+from unittest.mock import patch
+
 from importlib import reload
 import json
 import os
@@ -8,6 +10,8 @@ from ale import util
 from ale.drivers import sort_drivers
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
+
+from ale.drivers.mess_drivers import MessengerMdisPds3NaifSpiceDriver
 
 from conftest import get_image_label, get_image_kernels, convert_kernels
 
@@ -59,39 +63,44 @@ def test_load_invalid_spice_root(monkeypatch):
 
 
 def test_load_mes_from_metakernels(tmpdir, monkeypatch, mess_kernels):
-    monkeypatch.setenv('ALESPICEROOT', str(tmpdir))
+    with patch.dict('os.environ', {'ALESPICEROOT': str(tmpdir)}):
+        # reload module to repopulate ale.spice_root
+        reload(ale)
 
-    # reload module to repopulate ale.spice_root
-    reload(ale)
+        updated_kernels = mess_kernels
+        print(updated_kernels)
+        label_file = get_image_label('EN1072174528M')
+        tmpdir.mkdir('mess')
+        with open(tmpdir.join('mess', 'mess_2015_v1.tm'), 'w+') as mk_file:
+            mk_str = util.write_metakernel_from_kernel_list(updated_kernels)
+            print(mk_str)
+            mk_file.write(mk_str)
 
-    updated_kernels = mess_kernels
-    label_file = get_image_label('EN1072174528M')
-    tmpdir.mkdir('mess')
-    with open(tmpdir.join('mess', 'mess_2015_v1.tm'), 'w+') as mk_file:
-        mk_str = util.write_metakernel_from_kernel_list(updated_kernels)
-        print(mk_str)
-        mk_file.write(mk_str)
+        usgscsm_isd_obj = ale.load(label_file, verbose=True)
 
-    usgscsm_isd_obj = ale.load(label_file, verbose=True)
     assert usgscsm_isd_obj['name_platform'] == 'MESSENGER'
     assert usgscsm_isd_obj['name_sensor'] == 'MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA'
     assert usgscsm_isd_obj['name_model'] == 'USGS_ASTRO_FRAME_SENSOR_MODEL'
+    reload(ale)
+    assert not ale.spice_root
 
 def test_load_mes_with_no_metakernels(tmpdir, monkeypatch, mess_kernels):
-    monkeypatch.setenv('ALESPICEROOT', str(tmpdir))
+    with patch.dict('os.environ', {'ALESPICEROOT': str(tmpdir)}):
+        # reload module to repopulate ale.spice_root
+        reload(ale)
 
-    # reload module to repopulate ale.spice_root
+        updated_kernels = mess_kernels
+        label_file = get_image_label('EN1072174528M')
+        tmpdir.mkdir('mes')
+
+        # intentionally make an mk file with wrong year
+        with open(tmpdir.join('mes', 'mes_2016_v1.tm'), 'w+') as mk_file:
+            mk_str = util.write_metakernel_from_kernel_list(updated_kernels)
+            print(mk_str)
+            mk_file.write(mk_str)
+
+        with pytest.raises(Exception):
+            usgscsm_isd_obj = ale.load(label_file, verbose=True)
+
     reload(ale)
-
-    updated_kernels = mess_kernels
-    label_file = get_image_label('EN1072174528M')
-    tmpdir.mkdir('mes')
-
-    # intentionally make an mk file with wrong year
-    with open(tmpdir.join('mes', 'mes_2016_v1.tm'), 'w+') as mk_file:
-        mk_str = util.write_metakernel_from_kernel_list(updated_kernels)
-        print(mk_str)
-        mk_file.write(mk_str)
-
-    with pytest.raises(Exception):
-        usgscsm_isd_obj = ale.load(label_file, verbose=True)
+    assert not ale.spice_root

@@ -1,10 +1,6 @@
-from glob import glob
-import os
-
-import pvl
-import spiceypy as spice
 import numpy as np
 
+from pyspiceql import pyspiceql
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
@@ -71,7 +67,6 @@ class MessengerMdisIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDist
           instrument id
         """
         return ID_LOOKUP[super().instrument_id]
-
 
 class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortion, Driver):
     """
@@ -164,14 +159,16 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortio
         : double
           focal length in meters
         """
-        coeffs = spice.gdpool('INS{}_FL_TEMP_COEFFS'.format(self.fikid), 0, 6)
+        if not hasattr(self, "_focal_length"):
+          coeffs = self.naif_keywords['INS{}_FL_TEMP_COEFFS'.format(self.fikid)]
 
-        # reverse coeffs, MDIS coeffs are listed a_0, a_1, a_2 ... a_n where
-        # numpy wants them a_n, a_n-1, a_n-2 ... a_0
-        f_t = np.poly1d(coeffs[::-1])
+          # reverse coeffs, MDIS coeffs are listed a_0, a_1, a_2 ... a_n where
+          # numpy wants them a_n, a_n-1, a_n-2 ... a_0
+          f_t = np.poly1d(coeffs[::-1])
 
-        # eval at the focal_plane_temperature
-        return f_t(self.label['FOCAL_PLANE_TEMPERATURE'].value)
+          # eval at the focal_plane_temperature
+          self._focal_length = f_t(self.label['FOCAL_PLANE_TEMPERATURE'].value)
+        return self._focal_length
 
     @property
     def detector_center_sample(self):
@@ -246,8 +243,9 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortio
         -------
         : float pixel size
         """
-        return spice.gdpool('INS{}_PIXEL_PITCH'.format(self.ikid), 0, 1)
-
+        if not hasattr(self, "_pixel_size"):
+          self._pixel_size = self.naif_keywords['INS{}_PIXEL_PITCH'.format(self.ikid)]
+        return self._pixel_size
 
 class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDistortion, Driver):
     """
@@ -286,25 +284,6 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
           instrument id
         """
         return ID_LOOKUP[super().instrument_id]
-
-    @property
-    def ephemeris_start_time(self):
-        """
-        Returns the ephemeris_start_time of the image.
-        Expects spacecraft_clock_start_count to be defined. This should be a float
-        containing the start clock count of the spacecraft.
-        Expects spacecraft_id to be defined. This should be the integer Naif ID code
-        for the spacecraft.
-
-        Returns
-        -------
-        : float
-          ephemeris start time of the image.
-        """
-        if not hasattr(self, '_ephemeris_start_time'):
-            sclock = self.spacecraft_clock_start_count
-            self._starting_ephemeris_time = spice.scs2e(self.spacecraft_id, sclock)
-        return self._starting_ephemeris_time
 
     @property
     def usgscsm_distortion_model(self):
@@ -360,13 +339,16 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
         : double
           focal length in meters
         """
-        coeffs = spice.gdpool('INS{}_FL_TEMP_COEFFS'.format(self.fikid), 0, 6)
-        # reverse coeffs, MDIS coeffs are listed a_0, a_1, a_2 ... a_n where
-        # numpy wants them a_n, a_n-1, a_n-2 ... a_0
-        f_t = np.poly1d(coeffs[::-1])
+        if not hasattr(self, "_focal_length"):
 
-        # eval at the focal_plane_temperature
-        return f_t(self.label['IsisCube']['Instrument']['FocalPlaneTemperature'].value)
+          coeffs = self.naif_keywords['INS{}_FL_TEMP_COEFFS'.format(self.fikid)]
+          # reverse coeffs, MDIS coeffs are listed a_0, a_1, a_2 ... a_n where
+          # numpy wants them a_n, a_n-1, a_n-2 ... a_0
+          f_t = np.poly1d(coeffs[::-1])
+
+          # eval at the focal_plane_temperature
+          self._focal_length = f_t(self.label['IsisCube']['Instrument']['FocalPlaneTemperature'].value)
+        return self._focal_length
 
     @property
     def detector_center_sample(self):
@@ -383,7 +365,9 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
         : float
           detector center sample
         """
-        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 3)[0]) - 0.5
+        if not hasattr(self, "_detector_center_sample"):
+          self._detector_center_sample = float(self.naif_keywords['INS{}_CCD_CENTER'.format(self.ikid)][0]) - 0.5
+        return self._detector_center_sample
 
 
     @property
@@ -401,7 +385,9 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
         : float
           detector center line
         """
-        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 3)[1]) - 0.5
+        if not hasattr(self, "_detector_center_line"):
+          self._detector_center_line = float(self.naif_keywords['INS{}_CCD_CENTER'.format(self.ikid)][1]) - 0.5
+        return self._detector_center_line
 
     @property
     def sensor_model_version(self):
@@ -423,7 +409,9 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
         -------
         : float pixel size
         """
-        return spice.gdpool('INS{}_PIXEL_PITCH'.format(self.ikid), 0, 1)
+        if not hasattr(self, "_pixel_size"):
+          self._pixel_size = self.naif_keywords['INS{}_PIXEL_PITCH'.format(self.ikid)]
+        return self._pixel_size
 
     @property
     def sampling_factor(self):

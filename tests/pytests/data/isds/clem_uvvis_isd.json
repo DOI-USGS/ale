@@ -161,7 +161,7 @@
       2.1089410000000002e-05
     ],
     "INS-40021_FILTER_BANDCENTER": 415.0,
-    "INS-40021_SWAP_OBSERVER_TARGET": "TRUE",
+    "INS-40021_SWAP_OBSERVER_TARGET": true,
     "INS-40021_F/RATIO": -999.9999,
     "INS-40021_BORESIGHT_LINE": 144.5,
     "INS-40021_FOV_SHAPE": "RECTANGLE",
@@ -190,7 +190,7 @@
     "INS-40021_CK_REFERENCE_ID": -40000.0,
     "INS-40021_FOV_FRAME": "CLEM_UVVIS_A",
     "INS-40021_FOV_ANGLE_UNITS": "DEGREES",
-    "INS-40021_LT_SURFACE_CORRECT": "TRUE",
+    "INS-40021_LT_SURFACE_CORRECT": true,
     "INS-40021_SPK_TIME_BIAS": 0.0,
     "INS-40021_CCD_CENTER": [
       512.5,
@@ -222,7 +222,10 @@
       -0.0047,
       -0.0046,
       0.0028,
-      0.0052
+      0.0052,
+      0.004,
+      0.0019,
+      -0.0044
     ],
     "BODY301_NUT_PREC_RA": [
       -3.8787000000000003,
@@ -234,7 +237,10 @@
       0.0,
       0.0,
       0.0,
-      -0.0052
+      -0.0052,
+      0.0,
+      0.0,
+      0.0043
     ],
     "BODY301_LONG_AXIS": 0.0,
     "BODY301_NUT_PREC_DEC": [
@@ -247,7 +253,10 @@
       0.0009,
       0.0,
       0.0,
-      0.0008
+      0.0008,
+      0.0,
+      0.0,
+      -0.0009
     ],
     "BODY301_POLE_DEC": [
       66.5392,

@@ -10,7 +10,7 @@ from ale.base.data_isis import IsisSpice
 from ale.drivers.tgo_drivers import TGOCassisIsisLabelNaifSpiceDriver
 
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, call
 
 from conftest import get_image_label, get_image_kernels, convert_kernels, compare_dicts, get_isd
 
@@ -46,6 +46,9 @@ class test_cassis_isis_naif(unittest.TestCase):
         assert self.driver.instrument_id == "TGO_CASSIS"
 
     def test_ephemeris_start_time(self):
-        with patch("ale.drivers.viking_drivers.spice.utc2et", return_value=12345) as utc2et:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12345
-            utc2et.assert_called_with("2016-11-26 22:32:14.582000")
+            calls = [call('utcToEt', {'utc': '2016-11-26 22:32:14.582000', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
+

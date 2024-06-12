@@ -1,6 +1,7 @@
 import json
 import numpy as np
 from scipy.interpolate import interp1d, BPoly
+import time 
 
 from ale.transformation import FrameChain
 
@@ -37,19 +38,26 @@ def to_usgscsm(driver):
         'semiminor' : body_radii[2],
         'unit' : 'km'
     }
+
+    t0 = time.process_time()
     positions, velocities, position_times = driver.sensor_position
     isd_data['sensor_position'] = {
         'positions' : positions,
         'velocities' : velocities,
         'unit' : 'm'
     }
-    
+    t1 = time.process_time()
+    print(f"Total time to get positions: {t1-t0}")
+
+    t0 = time.process_time()
     sun_positions, sun_velocities, _ = driver.sun_position
     isd_data['sun_position'] = {
         'positions' : sun_positions,
         'velocities' : sun_velocities,
         'unit' : 'm'
     }
+    t1 = time.process_time()
+    print(f"Total time to get orientations: {t1-t0}")
 
     if (driver.projection != ""):
         isd_data["projection"] = driver.projection
