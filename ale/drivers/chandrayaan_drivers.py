@@ -52,6 +52,8 @@ class Chandrayaan1M3Pds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, NoDis
     @property
     def platform_name(self):
         """
+        Returns the name of the platform.  For M3, this is reflected by the mission name.
+
         Returns
         -------
         : str
@@ -63,7 +65,9 @@ class Chandrayaan1M3Pds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, NoDis
     @property
     def image_lines(self):
         """
-          Returns
+        Return the number of lines in the image.
+
+        Returns
         -------
         : int
           Number of lines in the image
@@ -74,6 +78,8 @@ class Chandrayaan1M3Pds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, NoDis
     @property
     def image_samples(self):
         """
+        Return the number of samples in the image.
+
         Returns
         -------
         : int
@@ -131,8 +137,8 @@ class Chandrayaan1M3Pds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, NoDis
     @property
     def utc_time_table(self):
         """ 
-        Return
-        ------
+        Returns
+        -------
         : str
           The name of the file containing the line timing information
         """
