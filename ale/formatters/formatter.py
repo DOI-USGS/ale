@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-import json
-import numpy as np
-from scipy.interpolate import interp1d, BPoly
-
-import spiceypy as spice
-
-=======
->>>>>>> 6d740875ffcbc1af9752212e2c41a9719410169c
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
 from ale.base.type_sensor import LineScanner, Framer, Radar, PushFrame
