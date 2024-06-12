@@ -87,4 +87,5 @@ spiceql_mission_map = {
     "Near Infrared Camera": "nir",
     "High Resolution Camera": "clementine1",
     "Long Wave Infrared Camera": "clementine1",
+    "Visual and Infrared Spectrometer": "vir",
 }

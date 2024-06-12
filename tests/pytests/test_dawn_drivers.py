@@ -214,6 +214,7 @@ class test_dawn_vir_isis3_naif(unittest.TestCase):
     def test_sensor_frame_id(self):
         ale.spice_root = "/foo/bar"
         assert self.driver.sensor_frame_id == -203223
+        ale.spice_root = None
 
     def test_line_scan_rate(self):
         with patch('ale.drivers.dawn_drivers.read_table_data', return_value=12345) as read_table_data, \
@@ -273,4 +274,5 @@ class test_dawn_vir_isis3_naif(unittest.TestCase):
     def test_has_articulation_kernel(self):
         ale.spice_root = "/foo/bar"
         assert self.driver.has_articulation_kernel == False
+        ale.spice_root = None
 
