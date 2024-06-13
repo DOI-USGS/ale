@@ -3,8 +3,211 @@ import spiceypy as spice
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
+from ale.base.label_pds3 import Pds3Label
 from ale.base.type_distortion import NoDistortion, ChandrayaanMrffrDistortion
 from ale.base.type_sensor import LineScanner, Radar
+from csv import reader
+
+
+class Chandrayaan1M3Pds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, NoDistortion, Driver):
+
+    @property
+    def ikid(self):
+        """
+        Returns the Naif ID code for the Moon Mineralogy Mapper
+
+        Returns
+        -------
+        : int
+          Naif ID used to for identifying the instrument in Spice kernels
+        """
+        return -86520
+
+    @property
+    def sensor_frame_id(self):
+        """
+        Returns the Naif ID code for the sensor reference frame
+
+        Returns
+        -------
+        : int
+          Naif ID code for the sensor frame
+        """
+        return spice.bods2c("CH1")
+
+
+    @property
+    def spacecraft_name(self):
+        """
+        Returns the name of the spacecraft
+
+        Returns
+        -------
+        : str
+          Full name of the spacecraft
+        """
+        return self.label['MISSION_ID']
+
+
+    @property
+    def platform_name(self):
+        """
+        Returns the name of the platform.  For M3, this is reflected by the mission name.
+
+        Returns
+        -------
+        : str
+          Name of the platform that the sensor is on
+        """
+        return self.label['MISSION_NAME']
+
+
+    @property
+    def image_lines(self):
+        """
+        Return the number of lines in the image.
+
+        Returns
+        -------
+        : int
+          Number of lines in the image
+        """
+        return self.label.get('RDN_FILE').get('RDN_IMAGE').get('LINES')
+
+
+    @property
+    def image_samples(self):
+        """
+        Return the number of samples in the image.
+
+        Returns
+        -------
+        : int
+          Number of samples in the image
+        """
+        return self.label.get('RDN_FILE').get('RDN_IMAGE').get('LINE_SAMPLES')
+
+
+    def read_timing_data(self):
+        """
+        Read data from the timing file.
+
+        Returns
+        -------
+        None
+        """
+        if hasattr(self, '_utc_times'):
+            return(self._lines, self._utc_times)
+
+        # Read timing file as structured text.  Reads each row as a list.
+        with open(self.utc_time_table, 'r') as time_file:
+            lists = list(reader(time_file, skipinitialspace=True, delimiter=" "))
+
+        # Transpose such that each column is a list. Unpack and ignore anything that's not lines and times.
+        self._lines, self._utc_times, *_ = zip(*lists)
+
+
+    @property
+    def ephemeris_start_time(self):
+        """
+        Returns
+        -------
+        : double
+          The start time of the image in ephemeris seconds past the J2000 epoch.
+        """
+        if not hasattr(self, '_ephemeris_start_time'):
+            et = spice.utc2et(self.utc_times[0])
+            et -= (.5 * self.line_exposure_duration)
+            clock_time = spice.sce2s(self.sensor_frame_id, et)
+            self._ephemeris_start_time = spice.scs2e(self.sensor_frame_id, clock_time)
+        return self._ephemeris_start_time
+
+
+    @property
+    def ephemeris_stop_time(self):
+        """
+        Returns
+        -------
+        : double
+          The stop time of the image in ephemeris seconds past the J2000 epoch.
+        """
+        return self.ephemeris_start_time + (self.image_lines * self.exposure_duration)
+                        
+
+    @property
+    def utc_time_table(self):
+        """ 
+        Returns
+        -------
+        : str
+          The name of the file containing the line timing information
+        """
+        if not hasattr(self, '_utc_time_table'):
+            self._utc_time_table = self.label['UTC_FILE']['^UTC_TIME_TABLE']
+        return self._utc_time_table
+
+
+    @property
+    def utc_times(self):
+        """ UTC time of the center of each line
+        """
+        if not hasattr(self, '_utc_times'):
+            self.read_timing_data()
+
+        if self._utc_times[0] > self._utc_times[-1]:
+            return list(reversed(self._utc_times))
+        return self._utc_times
+      
+
+    @property
+    def sampling_factor(self):
+        """
+        Returns the summing factor from the PDS3 label. For example a return value of 2
+        indicates that 2 lines and 2 samples (4 pixels) were summed and divided by 4
+        to produce the output pixel value.
+
+        Information found in M3 SIS
+
+        Returns
+        -------
+        : int
+          Number of samples and lines combined from the original data to produce a single pixel in this image
+        """
+        instrument_mode = self.label['INSTRUMENT_MODE_ID']
+        if instrument_mode.upper() == "GLOBAL":
+            return 2
+        else:
+            return 1
+
+                
+    @property
+    def line_exposure_duration(self):
+        """
+        Line exposure duration returns the time between the exposures for
+        subsequent lines.
+
+        Logic found in ISIS translation file "Chandrayaan1M3Instrument.trn"
+
+        Returns
+        -------
+        : float
+          Returns the line exposure duration in seconds from the PDS3 label.
+        """
+        instrument_mode = self.label['INSTRUMENT_MODE_ID']
+        if instrument_mode.upper() == "GLOBAL":
+            return .10176
+        elif instrument_mode.upper() == "TARGET":
+            return .05088
+
+    @property
+    def sensor_model_version(self):
+        """
+        Returns
+        -------
+        : int
+          version of the sensor model
+        """
+        return 1
 
 class Chandrayaan1M3IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
     
