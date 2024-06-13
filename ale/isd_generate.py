@@ -96,6 +96,11 @@ def main():
         help="Shows ale version number."
     )
     parser.add_argument(
+        "-w", "--use_web_spice",
+        action="store_true",
+        help="Get spice over the restful interface."
+    )
+    parser.add_argument(
         "input",
         nargs="+",
         help="Path to image or label file (or multiple)."
@@ -119,7 +124,7 @@ def main():
 
     if len(args.input) == 1:
         try:
-            file_to_isd(args.input[0], args.out, kernels=k, log_level=log_level, compress=args.compress, only_isis_spice=args.only_isis_spice, only_naif_spice=args.only_naif_spice, local=args.local)
+            file_to_isd(args.input[0], args.out, kernels=k, log_level=log_level, compress=args.compress, only_isis_spice=args.only_isis_spice, only_naif_spice=args.only_naif_spice, local=args.local, use_web=args.use_web_spice)
         except Exception as err:
             # Seriously, this just throws a generic Exception?
             sys.exit(f"File {args.input[0]}: {err}")
@@ -134,7 +139,8 @@ def main():
                                        "only_isis_spice": args.only_isis_spice, 
                                        "only_naif_spice": args.only_naif_spice,
                                        "local": args.local,
-                                       "nadir": args.nadir}
+                                       "nadir": args.nadir,
+                                       "use_web":args.use_web_spice}
                 ): f for f in args.input
             }
             for f in concurrent.futures.as_completed(futures):
@@ -157,8 +163,8 @@ def file_to_isd(
     only_isis_spice=False,
     only_naif_spice=False,
     local=False,
-    nadir=False
-):
+    nadir=False,
+    use_web=False):
     """
     Returns nothing, but acts as a thin wrapper to take the *file* and generate
     an ISD at *out* (if given, defaults to replacing the extension on *file*
@@ -188,6 +194,9 @@ def file_to_isd(
 
     if nadir:
         props['nadir'] = nadir
+
+    if use_web:
+        props["web"] = use_web
 
     if kernels is not None:
         kernels = [str(PurePath(p)) for p in kernels]

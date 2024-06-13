@@ -3,7 +3,7 @@ import os
 import numpy as np
 import spiceypy as spice
 import json
-from unittest.mock import patch, PropertyMock
+from unittest.mock import patch, PropertyMock, call
 import unittest
 from conftest import get_image_label, get_image_kernels, convert_kernels, get_isd, compare_dicts
 import ale
@@ -79,14 +79,18 @@ class test_mex_pds3_naif(unittest.TestCase):
         assert self.driver.short_mission_name=='mex'
 
     def test_ikid(self):
-        with patch('ale.drivers.mex_drivers.spice.bods2c', return_value=12345) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ikid == 12345
-            bods2c.assert_called_with('MEX_HRSC_HEAD')
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_HEAD', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_fikid(self):
-        with patch('ale.drivers.mex_drivers.spice.bods2c', return_value=12345) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.fikid == 12345
-            bods2c.assert_called_with('MEX_HRSC_IR')
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_instrument_id(self):
         assert self.driver.instrument_id == 'MEX_HRSC_IR'
@@ -95,38 +99,43 @@ class test_mex_pds3_naif(unittest.TestCase):
         assert self.driver.spacecraft_name =='MEX'
 
     def test_focal_length(self):
-        with patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.fikid', \
-                   new_callable=PropertyMock) as fikid:
-            fikid.return_value = -41218
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-41218]) as spiceql_call:
             assert self.driver.focal_length == 174.82
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_focal2pixel_lines(self):
-        with patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.fikid', \
-                   new_callable=PropertyMock) as fikid:
-            fikid.return_value = -41218
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-41218]) as spiceql_call:
             np.testing.assert_almost_equal(self.driver.focal2pixel_lines,
                                            [-7113.11359717265, 0.062856784318668, 142.857129028729])
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_focal2pixel_samples(self):
-        with patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.fikid', \
-                   new_callable=PropertyMock) as fikid:
-            fikid.return_value = -41218
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-41218]) as spiceql_call:
             np.testing.assert_almost_equal(self.driver.focal2pixel_samples,
                                            [-0.778052433438109, -142.857129028729, 0.062856784318668])
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_pixel2focal_x(self):
-        with patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.fikid', \
-                   new_callable=PropertyMock) as fikid:
-            fikid.return_value = -41218
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-41218]) as spiceql_call:
             np.testing.assert_almost_equal(self.driver.pixel2focal_x,
                                            [0.016461898406507, -0.006999999322408, 3.079982431615e-06])
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_pixel2focal_y(self):
-        with patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.fikid', \
-                   new_callable=PropertyMock) as fikid:
-            fikid.return_value = -41218
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-41218]) as spiceql_call:
             np.testing.assert_almost_equal(self.driver.pixel2focal_y,
                                            [49.7917927568053, 3.079982431615e-06, 0.006999999322408])
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_detector_start_line(self):
         assert self.driver.detector_start_line == 0.0
@@ -189,14 +198,41 @@ class test_mex_isis3_naif(unittest.TestCase):
         assert self.driver.instrument_id == 'MEX_HRSC_IR'
 
     def test_ikid(self):
-        with patch('ale.drivers.mex_drivers.spice.bods2c', return_value=12345) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ikid == 12345
-            bods2c.assert_called_with('MEX_HRSC_HEAD')
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_HEAD', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_fikid(self):
-        with patch('ale.drivers.mex_drivers.spice.bods2c', return_value=12345) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.fikid == 12345
-            bods2c.assert_called_with('MEX_HRSC_IR')
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
+
+    def test_focal_length(self):
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-41218]) as spiceql_call:
+            assert self.driver.focal_length == 174.82
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
+
+    def test_focal2pixel_lines(self):
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-41218]) as spiceql_call:
+            np.testing.assert_almost_equal(self.driver.focal2pixel_lines,
+                                           [-7113.11359717265, 0.062856784318668, 142.857129028729])
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
+
+    def test_focal2pixel_samples(self):
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-41218]) as spiceql_call:
+            np.testing.assert_almost_equal(self.driver.focal2pixel_samples,
+                                           [-0.778052433438109, -142.857129028729, 0.062856784318668])
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_ephemeris_start_time(self):
         with patch('ale.drivers.mex_drivers.read_table_data', return_value=12345) as read_table_data, \
@@ -244,22 +280,17 @@ class test_mex_src_pds3_naif(unittest.TestCase):
         assert self.driver.short_mission_name=='mex'
 
     def test_ikid(self):
-        with patch('ale.drivers.mex_drivers.spice.bods2c', return_value=12345) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ikid == 12345
-            bods2c.assert_called_with('MEX_HRSC_SRC')
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_SRC', 'mission': 'src', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_instrument_id(self):
         assert self.driver.instrument_id == 'MEX_HRSC_SRC'
 
     def test_spacecraft_name(self):
         assert self.driver.spacecraft_name =='MEX'
-
-    def test_focal_length(self):
-        with patch('ale.drivers.mex_drivers.spice.gdpool', return_value=[10.0]) as gdpool, \
-        patch('ale.drivers.mex_drivers.spice.bods2c', return_value=-12345) as bods2c:
-            assert self.driver.ikid == -12345
-            bods2c.assert_called_with('MEX_HRSC_SRC')
-            assert self.driver.focal_length == 10.0
  
     def test_focal2pixel_lines(self):
         np.testing.assert_almost_equal(self.driver.focal2pixel_lines,

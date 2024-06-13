@@ -1,16 +1,12 @@
 import pytest
-import numpy as np
 import os
 import unittest
-from unittest.mock import MagicMock, PropertyMock, patch
-import spiceypy as spice
+from unittest.mock import patch, call
 import json
 
 from conftest import get_image, get_image_label, get_isd, get_image_kernels, convert_kernels, compare_dicts
 import ale
 from ale.drivers.hayabusa_drivers import HayabusaAmicaIsisLabelNaifSpiceDriver, HayabusaNirsIsisLabelNaifSpiceDriver
-from ale import util
-
 
 # AMICA Tests
 @pytest.fixture(scope='module')
@@ -83,11 +79,18 @@ class test_nirs_isis_naif(unittest.TestCase):
         assert self.driver.sensor_name == "HAYABUSA_NIRS"
 
     def test_exposure_duration(self):
-        with patch('ale.drivers.hayabusa_drivers.spice.scs2e', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-130, 12345, 12345]) as spiceql_call:
             assert self.driver.exposure_duration == 0
-            scs2e.assert_called_with(-130, '1/2392973413.133')
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'HAYABUSA', 'mission': 'nirs', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': -130, 'sclk': '1/2392975548.000', 'mission': 'nirs', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': -130, 'sclk': '1/2392973413.133', 'mission': 'nirs', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 3
     
     def test_ephemeris_stop_time(self):
-        with patch('ale.drivers.hayabusa_drivers.spice.scs2e', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-130, 12345]) as spiceql_call:
             assert self.driver.ephemeris_stop_time == 12345
-            scs2e.assert_called_with(-130, '1/2392975548.000')
+            calls = [call('NonMemo_translateNameToCode', {'frame': 'HAYABUSA', 'mission': 'nirs', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': -130, 'sclk': '1/2392975548.000', 'mission': 'nirs', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 2
