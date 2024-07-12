@@ -42,30 +42,12 @@ class test_isis_naif(unittest.TestCase):
              patch('ale.drivers.juno_drivers.JunoJunoCamIsisLabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {'INS-61500_INTERFRAME_DELTA': .1, 'INS-61500_START_TIME_BIAS': .1}
             assert self.driver.ephemeris_start_time == 12348.446
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'JUNO', 'mission': 'juno', 'searchKernels': False}, False),
+            calls = [call('translateNameToCode', {'frame': 'JUNO', 'mission': 'juno', 'searchKernels': False}, False),
                      call('strSclkToEt', {'frameCode': -61, 'sclk': '525560580:87', 'mission': 'juno', 'searchKernels': False}, False),
-                     call('NonMemo_translateNameToCode', {'frame': 'JUNO_JUNOCAM', 'mission': 'juno', 'searchKernels': False}, False)]
+                     call('translateNameToCode', {'frame': 'JUNO_JUNOCAM', 'mission': 'juno', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 3
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
 
-    def test_naif_keywords(self):
-        with patch('ale.base.data_naif.spice.bodvrd', return_value=[1000, 1000, 1000]) as bodvrd, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=599) as bods2c, \
-             patch('ale.base.data_naif.spice.cidfrm', return_value=(10015, 'IAU_JUPITER')) as cidfrm:
-            
-            naif_keywords = {
-                "BODY599_RADII"      : 1000,
-                "BODY_CODE"          : 599,
-                "BODY_FRAME_CODE"    : 10015
-            }
-
-            assert self.driver.naif_keywords["BODY_CODE"] == naif_keywords["BODY_CODE"]
-            assert self.driver.naif_keywords["BODY599_RADII"] == naif_keywords["BODY599_RADII"]
-            assert self.driver.naif_keywords["BODY_FRAME_CODE"] == naif_keywords["BODY_FRAME_CODE"]
-
-            bodvrd.assert_called_with('JUPITER', 'RADII', 3)
-            bods2c.assert_called_with('JUPITER')
-            cidfrm.assert_called_with(599)

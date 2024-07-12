@@ -86,7 +86,7 @@ class test_leisa_isis_naif(unittest.TestCase):
     def test_ephemeris_start_time(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-98, 12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12345
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'NEW HORIZONS', 'mission': 'leisa', 'searchKernels': False}, False),
+            calls = [call('translateNameToCode', {'frame': 'NEW HORIZONS', 'mission': 'leisa', 'searchKernels': False}, False),
                      call('strSclkToEt', {'frameCode': -98, 'sclk': '0296962438:00000', 'mission': 'leisa', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 2
@@ -94,7 +94,7 @@ class test_leisa_isis_naif(unittest.TestCase):
     def test_ephemeris_stop_time(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-98, 12345]) as spiceql_call:
             assert self.driver.ephemeris_stop_time == (12345 + self.driver.exposure_duration * self.driver.image_lines)
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'NEW HORIZONS', 'mission': 'leisa', 'searchKernels': False}, False),
+            calls = [call('translateNameToCode', {'frame': 'NEW HORIZONS', 'mission': 'leisa', 'searchKernels': False}, False),
                      call('strSclkToEt', {'frameCode': -98, 'sclk': '0296962438:00000', 'mission': 'leisa', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 2
@@ -124,17 +124,9 @@ class test_lorri_isis_naif(unittest.TestCase):
             assert self.driver.ikid == -98301
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.drivers.nh_drivers.spice.scs2e', return_value=12345) as scs2e:
+        with patch('ale.base.data_naif.NaifSpice.spiceql_call', return_value=12345) as spice:
             assert self.driver.ephemeris_stop_time == 12345
-            scs2e.assert_called_with(-98, '1/0034974379:47125')
-
-    def test_detector_center_sample(self):
-        with patch('ale.drivers.nh_drivers.spice.gdpool', return_value=[-1, 0, -1]) as gdpool:
-            assert self.driver.detector_center_sample == 0
-
-    def test_detector_center_line(self):
-        with patch('ale.drivers.nh_drivers.spice.gdpool', return_value=[0, -1, -1]) as gdpool:
-            assert self.driver.detector_center_line == 0
+            spice.assert_called_with('strSclkToEt', {'frameCode': 12345, 'sclk': '1/0034974379:47125', 'mission': 'lorri'})
 
     def test_sensor_name(self):
         assert self.driver.sensor_name == "NEW HORIZONS"

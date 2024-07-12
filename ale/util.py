@@ -19,9 +19,6 @@ import re
 import networkx as nx
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
-import spiceypy as spice
-
-
 
 class CachedDict():
     """
@@ -642,68 +639,6 @@ def write_metakernel_from_kernel_list(kernels):
         ])
 
     return body
-
-
-def duckpool(naifvar, start=0, length=10, default=None):
-    """
-    Duck typing friendly version of spiceypy kernel pool functions.
-
-    Parameters
-    ----------
-    naifvar : str
-              naif var string to query pool for
-
-    start : int
-            Index of first value
-
-    length : int
-             max number of values returned
-
-    default : obj
-              Default value to return if key is not found in kernel pool
-
-    Returns
-    -------
-    : obj
-      Spice value returned from spiceypy if found, default value otherwise
-
-    """
-    for f in [spice.gdpool, spice.gcpool, spice.gipool]:
-        try:
-            val = f(naifvar, start, length)
-            return val[0] if  len(val) == 1 else val
-        except:
-            continue
-    return default
-
-
-def query_kernel_pool(matchstr="*", max_length=10):
-    """
-    Collect multiple keywords from the naif kernel pool based on a
-    template string
-
-    Parameters
-    ----------
-    matchstr : str
-               matchi_c formatted str
-
-    max_length : int
-                 maximum length array to get from naif keywords
-
-    Returns
-    -------
-    : dict
-      python dictionary of naif keywords in {keyword:value} format.
-    """
-
-    try:
-        svars = spice.gnpool(matchstr, 0, 100)
-    except Exception as e:
-        warnings.warn(f"kernel search for {matchstr} failed with {e}")
-        svars = []
-
-    svals = [duckpool(v, length=max_length) for v in svars]
-    return dict(zip(svars, svals))
 
 
 def read_pvl(path, use_jank=False):

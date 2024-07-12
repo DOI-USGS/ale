@@ -8,7 +8,7 @@ from numpy.polynomial.polynomial import polyval, polyder
 from dateutil import parser
 
 import pvl
-import spiceypy as spice
+
 from ale.rotation import ConstantRotation, TimeDependentRotation
 from ale.transformation import FrameChain
 

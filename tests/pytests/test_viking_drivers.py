@@ -266,7 +266,7 @@ def test_viking1_load(test_kernels, label_type, kernel_type, image):
     label_file = get_image_label(image, label_type)
     if kernel_type == "naif":
         label_file = get_image_label(image, label_type)
-        isd = ale.loads(label_file, props={'kernels': test_kernels[image]})
+        isd = ale.loads(label_file, props={'kernels': test_kernels[image]}, verbose=True)
     else:
         label_file = os.path.join(data_root, "{}/{}.cub".format(image, image))
         isd = ale.loads(label_file)
@@ -276,6 +276,7 @@ def test_viking1_load(test_kernels, label_type, kernel_type, image):
     compare_dict = get_isd(isd_name)
 
     comparison = compare_dicts(json.loads(isd), compare_dict)
+    print(isd)
     print(comparison)
     assert comparison == []
 

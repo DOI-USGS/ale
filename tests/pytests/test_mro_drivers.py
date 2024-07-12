@@ -62,6 +62,7 @@ def test_mro_ctx_load(test_ctx_kernels, label_type, kernel_type):
         compare_isd["projection"] = '+proj=sinu +lon_0=148.36859083039 +x_0=0 +y_0=0 +R=3396190 +units=m +no_defs'
         compare_isd["geotransform"] = [-219771.1526456, 1455.4380969907, 0.0, 5175537.8728989, 0.0, -1455.4380969907]
 
+    print(json.dumps(isd_obj))
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
 
@@ -73,6 +74,7 @@ def test_mro_hirise_load(test_hirise_kernels, label_type, kernel_type):
     compare_isd = get_isd('hirise')
 
     isd_obj = json.loads(isd_str)
+    print(compare_dicts(isd_obj, compare_isd))
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
 
@@ -85,6 +87,7 @@ def test_mro_marci_load(test_marci_kernels, label_type, kernel_type):
 
     isd_obj = json.loads(isd_str)
     comparison = compare_dicts(isd_obj, compare_isd)
+    print(comparison)
     assert comparison == []
 
 def test_mro_crism_load(test_crism_kernels):
@@ -92,6 +95,7 @@ def test_mro_crism_load(test_crism_kernels):
     isd_str = ale.loads(label_file, props={'kernels': test_crism_kernels, 'exact_ck_times': False})
     isd_obj = json.loads(isd_str)
     compare_isd = get_isd('crism')
+    print(json.dumps(isd_obj))
     assert compare_dicts(isd_obj, compare_isd) == []
 
 # ========= Test ctx isislabel and isisspice driver =========
@@ -129,7 +133,7 @@ class test_ctx_isis_naif(unittest.TestCase):
     def test_ephemeris_start_time(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-74, 12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12345
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MRO', 'mission': 'ctx', 'searchKernels': False}, False),
+            calls = [call('translateNameToCode', {'frame': 'MRO', 'mission': 'ctx', 'searchKernels': False}, False),
                      call('strSclkToEt', {'frameCode': -74, 'sclk': '0928283918:060', 'mission': 'ctx', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             spiceql_call.call_count == 2
@@ -137,7 +141,7 @@ class test_ctx_isis_naif(unittest.TestCase):
     def test_ephemeris_stop_time(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-74, 12345]) as spiceql_call:
             assert self.driver.ephemeris_stop_time == (12345 + self.driver.exposure_duration * self.driver.image_lines)
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MRO', 'mission': 'ctx', 'searchKernels': False}, False),
+            calls = [call('translateNameToCode', {'frame': 'MRO', 'mission': 'ctx', 'searchKernels': False}, False),
                      call('strSclkToEt', {'frameCode': -74, 'sclk': '0928283918:060', 'mission': 'ctx', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             spiceql_call.call_count == 2
@@ -151,9 +155,9 @@ class test_ctx_isis_naif(unittest.TestCase):
     def test_detector_center_sample(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-499, {"frameCode":[-499]}, -74021, {'INS-74021_BORESIGHT_SAMPLE': 12345}, {}]) as spiceql_call:
             assert self.driver.detector_center_sample == 12345 - .5
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'Mars', 'mission': 'ctx', 'searchKernels': False}, False),
+            calls = [call('translateNameToCode', {'frame': 'Mars', 'mission': 'ctx', 'searchKernels': False}, False),
                      call('getTargetFrameInfo', {'targetId': -499, 'mission': 'ctx', 'searchKernels': False}, False),
-                     call('NonMemo_translateNameToCode', {'frame': 'MRO_CTX', 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('translateNameToCode', {'frame': 'MRO_CTX', 'mission': 'ctx', 'searchKernels': False}, False),
                      call('findMissionKeywords', {'key': '*-74021*', 'mission': 'ctx', 'searchKernels': False}, False),
                      call('findTargetKeywords', {'key': '*-499*', 'mission': 'ctx', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
@@ -181,9 +185,9 @@ class test_ctx_pds_naif(unittest.TestCase):
     def test_detector_center_sample(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-499, {"frameCode":[-499]}, -74021, {'INS-74021_BORESIGHT_SAMPLE': 12345}, {}]) as spiceql_call:
             assert self.driver.detector_center_sample == 12345 - .5
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MARS', 'mission': 'ctx', 'searchKernels': False}, False),
+            calls = [call('translateNameToCode', {'frame': 'MARS', 'mission': 'ctx', 'searchKernels': False}, False),
                      call('getTargetFrameInfo', {'targetId': -499, 'mission': 'ctx', 'searchKernels': False}, False),
-                     call('NonMemo_translateNameToCode', {'frame': 'MRO_CTX', 'mission': 'ctx', 'searchKernels': False}, False),
+                     call('translateNameToCode', {'frame': 'MRO_CTX', 'mission': 'ctx', 'searchKernels': False}, False),
                      call('findMissionKeywords', {'key': '*-74021*', 'mission': 'ctx', 'searchKernels': False}, False),
                      call('findTargetKeywords', {'key': '*-499*', 'mission': 'ctx', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
@@ -224,7 +228,7 @@ class test_hirise_isis_naif(unittest.TestCase):
     def test_ccd_ikid(self):
         with patch('ale.spiceql_access.spiceql_call', return_value=12345) as spiceql_call:
             assert self.driver.ccd_ikid == 12345
-            spiceql_call.assert_called_with('NonMemo_translateNameToCode', {'frame': 'MRO_HIRISE_CCD12', 'mission': 'hirise', 'searchKernels': False}, False)
+            spiceql_call.assert_called_with('translateNameToCode', {'frame': 'MRO_HIRISE_CCD12', 'mission': 'hirise', 'searchKernels': False}, False)
             assert spiceql_call.call_count == 1
 
     def test_sensor_frame_id(self):
@@ -252,7 +256,7 @@ class test_marci_isis_naif(unittest.TestCase):
     def test_base_ikid(self):
         with patch('ale.spiceql_access.spiceql_call', return_value=12345) as spiceql_call:
             assert self.driver.base_ikid == 12345
-            spiceql_call.assert_called_with('NonMemo_translateNameToCode', {'frame': 'MRO_MARCI', 'mission': 'marci', 'searchKernels': False}, False)
+            spiceql_call.assert_called_with('translateNameToCode', {'frame': 'MRO_MARCI', 'mission': 'marci', 'searchKernels': False}, False)
             assert spiceql_call.call_count == 1
 
     def test_flipped_framelets(self):
@@ -273,7 +277,7 @@ class test_marci_isis_naif(unittest.TestCase):
     def test_start_time(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[12345, 12345]) as spiceql_call:
             assert self.driver.start_time == 12344.99999125
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MARS RECONNAISSANCE ORBITER', 'mission': 'marci', 'searchKernels': False}, False),
+            calls = [call('translateNameToCode', {'frame': 'MARS RECONNAISSANCE ORBITER', 'mission': 'marci', 'searchKernels': False}, False),
                      call('strSclkToEt', {'frameCode': 12345, 'sclk': '1322269479:177', 'mission': 'marci', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 2

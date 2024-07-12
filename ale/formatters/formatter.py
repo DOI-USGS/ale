@@ -16,12 +16,11 @@ def to_isd(driver):
     string
         The ISIS compatible meta data as a JSON encoded string.
     """
-    
+     
     driver_data = driver.to_dict()
     isd = {}
-    
     isd['isis_camera_version'] = driver_data["sensor_model_version"]
-    
+
     # general information
     isd['image_lines'] = driver_data["image_lines"]
     isd['image_samples'] = driver_data["image_samples"]
@@ -37,7 +36,8 @@ def to_isd(driver):
     if isinstance(driver, LineScanner):
         isd['name_model'] = 'USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL'
         isd['interpolation_method'] = 'lagrange'
-
+        
+        print(driver_data["line_scan_rate"])
         start_lines, start_times, scan_rates = driver_data["line_scan_rate"]
         isd['line_scan_rate'] = [[line, time, rate] for line, time, rate in zip(start_lines, start_times, scan_rates)]
         isd['starting_ephemeris_time'] = driver_data["ephemeris_start_time"]

@@ -46,7 +46,7 @@ class test_galileossi_isis3_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-77001_K1": -2.4976983626e-05}
             assert self.driver.odtk == -2.4976983626e-05
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'GLL_SSI_PLATFORM', 'mission': 'galileo', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'GLL_SSI_PLATFORM', 'mission': 'galileo', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 

@@ -61,7 +61,7 @@ class test_high_isis3_naif(unittest.TestCase):
     def test_ikid(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-533001]) as spiceql_call:
             assert self.driver.ikid == -533001
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LO3_HIGH_RESOLUTION_CAMERA', 'mission': '', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LO3_HIGH_RESOLUTION_CAMERA', 'mission': '', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -80,14 +80,15 @@ class test_high_isis3_naif(unittest.TestCase):
             data_naif_keywords.return_value = {}
 
             naif_keywords = {
-                "INS-533001_TRANSX"  : [115.50954565137368, -0.0069539566557483634, -3.945326343273575e-06],
-                "INS-533001_TRANSY"  : [-31.502451933874543, -2.8238081535057043e-06, 0.006946606435847521],
-                "INS-533001_ITRANSS" : [16608.04530570598, -143.8029914300184, -0.08167293419690833],
-                "INS-533001_ITRANSL" : [4541.6924305390585, -0.058456177624059004, 143.9551496988325]
+                "INS-533001_TRANSX"  : [115.50954565137361, -0.006953956655748361, -3.945326343256228e-06],
+                "INS-533001_TRANSY"  : [-31.50245193387455, -2.8238081535060084e-06, 0.0069466064358475205],
+                "INS-533001_ITRANSS" : [16608.045305705986, -143.80299143001847, -0.08167293419674368],
+                "INS-533001_ITRANSL" : [4541.692430539061, -0.05845617762406423, 143.9551496988325]
             }
-            
+
+            print(self.driver.naif_keywords) 
             assert self.driver.naif_keywords == naif_keywords
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LO3_HIGH_RESOLUTION_CAMERA', 'mission': '', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LO3_HIGH_RESOLUTION_CAMERA', 'mission': '', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
   

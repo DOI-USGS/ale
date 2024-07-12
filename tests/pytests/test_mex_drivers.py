@@ -81,14 +81,14 @@ class test_mex_pds3_naif(unittest.TestCase):
     def test_ikid(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ikid == 12345
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_HEAD', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_HEAD', 'mission': 'hrsc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
     def test_fikid(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.fikid == 12345
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -101,7 +101,7 @@ class test_mex_pds3_naif(unittest.TestCase):
     def test_focal_length(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-41218]) as spiceql_call:
             assert self.driver.focal_length == 174.82
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -109,7 +109,7 @@ class test_mex_pds3_naif(unittest.TestCase):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-41218]) as spiceql_call:
             np.testing.assert_almost_equal(self.driver.focal2pixel_lines,
                                            [-7113.11359717265, 0.062856784318668, 142.857129028729])
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -117,7 +117,7 @@ class test_mex_pds3_naif(unittest.TestCase):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-41218]) as spiceql_call:
             np.testing.assert_almost_equal(self.driver.focal2pixel_samples,
                                            [-0.778052433438109, -142.857129028729, 0.062856784318668])
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -125,7 +125,7 @@ class test_mex_pds3_naif(unittest.TestCase):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-41218]) as spiceql_call:
             np.testing.assert_almost_equal(self.driver.pixel2focal_x,
                                            [0.016461898406507, -0.006999999322408, 3.079982431615e-06])
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -133,7 +133,7 @@ class test_mex_pds3_naif(unittest.TestCase):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-41218]) as spiceql_call:
             np.testing.assert_almost_equal(self.driver.pixel2focal_y,
                                            [49.7917927568053, 3.079982431615e-06, 0.006999999322408])
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -200,21 +200,21 @@ class test_mex_isis3_naif(unittest.TestCase):
     def test_ikid(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ikid == 12345
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_HEAD', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_HEAD', 'mission': 'hrsc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
     def test_fikid(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.fikid == 12345
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
     def test_focal_length(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-41218]) as spiceql_call:
             assert self.driver.focal_length == 174.82
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -222,7 +222,7 @@ class test_mex_isis3_naif(unittest.TestCase):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-41218]) as spiceql_call:
             np.testing.assert_almost_equal(self.driver.focal2pixel_lines,
                                            [-7113.11359717265, 0.062856784318668, 142.857129028729])
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -230,7 +230,7 @@ class test_mex_isis3_naif(unittest.TestCase):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-41218]) as spiceql_call:
             np.testing.assert_almost_equal(self.driver.focal2pixel_samples,
                                            [-0.778052433438109, -142.857129028729, 0.062856784318668])
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -282,7 +282,7 @@ class test_mex_src_pds3_naif(unittest.TestCase):
     def test_ikid(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ikid == 12345
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MEX_HRSC_SRC', 'mission': 'src', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_SRC', 'mission': 'src', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 

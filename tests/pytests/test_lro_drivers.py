@@ -61,10 +61,10 @@ def test_load_lroc_nac(test_kernels, label_type, image, kernel_type):
 @pytest.mark.parametrize("image", ['wac0000a1c4.uv.even'])
 def test_load_lroc_wac(test_kernels, label_type, image, kernel_type):
     label_file = get_image_label(image, label_type)
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]}, verbose=True)
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
     compare_isd = image_dict[image]
-
     isd_obj = json.loads(isd_str)
+    print(json.dumps(isd_obj))
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
 
@@ -106,7 +106,7 @@ class test_pds_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_OD_K": [1.0]}
             assert self.driver.odtk == [1.0]
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -148,8 +148,8 @@ class test_pds_naif(unittest.TestCase):
              new_callable=PropertyMock) as ephemeris_start_time:
             ephemeris_start_time.return_value = 0
             assert self.driver.spacecraft_direction > 0
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False),
-                     call('NonMemo_translateNameToCode', {'frame': 'LRO_SC_BUS', 'mission': 'lroc', 'searchKernels': False}, False),
+            calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False),
+                     call('translateNameToCode', {'frame': 'LRO_SC_BUS', 'mission': 'lroc', 'searchKernels': False}, False),
                      call('getTargetStates', {'ets': [0], 'target': 'LRO', 'observer': 'MOON', 'frame': 'J2000', 'abcorr': 'None', 'mission': 'lroc', 'ckQuality': '', 'spkQuality': '', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 3
@@ -167,7 +167,7 @@ class test_pds_naif(unittest.TestCase):
             np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, -1, 0])
             spacecraft_direction.return_value = 1
             np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, 1, 0])
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -191,7 +191,7 @@ class test_isis_naif(unittest.TestCase):
             naif_keywords.return_value = {"INS-12345_OD_K": [1.0]}
             distortion_model = self.driver.usgscsm_distortion_model
             assert distortion_model['lrolrocnac']['coefficients'] == [1.0]
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -200,7 +200,7 @@ class test_isis_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_OD_K": [1.0]}
             assert self.driver.odtk == [1.0]
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -212,7 +212,7 @@ class test_isis_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_BORESIGHT_SAMPLE": 1.0}
             assert self.driver.detector_center_sample == 0.5
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -222,7 +222,7 @@ class test_isis_naif(unittest.TestCase):
     def test_ephemeris_start_time(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-85, 321]) as spiceql_call:
             np.testing.assert_almost_equal(self.driver.ephemeris_start_time, 322.05823191)
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LUNAR RECONNAISSANCE ORBITER', 'mission': 'lroc', 'searchKernels': False}, False),
+            calls = [call('translateNameToCode', {'frame': 'LUNAR RECONNAISSANCE ORBITER', 'mission': 'lroc', 'searchKernels': False}, False),
                      call('strSclkToEt', {'frameCode': -85, 'sclk': '1/270649237:07208', 'mission': 'lroc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 2
@@ -254,8 +254,8 @@ class test_isis_naif(unittest.TestCase):
              new_callable=PropertyMock) as ephemeris_start_time:
             ephemeris_start_time.return_value = 0
             assert self.driver.spacecraft_direction > 0
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False),
-                     call('NonMemo_translateNameToCode', {'frame': 'LRO_SC_BUS', 'mission': 'lroc', 'searchKernels': False}, False),
+            calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False),
+                     call('translateNameToCode', {'frame': 'LRO_SC_BUS', 'mission': 'lroc', 'searchKernels': False}, False),
                      call('getTargetStates', {'ets': [0], 'target': 'LUNAR RECONNAISSANCE ORBITER', 'observer': 'MOON', 'frame': 'J2000', 'abcorr': 'None', 'mission': 'lroc', 'ckQuality': '', 'spkQuality': '', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 3
@@ -273,7 +273,7 @@ class test_isis_naif(unittest.TestCase):
             np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, -1, 0])
             spacecraft_direction.return_value = 1
             np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, 1, 0])
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -332,8 +332,8 @@ class test_wac_isis_naif(unittest.TestCase):
 
     def test_ephemeris_start_time(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-85, 321]) as spiceql_call:
-            np.testing.assert_almost_equal(self.driver.ephemeris_start_time, 321)
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LUNAR RECONNAISSANCE ORBITER', 'mission': 'lroc', 'searchKernels': False}, False),
+            np.testing.assert_almost_equal(self.driver.ephemeris_start_time, 321.02)
+            calls = [call('translateNameToCode', {'frame': 'LUNAR RECONNAISSANCE ORBITER', 'mission': 'lroc', 'searchKernels': False}, False),
                      call('strSclkToEt', {'frameCode': -85, 'sclk': '1/274692469:15073', 'mission': 'lroc', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 2

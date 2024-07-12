@@ -5,7 +5,6 @@ import numpy as np
 
 import pvl
 import struct
-import spiceypy as spice
 import warnings
 
 from pyspiceql import pyspiceql

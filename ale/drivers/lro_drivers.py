@@ -1,5 +1,6 @@
+import spiceypy as spice 
+
 import numpy as np
-import spiceypy as spice
 
 from pyspiceql import pyspiceql
 from ale.base import Driver
@@ -1347,7 +1348,9 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : int
           Zero based Detector line corresponding to the first image line
         """
-        offset = list(self.naif_keywords['INS{}_FILTER_OFFSET'.format(self.fikid)])
+
+        offset = self.naif_keywords['INS{}_FILTER_OFFSET'.format(self.fikid)]
+
         try:
             # If multiple items are present, use the first one
             offset = offset[0]
@@ -1367,7 +1370,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : float
           focal length
         """
-        return float(self.naif_keywords['INS{}_FOCAL_LENGTH'.format(self.fikid)][0])
+        return float(self.naif_keywords['INS{}_FOCAL_LENGTH'.format(self.fikid)])
 
     @property
     def detector_center_sample(self):
@@ -1380,8 +1383,11 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : float
           Detector sample of the principal point
         """
-        return float(self.naif_keywords['INS{}_BORESIGHT_SAMPLE'.format(self.fikid)][0]) - 0.5
-
+        try: 
+          return float(self.naif_keywords['INS{}_BORESIGHT_SAMPLE'.format(self.fikid)][0]) - 0.5
+        except Exception as e: 
+          return float(self.naif_keywords['INS{}_BORESIGHT_SAMPLE'.format(self.fikid)]) - 0.5
+        
     @property
     def detector_center_line(self):
         """
@@ -1393,4 +1399,7 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : float
           Detector line of the principal point
         """
-        return float(self.naif_keywords['INS{}_BORESIGHT_LINE'.format(self.fikid)][0]) - 0.5
+        try: 
+          return float(self.naif_keywords['INS{}_BORESIGHT_LINE'.format(self.fikid)][0]) - 0.5
+        except Exception as e:
+          return float(self.naif_keywords['INS{}_BORESIGHT_LINE'.format(self.fikid)]) - 0.5 

@@ -50,6 +50,7 @@ def check_response(response):
     if response.json()["statusCode"] != 200:
         raise requests.HTTPError(f"Recieved code {response.json()['statusCode']} from spice server, with error: {response.json()['body']}")
 
+
 def spiceql_call(function_name = "", function_args = {}, use_web=False):
     """
     Interface to SpiceQL (Spice Query Library) for both Offline and Online use
@@ -80,7 +81,7 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
         func = getattr(pyspiceql, function_name)
         return func(**function_args)
     
-    url = "https://spiceql-dev.prod-asc.chs.usgs.gov/v1/"
+    url = "10.12.56.68"
     url += function_name
     headers = {
         'accept': '*/*',

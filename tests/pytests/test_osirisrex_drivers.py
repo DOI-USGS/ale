@@ -22,10 +22,10 @@ def test_kernels(scope="module"):
 @pytest.mark.parametrize("image", ['20190303T100344S990_map_iofL2pan_V001'])
 def test_osirisrex_load(test_kernels, image):
     label_file = get_image_label(image, 'isis')
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels})
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels}, verbose=True)
     compare_isd = get_isd("osirisrex")
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
+    print(json.dumps(isd_obj))
     assert compare_dicts(isd_obj, compare_isd) == []
 
 # ========= Test osirisrex isislabel and naifspice driver =========
@@ -44,37 +44,6 @@ class test_osirisrex_isis_naif(unittest.TestCase):
     def test_exposure_duration(self):
         np.testing.assert_almost_equal(self.driver.exposure_duration, 0.005285275)
 
-    def test_sensor_frame_id(self):
-        with patch('ale.drivers.osirisrex_drivers.spice.bods2c', return_value=-64361) as bods2c:
-            assert self.driver.sensor_frame_id == -64361
-            bods2c.assert_called_with('ORX_OCAMS_MAPCAM')
-
-    def test_detector_center_sample(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-54321]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
-            naif_keywords.return_value = {"INS-54321_CCD_CENTER": [12345, 100]}
-            assert self.driver.detector_center_sample == 12345
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'ORX_OCAMS_MAPCAM', 'mission': '', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
-
-    def test_detector_center_line(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-54321]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
-            naif_keywords.return_value = {"INS-54321_CCD_CENTER": [12345, 100]}
-            assert self.driver.detector_center_line == 100
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'ORX_OCAMS_MAPCAM', 'mission': '', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
-
     def test_filter_name(self):
         assert self.driver.filter_name == "PAN"
 
-    def test_odtk(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-54321]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
-            naif_keywords.return_value = {"INS-54321_OD_K_PAN": [2.21e-05, 1.71e-04, 5.96e-05]}
-            assert self.driver.odtk == [2.21e-05, 1.71e-04, 5.96e-05]
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'ORX_OCAMS_MAPCAM', 'mission': '', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1

@@ -55,7 +55,7 @@ class test_pds3_naif(unittest.TestCase):
         assert self.driver.spacecraft_name == 'MESSENGER'
 
     def test_fikid(self):
-        with patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+        with patch('ale.base.data_naif.NaifSpice.spiceql_call', return_value=-12345) as bods2c:
             assert self.driver.spacecraft_name == 'MESSENGER'
 
     def test_instrument_id(self):
@@ -69,7 +69,7 @@ class test_pds3_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_FL_TEMP_COEFFS": np.array([pow(4.07, -x) for x in np.arange(6)])}
             assert self.driver.focal_length == pytest.approx(6.0)
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -90,7 +90,7 @@ class test_pds3_naif(unittest.TestCase):
             assert self.driver.usgscsm_distortion_model == {"transverse" : {
                                                                 "x" : [1, 2, 3, 4, 5],
                                                                 "y" : [-1, -2, -3, -4, -5]}}
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -100,7 +100,7 @@ class test_pds3_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_PIXEL_PITCH": np.array([0.1])}
             assert self.driver.pixel_size == 0.1
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -118,7 +118,7 @@ class test_isis3_naif(unittest.TestCase):
         assert self.driver.platform_name == 'MESSENGER'
 
     def test_fikid(self):
-        with patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+        with patch('ale.base.data_naif.NaifSpice.spiceql_call', return_value=-12345) as bods2c:
             assert self.driver.spacecraft_name == 'MESSENGER'
 
     def test_instrument_id(self):
@@ -132,7 +132,7 @@ class test_isis3_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_FL_TEMP_COEFFS": np.array([pow(4.07, -x) for x in np.arange(6)])}
             assert self.driver.focal_length == pytest.approx(6.0)
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -141,7 +141,7 @@ class test_isis3_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_CCD_CENTER": np.array([512.5, 512.5, 1])}
             assert self.driver.detector_center_sample == 512
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -150,7 +150,7 @@ class test_isis3_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_CCD_CENTER": np.array([512.5, 512.5, 1])}
             assert self.driver.detector_center_line == 512
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -165,7 +165,7 @@ class test_isis3_naif(unittest.TestCase):
             assert self.driver.usgscsm_distortion_model == {"transverse" : {
                                                                 "x" : [1, 2, 3, 4, 5],
                                                                 "y" : [-1, -2, -3, -4, -5]}}
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -176,6 +176,6 @@ class test_isis3_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_PIXEL_PITCH": np.array([0.1])}
             assert self.driver.pixel_size == 0.1
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1

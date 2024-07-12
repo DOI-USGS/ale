@@ -60,7 +60,7 @@ class test_wac_isis3_naif(unittest.TestCase):
     def test_ephemeris_start_time(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-94, 1234]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 1234
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MARS GLOBAL SURVEYOR', 'mission': 'mgs', 'searchKernels': False}, False),
+            calls = [call('translateNameToCode', {'frame': 'MARS GLOBAL SURVEYOR', 'mission': 'mgs', 'searchKernels': False}, False),
                      call('strSclkToEt', {'frameCode': -94, 'sclk': '561812335:32', 'mission': 'mgs', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 2
@@ -68,7 +68,7 @@ class test_wac_isis3_naif(unittest.TestCase):
     def test_ephemeris_stop_time(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-94, 1234]) as spiceql_call:
             assert self.driver.ephemeris_stop_time == 1541.2
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MARS GLOBAL SURVEYOR', 'mission': 'mgs', 'searchKernels': False}, False),
+            calls = [call('translateNameToCode', {'frame': 'MARS GLOBAL SURVEYOR', 'mission': 'mgs', 'searchKernels': False}, False),
                      call('strSclkToEt', {'frameCode': -94, 'sclk': '561812335:32', 'mission': 'mgs', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 2
@@ -114,7 +114,7 @@ class test_nac_isis3_naif(unittest.TestCase):
     def test_ephemeris_start_time(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-94, 1234]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 1234
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MARS GLOBAL SURVEYOR', 'mission': 'mgs', 'searchKernels': False}, False),
+            calls = [call('translateNameToCode', {'frame': 'MARS GLOBAL SURVEYOR', 'mission': 'mgs', 'searchKernels': False}, False),
                      call('strSclkToEt', {'frameCode': -94, 'sclk': '619971158:28', 'mission': 'mgs', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 2
@@ -122,7 +122,7 @@ class test_nac_isis3_naif(unittest.TestCase):
     def test_ephemeris_stop_time(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-94, 1234]) as spiceql_call:
             assert self.driver.ephemeris_stop_time == 1239.9240448
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'MARS GLOBAL SURVEYOR', 'mission': 'mgs', 'searchKernels': False}, False),
+            calls = [call('translateNameToCode', {'frame': 'MARS GLOBAL SURVEYOR', 'mission': 'mgs', 'searchKernels': False}, False),
                      call('strSclkToEt', {'frameCode': -94, 'sclk': '619971158:28', 'mission': 'mgs', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 2

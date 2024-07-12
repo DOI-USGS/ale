@@ -1,7 +1,6 @@
 import pytest
 import os
 import numpy as np
-import spiceypy as spice
 from importlib import reload
 import json
 
@@ -107,7 +106,7 @@ class test_dawn_fc_pds3_naif(unittest.TestCase):
     def test_ephemeris_start_time(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[54321, 12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12345.193
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'DAWN', 'mission': 'fc2', 'searchKernels': False}, False),
+            calls = [call('translateNameToCode', {'frame': 'DAWN', 'mission': 'fc2', 'searchKernels': False}, False),
                      call('strSclkToEt', {'frameCode': 54321, 'sclk': '488002612:246', 'mission': 'fc2', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 2
@@ -118,7 +117,7 @@ class test_dawn_fc_pds3_naif(unittest.TestCase):
             naif_keywords.return_value = {"INS-12345_RAD_DIST_COEFF": [12345]}
             dist = self.driver.usgscsm_distortion_model
             assert dist['dawnfc']['coefficients'] == [12345]
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'DAWN_FC2_FILTER_6', 'mission': 'fc2', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'DAWN_FC2_FILTER_6', 'mission': 'fc2', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -127,7 +126,7 @@ class test_dawn_fc_pds3_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_PIXEL_SIZE": [1000]}
             assert self.driver.focal2pixel_samples == [0, 1, 0]
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'DAWN_FC2_FILTER_6', 'mission': 'fc2', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'DAWN_FC2_FILTER_6', 'mission': 'fc2', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -136,7 +135,7 @@ class test_dawn_fc_pds3_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_PIXEL_SIZE": [1000]}
             assert self.driver.focal2pixel_lines == [0, 0, 1]
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'DAWN_FC2_FILTER_6', 'mission': 'fc2', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'DAWN_FC2_FILTER_6', 'mission': 'fc2', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -148,7 +147,7 @@ class test_dawn_fc_pds3_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_CCD_CENTER": [12345, 100]}
             assert self.driver.detector_center_sample == 12345.5
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'DAWN_FC2_FILTER_6', 'mission': 'fc2', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'DAWN_FC2_FILTER_6', 'mission': 'fc2', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -157,7 +156,7 @@ class test_dawn_fc_pds3_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_CCD_CENTER": [12345, 100]}
             assert self.driver.detector_center_line == 100.5
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'DAWN_FC2_FILTER_6', 'mission': 'fc2', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'DAWN_FC2_FILTER_6', 'mission': 'fc2', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -183,7 +182,7 @@ class test_dawn_fc_isis3_naif(unittest.TestCase):
     def test_ephemeris_start_time(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[54321, 12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12345.193
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'DAWN', 'mission': 'fc2', 'searchKernels': False}, False),
+            calls = [call('translateNameToCode', {'frame': 'DAWN', 'mission': 'fc2', 'searchKernels': False}, False),
                      call('strSclkToEt', {'frameCode': 54321, 'sclk': '488002612:246', 'mission': 'fc2', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 2

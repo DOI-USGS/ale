@@ -1,5 +1,3 @@
-import spiceypy as spice
-
 import ale
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
@@ -8,6 +6,8 @@ from ale.base.base import Driver
 from ale.base.type_distortion import RadialDistortion
 
 from ale import util
+
+
 
 class OsirisRexCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDistortion, Driver):
     @property
@@ -138,7 +138,11 @@ class OsirisRexCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Radi
         : dict
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
-        return {**super().naif_keywords, **util.query_kernel_pool(f"*{self.polyCamFocusPositionNaifId}*")}
+        keywords = self.spiceql_call("findMissionKeywords", {"key": str(self.polyCamFocusPositionNaifId), "mission" : self.spiceql_mission})
+        if keywords: 
+          return super().naif_keywords | keywords 
+        else: 
+          return super().naif_keywords 
 
     @property
     def sensor_model_version(self):

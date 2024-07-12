@@ -1,4 +1,5 @@
 import json
+import sys 
 
 import tempfile
 import os 
@@ -48,9 +49,9 @@ class Driver():
         def get_property(prop_name):
             try:
                 return getattr(self, prop_name)
-            except Exception as e:
-                print(prop_name, e)
-                return None
+            except (Exception) as e: 
+                print(f"Failed to get property {prop_name} with type {type(e)}: {e}", file=sys.stderr)
+                return None 
 
         if properties is None:
             properties = []
@@ -88,14 +89,13 @@ class Driver():
           for result, property_name in zip(jobs, spice_props):
               data[property_name] = result
         end = time.time()
-        print(f"TOTAL SPICE TIME: {end - start}")
         
         start = time.time()
         for prop in properties:
             data[prop] = get_property(prop)
+            if prop == "line_scan_rate":
         end = time.time()
-        print(f"TOTAL OTHER TIME: {end - start}")
-
+        
         start = time.time()
         with ThreadPool() as pool:
           jobs = pool.starmap_async(get_property, [(name,) for name in ephemeris_props])
@@ -104,7 +104,6 @@ class Driver():
           for result, property_name in zip(jobs, ephemeris_props):
               data[property_name] = result
         end = time.time()
-        print(f"TOTAL EPHEM TIME: {end - start}")
         return data
     
     @property

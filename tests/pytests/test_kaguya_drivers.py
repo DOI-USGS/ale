@@ -69,14 +69,14 @@ class test_kaguyatc_pds_naif(unittest.TestCase):
     def test_sensor_frame_id(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.sensor_frame_id == 12345
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LISM_TC1_HEAD', 'mission': 'kaguya', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LISM_TC1_HEAD', 'mission': 'kaguya', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
     def test_ikid(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ikid == 12345
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LISM_TC1', 'mission': 'kaguya', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LISM_TC1', 'mission': 'kaguya', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -89,20 +89,12 @@ class test_kaguyatc_pds_naif(unittest.TestCase):
     def test_spacecraft_clock_stop_count(self):
         assert self.driver.spacecraft_clock_stop_count == 922997410.431674
 
-    def test_ephemeris_start_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, 12345]) as spiceql_call:
-            assert self.driver.ephemeris_start_time == 12345
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'SELENE', 'mission': 'kaguya', 'searchKernels': False}, False),
-                     call('doubleSclkToEt', {'frameCode': -12345, 'sclk': 922997380.174174, 'mission': 'kaguya', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 2
-
     def test_focal2pixel_samples(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_PIXEL_SIZE": 2}
             assert self.driver.focal2pixel_samples == [0, 0, -1/2]
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LISM_TC1', 'mission': 'kaguya', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LISM_TC1', 'mission': 'kaguya', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -111,7 +103,7 @@ class test_kaguyatc_pds_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_PIXEL_SIZE": 2}
             assert self.driver.focal2pixel_lines == [0, 1/2, 0]
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LISM_TC1', 'mission': 'kaguya', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LISM_TC1', 'mission': 'kaguya', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
     
@@ -134,14 +126,14 @@ class test_kaguyami_isis3_naif(unittest.TestCase):
     def test_sensor_frame_id(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.sensor_frame_id == 12345
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LISM_MI_N_HEAD', 'mission': 'kaguya', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LISM_MI_N_HEAD', 'mission': 'kaguya', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
     def test_ikid(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ikid == 12345
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LISM_MI-NIR1', 'mission': 'kaguya', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LISM_MI-NIR1', 'mission': 'kaguya', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -154,20 +146,12 @@ class test_kaguyami_isis3_naif(unittest.TestCase):
     def test_spacecraft_clock_stop_count(self):
         assert self.driver.spacecraft_clock_stop_count == '905631033.574'
 
-    def test_ephemeris_start_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, 12345]) as spiceql_call:
-            assert self.driver.ephemeris_start_time == 12345
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'KAGUYA', 'mission': 'kaguya', 'searchKernels': False}, False),
-                     call('doubleSclkToEt', {'frameCode': -12345, 'sclk': 905631021.135959, 'mission': 'kaguya', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 2
-
     def test_detector_center_line(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_CENTER": [54321, 12345]}
             assert self.driver.detector_center_line == 12344.5
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LISM_MI-NIR1', 'mission': 'kaguya', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LISM_MI-NIR1', 'mission': 'kaguya', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -176,7 +160,7 @@ class test_kaguyami_isis3_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_CENTER": [54321, 12345]}
             assert self.driver.detector_center_sample == 54320.5
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LISM_MI-NIR1', 'mission': 'kaguya', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LISM_MI-NIR1', 'mission': 'kaguya', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -185,7 +169,7 @@ class test_kaguyami_isis3_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_PIXEL_SIZE": 2}
             assert self.driver.focal2pixel_samples == [0, 0, -1/2]
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LISM_MI-NIR1', 'mission': 'kaguya', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LISM_MI-NIR1', 'mission': 'kaguya', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -194,7 +178,7 @@ class test_kaguyami_isis3_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_PIXEL_SIZE": 2}
             assert self.driver.focal2pixel_lines == [0, 1/2, 0]
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LISM_MI-NIR1', 'mission': 'kaguya', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LISM_MI-NIR1', 'mission': 'kaguya', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -257,14 +241,14 @@ class test_kaguyatc_isis3_naif(unittest.TestCase):
     def test_sensor_frame_id(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.sensor_frame_id == 12345
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LISM_TC1_HEAD', 'mission': 'kaguya', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LISM_TC1_HEAD', 'mission': 'kaguya', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
     def test_ikid(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ikid == 12345
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LISM_TC1', 'mission': 'kaguya', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LISM_TC1', 'mission': 'kaguya', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -273,14 +257,6 @@ class test_kaguyatc_isis3_naif(unittest.TestCase):
 
     def test_spacecraft_name(self):
         assert self.driver.spacecraft_name == 'SELENE'
-
-    def test_ephemeris_start_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, 12345]) as spiceql_call:
-            assert self.driver.ephemeris_start_time == 12345
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'SELENE', 'mission': 'kaguya', 'searchKernels': False}, False),
-                     call('doubleSclkToEt', {'frameCode': -12345, 'sclk': 922997380.174174, 'mission': 'kaguya', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 2
 
     def test_detector_start_line(self):
         assert self.driver.detector_start_line == 1
@@ -293,7 +269,7 @@ class test_kaguyatc_isis3_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_PIXEL_SIZE": 2}
             assert self.driver.focal2pixel_samples == [0, 0, -1/2]
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LISM_TC1', 'mission': 'kaguya', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LISM_TC1', 'mission': 'kaguya', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
@@ -302,6 +278,6 @@ class test_kaguyatc_isis3_naif(unittest.TestCase):
              patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_PIXEL_SIZE": 2}
             assert self.driver.focal2pixel_lines == [0, 1/2, 0]
-            calls = [call('NonMemo_translateNameToCode', {'frame': 'LISM_TC1', 'mission': 'kaguya', 'searchKernels': False}, False)]
+            calls = [call('translateNameToCode', {'frame': 'LISM_TC1', 'mission': 'kaguya', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1

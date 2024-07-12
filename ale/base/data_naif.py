@@ -1,11 +1,13 @@
+import spiceypy as spice 
+
 import warnings
 from multiprocessing.pool import ThreadPool
+
 
 import numpy as np
 import pyspiceql
 import scipy.constants
 from scipy.spatial.transform import Rotation as R
-import spiceypy as spice
 
 import ale
 from ale.base import spiceql_mission_map
@@ -29,7 +31,6 @@ class NaifSpice():
         """
         if self.kernels:
             [pyspiceql.KernelPool.getInstance().load(k) for k in self.kernels]
-            [spice.furnsh(k) for k in self.kernels]
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -40,7 +41,6 @@ class NaifSpice():
         """
         if self.kernels:
             [pyspiceql.KernelPool.getInstance().unload(k) for k in self.kernels]
-            [spice.unload(k) for k in self.kernels]
 
     @property
     def kernels(self):
@@ -737,13 +737,18 @@ class NaifSpice():
 
             self._naif_keywords['BODY_FRAME_CODE'] = self.target_frame_id
             self._naif_keywords['BODY_CODE'] = self.target_id
+            mission_keywords = self.spiceql_call("findMissionKeywords", {"key": f"*{self.ikid}*", "mission": self.spiceql_mission})
+            target_keywords = self.spiceql_call("findTargetKeywords", {"key": f"*{self.target_id}*", "mission": self.spiceql_mission})
 
-            self._naif_keywords = {**self._naif_keywords, 
-                                   **self.spiceql_call("findMissionKeywords", {"key": f"*{self.ikid}*", "mission": self.spiceql_mission}), 
-                                   **self.spiceql_call("findTargetKeywords", {"key": f"*{self.target_id}*", "mission": self.spiceql_mission})}
+            if mission_keywords: 
+                self._naif_keywords = self.naif_keywords | mission_keywords
+            if target_keywords: 
+                self._naif_keywords = self._naif_keywords | target_keywords
             
             try:
-                self._naif_keywords = {**self._naif_keywords, **self.spiceql_call("findMissionKeywords", {"key": f"*{self.fikid}*", "mission": self.spiceql_mission})}
+                frame_keywords = self.spiceql_call("findMissionKeywords", {"key": f"*{self.fikid}*", "mission": self.spiceql_mission})
+                if frame_keywords: 
+                    self._naif_keywords = self._naif_keywords | frame_keywords 
             except AttributeError as error:
                 pass
 
@@ -801,6 +806,6 @@ class NaifSpice():
             data_dir = ""
 
         if function_name in memo_funcs and data_dir == "" and self.use_web == False:
-            function_name = f"NonMemo_{function_name}"
+            function_name = f"{function_name}"
         return spiceql_access.spiceql_call(function_name, function_args, self.use_web)
     

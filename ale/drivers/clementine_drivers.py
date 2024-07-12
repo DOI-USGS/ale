@@ -1,5 +1,3 @@
-import spiceypy as spice
-
 import ale
 from ale.base import Driver
 from ale.base.label_isis import IsisLabel

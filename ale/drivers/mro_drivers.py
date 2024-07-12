@@ -1,6 +1,3 @@
-import numpy as np
-import spiceypy as spice
-
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice

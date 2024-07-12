@@ -1,4 +1,3 @@
-import spiceypy as spice
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer

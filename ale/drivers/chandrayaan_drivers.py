@@ -33,7 +33,7 @@ class Chandrayaan1M3Pds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, NoDis
         : int
           Naif ID code for the sensor frame
         """
-        return spice.bods2c("CH1")
+        return self.spiceql_call("translateNameToCode", {"frame": "CH1", "mission": self.spiceql_mission})
 
 
     @property
@@ -116,11 +116,11 @@ class Chandrayaan1M3Pds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, NoDis
           The start time of the image in ephemeris seconds past the J2000 epoch.
         """
         if not hasattr(self, '_ephemeris_start_time'):
-            et = spice.utc2et(self.utc_times[0])
+            et = self.spiceql_call("utcToEt", {"utc" : self.utc_times[0]})
             et -= (.5 * self.line_exposure_duration)
-            clock_time = spice.sce2s(self.sensor_frame_id, et)
-            self._ephemeris_start_time = spice.scs2e(self.sensor_frame_id, clock_time)
-        return self._ephemeris_start_time
+            clock_time = self.spiceql_call("doubleEtToSclk", {"frameCode" : self.sensor_frame_id, "et" : et, "mission": self.spiceql_mission})
+            self._ephemeris_start_time = self.spiceql_call("strSclkToEt", {"frameCode" : self.sensor_frame_id, "sclk" : clock_time, "mission" : self.spiceql_mission})
+        return self._ephemeris_start_time 
 
 
     @property

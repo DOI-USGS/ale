@@ -16,7 +16,6 @@ from ale.base.type_sensor import LineScanner
 
 from ale.rotation import ConstantRotation
 from ale.transformation import FrameChain
-from ale.util import query_kernel_pool
 from scipy.spatial.transform import Rotation
 
 vims_id_lookup = {
@@ -409,7 +408,7 @@ class CassiniVimsIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoD
         time = str(instrument_group["NativeStartTime"])
         int_time, decimal_time = str(time).split(".")
 
-        ephemeris_time = spice.scs2e(self.spacecraft_id, int_time)
+        ephemeris_time = self.spiceql_call("strSclkToEt", {"frameCode" : self.spacecraft_id, "sclk" : int_time, "mission" : self.spiceql_mission})
         ephemeris_time += float(decimal_time) / 15959.0
 
         ir_exp = float(instrument_group["ExposureDuration"][0]) * 1.01725 / 1000.0;

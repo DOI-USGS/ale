@@ -137,7 +137,6 @@ class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
                     self._focal_length = 474.398
                 elif (self.sensor_name ==  "Visual Imaging Subsystem Camera B"):
                     self._focal_length = 474.448
-                    print("Setting focal")
             elif (self.spacecraft_name == "VIKING ORBITER 2"):
                 if (self.sensor_name == "Visual Imaging Subsystem Camera A"):
                     self._focal_length = 474.610

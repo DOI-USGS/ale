@@ -4,7 +4,6 @@ import numpy as np
 from numpy.polynomial.polynomial import polyval
 import networkx as nx
 from networkx.algorithms.shortest_paths.generic import shortest_path
-import spiceypy as spice
 
 from ale.spiceql_access import get_ephem_data, spiceql_call
 from ale.rotation import ConstantRotation, TimeDependentRotation
@@ -127,6 +126,7 @@ class FrameChain(nx.DiGraph):
                                                                     "ckQuality": "",
                                                                     "searchKernels": frame_chain.search_kernels},
                                                                     use_web=frame_chain.use_web)
+                print("TIMES: ", sensor_times)
             except Exception as e:
                 pass
 
@@ -255,115 +255,6 @@ class FrameChain(nx.DiGraph):
                 return path[i+1], path[i], edge
 
         return None
-
-    @staticmethod
-    def extract_exact_ck_times(observStart, observEnd, targetFrame):
-        """
-        Generates all exact ephemeris data assocaited with a specific frame as
-        defined by targetFrame, between a start and end interval defined by 
-        observStart and observEnd
-
-        Parameters
-        ----------
-        observStart : float
-                      Start time in ephemeris time to extract ephemeris data from
-
-        observEnd : float
-                    End time in ephemeris time to extract ephemeris data to
-
-        targetFrame : int
-                      Target reference frame to get ephemeris data in
-
-        Returns
-        -------
-        times : list
-                A list of times where exact ephemeris data where recorded for
-                the targetFrame
-        """
-        times = []
-
-        FILESIZ = 128
-        TYPESIZ = 32
-        SOURCESIZ = 128
-
-        currentTime = observStart
-
-        count = spice.ktotal("ck")
-        if (count > 1):
-            msg = "Unable to get exact CK record times when more than 1 CK is loaded, Aborting"
-            raise Exception(msg)
-        elif (count < 1):
-            msg = "No CK kernels loaded, Aborting"
-            raise Exception(msg)
-
-        _, _, _, handle = spice.kdata(0, "ck", FILESIZ, TYPESIZ, SOURCESIZ)
-        spice.dafbfs(handle)
-        found = spice.daffna()
-        spCode = int(targetFrame / 1000) * 1000
-
-        while found:
-            observationSpansToNextSegment = False
-            summary = spice.dafgs()
-            dc, ic = spice.dafus(summary, 2, 6)
-
-            # Don't read type 5 ck here
-            if ic[2] == 5:
-                break
-
-            if (ic[0] == spCode and ic[2] == 3):
-                segStartEt = spice.sct2e(int(spCode/1000), dc[0])
-                segStopEt = spice.sct2e(int(spCode/1000), dc[1])
-
-                if (currentTime >= segStartEt  and  currentTime <= segStopEt):
-                    # Check for a gap in the time coverage by making sure the time span of the observation
-                    #  does not cross a segment unless the next segment starts where the current one ends
-                    if (observationSpansToNextSegment and currentTime > segStartEt):
-                        msg = "Observation crosses segment boundary--unable to interpolate pointing"
-                        raise Exception(msg)
-                    if (observEnd > segStopEt):
-                        observationSpansToNextSegment = True
-
-                    dovelocity = ic[3]
-                    end = ic[5]
-                    val = spice.dafgda(handle, int(end - 1), int(end))
-                    # int nints = (int) val[0];
-                    ninstances = int(val[1])
-                    numvel  =  dovelocity * 3
-                    quatnoff  =  ic[4] + (4 + numvel) * ninstances - 1
-                    # int nrdir = (int) (( ninstances - 1 ) / DIRSIZ); /* sclkdp directory records */
-                    sclkdp1off  =  int(quatnoff + 1)
-                    sclkdpnoff  =  int(sclkdp1off + ninstances - 1)
-                    # int start1off = sclkdpnoff + nrdir + 1;
-                    # int startnoff = start1off + nints - 1;
-                    sclkSpCode = int(spCode / 1000)
-
-                    sclkdp = spice.dafgda(handle, sclkdp1off, sclkdpnoff)
-
-                    instance = 0
-                    et = spice.sct2e(sclkSpCode, sclkdp[0])
-
-                    while (instance < (ninstances - 1)  and  et < currentTime):
-                        instance = instance + 1
-                        et = spice.sct2e(sclkSpCode, sclkdp[instance])
-
-                    if (instance > 0):
-                        instance = instance - 1
-                    et = spice.sct2e(sclkSpCode, sclkdp[instance])
-
-                    while (instance < (ninstances - 1) and et < observEnd):
-                        times.append(et)
-                        instance = instance + 1
-                        et = spice.sct2e(sclkSpCode, sclkdp[instance])
-                    times.append(et)
-
-                    if not observationSpansToNextSegment:
-                        break
-                    else:
-                        currentTime = segStopEt
-            spice.dafcs(handle)     # Continue search in daf last searched
-            found = spice.daffna()   # Find next forward array in current daf
-
-        return times
 
 
     def generate_rotations(self, frames, times, time_bias, rotation_type, mission=""):

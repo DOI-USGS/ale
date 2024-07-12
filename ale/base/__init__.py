@@ -1,10 +1,13 @@
 from ale.base.base import Driver
 
 spiceql_mission_map = {
+    "APOLLO_METRIC" : "apollo", 
     "CHANDRAYAAN-1_M3": "m3",
     "CHANDRAYAAN-1_MRFFR": "mrffr",
+    "M3": "m3", 
     "CASSINI_ISS_NAC": "cassini",
     "CASSINI_ISS_WAC": "cassini",
+    "CASSINI_VIMS_V" : "cassini",
     "DAWN_FC2_FILTER_1": "fc2",
     "DAWN_FC2_FILTER_2": "fc2",
     "DAWN_FC2_FILTER_3": "fc2",
@@ -49,6 +52,7 @@ spiceql_mission_map = {
     "ORX_OCAMS_MAPCAM": "",
     "ORX_OCAMS_POLYCAM": "",
     "ORX_OCAMS_SAMCAM": "",
+    "ROS_VIRTIS-M_IR" : "rosetta",
     "LISM_MI-VIS1": "kaguya",
     "LISM_MI-VIS2": "kaguya",
     "LISM_MI-VIS3": "kaguya",
@@ -83,6 +87,8 @@ spiceql_mission_map = {
     "VG1_ISSWA": "",
     "VG2_ISSNA": "",
     "VG2_ISSWA": "",
+    "VISUAL_IMAGING_SUBSYSTEM_CAMERA_A" : "viking1",
+    "VISUAL_IMAGING_SUBSYSTEM_CAMERA_B" : "viking1",
     "ULTRAVIOLET/VISIBLE CAMERA": "uvvis",
     "Near Infrared Camera": "nir",
     "High Resolution Camera": "clementine1",
