@@ -90,6 +90,12 @@ def main():
              "the center of the target body."
     )
     parser.add_argument(
+        "-f", "--fix_quaternion",
+        action="store_true",
+        help="There are rare cases when a stream of quaternion flip their signs. This option will "
+             "fix those to be consistent. This takes after a NASA ASP function to do the same. "
+    )
+    parser.add_argument(
         '--version',
         action='version',
         version=f"ale version {ale.__version__}",
@@ -119,7 +125,8 @@ def main():
 
     if len(args.input) == 1:
         try:
-            file_to_isd(args.input[0], args.out, kernels=k, log_level=log_level, compress=args.compress, only_isis_spice=args.only_isis_spice, only_naif_spice=args.only_naif_spice, local=args.local)
+            file_to_isd(args.input[0], args.out, kernels=k, log_level=log_level, compress=args.compress, only_isis_spice=args.only_isis_spice, 
+                        only_naif_spice=args.only_naif_spice, local=args.local, fix_quaternion=args.fix_quaternion)
         except Exception as err:
             # Seriously, this just throws a generic Exception?
             sys.exit(f"File {args.input[0]}: {err}")
@@ -157,7 +164,8 @@ def file_to_isd(
     only_isis_spice=False,
     only_naif_spice=False,
     local=False,
-    nadir=False
+    nadir=False,
+    fix_quaternion=False
 ):
     """
     Returns nothing, but acts as a thin wrapper to take the *file* and generate
@@ -195,6 +203,9 @@ def file_to_isd(
         usgscsm_str = ale.loads(file, props=props, verbose=log_level>logging.INFO, only_isis_spice=only_isis_spice, only_naif_spice=only_naif_spice)
     else:
         usgscsm_str = ale.loads(file, props=props, verbose=log_level>logging.INFO, only_isis_spice=only_isis_spice, only_naif_spice=only_naif_spice)
+
+    if fix_quaternion:
+        usgscsm_str = fix_quaternion_signs(usgscsm_str)
 
     if compress:
         logger.info(f"Writing: {os.path.splitext(isd_file)[0] + '.br'}")
@@ -252,8 +263,48 @@ def decompress_json(compressed_json_file):
 
     return os.path.splitext(compressed_json_file)[0] + '.json'
 
+def fix_quaternion_signs(usgscsm_str):
+    """
+    Ensure that instrument pointing quaternions do not change sign
+    
+    Parameters
+    ----------
+    usgscsm_str : str
+
+    Returns
+    -------
+    str
+        usgscsm_str
+    """
+    
+    usgscsm_json = json.loads(usgscsm_str)
+    quats = usgscsm_json["instrument_pointing"]["quaternions"]
+    
+    logger.info(f"fixing any quaternions that have a sign change")
+    # First find the largest magnitude quaternion coefficient and its coordinate
+    num_quats = len(quats)
+    max_q = 0.0
+    max_j = 0
+    for i in range(num_quats):
+        for j in range(4):
+            if abs(quats[i][j]) > abs(max_q):
+                max_q = quats[i][j]
+                max_j = j
+    
+    # Ensure the signs are consistent
+    for i in range(num_quats):
+        if quats[i][max_j] * max_q < 0:
+            for j in range(4):
+                quats[i][j] *= -1.0
+    
+    usgscsm_json["instrument_pointing"]["quaternions"] = quats
+    usgscsm_str = json.dumps(usgscsm_json, indent=2)
+    return usgscsm_str
+
+
 if __name__ == "__main__":
     try:
         sys.exit(main())
     except ValueError as err:
         sys.exit(err)
+
