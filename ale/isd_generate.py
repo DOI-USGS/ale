@@ -300,7 +300,7 @@ def fix_quaternion_signs(usgscsm_str):
     
     usgscsm_json["instrument_pointing"]["quaternions"] = quats
     usgscsm_str = json.dumps(usgscsm_json, indent=2)
-    logger.info(f"updated {} of {} quaternions that have a sign change".format(qcnt, range(quats)))
+    logger.info("updated {} of {} quaternions that have a sign change".format(qcnt, range(quats)))
     return usgscsm_str
 
 
