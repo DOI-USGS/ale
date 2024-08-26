@@ -280,7 +280,6 @@ def fix_quaternion_signs(usgscsm_str):
     usgscsm_json = json.loads(usgscsm_str)
     quats = usgscsm_json["instrument_pointing"]["quaternions"]
     
-    logger.info(f"fixing any quaternions that have a sign change")
     # First find the largest magnitude quaternion coefficient and its coordinate
     num_quats = len(quats)
     max_q = 0.0
@@ -292,13 +291,16 @@ def fix_quaternion_signs(usgscsm_str):
                 max_j = j
     
     # Ensure the signs are consistent
+    qcnt = 0
     for i in range(num_quats):
         if quats[i][max_j] * max_q < 0:
+            qcnt = qcnt + 1
             for j in range(4):
                 quats[i][j] *= -1.0
     
     usgscsm_json["instrument_pointing"]["quaternions"] = quats
     usgscsm_str = json.dumps(usgscsm_json, indent=2)
+    logger.info(f"updated {} of {} quaternions that have a sign change".format(qcnt, range(quats)))
     return usgscsm_str
 
 
