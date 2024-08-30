@@ -3,8 +3,9 @@ import numpy as np
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
-from ale.base.type_distortion import LoDistortion
+from ale.base.type_distortion import LoDistortion, NoDistortion
 from ale.base.base import Driver
+
 
 class LoHighCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, LoDistortion, Driver):
 
@@ -219,3 +220,172 @@ class LoHighCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, LoDisto
                 f"INS{self.ikid}_ITRANSL": itransl}
 
         return self._naif_keywords
+
+
+class LoMediumCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
+
+    @property
+    def lo_detector_map(self):
+        return {'Lunar Orbiter 1': {'name':'LO1_MEDIUM_RESOLUTION_CAMERA', 'id':-531002},
+                'Lunar Orbiter 2': {'name':'LO2_MEDIUM_RESOLUTION_CAMERA', 'id':-532002},
+                'Lunar Orbiter 3': {'name':'LO3_MEDIUM_RESOLUTION_CAMERA', 'id':-533002},
+                'Lunar Orbiter 4': {'name':'LO4_MEDIUM_RESOLUTION_CAMERA', 'id':-534002},
+                'Lunar Orbiter 5': {'name':'LO5_MEDIUM_RESOLUTION_CAMERA', 'id':-535002}}
+
+    @property
+    def instrument_id(self):
+        """
+        Returns the ID of the instrument.
+
+        Returns
+        -------
+        : str
+          Name of the instrument
+        """
+        lookup_table = {'Medium Resolution Camera': self.lo_detector_map[self.spacecraft_name]['name']}
+        return lookup_table[super().instrument_id]
+
+    @property
+    def ikid(self):
+        """
+        Returns the Naif ID code for the instrument
+        Expects the instrument_id to be defined. This must be a string containing
+        the short name of the instrument.
+
+        Returns
+        -------
+        : int
+          Naif ID used to for identifying the instrument in Spice kernels
+        """
+        return self.lo_detector_map[self.spacecraft_name]['id']
+
+    @property
+    def sensor_model_version(self):
+        """
+        The ISIS Sensor model number. This is likely just 1
+
+        Returns
+        -------
+        : int
+          ISIS sensor model version
+        """
+        return 1
+
+    @property
+    def sensor_name(self):
+        """
+        Returns the name of the instrument
+
+        Returns
+        -------
+        : str
+          Name of the sensor
+        """
+        return self.instrument_id
+    
+    @property
+    def ephemeris_start_time(self):
+        """
+        Returns the ephemeris time of the image.
+        Expects spacecraft_id to be defined. This should be the integer
+        Naif ID code for the spacecraft.
+
+        Returns
+        -------
+        : float
+          ephemeris time of the image
+        """
+        
+        return spice.utc2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
+    
+    @property
+    def ephemeris_stop_time(self):
+        """
+        Returns the ephemeris time of the image.
+        Expects spacecraft_id to be defined. This should be the integer
+        Naif ID code for the spacecraft.
+
+        Returns
+        -------
+        : float
+          ephemeris time of the image
+        """
+        
+        return self.ephemeris_start_time
+  
+    @property
+    def detector_center_line(self):
+        """
+        The center line of the image formatted in pixels.
+        For LO Medium Resolution Camera, this information is embedded directly
+        in the image label.
+
+        Returns
+        -------
+        list :
+            The center line of the image formatted in pixels.
+        """
+        return self.label['IsisCube']['Instrument']['BoresightLine']
+    
+
+    @property
+    def detector_center_sample(self):
+        """
+        The center sample of the image formatted in pixels.
+        For LO Medium Resolution Camera, this information is embedded directly
+        in the image label.
+
+        Returns
+        -------
+        list :
+            The center sample of the image formatted in pixels.
+        """
+        return self.label['IsisCube']['Instrument']['BoresightSample']
+
+
+    @property
+    def focal2pixel_samples(self):
+        """
+        The transformation from focal plan coordinates to detector samples.
+        To transform the coordinate (x,y) to detector samples do the following:
+
+        samples = focal2pixel_samples[0] + x * focal2pixel_samples[1] + y * focal2pixel_samples[2]
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector samples transform
+        """
+        return self.naif_keywords[f"INS{self.ikid}_ITRANSS"]
+
+    @property
+    def focal2pixel_lines(self):
+        """
+        The transformation from focal plan coordinates to detector lines.
+        To transform the coordinate (x,y) to detector lines do the following:
+
+        lines = focal2pixel_lines[0] + x * focal2pixel_lines[1] + y * focal2pixel_lines[2]
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector lines transform
+        """
+        return self.naif_keywords[f"INS{self.ikid}_ITRANSL"]
+    
+    @property
+    def light_time_correction(self):
+        """
+        Returns the type of light time correction and abberation correction to
+        use in NAIF calls.
+
+        ISIS has set this to NONE for all Lunar Orbitor data
+
+        Returns
+        -------
+        : str
+          The light time and abberation correction string for use in NAIF calls.
+          See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/abcorr.html
+          for the different options available.
+        """
+        return 'NONE'
