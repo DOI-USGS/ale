@@ -249,8 +249,7 @@ class LoMediumCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDis
     def ikid(self):
         """
         Returns the Naif ID code for the instrument
-        Expects the instrument_id to be defined. This must be a string containing
-        the short name of the instrument.
+        Expects the spacecraft name to be defined.
 
         Returns
         -------
@@ -287,8 +286,7 @@ class LoMediumCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDis
     def ephemeris_start_time(self):
         """
         Returns the ephemeris time of the image.
-        Expects spacecraft_id to be defined. This should be the integer
-        Naif ID code for the spacecraft.
+        Expects the utc_start_time for the image to be defined.
 
         Returns
         -------
@@ -302,8 +300,8 @@ class LoMediumCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDis
     def ephemeris_stop_time(self):
         """
         Returns the ephemeris time of the image.
-        Expects spacecraft_id to be defined. This should be the integer
-        Naif ID code for the spacecraft.
+        This matches the ephemeris start time of the image, so it expects
+        ephemeris_start_time to be defined.
 
         Returns
         -------
@@ -346,7 +344,7 @@ class LoMediumCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDis
     @property
     def focal2pixel_samples(self):
         """
-        The transformation from focal plan coordinates to detector samples.
+        The transformation from focal plane coordinates to detector samples.
         To transform the coordinate (x,y) to detector samples do the following:
 
         samples = focal2pixel_samples[0] + x * focal2pixel_samples[1] + y * focal2pixel_samples[2]
@@ -361,7 +359,7 @@ class LoMediumCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDis
     @property
     def focal2pixel_lines(self):
         """
-        The transformation from focal plan coordinates to detector lines.
+        The transformation from focal plane coordinates to detector lines.
         To transform the coordinate (x,y) to detector lines do the following:
 
         lines = focal2pixel_lines[0] + x * focal2pixel_lines[1] + y * focal2pixel_lines[2]
