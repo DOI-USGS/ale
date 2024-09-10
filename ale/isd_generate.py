@@ -19,6 +19,9 @@ from pathlib import Path, PurePath
 import sys
 
 import ale
+import brotli
+import json
+from ale.drivers import AleJsonEncoder
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +59,13 @@ def main():
         "-v", "--verbose",
         action="store_true",
         help="Display information as program runs."
+    )
+    parser.add_argument(
+        "-c", "--compress",
+        action="store_true",
+        help="Output a compressed isd json file with .br file extension. "
+             "Ale uses the brotli compression algorithm. "
+             "To decompress an isd file run: python -c \"import ale.isd_generate as isdg; isdg.decompress_json('/path/to/isd.br')\""
     )
     parser.add_argument(
         "-i", "--only_isis_spice",
@@ -109,7 +119,7 @@ def main():
 
     if len(args.input) == 1:
         try:
-            file_to_isd(args.input[0], args.out, kernels=k, log_level=log_level, only_isis_spice=args.only_isis_spice, only_naif_spice=args.only_naif_spice, local=args.local)
+            file_to_isd(args.input[0], args.out, kernels=k, log_level=log_level, compress=args.compress, only_isis_spice=args.only_isis_spice, only_naif_spice=args.only_naif_spice, local=args.local)
         except Exception as err:
             # Seriously, this just throws a generic Exception?
             sys.exit(f"File {args.input[0]}: {err}")
@@ -143,6 +153,7 @@ def file_to_isd(
     out: os.PathLike = None,
     kernels: list = None,
     log_level=logging.WARNING,
+    compress=False,
     only_isis_spice=False,
     only_naif_spice=False,
     local=False,
@@ -185,11 +196,61 @@ def file_to_isd(
     else:
         usgscsm_str = ale.loads(file, props=props, verbose=log_level>logging.INFO, only_isis_spice=only_isis_spice, only_naif_spice=only_naif_spice)
 
-    logger.info(f"Writing: {isd_file}")
-    isd_file.write_text(usgscsm_str)
+    if compress:
+        logger.info(f"Writing: {os.path.splitext(isd_file)[0] + '.br'}")
+        compress_json(usgscsm_str, os.path.splitext(isd_file)[0] + '.br')
+    else:
+        logger.info(f"Writing: {isd_file}")  
+        isd_file.write_text(usgscsm_str)
 
     return
 
+def compress_json(json_data, output_file):
+    """
+    Compresses inputted JSON data using brotli compression algorithm.
+    
+    Parameters
+    ----------
+    json_data : str
+        JSON data
+
+    output_file : str
+        The output compressed file path with .br extension.
+
+    """
+    binary_json = json.dumps(json_data).encode('utf-8')
+
+    if not os.path.splitext(output_file)[1] == '.br':
+        raise ValueError("Output file {} is not a valid .br file extension".format(output_file.split(".")[1]))
+    
+    with open(output_file, 'wb') as f:
+        f.write(brotli.compress(binary_json))
+
+
+def decompress_json(compressed_json_file):
+    """
+    Decompresses inputted .br file.
+    
+    Parameters
+    ----------
+    compressed_json_file : str
+        .br file path
+
+    Returns
+    -------
+    str
+        Decompressed .json file path
+    """
+    if not os.path.splitext(compressed_json_file)[1] == '.br':
+        raise ValueError("Inputted file {} is not a valid .br file extension".format(compressed_json_file))
+    with open(compressed_json_file, 'rb') as f:
+        data = f.read()
+    with open(compressed_json_file, 'wb') as f:
+        f.write(brotli.decompress(data))
+
+    os.rename(compressed_json_file, os.path.splitext(compressed_json_file)[0] + '.json')
+
+    return os.path.splitext(compressed_json_file)[0] + '.json'
 
 if __name__ == "__main__":
     try:

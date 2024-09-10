@@ -2,17 +2,13 @@ from cgi import test
 import pytest
 import ale
 import os
-import pvl
 
-import numpy as np
-from ale.drivers import co_drivers
-from ale.formatters.formatter import to_isd
 import unittest
-from unittest.mock import PropertyMock, patch
+from unittest.mock import patch
 import json
-from conftest import get_image_label, get_image_kernels, get_isd, convert_kernels, compare_dicts, get_table_data
+from conftest import get_image_label, get_image_kernels, get_isd, convert_kernels, compare_dicts
 
-from ale.drivers.chandrayaan_drivers import Chandrayaan1M3IsisLabelNaifSpiceDriver, Chandrayaan1MRFFRIsisLabelNaifSpiceDriver
+from ale.drivers.chandrayaan_drivers import Chandrayaan1M3IsisLabelNaifSpiceDriver, Chandrayaan1MRFFRIsisLabelNaifSpiceDriver, Chandrayaan1M3Pds3NaifSpiceDriver
 
 @pytest.fixture()
 def m3_kernels(scope="module", autouse=True):
@@ -47,6 +43,66 @@ def test_chandrayaan_mrffr_load(mrffr_kernels):
     isd_obj = json.loads(isd_str)
     x = compare_dicts(isd_obj, compare_dict)
     assert x == []
+
+def test_chandrayaan_m3_pds_load(m3_kernels):
+    label_file = get_image_label("M3T20090630T083407_V03_L1B_cropped", label_type="pds3")
+    compare_dict = get_isd("chandrayaan_m3_nadir")
+
+    # Patch the full path of the timing table onto the driver
+    with patch("ale.drivers.chandrayaan_drivers.Chandrayaan1M3Pds3NaifSpiceDriver.utc_time_table", os.path.dirname(label_file)+"/M3T20090630T083407_V03_TIM_cropped.TAB"):
+        isd_str = ale.loads(label_file, props={"kernels": m3_kernels, "nadir": True})
+        isd_obj = json.loads(isd_str)
+        x = compare_dicts(isd_obj, compare_dict)
+        assert x == []
+
+
+class test_chandrayaan_m3_pds_naif(unittest.TestCase):
+
+    def setUp(self):
+        label = get_image_label("M3T20090630T083407_V03_L1B_cropped", "pds3")
+        self.driver = Chandrayaan1M3Pds3NaifSpiceDriver(label)
+
+    def test_ikid(self):
+        assert self.driver.ikid == -86520
+
+    def test_sensor_frame_id(self):
+        assert self.driver.sensor_frame_id == -86
+
+    def test_spacecraft_name(self):
+        assert self.driver.spacecraft_name == 'CH1'
+
+    def test_image_lines(self):
+        assert self.driver.image_lines == 5
+
+    def test_image_samples(self):
+        assert self.driver.image_samples == 608
+
+    def test_ephemeris_start_time(self):
+        label_file = get_image_label("M3T20090630T083407_V03_L1B_cropped", label_type="pds3")
+        with patch("ale.drivers.chandrayaan_drivers.spice.scs2e", return_value=12345) as scs2e,\
+              patch("ale.drivers.chandrayaan_drivers.spice.utc2et", return_value=12345) as utc2et,\
+                patch("ale.drivers.chandrayaan_drivers.spice.sce2s", return_value=12345) as sce2s,\
+                 patch("ale.drivers.chandrayaan_drivers.Chandrayaan1M3Pds3NaifSpiceDriver.utc_time_table", os.path.dirname(label_file)+"/M3T20090630T083407_V03_TIM_cropped.TAB"):
+            assert self.driver.ephemeris_start_time == 12345
+
+    def test_ephemeris_stop_time(self):
+        label_file = get_image_label("M3T20090630T083407_V03_L1B_cropped", label_type="pds3")
+        with patch("ale.drivers.chandrayaan_drivers.spice.scs2e", return_value=12345) as scs2e,\
+              patch("ale.drivers.chandrayaan_drivers.spice.utc2et", return_value=12345) as utc2et,\
+                patch("ale.drivers.chandrayaan_drivers.spice.sce2s", return_value=12345) as sce2s,\
+                 patch("ale.drivers.chandrayaan_drivers.Chandrayaan1M3Pds3NaifSpiceDriver.utc_time_table", os.path.dirname(label_file)+"/M3T20090630T083407_V03_TIM_cropped.TAB"):
+            assert self.driver.ephemeris_stop_time == 12345.2544
+
+    def test_utc_times(self):
+        label_file = get_image_label("M3T20090630T083407_V03_L1B_cropped", label_type="pds3")
+        with patch("ale.drivers.chandrayaan_drivers.Chandrayaan1M3Pds3NaifSpiceDriver.utc_time_table", os.path.dirname(label_file)+"/M3T20090630T083407_V03_TIM_cropped.TAB"):
+            assert self.driver.utc_times[0] == '2009-06-30T08:34:35.449851'
+
+    def test_sampling_factor(self):
+        assert self.driver.sampling_factor == 1
+
+    def test_line_exposure_duration(self):
+        assert self.driver.line_exposure_duration == .05088
 
 
 # ========= Test chandrayaan isislabel and naifspice driver =========

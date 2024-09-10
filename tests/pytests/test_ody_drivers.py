@@ -76,6 +76,41 @@ class test_themisir_isis_naif(unittest.TestCase):
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
 
+    def test_ikid(self):
+        assert self.driver.ikid == -53031
+
+    def test_sampling_factor(self):
+        assert self.driver.sampling_factor == 1
+
+    def test_ephemeris_start_time(self):
+        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=400001111.2222333) as scs2e:
+            assert self.driver.ephemeris_start_time == 400001111.4885301
+
+    def test_ephemeris_stop_time(self):
+        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=400001111.2222333) as scs2e:
+            assert self.driver.ephemeris_stop_time == 400001127.9656446
+
+    def test_focal_length(self):
+        assert self.driver.focal_length == 203.9213
+
+    def test_detector_center_sample(self):
+        assert self.driver.detector_center_sample == 160.0
+
+    def test_detector_center_line(self):
+        assert self.driver.detector_center_line == 0
+
+    def test_tdi_mode(self):
+        assert self.driver.tdi_mode == "ENABLED"
+
+    def test_sensor_name(self):
+        assert self.driver.sensor_name == "MARS_ODYSSEY"
+
+    def test_band_times(self):
+        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=400001111.2222333) as scs2e:
+            assert self.driver.band_times == [400001111.4885301,
+                400001112.0211237, 400001112.8865883, 400001113.7520529,
+                400001114.6175175, 400001115.4829821, 400001116.34844667,
+                400001117.2139113, 400001118.0460888, 400001118.9115534]
 
 class test_themisvis_isis_naif(unittest.TestCase):
     def setUp(self):
@@ -120,12 +155,12 @@ class test_themisvis_isis_naif(unittest.TestCase):
 
     def test_detector_center_sample(self):
         assert self.driver.detector_center_sample == 512
-    
-    def test_framelets_flipped(self):
-        assert self.driver.framelets_flipped == True
 
     def test_sampling_factor(self):
         assert self.driver.sampling_factor == 1
+
+    def test_sensor_names(self):
+        assert self.driver.sensor_name == "MARS_ODYSSEY"
 
     def test_num_frames(self):
         assert self.driver.num_frames == 19
@@ -139,3 +174,7 @@ class test_themisvis_isis_naif(unittest.TestCase):
     def test_band_times(self):
         with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=392211096.4307215) as scs2e:
             assert self.driver.band_times == [392211098.2259215]
+    
+    def test_framelets_flipped(self):
+        assert self.driver.framelets_flipped == True
+
