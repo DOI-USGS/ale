@@ -5,7 +5,8 @@ import tempfile
 import os 
 
 class Driver():
-    """Base class for all Drivers.
+    """
+    Base class for all Drivers.
 
     Attributes
     ----------
@@ -15,7 +16,8 @@ class Driver():
     """
 
     def __init__(self, file, num_ephem=909, num_quats=909, props={}, parsed_label=None):
-        """Initialize a driver.
+        """
+        Initialize a driver.
 
         Parameters
         ----------
@@ -41,7 +43,8 @@ class Driver():
 
     @property
     def image_lines(self):
-        """Returns an integer containing the number of lines in the image.
+        """
+        Returns an integer containing the number of lines in the image.
         
         Returns
         -------
@@ -53,7 +56,8 @@ class Driver():
 
     @property
     def image_samples(self):
-        """Returns an integer containing the number of samples in an image.
+        """
+        Returns an integer containing the number of samples in an image.
         
         Returns
         -------
@@ -65,7 +69,8 @@ class Driver():
 
     @property
     def usgscsm_distortion_model(self):
-        """Returns distortion information for the USGSCSM sensor model.
+        """
+        Returns distortion information for the USGSCSM sensor model.
         
         Returns
         -------
@@ -77,7 +82,8 @@ class Driver():
 
     @property
     def detector_start_line(self):
-        """Returns the zero-based detector line corresponding to the first image line.
+        """
+        Returns the zero-based detector line corresponding to the first image line.
         
         Returns
         -------
@@ -89,7 +95,8 @@ class Driver():
 
     @property
     def detector_start_sample(self):
-        """Returns the zero-based detector line corresponding to the first image line.
+        """
+        Returns the zero-based detector line corresponding to the first image line.
 
         Returns
         -------
@@ -101,7 +108,8 @@ class Driver():
 
     @property
     def sample_summing(self):
-        """Returns the number of detector samples summed to produce each image sample.
+        """
+        Returns the number of detector samples summed to produce each image sample.
         
         Returns
         -------
@@ -113,7 +121,8 @@ class Driver():
 
     @property
     def line_summing(self):
-        """Returns the number of detector samples summed to produce each image sample.
+        """
+        Returns the number of detector samples summed to produce each image sample.
         
         Returns
         -------
@@ -125,7 +134,8 @@ class Driver():
 
     @property
     def platform_name(self):
-        """Returns the name of the platform containing the sensor. This is usually the spacecraft name.
+        """
+        Returns the name of the platform containing the sensor. This is usually the spacecraft name.
         
         Returns
         -------
@@ -137,7 +147,8 @@ class Driver():
 
     @property
     def sensor_name(self):
-        """Returns the name of the instrument.
+        """
+        Returns the name of the instrument.
         
         Returns
         -------
@@ -149,7 +160,8 @@ class Driver():
 
     @property
     def target_body_radii(self):
-        """The triaxial radii of the target body.
+        """
+        The triaxial radii of the target body.
         
         Returns
         -------
@@ -161,7 +173,8 @@ class Driver():
 
     @property
     def focal_length(self):
-        """The focal length of the instrument.
+        """
+        The focal length of the instrument.
         
         Returns
         -------
@@ -173,7 +186,8 @@ class Driver():
 
     @property
     def detector_center_line(self):
-        """The center line of the CCD in detector pixels.
+        """
+        The center line of the CCD in detector pixels.
 
         Returns
         -------
@@ -185,7 +199,8 @@ class Driver():
 
     @property
     def detector_center_sample(self):
-        """The center sample of the CCD in detector pixels.
+        """
+        The center sample of the CCD in detector pixels.
         
         Returns
         -------
@@ -197,7 +212,8 @@ class Driver():
 
     @property
     def sensor_position(self):
-        """Return the positions, velocities, and times for the sensor.
+        """
+        Return the positions, velocities, and times for the sensor.
         
         Returns
         -------
@@ -209,7 +225,8 @@ class Driver():
 
     @property
     def frame_chain(self):
-        """Return the root node of the rotation frame tree/chain.
+        """
+        Return the root node of the rotation frame tree/chain.
         
         Returns
         -------
@@ -221,7 +238,8 @@ class Driver():
 
     @property
     def sun_position(self):
-        """The sun position relative to the center of the target body in J2000 reference frame.
+        """
+        The sun position relative to the center of the target body in J2000 reference frame.
         
         Returns
         -------
@@ -232,7 +250,8 @@ class Driver():
 
     @property
     def target_name(self):
-        """Return the target name.
+        """
+        Return the target name.
         
         Returns
         -------
@@ -245,7 +264,8 @@ class Driver():
 
     @property
     def target_frame_id(self):
-        """The NAIF ID associated with the target body.
+        """
+        The NAIF ID associated with the target body.
         
         Returns
         -------
@@ -257,7 +277,8 @@ class Driver():
 
     @property
     def sensor_frame_id(self):
-        """Returns the Naif ID code for the sensor reference frame.
+        """
+        Returns the Naif ID code for the sensor reference frame.
         
         Returns
         -------
@@ -269,7 +290,8 @@ class Driver():
 
     @property
     def naif_keywords(self):
-        """The NaifKeywords group from the file label that contains stored values from the original SPICE kernels.
+        """
+        The NaifKeywords group from the file label that contains stored values from the original SPICE kernels.
         
         Returns
         -------
@@ -281,7 +303,8 @@ class Driver():
 
     @property
     def sensor_model_version(self):
-        """Return the version of the ISIS sensor model.
+        """
+        Return the version of the ISIS sensor model.
         
         Returns
         -------
@@ -293,7 +316,8 @@ class Driver():
 
     @property
     def focal2pixel_lines(self):
-        """The line component of the affine transformation from focal plane coordinates to centered ccd pixels.
+        """
+        The line component of the affine transformation from focal plane coordinates to centered ccd pixels.
         
         Returns
         -------
@@ -306,7 +330,8 @@ class Driver():
 
     @property
     def focal2pixel_samples(self):
-        """The sample component of the affine transformation from focal plane coordinates to centered ccd pixels.
+        """
+        The sample component of the affine transformation from focal plane coordinates to centered ccd pixels.
         
         Returns
         -------
@@ -319,7 +344,8 @@ class Driver():
 
     @property
     def pixel2focal_x(self):
-        """Convert from the detector to the focal plane x value.
+        """
+        Convert from the detector to the focal plane x value.
         
         Returns
         -------
@@ -332,7 +358,8 @@ class Driver():
 
     @property
     def pixel2focal_y(self):
-        """Convert from the detector to the focal plane y value.
+        """
+        Convert from the detector to the focal plane y value.
         
         Returns
         -------
@@ -345,7 +372,8 @@ class Driver():
 
     @property
     def ephemeris_start_time(self):
-        """The image start time in ephemeris time.
+        """
+        The image start time in ephemeris time.
         
         Returns
         -------
@@ -357,7 +385,8 @@ class Driver():
 
     @property
     def ephemeris_stop_time(self):
-        """The image stop time in ephemeris time.
+        """
+        The image stop time in ephemeris time.
         
         Returns
         -------
@@ -369,7 +398,8 @@ class Driver():
 
     @property
     def center_ephemeris_time(self):
-        """Returns the average of the start and stop ephemeris times.
+        """
+        Returns the average of the start and stop ephemeris times.
 
         Returns
         -------
@@ -381,7 +411,8 @@ class Driver():
 
     @property
     def short_mission_name(self):
-        """Return short version of the mission name.
+        """
+        Return short version of the mission name.
 
         Returns
         -------
@@ -393,7 +424,8 @@ class Driver():
 
     @property 
     def projection(self):
-        """Return projection information generated by osgeo.
+        """
+        Return projection information generated by osgeo.
 
         Returns
         -------
@@ -433,7 +465,8 @@ class Driver():
     
     @property 
     def geotransform(self):
-        """Return geotransform information generated by osgeo.
+        """
+        Return geotransform information generated by osgeo.
 
         Returns
         -------

@@ -7,7 +7,8 @@ class IsisLabel():
 
     @property
     def label(self):
-        """ Return the cube label.
+        """
+        Return the cube label.
 
         Returns
         -------
@@ -136,7 +137,8 @@ class IsisLabel():
 
     @property
     def sample_summing(self):
-        """ Returns the number of detector samples summed to produce each image sample
+        """
+        Returns the number of detector samples summed to produce each image sample
 
         Returns
         -------
@@ -148,7 +150,7 @@ class IsisLabel():
     @property
     def line_summing(self):
         """
-        the number of detector lines summed to produce each image sample
+        The number of detector lines summed to produce each image sample
 
         Returns
         -------
