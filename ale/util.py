@@ -117,7 +117,8 @@ def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=
 
 
 def find_latest_metakernel(path, year):
-    """ Find the latest version of a metakernel.
+    """
+    Find the latest version of a metakernel.
 
     Parameters
     ----------
@@ -152,7 +153,8 @@ def find_latest_metakernel(path, year):
 
 
 def dict_merge(dct, merge_dct):
-    """ Merge the contents of two dictionaries.
+    """
+    Merge the contents of two dictionaries.
 
     Parameters
     ----------
@@ -210,7 +212,8 @@ def get_isis_preferences(isis_preferences=None):
 
 
 def dict_to_lower(d):
-    """ Recursively convert all keys in the dictionary to lower-case.
+    """
+    Recursively convert all keys in the dictionary to lower-case.
 
     Parameters
     ----------
@@ -226,7 +229,8 @@ def dict_to_lower(d):
 
 
 def expandvars(path, env_dict=os.environ, default=None, case_sensitive=True):
-    """ Expand the environment variables in a given string.
+    """
+    Expand the environment variables in a given string.
 
     Parameters
     ----------
@@ -310,7 +314,8 @@ def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
     return get_kernels_from_isis_pvl(kernel_group, expand, format_as)
 
 def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
-    """ Extract kernels from ISIS PVL.
+    """
+    Extract kernels from ISIS PVL.
 
     Parameters
     ----------
@@ -401,7 +406,8 @@ def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
         raise Exception(f'{format_as} is not a valid return format')
 
 def write_metakernel_from_cube(cube, mkpath=None):
-    """ Create a metakernel from a spiceinit'd cube.
+    """
+    Create a metakernel from a spiceinit'd cube.
 
     Parameters
     ----------
@@ -475,7 +481,7 @@ def get_ck_frames(kernel):
 
 def create_spk_dependency_tree(kernels):
     """
-    construct the dependency tree for the body states in a set of kernels.
+    Construct the dependency tree for the body states in a set of kernels.
 
     Parameters
     ----------
