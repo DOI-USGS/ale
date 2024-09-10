@@ -144,7 +144,7 @@ class ApolloPanIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoDis
     @property
     def instrument_name(self):
         """
-        The name of the instrument
+        The name of the instrument.
 
         Returns
         -------
@@ -160,17 +160,25 @@ class ApolloPanIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoDis
 
     @property
     def sensor_model_version(self):
+        """
+        The ISIS Sensor model number for ApolloPanCamera in ISIS.
+        
+        Returns
+        -------
+        : int
+          ISIS sensor model version
+        """
         return 1
+
 
     @property
     def focal2pixel_lines(self):
         """
         The line component of the affine transformation
-        from focal plane coordinates to centered ccd pixels
-        Expects naif_keywords to be defined. This should be a dict containing
-        Naif keywords from the label.
-        Expects ikid to be defined. This should be the integer Naif ID code
-        for the instrument.
+        from focal plane coordinates to centered ccd pixels.
+
+        This information is not contained in the label, so it is
+        hard-coded to match apollo kernels.
 
         Returns
         -------
@@ -185,10 +193,9 @@ class ApolloPanIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoDis
         """
         The sample component of the affine transformation
         from focal plane coordinates to centered ccd pixels
-        Expects naif_keywords to be defined. This should be a dict containing
-        Naif keywords from the label.
-        Expects ikid to be defined. This should be the integer Naif ID code
-        for the instrument.
+
+        This information is not contained in the label, so it is
+        hard-coded to match apollo kernels.
 
         Returns
         -------
@@ -201,19 +208,26 @@ class ApolloPanIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoDis
     @property
     def pixel2focal_x(self):
         """
-        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+        Returns detector to focal plane x.
+
+        This information is not contained in the label, so it is
+        hard-coded to match apollo kernels.
 
         Returns
         -------
         : list<double>
-        detector to focal plane x
+          detector to focal plane x
         """
         return (0.0, 0.005, 0.0)
+
 
     @property
     def pixel2focal_y(self):
         """
-        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+        Returns detector to focal plane y.
+
+        This information is not contained in the label, so it is
+        hard-coded to match apollo kernels.
 
         Returns
         -------
@@ -221,6 +235,7 @@ class ApolloPanIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoDis
         detector to focal plane y
         """
         return (0.0, 0.0, 0.0)
+
 
     @property
     def focal_length(self):
@@ -235,6 +250,7 @@ class ApolloPanIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoDis
         """
         return 610.0
 
+
     @property
     def ephemeris_start_time(self):
         """
@@ -247,7 +263,6 @@ class ApolloPanIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoDis
         float :
             The image start ephemeris time
         """
-
         isis_bytes = read_table_data(self.label['Table'], self._file)
         return parse_table(self.label['Table'], isis_bytes)['ET'][0]
 
@@ -282,7 +297,6 @@ class ApolloPanIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoDis
         list :
             The center line of the CCD
         """
-
         if self.spacecraft_name == "APOLLO16":
             return 11503.5
         else:
@@ -301,7 +315,6 @@ class ApolloPanIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoDis
         list :
             The center sample of the CCD
         """
-
         if self.spacecraft_name == "APOLLO16":
             return 115537.5
         else:
