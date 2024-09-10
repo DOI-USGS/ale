@@ -148,7 +148,8 @@ def rotate_state(table, rotation):
     return rotated_pos, rotated_vel, ephemeris_times
 
 class IsisSpice():
-    """Mixin class for reading from an ISIS cube that has been spiceinit'd
+    """
+    Mixin class for reading from an ISIS cube that has been spiceinit'd
 
     Attributes
     ----------
@@ -602,7 +603,8 @@ class IsisSpice():
 
     @property
     def sensor_frame_id(self):
-        """Returns the Naif ID code for the sensor reference frame.
+        """
+        Returns the Naif ID code for the sensor reference frame.
 
         Returns
         -------
@@ -618,7 +620,8 @@ class IsisSpice():
 
     @property
     def target_frame_id(self):
-        """The NAIF ID associated with the target body.
+        """
+        The NAIF ID associated with the target body.
         
         Returns
         -------

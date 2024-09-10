@@ -24,7 +24,8 @@ class ReadIsis(IsisSpice, IsisLabel, Driver):
         return 0
 
 def run_spiceinit_isis(image_path):
-    """ Run spiceinit on an image using ISIS.
+    """
+    Run spiceinit on an image using ISIS.
 
     Parameters
     ----------
@@ -57,7 +58,8 @@ def run_spiceinit_isis(image_path):
     temp_folder.rmdir()
 
 def run_spiceinit_ale(image_path):
-    """ Run spiceinit on an image using ALE drivers.
+    """
+    Run spiceinit on an image using ALE drivers.
 
     Parameters
     ----------
@@ -74,7 +76,8 @@ def run_spiceinit_ale(image_path):
 
 
 def generate_body_rotation(driver, target_frame_id):
-    """ Generate body rotation information from a driver.
+    """
+    Generate body rotation information from a driver.
     
     Parameters
     ----------
@@ -119,7 +122,8 @@ def generate_body_rotation(driver, target_frame_id):
     return body_rotation
 
 def generate_instrument_rotation(driver, sensor_frame_id):
-    """ Generate instrument rotation information from a driver.
+    """
+    Generate instrument rotation information from a driver.
 
     Parameters
     ----------
@@ -164,7 +168,8 @@ def generate_instrument_rotation(driver, sensor_frame_id):
     return instrument_pointing
 
 def generate_instrument_position(driver):
-    """ Generate instrument position information from a driver.
+    """
+    Generate instrument position information from a driver.
 
     Parameters
     ----------
@@ -190,7 +195,8 @@ def generate_instrument_position(driver):
     return instrument_position
 
 def generate_sun_position(driver):
-    """ Generate sun position information from a driver.
+    """
+    Generate sun position information from a driver.
 
     Parameters
     ----------
@@ -217,7 +223,8 @@ def generate_sun_position(driver):
     return sun_position
 
 def create_json_dump(driver, sensor_frame_id, target_frame_id):
-    """ Convenience function for generating and merging instrument rotation, body rotation, instrument position, and sun position.
+    """
+    Convenience function for generating and merging instrument rotation, body rotation, instrument position, and sun position.
 
     Parameters
     ----------
@@ -241,7 +248,8 @@ def create_json_dump(driver, sensor_frame_id, target_frame_id):
     return json_dump
 
 def diff_and_describe(json1, json2, key_array):
-    """ Compare two dictionaries and output differences.
+    """
+    Compare two dictionaries and output differences.
 
     Parameters
     ----------
@@ -259,7 +267,8 @@ def diff_and_describe(json1, json2, key_array):
     print(" ".join(key_array) + "\nNum records:", len(diff), "\nMean:", np.mean(diff, axis=(0)), "\nMedian:", np.median(diff, axis=(0)), "\n")
 
 def compare_isds(json1, json2):
-    """ Compare two isds using :func:`driver_verification.diff_and_describe`
+    """
+    Compare two isds using :func:`driver_verification.diff_and_describe`
     
     Parameters
     ----------
@@ -283,7 +292,8 @@ def compare_isds(json1, json2):
     diff_and_describe(json1, json2, ["body_rotation", "angular_velocities"])
 
 def main(image):
-    """ Generate and compare an ALE ISD and an ISIS ISD.
+    """
+    Generate and compare an ALE ISD and an ISIS ISD.
 
     Parameters
     ----------

@@ -120,7 +120,8 @@ class PushFrame():
 
     @property
     def framelet_height(self):
-        """ Return the number of lines in a framelet.
+        """
+        Return the number of lines in a framelet.
 
         Returns
         -------
@@ -132,7 +133,8 @@ class PushFrame():
 
     @property
     def framelet_order_reversed(self):
-        """ Return a boolean indicating if the framelets are reversed.
+        """
+        Return a boolean indicating if the framelets are reversed.
 
         Returns
         -------
@@ -144,7 +146,8 @@ class PushFrame():
 
     @property
     def framelets_flipped(self):
-        """ Return a boolean indicating if the framelets are flipped.
+        """
+        Return a boolean indicating if the framelets are flipped.
 
         Returns
         -------
@@ -157,7 +160,8 @@ class PushFrame():
 
     @property
     def num_frames(self):
-        """ Return the number of frames in the image.
+        """
+        Return the number of frames in the image.
 
         Returns
         -------

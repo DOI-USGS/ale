@@ -423,7 +423,8 @@ class NaifSpice():
 
     @property
     def frame_chain(self):
-        """Return the root node of the rotation frame tree/chain.
+        """
+        Return the root node of the rotation frame tree/chain.
         
         Returns
         -------
