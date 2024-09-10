@@ -1,0 +1,282 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 479
+    TileLines   = 319
+
+    Group = Dimensions
+      Samples = 23950
+      Lines   = 2552
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName       = APOLLO15
+    InstrumentName       = "APOLLO PANORAMIC CAMERA"
+    InstrumentId         = APOLLO_PAN
+    TargetName           = MOON
+    StartTime            = 1971-08-04T16:28:24.9159358
+    StopTime             = 1971-08-04T16:28:26.7420639
+    LineExposureDuration = -0.0015893195483426 <sec/mm>
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode       = -915230
+    LeapSecond          = $base/kernels/lsk/naif0010.tls
+    TargetAttitudeShape = ($base/kernels/pck/pck00009.tpc,
+                           $apollo15/kernels/pck/moon_080317.tf,
+                           $apollo15/kernels/pck/moon_assoc_me.tf)
+    TargetPosition      = (Table,
+                           $apollo15/kernels/tspk/moon_pa_de421_1900-2050.bpc,
+                           $apollo15/kernels/tspk/de421.bsp)
+    ShapeModel          = $base/dems/ldem_128ppd_Mar2011_clon180_radius_pad.c-
+                          ub
+    InstrumentPointing  = Table
+    InstrumentPosition  = Table
+    InstrumentAddendum  = $apollo15/kernels/iak/apolloPanAddendum001.ti
+    CameraVersion       = 1
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 244547137
+  Bytes               = 5568
+  Records             = 87
+  ByteOrder           = Lsb
+  TimeDependentFrames = (31006, 1)
+  ConstantFrames      = (31001, 31007, 31006)
+  ConstantRotation    = (0.99999987325471, -3.29285422375571e-04,
+                         3.80869618671387e-04, 3.29286000210947e-04,
+                         0.99999994578431, -1.45444093783627e-06,
+                         -3.80869119096078e-04, 1.57985578682691e-06,
+                         0.99999992746811)
+  CkTableStartTime    = -896556653.92828
+  CkTableEndTime      = -896556652.04736
+  CkTableOriginalSize = 87
+  FrameTypeCode       = 6
+  Description         = "Created by apollopaninit"
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 244552705
+  Bytes                = 4872
+  Records              = 87
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = -896556653.92828
+  SpkTableEndTime      = -896556652.04736
+  SpkTableOriginalSize = 87.0
+  Description          = "Created by apollopaninit"
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name              = InstrumentPosition
+  StartByte         = 244557577
+  Bytes             = 64
+  Records           = 2
+  ByteOrder         = Lsb
+  SpkTableStartTime = -896556653.91001
+  SpkTableEndTime   = -896556652.04736
+  CacheType         = Linear
+  Description       = "Created by apollopaninit"
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 244557641
+  Bytes               = 3480
+  Records             = 87
+  ByteOrder           = Lsb
+  CkTableStartTime    = -896556653.92828
+  CkTableEndTime      = -896556652.04736
+  Description         = "Created by appollopan2isis"
+  TimeDependentFrames = (-915000, 1)
+  ConstantFrames      = (-915230, -915000)
+  ConstantRotation    = (1, 0, 0, 0, 1, 0, 0, 0, 1)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name      = "Fiducial Measurement"
+  StartByte = 244561121
+  Bytes     = 1780
+  Records   = 89
+  ByteOrder = Lsb
+
+  Group = Field
+    Name = FID_INEX
+    Type = Integer
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = X_COORD
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = Y_COORD
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+End
