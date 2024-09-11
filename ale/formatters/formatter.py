@@ -176,14 +176,12 @@ def to_isd(driver):
     instrument_position['spk_table_original_size'] = len(times)
     instrument_position['ephemeris_times'] = times
     # Rotate positions and velocities into J2000 then scale into kilometers
-    # If velocities are provided, then rotate, otherwise create array of 0s to match shape of position
+    # If velocities are provided, then rotate and add to ISD
     if velocities is not None:
         velocities = j2000_rotation.rotate_velocity_at(positions, velocities, times)/1000
-    else:
-        velocities = np.zeros(positions.shape)
+        instrument_position['velocities'] = velocities
     positions = j2000_rotation.apply_at(positions, times)/1000
     instrument_position['positions'] = positions
-    instrument_position['velocities'] = velocities
     instrument_position["reference_frame"] = j2000_rotation.dest
 
     meta_data['instrument_position'] = instrument_position
@@ -195,14 +193,12 @@ def to_isd(driver):
     sun_position['spk_table_original_size'] = len(times)
     sun_position['ephemeris_times'] = times
     # Rotate positions and velocities into J2000 then scale into kilometers
-    # If velocities are provided, then rotate, otherwise create array of 0s to match shape of position
+    # If velocities are provided, then rotate and add to ISD
     if velocities is not None:
         velocities = j2000_rotation.rotate_velocity_at(positions, velocities, times)/1000
-    else:
-        velocities = np.zeros(positions.shape)
-    positions = j2000_rotation.apply_at(positions, times)/1000
+        positions = j2000_rotation.apply_at(positions, times)/1000
+        sun_position['velocities'] = velocities
     sun_position['positions'] = positions
-    sun_position['velocities'] = velocities
     sun_position["reference_frame"] = j2000_rotation.dest
 
     meta_data['sun_position'] = sun_position
