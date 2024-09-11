@@ -196,8 +196,9 @@ def to_isd(driver):
     # If velocities are provided, then rotate and add to ISD
     if velocities is not None:
         velocities = j2000_rotation.rotate_velocity_at(positions, velocities, times)/1000
-        positions = j2000_rotation.apply_at(positions, times)/1000
         sun_position['velocities'] = velocities
+    
+    positions = j2000_rotation.apply_at(positions, times)/1000
     sun_position['positions'] = positions
     sun_position["reference_frame"] = j2000_rotation.dest
 
