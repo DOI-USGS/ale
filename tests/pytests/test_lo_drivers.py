@@ -150,7 +150,7 @@ def test_medium_kernels():
 
 def test_medium_load(test_medium_kernels):
     label_file = get_image_label('3133_med_res', 'isis')
-    compare_dict = get_isd("lohighcamera")
+    compare_dict = get_isd("lomediumcamera")
 
     isd_str = ale.loads(label_file, props={'kernels': test_medium_kernels}, verbose=True)
     isd_obj = json.loads(isd_str)
