@@ -5,7 +5,7 @@ DAFETF NAIF DAF ENCODED TRANSFER FILE
 'SPKMERGE                                                    '
 BEGIN_ARRAY 1 45
 'DE-0430LE-0430                          '
-'-3DD079AA346BD4^8'
+'-3DD07B4E346BD4^8'
 '-3DD078BA346BD2^8'
 '12D'
 '3'
@@ -60,7 +60,7 @@ BEGIN_ARRAY 1 45
 END_ARRAY 1 45
 BEGIN_ARRAY 2 39
 'DE-0430LE-0430                          '
-'-3DD079AA346BD4^8'
+'-3DD07B4E346BD4^8'
 '-3DD078BA346BD2^8'
 'A'
 '0'
@@ -109,7 +109,7 @@ BEGIN_ARRAY 2 39
 END_ARRAY 2 39
 BEGIN_ARRAY 3 45
 'DE-0430LE-0430                          '
-'-3DD079AA346BD4^8'
+'-3DD07B4E346BD4^8'
 '-3DD078BA346BD2^8'
 '3'
 '0'
@@ -164,7 +164,7 @@ BEGIN_ARRAY 3 45
 END_ARRAY 3 45
 BEGIN_ARRAY 4 72
 'LO3_DE403ME_2010JAN                     '
-'-3DD079AA346BD4^8'
+'-3DD07B4E346BD4^8'
 '-3DD078BA346BD2^8'
 '-215'
 '12D'
@@ -248,7 +248,7 @@ TOTAL_ARRAYS 4
  ~NAIF/SPC BEGIN COMMENTS~
 ; /Users/arsanders/data/lo/ale_0.bsp LOG FILE
 
-; Created 2024-08-29/13:05:56.00.
+; Created 2024-09-11/11:48:27.00.
 ;
 ; BEGIN SPKMERGE COMMANDS
 
@@ -258,12 +258,12 @@ SPK_KERNEL           = /Users/arsanders/data/lo/ale_0.bsp
   SOURCE_SPK_KERNEL  = /Volumes/drive/data/base/kernels/spk/de430.bsp
     INCLUDE_COMMENTS = NO
     BODIES           = 3, 10, 301
-    BEGIN_TIME       = 1967 FEB 20 08:12:28.610
+    BEGIN_TIME       = 1967 FEB 20 08:05:28.610
     END_TIME         = 1967 FEB 20 08:16:28.610
 SOURCE_SPK_KERNEL = /Volumes/drive/data/lo/kernels/spk/lo3_photo_support_ME.bsp
     INCLUDE_COMMENTS = NO
     BODIES           = -533
-    BEGIN_TIME       = 1967 FEB 20 08:12:28.610
+    BEGIN_TIME       = 1967 FEB 20 08:05:28.610
     END_TIME         = 1967 FEB 20 08:16:28.610
 
 ; END SPKMERGE COMMANDS
