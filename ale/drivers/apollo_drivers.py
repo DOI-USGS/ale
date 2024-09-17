@@ -142,7 +142,7 @@ class ApolloMetricIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDisto
 class ApolloPanIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoDistortion, Driver):
 
     @property
-    def instrument_name(self):
+    def instrument_id(self):
         """
         The name of the instrument.
 
@@ -157,6 +157,18 @@ class ApolloPanIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoDis
 
         return id_lookup[super().instrument_id]
 
+
+    @property
+    def instrument_name(self):
+        """
+        The name of the instrument.
+
+        Returns
+        -------
+        str
+          The short text name for the instrument
+        """
+        return "APOLLO PANORAMIC CAMERA"
 
     @property
     def sensor_model_version(self):
