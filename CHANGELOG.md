@@ -44,6 +44,7 @@ release.
 - Rosetta Virtis drivers, tests, and data [#520](https://github.com/DOI-USGS/ale/pull/520)
 - Added compress and decompress ISD functions and added --compress flag to isd_generate[#604](https://github.com/DOI-USGS/ale/issues/604)
 - LO Medium Camera drivers, tests, and data [#613](https://github.com/DOI-USGS/ale/issues/613)
+- Added the ability to generate ISDs with no velocities specified for instrument/sun position [#614](https://github.com/DOI-USGS/ale/issues/614)
 
 ### Changed
 - Changed how push frame sensor drivers compute the `ephemeris_time` property [#595](https://github.com/DOI-USGS/ale/pull/595)
