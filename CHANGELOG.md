@@ -43,6 +43,7 @@ release.
 - Apollo Metric drivers, tests, and data [#533](https://github.com/DOI-USGS/ale/pull/533)
 - Rosetta Virtis drivers, tests, and data [#520](https://github.com/DOI-USGS/ale/pull/520)
 - Added compress and decompress ISD functions and added --compress flag to isd_generate[#604](https://github.com/DOI-USGS/ale/issues/604)
+- LO Medium Camera drivers, tests, and data [#613](https://github.com/DOI-USGS/ale/issues/613)
 
 ### Changed
 - Changed how push frame sensor drivers compute the `ephemeris_time` property [#595](https://github.com/DOI-USGS/ale/pull/595)
