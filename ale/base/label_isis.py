@@ -23,14 +23,15 @@ class IsisLabel():
         if not hasattr(self, "_label"):
             if isinstance(self._file, pvl.PVLModule):
                 self._label = self._file
-            grammar = pvl.grammar.ISISGrammar()
-            grammar.comments+=(("#", "\n"), )
-            try:
-                self._label = pvl.loads(self._file, grammar=grammar)
-            except Exception:
-                self._label = pvl.load(self._file, grammar=grammar)
-            except:
-                raise ValueError("{} is not a valid label".format(self._file))
+            else:
+                grammar = pvl.grammar.ISISGrammar()
+                grammar.comments+=(("#", "\n"), )
+                try:
+                    self._label = pvl.loads(self._file, grammar=grammar)
+                except Exception:
+                    self._label = pvl.load(self._file, grammar=grammar)
+                except:
+                    raise ValueError("{} is not a valid label".format(self._file))
         return self._label
 
     @property
