@@ -408,7 +408,7 @@ class NaifSpice():
         if not hasattr(self, "_sun_position"):
             times = self.ephemeris_time
             if len(times) > 1:
-                times = np/array([times[0], times[-1]])
+                times = np.array([times[0], times[-1]])
             positions = []
             velocities = []
 
@@ -451,6 +451,8 @@ class NaifSpice():
 
             # if isinstance(ephem, np.ndarray):
             #     ephem = ephem.tolist()
+            #     print("[data_naif.sensor_position] ephem is an ndarray")
+            # print("[data_naif.sensor_position] ephem type: " + str(type(ephem)))
 
             pos = []
             vel = []
