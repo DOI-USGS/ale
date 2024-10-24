@@ -379,6 +379,10 @@ class FrameChain(nx.DiGraph):
         times : list
                 A list of times to compute the rotation at
         """
+        # Convert list of np.floats to ndarray
+        if isinstance(times, list) and isinstance(times[0], np.floating):
+            times = np.array(times)
+
         frame_tasks = []
         for s, d in frames:
             function_args = {"toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels}
