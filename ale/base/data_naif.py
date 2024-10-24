@@ -408,7 +408,7 @@ class NaifSpice():
         if not hasattr(self, "_sun_position"):
             times = self.ephemeris_time
             if len(times) > 1:
-                times = [times[0], times[-1]]
+                times = np/array([times[0], times[-1]])
             positions = []
             velocities = []
 
@@ -449,8 +449,8 @@ class NaifSpice():
            not hasattr(self, '_ephem'):
             ephem = self.ephemeris_time
 
-            if isinstance(ephem, np.ndarray):
-                ephem = ephem.tolist()
+            # if isinstance(ephem, np.ndarray):
+            #     ephem = ephem.tolist()
 
             pos = []
             vel = []
@@ -495,7 +495,7 @@ class NaifSpice():
                 ssb_obs_states = np.array(ssb_obs)[:,0:6]
 
                 radius_lt = (self.target_body_radii[2] + self.target_body_radii[0]) / 2 / (scipy.constants.c/1000.0)
-                adjusted_time = np.array(ephem) - obs_tar_lts + radius_lt
+                adjusted_time = ephem - obs_tar_lts + radius_lt
 
                 kwargs = {"target": target,
                           "observer": "SSB",

@@ -24,7 +24,7 @@ def stringify_web_args(function_args):
     clean_function_args = function_args
     for key, value in function_args.items():
         if isinstance(value, np.ndarray):
-            clean_function_args[key] = str(list(value))
+            clean_function_args[key] = str(value.tolist())
         if isinstance(value, list):
             clean_function_args[key] = str(value)
         if isinstance(value, bool):
