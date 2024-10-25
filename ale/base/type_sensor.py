@@ -194,10 +194,10 @@ class Framer():
 
         Returns
         -------
-        : double
+        : ndarray
           Center ephemeris time for the image
         """
-        return [self.center_ephemeris_time]
+        return np.array([self.center_ephemeris_time])
 
     @property
     def ephemeris_stop_time(self):
