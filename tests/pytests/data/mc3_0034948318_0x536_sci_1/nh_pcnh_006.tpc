@@ -1,0 +1,116 @@
+nh_pcnh_006.tpc
+
+PCK containing radii for Pluto, Charon, Nix, Hydra
+
+\begindata
+
+BODY999_RADII = ( 1188.3  1188.3  1188.3 )
+BODY901_RADII = (  606.0   606.0   606.0 )
+BODY902_RADII = (   24.1    16.4    15.2 )
+BODY903_RADII = (   25.65   17.9    16.1 )
+BODY904_RADII = (   10      10      10   )
+BODY905_RADII = (    3.5     3.5     3.5 )
+
+BODY902_POLE_RA   = (   350.1179532     0.0       0.0 )
+BODY902_POLE_DEC  = (   -38.6337107     0.0       0.0 )
+BODY902_PM        = (    81.9449154   197.01579   0.0 )
+BODY902_JED_EPOCH = ( 2457217.83654080 )
+BODY902_CONSTANTS_REF_FRAME   =   (  1 )
+
+
+BODY903_POLE_RA   = (   349.1           0.0       0.0 )
+BODY903_POLE_DEC  = (    37.69          0.0       0.0 )
+BODY903_PM        = (   176.3895140   837.7607    0.0 )
+BODY903_JED_EPOCH = ( 2457217.83654080 )
+BODY903_CONSTANTS_REF_FRAME   =   (  1 )
+
+\begintext
+
+ID   Body     Radii     1-sigma    comments
+
+999  Pluto   1188.3km   +/-1.6km   Nimmo et al., 2016 (3)
+901  Charon   606.0km   +/-1.0km   Nimmo et al., 2016 (3)
+904  Kerberos  10  km              Weaver et al. 2016 (4)
+905  Styx       3.5km              Weaver et al. 2016 (4)
+
+
+902 Nix Porter et al., 2017 (5), updated via email:
+  Tri-axial diameters =  48.3 x 32.8 x 30.4 km
+  ra                  = 350.1179532deg
+  dec                 = -38.6337107deg
+  pm                  = 81.9449154deg
+  period              = 1.8272647d/360deg
+                      =         1d/197.01579deg
+  et0                 = 490133077.125s past J2000 epoch
+                      =      5672.83654090 JED past JED 2451545.0
+                      =   2457217.8365407987 JED
+  Rotation model reference frame is J2000 (SPICE Frame ID 1)
+
+
+903 Hydra, Porter et al., 2017 (5):
+  Tri-axial diameters = 50.3 x 35.8 x 32.2 km
+  ra                  =  82.4457646deg
+  dec                 =   6.5129206deg
+  pm                  = 176.3895140
+  period              = 0.4297170d/360deg
+                      =         1d/837.760665740deg
+  et0                 = 490133077.125s past J2000 epoch
+                      =      5672.83654090 JED past JED 2451545.0
+                      =   2457217.8365407987 JED
+  Rotation model reference frame is J2000 (SPICE Frame ID 1)
+
+
+
+Notes
+=====
+
+(1) Nimmo et al. Mean radius and shape of Pluto and Charon from New
+    Horizons images, 2016.  http://arxiv.org/abs/1603.00821
+
+(2) Based on embargoed materials presented at New Horizons Science Team
+    Meeting, 29.-31.July, 2015
+
+(3) Francis Nimmo, Orkan Umurhan, Carey M. Lisse, Carver J. Bierson,
+    Tod R. Lauer, Marc W. Buie, Henry B. Throop, Josh A. Kammer,
+    James H. Roberts, William B. McKinnon, Amanda M. Zangari, Jeffrey
+    M. Moore, S. Alan Stern, Leslie A. Young, Harold A. Weaver, Cathy B.
+    Olkin, Kim Ennico, Mean radius and shape of Pluto and Charon from
+    New Horizons images, Icarus, Available online 12 July 2016, ISSN
+    0019-1035, http://dx.doi.org/10.1016/j.icarus.2016.06.027.
+
+(4) Weaver, H. A.; Buie, M. W.; Buratti, B. J.; Grundy, W. M.; Lauer, T. R.;
+    Olkin, C. B.; Parker, A. H.; Porter, S. B.; Showalter, M. R.; Spencer,
+    J. R.; Stern, S. A.; Verbiscer, A. J.; McKinnon, W. B.; Moore, J. M.;
+    Robbins, S. J.; Schenk, P.; Singer, K. N.; Barnouin, O. S.; Cheng, A.
+    F.; Ernst, C. M.; Lisse, C. M.; Jennings, D. E.; Lunsford, A. W.;
+    Reuter, D. C.; Hamilton, D. P.; Kaufmann, D. E.; Ennico, K.; Young, L.
+    A.; Beyer, R. A.; Binzel, R. P.; Bray, V. J.; Chaikin, A. L.; Cook, J.
+    C.; Cruikshank, D. P.; Dalle Ore, C. M.; Earle, A. M.; Gladstone, G. R.;
+    Howett, C. J. A.; Linscott, I. R.; Nimmo, F.; Parker, J. Wm.; Philippe,
+    S.; Protopapa, S.; Reitsema, H. J.; Schmitt, B.; Stryk, T.; Summers, M.
+    E.; Tsang, C. C. C.; Throop, H. H. B.; White, O. L.; Zangari, A. M., The
+    small satellites of Pluto as observed by New Horizons, Science, Volume
+    351, Issue 6279, id.aae0030 (2016),
+    http://dx.doi.org/10.1126/science.aae0030.
+
+(5) Porter, S.B. et al., 2017. Shapes and Poles of Nix and Hydra. Presented
+    at the 2017 Asteroids, Comets, and Meteors Meeting.
+
+
+History
+=======
+
+BTCarcich 2017-04-26  Version 006, Updated Nix and Hydra radii, added
+                                   Kerberos and Styx radii; added Nix and
+                                   Hydra pole positions.
+BTCarcich 2016-09-13  Version 005, Restored 1-sigma uncertainties for Pluto
+                                   and Charon from online abstract.
+BTCarcich 2016-09-13  Version 005, Added new Pluto and Charon values,
+                                   removed 1-sigma uncertainties
+BTCarcich 2016-05-31  Version 004, cleaning up typos; no substantive change
+BTCarcich 2016-05-28  Version 003, updated Pluto and Charon radii
+                                   per direction by Ross Beyer, Leslie
+                                   Young, via NH-GGI email list
+BTCarcich 2015-08-05  Version 002, updated Charon radii per Alan Stern
+BTCarcich 2015-07-30  Version 001
+

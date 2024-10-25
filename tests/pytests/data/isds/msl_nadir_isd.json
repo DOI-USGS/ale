@@ -1,0 +1,295 @@
+{
+  "isis_camera_version": 1,
+  "image_lines": 1193,
+  "image_samples": 1338,
+  "name_platform": "MARS SCIENCE LABORATORY",
+  "name_sensor": "MAST CAMERA LEFT",
+  "reference_height": {
+    "maxheight": 1000,
+    "minheight": -1000,
+    "unit": "m"
+  },
+  "name_model": "USGS_ASTRO_FRAME_SENSOR_MODEL",
+  "center_ephemeris_time": 598494669.4412209,
+  "radii": {
+    "semimajor": 3396.19,
+    "semiminor": 3376.2,
+    "unit": "km"
+  },
+  "body_rotation": {
+    "time_dependent_frames": [
+      10014,
+      1
+    ],
+    "ck_table_start_time": 598494669.4412209,
+    "ck_table_end_time": 598494669.4412209,
+    "ck_table_original_size": 1,
+    "ephemeris_times": [
+      598494669.4412209
+    ],
+    "quaternions": [
+      [
+        -0.31921039676060065,
+        0.2937636389682398,
+        -0.12264933637077348,
+        0.8926168199781396
+      ]
+    ],
+    "angular_velocities": [
+      [
+        3.162301082738196e-05,
+        -2.881378599775597e-05,
+        5.651578887273641e-05
+      ]
+    ],
+    "reference_frame": 1
+  },
+  "instrument_pointing": {
+    "time_dependent_frames": [
+      -76000,
+      1
+    ],
+    "ck_table_start_time": 598494669.4412209,
+    "ck_table_end_time": 598494669.4412209,
+    "ck_table_original_size": 1,
+    "ephemeris_times": [
+      598494669.4412209
+    ],
+    "quaternions": [
+      [
+        0.7419899275668841,
+        0.41563986262021746,
+        0.25055291222506065,
+        0.4625123675815364
+      ]
+    ],
+    "angular_velocities": null,
+    "reference_frame": 1,
+    "constant_frames": [
+      -76573,
+      -76000
+    ],
+    "constant_rotation": [
+      0.41656672703572295,
+      0.908831179877854,
+      -0.022316998198093657,
+      -0.7809014963237929,
+      0.3702829395764849,
+      0.503073948538243,
+      0.46547289391113544,
+      -0.19213649091316684,
+      0.8639551804888768
+    ]
+  },
+  "naif_keywords": {
+    "BODY499_RADII": [
+      3396.19,
+      3396.19,
+      3376.2
+    ],
+    "BODY_FRAME_CODE": 10014,
+    "BODY_CODE": 499,
+    "FRAME_-76210_NAME": "MSL_MASTCAM_LEFT",
+    "INS-76210_CAHVOR_H": [
+      712.373106,
+      4664.465028,
+      33.182389
+    ],
+    "TKFRAME_-76210_UNITS": "DEGREES",
+    "INS-76210_IFOV_VERTICAL": 0.01230196,
+    "INS-76210_CAHVOR_O": [
+      0.999627,
+      0.026908,
+      0.004759
+    ],
+    "INS-76210_CAHVOR_R": [
+      -0.000151,
+      -0.139189,
+      -1.250336
+    ],
+    "INS-76210_CAHVOR_V": [
+      570.612488,
+      -14.279011,
+      4648.733195
+    ],
+    "INS-76210_CAHVOR_FILE": "MSL_CAL_003_SN_3003_FILTER_0_FOCUS_02315-MCAML-FLIGHT.cahvor",
+    "INS-76210_DISTORTION_PIXEL": [
+      837.77915717,
+      592.14046615
+    ],
+    "TKFRAME_-76210_AXES": [
+      2.0,
+      1.0,
+      3.0
+    ],
+    "TKFRAME_-76210_SPEC": "ANGLES",
+    "INS-76210_FOCAL_LENGTH": 34.0,
+    "INS-76210_CAHVOR_QUAT": [
+      1e-05,
+      -0.00325,
+      -0.00104,
+      0.99999
+    ],
+    "INS-76210_CAHVOR_POS": [
+      0.80436,
+      0.55942,
+      -1.90608
+    ],
+    "INS-76210_FOV_BOUNDARY": [
+      0.17483767,
+      0.12730492,
+      0.97633255,
+      -0.0,
+      0.12834274,
+      0.99172987,
+      -0.17476887,
+      0.12719345,
+      0.9763594,
+      -0.17553059
+    ],
+    "INS-76210_PIXEL_LINES": 1200.0,
+    "INS-76210_CAHVOR_MODEL": " CAHVOR",
+    "INS-76210_PIXEL_SIZE": 0.0074,
+    "INS-76210_CAHVOR_HC": 829.187822,
+    "INS-76210_IFOV_NOMINAL": 0.01247026,
+    "INS-76210_CAHVOR_HS": 4645.242086,
+    "INS-76210_BORESIGHT_PIXEL": [
+      829.18782212,
+      601.33514402
+    ],
+    "FRAME_-76210_CLASS_ID": -76210.0,
+    "INS-76210_FOV_CENTER_PIXEL": [
+      823.5,
+      599.5
+    ],
+    "INS-76210_FOV_CLASS_SPEC": "CORNERS",
+    "INS-76210_BORESIGHT": [
+      -0.0,
+      -0.0,
+      1.0
+    ],
+    "INS-76210_CAHVOR_THETA": -1.5710039999999998,
+    "INS-76210_IFOV": 0.01228988,
+    "TKFRAME_-76210_RELATIVE": "MSL_RSM_HEAD",
+    "FRAME_-76210_CLASS": 4.0,
+    "INS-76210_CAHVOR_DIMS": [
+      1648.0,
+      1200.0
+    ],
+    "INS-76210_FOV_SHAPE": "POLYGON",
+    "INS-76210_PIXEL_SAMPLES": 1648.0,
+    "INS-76210_IFOV_HORIZONTAL": 0.0122778,
+    "INS-76210_CAHVOR_VC": 601.335144,
+    "INS-76210_CAHVOR_VS": 4644.882626,
+    "TKFRAME_-76210_ANGLES": [
+      -90.01,
+      1.484,
+      89.655
+    ],
+    "FRAME_-76210_CENTER": -76.0,
+    "INS-76210_CAHVOR_A": [
+      0.999664,
+      0.025047,
+      0.006727
+    ],
+    "INS-76210_CAHVOR_C": [
+      0.767151,
+      0.433709,
+      -1.971648
+    ],
+    "INS-76210_FOV_FRAME": "MSL_MASTCAM_LEFT",
+    "BODY499_POLE_DEC": [
+      52.8865,
+      -0.0609,
+      0.0
+    ],
+    "BODY499_POLE_RA": [
+      317.68143,
+      -0.1061,
+      0.0
+    ],
+    "BODY499_PM": [
+      176.63,
+      350.89198226,
+      0.0
+    ]
+  },
+  "detector_sample_summing": 1,
+  "detector_line_summing": 1,
+  "focal_length_model": {
+    "focal_length": 34.0
+  },
+  "detector_center": {
+    "line": 576.4026068104001,
+    "sample": 680.1442422028803
+  },
+  "focal2pixel_lines": [
+    0,
+    0,
+    136.49886775101947
+  ],
+  "focal2pixel_samples": [
+    0,
+    136.49886775101947,
+    0
+  ],
+  "optical_distortion": {
+    "cahvor": {
+      "coefficients": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "starting_detector_line": 0,
+  "starting_detector_sample": 0,
+  "instrument_position": {
+    "spk_table_start_time": 598494669.4412209,
+    "spk_table_end_time": 598494669.4412209,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
+      598494669.4412209
+    ],
+    "positions": [
+      [
+        -42.94189787175925,
+        -2877.908568116462,
+        -1793.8700624828516
+      ]
+    ],
+    "velocities": [
+      [
+        0.21433546111887108,
+        0.0543006771748966,
+        -0.09224545246537652
+      ]
+    ],
+    "reference_frame": 1
+  },
+  "sun_position": {
+    "spk_table_start_time": 598494669.4412209,
+    "spk_table_end_time": 598494669.4412209,
+    "spk_table_original_size": 1,
+    "ephemeris_times": [
+      598494669.4412209
+    ],
+    "positions": [
+      [
+        -178112289.0644448,
+        -111686023.6724429,
+        -46420243.18796098
+      ]
+    ],
+    "velocities": [
+      [
+        12.688344510456547,
+        -19.98128446099721,
+        -9.507348850574344
+      ]
+    ],
+    "reference_frame": 1
+  }
+}

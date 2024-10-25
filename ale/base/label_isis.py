@@ -7,6 +7,19 @@ class IsisLabel():
 
     @property
     def label(self):
+        """
+        Return the cube label.
+
+        Returns
+        -------
+        pvl.PVLModule
+            The cube label as a PVLModule object.
+
+        Raises
+        ------
+        ValueError
+            Raised when an invalid label is provided.
+        """
         if not hasattr(self, "_label"):
             if isinstance(self._file, pvl.PVLModule):
                 self._label = self._file
@@ -107,7 +120,7 @@ class IsisLabel():
     @property
     def sampling_factor(self):
         """
-        Returns the summing factor from the PDS3 label. For example a return value of 2
+        Returns the summing factor from the ISIS label. For example a return value of 2
         indicates that 2 lines and 2 samples (4 pixels) were summed and divided by 4
         to produce the output pixel value.
 
@@ -137,7 +150,7 @@ class IsisLabel():
     @property
     def line_summing(self):
         """
-        the number of detector lines summed to produce each image sample
+        The number of detector lines summed to produce each image sample
 
         Returns
         -------
@@ -170,14 +183,22 @@ class IsisLabel():
         : str
           Spacecraft clock start count
         """
-        if 'SpacecraftClockStartCount' in self.label['IsisCube']['Instrument']:
-            return str(self.label['IsisCube']['Instrument']['SpacecraftClockStartCount'])
-        elif 'SpacecraftClockCount' in self.label['IsisCube']['Instrument']:
-            return str(self.label['IsisCube']['Instrument']['SpacecraftClockCount'])
-        elif 'SpacecraftClockStartCount' in self.label['IsisCube']['Archive']:
-            return str(self.label['IsisCube']['Archive']['SpacecraftClockStartCount'])
-        else:
-            return None
+        if not hasattr(self, "_clock_start_count"):
+            if 'SpacecraftClockStartCount' in self.label['IsisCube']['Instrument']:
+                self._clock_start_count = self.label['IsisCube']['Instrument']['SpacecraftClockStartCount']
+            elif 'SpacecraftClockCount' in self.label['IsisCube']['Instrument']:
+                self._clock_start_count = self.label['IsisCube']['Instrument']['SpacecraftClockCount']
+            elif 'SpacecraftClockStartCount' in self.label['IsisCube']['Archive']:
+                self._clock_start_count = self.label['IsisCube']['Instrument']['SpacecraftClockStartCount']
+            else:
+                self._clock_start_count = None
+
+            if isinstance(self._clock_start_count, pvl.Quantity):
+                self._clock_start_count = self._clock_start_count.value
+
+            self._clock_start_count = str(self._clock_start_count)
+
+        return self._clock_start_count
 
     @property
     def spacecraft_clock_stop_count(self):
@@ -190,12 +211,20 @@ class IsisLabel():
         : str
           Spacecraft clock stop count
         """
-        if 'SpacecraftClockStopCount' in self.label['IsisCube']['Instrument']:
-            return self.label['IsisCube']['Instrument']['SpacecraftClockStopCount']
-        elif 'SpacecraftClockStopCount' in self.label['IsisCube']['Archive']:
-            return self.label['IsisCube']['Archive']['SpacecraftClockStopCount']
-        else:
-            return None
+        if not hasattr(self, "_clock_stop_count"):
+            if 'SpacecraftClockStopCount' in self.label['IsisCube']['Instrument']:
+                self._clock_stop_count = self.label['IsisCube']['Instrument']['SpacecraftClockStopCount']
+            elif 'SpacecraftClockStopCount' in self.label['IsisCube']['Archive']:
+                self._clock_stop_count = self.label['IsisCube']['Archive']['SpacecraftClockStopCount']
+            else:
+                self._clock_stop_count = None
+
+            if isinstance(self._clock_stop_count, pvl.Quantity):
+                self._clock_stop_count = self._clock_stop_count.value
+
+            self._clock_stop_count = str(self._clock_stop_count)
+
+        return self._clock_stop_count
 
     @property
     def utc_start_time(self):

@@ -1,0 +1,726 @@
+KPL/IK
+
+MI/LISM/SELENE Instrument Kernel
+===========================================================================
+
+   This Multiband Imager (MI) instrument kernel (I-kernel) contains
+   the instrument mounting offset, fields-of-view specifications, and optics 
+   and detector parameters. Details of MI instrument are described in 
+   Ohtake et al., 2007. 
+
+Version and Date
+---------------------------------------------------------------------------
+   Version 1.05-- October 7, 2009 M. Ohtake, Y.Yokota (JAXA)
+
+    - Angles of LISM_TC1_HEAD and LISM_TC2_HEAD were updated.
+    - Comment of distortion equation is corrected.
+
+   Version 1.04-- June 18, 2009 M. Ohtake, Y.Yokota (JAXA)
+   (Same as Version 1.03test-- May 8, 2008 -- M. Ohtake, Y.Yokota (JAXA))
+
+     Pitch angle of LISM_MI_V_HEAD is corrected from  -0.0899 to
+     -0.0486deg (Delta angle is 0.0413 deg).
+
+   Version 1.03-- December 7, 2007 -- M. Ohtake, J. Haruyama, Y.Yokota (JAXA)
+
+    - ANGLES of the Frames (from -131310 to -131370) were updated
+      by using the laboratory measurement values. 
+    - Pixel coordinates of Along-track center are corrected.
+    - Comments were updated.
+
+   Version 1.02 -- October 10, 2007 -- Y.Yokota (JAXA)
+
+      FOV_BOUNDARY_CORNERS data for Level 2A software were corrected.
+
+   Version 1.0  -- October 2, 2007 -- Naru Hirata (Univ. of Aizu.),
+                  Makiko Ohtake (JAXA), Jun'ichi Haruyama (JAXA),
+                  Tsuneo Matsunaga (NIES), Y.Yokota (JAXA)
+
+      Initial version after launch.
+      Preliminary versions have been developed since March 14, 2005.
+
+References
+---------------------------------------------------------------------------
+Ohtake et al., 2007 **** TBD ****
+Kodama et al., 2007 **** TBD ****
+
+
+Implementation Notes
+---------------------------------------------------------------------------
+
+
+MI NAIF IDs
+---------------------------------------------------------------------------
+
+   The following NAIF IDs are assigned to individual MI sensors and bands:
+
+       Sensor                                  NAIF ID
+      ------------------------------------------------
+       LISM_MI-VIS1 ( 415 nm)                  -131331
+       LISM_MI-VIS2 ( 750 nm)                  -131332
+       LISM_MI-VIS3 ( 900 nm)                  -131333
+       LISM_MI-VIS4 ( 950 nm)                  -131334
+       LISM_MI-VIS5 (1000 nm)                  -131335
+       LISM_MI-NIR1 (1000 nm)                  -131341
+       LISM_MI-NIR2 (1050 nm)                  -131342
+       LISM_MI-NIR3 (1250 nm)                  -131343
+       LISM_MI-NIR4 (1550 nm)                  -131344
+      ------------------------------------------------
+
+      \begindata
+
+      NAIF_BODY_NAME                += ( 'LISM_MI-VIS1' )
+      NAIF_BODY_CODE                += ( -131331 )
+      NAIF_BODY_NAME                += ( 'LISM_MI-VIS2' )
+      NAIF_BODY_CODE                += ( -131332 )
+      NAIF_BODY_NAME                += ( 'LISM_MI-VIS3' )
+      NAIF_BODY_CODE                += ( -131333 )
+      NAIF_BODY_NAME                += ( 'LISM_MI-VIS4' )
+      NAIF_BODY_CODE                += ( -131334 )
+      NAIF_BODY_NAME                += ( 'LISM_MI-VIS5' )
+      NAIF_BODY_CODE                += ( -131335 )
+      NAIF_BODY_NAME                += ( 'LISM_MI-NIR1' )
+      NAIF_BODY_CODE                += ( -131341 )
+      NAIF_BODY_NAME                += ( 'LISM_MI-NIR2' )
+      NAIF_BODY_CODE                += ( -131342 )
+      NAIF_BODY_NAME                += ( 'LISM_MI-NIR3' )
+      NAIF_BODY_CODE                += ( -131343 )
+      NAIF_BODY_NAME                += ( 'LISM_MI-NIR4' )
+      NAIF_BODY_CODE                += ( -131344 )
+
+      \begintext
+
+Optical Parameters
+---------------------------------------------------------------------------
+
+      -----------------------------------------------------------------
+             parameter                    MI-VIS              
+      -----------------------------------------------------------------
+      Focal Length, mm, VIS1                    65.4
+      Focal Length, mm, VIS2                    65.3
+      Focal Length, mm, VIS3                    65.4
+      Focal Length, mm, VIS4                    65.4
+      Focal Length, mm, VIS5                    65.4
+      f/ratio                             f/3.7
+      IFOV, rad/pixel                     0.0002000
+      Field of view (rad)
+          Cross-track                     0.1919862
+          Along-track                     0.0002000
+      -----------------------------------------------------------------
+
+      -----------------------------------------------------------------
+             parameter                    MI-NIR              
+      -----------------------------------------------------------------
+      Focal Length, mm, NIR1                    64.9
+      Focal Length, mm, NIR2                    64.9
+      Focal Length, mm, NIR3                    65.0
+      Focal Length, mm, NIR4                    65.2
+      f/ratio                             f/3.7
+      IFOV, rad/pixel                     0.0006200
+      Field of view (rad)
+          Cross-track                     0.1919862
+          Along-track                     0.0006200
+      -----------------------------------------------------------------
+
+   These values are incorporated in the keywords below; pixel sizes 
+   are converted to MILLIMETERS.
+                    ^^^^^^^^^^^
+
+      \begindata
+
+      INS-131331_FOCAL_LENGTH = (  65.4    ) 
+      INS-131331_F_NUMBER     = (  3.7       )
+      INS-131332_FOCAL_LENGTH = (  65.3    ) 
+      INS-131332_F_NUMBER     = (  3.7       )
+      INS-131333_FOCAL_LENGTH = (  65.4    ) 
+      INS-131333_F_NUMBER     = (  3.7       )
+      INS-131334_FOCAL_LENGTH = (  65.4    ) 
+      INS-131334_F_NUMBER     = (  3.7       )
+      INS-131335_FOCAL_LENGTH = (  65.4    ) 
+      INS-131335_F_NUMBER     = (  3.7       )
+
+      INS-131341_FOCAL_LENGTH = (  64.9    ) 
+      INS-131341_F_NUMBER     = (  3.7       )
+      INS-131342_FOCAL_LENGTH = (  64.9    ) 
+      INS-131342_F_NUMBER     = (  3.7       )
+      INS-131343_FOCAL_LENGTH = (  65.0    ) 
+      INS-131343_F_NUMBER     = (  3.7       )
+      INS-131344_FOCAL_LENGTH = (  65.2    ) 
+      INS-131344_F_NUMBER     = (  3.7       )
+
+      \begintext
+
+Mounting Alignment
+---------------------------------------------------------------------------
+
+Detector CCD Parameters
+---------------------------------------------------------------------------
+
+      -----------------------------------------------------------------
+             parameter                    MI-VIS              MI-NIR
+      -----------------------------------------------------------------
+      Pixel Size, mm
+          Cross-track                     0.013                0.040
+          Along-track                     0.013                0.040
+      Virtual Detector Array Size (*1)
+          Cross-track                      962                  320
+          Along-track                        1                    1
+      Virtual Detector Array Center (*2)
+          Cross-track                     484.0               160.0
+       -----------------------------------------------------------------
+
+   (*1) Virtual Detector is one-dimensional sensor which is defined on the
+        two-dimensional physical CCD plane.
+
+   (*2) Center of the first pixel is defined as "1.0".
+
+
+       Actual Band Order on detectors (*** Comments are TBD ***)
+       ------------------------------------------------
+       LISM_MI-VIS1 ( 415 nm)                  -131331
+       LISM_MI-VIS2 ( 750 nm)                  -131332
+       LISM_MI-VIS5 (1000 nm)                  -131335
+       LISM_MI-VIS4 ( 950 nm)                  -131334
+       LISM_MI-VIS3 ( 900 nm)                  -131333
+       ------------------------------------------------
+       LISM_MI-NIR3 (1250 nm)                  -131343
+       LISM_MI-NIR4 (1550 nm)                  -131344
+       LISM_MI-NIR1 (1000 nm)                  -131341
+       LISM_MI-NIR2 (1050 nm)                  -131342
+       ------------------------------------------------
+
+      \begindata
+
+      INS-131331_PIXEL_SAMPLES  = ( 962         )
+      INS-131331_PIXEL_LINES    = ( 962         )
+      INS-131331_CENTER         = ( 484.0, 1.0 )       
+      INS-131331_PIXEL_SIZE     = ( 0.013     )
+
+      INS-131332_PIXEL_SAMPLES  = ( 962         )
+      INS-131332_PIXEL_LINES    = ( 962         )
+      INS-131332_CENTER         = ( 484.0, 1.0 )       
+      INS-131332_PIXEL_SIZE     = ( 0.013     )
+
+      INS-131335_PIXEL_SAMPLES  = ( 962         )
+      INS-131335_PIXEL_LINES    = ( 962         )
+      INS-131335_CENTER         = ( 484.0, 1.0 )       
+      INS-131335_PIXEL_SIZE     = ( 0.013     )
+
+      INS-131334_PIXEL_SAMPLES  = ( 962         )
+      INS-131334_PIXEL_LINES    = ( 962         )
+      INS-131334_CENTER         = ( 484.0, 1.0 )       
+      INS-131334_PIXEL_SIZE     = ( 0.013     )
+
+      INS-131333_PIXEL_SAMPLES  = ( 962         )
+      INS-131333_PIXEL_LINES    = ( 962         )
+      INS-131333_CENTER         = ( 484.0, 1.0 )       
+      INS-131333_PIXEL_SIZE     = ( 0.013     )
+
+      INS-131343_PIXEL_SAMPLES  = ( 320          )
+      INS-131343_PIXEL_LINES    = ( 240          )
+      INS-131343_CENTER         = ( 160.0, 1.0 )       
+      INS-131343_PIXEL_SIZE     = ( 0.040     )
+
+      INS-131344_PIXEL_SAMPLES  = ( 320          )
+      INS-131344_PIXEL_LINES    = ( 240          )
+      INS-131344_CENTER         = ( 160.0, 1.0 )       
+      INS-131344_PIXEL_SIZE     = ( 0.040     )
+
+      INS-131341_PIXEL_SAMPLES  = ( 320          )
+      INS-131341_PIXEL_LINES    = ( 240          )
+      INS-131341_CENTER         = ( 160.0, 1.0 )       
+      INS-131341_PIXEL_SIZE     = ( 0.040     )
+
+      INS-131342_PIXEL_SAMPLES  = ( 320          )
+      INS-131342_PIXEL_LINES    = ( 240          )
+      INS-131342_CENTER         = ( 160.0, 1.0 )       
+      INS-131342_PIXEL_SIZE     = ( 0.040     )
+
+      \begintext
+
+
+
+FOV Definitions
+---------------------------------------------------------------------------
+
+
+   In this section, definitions for FOVs of MI-VIS and  MI-NIR are described
+   in a format consistent required by the SPICE (CSPICE) function GETFOV
+   (getfov_c).
+
+   On each focal plane of  MI-VIS and  MI-NIR, a two-dimensional CCD is 
+   located. Virtual one-dimensional detector is defined for each band on 
+   the two-dimensional physical CCD plane. Hereafter it is treated as
+   one-dimensional detector array.
+
+   The direction along the row of pixels of each band is defined to be 
+   Y axis. The +Y is the direction toward the radiator side from the 
+   detectors. Z axis is defined to be "ideal" boresight. 
+
+
+                       Corner pixel
+                      view direction 
+                           ^
+         Center pixel       \             X(Along-track)
+            view   <.        \           ^   CCD plane
+          direction  `-.      \          |
+                        `-.    \         |     .^ -Y(Cross-track)
+                           `-.  \        |   .'
+                              `-.\    F  | .'
+                     <-----------`o.-----o'  Detector line in
+                   Z        Focal  \`-.  | .  the CCD plane
+                            point   \  `-*'
+                                     \ .'| Center pixel
+                                      *  |
+                                  Corner
+                                   pixel           
+
+   The data from which the view directions for the corner pixels
+   have been computed are provided in the camera geometric calibration
+   references (Kodama et al., 2007). 
+
+   The "actual" boresight vector (INS<INSTID>_BORESIGHT) is along the
+   view direction of the "center" pixel.
+
+   Corner vectors (FOV_BOUNDARY_CORNERS) are defined as line-of-sight 
+   vectors from the middle points of the upper and lower edges of corner 
+   pixels. We note that these  points are A and B, but not C and D in the
+   below diagram. These corner vectors are only used in LISM Level 2A:
+
+
+     C      A                                       A'      C'
+    /      /                                         \       \
+   o------o-------o------o-------o-----     ---o------o-------o
+   |              |              |             |              |
+   |  Pixel no.1  |  Pixel no.2  |    ....     |  Last Pixel  |
+   |              |              |             |              |
+   |              |              |             |              |
+   o------o-------o------o-------o-----     ---o------o-------o
+    \      \                                         /       /
+     D      B                                       B'      D'
+
+
+   When the coordinates of the first and last pixel of each CCD are 
+   (Xf,Yf) and (Xl,Yl) and those of the two middle pixels of the first
+   and last pixels are (Xm1,Ym1) and (Xm2,Ym2), the FOV definition can
+   be expressed as: 
+
+         INS<INSTID>_FOV_FRAME            = 'LISM_TC1_HEAD'
+         INS<INSTID>_FOV_SHAPE            = 'RECTANGLE'
+         INS<INSTID>_BORESIGHT            = (
+                                             -Xm, -(Ym1+Ym2)/2, FL 
+                                            )
+         INS<INSTID>_FOV_BOUNDARY_CORNERS = (
+                                           -(Xf-HP),     -Yf,     FL
+                                           -(Xf+HP),     -Yf,     FL
+                                           -(Xl+HP),     -Yl,     FL
+                                           -(Xl-HP),     -Yl,     FL
+                                            )
+
+   where HP is 1/2 of the pixel size [mm], and FL is the focal length.
+
+      \begindata
+
+         INS-131331_FOV_FRAME            = 'LISM_MI_V_HEAD'
+         INS-131331_FOV_SHAPE            = 'RECTANGLE'
+         INS-131331_BORESIGHT            = (
+                                            6.2543   -0.0201   65.4000
+                                           )
+         INS-131331_FOV_BOUNDARY_CORNERS = (
+                                            6.2608    6.2654   65.4000 
+                                            6.2478    6.2654   65.4000 
+                                            6.2478   -6.2406   65.4000 
+                                            6.2608   -6.2406   65.4000 
+                                           )
+
+         INS-131332_FOV_FRAME            = 'LISM_MI_V_HEAD'
+         INS-131332_FOV_SHAPE            = 'RECTANGLE'
+         INS-131332_BORESIGHT            = (
+                                            3.1270   -0.0208   65.3000
+                                           )
+         INS-131332_FOV_BOUNDARY_CORNERS = (
+                                            3.1335    6.2647   65.3000 
+                                            3.1205    6.2647   65.3000 
+                                            3.1205   -6.2413   65.3000 
+                                            3.1335   -6.2413   65.3000 
+                                           )
+
+         INS-131335_FOV_FRAME            = 'LISM_MI_V_HEAD'
+         INS-131335_FOV_SHAPE            = 'RECTANGLE'
+         INS-131335_BORESIGHT            = (
+                                           -0.0060   -0.0187   65.4000
+                                           )
+         INS-131335_FOV_BOUNDARY_CORNERS = (
+                                            0.0005    6.2668   65.4000 
+                                           -0.0125    6.2668   65.4000 
+                                           -0.0125   -6.2392   65.4000 
+                                            0.0005   -6.2392   65.4000 
+                                           )
+
+         INS-131334_FOV_FRAME            = 'LISM_MI_V_HEAD'
+         INS-131334_FOV_SHAPE            = 'RECTANGLE'
+         INS-131334_BORESIGHT            = (
+                                           -3.1416   -0.0171   65.4000
+                                           )
+         INS-131334_FOV_BOUNDARY_CORNERS = (
+                                           -3.1351    6.2684   65.4000 
+                                           -3.1481    6.2684   65.4000 
+                                           -3.1481   -6.2376   65.4000 
+                                           -3.1351   -6.2376   65.4000 
+                                           )
+
+         INS-131333_FOV_FRAME            = 'LISM_MI_V_HEAD'
+         INS-131333_FOV_SHAPE            = 'RECTANGLE'
+         INS-131333_BORESIGHT            = (
+                                           -6.2723   -0.0170   65.4000
+                                           )
+         INS-131333_FOV_BOUNDARY_CORNERS = (
+                                           -6.2658    6.2685   65.4000 
+                                           -6.2788    6.2685   65.4000 
+                                           -6.2788   -6.2375   65.4000 
+                                           -6.2658   -6.2375   65.4000 
+                                           )
+
+         INS-131343_FOV_FRAME            = 'LISM_MI_N_HEAD'
+         INS-131343_FOV_SHAPE            = 'RECTANGLE'
+         INS-131343_BORESIGHT            = (
+                                           4.5004    -0.0013   65.0000
+                                           )
+         INS-131343_FOV_BOUNDARY_CORNERS = (
+                                           4.5204     6.3787   65.0000 
+                                           4.4804     6.3787   65.0000 
+                                           4.4804    -6.4213   65.0000 
+                                           4.5204    -6.4213   65.0000 
+                                           )
+
+         INS-131344_FOV_FRAME            = 'LISM_MI_N_HEAD'
+         INS-131344_FOV_SHAPE            = 'RECTANGLE'
+         INS-131344_BORESIGHT            = (
+                                           1.4998     0.0028   65.2000
+                                           )
+         INS-131344_FOV_BOUNDARY_CORNERS = (
+                                           1.5198     6.3828   65.2000 
+                                           1.4798     6.3828   65.2000 
+                                           1.4798    -6.4172   65.2000 
+                                           1.5198    -6.4172   65.2000 
+                                           )
+
+         INS-131341_FOV_FRAME            = 'LISM_MI_N_HEAD'
+         INS-131341_FOV_SHAPE            = 'RECTANGLE'
+         INS-131341_BORESIGHT            = (
+                                           -1.5114   -0.0084   64.9000
+                                           )
+         INS-131341_FOV_BOUNDARY_CORNERS = (
+                                           -1.4914    6.3716   64.9000 
+                                           -1.5314    6.3716   64.9000 
+                                           -1.5314   -6.4284   64.9000 
+                                           -1.4914   -6.4284   64.9000 
+                                           )
+
+         INS-131342_FOV_FRAME            = 'LISM_MI_N_HEAD'
+         INS-131342_FOV_SHAPE            = 'RECTANGLE'
+         INS-131342_BORESIGHT            = (
+                                            -4.513   -0.0118   64.9000
+                                           )
+         INS-131342_FOV_BOUNDARY_CORNERS = (
+                                            -4.4930   6.3682   64.9000 
+                                            -4.5330   6.3682   64.9000 
+                                            -4.5330  -6.4318   64.9000 
+                                            -4.4930  -6.4318   64.9000 
+                                           )
+
+      \begintext
+
+SELENE/LISM NAIF frame IDs
+---------------------------------------------------------------------------
+
+   The following NAIF IDs are assigned to individual LISM frames and sensors:
+
+      Definition of the keywords used in these assignment are attached
+      at bottom of the table.
+                                               NAIF ID
+      ------------------------------------------------
+       SELENE_M                                   -131
+       SELENE_M_SPACECRAFT                     -131000
+
+       LISM_LRU_SP                             -131310
+       LISM_SP                                 -131311
+       LISM_SP_HIGH                            -131312
+
+       LISM_LRU_TC_MI                          -131320
+
+       LISM_MI_V_HEAD                          -131330
+       LISM_MI_N_HEAD                          -131340
+
+       LISM_MI-VIS1                            -131331
+       LISM_MI-VIS2                            -131332
+       LISM_MI-VIS3                            -131333
+       LISM_MI-VIS4                            -131334
+       LISM_MI-VIS5                            -131335
+       LISM_MI-NIR1                            -131341
+       LISM_MI-NIR2                            -131342
+       LISM_MI-NIR3                            -131343
+       LISM_MI-NIR4                            -131344
+
+       LISM_TC1_HEAD                           -131350
+       LISM_TC2_HEAD                           -131370
+
+       LISM_TC1                                -131351
+       LISM_TC2                                -131371
+
+       LISM_TC1_WDF  (Double DCT Full)         -131352
+       LISM_TC1_WTF  (Double Through Full)     -131353
+       LISM_TC1_SDF  (Single DCT Full)         -131354
+       LISM_TC1_STF  (Single Through Full)     -131355
+       LISM_TC1_WDN  (Double DCT Nominal)      -131356
+       LISM_TC1_WTN  (Double Through Nominal)  -131357
+       LISM_TC1_SDN  (Single DCT Nominal)      -131358
+       LISM_TC1_STN  (Single Through Nominal)  -131359
+       LISM_TC1_WDH  (Double DCT Half)         -131360
+       LISM_TC1_WTH  (Double Through Half)     -131361
+       LISM_TC1_SDH  (Single DCT Half)         -131362
+       LISM_TC1_STH  (Single Through Half)     -131363
+       LISM_TC1_SSH  (Single SP_support Half)  -131364
+
+       LISM_TC2_WDF  (Double DCT Full)         -131372
+       LISM_TC2_WTF  (Double Through Full)     -131373
+       LISM_TC2_SDF  (Single DCT Full)         -131374
+       LISM_TC2_STF  (Single Through Full)     -131375
+       LISM_TC2_WDN  (Double DCT Nominal)      -131376
+       LISM_TC2_WTN  (Double Through Nominal)  -131377
+       LISM_TC2_SDN  (Single DCT Nominal)      -131378
+       LISM_TC2_STN  (Single Through Nominal)  -131379
+       LISM_TC2_WDH  (Double DCT Half)         -131380
+       LISM_TC2_WTH  (Double Through Half)     -131381
+       LISM_TC2_SDH  (Single DCT Half)         -131382
+       LISM_TC2_STH  (Single Through Half)     -131383
+       LISM_TC2_SSH  (Single SP_support Half)  -131384
+
+   Definition of the keywords
+       SELENE_M: SELENE mission
+       SELENE_M_SPACECRAFT: SELENE main satellite
+       LISM_LRU_SP: LISM Radiometer SP Unit
+       LISM_SP: SP nominal resolution
+       LISM_SP_HIGH: SP high resolution
+       LISM_LRU_TC_MI: LISM Radiometer TC/MI Unit
+       LISM_MI_V_HEAD: MI-VIS optics
+       LISM_MI_N_HEAD: MI-NIR optics
+       LISM_TC1_HEAD: TC1 optics
+       LISM_TC2_HEAD: TC2 optics
+
+SELENE/LISM Frames
+---------------------------------------------------------------------------
+
+   The following SELENE/LISM frames are defined in this kernel file:
+
+           Name                  Relative to           Type       NAIF ID
+      ======================  ===================  ============   =======
+
+      SELENE_M_SPACECRAFT     J2000                CK             -131000
+      LISM_LRU_SP             SELENE_M             FIXED          -131310
+      LISM_LRU_TC_MI          SELENE_M             FIXED          -131320
+      LISM_MI_V_HEAD          LISM_LRU_TC_MI       FIXED          -131330
+      LISM_MI_N_HEAD          LISM_LRU_TC_MI       FIXED          -131340
+      LISM_TC1_HEAD           LISM_LRU_TC_MI       FIXED          -131350
+      LISM_TC2_HEAD           LISM_LRU_TC_MI       FIXED          -131370
+
+
+SELENE/LISM Frame Tree
+--------------------------------------
+
+   The diagram below shows the SELENE/LISM frame hierarchy.
+
+
+                               "J2000" INERTIAL
+           +-----------------------------------------------------+
+           |                          |                          |
+           |<-pck                     |                          |<-pck
+           |                          |                          |
+           V                          |                          V
+       "MOON_ME"                      |                     "IAU_EARTH"
+     MOON BODY-FIXED                  |<-ck               EARTH BODY-FIXED
+     ---------------                  |                   ----------------
+                                      V
+                            "SELENE_M_SPACECRAFT"
+           +-----------------------------------------------------+
+           |                                                     |
+           |<-fixed                                              |<-fixed
+           |                                                     |
+           V                                                     V
+    "LISM_LRU_TC_MI"                                       "LISM_LRU_SP"
+    -----------------------------------------------+       -------------
+           |            |             |            |
+           |<-fixed     |             |<-fixed     |
+           |            |             |            |
+           V            |             V            |
+    "LISM_TC1_HEAD"     |      "LISM_MI_V_HEAD"    |
+    ---------------     |      --------------      |
+                        |                          |
+                        |<-fixed                   |<-fixed
+                        |                          |
+                        V                          V
+                 "LISM_TC2_HEAD"            "LISM_MI_N_HEAD"
+                 ---------------            ----------------
+
+   \begindata
+
+      FRAME_SELENE_M_SPACECRAFT       = -131000
+      FRAME_-131000_NAME              = 'SELENE_M_SPACECRAFT'
+      FRAME_-131000_CLASS             =  3
+      FRAME_-131000_CLASS_ID          = -131000
+      FRAME_-131000_CENTER            = -131
+      CK_-131000_SCLK                 = -131
+      CK_-131000_SPK                  = -131
+
+      FRAME_LISM_LRU_SP               =  -131310
+      FRAME_-131310_NAME              = 'LISM_LRU_SP'
+      FRAME_-131310_CLASS             =  4
+      FRAME_-131310_CLASS_ID          =  -131310
+      FRAME_-131310_CENTER            =  -131
+      TKFRAME_-131310_RELATIVE        = 'SELENE_M_SPACECRAFT'
+      TKFRAME_-131310_SPEC            = 'ANGLES'
+      TKFRAME_-131310_UNITS           = 'DEGREES'
+      TKFRAME_-131310_AXES            = ( 3,   2,   1   )
+      TKFRAME_-131310_ANGLES          = ( 0.1429, -0.0202, 0.0689 )
+
+      FRAME_LISM_LRU_TC_MI            =  -131320
+      FRAME_-131320_NAME              = 'LISM_LRU_TC_MI'
+      FRAME_-131320_CLASS             =  4
+      FRAME_-131320_CLASS_ID          =  -131320
+      FRAME_-131320_CENTER            =  -131
+      TKFRAME_-131320_RELATIVE        = 'SELENE_M_SPACECRAFT'
+      TKFRAME_-131320_SPEC            = 'ANGLES'
+      TKFRAME_-131320_UNITS           = 'DEGREES'
+      TKFRAME_-131320_AXES            = ( 3,   2,   1   )
+      TKFRAME_-131320_ANGLES          = ( 0.0099, 0.0396, -0.0179 )
+
+      FRAME_LISM_MI_V_HEAD            =  -131330
+      FRAME_-131330_NAME              = 'LISM_MI_V_HEAD'
+      FRAME_-131330_CLASS             =  4
+      FRAME_-131330_CLASS_ID          =  -131330
+      FRAME_-131330_CENTER            =  -131
+      TKFRAME_-131330_RELATIVE        = 'LISM_LRU_TC_MI'
+      TKFRAME_-131330_SPEC            = 'ANGLES'
+      TKFRAME_-131330_UNITS           = 'DEGREES'
+      TKFRAME_-131330_AXES            = ( 3,   2,   1   )
+      TKFRAME_-131330_ANGLES          = ( 0.0138, -0.0486, -0.0536 )
+
+      FRAME_LISM_MI_N_HEAD            =  -131340
+      FRAME_-131340_NAME              = 'LISM_MI_N_HEAD'
+      FRAME_-131340_CLASS             =  4
+      FRAME_-131340_CLASS_ID          =  -131340
+      FRAME_-131340_CENTER            =  -131
+      TKFRAME_-131340_RELATIVE        = 'LISM_LRU_TC_MI'
+      TKFRAME_-131340_SPEC            = 'ANGLES'
+      TKFRAME_-131340_UNITS           = 'DEGREES'
+      TKFRAME_-131340_AXES            = ( 3,   2,   1   )
+      TKFRAME_-131340_ANGLES          = ( 0.0232, -0.0068, -0.0332 )
+
+      FRAME_LISM_TC1_HEAD             =  -131350
+      FRAME_-131350_NAME              = 'LISM_TC1_HEAD'
+      FRAME_-131350_CLASS             =  4
+      FRAME_-131350_CLASS_ID          =  -131350
+      FRAME_-131350_CENTER            =  -131
+      TKFRAME_-131350_RELATIVE        = 'LISM_LRU_TC_MI'
+      TKFRAME_-131350_SPEC            = 'ANGLES'
+      TKFRAME_-131350_UNITS           = 'DEGREES'
+      TKFRAME_-131350_AXES            = ( 3,   2,   1   )
+      TKFRAME_-131350_ANGLES          = ( 0.04903647, -14.97465222, 0.05110624 )
+
+      FRAME_LISM_TC2_HEAD             =  -131370
+      FRAME_-131370_NAME              = 'LISM_TC2_HEAD'
+      FRAME_-131370_CLASS             =  4
+      FRAME_-131370_CLASS_ID          =  -131370
+      FRAME_-131370_CENTER            =  -131
+      TKFRAME_-131370_RELATIVE        = 'LISM_LRU_TC_MI'
+      TKFRAME_-131370_SPEC            = 'ANGLES'
+      TKFRAME_-131370_UNITS           = 'DEGREES'
+      TKFRAME_-131370_AXES            = ( 3,   2,   1   )
+      TKFRAME_-131370_ANGLES          = ( -0.04379912, 15.01058661, 0.09222246 )
+
+   \begintext
+   
+Distortion information
+---------------------------------------------------------------------------
+  Line-of-sight vector of pixel no. n can be expressed as below.
+
+   Distortion coefficients information:
+     INS<INSTID>_DISTORTION_COEF_X  = ( a0, a1, a2, a3)
+     INS<INSTID>_DISTORTION_COEF_Y  = ( b0, b1, b2, b3),
+
+   Distance r from the center:
+     r = - (n - INS<INSTID>_CENTER) * INS<INSTID>_PIXEL_SIZE.
+
+   Line-of-sight vector v is calculated as
+     v[X] = INS<INSTID>BORESIGHT[X]
+            +a0 +a1*r +a2*r^2 +a3*r^3 ,
+     v[Y] = INS<INSTID>BORESIGHT[Y]
+            +r +a0 +a1*r +a2*r^2 +a3*r^3 ,
+     v[Z] = INS<INSTID>BORESIGHT[Z] .
+
+
+   \begindata
+
+      INS-131331_DISTORTION_COEF_X  = (
+                                       -1.7347e-18,  6.5562e-4, -1.7224e-4
+                                      )
+      INS-131331_DISTORTION_COEF_Y  = (
+                                        2.3130e-18, -1.7082e-3,  5.0717e-5
+                                      )
+      INS-131332_DISTORTION_COEF_X  = (
+                                        2.8912e-19,  3.8886e-4, -8.4176e-5
+                                      )
+      INS-131332_DISTORTION_COEF_Y  = (
+                                       -2.0238e-18,  2.6316e-3,  4.9624e-5
+                                      )
+      INS-131333_DISTORTION_COEF_X  = (
+                                        2.3130e-18, -2.2133e-4,  2.6768e-4
+                                      )
+      INS-131333_DISTORTION_COEF_Y  = (
+                                        1.0119e-18, -1.6243e-3,  1.6044e-5
+                                      )
+      INS-131334_DISTORTION_COEF_X  = (
+                                        1.1565e-18, -9.5157e-6,  1.4639e-4
+                                      )
+      INS-131334_DISTORTION_COEF_Y  = (
+                                       -1.3010e-18,  2.4813e-3, -2.3439e-5
+                                      )
+      INS-131335_DISTORTION_COEF_X  = (
+                                        2.8912e-19,  2.0899e-4,  4.7727e-5
+                                      )
+      INS-131335_DISTORTION_COEF_Y  = (
+                                       -1.0119e-18,  3.4982e-3,  1.9597e-5
+                                      )
+      INS-131341_DISTORTION_COEF_X  = (
+                                      -9.0474e-4, -2.4390e-3,
+                                      -2.5248e-5,  2.8753e-5
+                                      )
+      INS-131341_DISTORTION_COEF_Y  = (
+                                      -1.7747e-4,  2.4504e-3,
+                                       1.0338e-4, -4.7280e-5
+                                      )
+      INS-131342_DISTORTION_COEF_X  = (
+                                      -1.4361e-3, -3.7386e-3,
+                                       3.0261e-5,  3.7848e-5
+                                      )
+      INS-131342_DISTORTION_COEF_Y  = (
+                                      -9.2563e-4, -1.3992e-3,
+                                       2.0318e-4, -1.6216e-5
+                                      )
+      INS-131343_DISTORTION_COEF_X  = (
+                                      -2.6566e-4,  4.3774e-4,
+                                      -2.8387e-4, -4.6355e-6
+                                      )
+      INS-131343_DISTORTION_COEF_Y  = (
+                                       1.1552e-3, -2.5034e-3,
+                                       2.7161e-4, -1.2621e-5
+                                      )
+      INS-131344_DISTORTION_COEF_X  = (
+                                      -5.0560e-3,  9.5244e-5,
+                                      -1.2675e-4, -1.3607e-5
+                                      )
+      INS-131344_DISTORTION_COEF_Y  = (
+                                      -4.2265e-3,  7.2037e-5,
+                                       2.9845e-4, -3.4799e-5
+                                      )
+   \begintext

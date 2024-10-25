@@ -7,6 +7,19 @@ class Pds3Label():
 
     @property
     def label(self):
+        """
+        Return the PDS3 label.
+
+        Returns
+        -------
+        pvl.PVLModule
+            The cube label as a PVLModule object.
+
+        Raises
+        ------
+        ValueError
+            Raised when an invalid label is provided.
+        """
         if not hasattr(self, "_label"):
             if isinstance(self._file, pvl.PVLModule):
                 self._label = self._file
@@ -78,7 +91,7 @@ class Pds3Label():
         """
         Returns the full name of the instrument host
 
-          Returns
+        Returns
         -------
         : str
           Full name of the instrument host
@@ -104,7 +117,7 @@ class Pds3Label():
         """
         Returns the name of the spacecraft
 
-          Returns
+        Returns
         -------
         : str
           Full name of the spacecraft
@@ -117,7 +130,7 @@ class Pds3Label():
         """
         Returns the start time of the image as a UTC string
 
-          Returns
+        Returns
         -------
         : str
           Start time of the image in UTC YYYY-MM-DDThh:mm:ss[.fff]
@@ -130,7 +143,7 @@ class Pds3Label():
         """
         Returns the stop time of the image as a UTC string
 
-          Returns
+        Returns
         -------
         : str
           Stop time of the image in UTC YYYY-MM-DDThh:mm:ss[.fff]
@@ -141,7 +154,9 @@ class Pds3Label():
     @property
     def image_lines(self):
         """
-          Returns
+        Returns the number of lines in the image.
+
+        Returns
         -------
         : int
           Number of lines in the image
@@ -152,6 +167,8 @@ class Pds3Label():
     @property
     def image_samples(self):
         """
+        Returns the number of samples in the image.
+
         Returns
         -------
         : int
@@ -251,6 +268,9 @@ class Pds3Label():
     @property
     def spacecraft_clock_start_count(self):
         """
+        The spacecraft clock start count, frequently used to determine the start time
+        of the image.
+
         Returns
         -------
         : str
@@ -262,6 +282,9 @@ class Pds3Label():
     @property
     def spacecraft_clock_stop_count(self):
         """
+        The spacecraft clock stop count, frequently used to determine the stop time
+        of the image.
+
         Returns
         -------
         : str
@@ -288,19 +311,23 @@ class Pds3Label():
          """
         # The EXPOSURE_DURATION may either be stored as a (value, unit) or just a value
         if 'EXPOSURE_DURATION' in self.label:
-            try:
-                unit = self.label['EXPOSURE_DURATION'].units
-                unit = unit.lower()
-                if unit == "ms" or unit == "msec" or unit == "millisecond":
-                  return self.label['EXPOSURE_DURATION'].value * 0.001
-                else:
-                  return self.label['EXPOSURE_DURATION'].value
-
-            # With no units, assume milliseconds
-            except:
-                return self.label['EXPOSURE_DURATION'] * 0.001
+            key = self.label['EXPOSURE_DURATION']
+        elif 'INSTRUMENT_STATE_PARMS' in self.label:
+            key = self.label['INSTRUMENT_STATE_PARMS']['EXPOSURE_DURATION']
         else:
             return self.line_exposure_duration
+        try:
+            unit = key.units
+            unit = unit.lower()
+            if unit == "ms" or unit == "msec" or unit == "millisecond":
+                return key.value * 0.001
+            else:
+                return key.value
+
+        # With no units, assume milliseconds
+        except:
+            return key * 0.001
+        
 
 
     # Consider expanding this to handle units

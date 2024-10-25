@@ -1,0 +1,500 @@
+KPL/IK
+
+VIRTIS Instrument kernel
+===========================================================================
+
+   This instrument kernel (I-kernel) contains Rosetta VIRTIS optics,
+   detector, and field-of-view parameters.
+
+
+Version and Date
+---------------------------------------------------------------------------
+
+   Version 1.4 -- July 21, 2014 --- Marc Costa Sitja, ESAC/ESA
+   
+      Minor corrections after final review by Federico Tosi.
+
+   Version 1.3 -- July 21, 2014 --- Federico Tosi, INAF-IAPS;
+                                    Boris Semenov, NAIF/JPL
+   
+      Added FOV parameters for ROS_VIRTIS-M_IR_ZERO.
+
+   Version 1.2 -- November 15, 2010 --- Bjoern Grieger, ESAC/ESAC
+   
+      Added FOV parameters for ROS_VIRTIS-M_VIS_ZERO.
+
+   Version 1.1 -- September 6, 2006 --- Federico Tosi, IASF &
+                                        Boris Semenov, NAIF/JPL
+
+      Updated to match the actual instrument design and the latest frame
+      implementation (FK v0.8+), including:
+
+         -  removed all descriptions and parameters for instruments
+            ROS_VIRTIS-M_VIS_SCAN/-226212,
+            ROS_VIRTIS-M_IR_SCAN/-226214, and ROS_VIRTIS_URF/-226230;
+
+         -  corrected FOV diagrams to indicate the actual direction of
+            flight 
+
+         -  corrected the VIRTIS-H FOV diagram to indicate the actual
+            FOV alignment
+
+         -  swapped values in the FOV_ANGULAR_SIZE keywords, "The
+            nominal VIRTIS detector parameters" table, and VIRTIS-H
+            PIXEL_SAMPLES/PIXEL_LINE/CCD_CENTER keywords to match true
+            cross- and along-track FOV alignment
+
+         -  changed VIRTIS-M_VIS and VIRTIS_M-IR CCD_CENTER to 128.5,
+            0.5 (from 127.5, 0.5)
+
+         -  set reference axis in VIRTIS-H FOV definition to X (1,0,0)
+
+         -  added the full scan FOV associated with
+            ROS_VIRTIS-M/-226210
+
+   Version 1.0 -- March 15, 2005 -- Boris Semenov, NAIF/JPL
+
+      Version number change for the first official release.
+
+   Version 0.3 -- March 15, 2005 -- Boris Semenov, NAIF/JPL
+
+      Fixed VIRTIS-H FOV definition and relevant parameters and
+      comments to align slit with the +X axis of the VIRTIS-H frame.
+
+   Version 0.2 -- October 12, 2004 -- Boris Semenov, NAIF/JPL
+
+      Fixed cut-n-paste errors (incorrect ID) in the keywords in the 
+      ``Detector Parameters'' section.
+
+   Version 0.1 -- September 2, 2004 -- Boris Semenov, NAIF/JPL
+
+      Filled in instrument overview section (copied from [6]).
+
+   Version 0.0 -- August 4, 2004 -- Boris Semenov, NAIF/JPL
+
+      VERY PRELIMINARY VERSION.
+
+
+References
+---------------------------------------------------------------------------
+
+   1. ``Kernel Pool Required Reading''
+
+   2. ``C-kernel Required Reading''
+
+   3. ``VIRTIS EID, Part B'', ROS-EST-RS-30015/EID B, 2001-02-15
+
+   4. Rosetta Frames Definition Kernel (FK), latest version.
+
+   5. ``VIRTIS: Experiment User Manual'', RO-VIR-UM-001, 2002-05-10
+
+   6. ESA Science and Technology Web Server, Rosetta Instruments Area,
+      http://sci.esa.int/science-e/www/object/index.cfm?fobjectid=35061
+
+
+Implementation Notes
+--------------------------------------------------------
+
+   Applications that need SPICE I-kernel data must ``load'' the I-kernel
+   file, normally during program initialization.
+
+   Loading the kernel using the SPICELIB routine FURNSH causes the data
+   items and their associated values present in the kernel to become
+   associated with a data structure called the ``kernel pool''. The
+   application program may then obtain the value(s) for any IK data
+   item using the SPICELIB routines GDPOOL, GIPOOL, GCPOOL. Routine
+   GETFOV may be used if the file contains instrument field-of-view
+   (FOV) specification. See [1] for details.
+
+   This file was created with, and can be updated with a text editor or
+   word processor.
+
+
+Conventions for Specifying Data
+--------------------------------------------------------
+
+   Data items are specified using ``keyword=value'' assignments [1].
+   All keywords referencing values in this I-kernel start with the
+   characters `INS' followed by the NAIF Rosetta instrument ID code,
+   constructed using the spacecraft ID number (-226) followed by the
+   NAIF three digit ID number for VIRTIS module. These IDs are
+   defined in [4] as follows:
+
+               Instrument name          ID
+               --------------------   -------
+               ROS_VIRTIS             -226200
+               ROS_VIRTIS-M           -226210
+               ROS_VIRTIS-M_VIS       -226211
+               ROS_VIRTIS-M_VIS_ZERO  -226212
+               ROS_VIRTIS-M_IR        -226213
+               ROS_VIRTIS-M_IR_ZERO   -226214
+               ROS_VIRTIS-H           -226220
+
+   The remainder of the keyword is an underscore character followed by
+   the unique name of the data item. For example, the focal length of
+   the VIRTIS-M VIS optics is specified by
+
+               INS-226211_FOCAL_LENGTH
+
+   The upper bound on the length of all keywords is 32 characters.
+
+   If a keyword is included in more than one file, or if the same
+   keyword appears more than once within a single file, the last
+   assignment supersedes any earlier assignments.
+
+
+Overview
+--------------------------------------------------------
+
+   From [6]:
+
+      VIRTIS (Visible and Infrared Thermal Imaging Spectrometer) is an
+      imaging spectrometer that combines three data channels in one
+      instrument. Two of the data channels are designed to perform
+      spectral mapping. The third channel is devoted to spectroscopy.
+
+      Summary of VIRTIS Characteristics
+
+         Spectral range (mkm):  
+            Mapping Spectrometer - Visible  --- 0.25 - 1.0
+            Mapping Spectrometer - Infrared --- 0.95 - 5
+            Hi Res Spectrometer  - Infrared --- 2.03 - 5.03
+
+         Spectral resolution:
+            Mapping Spectrometer - Visible  --- 100 - 380
+            Mapping Spectrometer - Infrared --- 70 - 360
+            Hi Res Spectrometer  - Infrared --- 1300 - 3000
+
+         Field of view (mrad x mrad)
+            Mapping Spectrometer - Visible  --- 64 (slit) x 64 (scan)
+            Mapping Spectrometer - Infrared --- 64 (slit) x 64 (scan)
+            Hi Res Spectrometer  - Infrared --- 0.583 x 1.749
+
+         Mass (kg)      
+            30
+
+
+Mounting Alignment
+--------------------------------------------------------
+
+   Refer to the latest version of the Rosetta Frames Definition Kernel
+   (FK) [4] for the VIRTIS reference frame definitions and mounting
+   alignment information.
+
+
+Apparent FOV Layout
+--------------------------------------------------------
+
+   This diagram illustrates the VIRTIS-M VIS and IR apparent FOV layout
+   for "zero" scan mirror position in the corresponding reference
+   frame. These FOVs are associated with detector instrument IDs
+   (-226211 and -226213).
+
+
+                                  ^ +Xmvis (cross track) 
+                                  | +Xmir                          direction
+        |                         |                           --->   of
+        | ~0.014 degrees          |                                flight
+        |                         | 
+        v         Pixel 1         |      Pixel 256
+       ---              +---------|---------+
+        |       1 line  |         x-------------> +Ymvis (along track)
+       ---              +-------------------+     +Ymir             
+        ^                   256 pixels/line                        
+        |
+                        |   ~3.67 degrees   |
+                        |<----------------->|
+                        |                   |      Boresight (+Z axis)
+                                                    is into the page
+
+
+   This diagram illustrates the VIRTIS-M apparent FOV layout resulting
+   from a full, 256 step, +/- 1.83 degree scan mirror sweep about Y
+   axis. This FOV is associated with instrument ID -226210 and is
+   useful only for rough coverage analysis as in reality the instrument
+   does not always articulate the mirror over the whole possible range.
+
+
+                                  ^ +Xm (cross track)
+                                  |   
+        |        Pixel 1,1        |                                direction
+       ---              *---------|---------+                 ---->   of
+        ^               |         |         |                       flight
+        |  ~3.67        |         |         |
+        | degrees       |         |         |
+        |               |         |         |
+        |     256 lines |         x-------------> +Ym (along track)
+        |     (each for |                   |     
+        |     a step in |                   |
+        |     scan seq.)|                   |
+        V               |                   |
+       ---              +-------------------+
+        |                  256 pixels/line
+         
+
+                        |   ~3.67 degrees   |
+                        |<----------------->|
+                        |                   |      Boresight (+Z axis)
+                                                    is into the page
+
+
+   This diagram illustrates the VIRTIS-H apparent FOV layout in the
+   corresponding reference frame.
+
+
+                                  ^ +Xh (cross track)
+                                  |
+        |                         |                             direction
+        | ~0.0334 degrees         |                        ---->   of
+        |                         |                              flight
+        v               Pixel 1   |   Pixel 3
+       ------                +----|----+
+        |                    |    x-------------> +Yh (along track)
+       ------                +---------+
+        ^                    3 pixel/line
+        |
+                             |         | ~0.1 degrees   
+                           ->|---------|<-----
+                             |         |             Boresight (+Z axis)
+                                                      is into the page
+
+
+Optical Parameters
+--------------------------------------------------------
+
+   The following VIRTIS-M VIS and IR and VIRTIS-H nominal first order
+   optical parameters are included in the data section below, from [3]:
+
+      -----------------------------------------------------------------
+             parameter         VIRTIS-M/VIS   VIRTIS-M/IR   VIRTIS-H
+      -----------------------------------------------------------------
+      Focal Length, mm            152.0          152.0        195.5 (*)
+      f/ratio                     f/5.6          f/3.2        f/2.04  
+      IFOV, rad/pixel                     
+          Cross-track             0.00025        0.00025      0.000583
+          Along-track             0.00025        0.00025      0.000583
+      Field of view (deg) 
+          Cross-track             3.6669         3.6669       0.0334
+          Along-track             0.0143         0.0143       0.1002
+      Field of view (deg) - scan (**)
+          Cross-track             3.6669         3.6669       n/a
+          Along-track             3.6669         3.6669       n/a
+      -----------------------------------------------------------------
+
+   (*) VIRTIS-H focal length was estimated from IFOV and pixel size.
+   
+   (**) This field of view corresponds to the maximum possible, using
+       the complete 256 step scan sequence.
+
+   The keywords below provide nominal values from the table above.
+   Angular size values in the keywords are given radians, with the
+   cross-track size being the first value and the along-track size
+   being the second value in each pair.
+
+      \begindata
+
+         INS-226211_FOCAL_LENGTH       = ( 152.0                )
+         INS-226211_F/RATIO            = (   5.6                )
+         INS-226211_FOV_ANGULAR_SIZE   = (   0.000250, 0.064000 )
+         INS-226211_IFOV               = (   0.000250, 0.000250 )
+
+         INS-226213_FOCAL_LENGTH       = ( 152.0                )
+         INS-226213_F/RATIO            = (   3.2                )
+         INS-226213_FOV_ANGULAR_SIZE   = (   0.000250, 0.064000 )
+         INS-226213_IFOV               = (   0.000250, 0.000250 )
+
+         INS-226220_FOCAL_LENGTH       = ( 195.5                )
+         INS-226220_F/RATIO            = (   2.04               )
+         INS-226220_FOV_ANGULAR_SIZE   = (   0.000583, 0.001749 )
+         INS-226220_IFOV               = (   0.000583, 0.000583 )
+
+      \begintext
+
+
+Detector Parameters
+--------------------------------------------------------
+
+   The nominal VIRTIS detector parameters from [6] are:
+
+      -----------------------------------------------------------------
+             parameter            VIRTIS-M/VIS   VIRTIS-M/IR   VIRTIS-H
+      -----------------------------------------------------------------
+      Detector Array Size/Physical 
+          Along-track                 1024          436          436
+          Cross-track                  512          270          270  
+      Detector Array Size/Spatial  
+          Cross-track                    1            1            1
+          Along-track                  256 (1)      256 (2)        3
+      Detector Array Center/Spatial
+          Cross-track                    0.5          0.5          0.5
+          Along-track                  128.5        128.5          1.5
+      Pixel Size, microns/Spatial
+          Cross-track                   38 (3)       38           38
+          Along-track                   38           38           38
+      -----------------------------------------------------------------
+
+   (1) VIS CCD pixels are 2x2 binned at detector level
+
+   (2) assuming IR reads out the same number of pixels as VIS
+
+   (3) size of a 2x2 binned pixel
+
+   The values are given in microns for PIXEL_SIZE keywords and in counts
+   for PIXEL_SAMPLES, PIXEL_LINES, and CENTER keywords.
+
+      \begindata
+
+         INS-226211_PIXEL_SIZE         = ( 38, 38 )
+         INS-226211_PIXEL_SAMPLES      = ( 256 )
+         INS-226211_PIXEL_LINES        = (   1 )
+         INS-226211_CCD_CENTER         = ( 128.5, 0.5 )
+
+         INS-226213_PIXEL_SIZE         = ( 38, 38 )
+         INS-226213_PIXEL_SAMPLES      = ( 256 )
+         INS-226213_PIXEL_LINES        = (   1 )
+         INS-226213_CCD_CENTER         = ( 128.5, 0.5 )
+
+         INS-226220_PIXEL_SIZE         = ( 38, 38 )
+         INS-226220_PIXEL_SAMPLES      = (   3 )
+         INS-226220_PIXEL_LINES        = (   1 )
+         INS-226220_CCD_CENTER         = (   1.5, 0.5 )
+
+      \begintext
+
+
+FOV Definitions
+---------------------------------------------------------------------------
+
+   This section contains definitions for the VIRTIS FOVs. These
+   definitions are provided in the format required by the SPICE
+   (CSPICE) function GETFOV (getfov_c).
+   
+   The set of assignments in the data section below defines the
+   VIRTIS-M VIS and IR non-scanning FOVs and VIRTIS-H FOV with respect
+   to the corresponding frames to be a rectangles with the corners
+   defined by the first and last pixels of the spatial, cross-track
+   line and the boresight along the +Z axis. These FOV definitions use
+   angular extent style specification with the cross and along track
+   angular sizes taken from the ``Optics Parameters'' section above.
+
+      \begindata
+
+         INS-226211_FOV_FRAME                 = 'ROS_VIRTIS-M_VIS'
+         INS-226211_FOV_SHAPE                 = 'RECTANGLE'
+         INS-226211_BORESIGHT                 = (
+                                            0.000000     0.000000   152.000000
+                                                )
+         INS-226211_FOV_CLASS_SPEC            = 'ANGLES'
+         INS-226211_FOV_REF_VECTOR            = (
+                                            1.000000     0.000000     0.000000
+                                                )
+         INS-226211_FOV_REF_ANGLE             = ( 0.00716197 )
+         INS-226211_FOV_CROSS_ANGLE           = ( 1.83346494 )
+         INS-226211_FOV_ANGLE_UNITS           = 'DEGREES'
+
+
+         INS-226212_FOV_FRAME                 = 'ROS_VIRTIS-M_VIS_ZERO'
+         INS-226212_FOV_SHAPE                 = 'RECTANGLE'
+         INS-226212_BORESIGHT                 = (
+                                            0.000000 0.000000 152.000000
+                                                )
+         INS-226212_FOV_CLASS_SPEC            = 'ANGLES'
+         INS-226212_FOV_REF_VECTOR            = (
+                                            1.000000 0.000000 0.000000
+                                                )
+         INS-226212_FOV_REF_ANGLE             = ( 0.00716197 )
+         INS-226212_FOV_CROSS_ANGLE           = ( 1.83346494 )
+         INS-226212_FOV_ANGLE_UNITS           = 'DEGREES' 
+
+         INS-226213_FOV_FRAME                 = 'ROS_VIRTIS-M_IR'
+         INS-226213_FOV_SHAPE                 = 'RECTANGLE'
+         INS-226213_BORESIGHT                 = (
+                                            0.000000     0.000000   152.000000
+                                                )
+         INS-226213_FOV_CLASS_SPEC            = 'ANGLES'
+         INS-226213_FOV_REF_VECTOR            = (
+                                            1.000000     0.000000     0.000000
+                                                )
+         INS-226213_FOV_REF_ANGLE             = ( 0.00716197 )
+         INS-226213_FOV_CROSS_ANGLE           = ( 1.83346494 )
+         INS-226213_FOV_ANGLE_UNITS           = 'DEGREES'
+
+         INS-226214_FOV_FRAME                 = 'ROS_VIRTIS-M_IR_ZERO'
+         INS-226214_FOV_SHAPE                 = 'RECTANGLE'
+         INS-226214_BORESIGHT                 = (
+                                            0.000000     0.000000   152.000000
+                                                )
+         INS-226214_FOV_CLASS_SPEC            = 'ANGLES'
+         INS-226214_FOV_REF_VECTOR            = (
+                                            1.000000     0.000000     0.000000
+                                                )
+         INS-226214_FOV_REF_ANGLE             = ( 0.00716197 )
+         INS-226214_FOV_CROSS_ANGLE           = ( 1.83346494 )
+         INS-226214_FOV_ANGLE_UNITS           = 'DEGREES'
+
+         INS-226220_FOV_FRAME                 = 'ROS_VIRTIS-H'
+         INS-226220_FOV_SHAPE                 = 'RECTANGLE'
+         INS-226220_BORESIGHT                 = (
+                                            0.000000     0.000000   195.500000
+                                                )
+         INS-226220_FOV_CLASS_SPEC            = 'ANGLES'
+         INS-226220_FOV_REF_VECTOR            = (
+                                            1.000000     0.000000     0.000000
+                                                )
+         INS-226220_FOV_REF_ANGLE             = ( 0.01670172 )
+         INS-226220_FOV_CROSS_ANGLE           = ( 0.05010516 )
+         INS-226220_FOV_ANGLE_UNITS           = 'DEGREES'
+
+      \begintext
+
+   The set of assignments in the data section below defines the
+   VIRTIS-M FOV resulting from a full, 256 step, +/- 1.83 degree scan
+   mirror sweep about Y axis with respect to VIRTIS-M frame to be a
+   rectangle with the corners defined by the first and last pixels of
+   the spatial, along-track line in the first and last scan positions
+   and the boresight along the +Z axis. These FOV definitions use
+   angular extent style specification with the cross and along track
+   angular sizes taken from the ``Optics Parameters'' section above.
+
+      \begindata
+
+         INS-226210_FOV_FRAME                 = 'ROS_VIRTIS-M'
+         INS-226210_FOV_SHAPE                 = 'RECTANGLE'
+         INS-226210_BORESIGHT                 = (
+                                            0.000000     0.000000   152.000000
+                                                )
+         INS-226210_FOV_CLASS_SPEC            = 'ANGLES'
+         INS-226210_FOV_REF_VECTOR            = (
+                                            1.000000     0.000000     0.000000
+                                                )
+         INS-226210_FOV_REF_ANGLE             = ( 1.83346494 )
+         INS-226210_FOV_CROSS_ANGLE           = ( 1.83346494 )
+         INS-226210_FOV_ANGLE_UNITS           = 'DEGREES'
+
+      \begintext
+
+
+Optical Distortion
+--------------------------------------------------------
+
+   N/A.
+
+
+Platform ID
+---------------------------------------------------------------------------
+
+   This number is the NAIF instrument ID of the platform on which the
+   instrument mounted. All VIRTIS components it is the spacecraft.
+
+      \begindata
+
+      INS-226200_PLATFORM_ID  = ( -226000 )
+      INS-226210_PLATFORM_ID  = ( -226000 )
+      INS-226211_PLATFORM_ID  = ( -226000 )
+      INS-226213_PLATFORM_ID  = ( -226000 )
+      INS-226220_PLATFORM_ID  = ( -226000 )
+
+      \begintext
+
+
+End of IK file.

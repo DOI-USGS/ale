@@ -328,7 +328,9 @@ class NaifSpice():
         : (sun_positions, sun_velocities)
           a tuple containing a list of sun positions, a list of sun velocities
         """
-        times = [self.center_ephemeris_time]
+        times = self.ephemeris_time
+        if len(times) > 1:
+            times = [times[0], times[-1]]
         positions = []
         velocities = []
 
@@ -368,7 +370,7 @@ class NaifSpice():
 
             target = self.spacecraft_name
             observer = self.target_name
-            # Check for ISIS flag to fix target and observer swapping
+            ## Check for ISIS flag to fix target and observer swapping
             if self.swap_observer_target:
                 target = self.target_name
                 observer = self.spacecraft_name
@@ -421,6 +423,15 @@ class NaifSpice():
 
     @property
     def frame_chain(self):
+        """
+        Return the root node of the rotation frame tree/chain.
+        
+        Returns
+        -------
+        FrameNode
+            The root node of the frame tree. This will always be the J2000 reference frame.
+        """
+
         if not hasattr(self, '_frame_chain'):
             nadir = self._props.get('nadir', False)
             exact_ck_times = self._props.get('exact_ck_times', True)
@@ -428,7 +439,8 @@ class NaifSpice():
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
                                                       ephemeris_times=self.ephemeris_time,
-                                                      nadir=nadir, exact_ck_times=exact_ck_times)
+                                                      nadir=nadir, exact_ck_times=exact_ck_times,
+                                                      inst_time_bias=self.instrument_time_bias)
 
             if nadir:
                 # Logic for nadir calculation was taken from ISIS3
@@ -589,3 +601,17 @@ class NaifSpice():
                 pass
 
         return self._naif_keywords
+
+    @property
+    def instrument_time_bias(self):
+        """
+        Time bias used for generating sensor orientations
+
+        The default is 0 for not time bias
+
+        Returns
+        -------
+        : int
+          Time bias in ephemeris time
+        """
+        return 0

@@ -40,7 +40,7 @@ def test_kernels():
 @pytest.mark.parametrize("label_type, kernel_type", [('isis3', 'naif'), ('isis3', 'isis')])
 #@pytest.mark.parametrize("image", image_dict.keys()) Add this when when all are supported by ale isd.
 @pytest.mark.parametrize("image", ['M103595705LE'])
-def test_load(test_kernels, label_type, image, kernel_type):
+def test_load_lroc_nac(test_kernels, label_type, image, kernel_type):
     if kernel_type == 'naif':
         label_file = get_image_label(image, label_type)
         isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
@@ -51,9 +51,22 @@ def test_load(test_kernels, label_type, image, kernel_type):
         compare_isd = get_isd('lro_isis')
 
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
+
+# Test load of LROC labels
+@pytest.mark.parametrize("label_type, kernel_type", [('isis3', 'naif')])
+#@pytest.mark.parametrize("image", image_dict.keys()) Add this when when all are supported by ale isd.
+@pytest.mark.parametrize("image", ['wac0000a1c4.uv.even'])
+def test_load_lroc_wac(test_kernels, label_type, image, kernel_type):
+    label_file = get_image_label(image, label_type)
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]}, verbose=True)
+    compare_isd = image_dict[image]
+
+    isd_obj = json.loads(isd_str)
+    comparison = compare_dicts(isd_obj, compare_isd)
+    assert comparison == []
+
 
 # Test load of MiniRF labels
 def test_load_minirf(test_kernels):
@@ -262,12 +275,20 @@ class test_miniRf(unittest.TestCase):
 
     def test_ephmeris_start_time(self):
         with patch('ale.drivers.lro_drivers.spice.str2et', return_value=12345) as str2et:
-          assert self.driver.ephemeris_start_time == 12345
+          assert self.driver.ephemeris_start_time == 12344.995295578527
 
     def test_ephmeris_stop_time(self):
         with patch('ale.drivers.lro_drivers.spice.str2et', return_value=12345) as str2et:
-          assert self.driver.ephemeris_stop_time == 12345
+          assert self.driver.ephemeris_stop_time == 12348.297799453276
 
+    @patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock, return_value={})
+    def test_naif_keywords(self, naif_keywords):
+        with patch("ale.base.data_naif.spice.bods2c", return_value=12345) as bods2c:
+            print(self.driver.naif_keywords["INS12345_ITRANSL"])
+            np.testing.assert_array_almost_equal(self.driver.naif_keywords["INS12345_ITRANSL"], [0.0, 0.0, 0.0])
+            np.testing.assert_array_almost_equal(self.driver.naif_keywords["INS12345_ITRANSS"], [1.0, 0.13333333333333, 0])
+            np.testing.assert_array_almost_equal(self.driver.naif_keywords["INS12345_TRANSX"], [-7.5, 7.5, 0])
+            np.testing.assert_array_almost_equal(self.driver.naif_keywords["INS12345_TRANSY"], [0, 0, 0])
 
 # ========= Test WAC isislabel and naifspice driver =========
 class test_wac_isis_naif(unittest.TestCase):
@@ -284,7 +305,7 @@ class test_wac_isis_naif(unittest.TestCase):
 
     def test_ephemeris_start_time(self):
         with patch('ale.drivers.lro_drivers.spice.scs2e', return_value=321) as scs2e:
-            np.testing.assert_almost_equal(self.driver.ephemeris_start_time, 321)
+            np.testing.assert_almost_equal(self.driver.ephemeris_start_time, 321.02)
             scs2e.assert_called_with(-85, '1/274692469:15073')
 
     def test_detector_center_sample(self):
@@ -318,7 +339,7 @@ class test_wac_isis_naif(unittest.TestCase):
         assert self.driver.sampling_factor == 4
 
     def test_num_frames(self):
-        assert self.driver.num_frames == 260
+        assert self.driver.num_frames == 261
 
     def test_framelet_height(self):
         assert self.driver.framelet_height == 16

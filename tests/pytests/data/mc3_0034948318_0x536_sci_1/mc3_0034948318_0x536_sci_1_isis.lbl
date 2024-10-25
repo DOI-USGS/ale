@@ -1,0 +1,105 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 500
+    TileLines   = 400
+
+    Group = Dimensions
+      Samples = 5000
+      Lines   = 400
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName            = "NEW HORIZONS"
+    InstrumentId              = MVIC_TDI
+    TargetName                = Jupiter
+    MidObservationTime        = 2007-02-28T06:00:23.454 <Cal d>
+    SpacecraftClockStartCount = 1/0034948318:06600
+    ExposureDuration          = 0.59168
+    Detector                  = CH4
+    HwSide                    = 1
+    ScanType                  = TDI
+    InstrumentMode            = 2
+    RalphExposureDuration     = 0.59168
+    TdiRate                   = 54.0833 <hz>
+    StartTime                 = 2007-02-28T06:00:00.520
+  End_Group
+
+  Group = Archive
+    HighSpeedCompressionMode    = LOSSLESS
+    ObservationCompletionStatus = COMPLETE
+    SequenceDescription         = "MVIC terminator flat"
+  End_Group
+
+  Group = BandBin
+    Name         = CH4
+    Center       = 895 <nanometers>
+    Width        = 40 <nanometers>
+    OriginalBand = 1
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode = -98908 <SPICE ID>
+  End_Group
+
+  Group = AlphaCube
+    AlphaSamples        = 5000
+    AlphaLines          = 2493
+    AlphaStartingSample = 0.5
+    AlphaStartingLine   = 0.5
+    AlphaEndingSample   = 5000.5
+    AlphaEndingLine     = 400.5
+    BetaSamples         = 5000
+    BetaLines           = 400
+  End_Group
+
+  Group = RadiometricCalibration
+    PixelSize                 = 13.0000 <microns>
+    PixelFov                  = 19.8065 <microrad/pix>
+    Gain                      = 58.6000 <electrons/DN>
+    ReadNoise                 = 30.0000 <electrons>
+    TdiRate                   = 54.0833 <hz>
+    SolarSpectrumResolved     = 0.0394 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    SolarSpectrumUnresolved   = 1.55E-11 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    PholusSpectrumResolved    = 0.0385 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    PholusSpectrumUnresolved  = 1.51E-11 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    CharonSpectrumResolved    = 0.0394 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    CharonSpectrumUnresolved  = 1.54E-11 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    JupiterSpectrumResolved   = 0.0474 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    JupiterSpectrumUnresolved = 1.86E-11 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    PlutoSpectrumResolved     = 0.0398 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    PlutoSpectrumUnresolved   = 1.56E-11 <(erg/cm^2/s/sr)/(DN/s/pix)>
+    SolarPivotWavelength      = 8.86E-5 <cm>
+    JupiterPivotWavelength    = 8.84E-5 <cm>
+    PholusPivotWavelength     = 8.87E-5 <cm>
+    PlutoPivotWavelength      = 8.86E-5 <cm>
+    CharonPivotWavelength     = 8.86E-5 <cm>
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 8085518
+  Bytes     = 1122
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 8065537
+  Bytes     = 19981
+End_Object
+End

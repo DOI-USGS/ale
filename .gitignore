@@ -4,6 +4,7 @@
 # Docs
 docs/doxyxml/
 docs/build/*
+docs/xml/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -13,6 +14,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
+docs/
 develop-eggs/
 dist/
 downloads/
@@ -222,3 +224,6 @@ dmypy.json
 *.CUB
 *.img
 *.IMG
+print.prt
+tests/ctests/default.profraw
+default.profraw
