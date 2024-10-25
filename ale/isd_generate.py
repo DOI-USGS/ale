@@ -53,31 +53,31 @@ def main():
     )
     parser.add_argument(
         "--semimajor", "-a", "-r", "--radius",
-        required="--semiminor" in sys.argv,
+        required="--semiminor" in sys.argv or "-b" in sys.argv,
         type=float,
         default=None,
-        help="Optional spherical radius (km) override.  Setting "
-             " '--semimajor 3396.19' "
+        help="Optional spherical radius (m) override.  Setting "
+             " '--semimajor 3396190.0' "
              "will override both semi-major and semi-minor radius values with the same value.  "
-             "An ellipse can be defined if '--semiminor' is also sent.  "
-             "If not specified, the default radius "
-             "values (e.g.; from NAIF kernels or the ISIS Cube) will be used.  "
-             "When is needed? Beyond a specialized need, it is common "
+             "An ellipsoid can be defined if '--semiminor' is also sent.  "
+             "If not specified, the default radius values "
+             "(e.g.; from NAIF kernels or the ISIS Cube) will be used.  "
+             "When is a semimajor specification needed? Beyond a specialized need, it is common "
              "that planetary bodies are defined as a triaxial body.  "
              "In most of these cases, the IAU WGCCRE report recommends the use of a "
              "best-fit sphere for a derived map product.  "
              "For current IAU spherical recommendations see: "
              "https://doi.org/10.1007/s10569-017-9805-5 or "
              "http://voparis-vespa-crs.obspm.fr:8080/web/ ."
-             "Make sure radius values are in kilometers."
+             "Make sure radius values are in meters (not kilometers)."
     )
     parser.add_argument(
         "--semiminor", "-b",
         type=float,
         default=None,
-        help="Optional semi-minor radius (km) override. When using this parameter, you must also define the semi-major radius. Setting "
-             " '--semimajor 3396.19 --semiminor 3376.2' "
-             "will override the semi-major and semi-minor radii to define an ellipse.  "
+        help="Optional semi-minor radius (m) override. When using this parameter, you must also define the semi-major radius. For example: "
+             " '--semimajor 3396190.0 --semiminor 3376200.0' "
+             "will override the semi-major and semi-minor radii to define an ellipsoid.  "
     )
     parser.add_argument(
         "-v", "--verbose",
@@ -117,7 +117,7 @@ def main():
     else:
         if args.semiminor is None:  # set a sphere
           radii = [args.semimajor, args.semimajor]
-        else:                       # set as ellipse
+        else:                       # set as ellipsoid
           radii = [args.semimajor, args.semiminor]
 
     if len(args.input) == 1:
@@ -181,10 +181,13 @@ def file_to_isd(
         usgscsm_str = ale.loads(file)
 
     if radii is not None:
+        # first convert to kilometers for ISD
+        radii = [x / 1000.0 for x in radii] 
+        
         usgscsm_json = json.loads(usgscsm_str)
         usgscsm_json["radii"]["semimajor"] = radii[0]
         usgscsm_json["radii"]["semiminor"] = radii[1]
-        logger.info(f"Overriding radius to:")
+        logger.info(f"Overriding radius to (km):")
         logger.info(usgscsm_json["radii"])
         usgscsm_str = json.dumps(usgscsm_json, indent=2)
 
