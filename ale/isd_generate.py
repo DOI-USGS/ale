@@ -52,8 +52,8 @@ def main():
              ".json will be used to generate the output file paths."
     )
     parser.add_argument(
-        "--semimajor",
-        required='--semiminor' in sys.argv,
+        "--semimajor", "-a", "-r", "--radius",
+        required="--semiminor" in sys.argv,
         type=float,
         default=None,
         help="Optional spherical radius (km) override.  Setting "
@@ -68,11 +68,11 @@ def main():
              "best-fit sphere for a derived map product.  "
              "For current IAU spherical recommendations see: "
              "https://doi.org/10.1007/s10569-017-9805-5 or "
-             "http://voparis-vespa-crs.obspm.fr:8080/web/  "
+             "http://voparis-vespa-crs.obspm.fr:8080/web/ ."
              "Make sure radius values are in kilometers."
     )
     parser.add_argument(
-        "--semiminor",
+        "--semiminor", "-b",
         type=float,
         default=None,
         help="Optional semi-minor radius (km) override. When using this parameter, you must also define the semi-major radius. Setting "
@@ -199,3 +199,4 @@ if __name__ == "__main__":
         sys.exit(main())
     except ValueError as err:
         sys.exit(err)
+
