@@ -23,8 +23,20 @@ class ReadIsis(IsisSpice, IsisLabel, Driver):
     def sensor_model_version(self):
         return 0
 
-# Define the function to run spiceinit with ISIS
 def run_spiceinit_isis(image_path):
+    """
+    Run spiceinit on an image using ISIS.
+
+    Parameters
+    ----------
+    image_path : str
+        String path to the image on which spiceinit will be run
+
+    Returns
+    -------
+    None
+
+    """
     if ale_root is None:
         raise EnvironmentError("The environment variable 'ALEROOT' is not set.")
     # Move ALE drivers to a temporary subfolder
@@ -45,12 +57,41 @@ def run_spiceinit_isis(image_path):
         shutil.move(str(driver), str(ale_drivers_path))
     temp_folder.rmdir()
 
-# Define the function to run spiceinit with ALE
 def run_spiceinit_ale(image_path):
+    """
+    Run spiceinit on an image using ALE drivers.
+
+    Parameters
+    ----------
+    image_path : str
+        String path to the image on which spiceinit will be run
+
+    Returns
+    -------
+    None
+
+    """
     # Run spiceinit with ALE
     subprocess.run(['spiceinit', f'from={image_path}'])
 
+
 def generate_body_rotation(driver, target_frame_id):
+    """
+    Generate body rotation information from a driver.
+    
+    Parameters
+    ----------
+    driver : :class:`ale.base.Driver`
+        The driver from which body rotation information will be generated.
+    target_frame_id : 
+        The NAIF ID associated with the target body for which rotation information will be generated.
+
+    Returns
+    -------
+    dict
+        A dictionary containing body rotation information for the target body.
+    
+    """
     frame_chain = driver.frame_chain
     target_frame = target_frame_id
 
@@ -81,6 +122,21 @@ def generate_body_rotation(driver, target_frame_id):
     return body_rotation
 
 def generate_instrument_rotation(driver, sensor_frame_id):
+    """
+    Generate instrument rotation information from a driver.
+
+    Parameters
+    ----------
+    driver : :class:`ale.base.Driver`
+        The driver from which to generate instrument rotation information.
+    sensor_frame_id : dict
+        The NAIF ID of the sensor frame for which to generate rotation information.
+
+    Returns
+    -------
+    dict 
+        A dictionary containing instrument rotation information.
+    """
     # sensor orientation
     frame_chain = driver.frame_chain
     sensor_frame = sensor_frame_id
@@ -112,6 +168,19 @@ def generate_instrument_rotation(driver, sensor_frame_id):
     return instrument_pointing
 
 def generate_instrument_position(driver):
+    """
+    Generate instrument position information from a driver.
+
+    Parameters
+    ----------
+    driver : :class:`ale.base.Driver`
+        The driver from which to generate instrument position information.
+
+    Returns
+    -------
+    dict
+        A dictionary containing instrument position information.
+    """
     instrument_position = {}
     positions, velocities, times = driver.sensor_position
     instrument_position['spk_table_start_time'] = times[0]
@@ -126,6 +195,19 @@ def generate_instrument_position(driver):
     return instrument_position
 
 def generate_sun_position(driver):
+    """
+    Generate sun position information from a driver.
+
+    Parameters
+    ----------
+    driver : :class:`ale.base.Driver`
+        The driver from which to generate sun position information.
+
+    Returns
+    -------
+    dict
+        A dictionary containing sun position information.
+    """
     sun_position = {}
     positions, velocities, times = driver.sun_position
     sun_position['spk_table_start_time'] = times[0]
@@ -141,6 +223,23 @@ def generate_sun_position(driver):
     return sun_position
 
 def create_json_dump(driver, sensor_frame_id, target_frame_id):
+    """
+    Convenience function for generating and merging instrument rotation, body rotation, instrument position, and sun position.
+
+    Parameters
+    ----------
+    driver : :class:`ale.base.Driver`
+        The driver from which to generate rotation and position information.
+    sensor_frame_id : dict
+        The NAIF ID of the sensor frame for which to generate rotation information.
+    target_frame_id : dict
+        The NAIF ID associated with the target body for which rotation information will be generated.
+
+    Returns
+    -------
+    dict
+        A dictionary containing instrument_rotation, body_rotation, instrument_position, and sun_position.
+    """
     json_dump = {}
     json_dump["instrument_rotation"] = generate_instrument_rotation(driver, sensor_frame_id)
     json_dump["body_rotation"] = generate_body_rotation(driver, target_frame_id)
@@ -149,14 +248,40 @@ def create_json_dump(driver, sensor_frame_id, target_frame_id):
     return json_dump
 
 def diff_and_describe(json1, json2, key_array):
+    """
+    Compare two dictionaries and output differences.
+
+    Parameters
+    ----------
+    json1 : dict
+        The first dictionary for comparison.
+    json2 : dict
+        The second dictionary for comparison.
+    key_array : str
+        The key to be compared.
+    """
     for key in key_array:
         json1 = json1[key]
         json2 = json2[key]
     diff = json1 - json2
     print(" ".join(key_array) + "\nNum records:", len(diff), "\nMean:", np.mean(diff, axis=(0)), "\nMedian:", np.median(diff, axis=(0)), "\n")
 
-# Define the function to compare ISDs
 def compare_isds(json1, json2):
+    """
+    Compare two isds using :func:`driver_verification.diff_and_describe`
+    
+    Parameters
+    ----------
+    json1 : dict
+        A dictionary containing a json-formatted ISD for comparison
+    json2 : dict
+        A dictionary containing a json-formatted ISD for comparison
+
+    Returns
+    -------
+    None
+
+    """
     diff_and_describe(json1, json2, ["instrument_position", "positions"])
     diff_and_describe(json1, json2, ["instrument_position", "velocities"])
     diff_and_describe(json1, json2, ["sun_position", "positions"])
@@ -166,9 +291,15 @@ def compare_isds(json1, json2):
     diff_and_describe(json1, json2, ["body_rotation", "quaternions"])
     diff_and_describe(json1, json2, ["body_rotation", "angular_velocities"])
 
-# Define the main function
 def main(image):
-    
+    """
+    Generate and compare an ALE ISD and an ISIS ISD.
+
+    Parameters
+    ----------
+    image : str
+        The name of the file for which to generate and compare ISDs.
+    """
     # Duplicate the image for ALE and ISIS processing
     image_ale_path = Path(f"{image}_ALE.cub")
     image_isis_path = Path(f"{image}_ISIS.cub")

@@ -7,6 +7,19 @@ class IsisLabel():
 
     @property
     def label(self):
+        """
+        Return the cube label.
+
+        Returns
+        -------
+        pvl.PVLModule
+            The cube label as a PVLModule object.
+
+        Raises
+        ------
+        ValueError
+            Raised when an invalid label is provided.
+        """
         if not hasattr(self, "_label"):
             if isinstance(self._file, pvl.PVLModule):
                 self._label = self._file
@@ -137,7 +150,7 @@ class IsisLabel():
     @property
     def line_summing(self):
         """
-        the number of detector lines summed to produce each image sample
+        The number of detector lines summed to produce each image sample
 
         Returns
         -------

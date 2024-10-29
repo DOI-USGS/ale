@@ -160,6 +160,28 @@ class CachedDict():
 
 
 def find_latest_metakernel(path, year):
+    """
+    Find the latest version of a metakernel.
+
+    Parameters
+    ----------
+    path : str
+        The string path of the directory in which to search for metakernels.
+    year : str|int
+        The year of the desired metakernel.
+
+    Returns
+    -------
+    str
+        The string filename of the latest metakernel.
+
+    Raises
+    ------
+    Exception
+        No metakernels were found in the given path.
+    Exception
+        No metakernels matching the specified year were found in the provided path.
+    """
     metakernel = None
     mks = sorted(glob(os.path.join(path,'*.[Tt][Mm]')))
     if not mks:
@@ -174,6 +196,21 @@ def find_latest_metakernel(path, year):
 
 
 def dict_merge(dct, merge_dct):
+    """
+    Merge the contents of two dictionaries.
+
+    Parameters
+    ----------
+    dct : dict
+        The first dictionary to merge.
+    merge_dct : dict
+        The second dictionary to merge.
+
+    Returns
+    -------
+    dict
+        The merged dictionary containing the contents of the two given dictionaries.
+    """
     new_dct = dct.copy()
     for k, v in merge_dct.items():
         if (k in dct and isinstance(dct[k], dict)
@@ -219,6 +256,250 @@ def get_isis_preferences(isis_preferences=None):
     return finalprefs
 
 
+def dict_to_lower(d):
+    """
+    Recursively convert all keys in the dictionary to lower-case.
+
+    Parameters
+    ----------
+    d : dict
+        The dictionary for which to convert the keys to lower-case.
+
+    Returns
+    -------
+    dict
+        The original dictionary with keys converted to lower-case.
+    """
+    return {k.lower():v if not isinstance(v, dict) else dict_to_lower(v) for k,v in d.items()}
+
+
+def expandvars(path, env_dict=os.environ, default=None, case_sensitive=True):
+    """
+    Expand the environment variables in a given string.
+
+    Parameters
+    ----------
+    path : str
+        The string containing variables to be expanded.
+    env_dict : dict, optional
+        A dictionary containing environment variable definitions, by default os.environ
+    default : obj, optional
+        A default value for undefined environment variables, by default None
+    case_sensitive : bool, optional
+        Whether or not the output should match the case of the input, by default True
+
+    Returns
+    -------
+    str
+        The original string with expanded environment variables.
+
+    Raises
+    ------
+    KeyError
+        Raised if the value is not in the dictionary
+    """
+    if env_dict != os.environ:
+        env_dict = dict_merge(env_dict, os.environ)
+
+    while "$" in path:
+        user_dict = env_dict if case_sensitive else dict_to_lower(env_dict)
+
+        def replace_var(m):
+            group1 = m.group(1) if case_sensitive else m.group(1).lower()
+            val = user_dict.get(m.group(2) or group1 if default is None else default)
+            if not val:
+                raise KeyError(f"Failed to evaluate {m.group(0)} from env_dict. " + 
+                               f"Should {m.group(0)} be an environment variable?")
+
+            return val
+        reVar = r'\$(\w+|\{([^}]*)\})'
+        path = re.sub(reVar, replace_var, path)
+    return path
+
+
+def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
+    """
+    Parses a cube label to obtain the kernels from the Kernels group.
+
+    Parameters
+    ----------
+    cube : cube
+        Path to the cube to pull the kernels from.
+    expand : bool, optional
+        Whether or not to expand variables within kernel paths based on your IsisPreferences file.
+        See :func:`get_isis_preferences` for how the IsisPreferences file is found.
+    format_as : str, optional {'list', 'dict'}
+        How to return the kernels: either as a one-dimensional ordered list, or as a dictionary
+        of kernel lists.
+
+    Returns
+    -------
+    : list
+        One-dimensional ordered list of all kernels from the Kernels group in the cube.
+    : Dictionary
+        Dictionary of lists of kernels with the keys being the Keywords from the Kernels group of
+        cube itself, and the values being the values associated with that Keyword in the cube.
+    """
+    # enforce key order
+    mk_paths = OrderedDict.fromkeys(
+        ['TargetPosition', 'InstrumentPosition',
+         'InstrumentPointing', 'Frame', 'TargetAttitudeShape',
+         'Instrument', 'InstrumentAddendum', 'LeapSecond',
+         'SpacecraftClock', 'Extra'])
+
+    # just work with full path
+    cube = os.path.abspath(cube)
+    cubelabel = pvl.load(cube)
+
+    try:
+        kernel_group = cubelabel['IsisCube']
+    except KeyError:
+        raise KeyError(f'{cubelabel}, Could not find kernels group, input cube [{cube}] may not be spiceinited')
+
+    return get_kernels_from_isis_pvl(kernel_group, expand, format_as)
+
+def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
+    """
+    Extract kernels from ISIS PVL.
+
+    Parameters
+    ----------
+    kernel_group : str
+        The target kernel group to extract
+    expand : bool, optional
+        True if values of environment variables should be expanded, by default True
+    format_as : str, optional
+        Desired output format, by default "list"
+
+    Returns
+    -------
+    list|str|obj
+        The extracted kernels in the user-specified format
+
+    Raises
+    ------
+    Exception
+        Raised if the user specifies an invalid or unsupported format.
+    """
+    # enforce key order
+    mk_paths = OrderedDict.fromkeys(
+        ['TargetPosition', 'InstrumentPosition',
+         'InstrumentPointing', 'Frame', 'TargetAttitudeShape',
+         'Instrument', 'InstrumentAddendum', 'LeapSecond',
+         'SpacecraftClock', 'Extra'])
+
+
+    if isinstance(kernel_group, str):
+        kernel_group = pvl.loads(kernel_group)
+
+    kernel_group = kernel_group["Kernels"]
+
+    def load_table_data(key):
+        mk_paths[key] = kernel_group.get(key, None)
+        if isinstance(mk_paths[key], str):
+            mk_paths[key] = [mk_paths[key]]
+        while 'Table' in mk_paths[key]: mk_paths[key].remove('Table')
+        while 'Nadir' in mk_paths[key]: mk_paths[key].remove('Nadir')
+
+    load_table_data('TargetPosition')
+    load_table_data('InstrumentPosition')
+    load_table_data('InstrumentPointing')
+    load_table_data('TargetAttitudeShape')
+    # the rest
+    mk_paths['Frame'] = [kernel_group.get('Frame', None)]
+    mk_paths['Instrument'] = [kernel_group.get('Instrument', None)]
+    mk_paths['InstrumentAddendum'] = [kernel_group.get('InstrumentAddendum', None)]
+    mk_paths['SpacecraftClock'] = [kernel_group.get('SpacecraftClock', None)]
+    mk_paths['LeapSecond'] = [kernel_group.get('LeapSecond', None)]
+    mk_paths['Clock'] = [kernel_group.get('Clock', None)]
+    mk_paths['Extra'] = [kernel_group.get('Extra', None)]
+
+    # handles issue with OsirisRex instrument kernels being in a 2d list
+    if isinstance(mk_paths['Instrument'][0], list):
+        mk_paths['Instrument'] = np.concatenate(mk_paths['Instrument']).flat
+
+    if (format_as == 'list'):
+        # get kernels as 1-d string list
+        kernels = []
+        for kernel in chain.from_iterable(mk_paths.values()):
+            if isinstance(kernel, str):
+                kernels.append(kernel)
+            elif isinstance(kernel, list):
+                kernels.extend(kernel)
+        if expand:
+            isisprefs = get_isis_preferences()
+            if not "DataDirectory" in isisprefs:
+              warnings.warn("No IsisPreferences file found, is your ISISROOT env var set?")
+
+            kernels = [expandvars(k, isisprefs['DataDirectory'], case_sensitive=False) for k in kernels]
+        # Ensure that the ISIS Addendum kernel is last in case it overrides
+        # some values from the default Instrument kernel
+        # Sorts planetary constants kernel first so it can be overridden by more specific kernels
+        kernels = sorted(kernels, key=lambda x: "Addendum" in x)
+        kernels = sorted(kernels, key=lambda x: "pck00" in x, reverse=True)
+        return kernels
+    elif (format_as == 'dict'):
+        # return created dict
+        if expand:
+            isisprefs = get_isis_preferences()
+            for kern_list in mk_paths:
+                for index, kern in enumerate(mk_paths[kern_list]):
+                    if kern is not None:
+                        mk_paths[kern_list][index] = expandvars(kern, isisprefs['DataDirectory'], case_sensitive=False)
+        return mk_paths
+    else:
+        raise Exception(f'{format_as} is not a valid return format')
+
+def write_metakernel_from_cube(cube, mkpath=None):
+    """
+    Create a metakernel from a spiceinit'd cube.
+
+    Parameters
+    ----------
+    cube : str
+        The string filename of the cube from which to generate a metakernel.
+    mkpath : str, optional
+        The path to the output metakernel or None if not written to disk, by default None
+
+    Returns
+    -------
+    str
+        The text of the generated metakernel.
+    """
+    # add ISISPREF paths as path_symbols and path_values to avoid custom expand logic
+    pvlprefs = get_isis_preferences()
+
+    kernels = generate_kernels_from_cube(cube)
+
+    # make sure kernels are mk strings
+    kernels = ["'"+k+"'" for k in kernels]
+
+    paths = OrderedDict(pvlprefs['DataDirectory'])
+    path_values = ["'"+os.path.expandvars(path)+"'" for path in paths.values()]
+    path_symbols = ["'"+symbol.lower()+"'" for symbol in paths.keys()]
+
+    body = '\n\n'.join([
+        'KPL/MK',
+        f'Metakernel Generated from an ISIS cube: {cube}',
+        '\\begindata',
+        'PATH_VALUES = (',
+        '\n'.join(path_values),
+        ')',
+        'PATH_SYMBOLS = (',
+        '\n'.join(path_symbols),
+        ')',
+        'KERNELS_TO_LOAD = (',
+        '\n'.join(kernels),
+        ')',
+        '\\begintext'
+    ])
+
+    if mkpath is not None:
+        with open(mkpath, 'w') as f:
+            f.write(body)
+
+    return body
+
 def get_ck_frames(kernel):
     """
     Get all of the reference frames defined in a kernel.
@@ -246,7 +527,7 @@ def get_ck_frames(kernel):
 
 def create_spk_dependency_tree(kernels):
     """
-    construct the dependency tree for the body states in a set of kernels.
+    Construct the dependency tree for the body states in a set of kernels.
 
     Parameters
     ----------

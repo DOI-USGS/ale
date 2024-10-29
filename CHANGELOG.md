@@ -43,12 +43,13 @@ release.
 - Apollo Metric drivers, tests, and data [#533](https://github.com/DOI-USGS/ale/pull/533)
 - Rosetta Virtis drivers, tests, and data [#520](https://github.com/DOI-USGS/ale/pull/520)
 - Added compress and decompress ISD functions and added --compress flag to isd_generate[#604](https://github.com/DOI-USGS/ale/issues/604)
+- LO Medium Camera drivers, tests, and data [#613](https://github.com/DOI-USGS/ale/issues/613)
+- Added the ability to generate ISDs with no velocities specified for instrument/sun position [#614](https://github.com/DOI-USGS/ale/issues/614)
 
 ### Changed
 - Changed how push frame sensor drivers compute the `ephemeris_time` property [#595](https://github.com/DOI-USGS/ale/pull/595)
 
 ### Fixed
-
 - Fixed landed sensors to correctly project locally [#590](https://github.com/DOI-USGS/ale/pull/590)
 - Fixed Hayabusa amica center time computation to match ISIS [#592](https://github.com/DOI-USGS/ale/pull/592)
 - Set Lunar Oribter abberation correction to None as it is in ISIS [#593](https://github.com/DOI-USGS/ale/pull/593)
@@ -56,6 +57,7 @@ release.
 - Fixed missing sensor_model_version attribute on VikingIsisLabelNaifSpiceDriver [#583](https://github.com/DOI-USGS/ale/pull/583)
 - Fixed incorrect distortion look up in Orex camera when working with PolyCam images [#583](https://github.com/DOI-USGS/ale/pull/583)
 - Brought timing in line with ISIS for the KaguyaMiIsisLabelNaifSpiceDriver [#599](https://github.com/DOI-USGS/ale/pull/599)
+- Brought timing in line with ISIS for the MroMarciIsisLabelNaifSpiceDriver [#600](https://github.com/DOI-USGS/ale/pull/600)
 
 ## [0.10.0] - 2024-01-08 
 

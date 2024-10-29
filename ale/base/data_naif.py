@@ -543,6 +543,15 @@ class NaifSpice():
 
     @property
     def frame_chain(self):
+        """
+        Return the root node of the rotation frame tree/chain.
+        
+        Returns
+        -------
+        FrameNode
+            The root node of the frame tree. This will always be the J2000 reference frame.
+        """
+
         if not hasattr(self, '_frame_chain'):
             nadir = self._props.get('nadir', False)
             exact_ck_times = self._props.get('exact_ck_times', True)

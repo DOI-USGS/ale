@@ -17,7 +17,7 @@ import os
 import pvl
 from pathlib import Path, PurePath
 import sys
-
+import json
 import ale
 import brotli
 import json
@@ -54,6 +54,34 @@ def main():
              "If multiple input files are provided, this option will be ignored "
              "and the default strategy of replacing their final suffix with "
              ".json will be used to generate the output file paths."
+    )
+    parser.add_argument(
+        "--semimajor", "-a", "-r", "--radius",
+        required="--semiminor" in sys.argv or "-b" in sys.argv,
+        type=float,
+        default=None,
+        help="Optional spherical radius (m) override.  Setting "
+             " '--semimajor 3396190.0' "
+             "will override both semi-major and semi-minor radius values with the same value.  "
+             "An ellipsoid can be defined if '--semiminor' is also sent.  "
+             "If not specified, the default radius values "
+             "(e.g.; from NAIF kernels or the ISIS Cube) will be used.  "
+             "When is a semimajor specification needed? Beyond a specialized need, it is common "
+             "that planetary bodies are defined as a triaxial body.  "
+             "In most of these cases, the IAU WGCCRE report recommends the use of a "
+             "best-fit sphere for a derived map product.  "
+             "For current IAU spherical recommendations see: "
+             "https://doi.org/10.1007/s10569-017-9805-5 or "
+             "http://voparis-vespa-crs.obspm.fr:8080/web/ ."
+             "Make sure radius values are in meters (not kilometers)."
+    )
+    parser.add_argument(
+        "--semiminor", "-b",
+        type=float,
+        default=None,
+        help="Optional semi-minor radius (m) override. When using this parameter, you must also define the semi-major radius. For example: "
+             " '--semimajor 3396190.0 --semiminor 3376200.0' "
+             "will override the semi-major and semi-minor radii to define an ellipsoid.  "
     )
     parser.add_argument(
         "-v", "--verbose",
@@ -122,9 +150,17 @@ def main():
         except (KeyError, pvl.exceptions.LexerError):
             k = [args.kernel, ]
 
+    if args.semimajor is None:
+        radii = None
+    else:
+        if args.semiminor is None:  # set a sphere
+          radii = [args.semimajor, args.semimajor]
+        else:                       # set as ellipsoid
+          radii = [args.semimajor, args.semiminor]
+
     if len(args.input) == 1:
         try:
-            file_to_isd(args.input[0], args.out, kernels=k, log_level=log_level, compress=args.compress, only_isis_spice=args.only_isis_spice, only_naif_spice=args.only_naif_spice, local=args.local, use_web=args.use_web_spice)
+            file_to_isd(args.input[0], args.out, radii, kernels=k, log_level=log_level, compress=args.compress, only_isis_spice=args.only_isis_spice, only_naif_spice=args.only_naif_spice, local=args.local)
         except Exception as err:
             # Seriously, this just throws a generic Exception?
             sys.exit(f"File {args.input[0]}: {err}")
@@ -134,7 +170,8 @@ def main():
         ) as executor:
             futures = {
                 executor.submit(
-                    file_to_isd, f, **{"kernels": k, 
+                    file_to_isd, f, **{"radii": radii,
+                                       "kernels": k, 
                                        "log_level": log_level, 
                                        "only_isis_spice": args.only_isis_spice, 
                                        "only_naif_spice": args.only_naif_spice,
@@ -157,6 +194,7 @@ def main():
 def file_to_isd(
     file: os.PathLike,
     out: os.PathLike = None,
+    radii: list = None,
     kernels: list = None,
     log_level=logging.WARNING,
     compress=False,
@@ -205,12 +243,25 @@ def file_to_isd(
     else:
         usgscsm_str = ale.loads(file, props=props, verbose=log_level>logging.INFO, only_isis_spice=only_isis_spice, only_naif_spice=only_naif_spice)
 
+    if radii is not None:
+        # first convert to kilometers for ISD
+        radii = [x / 1000.0 for x in radii] 
+        
+        usgscsm_json = json.loads(usgscsm_str)
+        usgscsm_json["radii"]["semimajor"] = radii[0]
+        usgscsm_json["radii"]["semiminor"] = radii[1]
+        logger.info(f"Overriding radius to (km):")
+        logger.info(usgscsm_json["radii"])
+        usgscsm_str = json.dumps(usgscsm_json, indent=2)
+
+    logger.info(f"Writing: {isd_file}")
     if compress:
         logger.info(f"Writing: {os.path.splitext(isd_file)[0] + '.br'}")
         compress_json(usgscsm_str, os.path.splitext(isd_file)[0] + '.br')
     else:
         logger.info(f"Writing: {isd_file}")  
         isd_file.write_text(usgscsm_str)
+
 
     return
 
@@ -266,3 +317,4 @@ if __name__ == "__main__":
         sys.exit(main())
     except ValueError as err:
         sys.exit(err)
+
