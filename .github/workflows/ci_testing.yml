@@ -41,7 +41,8 @@ jobs:
           python setup.py install
       - name: Test Python Package
         run: |
-           export SPICEROOT=$TMPDIR
+           mkdir spicedata/
+           export SPICEROOT=`pwd`/spicedata/
            pytest --cov-report=xml --cov=ale tests/pytests -vv
       - name: Build C++ Package
         run: |
