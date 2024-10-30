@@ -94,7 +94,7 @@ class Driver():
         for prop in properties:
             data[prop] = get_property(prop)
             if prop == "line_scan_rate":
-        end = time.time()
+                end = time.time()
         
         start = time.time()
         with ThreadPool() as pool:
