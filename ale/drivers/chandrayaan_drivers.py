@@ -455,3 +455,141 @@ class Chandrayaan1MRFFRIsisLabelNaifSpiceDriver(Radar, IsisLabel, NaifSpice, Cha
                 f"INS{self.ikid}_TRANSY": transy,
                 f"INS{self.ikid}_ITRANSS": transs,
                 f"INS{self.ikid}_ITRANSL": transl}
+
+class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
+    
+    @property
+    def instrument_id(self):
+        """
+        Returns the instrument id for chandrayaan2 terrain mapping camera
+        
+        Returns
+        -------
+        : str
+          Frame Reference for chandrayaan2 terrain mapping camera
+        """
+        inst_id_lookup = {
+            "TMC-2" : "CHANDRAYAAN-2 ORBITER"
+        }
+        return inst_id_lookup[super().instrument_id] 
+    
+    @property
+    def ikid(self):
+        """
+        The NAIF id for the instrument
+        Expects kernels_group to be defined. 
+        
+        Returns
+        -------
+        : int
+          ikid for chandrayaan2 terrain mapping camera
+        """
+        return self.label['IsisCube']['Kernels']['NaifFrameCode']
+    
+    @property
+    def sensor_name(self):
+        """
+        Returns the sensor name
+
+        Returns
+        -------
+        : str
+          sensor name
+        """
+        return self.instrument_id
+    
+    @property
+    def sensor_model_version(self):
+        """
+        The ISIS Sensor model number for Chandrayaan2TMC2 in ISIS. This is likely just 1
+        
+        Returns
+        -------
+        : int
+          ISIS sensor model version
+        """
+        return 1
+    
+    @property
+    def ephemeris_start_time(self):
+        """
+        The spacecraft clock start count, frequently used to determine the start time
+        of the image.
+
+        Returns
+        -------
+        : str
+          Spacecraft clock start count
+        """
+        return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
+    
+    @property
+    def ephemeris_stop_time(self):
+        """
+        The spacecraft clock stop count, frequently used to determine the stop time
+        of the image.
+
+        Returns
+        -------
+        : str
+          Spacecraft clock stop count
+        """
+        return spice.str2et(self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S.%f"))   
+
+    @property
+    def detector_center_line(self):
+        """
+        The center of the CCD in detector pixels
+        Expects ikid to be defined. this should be the integer Naif ID code for
+        the instrument.
+
+        Returns
+        -------
+        list :
+            The center of the CCD formatted as line, sample
+        """
+        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0])
+    
+    @property
+    def detector_center_sample(self):
+        """
+        The center of the CCD in detector pixels
+        Expects ikid to be defined. this should be the integer Naif ID code for
+        the instrument.
+
+        Returns
+        -------
+        list :
+            The center of the CCD formatted as line, sample
+        """
+        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
+
+    @property
+    def focal2pixel_lines(self):
+        """
+        Expects ikid to be defined. This should be an integer containing the
+        Naif ID code for the instrument.
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector lines
+        """
+        # meters to mm
+        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 1000
+        return [0.0, 0.0, 1/pixel_size]
+    
+    @property
+    def focal2pixel_samples(self):
+        """
+        Expects ikid to be defined. This should be an integer containing the Naif
+        ID code of the instrument
+
+        Returns
+        -------
+        : list<double>
+          focal plane to detector samples
+        """
+        # meters to mm
+        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 1000
+        return [0.0, 1/pixel_size, 0.0]
