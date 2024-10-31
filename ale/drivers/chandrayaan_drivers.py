@@ -548,7 +548,7 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         list :
             The center of the CCD formatted as line, sample
         """
-        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0])
+        return self.naif_keywords[f"INS{self.ikid}_BORESIGHT"][0] 
     
     @property
     def detector_center_sample(self):
@@ -562,7 +562,7 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         list :
             The center of the CCD formatted as line, sample
         """
-        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[1])
+        return self.naif_keywords[f"INS{self.ikid}_BORESIGHT"][1]
 
     @property
     def focal2pixel_lines(self):
@@ -576,7 +576,7 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
           focal plane to detector lines
         """
         # meters to mm
-        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 1000
+        pixel_size = self.naif_keywords[f"INS{self.ikid}_PIXEL_SIZE"] * 1000
         return [0.0, 0.0, 1/pixel_size]
     
     @property
