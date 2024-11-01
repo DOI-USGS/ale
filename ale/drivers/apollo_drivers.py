@@ -1,4 +1,5 @@
 import pvl
+import spiceypy as spice
 
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice

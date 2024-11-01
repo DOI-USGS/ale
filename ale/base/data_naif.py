@@ -30,7 +30,7 @@ class NaifSpice():
         to get the kernels furnished.
         """
         if self.kernels:
-            [pyspiceql.KernelPool.getInstance().load(k) for k in self.kernels]
+            [pyspiceql.load(k) for k in self.kernels]
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -40,7 +40,7 @@ class NaifSpice():
         kernels can be unloaded.
         """
         if self.kernels:
-            [pyspiceql.KernelPool.getInstance().unload(k) for k in self.kernels]
+            [pyspiceql.unload(k) for k in self.kernels]
 
     @property
     def kernels(self):
