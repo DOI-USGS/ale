@@ -218,6 +218,16 @@ class LoMediumCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDis
                 'Lunar Orbiter 4': {'name':'LO4_MEDIUM_RESOLUTION_CAMERA', 'id':-534002},
                 'Lunar Orbiter 5': {'name':'LO5_MEDIUM_RESOLUTION_CAMERA', 'id':-535002}}
 
+    @property 
+    def lo_detector_list(self):
+        return [
+          'LO1_MEDIUM_RESOLUTION_CAMERA', 
+          'LO2_MEDIUM_RESOLUTION_CAMERA',
+          'LO3_MEDIUM_RESOLUTION_CAMERA',
+          'LO4_MEDIUM_RESOLUTION_CAMERA',
+          'LO5_MEDIUM_RESOLUTION_CAMERA'
+        ]
+
     @property
     def instrument_id(self):
         """
@@ -228,7 +238,11 @@ class LoMediumCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDis
         : str
           Name of the instrument
         """
-        lookup_table = {'Medium Resolution Camera': self.lo_detector_map[self.spacecraft_name]['name']}
+        try: 
+          lookup_table = {'Medium Resolution Camera': self.lo_detector_map[self.spacecraft_name]['name']}
+        except Exception as e: 
+          if super().instrument_id in lo_detector_list: 
+              return super().instrument_id 
         return lookup_table[super().instrument_id]
 
     @property
@@ -280,7 +294,7 @@ class LoMediumCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDis
           ephemeris time of the image
         """
         
-        return spice.utc2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
+        return self.spiceql_call("utcToEt", {"utc" : self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
     
     @property
     def ephemeris_stop_time(self):

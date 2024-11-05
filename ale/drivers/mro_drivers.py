@@ -10,6 +10,8 @@ from ale.util import CachedDict
 
 from ale import util
 
+import numpy as np
+
 class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
 
     @property

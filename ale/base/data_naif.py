@@ -460,6 +460,7 @@ class NaifSpice():
             target = self.spacecraft_name
             observer = self.target_name
             ## Check for ISIS flag to fix target and observer swapping
+            print(self.swap_observer_target)
             if self.swap_observer_target:
                 target = self.target_name
                 observer = self.spacecraft_name
@@ -475,6 +476,7 @@ class NaifSpice():
                           "abcorr": self.light_time_correction,
                           "mission": self.spiceql_mission,
                           "searchKernels": self.search_kernels}
+                print(kwargs)
                 position_tasks.append([ephem, "getTargetStates", 400, self.use_web, kwargs])
 
                 # ssb to spacecraft
@@ -484,6 +486,7 @@ class NaifSpice():
                           "abcorr": "NONE",
                           "mission": self.spiceql_mission,
                           "searchKernels": self.search_kernels}
+                print(kwargs)
                 position_tasks.append([ephem, "getTargetStates", 400, self.use_web, kwargs])
 
                 # Build graph async
@@ -505,6 +508,7 @@ class NaifSpice():
                           "abcorr": "NONE",
                           "mission": self.spiceql_mission,
                           "searchKernels": self.search_kernels}
+                print(kwargs)
                 ssb_tars = spiceql_access.get_ephem_data(adjusted_time, "getTargetStates", web=self.use_web, function_args=kwargs)
                 ssb_tar_states = np.array(ssb_tars)[:,0:6]
 
@@ -523,6 +527,7 @@ class NaifSpice():
                           "abcorr": self.light_time_correction,
                           "mission": self.spiceql_mission,
                           "searchKernels": self.search_kernels}
+                print(kwargs)
                 states = spiceql_access.get_ephem_data(ephem, "getTargetStates", web=self.use_web, function_args=kwargs)
                 states = np.array(states)[:,0:6]
 

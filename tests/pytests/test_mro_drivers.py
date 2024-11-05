@@ -4,12 +4,13 @@ import unittest
 from unittest.mock import PropertyMock, patch, call
 
 import pytest
+import pyspiceql as psql 
 
 import ale
 from ale.drivers.mro_drivers import MroCtxPds3LabelNaifSpiceDriver, MroCtxIsisLabelNaifSpiceDriver, MroCtxIsisLabelIsisSpiceDriver
 from ale.drivers.mro_drivers import MroHiRiseIsisLabelNaifSpiceDriver, MroMarciIsisLabelNaifSpiceDriver, MroCrismIsisLabelNaifSpiceDriver
 
-from conftest import get_image, get_image_kernels, get_isd, convert_kernels, get_image_label, compare_dicts
+from conftest import get_image, get_image_kernels, get_isd, convert_kernels, get_image_label, compare_dicts, data_root
 
 @pytest.fixture(scope='module')
 def test_ctx_kernels():
@@ -39,6 +40,7 @@ def test_marci_kernels():
 def test_crism_kernels():
     kernels = get_image_kernels('FRT00003B73_01_IF156S_TRR2')
     updated_kernels, binary_kernels = convert_kernels(kernels)
+    kernel_root = os.path.join(data_root, "FRT00003B73_01_IF156S_TRR2")
     yield updated_kernels
     for kern in binary_kernels:
         os.remove(kern)
@@ -69,11 +71,14 @@ def test_mro_ctx_load(test_ctx_kernels, label_type, kernel_type):
 @pytest.mark.parametrize("label_type, kernel_type", [('isis3', 'naif')])
 def test_mro_hirise_load(test_hirise_kernels, label_type, kernel_type):
     label_file = get_image_label("PSP_001446_1790_BG12_0", label_type)
-
+    
     isd_str = ale.loads(label_file, props={'kernels': test_hirise_kernels}, verbose=True)
     compare_isd = get_isd('hirise')
 
     isd_obj = json.loads(isd_str)
+    with open("/home/ec2-user/hirise.json", "w") as f:
+        json.dump(isd_obj, f)
+    
     print(compare_dicts(isd_obj, compare_isd))
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
@@ -92,7 +97,7 @@ def test_mro_marci_load(test_marci_kernels, label_type, kernel_type):
 
 def test_mro_crism_load(test_crism_kernels):
     label_file = get_image_label('FRT00003B73_01_IF156S_TRR2', 'isis3')
-    isd_str = ale.loads(label_file, props={'kernels': test_crism_kernels, 'exact_ck_times': False})
+    isd_str = ale.loads(label_file, props={'kernels': test_crism_kernels, 'exact_ck_times': False}, verbose=True)
     isd_obj = json.loads(isd_str)
     compare_isd = get_isd('crism')
     print(json.dumps(isd_obj))

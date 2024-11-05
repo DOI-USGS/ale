@@ -5,8 +5,9 @@ import json
 
 import unittest
 from unittest.mock import patch, call
-from conftest import data_root, get_image, get_isd, get_image_label, get_image_kernels, convert_kernels, compare_dicts
+from conftest import data_root, get_image, get_isd, get_image_label, get_image_kernels, convert_kernels, compare_dicts, data_root
 
+import pyspiceql as psql
 import ale
 from ale.drivers.viking_drivers import VikingIsisLabelNaifSpiceDriver
 
@@ -263,6 +264,7 @@ def test_kernels():
 @pytest.mark.parametrize("label_type, kernel_type", [('isis3', 'naif'), ('isis3', 'isis')])
 @pytest.mark.parametrize("image", image_dict.keys())
 def test_viking1_load(test_kernels, label_type, kernel_type, image):
+    print(test_kernels)
     label_file = get_image_label(image, label_type)
     if kernel_type == "naif":
         label_file = get_image_label(image, label_type)
@@ -306,11 +308,9 @@ class test_isis_naif(unittest.TestCase):
         assert self.driver.alt_ikid == -27999
 
     def test_ephemeris_start_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[54321]) as spiceql_call:
-            assert self.driver.ephemeris_start_time == 54324.99
-            calls = [call('strSclkToEt', {'frameCode': -27999, 'sclk': '40031801', 'mission': 'viking1', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
+        psql.load(os.path.join(data_root, "f004a47", "vo1_fsc.tsc"))
+        psql.load(os.path.join(data_root, "f004a47", "naif0012.tls"))
+        assert self.driver.ephemeris_start_time == pytest.approx(-679343590.0241007)
 
     def test_detector_center_line(self):
         assert self.driver.detector_center_line == 0
@@ -323,8 +323,7 @@ class test_isis_naif(unittest.TestCase):
 
     @patch('ale.base.label_isis.IsisLabel.exposure_duration', 0.43)
     def test_ephemeris_start_time_different_exposure(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[54321]) as spiceql_call:
-            assert self.driver.ephemeris_start_time == 54322.75
-            calls = [call('strSclkToEt', {'frameCode': -27999, 'sclk': '40031801', 'mission': 'viking1', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
+        psql.load(os.path.join(data_root, "f004a47", "vo1_fsc.tsc"))
+        psql.load(os.path.join(data_root, "f004a47", "naif0012.tls"))
+        assert self.driver.ephemeris_start_time == pytest.approx(-679343592.2641007)
+ 

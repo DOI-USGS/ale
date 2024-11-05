@@ -94,4 +94,9 @@ spiceql_mission_map = {
     "High Resolution Camera": "clementine1",
     "Long Wave Infrared Camera": "clementine1",
     "Visual and Infrared Spectrometer": "vir",
-}
+    'LO1_MEDIUM_RESOLUTION_CAMERA' : 'lo',
+    'LO2_MEDIUM_RESOLUTION_CAMERA' : 'lo',
+    'LO3_MEDIUM_RESOLUTION_CAMERA' : 'lo',
+    'LO4_MEDIUM_RESOLUTION_CAMERA' : 'lo',
+    'LO5_MEDIUM_RESOLUTION_CAMERA' : 'lo',
+   }

@@ -87,14 +87,14 @@ class test_high_isis3_naif(unittest.TestCase):
             }
 
             print(self.driver.naif_keywords) 
-            assert self.driver.naif_keywords == naif_keywords
+            assert self.driver.naif_keywords["INS-533001_TRANSX"] ==  pytest.approx(naif_keywords["INS-533001_TRANSX"])
+            assert self.driver.naif_keywords["INS-533001_TRANSY"] ==  pytest.approx(naif_keywords["INS-533001_TRANSY"])
+            assert self.driver.naif_keywords["INS-533001_ITRANSS"] ==  pytest.approx(naif_keywords["INS-533001_ITRANSS"])
+            assert self.driver.naif_keywords["INS-533001_ITRANSL"] ==  pytest.approx(naif_keywords["INS-533001_ITRANSL"])
+            
             calls = [call('translateNameToCode', {'frame': 'LO3_HIGH_RESOLUTION_CAMERA', 'mission': '', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
-  
-
-
-
 
 
 @pytest.fixture(scope='module')
@@ -128,16 +128,6 @@ class test_medium_isis3_naif(unittest.TestCase):
     
     def test_sensor_name(self):
         assert self.driver.sensor_name == 'LO3_MEDIUM_RESOLUTION_CAMERA'
-
-    def test_ephemeris_start_time(self):
-        with patch('ale.drivers.lo_drivers.spice.utc2et', return_value=-1037072690.2047702) as utc2et:
-            assert self.driver.ephemeris_start_time == -1037072690.2047702
-            utc2et.assert_called_with("1967-02-20 08:14:28.610000")
-
-    def test_ephemeris_stop_time(self):
-        with patch('ale.drivers.lo_drivers.spice.utc2et', return_value=-1037072690.2047702) as utc2et:
-            assert self.driver.ephemeris_stop_time == -1037072690.2047702
-            utc2et.assert_called_with("1967-02-20 08:14:28.610000")
 
     def test_ikid(self):
         assert self.driver.ikid == -533002

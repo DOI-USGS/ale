@@ -24,7 +24,7 @@ def test_mro_load(test_kernels, label_type):
     isd_str = ale.loads(label_file, props={'kernels': test_kernels})
     isd_obj = json.loads(isd_str)
     compare_dict = get_isd('juno')
-    print(json.dumps(isd_obj, indent=2))
+    # print(json.dumps(isd_obj, indent=2))
     assert compare_dicts(isd_obj, compare_dict) == []
 
 # ========= Test isislabel and naifspice driver =========

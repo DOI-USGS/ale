@@ -18,7 +18,7 @@ class test_data_naif(unittest.TestCase):
     def setUp(self):
         kernels = get_image_kernels('B10_013341_1010_XN_79S172W')
         self.updated_kernels, self.binary_kernels = convert_kernels(kernels)
-        [pyspiceql.KernelPool.getInstance().load(k) for k in self.updated_kernels]
+        [pyspiceql.load(k) for k in self.updated_kernels]
         self.driver = NaifSpice()
         self.driver._props = {}
         self.driver.instrument_id = 'MRO_CTX'
@@ -30,7 +30,7 @@ class test_data_naif(unittest.TestCase):
         self.driver.center_ephemeris_time = 297088762.61698407
 
     def tearDown(self):
-        [pyspiceql.KernelPool.getInstance().unload(k) for k in self.updated_kernels]
+        [pyspiceql.unload(k) for k in self.updated_kernels]
         for kern in self.binary_kernels:
             os.remove(kern)
 
