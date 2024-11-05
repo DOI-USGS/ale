@@ -76,8 +76,6 @@ def test_mro_hirise_load(test_hirise_kernels, label_type, kernel_type):
     compare_isd = get_isd('hirise')
 
     isd_obj = json.loads(isd_str)
-    with open("/home/ec2-user/hirise.json", "w") as f:
-        json.dump(isd_obj, f)
     
     print(compare_dicts(isd_obj, compare_isd))
     comparison = compare_dicts(isd_obj, compare_isd)
