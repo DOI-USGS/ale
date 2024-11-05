@@ -67,7 +67,7 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
             # first line's middle et - 1/2 exposure duration = cube start time
             return self.hk_ephemeris_time[0] - (self.line_exposure_duration/2)
         except:
-            return spice.scs2e(self.spacecraft_id, self.label['IsisCube']['Instrument']['SpacecraftClockStartCount'])
+            return self.spiceql_call("strSclkToEt", {"frameCode" : self.spacecraft_id, "sclk" : self.label['IsisCube']['Instrument']['SpacecraftClockStartCount'], "mission" : self.spiceql_mission})
 
 
     @property
@@ -85,7 +85,7 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
             #  last line's middle et + 1/2 exposure duration = cube start time
             return self.hk_ephemeris_time[-1] + (self.line_exposure_duration/2)
         except:
-            return spice.scs2e(self.spacecraft_id, self.label['IsisCube']['Instrument']['SpacecraftClockStopCount'])
+            return self.spiceql_call("strSclkToEt", {"frameCode" : self.spacecraft_id, "sclk" : self.label['IsisCube']['Instrument']['SpacecraftClockStopCount'], "mission" : self.spiceql_mission})
 
     @property
     def housekeeping(self):
@@ -138,7 +138,7 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
                     else:
                         opt_angles[i] = cs(i+1)
 
-            line_mid_times = [spice.scs2e(self.spacecraft_id, str(round(i,5))) for i in data_scet]
+            line_mid_times = [self.spiceql_call("scs2e", {"frameCode" : self.spacecraft_id, "sclk" : str(round(i,5)), "mission": self.spiceql_mission} ) for i in data_scet]
             self._hk_ephemeris_time = line_mid_times
             self._optical_angle = opt_angles
             self._housekeeping= True

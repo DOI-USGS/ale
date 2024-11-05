@@ -1,5 +1,3 @@
-import spiceypy as spice
-
 import ale
 from ale.base import Driver
 from ale.base.label_isis import IsisLabel
@@ -73,7 +71,9 @@ class ClementineIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistort
 
     @property
     def ephemeris_start_time(self):
-        return spice.utc2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
+        if not hasattr(self, "_ephemeris_start_time"):
+            self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+        return self._ephemeris_start_time
         
     @property
     def ephemeris_stop_time(self):
