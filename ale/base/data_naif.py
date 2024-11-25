@@ -458,7 +458,7 @@ class NaifSpice():
                 # from the driver
                 trans_x = np.array(list(spice.gdpool('INS{}_ITRANSL'.format(self.ikid), 0, 3)))
 
-                if (trans_x[0] < trans_x[1]):
+                if (trans_x[1] < trans_x[2]):
                     velocity_axis = 1
 
                 quats = [spice.m2q(spice.twovec(-p_vec[i], 3, v_vec[i], velocity_axis)) for i, time in enumerate(times)]
