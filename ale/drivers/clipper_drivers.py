@@ -17,8 +17,8 @@ EIS_FOCAL_LENGTHS = {
 
 # According to diagrams in the SIS, increasing lines are +Y and increasing samples are -X
 # Focal to detector transforms assume 0.014 mm pixel pitch.
-EIS_ITRANSL = [0.0, 0.0, 1.0 / 0.014]
-EIS_ITRANSS = [0.0, -1.0 / 0.014, 0.0]
+EIS_ITRANSL = [0.0, 0.0, -1.0 / 0.014]
+EIS_ITRANSS = [0.0, 1.0 / 0.014,  0.0]
 
 EIS_NAC_FILTER_CODES = {
     "CLEAR" : -159121,
@@ -222,13 +222,25 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
           The short text name for the instrument
         """
         id_lookup = {
-            "EIS WAC PB": "EUROPAM_EIS_WAC"
+            "WAC-PUSHBROOM": "EUROPAM_EIS_WAC"
         }
 
         key = super().instrument_id
         if key not in id_lookup:
             raise WrongInstrumentException(f"Unknown instrument id: {key}.")
         return id_lookup[key]
+
+    @property
+    def sensor_name(self):
+      return ""
+
+    @property
+    def spacecraft_name(self):
+      spacecraft_name_lookup = {
+        "Clipper": "EUROPA_CLIPPER"
+      }
+
+      return spacecraft_name_lookup[super().spacecraft_name]
 
     @property
     def fikid(self):
@@ -265,7 +277,7 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         float :
             The center sample of the detector
         """
-        return 4096 / 2
+        return (4096 / 2) - 0.5
 
     @property
     def detector_center_line(self):
@@ -278,7 +290,7 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         float :
             The center line of the detector
         """
-        return 2048 / 2
+        return (2048 / 2) - 0.5
 
     @property
     def detector_start_line(self):
@@ -290,7 +302,7 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         : int
           Zero based Detector line corresponding to the first image line
         """
-        return EIS_FILTER_START_LINES[self.filter_name]
+        return -(self.label['IsisCube']['Instrument']['DetectorOffset'] - 1024.0);
 
     @property
     def detector_start_sample(self):
@@ -302,7 +314,7 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         : int
           Zero based Detector sample corresponding to the first image sample
         """
-        return EIS_FILTER_START_SAMPLES[self.filter_name]
+        return 0.5
 
     @property
     def focal_length(self):
@@ -346,6 +358,72 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         """
         return EIS_ITRANSS
 
+    @property
+    def times_table(self):
+        """
+        Returns EphemerisTime, ExposureTime, and LinesStart informtation which was stored as
+        binary information in the ISIS cube.
+
+        Returns
+        -------
+        : dict
+          Dictionary with EphemerisTime, ExposureTime, and LineStart.
+        """
+        lineScanTable = None
+        allTables = self.label.getall("Table")
+        for table in allTables:
+          if table["Name"] == "LineScanTimes":
+            lineScanTable = table
+
+        if lineScanTable == None:
+          raise Exception(f'Could not find LineScanTable in label.')
+
+        isis_bytes = read_table_data(lineScanTable, self._file)
+        return parse_table(lineScanTable, isis_bytes)
+
+    @property
+    def line_scan_rate(self):
+        """
+        Returns
+        -------
+        : tuple
+          list of lines, list of ephemeris times, and list of exposure
+          times
+        """
+        times = self.times_table['EphemerisTime']
+        times = [time - self.center_ephemeris_time for time in times]
+        start_lines = self.times_table['LineStart']
+        start_lines = [line - .5 for line in start_lines]
+        return start_lines, times, self.times_table['ExposureTime']
+
+    @property
+    def ephemeris_start_time(self):
+        """
+        Returns
+        -------
+        : float
+          starting ephemeris time
+        """
+        return self.times_table['EphemerisTime'][0]
+
+    @property
+    def ephemeris_stop_time(self):
+        """
+        Returns
+        -------
+        : float
+          ephemeris stop time
+        """
+        last_line = self.times_table['LineStart'][-1]
+        return self.times_table['EphemerisTime'][-1] + ((self.image_lines - last_line + 1) * self.times_table['ExposureTime'][-1])
+
+    @property
+    def light_time_correction(self):
+      return 'NONE'
+
+    @property
+    def sensor_model_version(self):
+      return 1
 
 class ClipperEISNACFCIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, RollingShutter, Driver):
     @property
