@@ -422,6 +422,32 @@ class Driver():
         """
         return self.__module__.split('.')[-1].split('_')[0]
 
+    @property
+    def read_geodata(self):
+        if not hasattr(self, "_geodata"):
+            try: 
+              from osgeo import gdal
+              gdal.UseExceptions()
+            except: 
+                self._projection = ""
+                return self._projection
+
+            self._geodata = None
+            if isinstance(self._file, pvl.PVLModule):
+                # save it to a temp folder
+                with tempfile.NamedTemporaryFile() as tmp:
+                    tmp.write(pvl.dumps(self._file)) 
+
+                    self._geodata = gdal.Open(tempfile.name)
+            else: 
+                # should be a path
+                if not os.path.exists(self._file): 
+                    self._geodata = None
+                else: 
+                    self._geodata = gdal.Open(self._file)
+
+        return self._geodata
+
     @property 
     def projection(self):
         """
@@ -433,34 +459,14 @@ class Driver():
             A string representation of the projection information.
 
         """
-        if not hasattr(self, "_projection"): 
-            try: 
-              from osgeo import gdal 
-            except: 
-                self._projection = ""
-                return self._projection
-
-            geodata = None
-            if isinstance(self._file, pvl.PVLModule):
-                # save it to a temp folder
-                with tempfile.NamedTemporaryFile() as tmp:
-                    tmp.write(pvl.dumps(self._file)) 
-
-                    geodata = gdal.Open(tempfile.name)
-            else: 
-                # should be a path
-                if not os.path.exists(self._file): 
-                    self._projection = "" 
-                else: 
-                    geodata = gdal.Open(self._file)
-   
-
+        if not hasattr(self, "_projection"):
             # Try to get the projection, if we are unsuccessful set it
             # to empty
             try:
-              self._projection = geodata.GetSpatialRef().ExportToProj4()
+                self._projection = self.read_geodata.GetSpatialRef().ExportToProj4()
             except:
-              self._projection = "" 
+                self._projection = ""
+
         return self._projection
     
     @property 
@@ -475,25 +481,11 @@ class Driver():
 
         """
         if not hasattr(self, "_geotransform"): 
-            try: 
-              from osgeo import gdal 
-            except: 
+            # Try to get the geotransform, if we are unsuccessful set it
+            # to the identity
+            try:
+                self._geotransform = self.read_geodata.GetGeoTransform()
+            except:
                 self._geotransform = (0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
-                return self._geotransform
-
-            if isinstance(self._file, pvl.PVLModule):
-                # save it to a temp folder
-                with tempfile.NamedTemporaryFile() as tmp:
-                    tmp.write(pvl.dumps(self._file)) 
-
-                    geodata = gdal.Open(tempfile.name)
-                    self._geotransform = geodata.GetGeoTransform()
-            else: 
-                # should be a path
-                if not os.path.exists(self._file): 
-                    self._geotransform = (0.0, 1.0, 0.0, 0.0, 0.0, 1.0) 
-                else: 
-                    geodata = gdal.Open(self._file)
-                    self._geotransform = geodata.GetGeoTransform()
                 
         return self._geotransform
