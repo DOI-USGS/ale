@@ -198,23 +198,23 @@ class TimeDependentRotation:
         """
         quats = self._rots.as_quat()
 
-        # # First find the largest magnitude quaternion coefficient and its coordinate
-        # num_quats = len(quats)
-        # max_q = 0.0
-        # max_j = 0
-        # for i in range(num_quats):
-        #     for j in range(4):
-        #         if abs(quats[i][j]) > abs(max_q):
-        #             max_q = quats[i][j]
-        #             max_j = j
+        # First find the largest magnitude quaternion coefficient and its coordinate
+        num_quats = len(quats)
+        max_q = 0.0
+        max_j = 0
+        for i in range(num_quats):
+            for j in range(4):
+                if abs(quats[i][j]) > abs(max_q):
+                    max_q = quats[i][j]
+                    max_j = j
 
-        # # Ensure the signs are consistent
-        # qcnt = 0
-        # for i in range(num_quats):
-        #     if quats[i][max_j] * max_q < 0:
-        #         qcnt = qcnt + 1
-        #         for j in range(4):
-        #             quats[i][j] *= -1.0
+        # Ensure the signs are consistent
+        qcnt = 0
+        for i in range(num_quats):
+            if quats[i][max_j] * max_q < 0:
+                qcnt = qcnt + 1
+                for j in range(4):
+                    quats[i][j] *= -1.0
 
         return quats
 
