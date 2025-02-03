@@ -17,22 +17,17 @@ SPICE data for such calculations.
 ## Quick Links
 
   - [Generating an ISD with `isd_generate`](https://astrogeology.usgs.gov/docs/getting-started/using-ale/isd-generate/)
+      - How to use the `isd_generate` script, and set up NAIF SPICE Data
 
-  - [Tutorial: Generating an ISD, Creating a CSM Model, and Converting Coordinates (ALE and Knoten)](https://astrogeology.usgs.gov/docs/getting-started/csm-stack/image-to-ground-tutorial/#tutorial-instantiating-a-csm-camera-model-from-image)
+  - [ALE Quickstart](https://astrogeology.usgs.gov/docs/getting-started/using-ale/isd-generate/)
+      - Brief overview of how to install ALE and use `load`/`loads` in python
+
+  - [Tutorial: Generating an ISD, Creating a CSM Model, and Converting Coordinates](https://astrogeology.usgs.gov/docs/getting-started/csm-stack/image-to-ground-tutorial/#tutorial-instantiating-a-csm-camera-model-from-image)
+      - A tutorial on using ALE and Knoten in python
 
   - [ALE Driver Architecture](https://astrogeology.usgs.gov/docs/concepts/ale/ale-driver-architecture/)
+      - How ALE and its drivers work
 
-
-## Using ALE to generate ISDs
-
-To generate an ISD for an image, use the load(s) function. Pass the path to your image/label file and ALE will attempt to find a suitable driver and return an ISD. You can use load to generate the ISD as a dictionary or loads to generate the ISD as a JSON encoded string.
-
-```
-isd_dict = load(path_to_label)
-isd_string = loads(path_to_label)
-```
-
-You can get more verbose output from load(s) by passing verbose=True. If you are having difficulty generating an ISD enable the verbose flag to view the actual errors encountered in drivers.
 
 ## Prerequisite: Conda
 
@@ -62,6 +57,18 @@ export ALESPICEROOT=/path/to/ale/spice
 # from inside a conda env:
 conda env config vars set ALESPICEROOT=/path/to/ale/spice
 ```
+
+
+## Using ALE to generate ISDs
+
+To generate an ISD for an image, use the load(s) function. Pass the path to your image/label file and ALE will attempt to find a suitable driver and return an ISD. You can use load to generate the ISD as a dictionary or loads to generate the ISD as a JSON encoded string.
+
+```
+isd_dict = load(path_to_label)
+isd_string = loads(path_to_label)
+```
+
+You can get more verbose output from load(s) by passing verbose=True. If you are having difficulty generating an ISD enable the verbose flag to view the actual errors encountered in drivers.
 
 
 ## Developing ALE
