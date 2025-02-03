@@ -8,5 +8,4 @@ Abstraction Layer for Ephemerides (ALE)
 .. toctree::
    :maxdepth: 3
 
-   tutorials/index
    library/index
