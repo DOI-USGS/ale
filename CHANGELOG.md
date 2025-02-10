@@ -58,6 +58,7 @@ release.
 - Fixed incorrect distortion look up in Orex camera when working with PolyCam images [#583](https://github.com/DOI-USGS/ale/pull/583)
 - Brought timing in line with ISIS for the KaguyaMiIsisLabelNaifSpiceDriver [#599](https://github.com/DOI-USGS/ale/pull/599)
 - Brought timing in line with ISIS for the MroMarciIsisLabelNaifSpiceDriver [#600](https://github.com/DOI-USGS/ale/pull/600)
+- Fixed a bug in which quaternions would flip sign in a way that caused interpolation errors [#603](https://github.com/DOI-USGS/ale/issues/603)
 
 ## [0.10.0] - 2024-01-08 
 

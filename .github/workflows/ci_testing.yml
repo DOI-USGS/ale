@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-       os: [ubuntu-latest, macos-latest]
+       os: [ubuntu-latest, macos-13]
        python-version: ["3.9", "3.10", "3.11"]
     defaults:
       run:
@@ -23,9 +23,8 @@ jobs:
       - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
         with:
           submodules: true
-      - uses: conda-incubator/setup-miniconda@3b0f2504dd76ef23b6d31f291f4913fb60ab5ff3
+      - uses: conda-incubator/setup-miniconda@d2e6a045a86077fb6cad6f5adf368e9076ddaa8d
         with:
-          miniforge-version: latest
           use-mamba: true
           channels: conda-forge
           activate-environment: ale
