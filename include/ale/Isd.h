@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 
+#include <highfive/highfive.hpp>
 #include <nlohmann/json.hpp>
 
 #include "ale/Distortion.h"
@@ -68,6 +69,63 @@ namespace ale {
     Orientations inst_pointing;
     Orientations body_rotation;
   };
+  
+
+  class MultiSpectralIsd {
+    public:
+
+    MultiSpectralIsd(HighFive::File);
+
+    std::vector<std::string> usgscsm_name_model;
+    std::vector<std::string> name_platform;
+    std::vector<std::string> image_id;
+    std::vector<std::string> name_sensor;
+
+    std::vector<double> semi_major;
+    std::vector<double> semi_minor;
+
+    std::vector<double> detector_sample_summing;
+    std::vector<double> detector_line_summing;
+
+    std::vector<double> focal_length;
+    std::vector<double> focal_uncertainty;
+
+    std::vector<double> detector_center_line;
+    std::vector<double> detector_center_sample;
+
+    // should probably be ints
+    std::vector<double> starting_detector_line;
+    std::vector<double> starting_detector_sample;
+
+    std::vector<std::vector<double>> focal2pixel_line;
+    std::vector<std::vector<double>> focal2pixel_sample;
+
+    // maybe change
+    std::vector<DistortionType> distortion_model;
+    std::vector<std::vector<double>> distortion_coefficients;
+
+    std::vector<unsigned int> image_lines;
+    std::vector<unsigned int> image_samples;
+
+    std::vector<double> max_reference_height;
+    std::vector<double> min_reference_height;
+
+    std::vector<std::vector<std::vector<double>>> line_scan_rate;
+
+    std::vector<double> starting_ephemeris_time;
+    std::vector<double> center_ephemeris_time;
+
+    std::vector<nlohmann::json> naif_keywords;
+
+    std::vector<PositionInterpolation> interpMethod;
+
+    std::vector<States> inst_pos;
+    std::vector<States> sun_pos;
+
+    std::vector<Orientations> inst_pointing;
+    std::vector<Orientations> body_rotation;
+  };
 }
+
 
 #endif
