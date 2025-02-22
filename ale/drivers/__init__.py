@@ -1,14 +1,15 @@
 import pvl
 
+import datetime
+from datetime import datetime
+from glob import glob
 import importlib
 import inspect
 from itertools import chain, compress
-import os
-from glob import glob
 import json
 import numpy as np
-import datetime
-from datetime import datetime
+import os
+import sys
 import traceback
 
 from ale.formatters.usgscsm_formatter import to_usgscsm
@@ -36,7 +37,7 @@ __formatters__ = {'usgscsm': to_usgscsm,
                   'ale' : to_isd}
 
 def sort_drivers(drivers=[]):
-    return list(sorted(drivers, key=lambda x:IsisSpice in x.__bases__, reverse=False))
+    return list(sorted(set(drivers), key=lambda x:IsisSpice in x.__bases__, reverse=False))
 
 class AleJsonEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -144,7 +145,7 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
 
     for driver in drivers:
         if verbose:
-            print(f'Trying {driver}')
+            print(f'Trying {driver}', file=sys.stderr)
         try:
             res = driver(label, props=props, parsed_label=parsed_label)
             # get instrument_id to force early failure
@@ -157,9 +158,9 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
                 return isd
         except Exception as e:
             if verbose:
-                print(f'Failed: {e}\n')
                 traceback.print_exc()
     raise Exception('No Such Driver for Label')
+
 
 def loads(label, props='', formatter='ale', indent = 2, verbose=False, only_isis_spice=False, only_naif_spice=False):
     """

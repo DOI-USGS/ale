@@ -40,6 +40,8 @@ jobs:
           python setup.py install
       - name: Test Python Package
         run: |
+           mkdir spicedata/
+           export SPICEROOT=`pwd`/spicedata/
            pytest --cov-report=xml --cov=ale tests/pytests -vv
       - name: Build C++ Package
         run: |
@@ -102,7 +104,7 @@ jobs:
           use-mamba: true
           channels: conda-forge
           activate-environment: ale
-          environment-file: environment.yml
+          environment-file: cpp_env.yml
           auto-activate-base: false
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
@@ -116,9 +118,10 @@ jobs:
           cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON -G "Visual Studio 16 2019" -A x64 -DALE_BUILD_TESTS=OFF -DALE_BUILD_DOCS=OFF ..
           cmake --build . --target ALL_BUILD --config Release
           ls D:\a\ale\ale\build\Release
-      - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce
+      - uses: actions/upload-artifact@v4
         with:
           name: ale
           path: |
             D:\a\ale\ale\build\Release\ale.dll
             D:\a\ale\ale\build\Release\ale.lib
+          overwrite: true

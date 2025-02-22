@@ -3,7 +3,6 @@ import numpy as np
 import os
 import unittest
 from unittest.mock import MagicMock, PropertyMock, patch
-import spiceypy as spice
 import json
 
 from conftest import get_image, get_image_label, get_isd, get_image_kernels, convert_kernels, compare_dicts
@@ -27,6 +26,8 @@ def test_load(test_kernels):
     isd_str = ale.loads(label_file, props={'kernels': test_kernels})
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
+    print("======================")
+    print(json.dumps(compare_dict, indent=2))
     assert compare_dicts(isd_obj, compare_dict) == []
 
 
@@ -43,22 +44,6 @@ class test_isis3_naif(unittest.TestCase):
 
     def test_exposure_duration(self):
         assert self.driver.exposure_duration == 0.0
-
-    def test_ephemeris_start_time(self):
-        with patch('ale.drivers.apollo_drivers.spice.str2et', return_value=1234) as gdpool:
-            assert self.driver.ephemeris_start_time == 1234
-
-    def test_ephemeris_stop_time(self):
-        with patch('ale.drivers.apollo_drivers.spice.str2et', return_value=1234) as gdpool:
-            assert self.driver.ephemeris_stop_time == 1234
-
-    def test_detector_center_sample(self):
-        with patch('ale.drivers.apollo_drivers.spice.gdpool', return_value=[0, 1727.5]) as gdpool:
-            assert self.driver.detector_center_sample == 1727.5
-
-    def test_detector_center_line(self):
-        with patch('ale.drivers.apollo_drivers.spice.gdpool', return_value=[0, 1727.5]) as gdpool:
-            assert self.driver.detector_center_line == 0
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1

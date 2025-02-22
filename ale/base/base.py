@@ -1,8 +1,12 @@
-import pvl
 import json
+import sys 
 
 import tempfile
 import os 
+from multiprocessing.pool import ThreadPool
+
+import time
+import pvl
 
 class Driver():
     """
@@ -41,6 +45,67 @@ class Driver():
         if parsed_label:
             self._label = parsed_label
 
+    def to_dict(self, properties=None):
+        def get_property(prop_name):
+            try:
+                return getattr(self, prop_name)
+            except (Exception) as e: 
+                print(f"Failed to get property {prop_name} with type {type(e)}: {e}", file=sys.stderr)
+                return None 
+
+        if properties is None:
+            properties = []
+            for attr in dir(self):
+              if isinstance(getattr(self.__class__, attr, None), property):
+                  properties.append(attr)
+
+        spice_props = ["ikid", 
+                       "ephemeris_start_time", 
+                       "ephemeris_stop_time", 
+                       "spacecraft_id", 
+                       "target_id", 
+                       "target_frame_id",
+                       "reference_frame",
+                       "sensor_frame_id"]
+
+        # Remove position and orientation properties
+        ephemeris_props = ["sensor_position", "sun_position", "frame_chain"]
+        for prop in ephemeris_props or prop in spice_props:
+            properties.remove(prop)
+
+        if "fikid" in properties:
+            properties.remove("fikid")
+            spice_props.append("fikid")
+        if "sensor_orientation" in properties:
+            properties.remove("sensor_orientation")
+
+        data = {}
+        
+        start = time.time()
+        with ThreadPool() as pool:
+          jobs = pool.starmap_async(get_property, [(name,) for name in spice_props])
+          jobs = jobs.get()
+
+          for result, property_name in zip(jobs, spice_props):
+              data[property_name] = result
+        end = time.time()
+        
+        start = time.time()
+        for prop in properties:
+            data[prop] = get_property(prop)
+            if prop == "line_scan_rate":
+                end = time.time()
+        
+        start = time.time()
+        with ThreadPool() as pool:
+          jobs = pool.starmap_async(get_property, [(name,) for name in ephemeris_props])
+          jobs = jobs.get()
+
+          for result, property_name in zip(jobs, ephemeris_props):
+              data[property_name] = result
+        end = time.time()
+        return data
+    
     @property
     def image_lines(self):
         """
@@ -437,15 +502,19 @@ class Driver():
                 # save it to a temp folder
                 with tempfile.NamedTemporaryFile() as tmp:
                     tmp.write(pvl.dumps(self._file)) 
-
-                    self._geodata = gdal.Open(tempfile.name)
+                    try:
+                        self._geodata = gdal.Open(tempfile.name)
+                    except:
+                        self._geodata = None
             else: 
                 # should be a path
                 if not os.path.exists(self._file): 
                     self._geodata = None
                 else: 
-                    self._geodata = gdal.Open(self._file)
-
+                    try:
+                        self._geodata = gdal.Open(self._file)
+                    except:
+                        self._geodata = None
         return self._geodata
 
     @property 
@@ -457,7 +526,6 @@ class Driver():
         -------
         str
             A string representation of the projection information.
-
         """
         if not hasattr(self, "_projection"):
             # Try to get the projection, if we are unsuccessful set it
@@ -487,5 +555,4 @@ class Driver():
                 self._geotransform = self.read_geodata.GetGeoTransform()
             except:
                 self._geotransform = (0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
-                
         return self._geotransform
