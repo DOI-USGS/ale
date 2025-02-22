@@ -13,6 +13,52 @@ This library allows for the position, rotation, velocity and rotational velocity
 multiple bodies in space, especially in relation to one another. It makes extensive use of NAIF's
 SPICE data for such calculations.
 
+
+## Quick Links
+
+  - [Generating an ISD with `isd_generate`](https://astrogeology.usgs.gov/docs/getting-started/using-ale/isd-generate/)
+      - How to use the `isd_generate` script, and set up NAIF SPICE Data
+
+  - [ALE Quickstart](https://astrogeology.usgs.gov/docs/getting-started/using-ale/isd-generate/)
+      - Brief overview of how to install ALE and use `load`/`loads` in python
+
+  - [Tutorial: Generating an ISD, Creating a CSM Model, and Converting Coordinates](https://astrogeology.usgs.gov/docs/getting-started/csm-stack/image-to-ground-tutorial/#tutorial-instantiating-a-csm-camera-model-from-image)
+      - A tutorial on using ALE and Knoten in python
+
+  - [ALE Driver Architecture](https://astrogeology.usgs.gov/docs/concepts/ale/ale-driver-architecture/)
+      - How ALE and its drivers work
+
+
+## Prerequisite: Conda
+
+Conda is a prerequisite for ALE.  If you need it, 
+[download and install conda through miniforge](https://conda-forge.org/download/).
+
+## Installing ALE
+```sh
+# Create an environment ("y" to confirm)
+conda create -n ale
+
+# Run this to activate your environment whenever you need to use ALE
+conda activate ale
+
+# Install ALE from conda (in your current environment)
+conda install -c conda-forge ale
+```
+
+
+## Adding the ALESPICEROOT environment variable
+If your ale driver uses NAIF SPICE data, you need to [download NAIF SPICE DATA (see ASC software docs)](https://astrogeology.usgs.gov/docs/getting-started/using-ale/isd-generate/#setting-up-naif-data) and set the ALESPICEROOT variable in one of these two ways:
+
+```sh
+# from your shell:
+export ALESPICEROOT=/path/to/ale/spice
+
+# from inside a conda env:
+conda env config vars set ALESPICEROOT=/path/to/ale/spice
+```
+
+
 ## Using ALE to generate ISDs
 
 To generate an ISD for an image, use the load(s) function. Pass the path to your image/label file and ALE will attempt to find a suitable driver and return an ISD. You can use load to generate the ISD as a dictionary or loads to generate the ISD as a JSON encoded string.
@@ -24,25 +70,28 @@ isd_string = loads(path_to_label)
 
 You can get more verbose output from load(s) by passing verbose=True. If you are having difficulty generating an ISD enable the verbose flag to view the actual errors encountered in drivers.
 
-## Setting up dependencies with conda (RECOMMENDED)
 
-Install conda (either [Anaconda](https://www.anaconda.com/download/#linux) or
-[Miniconda](https://conda.io/miniconda.html)) if you do not already have it. Installation
-instructions may be found [here](https://conda.io/docs/user-guide/install/index.html).
+## Developing ALE
 
-### Creating an isolated conda environment
-Run the following commands to create a self-contained dev environment for ALE (type `y` to confirm creation):
-```bash
-conda env create -n ale -f environment.yml
+### Installing ALE with git and conda
+
+Clone ALE from git and create a conda environment with the necessary dependencies.
+```sh
+git clone --recurse-submodules [paste link from "<> Code" button above]
+cd ale
+conda env create -n ale -f environment.yml  # "y" to confirm
 ```
-> *For more information: [conda environments](https://conda.io/docs/user-guide/tasks/manage-environments.html)*
 
-### Activating the environment
-After creating the `ale` environment, we need to activate it. The activation command depends on your shell.
-* **tcsh**: `conda activate ale`
-> *You can add these to the end of your $HOME/.bashrc or $HOME/.cshrc if you want the `ale` environment to be active in every new terminal.*
+### Conda Environment
 
-## Building ALE
+Activate the environment whenever you need to use ALE.
+```sh
+conda activate ale
+```
+> *You can add `conda activate ale` to the end of your .bashrc or .zshrc if you want the `ale` environment to be active in every new terminal.*
+
+
+### Building ALE
 After you've set up and activated your conda environment, you may then build ALE. Inside
 of a cloned fork of the repository, follow these steps:
 
@@ -60,37 +109,20 @@ running the following command will retrieve the gtest submodule manually:
 git submodule update --init --recursive
 ```
 
-## Adding the ALESPICEROOT environment variable
-If an ale driver is going to be used that leverages SPICE data, it is necessary to set the ALESPICEROOT. One can do this using normal shell syntax, e.g.:
 
-`export ALESPICEROOT=/path/to/ale/spice`
-
-or inside of a conda environment:
-
-`conda env config vars set ALESPICEROOT=/path/to/ale/spice`.
 ## Adding ALE as a dependency
 
-You can add ALE as a dependency of your CMake based C++ project by linking the exported CMake target, `ale::ale`.
+You can add ALE as a dependency of your CMake based C++ project by linking the exported CMake target, `ale::ale`
 
-For example:
-
-```
+```c
 add_library(my_library some_source.cpp)
 find_package(ale REQUIRED)
 target_link_libraries(my_library ale::ale)
 ```
 
+
 ## Running Tests
 
-To test the c++ part of ALE, run:
+To test the c++ part of ALE, run `ctest` from the build directory. 
 
-```
-ctest
-```
-from the build directory. 
-
-To test the python part of ALE, run:
-
-```
-pytest tests/pytests
-```
+To test the python part of ALE, run `pytest tests/pytests`
