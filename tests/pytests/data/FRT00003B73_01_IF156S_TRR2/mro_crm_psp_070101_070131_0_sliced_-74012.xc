@@ -1,0 +1,40 @@
+DAFETF NAIF DAF ENCODED TRANSFER FILE
+'DAF/CK  '
+'2'
+'6'
+' < DAFCAT: CK CONCATENATION >                               '
+BEGIN_ARRAY 1 19
+'MRO_CRISM_ART                           '
+'32CC3D144902^C'
+'32CC3EC5A555^C'
+'-1211C'
+'-1211B'
+'3'
+'1'
+19
+'FFFEEB240BDA2^0'
+'0^0'
+'0^0'
+'1787F7C636F536^-1'
+'0^0'
+'0^0'
+'3FAE27A8A4E618^-6'
+'-FFFEEB240BDA2^0'
+'0^0'
+'0^0'
+'-1787F7C636F536^-1'
+'0^0'
+'0^0'
+'65B6497F985C8^-6'
+'32CC3D144902^C'
+'32CC3D2AB7CC88^C'
+'32CC3D144902^C'
+'1^1'
+'2^1'
+END_ARRAY 1 19
+TOTAL_ARRAYS 1
+ ~NAIF/SPC BEGIN COMMENTS~
+This CK is for testing with the image: FRT00003B73_01_IF156S_TRR2_isis3.lbl
+
+This CK was generated using the following command: {}
+ ~NAIF/SPC END COMMENTS~

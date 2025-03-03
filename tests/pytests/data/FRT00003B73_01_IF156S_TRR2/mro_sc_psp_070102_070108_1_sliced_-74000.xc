@@ -18273,7 +18273,7 @@ BEGIN_ARRAY 1 18241
 END_ARRAY 1 18241
 TOTAL_ARRAYS 1
  ~NAIF/SPC BEGIN COMMENTS~
-This CK is for testing with the image: /Users/astamile/testData/ale/crism/FRT00003B73_01_IF156S_TRR2-spiced.cub
+This CK is for testing with the image: FRT00003B73_01_IF156S_TRR2_isis3.lbl
 
 This CK was generated using the following command: {}
  ~NAIF/SPC END COMMENTS~
