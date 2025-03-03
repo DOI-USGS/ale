@@ -91,7 +91,7 @@ jobs:
     runs-on: windows-2019
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.9", "3.10", "3.11"]
     steps:
       - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
         with:
@@ -116,9 +116,10 @@ jobs:
           cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON -G "Visual Studio 16 2019" -A x64 -DALE_BUILD_TESTS=OFF -DALE_BUILD_DOCS=OFF ..
           cmake --build . --target ALL_BUILD --config Release
           ls D:\a\ale\ale\build\Release
-      - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce
+      - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1
         with:
           name: ale
           path: |
             D:\a\ale\ale\build\Release\ale.dll
             D:\a\ale\ale\build\Release\ale.lib
+          overwrite: true
