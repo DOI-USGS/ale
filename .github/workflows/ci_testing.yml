@@ -120,8 +120,7 @@ jobs:
           ls D:\a\ale\ale\build\Release
       - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1
         with:
-          name: ale
+          name: ale-py${{ matrix.python-version }}
           path: |
             D:\a\ale\ale\build\Release\ale.dll
             D:\a\ale\ale\build\Release\ale.lib
-          overwrite: true
