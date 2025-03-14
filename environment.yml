@@ -11,7 +11,7 @@ dependencies:
   - jupyter
   - nlohmann_json
   - numpy
-  - spiceql>=1.0.0
+  - spiceql>=1.1.1
   - pvl
   - pytz
   - python
