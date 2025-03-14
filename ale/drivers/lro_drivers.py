@@ -277,8 +277,8 @@ class LroLrocNacPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driv
                                                            'frame': 'J2000', 
                                                            'abcorr': 'None',
                                                            'mission': self.spiceql_mission,
-                                                           'ckQuality': "",
-                                                           'spkQuality': ""})
+                                                           'ckQualities': ["smithed", "reconstructed"],
+                                                           'spkQualities': ["smithed", "reconstructed"]})
           velocity = lt_states[0][3:6]
           rotation = frame_chain.compute_rotation(1, lro_bus_id)
           rotated_velocity = spice.mxv(rotation._rots.as_matrix()[0], velocity)
@@ -523,8 +523,8 @@ class LroLrocNacIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driv
                                                            'frame': 'J2000', 
                                                            'abcorr': 'None',
                                                            'mission': self.spiceql_mission,
-                                                           'ckQuality': "",
-                                                           'spkQuality': ""})
+                                                           'ckQualities': ["smithed", "reconstructed"],
+                                                           'spkQualities': ["smithed", "reconstructed"]})
           velocity = lt_states[0][3:6]
           rotation = frame_chain.compute_rotation(1, lro_bus_id)
           rotated_velocity = spice.mxv(rotation._rots.as_matrix()[0], velocity)

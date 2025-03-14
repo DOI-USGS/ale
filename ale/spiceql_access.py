@@ -79,9 +79,9 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
     """
     if use_web == False:
         func = getattr(pyspiceql, function_name)
-        return func(**function_args)
+        return func(**function_args)[0]
     
-    url = "10.12.56.68"
+    url = "https://spiceql-fastapi-dev.prod-asc.chs.usgs.gov/"
     url += function_name
     headers = {
         'accept': '*/*',

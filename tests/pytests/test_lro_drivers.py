@@ -50,7 +50,7 @@ def test_load_lroc_nac(test_kernels, label_type, image, kernel_type):
         label_file = get_image(image)
         isd_str = ale.loads(label_file)
         compare_isd = get_isd('lro_isis')
-
+    print(isd_str)
     isd_obj = json.loads(isd_str)
     comparison = compare_dicts(isd_obj, compare_isd)
     assert comparison == []
@@ -150,7 +150,7 @@ class test_pds_naif(unittest.TestCase):
             assert self.driver.spacecraft_direction > 0
             calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False),
                      call('translateNameToCode', {'frame': 'LRO_SC_BUS', 'mission': 'lroc', 'searchKernels': False}, False),
-                     call('getTargetStates', {'ets': [0], 'target': 'LRO', 'observer': 'MOON', 'frame': 'J2000', 'abcorr': 'None', 'mission': 'lroc', 'ckQuality': '', 'spkQuality': '', 'searchKernels': False}, False)]
+                     call('getTargetStates', {'ets': [0], 'target': 'LRO', 'observer': 'MOON', 'frame': 'J2000', 'abcorr': 'None', 'mission': 'lroc', 'ckQualities': ['smithed', 'reconstructed'], 'spkQualities': ['smithed', 'reconstructed'], 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 3
             compute_rotation.assert_called_with(1, -12345)
@@ -256,7 +256,7 @@ class test_isis_naif(unittest.TestCase):
             assert self.driver.spacecraft_direction > 0
             calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False),
                      call('translateNameToCode', {'frame': 'LRO_SC_BUS', 'mission': 'lroc', 'searchKernels': False}, False),
-                     call('getTargetStates', {'ets': [0], 'target': 'LUNAR RECONNAISSANCE ORBITER', 'observer': 'MOON', 'frame': 'J2000', 'abcorr': 'None', 'mission': 'lroc', 'ckQuality': '', 'spkQuality': '', 'searchKernels': False}, False)]
+                     call('getTargetStates', {'ets': [0], 'target': 'LUNAR RECONNAISSANCE ORBITER', 'observer': 'MOON', 'frame': 'J2000', 'abcorr': 'None', 'mission': 'lroc', 'ckQualities': ["smithed", "reconstructed"], 'spkQualities': ["smithed", "reconstructed"], 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 3
             compute_rotation.assert_called_with(1, -12345)

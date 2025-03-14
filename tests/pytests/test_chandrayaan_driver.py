@@ -33,6 +33,7 @@ def test_chandrayaan_load(m3_kernels):
     print("kernels: ", m3_kernels)
     isd_str = ale.loads(label_file, props={"kernels": m3_kernels}, verbose=False)
     isd_obj = json.loads(isd_str)
+    print(isd_str)
     x = compare_dicts(isd_obj, compare_dict)
     assert x == []
 
