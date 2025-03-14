@@ -78,7 +78,7 @@ def test_vir_load(vir_kernels):
         patch('ale.drivers.dawn_drivers.parse_table', return_value=housekeeping_dict) as parse_table:
 
         compare_dict = get_isd("dawnvir")
-
+        
         isd_str = ale.loads(label_file, props={"kernels": vir_kernels, "nadir": False}, verbose=False)
         isd_obj = json.loads(isd_str)
         x = compare_dicts(isd_obj, compare_dict)
