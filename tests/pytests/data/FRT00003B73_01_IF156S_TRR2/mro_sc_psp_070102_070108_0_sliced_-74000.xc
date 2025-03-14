@@ -9594,6 +9594,10 @@ BEGIN_ARRAY 1 10167
 '32CC3D952F1BC2^A'
 '32CC3D9562474A^A'
 '32CC3D95957BEE^A'
+<<<<<<< HEAD
+=======
+1024
+>>>>>>> bd741b14aaf6be7417a6ffb35ad6a93a3849a2b3
 '32CC3D95C8AFC8^A'
 '32CC3D95FBF018^A'
 '32CC3D962F2414^A'
@@ -10191,7 +10195,7 @@ BEGIN_ARRAY 1 10167
 END_ARRAY 1 10167
 TOTAL_ARRAYS 1
  ~NAIF/SPC BEGIN COMMENTS~
-This CK is for testing with the image: /home/ec2-user/FRT00003B73_01_IF156S_TRR2_isis3.lbl
+This CK is for testing with the image: FRT00003B73_01_IF156S_TRR2_isis3.lbl
 
 This CK was generated using the following command: {}
  ~NAIF/SPC END COMMENTS~

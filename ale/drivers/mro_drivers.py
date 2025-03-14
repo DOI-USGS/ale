@@ -715,9 +715,12 @@ class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
           instrument id
         """
         id_lookup = {
-        "CRISM" : "MRO_CRISM_VNIR"
+          "S" : "MRO_CRISM_VNIR",
+          "J" : "MRO_CRISM_VNIR",
+          "L" : "MRO_CRISM_IR"
         }
-        return id_lookup[super().instrument_id]
+        
+        return id_lookup[self.label["IsisCube"]["Instrument"]["SensorId"]]
 
     @property
     def ephemeris_start_time(self):
@@ -725,7 +728,8 @@ class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
         Returns the starting ephemeris time of the image. Expects spacecraft_id to
         be defined. NAIF code -74999 was obtained from ISIS Crism camera model. Expects
         spacecraft_clock_start_count to be defined. This must be a string
-        containing the start clock count of the spacecraft
+        containing the start clock count of the spacecraft. The -74999 code is a 
+        "high precision" on board clock, check the mro sclks for more details.
 
         Returns
         -------
@@ -742,7 +746,8 @@ class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
         Returns the ephemeris stop time of the image. Expects spacecraft_id to
         be defined. NAIF code -74999 was obtained from ISIS Crism camera model.
         Expects spacecraft_clock_stop_count to be defined. This must be a string
-        containing the stop clock count of the spacecraft
+        containing the stop clock count of the spacecraft. The -74999 code is a 
+        "high precision" on board clock, check the mro sclks for more details.
 
         Returns
         -------
@@ -784,22 +789,9 @@ class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
         return self.instrument_id
 
     @property
-    def sensor_frame_id(self):
-        """
-        Returns the Naif ID code for the sensor reference frame.
-        This is the frame of the OsirisRex instrument itself, and is not dependent on filter.
-
-        Returns
-        -------
-        : int
-          Naif ID code for the sensor frame
-        """
-        return -74000
-
-    @property
     def sensor_model_version(self):
         """
-        The ISIS Sensor model number for HiRise in ISIS. This is likely just 1
+        The ISIS Sensor model number for CrismCamera in ISIS. This is likely just 1
 
         Returns
         -------

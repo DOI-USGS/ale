@@ -9847,7 +9847,7 @@ BEGIN_ARRAY 1 9823
 END_ARRAY 1 9823
 TOTAL_ARRAYS 1
  ~NAIF/SPC BEGIN COMMENTS~
-This CK is for testing with the image: /home/ec2-user/FRT00003B73_01_IF156S_TRR2_isis3.lbl
+This CK is for testing with the image: FRT00003B73_01_IF156S_TRR2_isis3.lbl
 
 This CK was generated using the following command: {}
  ~NAIF/SPC END COMMENTS~
