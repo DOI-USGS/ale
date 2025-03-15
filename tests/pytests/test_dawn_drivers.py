@@ -80,6 +80,7 @@ def test_vir_load(vir_kernels):
         compare_dict = get_isd("dawnvir")
         
         isd_str = ale.loads(label_file, props={"kernels": vir_kernels, "nadir": False}, verbose=False)
+        print(isd_str)
         isd_obj = json.loads(isd_str)
         x = compare_dicts(isd_obj, compare_dict)
         assert x == []
