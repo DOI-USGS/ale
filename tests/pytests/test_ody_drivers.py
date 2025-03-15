@@ -68,10 +68,10 @@ class test_themisir_isis_naif(unittest.TestCase):
         assert self.driver.line_exposure_duration == 0.0332871
 
     def test_start_time(self):
-        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=0) as scs2e:
+        with patch('ale.base.data_naif.NaifSpice.spiceql_call', return_value=0) as spice:
             self.driver.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"] = 10
             assert self.driver.start_time == 10
-            scs2e.assert_called_with(-53, '1220641481.102')
+            spice.assert_called_with('strSclkToEt', {'frameCode': 0, 'sclk': '1220641481.102', 'mission': 'odyssey'})
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
@@ -83,11 +83,11 @@ class test_themisir_isis_naif(unittest.TestCase):
         assert self.driver.sampling_factor == 1
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=400001111.2222333) as scs2e:
+        with patch('ale.base.data_naif.NaifSpice.spiceql_call', return_value=400001111.2222333) as scs2e:
             assert self.driver.ephemeris_start_time == 400001111.4885301
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=400001111.2222333) as scs2e:
+        with patch('ale.base.data_naif.NaifSpice.spiceql_call', return_value=400001111.2222333) as scs2e:
             assert self.driver.ephemeris_stop_time == 400001127.9656446
 
     def test_focal_length(self):
@@ -106,7 +106,7 @@ class test_themisir_isis_naif(unittest.TestCase):
         assert self.driver.sensor_name == "MARS_ODYSSEY"
 
     def test_band_times(self):
-        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=400001111.2222333) as scs2e:
+        with patch('ale.base.data_naif.NaifSpice.spiceql_call', return_value=400001111.2222333) as scs2e:
             assert self.driver.band_times == [400001111.4885301,
                 400001112.0211237, 400001112.8865883, 400001113.7520529,
                 400001114.6175175, 400001115.4829821, 400001116.34844667,
@@ -130,21 +130,21 @@ class test_themisvis_isis_naif(unittest.TestCase):
         assert self.driver.ikid == -53032
 
     def test_start_time(self):
-        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=0) as scs2e:
+        with patch('ale.base.data_naif.NaifSpice.spiceql_call', return_value=0) as spice:
             self.driver.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"] = 10
             assert self.driver.start_time == 9.9976
-            scs2e.assert_called_with(-53, '1023406812.230')
+            spice.assert_called_with('strSclkToEt', {'frameCode': 0, 'sclk': '1023406812.230'})
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=392211096.4307215) as scs2e:
+        with patch('ale.base.data_naif.NaifSpice.spiceql_call', return_value=392211096.4307215) as scs2e:
             assert self.driver.ephemeris_start_time == 392211098.2259215
 
     def test_ephemeris_center_time(self):
-        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=392211096.4307215) as scs2e:
+        with patch('ale.base.data_naif.NaifSpice.spiceql_call', return_value=392211096.4307215) as scs2e:
             assert self.driver.center_ephemeris_time == 392211106.33072156
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=392211096.4307215) as scs2e:
+        with patch('ale.base.data_naif.NaifSpice.spiceql_call', return_value=392211096.4307215) as scs2e:
             assert self.driver.ephemeris_stop_time == 392211115.33072156
 
     def test_focal_length(self):
@@ -172,7 +172,7 @@ class test_themisvis_isis_naif(unittest.TestCase):
         assert self.driver.interframe_delay == 0.9
 
     def test_band_times(self):
-        with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=392211096.4307215) as scs2e:
+        with patch('ale.base.data_naif.NaifSpice.spiceql_call', return_value=392211096.4307215) as scs2e:
             assert self.driver.band_times == [392211098.2259215]
     
     def test_framelets_flipped(self):

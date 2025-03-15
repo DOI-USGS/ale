@@ -1,0 +1,14 @@
+name: ale
+channels:
+  - conda-forge
+  - default
+
+dependencies:
+  - cmake>=3.15
+  - eigen
+  - gdal 
+  - nlohmann_json
+  - numpy
+  - pytz
+  - scipy>=1.4.0,<1.11
+  - spiceypy>=6.0.0

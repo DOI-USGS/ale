@@ -1,5 +1,5 @@
-import spiceypy as spice
 import numpy as np
+import spiceypy as spice
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
@@ -66,8 +66,9 @@ class LoHighCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, LoDisto
         : float
           ephemeris time of the image
         """
-        
-        return spice.utc2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
+        if not hasattr(self, "_ephemeris_start_time"):
+          self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+        return self._ephemeris_start_time
     
     @property
     def ephemeris_stop_time(self):
@@ -83,21 +84,6 @@ class LoHighCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, LoDisto
         """
         
         return self.ephemeris_start_time
-    
-
-    
-    @property
-    def ikid(self):
-        """
-        Overridden to grab the ikid from the Isis Cube since there is no way to
-        obtain this value with a spice bods2c call.
-
-        Returns
-        -------
-        : int
-          Naif ID used to for identifying the instrument in Spice kernels
-        """
-        return spice.namfrm(self.instrument_id)
     
     @property
     def detector_center_line(self):
@@ -232,6 +218,16 @@ class LoMediumCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDis
                 'Lunar Orbiter 4': {'name':'LO4_MEDIUM_RESOLUTION_CAMERA', 'id':-534002},
                 'Lunar Orbiter 5': {'name':'LO5_MEDIUM_RESOLUTION_CAMERA', 'id':-535002}}
 
+    @property 
+    def lo_detector_list(self):
+        return [
+          'LO1_MEDIUM_RESOLUTION_CAMERA', 
+          'LO2_MEDIUM_RESOLUTION_CAMERA',
+          'LO3_MEDIUM_RESOLUTION_CAMERA',
+          'LO4_MEDIUM_RESOLUTION_CAMERA',
+          'LO5_MEDIUM_RESOLUTION_CAMERA'
+        ]
+
     @property
     def instrument_id(self):
         """
@@ -242,7 +238,11 @@ class LoMediumCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDis
         : str
           Name of the instrument
         """
-        lookup_table = {'Medium Resolution Camera': self.lo_detector_map[self.spacecraft_name]['name']}
+        try: 
+          lookup_table = {'Medium Resolution Camera': self.lo_detector_map[self.spacecraft_name]['name']}
+        except Exception as e: 
+          if super().instrument_id in lo_detector_list: 
+              return super().instrument_id 
         return lookup_table[super().instrument_id]
 
     @property
@@ -294,7 +294,7 @@ class LoMediumCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDis
           ephemeris time of the image
         """
         
-        return spice.utc2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
+        return self.spiceql_call("utcToEt", {"utc" : self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
     
     @property
     def ephemeris_stop_time(self):

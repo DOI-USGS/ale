@@ -1,13 +1,11 @@
 import pytest
 import os
 import numpy as np
-import spiceypy as spice
 from importlib import reload
 import json
 
 import unittest
-from unittest import mock
-from unittest.mock import patch
+from unittest.mock import PropertyMock, patch, call
 from ale.drivers import AleJsonEncoder
 from conftest import get_image_label, get_image_kernels, get_isd, convert_kernels, compare_dicts
 
@@ -80,8 +78,9 @@ def test_vir_load(vir_kernels):
         patch('ale.drivers.dawn_drivers.parse_table', return_value=housekeeping_dict) as parse_table:
 
         compare_dict = get_isd("dawnvir")
-
+        
         isd_str = ale.loads(label_file, props={"kernels": vir_kernels, "nadir": False}, verbose=False)
+        print(isd_str)
         isd_obj = json.loads(isd_str)
         x = compare_dicts(isd_obj, compare_dict)
         assert x == []
@@ -106,48 +105,61 @@ class test_dawn_fc_pds3_naif(unittest.TestCase):
         assert self.driver.target_name == 'CERES'
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.dawn_drivers.spice.scs2e', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[54321, 12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12345.193
-            scs2e.assert_called_with(-203, '488002612:246')
+            calls = [call('translateNameToCode', {'frame': 'DAWN', 'mission': 'fc2', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': 54321, 'sclk': '488002612:246', 'mission': 'fc2', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 2
 
     def test_usgscsm_distortion_model(self):
-        with patch('ale.drivers.dawn_drivers.spice.gdpool', return_value=np.array([12345])) as gdpool, \
-             patch('ale.drivers.dawn_drivers.spice.bods2c', return_value=54321) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
+             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-12345_RAD_DIST_COEFF": [12345]}
             dist = self.driver.usgscsm_distortion_model
             assert dist['dawnfc']['coefficients'] == [12345]
-            bods2c.assert_called_with('DAWN_FC2_FILTER_6')
-            gdpool.assert_called_with('INS54321_RAD_DIST_COEFF', 0, 1)
+            calls = [call('translateNameToCode', {'frame': 'DAWN_FC2_FILTER_6', 'mission': 'fc2', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_focal2pixel_samples(self):
-        with patch('ale.drivers.dawn_drivers.spice.gdpool', return_value=np.array([1000])) as gdpool, \
-             patch('ale.drivers.dawn_drivers.spice.bods2c', return_value=54321) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
+             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-12345_PIXEL_SIZE": [1000]}
             assert self.driver.focal2pixel_samples == [0, 1, 0]
-            bods2c.assert_called_with('DAWN_FC2_FILTER_6')
-            gdpool.assert_called_with('INS54321_PIXEL_SIZE', 0, 1)
+            calls = [call('translateNameToCode', {'frame': 'DAWN_FC2_FILTER_6', 'mission': 'fc2', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_focal2pixel_lines(self):
-        with patch('ale.drivers.dawn_drivers.spice.gdpool', return_value=np.array([1000])) as gdpool, \
-             patch('ale.drivers.dawn_drivers.spice.bods2c', return_value=54321) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
+             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-12345_PIXEL_SIZE": [1000]}
             assert self.driver.focal2pixel_lines == [0, 0, 1]
-            bods2c.assert_called_with('DAWN_FC2_FILTER_6')
-            gdpool.assert_called_with('INS54321_PIXEL_SIZE', 0, 1)
+            calls = [call('translateNameToCode', {'frame': 'DAWN_FC2_FILTER_6', 'mission': 'fc2', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def sensor_model_version(self):
         assert self.driver.sensor_model_version == 2
 
     def test_detector_center_sample(self):
-        with patch('ale.drivers.dawn_drivers.spice.gdpool', return_value=np.array([12345, 100])) as gdpool, \
-             patch('ale.drivers.dawn_drivers.spice.bods2c', return_value=54321) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
+             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-12345_CCD_CENTER": [12345, 100]}
             assert self.driver.detector_center_sample == 12345.5
-            bods2c.assert_called_with('DAWN_FC2_FILTER_6')
-            gdpool.assert_called_with('INS54321_CCD_CENTER', 0, 2)
+            calls = [call('translateNameToCode', {'frame': 'DAWN_FC2_FILTER_6', 'mission': 'fc2', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_detector_center_line(self):
-        with patch('ale.drivers.dawn_drivers.spice.gdpool', return_value=np.array([12345, 100])) as gdpool, \
-             patch('ale.drivers.dawn_drivers.spice.bods2c', return_value=54321) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
+             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-12345_CCD_CENTER": [12345, 100]}
             assert self.driver.detector_center_line == 100.5
-            bods2c.assert_called_with('DAWN_FC2_FILTER_6')
-            gdpool.assert_called_with('INS54321_CCD_CENTER', 0, 2)
+            calls = [call('translateNameToCode', {'frame': 'DAWN_FC2_FILTER_6', 'mission': 'fc2', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
 # ========= Test dawn fc isis3label and naifspice driver =========
 class test_dawn_fc_isis3_naif(unittest.TestCase):
@@ -169,9 +181,12 @@ class test_dawn_fc_isis3_naif(unittest.TestCase):
         assert self.driver.target_name == 'CERES'
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.dawn_drivers.spice.scs2e', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[54321, 12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12345.193
-            scs2e.assert_called_with(-203, '488002612:246')
+            calls = [call('translateNameToCode', {'frame': 'DAWN', 'mission': 'fc2', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': 54321, 'sclk': '488002612:246', 'mission': 'fc2', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 2
 
 
 # ========= Test dawn vir isis3label and naifspice driver =========
@@ -199,6 +214,7 @@ class test_dawn_vir_isis3_naif(unittest.TestCase):
     def test_sensor_frame_id(self):
         ale.spice_root = "/foo/bar"
         assert self.driver.sensor_frame_id == -203223
+        ale.spice_root = None
 
     def test_line_scan_rate(self):
         with patch('ale.drivers.dawn_drivers.read_table_data', return_value=12345) as read_table_data, \
@@ -258,4 +274,5 @@ class test_dawn_vir_isis3_naif(unittest.TestCase):
     def test_has_articulation_kernel(self):
         ale.spice_root = "/foo/bar"
         assert self.driver.has_articulation_kernel == False
+        ale.spice_root = None
 

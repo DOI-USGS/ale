@@ -93,8 +93,7 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         account for the CCD being discharged or cleared.
         """
         if not hasattr(self, '_ephemeris_start_time'):
-            sclock = self.spacecraft_clock_start_count
-            self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
+            self._ephemeris_start_time = super().ephemeris_start_time
             self._ephemeris_start_time += 193.0 / 1000.0
         return self._ephemeris_start_time
 
@@ -129,7 +128,7 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         : list
           Radial distortion coefficients
         """
-        return spice.gdpool('INS{}_RAD_DIST_COEFF'.format(self.ikid),0, 1).tolist()
+        return self.naif_keywords['INS{}_RAD_DIST_COEFF'.format(self.ikid)]
 
     # TODO: Update focal2pixel samples and lines to reflect the rectangular
     #       nature of dawn pixels
@@ -145,7 +144,7 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
           focal plane to detector samples
         """
         # Microns to mm
-        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
+        pixel_size = float(self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)][0]) * .001
         return [0.0, 1/pixel_size, 0.0]
 
     @property
@@ -160,7 +159,7 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
           focal plane to detector lines
         """
         # Microns to mm
-        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
+        pixel_size = float(self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)][0]) * .001
         return [0.0, 0.0, 1/pixel_size]
 
     @property
@@ -191,7 +190,7 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         : float
           center detector sample
         """
-        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[0]) + 0.5
+        return float(self.naif_keywords['INS{}_CCD_CENTER'.format(self.ikid)][0]) + 0.5
 
     @property
     def detector_center_line(self):
@@ -209,7 +208,8 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         : float
           center detector line
         """
-        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[1]) + 0.5
+        return float(self.naif_keywords['INS{}_CCD_CENTER'.format(self.ikid)][1]) + 0.5
+
 
 class DawnFcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
     """
@@ -329,7 +329,7 @@ class DawnFcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
         : float
           center detector sample
         """
-        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[0]) + 0.5
+        return float(self.naif_keywords['INS{}_CCD_CENTER'.format(self.ikid)][0]) + 0.5
 
     @property
     def detector_center_line(self):
@@ -347,7 +347,7 @@ class DawnFcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
         : float
           center detector line
         """
-        return float(spice.gdpool('INS{}_CCD_CENTER'.format(self.ikid), 0, 2)[1]) + 0.5
+        return float(self.naif_keywords['INS{}_CCD_CENTER'.format(self.ikid)][1]) + 0.5
 
     @property
     def ephemeris_start_time(self):
@@ -362,8 +362,7 @@ class DawnFcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
           ephemeris start time
         """
         if not hasattr(self, '_ephemeris_start_time'):
-            sclock = self.spacecraft_clock_start_count
-            self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
+            self._ephemeris_start_time = super().ephemeris_start_time
             self._ephemeris_start_time += 193.0 / 1000.0
         return self._ephemeris_start_time
 

@@ -40,6 +40,8 @@ jobs:
           python setup.py install
       - name: Test Python Package
         run: |
+           mkdir spicedata/
+           export SPICEROOT=`pwd`/spicedata/
            pytest --cov-report=xml --cov=ale tests/pytests -vv
       - name: Build C++ Package
         run: |
@@ -104,7 +106,7 @@ jobs:
           use-mamba: true
           channels: conda-forge
           activate-environment: ale
-          environment-file: environment.yml
+          environment-file: cpp_env.yml
           auto-activate-base: false
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}

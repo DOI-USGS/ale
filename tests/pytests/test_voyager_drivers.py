@@ -300,11 +300,11 @@ def test_kernels():
 @pytest.mark.parametrize("label_type", ['isis3'])
 @pytest.mark.parametrize("image", image_dict.keys())
 def test_voyager_load(test_kernels, label_type, image):
+    print(test_kernels[image])
     label_file = get_image_label(image, label_type)
 
-    usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]}, verbose=True)
+    usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]}, verbose=False)
     usgscsm_isd_obj = json.loads(usgscsm_isd_str)
-    print(json.dumps(usgscsm_isd_obj, indent=2))
 
     isd_name = image
     compare_dict = get_isd(isd_name)

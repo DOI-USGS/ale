@@ -220,7 +220,7 @@ def convert_kernels(kernels):
                     kernel = matches.group(1)
                     binary_kernels.append(kernel)
             except:
-                warnings.warn(f"Unable to convert {path} to binary kernel")
+                raise Exception(f"Unable to convert {path} to binary kernel")
         updated_kernels.append(kernel)
     
     # Sort Kernels
