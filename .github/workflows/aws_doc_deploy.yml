@@ -37,7 +37,7 @@ jobs:
           mkdir build
           cd build
           cmake -DCMAKE_BUILD_TYPE=RELEASE -DCOVERAGE=OFF -DALE_BUILD_TESTS=OFF -DALE_BUILD_DOCS=ON ..
-          cmake --build . --target Sphinx --config Release
+          cmake --build . --target Docs --config Release
             
       - name: Set AWS credentials for upload
         uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
@@ -47,5 +47,5 @@ jobs:
           aws-region: us-west-2
       
       - name: Upload to S3
-        working-directory: build/docs/sphinx
+        working-directory: build/docs
         run: aws s3 sync --delete public s3://asc-public-docs/software_manuals/ale/
