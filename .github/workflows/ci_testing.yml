@@ -87,7 +87,7 @@ jobs:
           mkdir build
           cd build
           cmake -DCMAKE_BUILD_TYPE=RELEASE -DCOVERAGE=OFF -DALE_BUILD_TESTS=OFF -DALE_BUILD_DOCS=ON ..
-          cmake --build . --target Sphinx --config Debug
+          cmake --build . --target Docs --config Debug
 
   Build-and-Test-Win:
     runs-on: windows-2019
