@@ -1,14 +1,6 @@
-import json
-import numpy as np
-from scipy.interpolate import interp1d, BPoly
-
-import spiceypy as spice
-
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
-from ale.transformation import FrameChain
 from ale.base.type_sensor import LineScanner, Framer, Radar, PushFrame
-from ale.rotation import ConstantRotation, TimeDependentRotation
 
 def to_isd(driver):
     """
@@ -24,17 +16,17 @@ def to_isd(driver):
     string
         The ISIS compatible meta data as a JSON encoded string.
     """
-
-    meta_data = {}
-
-    meta_data['isis_camera_version'] = driver.sensor_model_version
+     
+    driver_data = driver.to_dict()
+    isd = {}
+    isd['isis_camera_version'] = driver_data["sensor_model_version"]
 
     # general information
-    meta_data['image_lines'] = driver.image_lines
-    meta_data['image_samples'] = driver.image_samples
-    meta_data['name_platform'] = driver.platform_name
-    meta_data['name_sensor'] = driver.sensor_name
-    meta_data['reference_height'] = {
+    isd['image_lines'] = driver_data["image_lines"]
+    isd['image_samples'] = driver_data["image_samples"]
+    isd['name_platform'] = driver_data["platform_name"]
+    isd['name_sensor'] = driver_data["sensor_name"]
+    isd['reference_height'] = {
         "maxheight": 1000,
         "minheight": -1000,
         "unit": "m"
@@ -42,54 +34,55 @@ def to_isd(driver):
 
     # line scan sensor model specifics
     if isinstance(driver, LineScanner):
-        meta_data['name_model'] = 'USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL'
-        meta_data['interpolation_method'] = 'lagrange'
-
-        start_lines, start_times, scan_rates = driver.line_scan_rate
-        meta_data['line_scan_rate'] = [[line, time, rate] for line, time, rate in zip(start_lines, start_times, scan_rates)]
-        meta_data['starting_ephemeris_time'] = driver.ephemeris_start_time
-        meta_data['center_ephemeris_time'] = driver.center_ephemeris_time
+        isd['name_model'] = 'USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL'
+        isd['interpolation_method'] = 'lagrange'
+        
+        print(driver_data["line_scan_rate"])
+        start_lines, start_times, scan_rates = driver_data["line_scan_rate"]
+        isd['line_scan_rate'] = [[line, time, rate] for line, time, rate in zip(start_lines, start_times, scan_rates)]
+        isd['starting_ephemeris_time'] = driver_data["ephemeris_start_time"]
+        isd['center_ephemeris_time'] = driver_data["center_ephemeris_time"]
 
     # frame sensor model specifics
     if isinstance(driver, Framer):
-        meta_data['name_model'] = 'USGS_ASTRO_FRAME_SENSOR_MODEL'
-        meta_data['center_ephemeris_time'] = driver.center_ephemeris_time
+        isd['name_model'] = 'USGS_ASTRO_FRAME_SENSOR_MODEL'
+        isd['center_ephemeris_time'] = driver.center_ephemeris_time
 
     if isinstance(driver, PushFrame):
-        meta_data['name_model'] = 'USGS_ASTRO_PUSH_FRAME_SENSOR_MODEL'
-        meta_data['starting_ephemeris_time'] = driver.ephemeris_start_time
-        meta_data['ending_ephemeris_time'] = driver.ephemeris_stop_time
-        meta_data['center_ephemeris_time'] = driver.center_ephemeris_time
-        meta_data['exposure_duration'] = driver.exposure_duration
-        meta_data['interframe_delay'] = driver.interframe_delay
-        meta_data['framelet_order_reversed'] = driver.framelet_order_reversed
-        meta_data['framelets_flipped'] = driver.framelets_flipped
-        meta_data['framelet_height'] = driver.framelet_height
-        meta_data['num_lines_overlap'] = driver.num_lines_overlap
+        isd['name_model'] = 'USGS_ASTRO_PUSH_FRAME_SENSOR_MODEL'
+        isd['starting_ephemeris_time'] = driver_data["ephemeris_start_time"]
+        isd['ending_ephemeris_time'] = driver_data["ephemeris_stop_time"]
+        isd['center_ephemeris_time'] = driver_data["center_ephemeris_time"]
+        isd['exposure_duration'] = driver_data["exposure_duration"]
+        isd['interframe_delay'] = driver_data["interframe_delay"]
+        isd['framelet_order_reversed'] = driver_data["framelet_order_reversed"]
+        isd['framelets_flipped'] = driver_data["framelets_flipped"]
+        isd['framelet_height'] = driver_data["framelet_height"]
+        isd['num_lines_overlap'] = driver_data["num_lines_overlap"]
 
     # SAR sensor model specifics
     if isinstance(driver, Radar):
-        meta_data['name_model'] = 'USGS_ASTRO_SAR_SENSOR_MODEL'
-        meta_data['starting_ephemeris_time'] = driver.ephemeris_start_time
-        meta_data['ending_ephemeris_time'] = driver.ephemeris_stop_time
-        meta_data['center_ephemeris_time'] = driver.center_ephemeris_time
-        meta_data['wavelength'] = driver.wavelength
-        meta_data['line_exposure_duration'] = driver.line_exposure_duration
-        meta_data['scaled_pixel_width'] = driver.scaled_pixel_width
-        meta_data['range_conversion_times'] = driver.range_conversion_times
-        meta_data['range_conversion_coefficients'] = driver.range_conversion_coefficients
-        meta_data['look_direction'] = driver.look_direction
+        isd['name_model'] = 'USGS_ASTRO_SAR_SENSOR_MODEL'
+        isd['starting_ephemeris_time'] = driver_data["ephemeris_start_time"]
+        isd['ending_ephemeris_time'] = driver_data["ephemeris_stop_time"]
+        isd['center_ephemeris_time'] = driver_data["center_ephemeris_time"]
+        isd['wavelength'] = driver_data["wavelength"]
+        isd['line_exposure_duration'] = driver_data["line_exposure_duration"]
+        isd['scaled_pixel_width'] = driver_data["scaled_pixel_width"]
+        isd['range_conversion_times'] = driver_data["range_conversion_times"]
+        isd['range_conversion_coefficients'] = driver_data["range_conversion_coefficients"]
+        isd['look_direction'] = driver_data["look_direction"]
 
     # Target body
     body_radii = driver.target_body_radii
-    meta_data['radii'] = {
+    isd['radii'] = {
         'semimajor' : body_radii[0],
         'semiminor' : body_radii[2],
         'unit' : 'km'
     }
 
-    frame_chain = driver.frame_chain
-    target_frame = driver.target_frame_id
+    frame_chain = driver_data["frame_chain"]
+    target_frame = driver_data["target_frame_id"]
 
     J2000 = 1 # J2000 frame id
     body_rotation = {}
@@ -115,10 +108,10 @@ def to_isd(driver):
         body_rotation['constant_rotation'] = constant_rotation.rotation_matrix().flatten()
 
     body_rotation["reference_frame"] = destination_frame
-    meta_data['body_rotation'] = body_rotation
+    isd['body_rotation'] = body_rotation
 
     # sensor orientation
-    sensor_frame = driver.sensor_frame_id
+    sensor_frame = driver_data["sensor_frame_id"]
 
     instrument_pointing = {}
     source_frame, destination_frame, _ = frame_chain.last_time_dependent_frame_between(1, sensor_frame)
@@ -142,35 +135,34 @@ def to_isd(driver):
     instrument_pointing['constant_frames'] = shortest_path(frame_chain, sensor_frame, destination_frame)
     constant_rotation = frame_chain.compute_rotation(destination_frame, sensor_frame)
     instrument_pointing['constant_rotation'] = constant_rotation.rotation_matrix().flatten()
-    
-    meta_data['instrument_pointing'] = instrument_pointing
+    isd['instrument_pointing'] = instrument_pointing
 
-    # interior orientation
-    meta_data['naif_keywords'] = driver.naif_keywords
+    # interiror orientation
+    isd['naif_keywords'] = driver.naif_keywords
 
     if isinstance(driver,LineScanner) or isinstance(driver, Framer) or isinstance(driver, PushFrame):
 
-        meta_data['detector_sample_summing'] = driver.sample_summing
-        meta_data['detector_line_summing'] = driver.line_summing
+        isd['detector_sample_summing'] = driver.sample_summing
+        isd['detector_line_summing'] = driver.line_summing
 
-        meta_data['focal_length_model'] = {
+        isd['focal_length_model'] = {
             'focal_length' : driver.focal_length
         }
-        meta_data['detector_center'] = {
-            'line' : driver.detector_center_line,
-            'sample' : driver.detector_center_sample
+        isd['detector_center'] = {
+            'line' : driver_data["detector_center_line"],
+            'sample' : driver_data["detector_center_sample"]
         }
-        meta_data['focal2pixel_lines'] = driver.focal2pixel_lines
-        meta_data['focal2pixel_samples'] = driver.focal2pixel_samples
-        meta_data['optical_distortion'] = driver.usgscsm_distortion_model
+        isd['focal2pixel_lines'] = driver_data["focal2pixel_lines"]
+        isd['focal2pixel_samples'] = driver_data["focal2pixel_samples"]
+        isd['optical_distortion'] = driver_data["usgscsm_distortion_model"]
 
-        meta_data['starting_detector_line'] = driver.detector_start_line
-        meta_data['starting_detector_sample'] = driver.detector_start_sample
+        isd['starting_detector_line'] = driver_data["detector_start_line"]
+        isd['starting_detector_sample'] = driver_data["detector_start_sample"]
 
     j2000_rotation = frame_chain.compute_rotation(target_frame, J2000)
 
     instrument_position = {}
-    positions, velocities, times = driver.sensor_position
+    positions, velocities, times = driver_data["sensor_position"]
     instrument_position['spk_table_start_time'] = times[0]
     instrument_position['spk_table_end_time'] = times[-1]
     instrument_position['spk_table_original_size'] = len(times)
@@ -183,11 +175,11 @@ def to_isd(driver):
     positions = j2000_rotation.apply_at(positions, times)/1000
     instrument_position['positions'] = positions
     instrument_position["reference_frame"] = j2000_rotation.dest
-
-    meta_data['instrument_position'] = instrument_position
-
+    
+    isd['instrument_position'] = instrument_position
+    
     sun_position = {}
-    positions, velocities, times = driver.sun_position
+    positions, velocities, times = driver_data["sun_position"]
     sun_position['spk_table_start_time'] = times[0]
     sun_position['spk_table_end_time'] = times[-1]
     sun_position['spk_table_original_size'] = len(times)
@@ -202,14 +194,14 @@ def to_isd(driver):
     sun_position['positions'] = positions
     sun_position["reference_frame"] = j2000_rotation.dest
 
-    meta_data['sun_position'] = sun_position
+    isd['sun_position'] = sun_position
 
     if (driver.projection != ""):
-        meta_data["projection"] = driver.projection
-        meta_data["geotransform"] = driver.geotransform
+        isd["projection"] = driver_data["projection"]
+        isd["geotransform"] = driver_data["geotransform"]
 
     # check that there is a valid sensor model name
-    if 'name_model' not in meta_data:
+    if 'name_model' not in isd:
         raise Exception('No CSM sensor model name found!')
 
-    return meta_data
+    return isd

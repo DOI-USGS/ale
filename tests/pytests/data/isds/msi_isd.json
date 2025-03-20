@@ -37,9 +37,9 @@
     ],
     "angular_velocities": [
       [
-        0.00031013516468020774,
-        6.225262045195156e-05,
-        9.803883131191956e-05
+        0.00031013516468020763,
+        6.225262045195155e-05,
+        9.803883131191953e-05
       ]
     ],
     "reference_frame": 1
@@ -88,27 +88,20 @@
     ]
   },
   "naif_keywords": {
-    "BODY2000433_RADII": [
-      17.0,
-      5.5,
-      5.5
-    ],
     "BODY_FRAME_CODE": 2000433,
     "BODY_CODE": 2000433,
-    "INS-93001_PIXEL_PITCH": 0.016,
-    "INS-93001_LT_SURFACE_CORRECT": "FALSE",
-    "INS-93001_SWAP_OBSERVER_TARGET": "TRUE",
-    "INS-93001_TRANSX": [
+    "FRAME_-93001_CENTER": -93.0,
+    "FRAME_-93001_CLASS": 4.0,
+    "FRAME_-93001_CLASS_ID": -93001.0,
+    "FRAME_-93001_NAME": "NEAR_MSI",
+    "INS-93001_BORESIGHT": [
+      1.0,
       0.0,
-      0.016,
       0.0
     ],
-    "INS-93001_TRANSY": [
-      0.0,
-      0.0,
-      -0.016
-    ],
-    "INS-93001_LIGHTTIME_CORRECTION": "LT+S",
+    "INS-93001_BORESIGHT_LINE": 206.5,
+    "INS-93001_BORESIGHT_SAMPLE": 269.0,
+    "INS-93001_FOCAL_LENGTH": 166.85,
     "INS-93001_FOV_BOUNDARY_CORNERS": [
       1.0,
       0.019744857140000002,
@@ -119,69 +112,78 @@
       1.0,
       -0.019744857140000002,
       -0.02575366124,
-      1.0
-    ],
-    "TKFRAME_-93001_UNITS": "DEGREES",
-    "INS-93001_FOCAL_LENGTH": 166.85,
-    "INS-93001_FOV_FRAME": "NEAR_MSI",
-    "FRAME_-93001_NAME": "NEAR_MSI",
-    "TKFRAME_-93001_AXES": [
-      2.0,
       1.0,
-      2.0
+      0.019744857140000002,
+      -0.02575366124
     ],
-    "TKFRAME_-93001_SPEC": "ANGLES",
-    "INS-93001_BORESIGHT_SAMPLE": 269.0,
+    "INS-93001_FOV_FRAME": "NEAR_MSI",
+    "INS-93001_FOV_SHAPE": "POLYGON",
+    "INS-93001_FRAME_ID": -93001.0,
     "INS-93001_ITRANSL": [
       0.0,
       0.0,
       -62.5
     ],
-    "INS-93001_K1": -7e-05,
     "INS-93001_ITRANSS": [
       0.0,
       62.5,
       0.0
     ],
-    "FRAME_-93001_CLASS_ID": -93001.0,
+    "INS-93001_K1": -7e-05,
+    "INS-93001_LIGHTTIME_CORRECTION": "LT+S",
+    "INS-93001_LT_SURFACE_CORRECT": false,
+    "INS-93001_PIXEL_PITCH": 0.016,
     "INS-93001_PLATFORM_ID": -93000.0,
-    "INS-93001_BORESIGHT_LINE": 206.5,
-    "INS-93001_FRAME_ID": -93001.0,
-    "TKFRAME_-93001_RELATIVE": "NEAR_SC_BUS_PRIME",
-    "INS-93001_BORESIGHT": [
-      1.0,
+    "INS-93001_SWAP_OBSERVER_TARGET": true,
+    "INS-93001_TRANSX": [
       0.0,
+      0.016,
       0.0
+    ],
+    "INS-93001_TRANSY": [
+      0.0,
+      0.0,
+      -0.016
     ],
     "TKFRAME_-93001_ANGLES": [
       90.0,
       -179.972278,
       -0.082635
     ],
-    "FRAME_-93001_CENTER": -93.0,
-    "FRAME_-93001_CLASS": 4.0,
-    "INS-93001_FOV_SHAPE": "POLYGON",
-    "FRAME_2000433_NAME": "EROS_FIXED",
-    "FRAME_2000433_CLASS_ID": 2000433.0,
-    "BODY2000433_POLE_DEC": [
-      17.22,
-      0.0,
-      0.0
+    "TKFRAME_-93001_AXES": [
+      2.0,
+      1.0,
+      2.0
     ],
+    "TKFRAME_-93001_RELATIVE": "NEAR_SC_BUS_PRIME",
+    "TKFRAME_-93001_SPEC": "ANGLES",
+    "TKFRAME_-93001_UNITS": "DEGREES",
+    "BODY2000433_LONG_AXIS": 0.0,
     "BODY2000433_PM": [
       326.07,
       1639.38864745,
       0.0
     ],
-    "FRAME_2000433_CENTER": 2000433.0,
-    "BODY2000433_LONG_AXIS": 0.0,
-    "OBJECT_2000433_FRAME": "EROS_FIXED",
-    "FRAME_2000433_CLASS": 2.0,
+    "BODY2000433_POLE_DEC": [
+      17.22,
+      0.0,
+      0.0
+    ],
     "BODY2000433_POLE_RA": [
       11.35,
       0.0,
       0.0
-    ]
+    ],
+    "BODY2000433_RADII": [
+      17.0,
+      5.5,
+      5.5
+    ],
+    "FRAME_2000433_CENTER": 2000433.0,
+    "FRAME_2000433_CLASS": 2.0,
+    "FRAME_2000433_CLASS_ID": 2000433.0,
+    "FRAME_2000433_NAME": "EROS_FIXED",
+    "OBJECT_2000433_FRAME": "EROS_FIXED"
   },
   "detector_sample_summing": 1,
   "detector_line_summing": 1,
@@ -229,9 +231,9 @@
     ],
     "velocities": [
       [
-        0.0007228575310681364,
-        -0.00018739946234992287,
-        -0.0005859505443755211
+        0.0007228575310681222,
+        -0.00018739946234989447,
+        -0.0005859505443754926
       ]
     ],
     "reference_frame": 1
@@ -245,16 +247,16 @@
     ],
     "positions": [
       [
-        122682357.26743293,
-        156146522.97922137,
-        110874367.26208726
+        122682357.26743294,
+        156146522.97922134,
+        110874367.26208724
       ]
     ],
     "velocities": [
       [
-        -16.298773023439573,
-        15.981064278673381,
-        6.140837444633245
+        -16.298773023435846,
+        15.981064278692006,
+        6.140837444610893
       ]
     ],
     "reference_frame": 1

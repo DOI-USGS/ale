@@ -1,5 +1,4 @@
 import numpy as np
-import spiceypy as spice
 
 class LegendreDistortion():
     """
@@ -194,10 +193,12 @@ class LoDistortion():
         # center (point of symmetry of distortion)
         perspective_key = 'INS{}_PERSPECTIVE_FACTORS'.format(self.ikid)
         center_key = 'INS{}_POINT_OF_SYMMETRY'.format(self.ikid)
-        perspective_x = float(spice.gdpool(perspective_key, 0, 1)[0])
-        perspective_y = float(spice.gdpool(perspective_key, 0, 2)[1])
-        center_point_x = float(spice.gdpool(center_key, 0, 1)[0])
-        center_point_y = float(spice.gdpool(center_key, 0, 2)[1])
+        
+        
+        perspective_x = float(self.naif_keywords[perspective_key][0])
+        perspective_y = float(self.naif_keywords[perspective_key][1])
+        center_point_x = float(self.naif_keywords[center_key][0])
+        center_point_y = float(self.naif_keywords[center_key][1])
 
         # Get the distortion coefficients
         # CameraDistortionMap::SetDistortion(naifIkCode);

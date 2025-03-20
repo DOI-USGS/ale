@@ -1,10 +1,4 @@
-from glob import glob
-import os
-
-import struct
-import pvl
-import spiceypy as spice
-import numpy as np
+from pyspiceql import pyspiceql
 
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
@@ -50,7 +44,9 @@ class TGOCassisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistorti
         : float
           ephemeris start time of the image.
         """
-        return spice.utc2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
+        if not hasattr(self, "_ephemeris_start_time"):
+            self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+        return self._ephemeris_start_time
 
     @property
     def sensor_frame_id(self):
