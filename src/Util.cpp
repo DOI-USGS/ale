@@ -686,4 +686,777 @@ Orientations getBodyRotation(json isd) {
   }
 }
 
+
+std::vector<std::string> getSensorModelName(HighFive::File hdf5) {
+  std::vector<std::string> name;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("name_model");
+    ds.read(name);
+  } catch (...) {
+    throw std::runtime_error("Could not parse the sensor model name.");
+  }
+  return name;
+}
+
+std::vector<std::string> getImageId(HighFive::File hdf5) {
+  std::vector<std::string> id;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("image_identifier");
+    ds.read(id);
+  } catch (...) {
+    throw std::runtime_error("Could not parse the image identifier.");
+  }
+  return id;
+}
+
+
+std::vector<std::vector<double>> getGeoTransform(HighFive::File hdf5) {
+  std::vector<std::vector<double>> transform;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("geotransform");
+    ds.read(transform);
+  } catch (std::exception &e) {
+    std::string originalError = e.what();
+    std::string msg = "Could not parse the geo_transform. ERROR: \n" + originalError;
+    throw std::runtime_error(msg);
+  }
+  return transform;
+}
+
+
+std::vector<std::string> getProjection(HighFive::File hdf5) {
+  std::vector<std::string> projection;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("projection");
+    ds.read(projection);
+  } catch (...) {
+    throw std::runtime_error("Could not parse the projection string.");
+  }
+  return projection;
+}
+
+
+std::vector<std::string> getSensorName(HighFive::File hdf5) {
+  std::vector<std::string> name;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("name_sensor");
+    ds.read(name);
+  } catch (...) {
+    throw std::runtime_error("Could not parse the sensor name.");
+  }
+  return name;
+}
+
+std::vector<std::string> getIsisCameraVersion(HighFive::File hdf5) {
+  std::vector<std::string> version;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("IsisCameraVersion");
+    ds.read(version);
+  } catch (...) {
+    throw std::runtime_error("Could not parse the IsisCameraVersion.");
+  }
+  return version;
+}
+
+
+std::vector<std::string> getPlatformName(HighFive::File hdf5) {
+  std::vector<std::string> platformName;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("name_platform");
+    ds.read(platformName);
+  } catch (...) {
+    throw std::runtime_error("Could not parse the platform name.");
+  }
+  return platformName;
+}
+
+std::vector<std::string> getLogFile(HighFive::File hdf5) {
+  std::vector<std::string> logFile;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("log_file");
+    ds.read(logFile);
+  } catch (...) {
+    throw std::runtime_error("Could not parse the log filename.");
+  }
+  return logFile;
+}
+
+std::vector<unsigned int> getTotalLines(HighFive::File hdf5) {
+  std::vector<unsigned int> lines;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("image_lines");
+    ds.read(lines);
+  } catch (...) {
+    throw std::runtime_error(
+        "Could not parse the number of lines in the image.");
+  }
+  return lines;
+}
+
+std::vector<unsigned int> getTotalSamples(HighFive::File hdf5) {
+  std::vector<unsigned int> samples;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("image_samples");
+    ds.read(samples);
+  } catch (...) {
+    throw std::runtime_error(
+        "Could not parse the number of samples in the image.");
+  }
+  return samples;
+}
+
+std::vector<double> getStartingTime(HighFive::File hdf5) {
+  std::vector<double> time;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("starting_ephemeris_time");
+    ds.read(time);
+  } catch (...) {
+    throw std::runtime_error("Could not parse the image start time.");
+  }
+  return time;
+}
+
+std::vector<double> getCenterTime(HighFive::File hdf5) {
+  std::vector<double> time;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("center_ephemeris_time");
+    ds.read(time);
+  } catch (...) {
+    throw std::runtime_error("Could not parse the center image time.");
+  }
+  return time;
+}
+
+std::vector<PositionInterpolation> getInterpolationMethod(HighFive::File hdf5) {
+  std::vector<std::string> interpMethodStrings;
+  std::vector<PositionInterpolation> interpMethod;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("interpolation_method");
+    ds.read(interpMethodStrings);
+
+    for (auto &it : interpMethodStrings){
+      if (iequals(it, "linear")) {
+        interpMethod.push_back(PositionInterpolation::LINEAR);
+      }
+      else if (iequals(it, "spline")){
+        interpMethod.push_back(PositionInterpolation::SPLINE);
+      }
+      else if (iequals(it, "lagrange")) {
+        interpMethod.push_back(PositionInterpolation::LAGRANGE);
+      }
+    }
+  } catch (...) {
+    throw std::runtime_error("Could not parse the interpolation method.");
+  }
+
+  return interpMethod;
+}
+
+std::vector<std::vector<std::vector<double>>> getLineScanRate(HighFive::File hdf5) {
+  std::vector<std::vector<std::vector<double>>> lines;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("line_scan_rate");
+    ds.read(lines);
+  } catch (...) {
+    throw std::runtime_error("Could not parse the line scan rate from the isd.");
+  }
+  return lines;
+}
+
+
+std::vector<double> getSampleSumming(HighFive::File hdf5) {
+  std::vector<double> summing;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("detector_sample_summing");
+    ds.read(summing);
+  } catch (...) {
+    throw std::runtime_error(
+        "Could not parse the sample direction detector pixel summing.");
+  }
+  return summing;
+}
+
+std::vector<double> getLineSumming(HighFive::File hdf5) {
+  std::vector<double> summing;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("detector_line_summing");
+    ds.read(summing);
+  } catch (...) {
+    throw std::runtime_error(
+        "Could not parse the line direction detector pixel summing.");
+  }
+  return summing;
+}
+
+std::vector<double> getFocalLength(HighFive::File hdf5) {
+  std::vector<double> focalLength;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("focal_length_model/focal_length");
+    ds.read(focalLength);
+  } catch (...) {
+    throw std::runtime_error("Could not parse the focal length.");
+  }
+  return focalLength;
+}
+
+std::vector<double> getFocalLengthUncertainty(HighFive::File hdf5) {
+  std::vector<double> focalUncertainty;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("focal_length_model/focal_uncertainty");
+    ds.read(focalUncertainty);
+  } catch (...) {
+    throw std::runtime_error("Could not parse the focal length uncertainty.");
+  }
+  return focalUncertainty;
+}
+
+std::vector<std::vector<double>> getFocal2PixelLines(HighFive::File hdf5) {
+  std::vector<std::vector<double>> transformation;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("focal2pixel_lines");
+    ds.read(transformation);
+  } catch (...) {
+    throw std::runtime_error("Could not parse the focal plane coordinate to "
+                             "detector lines transformation.");
+  }
+  return transformation;
+}
+
+std::vector<std::vector<double>> getFocal2PixelSamples(HighFive::File hdf5) {
+  std::vector<std::vector<double>> transformation;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("focal2pixel_samples");
+    ds.read(transformation);
+  } catch (...) {
+    throw std::runtime_error("Could not parse the focal plane coordinate to "
+                             "detector samples transformation.");
+  }
+  return transformation;
+}
+
+std::vector<double> getDetectorCenterLine(HighFive::File hdf5) {
+  std::vector<double> line;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("detector_center/line");
+    ds.read(line);
+  } catch (...) {
+    throw std::runtime_error("Could not parse the detector center line.");
+  }
+  return line;
+}
+
+std::vector<double> getDetectorCenterSample(HighFive::File hdf5) {
+  std::vector<double> sample;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("detector_center/sample");
+    ds.read(sample);
+  } catch (...) {
+    throw std::runtime_error("Could not parse the detector center sample.");
+  }
+  return sample;
+}
+
+std::vector<double> getDetectorStartingLine(HighFive::File hdf5) {
+  std::vector<double> line;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("starting_detector_line");
+    ds.read(line);
+  } catch (...) {
+    throw std::runtime_error("Could not parse the detector starting line.");
+  }
+  return line;
+}
+
+std::vector<double> getDetectorStartingSample(HighFive::File hdf5) {
+  std::vector<double> sample;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("starting_detector_sample");
+    ds.read(sample);
+  } catch (...) {
+    throw std::runtime_error("Could not parse the detector starting sample.");
+  }
+  return sample;
+}
+
+std::vector<double> getMinHeight(HighFive::File hdf5) {
+  std::vector<double> height;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("reference_height/minheight");
+    ds.read(height);
+  } catch (...) {
+    throw std::runtime_error(
+        "Could not parse the minimum height above the reference ellipsoid.");
+  }
+  return height;
+}
+
+std::vector<double> getMaxHeight(HighFive::File hdf5) {
+  std::vector<double> height;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("reference_height/maxheight");
+    ds.read(height);
+  } catch (...) {
+    throw std::runtime_error(
+        "Could not parse the maximum height above the reference ellipsoid.");
+  }
+  return height;
+}
+
+std::vector<double> getSemiMajorRadius(HighFive::File hdf5) {
+  std::vector<double> radius;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("radii/semimajor");
+    ds.read(radius);
+  } catch (...) {
+    throw std::runtime_error(
+        "Could not parse the reference ellipsoid semimajor radius.");
+  }
+  return radius;
+}
+
+std::vector<double> getSemiMinorRadius(HighFive::File hdf5) {
+  std::vector<double> radius;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("radii/semiminor");
+    ds.read(radius);
+
+  } catch (...) {
+    throw std::runtime_error(
+        "Could not parse the reference ellipsoid semiminor radius.");
+  }
+  return radius;
+}
+
+// Converts the distortion model name from the ISD (string) to the enumeration
+// type.
+std::vector<DistortionType> getDistortionModel(HighFive::File hdf5) {
+  std::vector<DistortionType> distortions;
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("optical_distortion");
+    std::vector<std::string> distortionStrings;
+    ds.read(distortionStrings);
+
+    for (auto &dist : distortionStrings){
+      if (dist.compare("transverse") == 0) {
+        distortions.push_back(DistortionType::TRANSVERSE);
+      } else if (dist.compare("radial") == 0) {
+        distortions.push_back(DistortionType::RADIAL);
+      } else if (dist.compare("kaguyalism") == 0) {
+        distortions.push_back(DistortionType::KAGUYALISM);
+      } else if (dist.compare("dawnfc") == 0) {
+        distortions.push_back(DistortionType::DAWNFC);
+      } else if (dist.compare("lrolrocnac") == 0) {
+        distortions.push_back(DistortionType::LROLROCNAC);
+      } else if (dist.compare("cahvor") == 0) {
+        distortions.push_back(DistortionType::CAHVOR);
+      } else if (dist.compare("lunarorbiter") == 0) {
+        distortions.push_back(DistortionType::LUNARORBITER);
+      } else if (dist.compare("radtan") == 0) {
+        distortions.push_back(DistortionType::RADTAN);
+      }
+    }
+  } catch (...) {
+    throw std::runtime_error("Could not parse the distortion model.");
+  }
+  return distortions;
+}
+
+std::vector<std::vector<double>> getDistortionCoeffs(HighFive::File hdf5) {
+  std::vector<std::vector<double>> coefficients;
+
+  std::vector<DistortionType> distortion = getDistortionModel(hdf5);
+
+  //TODO handle different distortion types per band...?
+  switch (distortion[0]) {
+    case DistortionType::TRANSVERSE: {
+      try {
+        std::vector<double> coefficientsX, coefficientsY;
+
+        HighFive::DataSet ds = hdf5.getDataSet("optical_distortion/transverse/x");
+        ds.read(coefficientsX);
+
+        ds = hdf5.getDataSet("optical_distortion/transverse/y");
+        ds.read(coefficientsY);
+
+        //coefficients = coefficientsX;
+
+        for (size_t i = 0; i < coefficientsX.size(); i++) {
+            // Combine the corresponding vectors from vec1 and vec2
+            std::vector<double> combinedCoeff;
+            combinedCoeff.push_back(coefficientsX[i]);
+            combinedCoeff.push_back(coefficientsY[i]);
+            //combinedCoeff.insert(combinedCoeff.end(), coefficientsY[i].begin(), coefficientsY[i].end());
+            
+            // Add the combined vector to the result
+            coefficients.push_back(combinedCoeff);
+        }
+
+        return coefficients;
+      } catch (...) {
+        throw std::runtime_error(
+            "Could not parse a set of transverse distortion model coefficients.");
+        /* TODO ???
+        coefficients = std::vector<double>(20, 0.0);
+        coefficients[1] = 1.0;
+        coefficients[12] = 1.0;
+        */
+      }
+    } break;
+    case DistortionType::RADIAL: {
+      try {
+        HighFive::DataSet ds = hdf5.getDataSet("optical_distortion/radial/coefficients");
+        ds.read(coefficients);
+        return coefficients;
+      } catch (...) {
+        throw std::runtime_error(
+            "Could not parse the radial distortion model coefficients.");
+        /* TODO ???
+        coefficients = std::vector<double>(3, 0.0);
+        */
+      }
+    } break;
+    case DistortionType::KAGUYALISM: {
+      try {
+        std::vector<std::vector<double>> coefficientsX, coefficientsY;
+        std::vector<double> boresightX, boresightY;
+        HighFive::DataSet ds = hdf5.getDataSet("optical_distortion/kaguyalism/x");
+        ds.read(coefficientsX);
+        ds = hdf5.getDataSet("optical_distortion/kaguyalism/y");
+        ds.read(coefficientsY);
+
+        ds = hdf5.getDataSet("optical_distortion/kaguyalism/boresight_x");
+        ds.read(boresightX);
+        ds = hdf5.getDataSet("optical_distortion/kaguyalism/boresight_y");
+        ds.read(boresightY);
+
+        for (int i = 0 ; i < coefficientsX.size(); i++){
+          coefficientsX[i].insert(coefficientsX[i].begin(), boresightX[i]);
+          coefficientsY[i].insert(coefficientsY[i].begin(), boresightY[i]);
+          coefficientsX[i].insert(coefficientsX[i].end(), coefficientsY[i].begin(),
+                              coefficientsY[i].end());
+        }
+
+        return coefficientsX;
+      } catch (...) {
+        throw std::runtime_error("Could not parse a set of Kaguya LISM "
+                                "distortion model coefficients.");
+        /* TODO
+        coefficients = std::vector<double>(8, 0.0);
+        */
+      }
+    } break;
+    case DistortionType::DAWNFC: {
+      try {
+        HighFive::DataSet ds = hdf5.getDataSet("optical_distortion/dawnfc/coefficients");
+        ds.read(coefficients);
+        return coefficients;
+      } catch (...) {
+        throw std::runtime_error(
+            "Could not parse the dawn radial distortion model coefficients.");
+        /* TODO
+        coefficients = std::vector<double>(1, 0.0);
+        */
+      }
+    } break;
+    case DistortionType::LROLROCNAC: {
+      try {
+        HighFive::DataSet ds = hdf5.getDataSet("optical_distortion/lrolrocnac/coefficients");
+        ds.read(coefficients);
+        return coefficients;
+      } catch (...) {
+        throw std::runtime_error(
+            "Could not parse the lrolrocnac distortion model coefficients.");
+        /* TODO
+        coefficients = std::vector<double>(1, 0.0);
+        */
+      }
+    } break;
+    case DistortionType::CAHVOR:
+    {
+      try
+      {
+        HighFive::DataSet ds = hdf5.getDataSet("optical_distortion/cahvor/coefficients");
+        ds.read(coefficients);
+        return coefficients;
+      }
+      catch (...)
+      {
+        throw std::runtime_error(
+            "Could not parse the cahvor distortion model coefficients.");
+        /* TODO
+        coefficients = std::vector<double>(5, 0.0);
+        */
+      }
+    } break;
+    case DistortionType::LUNARORBITER:
+    {
+      try
+      {
+        std::vector<double> perspectiveX, perspectiveY, centerPointX, centerPointY;
+        HighFive::DataSet ds = hdf5.getDataSet("optical_distortion/lunarorbiter/perspective_x");
+        ds.read(perspectiveX);
+        ds = hdf5.getDataSet("optical_distortion/lunarorbiter/perspective_y");
+        ds.read(perspectiveY);
+        ds = hdf5.getDataSet("optical_distortion/lunarorbiter/center_point_x");
+        ds.read(centerPointX);
+        ds = hdf5.getDataSet("optical_distortion/lunarorbiter/center_point_y");
+        ds.read(centerPointY);
+
+        for (int i = 0 ; i < perspectiveX.size(); i++){
+          coefficients.push_back({perspectiveX[i],perspectiveY[i],centerPointX[i],centerPointY[i]});
+        }
+
+        return coefficients;
+      }
+      catch (...)
+      {
+        throw std::runtime_error(
+          "Could not parse the Lunar Orbiter distortion model coefficients.");
+        /* TODO
+        coefficients = std::vector<double>(4, 0.0);
+        */
+      }
+    } break;
+    case DistortionType::RADTAN: {
+      try {
+        HighFive::DataSet ds = hdf5.getDataSet("optical_distortion/radtan/coefficients");
+        ds.read(coefficients);
+        return coefficients;
+      } catch (...) {
+        throw std::runtime_error(
+            "Could not parse the radtan distortion model coefficients.");
+        /* TODO
+        coefficients = std::vector<double>(5, 0.0);
+        */
+      }
+    } break;
+  }
+  throw std::runtime_error(
+      "Could not parse the distortion model coefficients.");
+
+  return coefficients;
+}
+
+std::vector<std::vector<Vec3d>> getVec3dArray(HighFive::DataSet ds) {
+  std::vector<std::vector<Vec3d>> positions;
+  // yikes.
+  // Each band in the multispectral isd has a 2d vector [band][position][x,y,z]
+  std::vector<std::vector<std::array<double,3>>> data;
+  try {
+    ds.read(data);
+    for(auto &band : data){
+      // Create a vector of 3d coords for this band
+      std::vector<Vec3d> bandVec;
+      for (auto &item: band) {
+        // Push all the 3d coords in this band into one vector
+        Vec3d vec(item[0],item[1],item[2]);
+        bandVec.push_back(vec);
+      }
+      // Add the vector to the multispectral vector
+      positions.push_back(bandVec);
+    }
+  } catch (...) {
+    throw std::runtime_error("Could not parse the 3D vector array.");
+  }
+  return positions;
+}
+
+
+std::vector<std::vector<Rotation>> getQuatArray(HighFive::DataSet ds) {
+  std::vector<std::vector<Rotation>> quats;
+  std::vector<std::vector<std::array<double, 4>>> data;
+  try {
+    ds.read(data);
+    for (auto &band : data){
+      std::vector<Rotation> bandQuats;
+      for (auto &row : band) {
+        Rotation vec(row[0], row[1], row[2], row[3]);
+        bandQuats.push_back(vec);
+      }
+      quats.push_back(bandQuats);
+    }
+  } catch (...) {
+    throw std::runtime_error("Could not parse the quaternion hdf5 object.");
+  }
+  return quats;
+}
+
+
+std::vector<States> getInstrumentPosition(HighFive::File hdf5) {
+  try {
+    std::vector<States> statesVec;
+    HighFive::DataSet ds = hdf5.getDataSet("instrument_position/positions");
+    std::vector<std::vector<Vec3d>> positions = getVec3dArray(ds);
+
+    ds = hdf5.getDataSet("instrument_position/ephemeris_times");
+    std::vector<std::vector<double>> times = getMultiSpectralArray<double>(ds);
+
+    ds = hdf5.getDataSet("instrument_position/reference_frame");
+    std::vector<int> refFrames;
+    ds.read(refFrames);
+
+    try{
+      ds = hdf5.getDataSet("instrument_position/velocities");
+      std::vector<std::vector<Vec3d>> velocities = getVec3dArray(ds);
+      for (int i = 0; i < positions.size(); i++){
+        statesVec.push_back(States(times[i], positions[i], velocities[i], refFrames[i]));
+      }
+      return statesVec;
+    }catch(const HighFive::Exception&){
+      // Intentionally left blank.  If no velocities, move on.
+    }
+
+    for (int i = 0; i < positions.size(); i++){
+      statesVec.push_back(States(times[i], positions[i], refFrames[i]));
+    }
+
+    return statesVec;
+  } catch (...) {
+    throw std::runtime_error("Could not parse the instrument position");
+  }
+}
+
+
+std::vector<States> getSunPosition(HighFive::File hdf5) {
+  try {
+    std::vector<States> statesVec;
+    HighFive::DataSet ds = hdf5.getDataSet("sun_position/positions");
+    std::vector<std::vector<Vec3d>> positions = getVec3dArray(ds);
+
+    ds = hdf5.getDataSet("sun_position/ephemeris_times");
+    std::vector<std::vector<double>> times = getMultiSpectralArray<double>(ds);
+
+
+    ds = hdf5.getDataSet("sun_position/reference_frame");
+    std::vector<int> refFrames;
+    ds.read(refFrames);
+
+    // If there are velocities, read them
+    try{
+      ds = hdf5.getDataSet("sun_position/velocities");
+      std::vector<std::vector<Vec3d>> velocities = getVec3dArray(ds);
+      for (int i = 0; i < positions.size(); i++){
+        statesVec.push_back(States(times[i], positions[i], velocities[i], refFrames[i]));
+      }
+      return statesVec;
+    }catch (const HighFive::Exception&){
+      // Intentionally left blank.  If there are no velocities, just move on.
+    }
+    
+    for (int i = 0; i < positions.size(); i++){
+      statesVec.push_back(States(times[i], positions[i], refFrames[i]));
+    }
+    return statesVec;
+
+  } catch (...) {
+    throw std::runtime_error("Could not parse the sun position");
+  }
+}
+
+std::vector<Orientations> getInstrumentPointing(HighFive::File hdf5) {
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("instrument_pointing/quaternions");
+    std::vector<std::vector<Rotation>> rotations = getQuatArray(ds);
+
+    ds = hdf5.getDataSet("instrument_pointing/ephemeris_times");
+    std::vector<std::vector<double>> times = getMultiSpectralArray<double>(ds);
+
+    ds = hdf5.getDataSet("instrument_pointing/angular_velocities");
+    std::vector<std::vector<Vec3d>> velocities = getVec3dArray(ds);
+
+    std::vector<std::vector<int>> constFrames;
+    try{
+      ds = hdf5.getDataSet("instrument_pointing/constant_frames");
+      constFrames  = getMultiSpectralArray<int>(ds);
+    }catch(const HighFive::Exception&){
+      //Intentionally left blank.  If there are no constant frames, move on.
+    }
+
+    std::vector<std::vector<int>> timeDepFrames;
+    try{
+      ds = hdf5.getDataSet("instrument_pointing/time_dependent_frames");
+      timeDepFrames= getMultiSpectralArray<int>(ds);
+    }catch(const HighFive::Exception&){
+      //Intentionally left blank.  If there are no time dependent frames, move on.
+    }
+
+    std::vector<std::vector<double>> rotArray(timeDepFrames.size(), {1,0,0,0,1,0,0,0,1});
+    try{
+      ds = hdf5.getDataSet("instrument_pointing/constant_rotation");
+      rotArray = getMultiSpectralArray<double>(ds);
+    }catch(const HighFive::Exception&){
+      //Intentionally left blank.  If there are no constant rotations, move on.
+    }
+
+    std::vector<Rotation> constRots;
+    for (auto &rots : rotArray){
+      Rotation constRot(rots);
+      constRots.push_back(constRot);
+    }
+
+    
+    std::vector<Orientations> orientationsVec;
+    for (int i = 0 ; i < rotations.size(); i++){
+      orientationsVec.push_back(Orientations(rotations[i], times[i], velocities[i], constRots[i], constFrames[i], timeDepFrames[i]));
+    }
+
+    return orientationsVec;
+
+  } catch (...) {
+    throw std::runtime_error("Could not parse the instrument pointing");
+  }
+}
+
+std::vector<Orientations> getBodyRotation(HighFive::File hdf5) {
+  try {
+    HighFive::DataSet ds = hdf5.getDataSet("body_rotation/quaternions");
+    std::vector<std::vector<Rotation>> rotations = getQuatArray(ds);
+
+    ds = hdf5.getDataSet("body_rotation/ephemeris_times");
+    std::vector<std::vector<double>> times = getMultiSpectralArray<double>(ds);
+    ds = hdf5.getDataSet("body_rotation/angular_velocities");
+    std::vector<std::vector<Vec3d>> velocities = getVec3dArray(ds);
+
+    std::vector<std::vector<int>> constFrames;
+    try{
+      ds = hdf5.getDataSet("body_rotation/constant_frames");
+      constFrames  = getMultiSpectralArray<int>(ds);
+    }catch(const HighFive::Exception&){
+      //Intentionally left blank.  If no const frames, move on.
+    }
+
+    std::vector<std::vector<int>> timeDepFrames;
+    try{
+      ds = hdf5.getDataSet("body_rotation/time_dependent_frames");
+      timeDepFrames = getMultiSpectralArray<int>(ds);
+    }catch(const HighFive::Exception&){
+      //Intentionally left blank.  If no time dependent frames, move on.
+    }
+
+    std::vector<std::vector<double>> rotArrays(rotations.size(), {1,0,0,0,1,0,0,0,1});
+    try{
+      ds = hdf5.getDataSet("body_rotation/constant_rotation");
+      rotArrays = getMultiSpectralArray<double>(ds);
+    }catch(const HighFive::Exception&){
+      //Intentionally left blank.  If no constant rotations, move on.
+    }
+
+    std::vector<Rotation> constRots;
+    for (auto &rot : rotArrays){
+      Rotation constRot(rot);
+      constRots.push_back(constRot);
+    }
+
+    std::vector<Orientations> orientationsVec;
+    for (size_t i = 0 ; i < rotations.size(); i++){
+      Orientations orientation(rotations[i], times[i], velocities[i], constRots[i], constFrames[i], timeDepFrames[i]);
+      orientationsVec.push_back(orientation);
+    }
+    return orientationsVec;
+
+  } catch (...) {
+    throw std::runtime_error("Could not parse the body rotation");
+  }
+}
+
 }
