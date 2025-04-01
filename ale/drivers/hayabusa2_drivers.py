@@ -1,5 +1,3 @@
-import spiceypy as spice
-
 import ale
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel

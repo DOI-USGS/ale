@@ -1,5 +1,5 @@
-import spiceypy as spice
 import pvl
+import spiceypy as spice
 
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
@@ -95,7 +95,7 @@ class ApolloMetricIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDisto
         : str
           Spacecraft clock start count
         """
-        return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
+        return self.spiceql_call("utcToEt", {"utc" : self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
 
     @property
     def ephemeris_stop_time(self):
@@ -122,7 +122,7 @@ class ApolloMetricIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDisto
         list :
             The center of the CCD formatted as line, sample
         """
-        return float(spice.gdpool('INS{}_BORESIGHT'.format(self.ikid), 0, 3)[0])
+        return float(self.naif_keywords['INS{}_BORESIGHT'.format(self.ikid)][0])
 
     @property
     def detector_center_sample(self):

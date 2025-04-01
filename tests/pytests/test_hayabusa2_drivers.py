@@ -4,8 +4,6 @@ import unittest
 from unittest.mock import patch
 
 import pytest
-import numpy as np
-import spiceypy as spice
 
 import ale
 from ale.drivers.hayabusa2_drivers import Hayabusa2ONCIsisLabelNaifSpiceDriver

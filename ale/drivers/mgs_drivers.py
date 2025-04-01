@@ -1,5 +1,3 @@
-import spiceypy as spice
-
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
@@ -79,7 +77,7 @@ class MgsMocNarrowAngleCameraIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, Na
         : float
           Detector sample of the principal point
         """
-        return float(spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 1)[0])
+        return float(self.naif_keywords['INS{}_CENTER'.format(self.ikid)][0])
 
     @property
     def detector_center_line(self):
@@ -92,7 +90,7 @@ class MgsMocNarrowAngleCameraIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, Na
         : float
           Detector line of the principal point
         """
-        return float(spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[1])
+        return float(self.naif_keywords['INS{}_CENTER'.format(self.ikid)][1])
 
 
     @property
@@ -182,23 +180,6 @@ class MgsMocWideAngleCameraIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, Naif
         return self.instrument_id
 
     @property
-    def ephemeris_start_time(self):
-        """
-        Returns the ephemeris start time of the image.
-        Expects spacecraft_id to be defined. This should be the integer
-        Naif ID code for the spacecraft.
-
-        Returns
-        -------
-        : float
-          ephemeris start time of the image
-        """
-        if not hasattr(self, '_ephemeris_start_time'):
-            sclock = self.label['IsisCube']['Instrument']['SpacecraftClockCount']
-            self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
-        return self._ephemeris_start_time
-
-    @property
     def ephemeris_stop_time(self):
         """
         ISIS doesn't preserve the spacecraft stop count that we can use to get
@@ -229,7 +210,7 @@ class MgsMocWideAngleCameraIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, Naif
         : float
           Detector sample of the principal point
         """
-        return float(spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 1)[0])
+        return float(self.naif_keywords['INS{}_CENTER'.format(self.ikid)][0])
 
     @property
     def detector_center_line(self):
@@ -242,7 +223,7 @@ class MgsMocWideAngleCameraIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, Naif
         : float
           Detector line of the principal point
         """
-        return float(spice.gdpool('INS{}_CENTER'.format(self.ikid), 0, 2)[1])
+        return float(self.naif_keywords['INS{}_CENTER'.format(self.ikid)][1])
 
 
     @property
