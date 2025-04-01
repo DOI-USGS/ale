@@ -47,7 +47,7 @@ release.
 - Added the ability to generate ISDs with no velocities specified for instrument/sun position [#614](https://github.com/DOI-USGS/ale/issues/614)
 
 ### Changed
-- Changed how push frame sensor drivers compute the `ephemeris_time` property [#595](https://github.com/DOI-USGS/ale/pull/595)
+- Changed how push frame sensor drivers compute the `ephemeris_time` property [#595](https://github.com/DOI-USGS/ale/pull/595) 
 
 ### Fixed
 - Fixed landed sensors to correctly project locally [#590](https://github.com/DOI-USGS/ale/pull/590)
@@ -59,6 +59,7 @@ release.
 - Brought timing in line with ISIS for the KaguyaMiIsisLabelNaifSpiceDriver [#599](https://github.com/DOI-USGS/ale/pull/599)
 - Brought timing in line with ISIS for the MroMarciIsisLabelNaifSpiceDriver [#600](https://github.com/DOI-USGS/ale/pull/600)
 - Fixed a bug in which quaternions would flip sign in a way that caused interpolation errors [#603](https://github.com/DOI-USGS/ale/issues/603)
+- Cast SpkTableOriginalSize as an integer from a float as np.linspace() expects an integer for the `num` param.
 
 ## [0.10.0] - 2024-01-08 
 
