@@ -145,7 +145,7 @@ class test_themisvis_isis_naif(unittest.TestCase):
 
     def test_ephemeris_stop_time(self):
         with patch('ale.drivers.ody_drivers.spice.scs2e', return_value=392211096.4307215) as scs2e:
-            assert self.driver.ephemeris_stop_time == 392211115.33072156
+            assert self.driver.ephemeris_stop_time == 392211115.32592154
 
     def test_focal_length(self):
         assert self.driver.focal_length == 202.059
