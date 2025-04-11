@@ -48,7 +48,8 @@ release.
 - Added the ability to generate ISDs with no velocities specified for instrument/sun position [#614](https://github.com/DOI-USGS/ale/issues/614)
 
 ### Changed
-- Changed how push frame sensor drivers compute the `ephemeris_time` property [#595](https://github.com/DOI-USGS/ale/pull/595) 
+- Changed how push frame sensor drivers compute the `ephemeris_time` property [#595](https://github.com/DOI-USGS/ale/pull/595)
+- Changed the number of `ephemeris_time` values for pushframe drivers from the number of framelets to the number of lines [#643](https://github.com/DOI-USGS/ale/pull/643)
 
 ### Fixed
 - Fixed landed sensors to correctly project locally [#590](https://github.com/DOI-USGS/ale/pull/590)
