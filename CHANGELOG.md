@@ -34,6 +34,8 @@ release.
 -->
 
 ## [Unreleased]
+
+## [0.11.0] - 2025-04-11
 ### Changed
 - Enabled Hayabusa2 drivers [#596](https://github.com/DOI-USGS/ale/pull/596)
 - Enabled Juno drivers [#597](https://github.com/DOI-USGS/ale/pull/597)
