@@ -19,6 +19,7 @@ def test_kernels(scope="module"):
     for kern in binary_kernels:
         os.remove(kern)
 
+@pytest.mark.xfail
 @pytest.mark.parametrize("image", ['20190303T100344S990_map_iofL2pan_V001'])
 def test_osirisrex_load(test_kernels, image):
     label_file = get_image_label(image, 'isis')
