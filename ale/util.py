@@ -295,13 +295,6 @@ def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
         Dictionary of lists of kernels with the keys being the Keywords from the Kernels group of
         cube itself, and the values being the values associated with that Keyword in the cube.
     """
-    # enforce key order
-    mk_paths = OrderedDict.fromkeys(
-        ['TargetPosition', 'InstrumentPosition',
-         'InstrumentPointing', 'Frame', 'TargetAttitudeShape',
-         'Instrument', 'InstrumentAddendum', 'LeapSecond',
-         'SpacecraftClock', 'Extra'])
-
     # just work with full path
     cube = os.path.abspath(cube)
     cubelabel = pvl.load(cube)
@@ -341,9 +334,7 @@ def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
         ['TargetPosition', 'InstrumentPosition',
          'InstrumentPointing', 'Frame', 'TargetAttitudeShape',
          'Instrument', 'InstrumentAddendum', 'LeapSecond',
-         'SpacecraftClock', 'Extra'])
-
-
+         'SpacecraftClock', 'Extra', 'ShapeModel'])
     if isinstance(kernel_group, str):
         kernel_group = pvl.loads(kernel_group)
 
@@ -368,6 +359,10 @@ def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
     mk_paths['LeapSecond'] = [kernel_group.get('LeapSecond', None)]
     mk_paths['Clock'] = [kernel_group.get('Clock', None)]
     mk_paths['Extra'] = [kernel_group.get('Extra', None)]
+    mk_paths['ShapeModel'] = [kernel_group.get('ShapeModel', None)]
+    if (mk_paths['ShapeModel'][0]):
+        if (os.path.splitext(mk_paths['ShapeModel'][0])[-1] != "bds"):
+            mk_paths['ShapeModel'] = [None]
 
     # handles issue with OsirisRex instrument kernels being in a 2d list
     if isinstance(mk_paths['Instrument'][0], list):
