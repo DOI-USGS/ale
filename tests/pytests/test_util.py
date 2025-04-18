@@ -181,7 +181,18 @@ def test_kernel_from_cube_dict(cube_kernels):
         cube.write(cube_kernels)
         cube.flush()
         kernels = util.generate_kernels_from_cube(cube.name, format_as='dict')
-    assert kernels == OrderedDict([('TargetPosition', ['$messenger/targetposition0', '$messenger/targetposition1']), ('InstrumentPosition', ['$messenger/instrumentposition']), ('InstrumentPointing', ['$messenger/instrumentpointing0', '$messenger/instrumentpointing1']), ('Frame', [None]), ('TargetAttitudeShape', ['$base/attitudeshape']), ('Instrument', ['$messenger/instrument']), ('InstrumentAddendum', [None]), ('LeapSecond', [None]), ('SpacecraftClock', ['$base/clock']), ('Extra', [None]), ('Clock', [None])])
+    assert kernels == OrderedDict([('TargetPosition', ['$messenger/targetposition0', '$messenger/targetposition1']),
+                                   ('InstrumentPosition', ['$messenger/instrumentposition']),
+                                   ('InstrumentPointing', ['$messenger/instrumentpointing0', '$messenger/instrumentpointing1']),
+                                   ('Frame', [None]),
+                                   ('TargetAttitudeShape', ['$base/attitudeshape']),
+                                   ('Instrument', ['$messenger/instrument']),
+                                   ('InstrumentAddendum', [None]), 
+                                   ('LeapSecond', [None]),
+                                   ('SpacecraftClock', ['$base/clock']), 
+                                   ('Extra', [None]),
+                                   ('ShapeModel', [None]), 
+                                   ('Clock', [None])])
 
 def test_kernel_from_cube_dict_expanded(monkeypatch, tmpdir, pvl_four_group, cube_kernels):
     monkeypatch.setenv('ISISROOT', str(tmpdir))
@@ -195,7 +206,19 @@ def test_kernel_from_cube_dict_expanded(monkeypatch, tmpdir, pvl_four_group, cub
         cube.write(cube_kernels)
         cube.flush()
         kernels = util.generate_kernels_from_cube(cube.name, expand=True, format_as='dict')
-    assert kernels == OrderedDict([('TargetPosition', ['/test/path/messenger/targetposition0', '/test/path/messenger/targetposition1']), ('InstrumentPosition', ['/test/path/messenger/instrumentposition']), ('InstrumentPointing', ['/test/path/messenger/instrumentpointing0', '/test/path/messenger/instrumentpointing1']), ('Frame', [None]), ('TargetAttitudeShape', ['/test/path/base/attitudeshape']), ('Instrument', ['/test/path/messenger/instrument']), ('InstrumentAddendum', [None]), ('LeapSecond', [None]), ('SpacecraftClock', ['/test/path/base/clock']), ('Extra', [None]), ('Clock', [None])])
+    print(kernels.keys())
+    assert kernels == OrderedDict([('TargetPosition', ['/test/path/messenger/targetposition0', '/test/path/messenger/targetposition1']), 
+                                   ('InstrumentPosition', ['/test/path/messenger/instrumentposition']),
+                                   ('InstrumentPointing', ['/test/path/messenger/instrumentpointing0', '/test/path/messenger/instrumentpointing1']),
+                                   ('Frame', [None]),
+                                   ('TargetAttitudeShape', ['/test/path/base/attitudeshape']),
+                                   ('Instrument', ['/test/path/messenger/instrument']),
+                                   ('InstrumentAddendum', [None]),
+                                   ('LeapSecond', [None]),
+                                   ('SpacecraftClock', ['/test/path/base/clock']),
+                                   ('Extra', [None]),
+                                   ('ShapeModel', [None]),
+                                   ('Clock', [None])])
 
 def test_kernel_from_cube_no_kernel_group():
     with pytest.raises(KeyError):
