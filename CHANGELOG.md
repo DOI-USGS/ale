@@ -48,6 +48,7 @@ release.
 - Added compress and decompress ISD functions and added --compress flag to isd_generate[#604](https://github.com/DOI-USGS/ale/issues/604)
 - LO Medium Camera drivers, tests, and data [#613](https://github.com/DOI-USGS/ale/issues/613)
 - Added the ability to generate ISDs with no velocities specified for instrument/sun position [#614](https://github.com/DOI-USGS/ale/issues/614)
+- Added MEX SRC IsisLabelNaifSpice driver and tests [#647](https://github.com/DOI-USGS/ale/pull/647)
 
 ### Changed
 - Changed how push frame sensor drivers compute the `ephemeris_time` property [#595](https://github.com/DOI-USGS/ale/pull/595)
@@ -65,6 +66,7 @@ release.
 - Brought timing in line with ISIS for the MroMarciIsisLabelNaifSpiceDriver [#600](https://github.com/DOI-USGS/ale/pull/600)
 - Fixed a bug in which quaternions would flip sign in a way that caused interpolation errors [#603](https://github.com/DOI-USGS/ale/issues/603)
 - Cast SpkTableOriginalSize as an integer from a float as np.linspace() expects an integer for the `num` param.
+- Fixed MEX SRC Pds3LabelNaifSpice driver ephemeris times to match ISIS [#647](https://github.com/DOI-USGS/ale/pull/647)
 
 ## [0.10.0] - 2024-01-08 
 
