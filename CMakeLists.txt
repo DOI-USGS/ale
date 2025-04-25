@@ -21,6 +21,7 @@ set(CMAKE_CXX_STANDARD 11)
 option(ALE_BUILD_LOAD "If the C++ Python load interface should be built." ON)
 option(ALE_USE_EXTERNAL_JSON "If an external nlohmann JSON library should be used" ON)
 option(ALE_USE_EXTERNAL_EIGEN "If an external EIGEN library should be used" ON)
+option(ALE_USE_EXTERNAL_HIGHFIVE "If an external HIGHFIVE library should be used" ON)
 
 # Third Party Dependencies
 if(ALE_USE_EXTERNAL_JSON)
@@ -38,6 +39,12 @@ else()
   target_include_directories (eigen INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/eigen)
 endif()
+
+if(ALE_USE_EXTERNAL_HIGHFIVE)
+  find_package(HDF5 COMPONENTS C CXX)
+  find_package(highfive REQUIRED)
+endif()
+
 
 if(ALE_BUILD_LOAD)
   # If there is an Anaconda environment activated, search that for Python first
