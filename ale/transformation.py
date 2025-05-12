@@ -123,7 +123,6 @@ class FrameChain(nx.DiGraph):
                                                                     "observEnd": ephemeris_times[-1] + inst_time_bias, 
                                                                     "targetFrame": sensor_frame,
                                                                     "mission": mission,
-                                                                    "ckQualities": ["smithed", "reconstructed"],
                                                                     "searchKernels": frame_chain.search_kernels},
                                                                     use_web=frame_chain.use_web)
                 print("TIMES: ", sensor_times)
