@@ -19,7 +19,7 @@ spiceql_mission_map = {
     "GLL_SSI_PLATFORM": "galileo",
     "HAYABUSA_AMICA": "amica",
     "HAYABUSA_NIRS": "nirs",
-    "HAYABUSA2_ONC-W2": "",
+    "HAYABUSA2_ONC-W2": "onc",
     "JUNO_JUNOCAM": "juno",
     "LRO_LROCNACL": "lroc",
     "LRO_LROCNACR": "lroc",
