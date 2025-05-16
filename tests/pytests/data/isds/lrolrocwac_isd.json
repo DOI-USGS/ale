@@ -24548,7 +24548,7 @@
         579.6253750655733,
         -1600.827410047273
       ]
-    }
+    ]
   },
   "starting_detector_line": 244.0,
   "starting_detector_sample": 0,
@@ -25200,3 +25200,4 @@
     "reference_frame": 1
   }
 }
+
