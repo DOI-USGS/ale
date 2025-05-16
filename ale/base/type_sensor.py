@@ -114,8 +114,9 @@ class PushFrame():
         : ndarray
           ephemeris times split based on image lines
         """
-
-        return np.arange(self.ephemeris_start_time, self.ephemeris_stop_time, self.interframe_delay)
+        if not hasattr(self, "_ephemeris_time"):
+            self._ephemeris_time = np.linspace(self.ephemeris_start_time, self.ephemeris_stop_time, self.image_lines + 1)
+        return self._ephemeris_time
 
 
     @property

@@ -125,7 +125,7 @@ def rotate_state(table, rotation):
     elif 'J2000SVX' in table:
         ephemeris_times = np.linspace(table['SpkTableStartTime'],
                                       table['SpkTableEndTime'],
-                                      table['SpkTableOriginalSize'])
+                                      int(table['SpkTableOriginalSize']))
         base_time = table['J2000SVX'][-1]
         time_scale = table['J2000SVY'][-1]
         scaled_times = (ephemeris_times - base_time) / time_scale

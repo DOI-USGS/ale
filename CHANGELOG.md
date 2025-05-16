@@ -34,10 +34,13 @@ release.
 -->
 
 ## [Unreleased]
+
+## [0.11.0] - 2025-04-11
 ### Changed
 - Enabled Hayabusa2 drivers [#596](https://github.com/DOI-USGS/ale/pull/596)
 - Enabled Juno drivers [#597](https://github.com/DOI-USGS/ale/pull/597)
 - Enabled Odyssey drivers [#582](https://github.com/DOI-USGS/ale/pull/582)
+- Disabled OSIRIS-REX drivers [$645](https://github.com/DOI-USGS/ale/pull/645)
 
 ### Added
 - Apollo Metric drivers, tests, and data [#533](https://github.com/DOI-USGS/ale/pull/533)
@@ -45,9 +48,12 @@ release.
 - Added compress and decompress ISD functions and added --compress flag to isd_generate[#604](https://github.com/DOI-USGS/ale/issues/604)
 - LO Medium Camera drivers, tests, and data [#613](https://github.com/DOI-USGS/ale/issues/613)
 - Added the ability to generate ISDs with no velocities specified for instrument/sun position [#614](https://github.com/DOI-USGS/ale/issues/614)
+- Added MEX SRC IsisLabelNaifSpice driver and tests [#647](https://github.com/DOI-USGS/ale/pull/647)
 
 ### Changed
 - Changed how push frame sensor drivers compute the `ephemeris_time` property [#595](https://github.com/DOI-USGS/ale/pull/595)
+- Changed the number of `ephemeris_time` values for pushframe drivers from the number of framelets to the number of lines [#643](https://github.com/DOI-USGS/ale/pull/643)
+- Changed `get_kernels_from_isis_pvl` to add any dsks from the ISIS kernels group to its kernel output [#627](https://github.com/DOI-USGS/ale/issues/627)
 
 ### Fixed
 - Fixed landed sensors to correctly project locally [#590](https://github.com/DOI-USGS/ale/pull/590)
@@ -59,6 +65,8 @@ release.
 - Brought timing in line with ISIS for the KaguyaMiIsisLabelNaifSpiceDriver [#599](https://github.com/DOI-USGS/ale/pull/599)
 - Brought timing in line with ISIS for the MroMarciIsisLabelNaifSpiceDriver [#600](https://github.com/DOI-USGS/ale/pull/600)
 - Fixed a bug in which quaternions would flip sign in a way that caused interpolation errors [#603](https://github.com/DOI-USGS/ale/issues/603)
+- Cast SpkTableOriginalSize as an integer from a float as np.linspace() expects an integer for the `num` param.
+- Fixed MEX SRC Pds3LabelNaifSpice driver ephemeris times to match ISIS [#647](https://github.com/DOI-USGS/ale/pull/647)
 
 ## [0.10.0] - 2024-01-08 
 

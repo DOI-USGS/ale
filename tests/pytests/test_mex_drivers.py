@@ -8,7 +8,7 @@ import unittest
 from conftest import get_image_label, get_image_kernels, convert_kernels, get_isd, compare_dicts
 import ale
 
-from ale.drivers.mex_drivers import MexHrscPds3NaifSpiceDriver, MexHrscIsisLabelNaifSpiceDriver, MexSrcPds3NaifSpiceDriver 
+from ale.drivers.mex_drivers import MexHrscPds3LabelNaifSpiceDriver, MexHrscIsisLabelNaifSpiceDriver, MexSrcPds3LabelNaifSpiceDriver, MexSrcIsisLabelNaifSpiceDriver
 
 
 @pytest.fixture()
@@ -28,8 +28,9 @@ def test_mex_hrsc_kernels(scope="module", autouse=True):
     for kern in binary_kernels:
         os.remove(kern)
 
-def test_mex_src_load(test_mex_src_kernels):
-    label_file = get_image_label("H0010_0023_SR2", 'pds3')
+@pytest.mark.parametrize("label", [('isis3'), ('pds3')])
+def test_mex_src_load(test_mex_src_kernels, label):
+    label_file = get_image_label("H0010_0023_SR2", label)
     compare_dict = get_isd("mexsrc")
     isd_str = ale.loads(label_file, props={'kernels': test_mex_src_kernels}, verbose=True)
     isd_obj = json.loads(isd_str)
@@ -43,11 +44,11 @@ def test_mex_src_load(test_mex_src_kernels):
 def test_mex_load(test_mex_hrsc_kernels, label):
     label_file = get_image_label('h5270_0000_ir2', label)
 
-    with patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_ephemeris_times', \
+    with patch('ale.drivers.mex_drivers.MexHrscPds3LabelNaifSpiceDriver.binary_ephemeris_times', \
                new_callable=PropertyMock) as binary_ephemeris_times, \
-        patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_exposure_durations', \
+        patch('ale.drivers.mex_drivers.MexHrscPds3LabelNaifSpiceDriver.binary_exposure_durations', \
                new_callable=PropertyMock) as binary_exposure_durations, \
-        patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_lines', \
+        patch('ale.drivers.mex_drivers.MexHrscPds3LabelNaifSpiceDriver.binary_lines', \
                new_callable=PropertyMock) as binary_lines, \
         patch('ale.base.type_sensor.LineScanner.ephemeris_time', \
                new_callable=PropertyMock) as ephemeris_time, \
@@ -73,7 +74,7 @@ class test_mex_pds3_naif(unittest.TestCase):
 
     def setUp(self):
         label = get_image_label("h5270_0000_ir2", "pds3")
-        self.driver =  MexHrscPds3NaifSpiceDriver(label)
+        self.driver =  MexHrscPds3LabelNaifSpiceDriver(label)
 
     def test_short_mission_name(self):
         assert self.driver.short_mission_name=='mex'
@@ -147,11 +148,11 @@ class test_mex_pds3_naif(unittest.TestCase):
         assert self.driver.detector_center_sample == 2592.0
 
     def test_center_ephemeris_time(self):
-        with patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_ephemeris_times', \
+        with patch('ale.drivers.mex_drivers.MexHrscPds3LabelNaifSpiceDriver.binary_ephemeris_times', \
                    new_callable=PropertyMock) as binary_ephemeris_times, \
-            patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_exposure_durations', \
+            patch('ale.drivers.mex_drivers.MexHrscPds3LabelNaifSpiceDriver.binary_exposure_durations', \
                    new_callable=PropertyMock) as binary_exposure_durations, \
-            patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.ephemeris_start_time',
+            patch('ale.drivers.mex_drivers.MexHrscPds3LabelNaifSpiceDriver.ephemeris_start_time',
                    new_callable=PropertyMock) as ephemeris_start_time:
             binary_ephemeris_times.return_value = [255744795.73322123]
             binary_exposure_durations.return_value = [0.013227428436279297]
@@ -159,22 +160,22 @@ class test_mex_pds3_naif(unittest.TestCase):
             assert self.driver.center_ephemeris_time == 255744693.90931007
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_ephemeris_times', \
+        with patch('ale.drivers.mex_drivers.MexHrscPds3LabelNaifSpiceDriver.binary_ephemeris_times', \
                    new_callable=PropertyMock) as binary_ephemeris_times, \
-            patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_exposure_durations', \
+            patch('ale.drivers.mex_drivers.MexHrscPds3LabelNaifSpiceDriver.binary_exposure_durations', \
                    new_callable=PropertyMock) as binary_exposure_durations :
             binary_ephemeris_times.return_value = [255744795.73322123]
             binary_exposure_durations.return_value = [0.013227428436279297]
             assert self.driver.ephemeris_stop_time == 255744795.74644867
 
     def test_line_scan_rate(self):
-        with patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_ephemeris_times', \
+        with patch('ale.drivers.mex_drivers.MexHrscPds3LabelNaifSpiceDriver.binary_ephemeris_times', \
                    new_callable=PropertyMock) as binary_ephemeris_times, \
-            patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_exposure_durations', \
+            patch('ale.drivers.mex_drivers.MexHrscPds3LabelNaifSpiceDriver.binary_exposure_durations', \
                    new_callable=PropertyMock) as binary_exposure_durations, \
-            patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.binary_lines', \
+            patch('ale.drivers.mex_drivers.MexHrscPds3LabelNaifSpiceDriver.binary_lines', \
                    new_callable=PropertyMock) as binary_lines, \
-            patch('ale.drivers.mex_drivers.MexHrscPds3NaifSpiceDriver.ephemeris_start_time',
+            patch('ale.drivers.mex_drivers.MexHrscPds3LabelNaifSpiceDriver.ephemeris_start_time',
                    new_callable=PropertyMock) as ephemeris_start_time:
             binary_ephemeris_times.return_value =    [0, 1, 2, 3, 5, 7, 9]
             binary_exposure_durations.return_value = [1, 1, 1, 2, 2, 2, 2]
@@ -274,7 +275,7 @@ class test_mex_isis3_naif(unittest.TestCase):
 class test_mex_src_pds3_naif(unittest.TestCase):
     def setUp(self):
         label = get_image_label("H0010_0023_SR2", "pds3")
-        self.driver =  MexSrcPds3NaifSpiceDriver(label)
+        self.driver =  MexSrcPds3LabelNaifSpiceDriver(label)
 
     def test_short_mission_name(self):
         assert self.driver.short_mission_name=='mex'
@@ -285,6 +286,20 @@ class test_mex_src_pds3_naif(unittest.TestCase):
             calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_SRC', 'mission': 'src', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
+
+    def test_ephemeris_start_time(self):
+        with patch('ale.drivers.mex_drivers.spice.str2et', return_value=1) as str2et:
+            assert self.driver.ephemeris_start_time == 0.998488
+            str2et.assert_called_with('2004-01-10 14:02:57.817000')
+
+    def test_ephemeris_stop_time(self):
+        with patch('ale.drivers.mex_drivers.spice.str2et', return_value=1) as str2et:
+            assert self.driver.ephemeris_stop_time == 1.001512
+            str2et.assert_called_with('2004-01-10 14:02:57.817000')
+    
+    def test_center_ephemeris_time(self):
+        with patch('ale.drivers.mex_drivers.spice.str2et', return_value=1) as str2et:
+            assert self.driver.center_ephemeris_time == 1
 
     def test_instrument_id(self):
         assert self.driver.instrument_id == 'MEX_HRSC_SRC'
@@ -307,4 +322,55 @@ class test_mex_src_pds3_naif(unittest.TestCase):
         assert self.driver.detector_center_sample == 512.0
 
     def test_sensor_model_version(self):
-        assert self.driver.sensor_model_version == 1
+        assert self.driver.sensor_model_version == 2
+
+# ========= Test mex - SRC - isislabel and naifspice driver =========
+class test_mex_src_isis_naif(unittest.TestCase):
+    def setUp(self):
+        label = get_image_label("H0010_0023_SR2", "isis3")
+        self.driver =  MexSrcIsisLabelNaifSpiceDriver(label)
+
+    def test_short_mission_name(self):
+        assert self.driver.short_mission_name=='mex'
+
+    def test_ikid(self):
+        with patch('ale.drivers.mex_drivers.spice.bods2c', return_value=12345) as bods2c:
+            assert self.driver.ikid == 12345
+            bods2c.assert_called_with('MEX_HRSC_SRC')
+
+    def test_ephemeris_start_time(self):
+        with patch('ale.drivers.mex_drivers.spice.str2et', return_value=1) as str2et:
+            assert self.driver.ephemeris_start_time == 0.998488
+            str2et.assert_called_with('2004-01-10 14:02:57.817000')
+
+    def test_ephemeris_stop_time(self):
+        with patch('ale.drivers.mex_drivers.spice.str2et', return_value=1) as str2et:
+            assert self.driver.ephemeris_stop_time == 1.001512
+            str2et.assert_called_with('2004-01-10 14:02:57.817000')
+    
+    def test_center_ephemeris_time(self):
+        with patch('ale.drivers.mex_drivers.spice.str2et', return_value=1) as str2et:
+            assert self.driver.center_ephemeris_time == 1
+
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == 'MEX_HRSC_SRC'
+
+    def test_sensor_name(self):
+        assert self.driver.sensor_name =='MEX_HRSC_SRC'
+ 
+    def test_focal2pixel_lines(self):
+        np.testing.assert_almost_equal(self.driver.focal2pixel_lines,
+                                           [0.0, 0.0, 111.1111111])
+
+    def test_focal2pixel_samples(self):
+        np.testing.assert_almost_equal(self.driver.focal2pixel_samples,
+                                           [0.0, 111.1111111, 0.0])
+
+    def test_detector_center_line(self):
+        assert self.driver.detector_center_line == 512.0
+
+    def test_detector_center_sample(self):
+        assert self.driver.detector_center_sample == 512.0
+
+    def test_sensor_model_version(self):
+        assert self.driver.sensor_model_version == 2

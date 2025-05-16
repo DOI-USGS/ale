@@ -366,7 +366,7 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
         : float
           ephemeris stop time of the image
         """
-        return (max(self.band_times) + self.num_frames * self.interframe_delay) + self.exposure_duration
+        return (max(self.band_times) + self.num_frames * self.interframe_delay)
 
     @property
     def focal_length(self):

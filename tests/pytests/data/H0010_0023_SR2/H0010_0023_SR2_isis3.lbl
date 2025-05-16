@@ -53,17 +53,17 @@ Object = IsisCube
                                  $base/kernels/spk/mar097.bsp)
     InstrumentPointing        = (Table,
                                  $mex/kernels/ck/ATNM_MEASURED_040101_050101_V-
-                                 03.BC, $mex/kernels/fk/MEX_V14.TF)
-    Instrument                = $mex/kernels/ik/MEX_HRSC_V03.TI
-    SpacecraftClock           = $mex/kernels/sclk/MEX_200219_STEP.TSC
+                                 03.BC, $mex/kernels/fk/MEX_V16.TF)
+    Instrument                = $mex/kernels/ik/MEX_HRSC_V09.TI
+    SpacecraftClock           = $mex/kernels/sclk/MEX_220810_STEP.TSC
     InstrumentPosition        = (Table,
                                  $mex/kernels/spk/ORMM__031222180906_00052.BSP)
-    InstrumentAddendum        = $mex/kernels/iak/hrscsrcAddendum001.ti
-    ShapeModel                = $base/dems/molaMarsPlanetaryRadius0005.cub
+    InstrumentAddendum        = $mex/kernels/iak/hrscsrcAddendum002.ti
+    ShapeModel                = Null
     InstrumentPositionQuality = Reconstructed
     InstrumentPointingQuality = Reconstructed
-    CameraVersion             = 1
-    Source                    = isis
+    CameraVersion             = 2
+    Source                    = ale
   End_Group
 End_Object
 
@@ -79,18 +79,18 @@ Object = Table
   ByteOrder           = Lsb
   TimeDependentFrames = (-41001, 1)
   ConstantFrames      = (-41220, -41200, -41000, -41001)
-  ConstantRotation    = (6.63224917165212e-04, 0.99999870208735,
+  ConstantRotation    = (6.63224917165195e-04, 0.99999870208735,
                          -0.0014683175140289, -0.999999553943,
-                         6.62236618915141e-04, -6.73466011123212e-04,
+                         6.6223661891518e-04, -6.73466011123212e-04,
                          -6.72492763397173e-04, 0.0014687635185151,
                          0.99999869524275)
-  CkTableStartTime    = 127015396.64583
-  CkTableEndTime      = 127015396.64583
+  CkTableStartTime    = 127015442.00119
+  CkTableEndTime      = 127015442.00119
   CkTableOriginalSize = 1
   FrameTypeCode       = 3
   Description         = "Created by spiceinit"
   Kernels             = ($mex/kernels/ck/ATNM_MEASURED_040101_050101_V03.BC,
-                         $mex/kernels/fk/MEX_V14.TF)
+                         $mex/kernels/fk/MEX_V16.TF)
 
   Group = Field
     Name = J2000Q0
@@ -148,8 +148,8 @@ Object = Table
   Records              = 1
   ByteOrder            = Lsb
   CacheType            = Linear
-  SpkTableStartTime    = 127015396.64583
-  SpkTableEndTime      = 127015396.64583
+  SpkTableStartTime    = 127015442.00119
+  SpkTableEndTime      = 127015442.00119
   SpkTableOriginalSize = 1.0
   Description          = "Created by spiceinit"
   Kernels              = $mex/kernels/spk/ORMM__031222180906_00052.BSP
@@ -204,18 +204,15 @@ Object = Table
   Records             = 1
   ByteOrder           = Lsb
   TimeDependentFrames = (10014, 1)
-  CkTableStartTime    = 127015396.64583
-  CkTableEndTime      = 127015396.64583
+  CkTableStartTime    = 127015442.00119
+  CkTableEndTime      = 127015442.00119
   CkTableOriginalSize = 1
-  FrameTypeCode       = 2
-  PoleRa              = (317.68143, -0.1061, 0.0)
-  PoleDec             = (52.8865, -0.0609, 0.0)
-  PrimeMeridian       = (176.63, 350.89198226, 0.0)
+  FrameTypeCode       = 3
   Description         = "Created by spiceinit"
   Kernels             = ($base/kernels/spk/de430.bsp,
                          $base/kernels/spk/mar097.bsp,
                          $base/kernels/pck/pck00009.tpc)
-  SolarLongitude      = 331.18846855952
+  SolarLongitude      = 331.18875627484
 
   Group = Field
     Name = J2000Q0
@@ -273,8 +270,8 @@ Object = Table
   Records              = 1
   ByteOrder            = Lsb
   CacheType            = Linear
-  SpkTableStartTime    = 127015396.64583
-  SpkTableEndTime      = 127015396.64583
+  SpkTableStartTime    = 127015442.00119
+  SpkTableEndTime      = 127015442.00119
   SpkTableOriginalSize = 1.0
   Description          = "Created by spiceinit"
   Kernels              = ($base/kernels/spk/de430.bsp,
@@ -326,7 +323,7 @@ End_Object
 Object = History
   Name      = IsisCube
   StartByte = 2105124
-  Bytes     = 2243
+  Bytes     = 3198
 End_Object
 
 Object = OriginalLabel
@@ -336,16 +333,46 @@ Object = OriginalLabel
 End_Object
 
 Object = NaifKeywords
-  BODY_CODE                                = 499
-  BODY499_RADII                            = (3396.19, 3396.19, 3376.2)
-  BODY_FRAME_CODE                          = 10014
-  INS-41220_FOCAL_LENGTH                   = 988.6
-  INS-41220_PIXEL_SIZE                     = 9.0
-  INS-41220_TRANSX                         = (0.0, 0.0, 0.009)
-  INS-41220_TRANSY                         = (0.0, 0.009, 0.0)
-  INS-41220_ITRANSS                        = (0.0, 0.0, 111.11111111111)
-  INS-41220_ITRANSL                        = (0.0, 111.11111111111, 0.0)
-  INS-41220_CCD_CENTER                     = (512.5, 512.5)
-  CLOCK_ET_-41_1/0021823325.32303_COMPUTED = 4b55959267489e41
+  BODY499_PM                 = (176.63, 350.89198226, 0)
+  BODY499_POLE_DEC           = (52.8865, -0.0609, 0)
+  BODY499_POLE_RA            = (317.68143, -0.1061, 0)
+  BODY499_RADII              = (3396.19, 3396.19, 3376.2)
+  BODY_CODE                  = 499
+  BODY_FRAME_CODE            = 10014
+  FRAME_-41220_CENTER        = -41200
+  FRAME_-41220_CLASS         = 4
+  FRAME_-41220_CLASS_ID      = -41220
+  FRAME_-41220_NAME          = MEX_HRSC_SRC
+  INS-41220_BORESIGHT        = (0, 0, 984.76)
+  INS-41220_BORESIGHT_LINE   = 512.5
+  INS-41220_BORESIGHT_SAMPLE = 512.5
+  INS-41220_CCD_CENTER       = (512.5, 512.5)
+  INS-41220_CK_FRAME_ID      = -41001
+  INS-41220_CK_REFERENCE_ID  = 1
+  INS-41220_F/RATIO          = 9.199999999999999
+  INS-41220_FOCAL_LENGTH     = 984.76
+  INS-41220_FOV_ANGLE_UNITS  = DEGREES
+  INS-41220_FOV_ANGULAR_SIZE = (0.0094, 0.0094)
+  INS-41220_FOV_CLASS_SPEC   = ANGLES
+  INS-41220_FOV_CROSS_ANGLE  = 0.27
+  INS-41220_FOV_FRAME        = MEX_HRSC_SRC
+  INS-41220_FOV_REF_ANGLE    = 0.27
+  INS-41220_FOV_REF_VECTOR   = (1, 0, 0)
+  INS-41220_FOV_SHAPE        = RECTANGLE
+  INS-41220_IFOV             = 9.140000000000001e-06
+  INS-41220_ITRANSL          = (0, 0, 111.111111111111)
+  INS-41220_ITRANSS          = (0, 111.111111111111, 0)
+  INS-41220_PIXEL_LINES      = 1024
+  INS-41220_PIXEL_PITCH      = 0.008999999999999999
+  INS-41220_PIXEL_SAMPLES    = 1024
+  INS-41220_PIXEL_SIZE       = (9, 9)
+  INS-41220_PLATFORM_ID      = -41000
+  INS-41220_TRANSX           = (0, 0.008999999999999999, 0)
+  INS-41220_TRANSY           = (0, 0, 0.008999999999999999)
+  TKFRAME_-41220_ANGLES      = (-0.08415400000000001, -0.038531, 90.038)
+  TKFRAME_-41220_AXES        = (1, 2, 3)
+  TKFRAME_-41220_RELATIVE    = MEX_HRSC_BASE
+  TKFRAME_-41220_SPEC        = ANGLES
+  TKFRAME_-41220_UNITS       = DEGREES
 End_Object
 End
