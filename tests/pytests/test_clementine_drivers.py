@@ -1,7 +1,7 @@
 import os
 import json
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, call
 
 import pytest
 
@@ -88,12 +88,19 @@ class test_uvvis_isis_naif(unittest.TestCase):
         assert self.driver.spacecraft_name == "CLEMENTINE_1"
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.clementine_drivers.spice.utc2et', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12345
+            calls = [call('utcToEt', {'utc': '1994-03-25 15:14:15.347000', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.drivers.clementine_drivers.spice.utc2et', return_value=12345) as scs2e:
-            assert self.driver.ephemeris_stop_time >= 12345
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
+            assert self.driver.ephemeris_stop_time == 12345.0090624
+            calls = [call('utcToEt', {'utc': '1994-03-25 15:14:15.347000', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
+
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
@@ -119,12 +126,17 @@ class test_hires_isis_naif(unittest.TestCase):
         assert self.driver.spacecraft_name == "CLEMENTINE_1"
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.clementine_drivers.spice.utc2et', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12345
+            calls = [call('utcToEt', {'utc': '1994-02-19 21:34:01.990000', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.drivers.clementine_drivers.spice.utc2et', return_value=12345) as scs2e:
-            assert self.driver.ephemeris_stop_time >= 12345
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
+            assert self.driver.ephemeris_stop_time == 12345.0005015
+            calls = [call('utcToEt', {'utc': '1994-02-19 21:34:01.990000', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
@@ -147,12 +159,17 @@ class test_nir_isis_naif(unittest.TestCase):
         assert self.driver.spacecraft_name == "CLEMENTINE_1"
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.clementine_drivers.spice.utc2et', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12345
+            calls = [call('utcToEt', {'utc': '1994-03-11 13:22:45.332000', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.drivers.clementine_drivers.spice.utc2et', return_value=12345) as scs2e:
-            assert self.driver.ephemeris_stop_time >= 12345
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
+            assert self.driver.ephemeris_stop_time == 12345.011
+            calls = [call('utcToEt', {'utc': '1994-03-11 13:22:45.332000', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_sensor_name(self):
         assert self.driver.sensor_name == "NIR"
@@ -184,12 +201,17 @@ class test_lwir_isis_naif(unittest.TestCase):
         assert self.driver.spacecraft_name == "CLEMENTINE_1"
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.clementine_drivers.spice.utc2et', return_value=12345) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12345
+            calls = [call('utcToEt', {'utc': '1994-04-04 17:17:51.263000', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.drivers.clementine_drivers.spice.utc2et', return_value=12345) as scs2e:
-            assert self.driver.ephemeris_stop_time >= 12345
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
+            assert self.driver.ephemeris_stop_time == 12345.000144
+            calls = [call('utcToEt', {'utc': '1994-04-04 17:17:51.263000', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
