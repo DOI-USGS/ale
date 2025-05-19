@@ -1,12 +1,20 @@
-import asyncio
+import logging
 import math
+import os
 import requests
-import time
 
 from multiprocessing.pool import ThreadPool
 import numpy as np
 
 import pyspiceql
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(format="%(message)s", level=logging.INFO)
+
+spiceql_url = os.environ.get('SPICEQL_REST_URL')
+log_level = os.environ.get('ALESPICEQL_LOG_LEVEL')
+if log_level.lower() == "debug":
+    logger.setLevel(logging.DEBUG)
 
 
 def stringify_web_args(function_args):
@@ -81,7 +89,12 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
         func = getattr(pyspiceql, function_name)
         return func(**function_args)[0]
     
-    url = "https://spiceql-fastapi-dev.prod-asc.chs.usgs.gov/"
+    if spiceql_url:
+        url = spiceql_url
+    else:
+        url = "https://spiceql-deployment.prod-asc.chs.usgs.gov/"
+
+    logger.info(f"SpiceQL Base URL: {url}")
     url += function_name
     headers = {
         'accept': '*/*',
@@ -90,7 +103,9 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
 
     # Convert any args being passed over the wire to strings
     clean_function_args = stringify_web_args(function_args)
+    logger.debug("Args: " + str(clean_function_args))
     response = requests.get(url, params=clean_function_args, headers=headers, verify=False)
+    logger.debug("Complete URL: " + str(response.url))
     check_response(response)
 
     return response.json()["body"]["return"]
