@@ -13,7 +13,7 @@ logging.basicConfig(format="%(message)s", level=logging.INFO)
 
 spiceql_url = os.environ.get('SPICEQL_REST_URL')
 log_level = os.environ.get('ALESPICEQL_LOG_LEVEL')
-if log_level.lower() == "debug":
+if log_level is not None and log_level.lower() == "debug":
     logger.setLevel(logging.DEBUG)
 
 
