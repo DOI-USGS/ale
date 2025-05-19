@@ -15,6 +15,31 @@ import ale
 from ale import util
 
 @pytest.fixture
+def cube_kernels():
+   return """
+    Object = IsisCube
+    Group = Instrument
+      StartTime = 2016-332T05:40:45.020
+      StopTime  = 2016-332T05:40:46.820
+      InstrumentId = fake
+      SpacecraftName = fake
+    End_Group
+
+    Group = Kernels
+      TargetAttitudeShape = $base/attitudeshape
+      TargetPosition = ($messenger/targetposition0, $messenger/targetposition1)
+      Instrument = $messenger/instrument
+      InstrumentPointing = (Table, $messenger/instrumentpointing0, $messenger/instrumentpointing1)
+      SpacecraftClock = $base/clock
+      InstrumentPosition = $messenger/instrumentposition
+      InstrumentAddendum = Null
+      ShapeModel = Null
+    End_Group
+    End_Object
+    End
+    """
+
+@pytest.fixture
 def pvl_one_group():
     return  """
     Group = Test

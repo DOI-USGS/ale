@@ -2,6 +2,7 @@ import os
 from os import path
 
 from glob import glob
+from itertools import chain, filterfalse, groupby
 import warnings
 
 import pvl
@@ -920,3 +921,99 @@ def expandvars(path, env_dict=os.environ, default=None, case_sensitive=True):
         reVar = r'\$(\w+|\{([^}]*)\})'
         path = re.sub(reVar, replace_var, path)
     return path
+
+def find_kernels(cube, isis_data, format_as=dict):
+    """
+    Find all kernels for a cube and return a json object with categorized kernels.
+
+    Parameters
+    ----------
+
+    cube : str
+           Path to an ISIS cube
+
+    isis_data : str
+                path to $ISISDATA
+
+    format_as : obj
+                What type to return the kernels as, ISIS3-like dict/PVL or flat list
+
+    Returns
+    -------
+    : obj
+      Container with kernels
+    """
+    def remove_dups(listofElements):
+        # Create an empty list to store unique elements
+        uniqueList = []
+
+        # Iterate over the original list and for each element
+        # add it to uniqueList, if its not already there.
+        for elem in listofElements:
+            if elem not in uniqueList:
+                uniqueList.append(elem)
+
+        # Return the list of unique elements
+        return uniqueList
+
+    cube_label = pvl.load(cube)
+    mission_lookup_table = get_isis_mission_translations(isis_data)
+
+    mission_dir = mission_lookup_table[cube_label["IsisCube"]["Instrument"]["SpacecraftName"]]
+    mission_dir = path.join(isis_data, mission_dir.lower())
+
+    kernel_dir = path.join(mission_dir, "kernels")
+    base_kernel_dir = path.join(isis_data, "base", "kernels")
+
+    kernel_types = [ name for name in os.listdir(kernel_dir) if os.path.isdir(os.path.join(kernel_dir, name)) ]
+    kernel_types.extend(name for name in os.listdir(base_kernel_dir) if os.path.isdir(os.path.join(base_kernel_dir, name)))
+    kernel_types = set(kernel_types)
+
+    db_files = []
+    for typ in kernel_types:
+        files = sorted(glob(path.join(kernel_dir, typ, "*.db")))
+        base_files = sorted(glob(path.join(base_kernel_dir, typ, "*.db")))
+        files = [list(it) for k,it in groupby(files, key=lambda f:os.path.basename(f).split(".")[0])]
+        base_files = [list(it) for k,it in groupby(base_files, key=lambda f:os.path.basename(f).split(".")[0])]
+
+        for instrument_dbs in files:
+            db_files.append(read_pvl(sorted(instrument_dbs)[-1], True))
+        for base_dbs in base_files:
+            db_files.append(read_pvl(sorted(base_dbs)[-1], True))
+
+
+    kernels = {}
+    for f in db_files:
+        #TODO: Error checking
+        typ = f[0][0]
+        kernel_search_results = search_isis_db(f[0][1], cube_label, isis_data)
+
+        if not kernel_search_results:
+            kernels[typ] = None
+        else:
+            try:
+                kernels[typ]["kernels"].extend(kernel_search_results["kernels"])
+                if any(kernel_search_results.get("types", [None])):
+                    kernels[typ]["types"].extend(kernel_search_results["types"])
+            except:
+                kernels[typ] = {}
+                kernels[typ]["kernels"] = kernel_search_results["kernels"]
+                if any(kernel_search_results.get("types", [None])):
+                    kernels[typ]["types"] = kernel_search_results["types"]
+
+    for k,v in kernels.items():
+        if v:
+            kernels[k]["kernels"] = remove_dups(v["kernels"])
+
+    if format_as == dict:
+        return kernels
+    elif format_as == list:
+        kernel_list = []
+        for _,kernels in kernels.items():
+            if kernels:
+                kernel_list.extend(kernels["kernels"])
+        return kernel_list
+    else:
+        warnings.warn(f"{format_as} is not a valid format, returning as dict")
+        return kernels
+    
