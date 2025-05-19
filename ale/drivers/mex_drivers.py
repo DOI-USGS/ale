@@ -783,7 +783,7 @@ class MexSrcPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortion,
         : double
           Starting ephemeris time of the image
         """
-        return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")) - (self.exposure_duration / 2)
+        return self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")}) - (self.exposure_duration / 2)
 
 
     @property
@@ -884,7 +884,9 @@ class MexSrcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
         : int
           Naif ID used to for identifying the instrument in Spice kernels
         """
-        return spice.bods2c("MEX_HRSC_SRC")
+        if not hasattr(self, "_ikid"):
+          self._ikid = self.spiceql_call("translateNameToCode", {"frame": "MEX_HRSC_SRC".format(super().instrument_id), "mission": self.spiceql_mission})
+        return self._ikid
 
 
     @property
@@ -930,7 +932,8 @@ class MexSrcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
         : double
           Starting ephemeris time of the image
         """
-        return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")) - (self.exposure_duration / 2)
+        
+        return self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")}) - (self.exposure_duration / 2)
 
 
     @property
