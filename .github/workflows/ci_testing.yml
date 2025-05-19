@@ -119,10 +119,10 @@ jobs:
           cd build
           cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON -G "Visual Studio 16 2019" -A x64 -DALE_BUILD_TESTS=OFF -DALE_BUILD_DOCS=OFF ..
           cmake --build . --target ALL_BUILD --config Release
-          ls D:\a\ale\ale\build\Release
+          ls C:\a\ale\ale\build\Release
       - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1
         with:
           name: ale-py${{ matrix.python-version }}
           path: |
-            D:\a\ale\ale\build\Release\ale.dll
-            D:\a\ale\ale\build\Release\ale.lib
+            C:\a\ale\ale\build\Release\ale.dll
+            C:\a\ale\ale\build\Release\ale.lib
