@@ -5,7 +5,7 @@ import unittest
 from unittest.mock import patch, PropertyMock
 
 import numpy as np
-import spiceypy as spice
+import pyspiceql
 
 from conftest import get_image_kernels, convert_kernels
 
@@ -18,8 +18,9 @@ class test_data_naif(unittest.TestCase):
     def setUp(self):
         kernels = get_image_kernels('B10_013341_1010_XN_79S172W')
         self.updated_kernels, self.binary_kernels = convert_kernels(kernels)
-        spice.furnsh(self.updated_kernels)
+        [pyspiceql.load(k) for k in self.updated_kernels]
         self.driver = NaifSpice()
+        self.driver._props = {}
         self.driver.instrument_id = 'MRO_CTX'
         self.driver.spacecraft_name = 'MRO'
         self.driver.target_name = 'Mars'
@@ -29,7 +30,7 @@ class test_data_naif(unittest.TestCase):
         self.driver.center_ephemeris_time = 297088762.61698407
 
     def tearDown(self):
-        spice.unload(self.updated_kernels)
+        [pyspiceql.unload(k) for k in self.updated_kernels]
         for kern in self.binary_kernels:
             os.remove(kern)
 
@@ -40,9 +41,7 @@ class test_data_naif(unittest.TestCase):
         assert self.driver.spacecraft_id == -74
 
     def test_target_frame_id(self):
-        with patch('ale.base.data_naif.NaifSpice.target_id', new_callable=PropertyMock) as target_id:
-            target_id.return_value = 499
-            assert self.driver.target_frame_id == 10014
+        assert self.driver.target_frame_id == 10014
 
     def test_sensor_frame_id(self):
         assert self.driver.sensor_frame_id == -74021
@@ -121,25 +120,32 @@ class test_data_naif(unittest.TestCase):
         orientation = self.driver.sensor_orientation
         np.testing.assert_allclose(orientation[0], [-0.08443224924851939, -0.017974644466439982, -0.9949019866167608, -0.052135827116906064])
 
+    def test_naif_keywords(self):
+        assert len(self.driver.naif_keywords) == 51
+        # Check that each keyword has the ikid, target_id, or the fikid
+        # or the two we manually add (BODY_FRAME_CODE and BODY_CODE)
+        for i in self.driver.naif_keywords.keys():
+            assert "74999" in i or "-74021" in i or "499" in i or i is "BODY_FRAME_CODE" or i is "BODY_CODE"
+
 def test_light_time_correction_keyword():
-    with patch('ale.base.data_naif.spice.gcpool', return_value=['NONE']) as gcpool, \
+    with patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords, \
          patch('ale.base.data_naif.NaifSpice.ikid', new_callable=PropertyMock) as ikid:
         ikid.return_value = -12345
+        naif_keywords.return_value = {"INS-12345_LIGHTTIME_CORRECTION": "NONE"}
         assert NaifSpice().light_time_correction == 'NONE'
-        gcpool.assert_called_with('INS-12345_LIGHTTIME_CORRECTION', 0, 1)
 
-@pytest.mark.parametrize(("key_val, return_val"), [(['TRUE'], True), (['FALSE'], False)])
+@pytest.mark.parametrize(("key_val, return_val"), [(True, True), (False, False)])
 def test_swap_observer_target_keyword(key_val, return_val):
-    with patch('ale.base.data_naif.spice.gcpool', return_value=key_val) as gcpool, \
+    with patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords, \
          patch('ale.base.data_naif.NaifSpice.ikid', new_callable=PropertyMock) as ikid:
         ikid.return_value = -12345
+        naif_keywords.return_value = {"INS-12345_SWAP_OBSERVER_TARGET": key_val}
         assert NaifSpice().swap_observer_target == return_val
-        gcpool.assert_called_with('INS-12345_SWAP_OBSERVER_TARGET', 0, 1)
 
-@pytest.mark.parametrize(("key_val, return_val"), [(['TRUE'], True), (['FALSE'], False)])
+@pytest.mark.parametrize(("key_val, return_val"), [(True, True), (False, False)])
 def test_correct_lt_to_surface_keyword(key_val, return_val):
-    with patch('ale.base.data_naif.spice.gcpool', return_value=key_val) as gcpool, \
+    with patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords, \
          patch('ale.base.data_naif.NaifSpice.ikid', new_callable=PropertyMock) as ikid:
         ikid.return_value = -12345
+        naif_keywords.return_value = {"INS-12345_LT_SURFACE_CORRECT": key_val}
         assert NaifSpice().correct_lt_to_surface == return_val
-        gcpool.assert_called_with('INS-12345_LT_SURFACE_CORRECT', 0, 1)

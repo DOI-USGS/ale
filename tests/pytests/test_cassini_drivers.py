@@ -3,7 +3,7 @@ import ale
 import os
 
 import unittest
-from unittest.mock import PropertyMock, patch
+from unittest.mock import PropertyMock, patch, call
 import json
 from conftest import get_image_label, get_image_kernels, get_isd, convert_kernels, compare_dicts, get_table_data
 
@@ -62,7 +62,7 @@ def test_load_vims_isis_naif(test_vims_kernels):
     label_file = get_image_label("v1514284191_1_vis", label_type="isis")
     compare_dict = get_isd("cassinivims")
 
-    isd_str = ale.loads(label_file, props={"kernels": test_vims_kernels})
+    isd_str = ale.loads(label_file, props={"kernels": test_vims_kernels}, verbose=True)
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
     x = compare_dicts(isd_obj, compare_dict)
@@ -82,16 +82,26 @@ class test_cassini_iss_pds3_naif(unittest.TestCase):
         assert self.driver.spacecraft_name == "CASSINI"
 
     def test_focal2pixel_samples(self):
-        with patch('ale.drivers.co_drivers.spice.gdpool', return_value=[12.0]) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-             assert self.driver.focal2pixel_samples == [0.0, 83.33333333333333, 0.0]
-             gdpool.assert_called_with('INS-12345_PIXEL_SIZE', 0, 1)
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, {"frameCode": -12345}, -12345, {"INS-12345_PIXEL_SIZE": 12}, {}]) as spiceql_call:
+            assert self.driver.focal2pixel_samples == [0.0, 83.33333333333333, 0.0]
+            calls = [call('translateNameToCode', {'frame': 'ENCELADUS', 'mission': 'cassini', 'searchKernels': False}, False),
+                    call('getTargetFrameInfo', {'targetId': -12345, 'mission': 'cassini', 'searchKernels': False}, False),
+                    call('translateNameToCode', {'frame': 'CASSINI_ISS_NAC', 'mission': 'cassini', 'searchKernels': False}, False),
+                    call('findMissionKeywords', {'key': '*-12345*', 'mission': 'cassini', 'searchKernels': False}, False),
+                    call('findTargetKeywords', {'key': "*-12345*", 'mission': 'cassini', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            spiceql_call.call_count == 5
 
     def test_focal2pixel_lines(self):
-        with patch('ale.drivers.co_drivers.spice.gdpool', return_value=[12.0]) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-             assert self.driver.focal2pixel_lines == [0.0, 0.0, 83.33333333333333]
-             gdpool.assert_called_with('INS-12345_PIXEL_SIZE', 0, 1)
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, {"frameCode": -12345}, -12345, {"INS-12345_PIXEL_SIZE": 12}, {}]) as spiceql_call:
+            assert self.driver.focal2pixel_lines == [0.0, 0.0, 83.33333333333333]
+            calls = [call('translateNameToCode', {'frame': 'ENCELADUS', 'mission': 'cassini', 'searchKernels': False}, False),
+                     call('getTargetFrameInfo', {'targetId': -12345, 'mission': 'cassini', 'searchKernels': False}, False),
+                     call('translateNameToCode', {'frame': 'CASSINI_ISS_NAC', 'mission': 'cassini', 'searchKernels': False}, False),
+                     call('findMissionKeywords', {'key': '*-12345*', 'mission': 'cassini', 'searchKernels': False}, False),
+                     call('findTargetKeywords', {'key': "*-12345*", 'mission': 'cassini', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            spiceql_call.call_count == 5
 
     def test_odtk(self):
         assert self.driver.odtk == [0, -8e-06, 0]
@@ -100,27 +110,33 @@ class test_cassini_iss_pds3_naif(unittest.TestCase):
         assert self.driver.instrument_id == "CASSINI_ISS_NAC"
 
     def test_focal_epsilon(self):
-        with patch('ale.drivers.co_drivers.spice.gdpool', return_value=[0.03]) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-             assert self.driver.focal_epsilon == 0.03
-             gdpool.assert_called_with('INS-12345_FL_UNCERTAINTY', 0, 1)
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, {"frameCode": -12345}, -12345, {"INS-12345_FL_UNCERTAINTY": [0.03]}, {}]) as spiceql_call:
+            assert self.driver.focal_epsilon == 0.03
+            calls = [call('translateNameToCode', {'frame': 'ENCELADUS', 'mission': 'cassini', 'searchKernels': False}, False),
+                     call('getTargetFrameInfo', {'targetId': -12345, 'mission': 'cassini', 'searchKernels': False}, False),
+                     call('translateNameToCode', {'frame': 'CASSINI_ISS_NAC', 'mission': 'cassini', 'searchKernels': False}, False),
+                     call('findMissionKeywords', {'key': '*-12345*', 'mission': 'cassini', 'searchKernels': False}, False),
+                     call('findTargetKeywords', {'key': "*-12345*", 'mission': 'cassini', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            spiceql_call.call_count == 5
 
     def test_focal_length(self):
         # This value isn't used for anything in the test, as it's only used for the
         # default focal length calculation if the filter can't be found.
-        with patch('ale.drivers.co_drivers.spice.gdpool', return_value=[10.0]) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-             assert self.driver.focal_length == 2003.09
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, {"frameCode": -12345}, -12345, {"INS-12345_FOV_CENTER_PIXEL": [2003.09]}, {}]) as spiceql_call:
+            assert self.driver.focal_length == 2003.09
+            calls = [call('translateNameToCode', {'frame': 'ENCELADUS', 'mission': 'cassini', 'searchKernels': False}, False),
+                    call('getTargetFrameInfo', {'targetId': -12345, 'mission': 'cassini', 'searchKernels': False}, False),
+                    call('translateNameToCode', {'frame': 'CASSINI_ISS_NAC', 'mission': 'cassini', 'searchKernels': False}, False),
+                    call('findMissionKeywords', {'key': '*-12345*', 'mission': 'cassini', 'searchKernels': False}, False),
+                    call('findTargetKeywords', {'key': "*-12345*", 'mission': 'cassini', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
 
     def test_detector_center_sample(self):
-        with patch('ale.drivers.co_drivers.spice.gdpool', return_value=[511.5, 511.5]) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-             assert self.driver.detector_center_sample == 512
+        assert self.driver.detector_center_sample == 512
 
     def test_detector_center_line(self):
-        with patch('ale.drivers.co_drivers.spice.gdpool', return_value=[511.5, 511.5]) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-             assert self.driver.detector_center_sample == 512
+        assert self.driver.detector_center_line == 512
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
@@ -130,32 +146,33 @@ class test_cassini_iss_pds3_naif(unittest.TestCase):
 
     @patch('ale.transformation.FrameChain.from_spice', return_value=ale.transformation.FrameChain())
     def test_custom_frame_chain(self, from_spice):
-        with patch('ale.drivers.co_drivers.spice.bods2c', return_value=-12345) as bods2c, \
-             patch('ale.drivers.co_drivers.CassiniIssPds3LabelNaifSpiceDriver.target_frame_id', \
-                     new_callable=PropertyMock) as target_frame_id, \
-             patch('ale.drivers.co_drivers.CassiniIssPds3LabelNaifSpiceDriver.ephemeris_start_time', \
-                     new_callable=PropertyMock) as ephemeris_start_time:
-            ephemeris_start_time.return_value = .1
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[Exception()]) as spiceql_call, \
+             patch('ale.drivers.co_drivers.CassiniIssPds3LabelNaifSpiceDriver.sensor_frame_id', new_callable=PropertyMock) as sensor_frame_id, \
+             patch('ale.drivers.co_drivers.CassiniIssPds3LabelNaifSpiceDriver.target_frame_id', new_callable=PropertyMock) as target_frame_id, \
+             patch('ale.drivers.co_drivers.CassiniIssPds3LabelNaifSpiceDriver._original_naif_sensor_frame_id', new_callable=PropertyMock) as original_naif_sensor_frame_id, \
+             patch('ale.drivers.co_drivers.CassiniIssPds3LabelNaifSpiceDriver.center_ephemeris_time', new_callable=PropertyMock) as center_ephemeris_time, \
+             patch('ale.drivers.co_drivers.CassiniIssPds3LabelNaifSpiceDriver.ephemeris_time', new_callable=PropertyMock) as ephemeris_time:
+            sensor_frame_id.return_value = 14082360
             target_frame_id.return_value = -800
+            original_naif_sensor_frame_id.return_value = -12345
+            center_ephemeris_time.return_value = 2.4
+            ephemeris_time.return_value = [2.4]
             frame_chain = self.driver.frame_chain
             assert len(frame_chain.nodes()) == 2
             assert 14082360 in frame_chain.nodes()
             assert -12345 in frame_chain.nodes()
-            from_spice.assert_called_with(center_ephemeris_time=2.4, ephemeris_times=[2.4], sensor_frame=-12345, target_frame=-800, exact_ck_times=True)
+            from_spice.assert_called_with(center_ephemeris_time=2.4, ephemeris_times=[2.4], sensor_frame=-12345, target_frame=-800, exact_ck_times=True, nadir=False, inst_time_bias=0, mission='cassini', use_web=False, search_kernels=False)
 
     @patch('ale.transformation.FrameChain.from_spice', return_value=ale.transformation.FrameChain())
     def test_custom_frame_chain_iak(self, from_spice):
-        with patch('ale.drivers.co_drivers.spice.bods2c', return_value=-12345) as bods2c, \
-             patch('ale.drivers.co_drivers.CassiniIssPds3LabelNaifSpiceDriver.target_frame_id', \
-                     new_callable=PropertyMock) as target_frame_id, \
-             patch('ale.drivers.co_drivers.CassiniIssPds3LabelNaifSpiceDriver.ephemeris_start_time', \
-                     new_callable=PropertyMock) as ephemeris_start_time, \
-             patch('ale.drivers.co_drivers.spice.frinfo', return_value=True) as frinfo:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[0]) as spiceql_call, \
+             patch('ale.drivers.co_drivers.CassiniIssPds3LabelNaifSpiceDriver.target_frame_id', new_callable=PropertyMock) as target_frame_id, \
+             patch('ale.drivers.co_drivers.CassiniIssPds3LabelNaifSpiceDriver.ephemeris_start_time', new_callable=PropertyMock) as ephemeris_start_time:
             ephemeris_start_time.return_value = .1
             target_frame_id.return_value = -800
             frame_chain = self.driver.frame_chain
             assert len(frame_chain.nodes()) == 0
-            from_spice.assert_called_with(center_ephemeris_time=2.4, ephemeris_times=[2.4], nadir=False, sensor_frame=14082360, target_frame=-800, exact_ck_times=True,  inst_time_bias=0)
+            from_spice.assert_called_with(center_ephemeris_time=2.4, ephemeris_times=[2.4], nadir=False, sensor_frame=14082360, target_frame=-800, exact_ck_times=True,  inst_time_bias=0, mission='cassini', use_web=False, search_kernels=False)
 
 # ========= Test cassini ISS isislabel and naifspice driver =========
 class test_cassini_iss_isis_naif(unittest.TestCase):
@@ -174,15 +191,16 @@ class test_cassini_iss_isis_naif(unittest.TestCase):
         assert self.driver.sensor_name == "Imaging Science Subsystem Narrow Angle Camera"
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.co_drivers.spice.str2et', return_value=[12345]) as str2et:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12345
-            str2et.assert_called_with('2011-12-12 05:02:19.773000')
+            calls = [call('utcToEt', {'utc': '2011-12-12 05:02:19.773000', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
 
     def test_center_ephemeris_time(self):
-        with patch('ale.drivers.co_drivers.spice.str2et', return_value=[12345]) as str2et:
-            print(self.driver.exposure_duration)
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.center_ephemeris_time == 12347.3
-            str2et.assert_called_with('2011-12-12 05:02:19.773000')
+            calls = [call('utcToEt', {'utc': '2011-12-12 05:02:19.773000', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
 
     def test_odtk(self):
         assert self.driver.odtk == [0, -8e-06, 0]
@@ -190,9 +208,14 @@ class test_cassini_iss_isis_naif(unittest.TestCase):
     def test_focal_length(self):
         # This value isn't used for anything in the test, as it's only used for the
         # default focal length calculation if the filter can't be found.
-        with patch('ale.drivers.co_drivers.spice.gdpool', return_value=[10.0]) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
-             assert self.driver.focal_length == 2003.09
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, {"frameCode": -12345}, -12345, {"INS-12345_FOV_CENTER_PIXEL": [2003.09]}, {}]) as spiceql_call:
+            assert self.driver.focal_length == 2003.09
+            calls = [call('translateNameToCode', {'frame': 'Enceladus', 'mission': 'cassini', 'searchKernels': False}, False),
+                    call('getTargetFrameInfo', {'targetId': -12345, 'mission': 'cassini', 'searchKernels': False}, False),
+                    call('translateNameToCode', {'frame': 'CASSINI_ISS_NAC', 'mission': 'cassini', 'searchKernels': False}, False),
+                    call('findMissionKeywords', {'key': '*-12345*', 'mission': 'cassini', 'searchKernels': False}, False),
+                    call('findTargetKeywords', {'key': "*-12345*", 'mission': 'cassini', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
@@ -202,32 +225,40 @@ class test_cassini_iss_isis_naif(unittest.TestCase):
 
     @patch('ale.transformation.FrameChain.from_spice', return_value=ale.transformation.FrameChain())
     def test_custom_frame_chain(self, from_spice):
-        with patch('ale.drivers.co_drivers.spice.bods2c', return_value=-12345) as bods2c, \
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[Exception()]) as spiceql_call, \
+             patch('ale.drivers.co_drivers.CassiniIssIsisLabelNaifSpiceDriver.sensor_frame_id', \
+                    new_callable=PropertyMock) as sensor_frame_id, \
              patch('ale.drivers.co_drivers.CassiniIssIsisLabelNaifSpiceDriver.target_frame_id', \
-                     new_callable=PropertyMock) as target_frame_id, \
-             patch('ale.drivers.co_drivers.CassiniIssIsisLabelNaifSpiceDriver.ephemeris_start_time', \
-                     new_callable=PropertyMock) as ephemeris_start_time:
-            ephemeris_start_time.return_value = .1
+                    new_callable=PropertyMock) as target_frame_id, \
+             patch('ale.drivers.co_drivers.CassiniIssIsisLabelNaifSpiceDriver._original_naif_sensor_frame_id', \
+                    new_callable=PropertyMock) as original_naif_sensor_frame_id, \
+             patch('ale.drivers.co_drivers.CassiniIssIsisLabelNaifSpiceDriver.center_ephemeris_time', \
+                    new_callable=PropertyMock) as center_ephemeris_time, \
+             patch('ale.drivers.co_drivers.CassiniIssIsisLabelNaifSpiceDriver.ephemeris_time', \
+                    new_callable=PropertyMock) as ephemeris_time:
+            sensor_frame_id.return_value = 14082360
             target_frame_id.return_value = -800
+            original_naif_sensor_frame_id.return_value = -12345
+            center_ephemeris_time.return_value = 2.4
+            ephemeris_time.return_value = [2.4]
             frame_chain = self.driver.frame_chain
             assert len(frame_chain.nodes()) == 2
             assert 14082360 in frame_chain.nodes()
             assert -12345 in frame_chain.nodes()
-            from_spice.assert_called_with(center_ephemeris_time=2.4000000000000004, ephemeris_times=[2.4000000000000004], sensor_frame=-12345, target_frame=-800, exact_ck_times=True)
+            from_spice.assert_called_with(center_ephemeris_time=2.4, ephemeris_times=[2.4], sensor_frame=-12345, target_frame=-800, exact_ck_times=True, nadir=False, inst_time_bias=0, mission='cassini', use_web=False, search_kernels=False)
 
     @patch('ale.transformation.FrameChain.from_spice', return_value=ale.transformation.FrameChain())
     def test_custom_frame_chain_iak(self, from_spice):
-        with patch('ale.drivers.co_drivers.spice.bods2c', return_value=-12345) as bods2c, \
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[0]) as spiceql_call, \
              patch('ale.drivers.co_drivers.CassiniIssIsisLabelNaifSpiceDriver.target_frame_id', \
-                     new_callable=PropertyMock) as target_frame_id, \
+                    new_callable=PropertyMock) as target_frame_id, \
              patch('ale.drivers.co_drivers.CassiniIssIsisLabelNaifSpiceDriver.ephemeris_start_time', \
-                     new_callable=PropertyMock) as ephemeris_start_time, \
-             patch('ale.drivers.co_drivers.spice.frinfo', return_value=True) as frinfo:
+                    new_callable=PropertyMock) as ephemeris_start_time:
             ephemeris_start_time.return_value = .1
             target_frame_id.return_value = -800
             frame_chain = self.driver.frame_chain
             assert len(frame_chain.nodes()) == 0
-            from_spice.assert_called_with(center_ephemeris_time=2.4000000000000004, ephemeris_times=[2.4000000000000004], nadir=False, sensor_frame=14082360, target_frame=-800, exact_ck_times=True, inst_time_bias=0)
+            from_spice.assert_called_with(center_ephemeris_time=2.4000000000000004, ephemeris_times=[2.4000000000000004], nadir=False, sensor_frame=14082360, target_frame=-800, exact_ck_times=True, inst_time_bias=0, mission='cassini', use_web=False, search_kernels=False)
 
 # ========= Test cassini ISS pds3label and naifspice driver =========
 class test_cassini_vims_isis_naif(unittest.TestCase):
@@ -260,9 +291,9 @@ class test_cassini_vims_isis_naif(unittest.TestCase):
     def test_compute_vims_time(self):
         # This value isn't used for anything in the test, as it's only used for the
         # default focal length calculation if the filter can't be found.
-        with patch('ale.drivers.co_drivers.spice.scs2e', return_value=12345) as scs2e:
+        with patch('ale.base.data_naif.NaifSpice.spiceql_call', return_value=12345) as sclkToEt:
             assert self.driver.compute_vims_time(1, 1, self.driver.image_samples, "VIS")
-            scs2e.assert_called_with(-82, '1514284191')
+            sclkToEt.assert_called_with("strSclkToEt", {'frameCode': 12345, 'sclk': '1514284191', 'mission': 'cassini'})
 
     def test_ephemeris_start_time(self):
         with patch('ale.drivers.co_drivers.CassiniVimsIsisLabelNaifSpiceDriver.compute_vims_time', return_value=12345) as compute_vims_time:

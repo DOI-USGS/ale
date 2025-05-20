@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
         with:
           submodules: true
-      - uses: conda-incubator/setup-miniconda@d2e6a045a86077fb6cad6f5adf368e9076ddaa8d
+      - uses: conda-incubator/setup-miniconda@505e6394dae86d6a5c7fbb6e3fb8938e3e863830
         with:
           use-mamba: true
           channels: conda-forge
@@ -40,6 +40,8 @@ jobs:
           python setup.py install
       - name: Test Python Package
         run: |
+           mkdir spicedata/
+           export SPICEROOT=`pwd`/spicedata/
            pytest --cov-report=xml --cov=ale tests/pytests -vv
       - name: Build C++ Package
         run: |
@@ -69,7 +71,7 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
-      - uses: conda-incubator/setup-miniconda@3b0f2504dd76ef23b6d31f291f4913fb60ab5ff3
+      - uses: conda-incubator/setup-miniconda@505e6394dae86d6a5c7fbb6e3fb8938e3e863830
         with:
           miniforge-version: latest
           use-mamba: true
@@ -98,13 +100,13 @@ jobs:
       - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
         with:
           submodules: recursive
-      - uses: conda-incubator/setup-miniconda@3b0f2504dd76ef23b6d31f291f4913fb60ab5ff3
+      - uses: conda-incubator/setup-miniconda@505e6394dae86d6a5c7fbb6e3fb8938e3e863830
         with:
           miniforge-version: latest
           use-mamba: true
           channels: conda-forge
           activate-environment: ale
-          environment-file: environment.yml
+          environment-file: cpp_env.yml
           auto-activate-base: false
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
@@ -117,10 +119,10 @@ jobs:
           cd build
           cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON -G "Visual Studio 16 2019" -A x64 -DALE_BUILD_TESTS=OFF -DALE_BUILD_DOCS=OFF ..
           cmake --build . --target ALL_BUILD --config Release
-          ls D:\a\ale\ale\build\Release
+          ls C:\a\ale\ale\build\Release
       - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1
         with:
           name: ale-py${{ matrix.python-version }}
           path: |
-            D:\a\ale\ale\build\Release\ale.dll
-            D:\a\ale\ale\build\Release\ale.lib
+            C:\a\ale\ale\build\Release\ale.dll
+            C:\a\ale\ale\build\Release\ale.lib

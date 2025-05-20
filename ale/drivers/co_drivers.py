@@ -4,7 +4,7 @@ from glob import glob
 import numpy as np
 
 import pvl
-import spiceypy as spice
+from pyspiceql import pyspiceql
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
@@ -16,7 +16,6 @@ from ale.base.type_sensor import LineScanner
 
 from ale.rotation import ConstantRotation
 from ale.transformation import FrameChain
-from ale.util import query_kernel_pool
 from scipy.spatial.transform import Rotation
 
 vims_id_lookup = {
@@ -178,7 +177,9 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
         : float
           start time
         """
-        return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))[0]
+        if not hasattr(self, "_ephemeris_start_time"):
+            self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+        return self._ephemeris_start_time
 
     @property
     def center_ephemeris_time(self):
@@ -225,10 +226,10 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
         """
         # default focal defined by IAK kernel
         if not hasattr(self, "_focal_length"):
-            try:
-                default_focal_len = super(CassiniIssPds3LabelNaifSpiceDriver, self).focal_length
-            except:
-                default_focal_len = float(spice.gdpool('INS{}_DEFAULT_FOCAL_LENGTH'.format(self.ikid), 0, 2)[0])
+          try:
+            default_focal_len = float(self.naif_keywords['INS{}_FOCAL_LENGTH'.format(self.ikid)])
+          except:
+            default_focal_len = float(self.naif_keywords['INS{}_FOV_CENTER_PIXEL'.format(self.ikid)][0])
 
             filters = tuple(self.label["IsisCube"]["BandBin"]['FilterName'].split("/"))
 
@@ -289,14 +290,20 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
             try:
                 # Call frinfo to check if the ISIS iak has been loaded with the
                 # additional reference frame. Otherwise, Fail and add it manually
-                _ = spice.frinfo(self.sensor_frame_id)
+                _ = self.spiceql_call("getFrameInfo", {"frame": self.sensor_frame_id, "mission": self.spiceql_mission})
                 self._frame_chain = super().frame_chain
-            except spice.utils.exceptions.NotFoundError as e:
+            except Exception as e:
+                nadir = self._props.get('nadir', False)
+                exact_ck_times = self._props.get('exact_ck_times', True)
                 self._frame_chain = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
                                                           target_frame=self.target_frame_id,
                                                           center_ephemeris_time=self.center_ephemeris_time,
                                                           ephemeris_times=self.ephemeris_time,
-                                                          exact_ck_times=True)
+                                                          nadir=nadir, exact_ck_times=exact_ck_times,
+                                                          inst_time_bias=self.instrument_time_bias,
+                                                          mission=self.spiceql_mission,
+                                                          use_web=self.use_web,
+                                                          search_kernels=self.search_kernels)
 
                 rotation = ConstantRotation([[0, 0, 1, 0]], self.sensor_frame_id, self._original_naif_sensor_frame_id)
 
@@ -401,7 +408,7 @@ class CassiniVimsIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoD
         time = str(instrument_group["NativeStartTime"])
         int_time, decimal_time = str(time).split(".")
 
-        ephemeris_time = spice.scs2e(self.spacecraft_id, int_time)
+        ephemeris_time = self.spiceql_call("strSclkToEt", {"frameCode" : self.spacecraft_id, "sclk" : int_time, "mission" : self.spiceql_mission})
         ephemeris_time += float(decimal_time) / 15959.0
 
         ir_exp = float(instrument_group["ExposureDuration"][0]) * 1.01725 / 1000.0;
@@ -539,7 +546,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         : float
           focal epsilon
         """
-        return float(spice.gdpool('INS{}_FL_UNCERTAINTY'.format(self.ikid), 0, 1)[0])
+        return float(self.naif_keywords['INS{}_FL_UNCERTAINTY'.format(self.ikid)][0])
 
     @property
     def spacecraft_name(self):
@@ -566,7 +573,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
           focal plane to detector samples
         """
         # Microns to mm
-        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
+        pixel_size = float(self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]) * .001
         return [0.0, 1/pixel_size, 0.0]
 
     @property
@@ -580,7 +587,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         : list<double>
           focal plane to detector lines
         """
-        pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 0.001
+        pixel_size = float(self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]) * .001
         return [0.0, 0.0, 1/pixel_size]
 
     @property
@@ -653,18 +660,21 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
 
         """
         # default focal defined by IK kernel
-        try:
-            default_focal_len = super(CassiniIssPds3LabelNaifSpiceDriver, self).focal_length
-        except:
-            default_focal_len = float(spice.gdpool('INS{}_FOV_CENTER_PIXEL'.format(self.ikid), 0, 2)[0])
+        if not hasattr(self, "_focal_length"):
+          try:
+            default_focal_len = float(self.naif_keywords['INS{}_FOCAL_LENGTH'.format(self.ikid)])
+          except:
+            default_focal_len = float(self.naif_keywords['INS{}_FOV_CENTER_PIXEL'.format(self.ikid)][0])
 
-        filters = tuple(self.label['FILTER_NAME'])
+          filters = tuple(self.label['FILTER_NAME'])
 
-        if self.instrument_id == "CASSINI_ISS_NAC":
-          return nac_filter_to_focal_length.get(filters, default_focal_len)
+          if self.instrument_id == "CASSINI_ISS_NAC":
+            self._focal_length = nac_filter_to_focal_length.get(filters, default_focal_len)
 
-        elif self.instrument_id == "CASSINI_ISS_WAC":
-          return wac_filter_to_focal_length.get(filters, default_focal_len)
+          elif self.instrument_id == "CASSINI_ISS_WAC":
+            self._focal_length = wac_filter_to_focal_length.get(filters, default_focal_len)
+
+        return self._focal_length
 
     @property
     def _original_naif_sensor_frame_id(self):
@@ -716,14 +726,20 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
             try:
                 # Call frinfo to check if the ISIS iak has been loaded with the
                 # additional reference frame. Otherwise, Fail and add it manually
-                _ = spice.frinfo(self.sensor_frame_id)
+                _ = self.spiceql_call("getFrameInfo", {"frame": self.sensor_frame_id, "mission": self.spiceql_mission})
                 self._frame_chain = super().frame_chain
-            except spice.utils.exceptions.NotFoundError as e:
+            except Exception as e:
+                nadir = self._props.get('nadir', False)
+                exact_ck_times = self._props.get('exact_ck_times', True)
                 self._frame_chain = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
                                                           target_frame=self.target_frame_id,
                                                           center_ephemeris_time=self.center_ephemeris_time,
                                                           ephemeris_times=self.ephemeris_time,
-                                                          exact_ck_times=True)
+                                                          nadir=nadir, exact_ck_times=exact_ck_times,
+                                                          inst_time_bias=self.instrument_time_bias,
+                                                          mission=self.spiceql_mission,
+                                                          use_web=self.use_web,
+                                                          search_kernels=self.search_kernels)
 
                 rotation = ConstantRotation([[0, 0, 1, 0]], self.sensor_frame_id, self._original_naif_sensor_frame_id)
 

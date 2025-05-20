@@ -2,118 +2,159 @@ import os
 from os import path
 
 from glob import glob
-from itertools import filterfalse, groupby
+from itertools import chain, filterfalse, groupby
 import warnings
 
 import pvl
 
-import collections
 from collections import OrderedDict
 try:
     from collections.abc import Mapping
 except ImportError:
     from collections import Mapping
-from itertools import chain
 from datetime import datetime
 import pytz
-import numpy as np
 
 import subprocess
 import re
 import networkx as nx
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
-import spiceypy as spice
 
-from ale import spice_root
-
-def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=set()):
+class CachedDict():
     """
-    Given a root directory, get any subdirectory containing metakernels,
-    assume spice directory structure.
-
-    Mostly doing filtering here, might be worth using Pandas?
-
-    Parameters
-    ----------
-    spice_dir : str
-                Path containing Spice directories downloaded from NAIF's website
-
-    missions : set, str
-               Mission or set of missions to search for
-
-    years : set, str, int
-            year or set of years to search for
-
-    versions : set, str
-               version or set of versions to search for
+    A subclass of dict that tracks the accessed keys.
     """
-    if not missions or missions == "all":
-        missions = set()
-    if not years or years == "all":
-        years = set()
-    if not versions or versions == "all":
-        versions = set()
 
-    if isinstance(missions, str):
-        missions = {missions}
+    def __init__(self, **kwargs):
+        """
+        Initialize the CachedDict object.
 
-    if isinstance(years, str) or isinstance(years, int):
-        years = {str(years)}
-    else:
-        years = {str(year) for year in years}
+        Parameters
+        ----------
+        *args : positional arguments
+            Variable length argument list.
+        **kwargs : keyword arguments
+            Arbitrary keyword arguments.
+        """
+        self.data = dict(**kwargs)
+        self.accessed_keys = set()
+    
 
-    avail = {
-        'count': 0,
-        'data': []
-    }
+    def __str__(self): 
+        """
+        to string function 
 
-    missions = [m.lower() for m in missions]
-    if spice_dir is not None:
-        mission_dirs = list(filter(path.isdir, glob(path.join(spice_dir, '*'))))
-    else:
-        warnings.warn("Unable to search mission directories without" +
-                      "ALESPICEROOT being set. Defaulting to empty list")
-        mission_dirs = []
+        Returns
+        -------
+        str
+           str representation of dictionary with filtered items
+        """
+        return str(self.to_dict)
+ 
 
-    for md in mission_dirs:
-        # Assuming spice root has the same name as the original on NAIF website"
-        mission = os.path.basename(md).split('-')[0].split('_')[0]
-        if missions and all([m not in mission.lower() for m in missions]):
-            continue
+    def __getitem__(self, key):
+        """
+        Get the value corresponding to the given key.
 
-        metakernel_keys = ['mission', 'year', 'version', 'path']
+        Parameters
+        ----------
+        key
+            The key to retrieve the value for.
 
-        # recursive glob to make metakernel search more robust to subtle directory structure differences
-        metakernel_paths = sorted(glob(os.path.join(md, '**','*.[Tt][Mm]'), recursive=True))
+        Returns
+        -------
+        value
+            The value corresponding to the key.
+        """
+        self.accessed_keys.add(key)
+        return self.data.__getitem__(key)
 
-        metakernels = []
-        for k in metakernel_paths:
-            components = path.splitext(path.basename(k))[0].split('_') + [k]
-            if len(components) == 3:
-                components.insert(1, 'N/A')
+    def __setitem__(self, key, value):
+        """
+        Set the value for the given key.
 
-            metakernels.append(dict(zip(metakernel_keys, components)))
+        Parameters
+        ----------
+        key
+            The key to set the value for.
+        value
+            The value to be set.
+        """
+        return self.data.__setitem__(key, value)
 
-        # naive filter, do we really need anything else?
-        if years:
-            metakernels = list(filter(lambda x:x['year'] in years or x['year'] == 'N/A', metakernels))
-        if versions:
-            if versions == 'latest':
-                latest = []
-                # Panda's groupby is overrated
-                for k, g in groupby(metakernels, lambda x:x['year']):
-                    items = list(g)
-                    latest.append(max(items, key=lambda x:x['version']))
-                metakernels = latest
-            else:
-                metakernels = list(filter(lambda x:x['version'] in versions, metakernels))
+    def __delitem__(self, key):
+        """
+        Delete the value corresponding to the given key.
 
-        avail['data'].extend(metakernels)
+        Parameters
+        ----------
+        key
+            The key to delete.
+        """
+        self.accessed_keys.remove(key)
+        return self.data.__delitem__(key)
 
-    avail['count'] = len(avail['data'])
+    def keys(self):
+        """
+        Get the list of keys that have been accessed.
 
-    return avail
+        Returns
+        -------
+        list
+            A list of keys.
+        """
+        return list(self.accessed_keys)
+
+    def values(self):
+        """
+        Get the list of values corresponding to the accessed keys.
+
+        Returns
+        -------
+        list
+            A list of values.
+        """
+        return [self[key] for key in self.accessed_keys if key in self]
+
+    def items(self):
+        """
+        Get the list of key-value pairs corresponding to the accessed keys.
+
+        Returns
+        -------
+        list
+            A list of key-value pairs.
+        """
+        return [(key, self.data[key]) for key in self.accessed_keys if key in self]
+
+    def is_key_accessed(self, key):
+        """
+        Check if a key has been accessed or not.
+
+        Parameters
+        ----------
+        key
+            The key to check.
+
+        Returns
+        -------
+        bool
+            True if the key has been accessed, False otherwise.
+        """
+        return key in self.accessed_keys
+
+
+    def to_dict(self): 
+        """
+        returns a dictionary of only keys accessed
+        
+        Returns 
+        -------
+        dict 
+            Dictionary of just the keys accessed     
+        """
+        return dict(zip(self.keys(), self.values()))
 
 
 def find_latest_metakernel(path, year):
@@ -178,6 +219,8 @@ def dict_merge(dct, merge_dct):
 
     return new_dct
 
+def dict_to_lower(d):
+    return {k.lower():v if not isinstance(v, dict) else dict_to_lower(v) for k,v in d.items()}
 
 def get_isis_preferences(isis_preferences=None):
     """
@@ -474,6 +517,7 @@ def get_ck_frames(kernel):
     # Sort the output list for testability
     return sorted(list(ids))
 
+
 def create_spk_dependency_tree(kernels):
     """
     Construct the dependency tree for the body states in a set of kernels.
@@ -506,6 +550,7 @@ def create_spk_dependency_tree(kernels):
             dep_tree.add_edge(int(body), int(rel_body), kernel=kernel)
 
     return dep_tree
+
 
 def spkmerge_config_string(dep_tree, output_spk, bodies, lsk, start, stop):
     """
@@ -555,6 +600,7 @@ def spkmerge_config_string(dep_tree, output_spk, bodies, lsk, start, stop):
         config += f"      INCLUDE_COMMENTS = no\n"
     return config
 
+
 def write_metakernel_from_kernel_list(kernels):
     """
     Parameters
@@ -589,69 +635,6 @@ def write_metakernel_from_kernel_list(kernels):
         ])
 
     return body
-
-
-
-def duckpool(naifvar, start=0, length=10, default=None):
-    """
-    Duck typing friendly version of spiceypy kernel pool functions.
-
-    Parameters
-    ----------
-    naifvar : str
-              naif var string to query pool for
-
-    start : int
-            Index of first value
-
-    length : int
-             max number of values returned
-
-    default : obj
-              Default value to return if key is not found in kernel pool
-
-    Returns
-    -------
-    : obj
-      Spice value returned from spiceypy if found, default value otherwise
-
-    """
-    for f in [spice.gdpool, spice.gcpool, spice.gipool]:
-        try:
-            val = f(naifvar, start, length)
-            return val[0] if  len(val) == 1 else val
-        except:
-            continue
-    return default
-
-
-def query_kernel_pool(matchstr="*", max_length=10):
-    """
-    Collect multiple keywords from the naif kernel pool based on a
-    template string
-
-    Parameters
-    ----------
-    matchstr : str
-               matchi_c formatted str
-
-    max_length : int
-                 maximum length array to get from naif keywords
-
-    Returns
-    -------
-    : dict
-      python dictionary of naif keywords in {keyword:value} format.
-    """
-
-    try:
-        svars = spice.gnpool(matchstr, 0, 100)
-    except Exception as e:
-        warnings.warn(f"kernel search for {matchstr} failed with {e}")
-        svars = []
-
-    svals = [duckpool(v, length=max_length) for v in svars]
-    return dict(zip(svars, svals))
 
 
 def read_pvl(path, use_jank=False):
@@ -920,6 +903,25 @@ def search_isis_db(dbobj, labelobj, isis_data):
     return kernels
 
 
+def expandvars(path, env_dict=os.environ, default=None, case_sensitive=True):
+    if env_dict != os.environ:
+        env_dict = dict_merge(env_dict, os.environ)
+
+    while "$" in path:
+        user_dict = env_dict if case_sensitive else dict_to_lower(env_dict)
+
+        def replace_var(m):
+            group1 = m.group(1) if case_sensitive else m.group(1).lower()
+            val = user_dict.get(m.group(2) or group1 if default is None else default)
+            if not val:
+                raise KeyError(f"Failed to evaluate {m.group(0)} from env_dict. " + 
+                               f"Should {m.group(0)} be an environment variable?")
+
+            return val
+        reVar = r'\$(\w+|\{([^}]*)\})'
+        path = re.sub(reVar, replace_var, path)
+    return path
+
 def find_kernels(cube, isis_data, format_as=dict):
     """
     Find all kernels for a cube and return a json object with categorized kernels.
@@ -1014,3 +1016,4 @@ def find_kernels(cube, isis_data, format_as=dict):
     else:
         warnings.warn(f"{format_as} is not a valid format, returning as dict")
         return kernels
+    

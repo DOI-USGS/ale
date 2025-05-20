@@ -1,0 +1,4 @@
+This CK is for testing with the image: /home/ec2-user/FRT00003B73_01_IF156S_TRR2_isis3.lbl
+
+This CK was generated using the following command: {}
+ckslicer -LSK /home/ec2-user/efs_prod/isis_data/base/kernels/lsk/naif0012.tls -SCLK /home/ec2-user/efs_prod/isis_data/mro/kernels/sclk/MRO_SCLKSCET.00112.65536.tsc -INPUTCK /home/ec2-user/efs_prod/isis_data/mro/kernels/ck/mro_sc_psp_070102_070108.bc -OUTPUTCK /home/ec2-user/test_kernels/mro_sc_psp_070102_070108_1_sliced_-74000.bc -ID -74000 -TIMETYPE SCLK -START 2/0852246539.022 -STOP 2/0852246779.089

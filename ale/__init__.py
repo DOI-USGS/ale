@@ -2,6 +2,8 @@ import os
 import warnings
 from pkg_resources import get_distribution, DistributionNotFound
 
+warnings.filterwarnings("ignore")
+
 
 try:
     _dist = get_distribution('ale')

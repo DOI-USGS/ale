@@ -1,4 +1,3 @@
-import spiceypy as spice
 
 import ale
 from ale.base.data_naif import NaifSpice
@@ -50,7 +49,7 @@ class VoyagerCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDist
 
     @property
     def pixel_size(self):
-        return spice.gdpool('INS{}_PIXEL_PITCH'.format(self.ikid), 0, 1)[0]
+        return self.naif_keywords['INS{}_PIXEL_PITCH'.format(self.ikid)][0]
 
     @property
     def detector_center_sample(self):
@@ -62,12 +61,13 @@ class VoyagerCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDist
 
     @property
     def ephemeris_start_time(self):
-        inital_time = spice.utc2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
-        # To get shutter end (close) time, subtract 2 seconds from the start time
-        updated_time = inital_time - 2
-        # To get shutter start (open) time, take off the exposure duration from the end time.
-        start_time = updated_time - self.exposure_duration
-        return start_time
+        if not hasattr(self, "_ephemeris_start_time"):
+            self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+            # To get shutter end (close) time, subtract 2 seconds from the start time
+            self._ephemeris_start_time -= 2
+            # To get shutter start (open) time, take off the exposure duration from the end time.
+            self._ephemeris_start_time -= self.exposure_duration
+        return self._ephemeris_start_time
 
     @property
     def ephemeris_stop_time(self):

@@ -43,7 +43,7 @@ class LineScanner():
           Exposure durations
         """
         t0_ephemeris = self.ephemeris_start_time - self.center_ephemeris_time
-        return [0.5], [t0_ephemeris], [self.exposure_duration]
+        return [[0.5], [t0_ephemeris], [self.exposure_duration]]
 
     @property
     def ephemeris_time(self):
@@ -228,10 +228,10 @@ class Framer():
 
         Returns
         -------
-        : double
+        : ndarray
           Center ephemeris time for the image
         """
-        return [self.center_ephemeris_time]
+        return np.array([self.center_ephemeris_time])
 
     @property
     def ephemeris_stop_time(self):
@@ -566,7 +566,10 @@ class Cahvor():
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
                                                       ephemeris_times=self.ephemeris_time,
-                                                      nadir=nadir, exact_ck_times=False)
+                                                      nadir=nadir, exact_ck_times=False,
+                                                      mission=self.spiceql_mission,
+                                                      use_web=self.use_web,
+                                                      search_kernels=self.search_kernels)
             cahvor_quats = Rotation.from_matrix(self.cahvor_rotation_matrix).as_quat()
             
             if nadir:

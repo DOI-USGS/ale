@@ -1,5 +1,4 @@
 import numpy as np
-import spiceypy as spice
 
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
@@ -97,7 +96,9 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         : int
           Naif frame code for MSL_ROVER
         """
-        return spice.bods2c("MSL_ROVER")
+        if not hasattr(self, "_final_inst_frame"):
+          self._final_inst_frame = self.spiceql_call("translateNameToCode", {"frame": "MSL_ROVER", "mission": self.spiceql_mission})
+        return self._final_inst_frame
 
     @property
     def sensor_frame_id(self):
@@ -113,7 +114,7 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         """
         if not hasattr(self, "_site_frame_id"):
           site_frame = "MSL_SITE_" + str(self.label["GEOMETRIC_CAMERA_MODEL_PARMS"]["REFERENCE_COORD_SYSTEM_INDEX"][0])
-          self._site_frame_id= spice.bods2c(site_frame)
+          self._site_frame_id = self.spiceql_call("translateNameToCode", {"frame": site_frame, "mission": self.spiceql_mission})
         return self._site_frame_id
 
     @property

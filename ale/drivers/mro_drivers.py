@@ -1,6 +1,3 @@
-import numpy as np
-import spiceypy as spice
-
 from ale.base import Driver
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
@@ -9,8 +6,11 @@ from ale.base.label_isis import IsisLabel
 from ale.base.type_distortion import RadialDistortion, NoDistortion
 from ale.base.type_sensor import LineScanner
 from ale.base.type_distortion import NoDistortion
+from ale.util import CachedDict
 
 from ale import util
+
+import numpy as np
 
 class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
 
@@ -54,7 +54,7 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
           Naif ID used to for identifying the instrument in Spice kernels
         """
         if not hasattr(self, "_base_ikid"):
-            self._base_ikid = spice.bods2c("MRO_MARCI")
+            self._base_ikid = self.spiceql_call("translateNameToCode", {"frame": "MRO_MARCI", "mission": self.spiceql_mission})
         return self._base_ikid
 
     @property
@@ -225,7 +225,7 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
         : list<double>
           focal plane to detector samples
         """
-        return list(spice.gdpool('INS{}_ITRANSS'.format(self.base_ikid), 0, 3))
+        return self.naif_keywords['INS{}_ITRANSS'.format(self.base_ikid)]
 
     @property
     def focal2pixel_lines(self):
@@ -237,7 +237,7 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
         : list<double>
           focal plane to detector lines
         """
-        return list(spice.gdpool('INS{}_ITRANSL'.format(self.base_ikid), 0, 3))
+        return self.naif_keywords['INS{}_ITRANSL'.format(self.base_ikid)]
 
     @property
     def naif_keywords(self):
@@ -250,7 +250,7 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
         : dict
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
-        return {**super().naif_keywords, **util.query_kernel_pool(f"*{self.base_ikid}*")}
+        return {**super().naif_keywords, **self.spiceql_call("findMissionKeywords", {"key": f"*{self.base_ikid}*", "mission": self.spiceql_mission})}
 
     @property
     def sensor_name(self):
@@ -349,23 +349,6 @@ class MroCtxIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDi
         ISIS doesn't propergate this to the ingested cube label, so hard-code it.
         """
         return "CONTEXT CAMERA"
-
-    @property
-    def ephemeris_start_time(self):
-        """
-        Returns the ephemeris start time of the image.
-        Expects spacecraft_id to be defined. This should be the integer
-        Naif ID code for the spacecraft.
-
-        Returns
-        -------
-        : float
-          ephemeris start time of the image
-        """
-        if not hasattr(self, '_ephemeris_start_time'):
-            sclock = self.label['IsisCube']['Instrument']['SpacecraftClockCount']
-            self._ephemeris_start_time = spice.scs2e(self.spacecraft_id, sclock)
-        return self._ephemeris_start_time
 
     @property
     def ephemeris_stop_time(self):
@@ -519,6 +502,7 @@ class MroCtxPds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDi
         """
         return self.label['SPACECRAFT_NAME']
 
+
 hirise_ccd_lookup = {
   0: 0,
   1: 1,
@@ -601,7 +585,7 @@ class MroHiRiseIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radia
 
             # The -74999 is the code to select the transformation from
             # high-precision MRO SCLK to ET
-            start_time = spice.scs2e(-74999, self.spacecraft_clock_start_count)
+            start_time = self.spiceql_call("strSclkToEt", {"frameCode": -74999, "sclk": self.spacecraft_clock_start_count, "mission": self.spiceql_mission})
             # Adjust the start time so that it is the effective time for
             # the first line in the image file.  Note that on 2006-03-29, this
             # time is now subtracted as opposed to adding it.  The computed start
@@ -641,7 +625,7 @@ class MroHiRiseIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radia
         """
         if not hasattr(self, "_ccd_ikid"):
             ccd_number = hirise_ccd_lookup[self.label["IsisCube"]["Instrument"]["CpmmNumber"]]
-            self._ccd_ikid = spice.bods2c("MRO_HIRISE_CCD{}".format(ccd_number))
+            self._ccd_ikid = self.spiceql_call("translateNameToCode", {"frame": "MRO_HIRISE_CCD{}".format(ccd_number), "mission": self.spiceql_mission})
         return self._ccd_ikid
 
     @property
@@ -695,7 +679,10 @@ class MroHiRiseIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radia
         : dict
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
-        return {**super().naif_keywords, **util.query_kernel_pool(f"*{self.ccd_ikid}*")}
+        if not hasattr(self, "_mrohirise_naif_keywords"):
+            _mrohirise_naif_keywords = {**super().naif_keywords, **self.spiceql_call("findMissionKeywords", {"key": f"*{self.ccd_ikid}*", "mission": self.spiceql_mission})}
+        return _mrohirise_naif_keywords
+
 
     @property
     def sensor_model_version(self):
@@ -749,7 +736,9 @@ class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
         : double
           Starting ephemeris time of the image
         """
-        return spice.scs2e(-74999, self.spacecraft_clock_start_count)
+        if not hasattr(self, "_ephemeris_start_time"):
+            self._ephemeris_start_time = self.spiceql_call("strSclkToEt", {"frameCode": -74999, "sclk": self.spacecraft_clock_start_count, "mission": self.spiceql_mission})
+        return self._ephemeris_start_time
 
     @property
     def ephemeris_stop_time(self):
@@ -765,7 +754,9 @@ class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
         : double
           Ephemeris stop time of the image
         """
-        return spice.scs2e(-74999, self.spacecraft_clock_stop_count)
+        if not hasattr(self, "_ephemeris_stop_time"):
+            self._ephemeris_stop_time = self.spiceql_call("strSclkToEt", {"frameCode": -74999, "sclk": self.spacecraft_clock_stop_count, "mission": self.spiceql_mission})
+        return self._ephemeris_stop_time
 
     @property
     def spacecraft_name(self):

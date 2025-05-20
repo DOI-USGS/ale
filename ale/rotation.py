@@ -154,7 +154,7 @@ class TimeDependentRotation:
         rot = Rotation.from_euler(sequence, np.asarray(euler), degrees=degrees)
         return TimeDependentRotation(rot.as_quat(), times, source, dest)
 
-    def __init__(self, quats, times, source, dest, av=None):
+    def __init__(self, quats, times, source, dest, av=[]):
         """
         Construct a time dependent rotation
 
@@ -181,10 +181,10 @@ class TimeDependentRotation:
         self.dest = dest
         self.quats = quats
         self.times = np.atleast_1d(times)
-        if av is not None:
+        if len(av) != 0:
             self.av = np.asarray(av)
         else:
-            self.av = av
+            self.av = None
 
     def __repr__(self):
         return f'Time Dependent Rotation Source: {self.source}, Destination: {self.dest}, Quats: {self.quats}, AV: {self.av}, Times: {self.times}'
@@ -239,7 +239,7 @@ class TimeDependentRotation:
         if self.av is not None:
             new_av = -self._rots.apply(self.av)
         else:
-            new_av = None
+            new_av = []
         return TimeDependentRotation(self._rots.inv().as_quat(), self.times, self.dest, self.source, av=new_av)
 
     def _slerp(self, times):
@@ -348,7 +348,7 @@ class TimeDependentRotation:
                 other_inverse = other._rot.inv()
                 new_av = np.asarray([other_inverse.apply(av) for av in self.av])
             else:
-                new_av = None
+                new_av = []
             return TimeDependentRotation((self._rots * other._rot).as_quat(), self.times, other.source, self.dest, av=new_av)
         elif isinstance(other, TimeDependentRotation):
             merged_times = np.union1d(np.asarray(self.times), np.asarray(other.times))

@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import os
 import unittest
-from unittest.mock import MagicMock, PropertyMock, patch
+from unittest.mock import PropertyMock, patch, call
 import spiceypy as spice
 import json
 
@@ -24,9 +24,8 @@ def test_nac_load(test_nac_kernels):
     label_file = get_image_label('m0402852', 'isis')
     compare_dict = get_isd("mgsmocna")
 
-    isd_str = ale.loads(label_file, props={'kernels': test_nac_kernels}, verbose=True)
+    isd_str = ale.loads(label_file, props={'kernels': test_nac_kernels})
     isd_obj = json.loads(isd_str)
-    print(json.dumps(isd_obj, indent=2))
     assert compare_dicts(isd_obj, compare_dict) == []
 
 
@@ -59,14 +58,20 @@ class test_wac_isis3_naif(unittest.TestCase):
         assert self.driver.sensor_name == "MGS_MOC_WA_RED"
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.mgs_drivers.spice.scs2e', return_value=1234) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-94, 1234]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 1234
-            scs2e.assert_called_with(-94, "561812335:32")
+            calls = [call('translateNameToCode', {'frame': 'MARS GLOBAL SURVEYOR', 'mission': 'mgs', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': -94, 'sclk': '561812335:32', 'mission': 'mgs', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 2
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.drivers.mgs_drivers.spice.scs2e', return_value=1234) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-94, 1234]) as spiceql_call:
             assert self.driver.ephemeris_stop_time == 1541.2
-            scs2e.assert_called_with(-94, "561812335:32")
+            calls = [call('translateNameToCode', {'frame': 'MARS GLOBAL SURVEYOR', 'mission': 'mgs', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': -94, 'sclk': '561812335:32', 'mission': 'mgs', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 2
 
 
     def test_detector_start_sample(self):
@@ -74,15 +79,14 @@ class test_wac_isis3_naif(unittest.TestCase):
        
 
     def test_detector_center_sample(self):
-        with patch('ale.drivers.mgs_drivers.spice.gdpool', return_value=[1727.5]) as gdpool:
+        with patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-94032_CENTER": [1727.5, 0]}
             assert self.driver.detector_center_sample == 1727.5
-            gdpool.assert_called_with('INS-94032_CENTER', 0, 1)
-
 
     def test_detector_center_line(self):
-        with patch('ale.drivers.mgs_drivers.spice.gdpool', return_value=[0, 1727.5]) as gdpool:
+        with patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-94032_CENTER": [0, 1727.5]}
             assert self.driver.detector_center_line == 1727.5
-            gdpool.assert_called_with('INS-94032_CENTER', 0, 2)
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
@@ -108,30 +112,34 @@ class test_nac_isis3_naif(unittest.TestCase):
         assert self.driver.sensor_name == "MGS_MOC_NA"
 
     def test_ephemeris_start_time(self):
-        with patch('ale.drivers.mgs_drivers.spice.scs2e', return_value=1234) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-94, 1234]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 1234
-            scs2e.assert_called_with(-94, "619971158:28")
+            calls = [call('translateNameToCode', {'frame': 'MARS GLOBAL SURVEYOR', 'mission': 'mgs', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': -94, 'sclk': '619971158:28', 'mission': 'mgs', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 2
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.drivers.mgs_drivers.spice.scs2e', return_value=1234) as scs2e:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-94, 1234]) as spiceql_call:
             assert self.driver.ephemeris_stop_time == 1239.9240448
-            scs2e.assert_called_with(-94, "619971158:28")
-
+            calls = [call('translateNameToCode', {'frame': 'MARS GLOBAL SURVEYOR', 'mission': 'mgs', 'searchKernels': False}, False),
+                     call('strSclkToEt', {'frameCode': -94, 'sclk': '619971158:28', 'mission': 'mgs', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 2
 
     def test_detector_start_sample(self):
         assert self.driver.detector_start_sample == 1
        
 
     def test_detector_center_sample(self):
-        with patch('ale.drivers.mgs_drivers.spice.gdpool', return_value=[1727.5]) as gdpool:
+        with patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-94031_CENTER": [1727.5, 0]}
             assert self.driver.detector_center_sample == 1727.5
-            gdpool.assert_called_with('INS-94031_CENTER', 0, 1)
-
 
     def test_detector_center_line(self):
-        with patch('ale.drivers.mgs_drivers.spice.gdpool', return_value=[0, 1727.5]) as gdpool:
+        with patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-94031_CENTER": [0, 1727.5]}
             assert self.driver.detector_center_line == 1727.5
-            gdpool.assert_called_with('INS-94031_CENTER', 0, 2)
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1

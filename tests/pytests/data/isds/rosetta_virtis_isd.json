@@ -2290,7 +2290,7 @@
       2.0,
       3.0
     ],
-    "INS-226213_SWAP_OBSERVER_TARGET": "TRUE",
+    "INS-226213_SWAP_OBSERVER_TARGET": true,
     "TKFRAME_-226213_SPEC": "ANGLES",
     "INS-226213_CCD_CENTER": [
       128.5,
@@ -2321,7 +2321,7 @@
       26.315789473684,
       0.0
     ],
-    "INS-226213_LT_SURFACE_CORRECT": "FALSE",
+    "INS-226213_LT_SURFACE_CORRECT": false,
     "INS-226213_ITRANSS": [
       0.0,
       0.0,

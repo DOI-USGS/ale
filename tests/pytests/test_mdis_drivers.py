@@ -5,7 +5,7 @@ import spiceypy as spice
 from importlib import reload
 import json
 import unittest
-from unittest.mock import patch
+from unittest.mock import PropertyMock, patch, call
 
 from conftest import get_image, get_image_label, get_isd, get_image_kernels, convert_kernels, compare_dicts
 import ale
@@ -55,7 +55,7 @@ class test_pds3_naif(unittest.TestCase):
         assert self.driver.spacecraft_name == 'MESSENGER'
 
     def test_fikid(self):
-        with patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+        with patch('ale.base.data_naif.NaifSpice.spiceql_call', return_value=-12345) as bods2c:
             assert self.driver.spacecraft_name == 'MESSENGER'
 
     def test_instrument_id(self):
@@ -65,10 +65,13 @@ class test_pds3_naif(unittest.TestCase):
         assert self.driver.sampling_factor == 2
 
     def test_focal_length(self):
-        with patch('ale.drivers.mess_drivers.spice.gdpool', return_value=np.array([pow(4.07, -x) for x in np.arange(6)])) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
+             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-12345_FL_TEMP_COEFFS": np.array([pow(4.07, -x) for x in np.arange(6)])}
             assert self.driver.focal_length == pytest.approx(6.0)
-            gdpool.assert_called_with('INS-12345_FL_TEMP_COEFFS', 0, 6)
+            calls = [call('translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_detector_center_sample(self):
         assert self.driver.detector_center_sample == 512
@@ -80,19 +83,26 @@ class test_pds3_naif(unittest.TestCase):
         assert self.driver.sensor_model_version == 2
 
     def test_usgscsm_distortion_model(self):
-        with patch('ale.drivers.mess_drivers.spice.gdpool', side_effect=[np.array([1, 2, 3, 4, 5]), np.array([-1, -2, -3, -4, -5])]) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
+             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-12345_OD_T_X": [1, 2, 3, 4, 5],
+                                          "INS-12345_OD_T_Y": [-1, -2, -3, -4, -5]}
             assert self.driver.usgscsm_distortion_model == {"transverse" : {
                                                                 "x" : [1, 2, 3, 4, 5],
                                                                 "y" : [-1, -2, -3, -4, -5]}}
-
+            calls = [call('translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
 
     def test_pixel_size(self):
-        with patch('ale.drivers.mess_drivers.spice.gdpool', return_value=np.array([0.1])) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
+             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-12345_PIXEL_PITCH": np.array([0.1])}
             assert self.driver.pixel_size == 0.1
-            gdpool.assert_called_with('INS-12345_PIXEL_PITCH', 0, 1)
+            calls = [call('translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
 # ========= Test ISIS3 Label and NAIF Spice driver =========
 class test_isis3_naif(unittest.TestCase):
@@ -108,7 +118,7 @@ class test_isis3_naif(unittest.TestCase):
         assert self.driver.platform_name == 'MESSENGER'
 
     def test_fikid(self):
-        with patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+        with patch('ale.base.data_naif.NaifSpice.spiceql_call', return_value=-12345) as bods2c:
             assert self.driver.spacecraft_name == 'MESSENGER'
 
     def test_instrument_id(self):
@@ -118,37 +128,54 @@ class test_isis3_naif(unittest.TestCase):
         assert self.driver.sampling_factor == 2
 
     def test_focal_length(self):
-        with patch('ale.drivers.mess_drivers.spice.gdpool', return_value=np.array([pow(4.07, -x) for x in np.arange(6)])) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
+             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-12345_FL_TEMP_COEFFS": np.array([pow(4.07, -x) for x in np.arange(6)])}
             assert self.driver.focal_length == pytest.approx(6.0)
-            gdpool.assert_called_with('INS-12345_FL_TEMP_COEFFS', 0, 6)
+            calls = [call('translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_detector_center_sample(self):
-        with patch('ale.drivers.mess_drivers.spice.gdpool', return_value=np.array([512.5, 512.5, 1])) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
+             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-12345_CCD_CENTER": np.array([512.5, 512.5, 1])}
             assert self.driver.detector_center_sample == 512
-            gdpool.assert_called_with('INS-12345_CCD_CENTER', 0, 3)
+            calls = [call('translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_detector_center_line(self):
-        with patch('ale.drivers.mess_drivers.spice.gdpool', return_value=np.array([512.5, 512.5, 1])) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
+             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-12345_CCD_CENTER": np.array([512.5, 512.5, 1])}
             assert self.driver.detector_center_line == 512
-            gdpool.assert_called_with('INS-12345_CCD_CENTER', 0, 3)
+            calls = [call('translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 2
 
     def test_usgscsm_distortion_model(self):
-        with patch('ale.drivers.mess_drivers.spice.gdpool', side_effect=[np.array([1, 2, 3, 4, 5]), np.array([-1, -2, -3, -4, -5])]) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
+             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-12345_OD_T_X": [1, 2, 3, 4, 5],
+                                          "INS-12345_OD_T_Y": [-1, -2, -3, -4, -5]}
             assert self.driver.usgscsm_distortion_model == {"transverse" : {
                                                                 "x" : [1, 2, 3, 4, 5],
                                                                 "y" : [-1, -2, -3, -4, -5]}}
+            calls = [call('translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1
 
 
 
     def test_pixel_size(self):
-        with patch('ale.drivers.mess_drivers.spice.gdpool', return_value=np.array([0.1])) as gdpool, \
-             patch('ale.base.data_naif.spice.bods2c', return_value=-12345) as bods2c:
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
+             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-12345_PIXEL_PITCH": np.array([0.1])}
             assert self.driver.pixel_size == 0.1
-            gdpool.assert_called_with('INS-12345_PIXEL_PITCH', 0, 1)
+            calls = [call('translateNameToCode', {'frame': 'MSGR_MDIS_NAC', 'mission': 'mdis', 'searchKernels': False}, False)]
+            spiceql_call.assert_has_calls(calls)
+            assert spiceql_call.call_count == 1

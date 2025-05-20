@@ -1,4 +1,3 @@
-import spiceypy as spice
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
@@ -98,15 +97,20 @@ class HayabusaNirsIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDisto
     @property
     def ephemeris_stop_time(self):
         """
-        Returns the exposure duration of the instrument
+        Returns the ephemeris stop time of the image. Expects spacecraft_id to
+        be defined. This must be the integer Naif Id code for the spacecraft.
+        Expects spacecraft_clock_stop_count to be defined. This must be a string
+        containing the stop clock count of the spacecraft
 
         Returns
         -------
-        : str
-          Exposure Duration
+        : double
+          Ephemeris stop time of the image
         """
         
-        return spice.scs2e(self.spacecraft_id, self.spacecraft_clock_stop_count)
+        if not hasattr(self, "_ephemeris_stop_time"):
+            self._ephemeris_stop_time = self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": self.spacecraft_clock_stop_count, "mission": self.spiceql_mission})
+        return self._ephemeris_stop_time
     
     @property
     def exposure_duration(self):
