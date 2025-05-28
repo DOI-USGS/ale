@@ -6,6 +6,8 @@ import requests
 from multiprocessing.pool import ThreadPool
 import numpy as np
 
+
+
 import pyspiceql
 
 logger = logging.getLogger(__name__)
@@ -53,10 +55,10 @@ def check_response(response):
     response.raise_for_status()
 
     if response.status_code != 200:
-        raise requests.HTTPError(f"Recieved code {response.status_code} from spice server, with error: {response.json()}")
+        raise requests.HTTPError(f"Received code {response.status_code} from spice server, with error: {response.json()}")
 
     if response.json()["statusCode"] != 200:
-        raise requests.HTTPError(f"Recieved code {response.json()['statusCode']} from spice server, with error: {response.json()['body']}")
+        raise requests.HTTPError(f"Received code {response.json()['statusCode']} from spice server, with error: {response.json()['body']}")
 
 
 def spiceql_call(function_name = "", function_args = {}, use_web=False):
@@ -92,9 +94,8 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
     if spiceql_url:
         url = spiceql_url
     else:
-        url = "https://spiceql-deployment.prod-asc.chs.usgs.gov/"
+        url = "https://astrogeology.usgs.gov/apis/spiceql/latest/"
 
-    logger.info(f"SpiceQL Base URL: {url}")
     url += function_name
     headers = {
         'accept': '*/*',
@@ -104,10 +105,15 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
     # Convert any args being passed over the wire to strings
     clean_function_args = stringify_web_args(function_args)
     logger.debug("Args: " + str(clean_function_args))
-    response = requests.get(url, params=clean_function_args, headers=headers, verify=False)
-    logger.debug("Complete URL: " + str(response.url))
-    check_response(response)
 
+    if function_name == "getTargetStates":
+        post_body = str(clean_function_args).replace("\'", "\"")
+        logger.debug("getTargetStates POST Payload: " + post_body)
+        response = requests.post(url, data=post_body, headers=headers, verify=False)
+    else:
+        response = requests.get(url, params=clean_function_args, headers=headers, verify=False)
+    check_response(response)
+    logger.debug(f"Request URL={str(response.url)}, Kernels={str(response.json()['body']['kernels'])}")
     return response.json()["body"]["return"]
 
 def get_ephem_data(times, function_name, batch_size=400, web=False, function_args={}):
