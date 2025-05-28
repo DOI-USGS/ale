@@ -113,7 +113,7 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
     else:
         response = requests.get(url, params=clean_function_args, headers=headers, verify=False)
     check_response(response)
-    logger.debug(f"Request URL={str(response.url)}, Kernels={str(response.json()["body"]["kernels"])}")
+    logger.debug(f"Request URL={str(response.url)}, Kernels={str(response.json()['body']['kernels'])}")
     return response.json()["body"]["return"]
 
 def get_ephem_data(times, function_name, batch_size=400, web=False, function_args={}):
