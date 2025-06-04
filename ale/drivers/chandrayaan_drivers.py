@@ -540,10 +540,10 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         Returns
         -------
         list :
-            The center of the CCD formatted as line, sample
+            The line of the center of the CCD, in pixel units
         """
-        return self.naif_keywords[f"INS{self.ikid}_BORESIGHT"][0] 
-    
+        return self.naif_keywords[f"INS{self.ikid}_CENTER"][1] 
+
     @property
     def detector_center_sample(self):
         """
@@ -554,9 +554,9 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         Returns
         -------
         list :
-            The center of the CCD formatted as line, sample
+            The sample coordinate of the center of the CCD, in pixel units
         """
-        return self.naif_keywords[f"INS{self.ikid}_BORESIGHT"][1]
+        return self.naif_keywords[f"INS{self.ikid}_CENTER"][0]
 
     @property
     def focal2pixel_lines(self):
@@ -586,5 +586,5 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         """
         # meters to mm
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 1000
-        return [0.0, 1/pixel_size, 0.0]
+        return [0.0, -1/pixel_size, 0.0]
 
