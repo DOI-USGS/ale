@@ -6,8 +6,11 @@ from ale.base.label_isis import IsisLabel
 from ale.base.label_pds3 import Pds3Label
 from ale.base.type_distortion import NoDistortion, ChandrayaanMrffrDistortion
 from ale.base.type_sensor import LineScanner, Radar
+from ale.rotation import ConstantRotation
+from ale.transformation import FrameChain
 from csv import reader
-
+from scipy.spatial.transform import Rotation
+import numpy
 
 class Chandrayaan1M3Pds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, NoDistortion, Driver):
 
@@ -587,6 +590,78 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         # meters to mm
         pixel_size = spice.gdpool('INS{}_PIXEL_SIZE'.format(self.ikid), 0, 1)[0] * 1000
         return [0.0, -1/pixel_size, 0.0]
+
+    @property
+    def original_naif_sensor_frame_id(self):
+        """
+        Original sensor frame ID as defined in the Chandrayaan 2 IK kernel. A new 
+        sensor frame ID is created in the frame_chain property to represent an
+        additional rotation that takes into account the discrepancy between
+        that the Chandrayaan 2 IK kernel defines and what ISIS expects for the 
+        directions of the axes sensors. The frame chain function below
+        implements the fix.
+
+        Returns
+        -------
+        : int
+          sensor frame code from NAIF's IK kernel
+        """
+        return self.ikid
+
+    @property
+    def sensor_frame_id(self):
+        """
+        Overwrite sensor frame id to return fake frame ID as discussed in
+        original_naif_sensor_frame_id() docstring. 
+
+        Returns
+        -------
+        : int
+          Frame id that applies a correction.
+        """
+        
+        # Subtract 1000 as all ids are negative and any subsequent one usually
+        # has increasing magnitude.
+        return self.original_naif_sensor_frame_id - 1000
+
+    @property
+    def frame_chain(self):
+        """
+        Returns a modified frame chain with with an additional coordinate transformation from Chandrayaan satellite to camera.
+
+        Returns
+        -------
+        : object
+          A networkx frame chain object
+        """
+        
+        if not hasattr(self, '_frame_chain'):
+        
+          #self._frame_chain = super().frame_chain
+          nadir = self._props.get('nadir', False)
+          exact_ck_times = self._props.get('exact_ck_times', True)
+        
+          self._frame_chain = \
+           FrameChain.from_spice(sensor_frame=self.original_naif_sensor_frame_id,
+                                 target_frame=self.target_frame_id,
+                                 center_ephemeris_time=self.center_ephemeris_time,
+                                 ephemeris_times=self.ephemeris_time,
+                                 exact_ck_times= exact_ck_times,
+                                 inst_time_bias=self.instrument_time_bias)
+
+          # Fix for the the Chandrayaan2 TMC2 instrument as outlined in the
+          # original_naif_sensor_frame_id() docstring. This swaps the x and z
+          # axes, and negates the y axis.
+          mat = numpy.array([[0, 0, 1],
+                             [0, -1, 0],
+                             [1, 0, 0]])
+          quats = Rotation.from_matrix(mat).as_quat()
+          rotation = ConstantRotation(quats, 
+                                      self.sensor_frame_id, 
+                                      self.original_naif_sensor_frame_id)
+          self._frame_chain.add_edge(rotation=rotation)
+                                
+        return self._frame_chain
 
 class Chandrayaan2OHRCIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
 
