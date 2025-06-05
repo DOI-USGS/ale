@@ -2,6 +2,7 @@ from cgi import test
 import pytest
 import ale
 import os
+import tempfile
 import ale.isd_generate as isdg
 
 import unittest
@@ -66,16 +67,17 @@ def test_chandrayaan_tmc():
     cub_file = get_image("ch2_tmc_ncf_20231030T1757326391_d_img_d18")
     
     # Create the ISD file
-    isd_file = "ch2_tmc_ncf_20231030T1757326391_d_img_d18_isd.json"
-    kernels = ale.util.generate_kernels_from_cube(cub_file, expand=True)
-    radii = None
-    isdg.file_to_isd(cub_file, isd_file, radii, kernels)
-    
-    # Load the produced ISD file
-    isd_obj = json.load(open(isd_file, 'r'))
+    with tempfile.NamedTemporaryFile('r+') as isd_file:
+        kernels = ale.util.generate_kernels_from_cube(cub_file, expand=True)
+        radii = None
+        isdg.file_to_isd(cub_file, isd_file.name, radii, kernels)
+        isd_file.flush()
+        
+        # Load the produced ISD file
+        isd_obj = json.load(open(isd_file.name, 'r'))
 
-    # Sanity check
-    assert isd_obj["starting_ephemeris_time"] == 751960721.8215932
+        # Sanity check
+        assert isd_obj["starting_ephemeris_time"] == 751960721.8215932
 
 class test_chandrayaan_m3_pds_naif(unittest.TestCase):
 
