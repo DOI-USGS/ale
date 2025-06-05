@@ -2,12 +2,13 @@ from cgi import test
 import pytest
 import ale
 import os
+import ale.isd_generate as isdg
 
 import unittest
 from unittest.mock import PropertyMock, patch, call
 
 import json
-from conftest import get_image_label, get_image_kernels, get_isd, convert_kernels, compare_dicts
+from conftest import get_image_label, get_image_kernels, get_isd, get_image, convert_kernels, compare_dicts
 
 from ale.drivers.chandrayaan_drivers import Chandrayaan1M3IsisLabelNaifSpiceDriver, Chandrayaan1MRFFRIsisLabelNaifSpiceDriver, Chandrayaan1M3Pds3NaifSpiceDriver
 
@@ -59,6 +60,22 @@ def test_chandrayaan_m3_pds_load(m3_kernels):
         x = compare_dicts(isd_obj, compare_dict)
         assert x == []
 
+def test_chandrayaan_tmc():
+
+    # Input cub file
+    cub_file = get_image("ch2_tmc_ncf_20231030T1757326391_d_img_d18")
+    
+    # Create the ISD file
+    isd_file = "ch2_tmc_ncf_20231030T1757326391_d_img_d18_isd.json"
+    kernels = ale.util.generate_kernels_from_cube(cub_file, expand=True)
+    radii = None
+    isdg.file_to_isd(cub_file, isd_file, radii, kernels)
+    
+    # Load the produced ISD file
+    isd_obj = json.load(open(isd_file, 'r'))
+
+    # Sanity check
+    assert isd_obj["starting_ephemeris_time"] == 751960721.8215932
 
 class test_chandrayaan_m3_pds_naif(unittest.TestCase):
 
