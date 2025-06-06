@@ -182,7 +182,7 @@ class test_isis_naif(unittest.TestCase):
     def test_short_mission_name(self):
         assert self.driver.short_mission_name == 'lro'
 
-    def test_intrument_id(self):
+    def test_instrument_id(self):
         assert self.driver.instrument_id == 'LRO_LROCNACL'
 
     def test_usgscsm_distortion_model(self):
@@ -295,14 +295,14 @@ class test_miniRf(unittest.TestCase):
     def test_range_conversion_coefficients(self):
         assert len(self.driver.range_conversion_coefficients) == 20
 
-    def test_ephmeris_start_time(self):
+    def test_ephemeris_start_time(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ephemeris_start_time == 12344.995295578527
             calls = [call('utcToEt', {'utc': '2010-04-25 04:22:31.244874', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
-    def test_ephmeris_stop_time(self):
+    def test_ephemeris_stop_time(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
             assert self.driver.ephemeris_stop_time == 12348.297799453276
             calls = [call('utcToEt', {'utc': '2010-04-25 04:22:31.244874', 'searchKernels': False}, False)]
@@ -327,7 +327,7 @@ class test_wac_isis_naif(unittest.TestCase):
     def test_short_mission_name(self):
         assert self.driver.short_mission_name == 'lro'
 
-    def test_intrument_id(self):
+    def test_instrument_id(self):
         assert self.driver.instrument_id == 'LRO_LROCWAC_UV'
 
     def test_ephemeris_start_time(self):
@@ -410,7 +410,7 @@ class test_wac_isis_isis(unittest.TestCase):
     def test_short_mission_name(self):
         assert self.driver.short_mission_name == 'lro'
 
-    def test_intrument_id(self):
+    def test_instrument_id(self):
         assert self.driver.instrument_id == 'LRO_LROCWAC_UV'
 
     def test_exposure_duration(self):

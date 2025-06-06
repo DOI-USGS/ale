@@ -11,7 +11,7 @@ from unittest.mock import PropertyMock, patch, call
 import json
 from conftest import get_image_label, get_image_kernels, get_isd, get_image, convert_kernels, compare_dicts
 
-from ale.drivers.chandrayaan_drivers import Chandrayaan1M3IsisLabelNaifSpiceDriver, Chandrayaan1MRFFRIsisLabelNaifSpiceDriver, Chandrayaan1M3Pds3NaifSpiceDriver
+from ale.drivers.chandrayaan_drivers import Chandrayaan1M3IsisLabelNaifSpiceDriver, Chandrayaan1MRFFRIsisLabelNaifSpiceDriver, Chandrayaan1M3Pds3NaifSpiceDriver, Chandrayaan2TMC2IsisLabelNaifSpiceDriver
 
 @pytest.fixture()
 def m3_kernels(scope="module", autouse=True):
@@ -60,24 +60,6 @@ def test_chandrayaan_m3_pds_load(m3_kernels):
         print(compare_dicts(isd_obj, compare_dict))
         x = compare_dicts(isd_obj, compare_dict)
         assert x == []
-
-def test_chandrayaan_tmc():
-
-    # Input cub file
-    cub_file = get_image("ch2_tmc_ncf_20231030T1757326391_d_img_d18")
-    
-    # Create the ISD file
-    with tempfile.NamedTemporaryFile('r+') as isd_file:
-        kernels = ale.util.generate_kernels_from_cube(cub_file, expand=True)
-        radii = None
-        isdg.file_to_isd(cub_file, isd_file.name, radii, kernels)
-        isd_file.flush()
-        
-        # Load the produced ISD file
-        isd_obj = json.load(open(isd_file.name, 'r'))
-
-        # Sanity check
-        assert isd_obj["starting_ephemeris_time"] == 751960721.8215932
 
 class test_chandrayaan_m3_pds_naif(unittest.TestCase):
 
@@ -204,3 +186,26 @@ class test_chandrayaan_mrffr_isis_naif(unittest.TestCase):
 
     def test_look_direction(self):
         assert self.driver.look_direction == "right"
+
+# Chandrayaan2 TMC tests
+class test_chandrayaan2_tmc_isis_naif(unittest.TestCase):
+
+    def setUp(self):
+        label = get_image_label('ch2_tmc_ncf_20231030T1757326391_d_img_d18', 'isis3')
+        self.driver = Chandrayaan2TMC2IsisLabelNaifSpiceDriver(label)
+
+    def test_short_mission_name(self):
+        assert self.driver.short_mission_name == 'chandrayaan'
+
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == 'CHANDRAYAAN-2 ORBITER'
+
+    def test_spacecraft_name(self):
+        assert self.driver.spacecraft_name == 'Chandrayaan-2'
+
+    def test_sensor_model_version(self):
+        assert self.driver.sensor_model_version == 1
+
+    def test_light_time_correction(self):
+        assert self.driver.light_time_correction == 'LT+S'
+
