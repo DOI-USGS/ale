@@ -4,6 +4,7 @@ spiceql_mission_map = {
     "APOLLO_METRIC" : "apollo", 
     "CHANDRAYAAN-1_M3": "m3",
     "CHANDRAYAAN-1_MRFFR": "mrffr",
+    "CHANDRAYAAN-2 ORBITER": "chandrayaan2",
     "M3": "m3", 
     "CASSINI_ISS_NAC": "cassini",
     "CASSINI_ISS_WAC": "cassini",
