@@ -518,7 +518,7 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         : str
           Spacecraft clock start count
         """
-        return spice.str2et(self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"))
+        return self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
     
     @property
     def ephemeris_stop_time(self):
