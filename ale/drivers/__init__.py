@@ -84,7 +84,7 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
     formatter : {'ale', 'isis', 'usgscsm'}
                 Output format for the ISD. As of 0.8.0, it is recommended that
                 the `ale` formatter is used. The `isis` and `usgscsm` formatters
-                are retrained for backwards compatability.
+                are retrained for backwards compatibility.
 
     verbose : bool
               If True, displays debug output specifying which drivers were
@@ -109,10 +109,10 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
     driver_mask = [only_isis_spice, only_naif_spice]
     class_list = [IsisSpice, NaifSpice]
     class_list = list(compress(class_list, driver_mask))
-    # predicat logic: make sure x is a class, who contains the word "driver" (clipper_drivers) and 
-    # the componenet classes 
-    predicat = lambda x: inspect.isclass(x) and "_driver" in x.__module__ and [i for i in class_list if i in inspect.getmro(x)] == class_list
-    driver_list = [inspect.getmembers(dmod, predicat) for dmod in __driver_modules__]
+    # predicate logic: make sure x is a class, who contains the word "driver" (clipper_drivers) and 
+    # the component classes 
+    predicate = lambda x: inspect.isclass(x) and "_driver" in x.__module__ and [i for i in class_list if i in inspect.getmro(x)] == class_list
+    driver_list = [inspect.getmembers(dmod, predicate) for dmod in __driver_modules__]
     drivers = chain.from_iterable(driver_list)
     drivers = sort_drivers([d[1] for d in drivers])
 
