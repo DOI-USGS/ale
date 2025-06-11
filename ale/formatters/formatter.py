@@ -137,7 +137,7 @@ def to_isd(driver):
     instrument_pointing['constant_rotation'] = constant_rotation.rotation_matrix().flatten()
     isd['instrument_pointing'] = instrument_pointing
 
-    # interiror orientation
+    # interior orientation
     isd['naif_keywords'] = driver.naif_keywords
 
     if isinstance(driver,LineScanner) or isinstance(driver, Framer) or isinstance(driver, PushFrame):
