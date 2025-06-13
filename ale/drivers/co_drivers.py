@@ -16,6 +16,7 @@ from ale.base.type_sensor import LineScanner
 
 from ale.rotation import ConstantRotation
 from ale.transformation import FrameChain
+from ale import util
 from scipy.spatial.transform import Rotation
 
 vims_id_lookup = {
@@ -178,7 +179,7 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
           start time
         """
         if not hasattr(self, "_ephemeris_start_time"):
-            self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+            self._ephemeris_start_time= self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
         return self._ephemeris_start_time
 
     @property
@@ -290,12 +291,12 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
             try:
                 # Call frinfo to check if the ISIS iak has been loaded with the
                 # additional reference frame. Otherwise, Fail and add it manually
-                _ = self.spiceql_call("getFrameInfo", {"frame": self.sensor_frame_id, "mission": self.spiceql_mission})
+                _= self.spiceql_call("getFrameInfo", {"frame": self.sensor_frame_id, "mission": self.spiceql_mission})
                 self._frame_chain = super().frame_chain
             except Exception as e:
                 nadir = self._props.get('nadir', False)
                 exact_ck_times = self._props.get('exact_ck_times', True)
-                self._frame_chain = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
+                self._frame_chain, kernels = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
                                                           target_frame=self.target_frame_id,
                                                           center_ephemeris_time=self.center_ephemeris_time,
                                                           ephemeris_times=self.ephemeris_time,
@@ -304,7 +305,7 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
                                                           mission=self.spiceql_mission,
                                                           use_web=self.use_web,
                                                           search_kernels=self.search_kernels)
-
+                self._kernels = util.merge_dicts(self._kernels, kernels)
                 rotation = ConstantRotation([[0, 0, 1, 0]], self.sensor_frame_id, self._original_naif_sensor_frame_id)
 
                 self._frame_chain.add_edge(rotation=rotation)
@@ -408,7 +409,7 @@ class CassiniVimsIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoD
         time = str(instrument_group["NativeStartTime"])
         int_time, decimal_time = str(time).split(".")
 
-        ephemeris_time = self.spiceql_call("strSclkToEt", {"frameCode" : self.spacecraft_id, "sclk" : int_time, "mission" : self.spiceql_mission})
+        ephemeris_time= self.spiceql_call("strSclkToEt", {"frameCode" : self.spacecraft_id, "sclk" : int_time, "mission" : self.spiceql_mission})
         ephemeris_time += float(decimal_time) / 15959.0
 
         ir_exp = float(instrument_group["ExposureDuration"][0]) * 1.01725 / 1000.0;
@@ -726,12 +727,12 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
             try:
                 # Call frinfo to check if the ISIS iak has been loaded with the
                 # additional reference frame. Otherwise, Fail and add it manually
-                _ = self.spiceql_call("getFrameInfo", {"frame": self.sensor_frame_id, "mission": self.spiceql_mission})
+                _= self.spiceql_call("getFrameInfo", {"frame": self.sensor_frame_id, "mission": self.spiceql_mission})
                 self._frame_chain = super().frame_chain
             except Exception as e:
                 nadir = self._props.get('nadir', False)
                 exact_ck_times = self._props.get('exact_ck_times', True)
-                self._frame_chain = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
+                self._frame_chain, kernels = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
                                                           target_frame=self.target_frame_id,
                                                           center_ephemeris_time=self.center_ephemeris_time,
                                                           ephemeris_times=self.ephemeris_time,
@@ -740,7 +741,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
                                                           mission=self.spiceql_mission,
                                                           use_web=self.use_web,
                                                           search_kernels=self.search_kernels)
-
+                self._kernels = util.merge_dicts(self._kernels, kernels)
                 rotation = ConstantRotation([[0, 0, 1, 0]], self.sensor_frame_id, self._original_naif_sensor_frame_id)
 
                 self._frame_chain.add_edge(rotation=rotation)

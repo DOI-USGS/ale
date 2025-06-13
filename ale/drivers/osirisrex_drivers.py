@@ -138,7 +138,7 @@ class OsirisRexCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Radi
         : dict
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
-        keywords = self.spiceql_call("findMissionKeywords", {"key": str(self.polyCamFocusPositionNaifId), "mission" : self.spiceql_mission})
+        keywords= self.spiceql_call("findMissionKeywords", {"key": str(self.polyCamFocusPositionNaifId), "mission" : self.spiceql_mission})
         if keywords: 
           return super().naif_keywords | keywords 
         else: 

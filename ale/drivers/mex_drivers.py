@@ -103,7 +103,7 @@ class MexHrscPds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, NoDisto
           Naif ID used to for identifying the instrument in Spice kernels
         """
         if not hasattr(self, "_ikid"):
-            self._ikid = self.spiceql_call("translateNameToCode", {"frame": "MEX_HRSC_HEAD", "mission": self.spiceql_mission})
+            self._ikid= self.spiceql_call("translateNameToCode", {"frame": "MEX_HRSC_HEAD", "mission": self.spiceql_mission})
         return self._ikid
 
 
@@ -123,7 +123,7 @@ class MexHrscPds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, NoDisto
           Naif ID code used in calculating focal length
         """
         if not hasattr(self, "_fikid"):
-            self._fikid = self.spiceql_call("translateNameToCode", {"frame": self.instrument_id, "mission": self.spiceql_mission})
+            self._fikid= self.spiceql_call("translateNameToCode", {"frame": self.instrument_id, "mission": self.spiceql_mission})
         return self._fikid
 
 
@@ -629,7 +629,7 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDisto
         Naif ID used to for identifying the instrument in Spice kernels
       """
       if not hasattr(self, "_ikid"):
-          self._ikid = self.spiceql_call("translateNameToCode", {"frame": "MEX_HRSC_HEAD", "mission": self.spiceql_mission})
+          self._ikid= self.spiceql_call("translateNameToCode", {"frame": "MEX_HRSC_HEAD", "mission": self.spiceql_mission})
       return self._ikid
 
   @property
@@ -648,7 +648,7 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDisto
         Naif ID code used in calculating focal length
       """
       if not hasattr(self, "_fikid"):
-          self._fikid = self.spiceql_call("translateNameToCode", {"frame": self.instrument_id, "mission": self.spiceql_mission})
+          self._fikid= self.spiceql_call("translateNameToCode", {"frame": self.instrument_id, "mission": self.spiceql_mission})
       return self._fikid
 
   @property
@@ -735,7 +735,7 @@ class MexSrcPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortion,
           Naif ID used to for identifying the instrument in Spice kernels
         """
         if not hasattr(self, "_ikid"):
-            self._ikid = self.spiceql_call("translateNameToCode", {"frame": "MEX_HRSC_SRC", "mission": self.spiceql_mission})
+            self._ikid= self.spiceql_call("translateNameToCode", {"frame": "MEX_HRSC_SRC", "mission": self.spiceql_mission})
         return self._ikid
 
 
@@ -885,7 +885,7 @@ class MexSrcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
           Naif ID used to for identifying the instrument in Spice kernels
         """
         if not hasattr(self, "_ikid"):
-          self._ikid = self.spiceql_call("translateNameToCode", {"frame": "MEX_HRSC_SRC".format(super().instrument_id), "mission": self.spiceql_mission})
+          self._ikid= self.spiceql_call("translateNameToCode", {"frame": "MEX_HRSC_SRC".format(super().instrument_id), "mission": self.spiceql_mission})
         return self._ikid
 
 
