@@ -2,7 +2,7 @@ import spiceypy as spice
 
 import warnings
 from multiprocessing.pool import ThreadPool
-
+import logging
 
 import numpy as np
 import pyspiceql
@@ -18,7 +18,6 @@ from ale import spiceql_access
 from ale import spice_root
 from ale import util
 
-
 class NaifSpice():
     """
     Mix-in for reading data from NAIF SPICE Kernels.
@@ -29,7 +28,7 @@ class NaifSpice():
         Called when the context is created. This is used
         to get the kernels furnished.
         """
-        if self.kernels:
+        if self.kernels and not self.use_web:
             [pyspiceql.load(k) for k in self.kernels]
         return self
 
@@ -39,7 +38,7 @@ class NaifSpice():
         this is done, the object is out of scope and the
         kernels can be unloaded.
         """
-        if self.kernels:
+        if self.kernels and not self.use_web:
             [pyspiceql.unload(k) for k in self.kernels]
 
     @property
@@ -78,16 +77,31 @@ class NaifSpice():
                     self._kernels = kernel_access.get_kernels_from_isis_pvl(self._props['kernels'])
                 except Exception as e:
                     self._kernels =  self._props['kernels']
-            elif ale.spice_root:
+            elif ale.spice_root and not self.use_web:
                 search_results = kernel_access.get_metakernels(ale.spice_root, missions=self.short_mission_name, years=self.utc_start_time.year, versions='latest')
 
                 if search_results['count'] == 0:
                     raise ValueError(f'Failed to find metakernels. mission: {self.short_mission_name}, year:{self.utc_start_time.year}, versions="latest" spice root = "{ale.spice_root}"')
                 self._kernels = [search_results['data'][0]['path']]
             else:
-                self._kernels = []
+                self._kernels = {}
 
         return self._kernels
+
+
+    @kernels.setter
+    def kernels(self, value):
+        """
+        Setter for the kernels property. Allows the user to set the kernels to be used.
+
+        Parameters
+        ----------
+        value : list, dict, or str
+            The kernels to set. Can be a list of kernel paths, a dictionary in ISIS style,
+            or a single kernel path as a string.
+        """
+        self._kernels = value
+
 
     @property
     def use_web(self):
@@ -203,7 +217,7 @@ class NaifSpice():
           Naif ID used to for identifying the instrument in Spice kernels
         """
         if not hasattr(self, "_ikid"):
-            self._ikid = self.spiceql_call("translateNameToCode", {"frame": self.instrument_id, "mission": self.spiceql_mission})
+            self._ikid= self.spiceql_call("translateNameToCode", {"frame": self.instrument_id, "mission": self.spiceql_mission})
         return self._ikid
 
     @property
@@ -219,7 +233,7 @@ class NaifSpice():
           Naif ID code for the spacecraft
         """
         if not hasattr(self, "_spacecraft_id"):
-            self._spacecraft_id = self.spiceql_call("translateNameToCode", {"frame": self.spacecraft_name, "mission": self.spiceql_mission})
+            self._spacecraft_id= self.spiceql_call("translateNameToCode", {"frame": self.spacecraft_name, "mission": self.spiceql_mission})
         return self._spacecraft_id
 
     @property
@@ -235,7 +249,7 @@ class NaifSpice():
           Naif ID code for the target body
         """
         if not hasattr(self, "_target_id"):
-            self._target_id = self.spiceql_call("translateNameToCode", {"frame": self.target_name, "mission": self.spiceql_mission})
+            self._target_id= self.spiceql_call("translateNameToCode", {"frame": self.target_name, "mission": self.spiceql_mission})
         return self._target_id
 
     @property
@@ -251,7 +265,7 @@ class NaifSpice():
           Naif ID code for the target frame
         """
         if not hasattr(self, "_target_frame_id"):
-            frame_info = self.spiceql_call("getTargetFrameInfo", {"targetId": self.target_id, "mission": self.spiceql_mission})
+            frame_info= self.spiceql_call("getTargetFrameInfo", {"targetId": self.target_id, "mission": self.spiceql_mission})
             self._target_frame_id = frame_info["frameCode"]
         return self._target_frame_id
 
@@ -384,7 +398,7 @@ class NaifSpice():
         """
         if not hasattr(self, "_reference_frame"):
             try:
-                frame_info = self.spiceql_call("getTargetFrameInfo", {"targetId": self.target_id, "mission": self.spiceql_mission})
+                frame_info= self.spiceql_call("getTargetFrameInfo", {"targetId": self.target_id, "mission": self.spiceql_mission})
                 self._reference_frame = frame_info["frameName"]
             except:
                 self._reference_frame = 'IAU_{}'.format(self.target_name)
@@ -412,7 +426,7 @@ class NaifSpice():
             positions = []
             velocities = []
 
-            sun_lt_states = self.spiceql_call("getTargetStates",{"ets": times,
+            sun_lt_states= self.spiceql_call("getTargetStates",{"ets": times,
                                                                  "target": "SUN",
                                                                  "observer": self.target_name,
                                                                  "frame": self.reference_frame,
@@ -444,9 +458,11 @@ class NaifSpice():
         : (positions, velocities, times)
           a tuple containing a list of positions, a list of velocities, and a list of times
         """
+        ale.logger.debug("Calling base sensor position")
         if not hasattr(self, '_position') or \
            not hasattr(self, '_velocity') or \
            not hasattr(self, '_ephem'):
+            ale.logger.debug("Generating Sensor Positions")            
             ephem = self.ephemeris_time
 
             # if isinstance(ephem, np.ndarray):
@@ -460,7 +476,7 @@ class NaifSpice():
             target = self.spacecraft_name
             observer = self.target_name
             ## Check for ISIS flag to fix target and observer swapping
-            print(self.swap_observer_target)
+
             if self.swap_observer_target:
                 target = self.target_name
                 observer = self.spacecraft_name
@@ -476,7 +492,6 @@ class NaifSpice():
                           "abcorr": self.light_time_correction,
                           "mission": self.spiceql_mission,
                           "searchKernels": self.search_kernels}
-                print(kwargs)
                 position_tasks.append([ephem, "getTargetStates", 400, self.use_web, kwargs])
 
                 # ssb to spacecraft
@@ -486,14 +501,17 @@ class NaifSpice():
                           "abcorr": "NONE",
                           "mission": self.spiceql_mission,
                           "searchKernels": self.search_kernels}
-                print(kwargs)
                 position_tasks.append([ephem, "getTargetStates", 400, self.use_web, kwargs])
 
                 # Build graph async
-                with ThreadPool() as pool:
+                with ThreadPool(processes=5) as pool:
                     jobs = pool.starmap_async(spiceql_access.get_ephem_data, position_tasks)
                     results = jobs.get()
 
+                for i in range(len(results)):
+                    self._kernels = util.merge_dicts(self._kernels, results[i][1])
+                    results[i] = results[i][0]
+                
                 obs_tars, ssb_obs = results
 
                 obs_tar_lts = np.array(obs_tars)[:,-1]
@@ -508,7 +526,6 @@ class NaifSpice():
                           "abcorr": "NONE",
                           "mission": self.spiceql_mission,
                           "searchKernels": self.search_kernels}
-                print(kwargs)
                 ssb_tars = spiceql_access.get_ephem_data(adjusted_time, "getTargetStates", web=self.use_web, function_args=kwargs)
                 ssb_tar_states = np.array(ssb_tars)[:,0:6]
 
@@ -527,8 +544,8 @@ class NaifSpice():
                           "abcorr": self.light_time_correction,
                           "mission": self.spiceql_mission,
                           "searchKernels": self.search_kernels}
-                print(kwargs)
-                states = spiceql_access.get_ephem_data(ephem, "getTargetStates", web=self.use_web, function_args=kwargs)
+                states, kernels = spiceql_access.get_ephem_data(ephem, "getTargetStates", web=self.use_web, function_args=kwargs)
+                self._kernels = util.merge_dicts(self._kernels, kernels)
                 states = np.array(states)[:,0:6]
 
             for state in states:
@@ -560,7 +577,7 @@ class NaifSpice():
         if not hasattr(self, '_frame_chain'):
             nadir = self._props.get('nadir', False)
             exact_ck_times = self._props.get('exact_ck_times', True)
-            self._frame_chain = FrameChain.from_spice(sensor_frame=self.sensor_frame_id,
+            self._frame_chain, kernels = FrameChain.from_spice(sensor_frame=self.sensor_frame_id,
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
                                                       ephemeris_times=self.ephemeris_time,
@@ -569,7 +586,7 @@ class NaifSpice():
                                                       mission=self.spiceql_mission,
                                                       use_web=self.use_web,
                                                       search_kernels=self.search_kernels)
-
+            self._kernels = util.merge_dicts(kernels, self._kernels)
             if nadir:
                 # Logic for nadir calculation was taken from ISIS3
                 #  SpiceRotation::setEphemerisTimeNadir
@@ -585,9 +602,8 @@ class NaifSpice():
                 # Get the default line translation with no potential flipping
                 # from the driver
                 trans_x_key = f"INS{self.ikid}_ITRANSL"
-                trans_x = self.spiceql_call("findMissionKeywords", {"key": trans_x_key, 
+                trans_x= self.spiceql_call("findMissionKeywords", {"key": trans_x_key, 
                                                                     "mission": self.spiceql_mission})[trans_x_key]
-
                 if (trans_x[0] < trans_x[1]):
                     velocity_axis = 1
 
@@ -632,7 +648,7 @@ class NaifSpice():
           Starting ephemeris time of the image
         """
         if not hasattr(self, "_ephemeris_start_time"):
-            self._ephemeris_start_time = self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": self.spacecraft_clock_start_count, "mission": self.spiceql_mission})
+            self._ephemeris_start_time= self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": self.spacecraft_clock_start_count, "mission": self.spiceql_mission})
         return self._ephemeris_start_time
 
     @property
@@ -649,7 +665,7 @@ class NaifSpice():
           Ephemeris stop time of the image
         """
         if not hasattr(self, "_ephemeris_stop_time"):
-            self._ephemeris_stop_time = self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": self.spacecraft_clock_stop_count, "mission": self.spiceql_mission})
+            self._ephemeris_stop_time= self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": self.spacecraft_clock_stop_count, "mission": self.spiceql_mission})
         return self._ephemeris_stop_time
 
     @property
@@ -742,8 +758,8 @@ class NaifSpice():
 
             self._naif_keywords['BODY_FRAME_CODE'] = self.target_frame_id
             self._naif_keywords['BODY_CODE'] = self.target_id
-            mission_keywords = self.spiceql_call("findMissionKeywords", {"key": f"*{self.ikid}*", "mission": self.spiceql_mission})
-            target_keywords = self.spiceql_call("findTargetKeywords", {"key": f"*{self.target_id}*", "mission": self.spiceql_mission})
+            mission_keywords= self.spiceql_call("findMissionKeywords", {"key": f"*{self.ikid}*", "mission": self.spiceql_mission})
+            target_keywords= self.spiceql_call("findTargetKeywords", {"key": f"*{self.target_id}*", "mission": self.spiceql_mission})
 
             if mission_keywords: 
                 self._naif_keywords = self.naif_keywords | mission_keywords
@@ -751,7 +767,7 @@ class NaifSpice():
                 self._naif_keywords = self._naif_keywords | target_keywords
             
             try:
-                frame_keywords = self.spiceql_call("findMissionKeywords", {"key": f"*{self.fikid}*", "mission": self.spiceql_mission})
+                frame_keywords= self.spiceql_call("findMissionKeywords", {"key": f"*{self.fikid}*", "mission": self.spiceql_mission})
                 if frame_keywords: 
                     self._naif_keywords = self._naif_keywords | frame_keywords 
             except AttributeError as error:
@@ -812,5 +828,7 @@ class NaifSpice():
 
         if function_name in memo_funcs and data_dir == "" and self.use_web == False:
             function_name = f"{function_name}"
-        return spiceql_access.spiceql_call(function_name, function_args, self.use_web)
+        ret, kernels = spiceql_access.spiceql_call(function_name, function_args, self.use_web)
+        self.kernels = util.merge_dicts(self.kernels, kernels, "combine")
+        return ret
     

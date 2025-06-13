@@ -3,10 +3,12 @@ import sys
 
 import tempfile
 import os 
+import multiprocessing
 from multiprocessing.pool import ThreadPool
 
 import time
 import pvl
+import ale
 
 class Driver():
     """
@@ -50,7 +52,7 @@ class Driver():
             try:
                 return getattr(self, prop_name)
             except (Exception) as e: 
-                print(f"Failed to get property {prop_name} with type {type(e)}: {e}", file=sys.stderr)
+                ale.logger.debug(f"Failed to get property {prop_name} with type {type(e)}: {e}")
                 return None 
 
         if properties is None:
@@ -80,9 +82,10 @@ class Driver():
             properties.remove("sensor_orientation")
 
         data = {}
+        num_procs = max(multiprocessing.cpu_count(), 10)
         
         start = time.time()
-        with ThreadPool() as pool:
+        with ThreadPool(processes=num_procs) as pool:
           jobs = pool.starmap_async(get_property, [(name,) for name in spice_props])
           jobs = jobs.get()
 
@@ -97,7 +100,8 @@ class Driver():
                 end = time.time()
         
         start = time.time()
-        with ThreadPool() as pool:
+
+        with ThreadPool(processes=num_procs) as pool:
           jobs = pool.starmap_async(get_property, [(name,) for name in ephemeris_props])
           jobs = jobs.get()
 

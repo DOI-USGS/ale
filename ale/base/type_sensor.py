@@ -6,6 +6,7 @@ from scipy.spatial.transform import Rotation
 
 from ale.transformation import FrameChain
 from ale.transformation import ConstantRotation, TimeDependentRotation
+from ale import util 
 
 class LineScanner():
     """
@@ -562,7 +563,7 @@ class Cahvor():
         """
         if not hasattr(self, '_frame_chain'):
             nadir = self._props.get("nadir", False)
-            self._frame_chain = FrameChain.from_spice(sensor_frame=self.final_inst_frame,
+            self._frame_chain, kernels = FrameChain.from_spice(sensor_frame=self.final_inst_frame,
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
                                                       ephemeris_times=self.ephemeris_time,
@@ -571,6 +572,7 @@ class Cahvor():
                                                       use_web=self.use_web,
                                                       search_kernels=self.search_kernels)
             cahvor_quats = Rotation.from_matrix(self.cahvor_rotation_matrix).as_quat()
+            self._kernels = util.merge_dicts(kernels, self._kernels)
             
             if nadir:
                 # Logic for nadir calculation was taken from ISIS3

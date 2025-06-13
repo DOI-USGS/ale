@@ -162,6 +162,7 @@ def to_isd(driver):
     j2000_rotation = frame_chain.compute_rotation(target_frame, J2000)
 
     instrument_position = {}
+    print("positions", driver_data["sensor_position"])
     positions, velocities, times = driver_data["sensor_position"]
     instrument_position['spk_table_start_time'] = times[0]
     instrument_position['spk_table_end_time'] = times[-1]
@@ -203,4 +204,7 @@ def to_isd(driver):
     if 'name_model' not in isd:
         raise Exception('No CSM sensor model name found!')
 
+    # remove extra qualities
+    isd["kernels"] = {k: v for k, v in driver.kernels.items() if not "_quality" in k or driver.spiceql_mission in k }
+    
     return isd

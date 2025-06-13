@@ -97,7 +97,7 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
           Naif frame code for MSL_ROVER
         """
         if not hasattr(self, "_final_inst_frame"):
-          self._final_inst_frame = self.spiceql_call("translateNameToCode", {"frame": "MSL_ROVER", "mission": self.spiceql_mission})
+          self._final_inst_frame= self.spiceql_call("translateNameToCode", {"frame": "MSL_ROVER", "mission": self.spiceql_mission})
         return self._final_inst_frame
 
     @property
@@ -114,7 +114,7 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
         """
         if not hasattr(self, "_site_frame_id"):
           site_frame = "MSL_SITE_" + str(self.label["GEOMETRIC_CAMERA_MODEL_PARMS"]["REFERENCE_COORD_SYSTEM_INDEX"][0])
-          self._site_frame_id = self.spiceql_call("translateNameToCode", {"frame": site_frame, "mission": self.spiceql_mission})
+          self._site_frame_id= self.spiceql_call("translateNameToCode", {"frame": site_frame, "mission": self.spiceql_mission})
         return self._site_frame_id
 
     @property

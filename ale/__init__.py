@@ -1,22 +1,41 @@
-import os
 import warnings
-from pkg_resources import get_distribution, DistributionNotFound
-
 warnings.filterwarnings("ignore")
 
+import os
+import sys
+
+import logging
 
 try:
-    _dist = get_distribution('ale')
-    # Normalize case for Windows systems
-    dist_loc = os.path.normcase(_dist.location)
-    here = os.path.normcase(__file__)
-    if not here.startswith(os.path.join(dist_loc, 'ale')):
-        # not installed, but there is another version that *is*
-        raise DistributionNotFound
-except DistributionNotFound:
+    from importlib.metadata import version, PackageNotFoundError
+except ImportError:
+    # For Python <3.8
+    try:
+        from importlib_metadata import version, PackageNotFoundError
+    except ImportError:
+        version = None
+        PackageNotFoundError = Exception
+try:
+    if version is not None:
+        __version__ = version("ale")
+    else:
+        __version__ = 'Unknown version (importlib.metadata not available)'
+except PackageNotFoundError:
     __version__ = 'Please install this project with setup.py'
-else:
-    __version__ = _dist.version
+
+logger = logging.getLogger("ale")
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s [ALE] %(levelname)s: %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.propagate = False
+
+log_level = os.environ.get("ALE_LOG_LEVEL", "INFO").upper()
+logger.setLevel(getattr(logging, log_level, logging.INFO))
+
+logger.debug(f"ALE version: {__version__}")
+logger.debug(f"ALE python version: {sys.version.split(' ')[0]}")
+logger.debug(f"ALE Log Level {log_level}")
 
 try:
     spice_root = os.environ['ALESPICEROOT']

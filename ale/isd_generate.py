@@ -160,7 +160,7 @@ def main():
 
     if len(args.input) == 1:
         try:
-            file_to_isd(args.input[0], args.out, radii, kernels=k, log_level=log_level, compress=args.compress, only_isis_spice=args.only_isis_spice, only_naif_spice=args.only_naif_spice, local=args.local, nadir=args.nadir)
+            file_to_isd(args.input[0], args.out, radii, kernels=k, log_level=log_level, compress=args.compress, only_isis_spice=args.only_isis_spice, only_naif_spice=args.only_naif_spice, use_web=args.use_web_spice, local=args.local, nadir=args.nadir)
         except Exception as err:
             # Seriously, this just throws a generic Exception?
             sys.exit(f"File {args.input[0]}: {err}")

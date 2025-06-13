@@ -12,6 +12,7 @@ import os
 import sys
 import traceback
 
+import ale
 from ale.formatters.usgscsm_formatter import to_usgscsm
 from ale.formatters.isis_formatter import to_isis
 from ale.formatters.formatter import to_isd
@@ -19,7 +20,6 @@ from ale.base.data_isis import IsisSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.label_pds3 import Pds3Label
 from ale.base.data_naif import NaifSpice
-
 
 from abc import ABC
 
@@ -119,33 +119,33 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
     drivers = sort_drivers([d[1] for d in drivers])
 
     if verbose:
-        print("Attempting to pre-parse label file")
+        ale.logger.info("Attempting to pre-parse label file")
     try:
         # Try default grammar for pds3 label
         parsed_label = parse_label(label)
     except Exception as e:
         if verbose:
-            print("First parse attempt failed with")
-            print(e)
+            ale.logger.info("First parse attempt failed with")
+            ale.logger.info(e)
         # If pds3 label fails, try isis grammar
         try:
             parsed_label = parse_label(label, pvl.grammar.ISISGrammar())
         except Exception as e:
             if verbose:
-                print("Second parse attempt failed with")
-                print(e)
+                ale.logger.info("Second parse attempt failed with")
+                ale.logger.info(e)
             # If both fail, then don't parse the label, and just pass the driver a file.
             parsed_label = None
 
     if verbose:
         if parsed_label:
-            print("Successfully pre-parsed label file")
+            ale.logger.info("Successfully pre-parsed label file")
         else:
-            print("Failed to pre-parse label file. Individual drivers will try again.")
+            ale.logger.info("Failed to pre-parse label file. Individual drivers will try again.")
 
     for driver in drivers:
         if verbose:
-            print(f'Trying {driver}', file=sys.stderr)
+            ale.logger.info(f'Trying {driver.__name__}')
         try:
             res = driver(label, props=props, parsed_label=parsed_label)
             # get instrument_id to force early failure
@@ -153,12 +153,15 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
             with res as driver:
                 isd = formatter(driver)
                 if verbose:
-                    print("Success with: ", driver)
-                    print("ISD:\n", json.dumps(isd, indent=2, cls=AleJsonEncoder))
+                    ale.logger.info(f"Success with: {driver.__class__.__name__}")
+                    ale.logger.info(f"ISD:\n{json.dumps(isd, indent=2, cls=AleJsonEncoder)}")
                 return isd
         except Exception as e:
             if verbose:
                 traceback.print_exc()
+        if verbose:
+            ale.logger.info(f'End {driver}\n\n')
+
     raise Exception('No Such Driver for Label')
 
 

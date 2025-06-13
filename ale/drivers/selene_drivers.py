@@ -223,7 +223,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           Sensor frame id
         """
         if not hasattr(self, "_sensor_frame_id"):
-          self._sensor_frame_id = self.spiceql_call("translateNameToCode", {"frame": "LISM_{}_HEAD".format(super().instrument_id), "mission": self.spiceql_mission})
+          self._sensor_frame_id= self.spiceql_call("translateNameToCode", {"frame": "LISM_{}_HEAD".format(super().instrument_id), "mission": self.spiceql_mission})
         return self._sensor_frame_id
 
     @property
@@ -245,7 +245,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           ikid of LISM_TC1 or LISM_TC2
         """
         if not hasattr(self, "_ikid"):
-          self._ikid = self.spiceql_call("translateNameToCode", {"frame": "LISM_{}".format(super().instrument_id), "mission": self.spiceql_mission})
+          self._ikid= self.spiceql_call("translateNameToCode", {"frame": "LISM_{}".format(super().instrument_id), "mission": self.spiceql_mission})
         return self._ikid
         
     @property
@@ -302,7 +302,7 @@ class KaguyaTcPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           ephemeris start time of the image
         """
         if not hasattr(self, "_ephemeris_start_time"):
-          self._ephemeris_start_time = self.spiceql_call("doubleSclkToEt", {"frameCode": self.spacecraft_id, 
+          self._ephemeris_start_time= self.spiceql_call("doubleSclkToEt", {"frameCode": self.spacecraft_id, 
                                                                          "sclk": self.spacecraft_clock_start_count, 
                                                                          "mission": self.spiceql_mission})
         return self._ephemeris_start_time
@@ -612,7 +612,7 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
           Sensor frame id
         """
         if not hasattr(self, "_sensor_frame_id"):
-          self._sensor_frame_id = self.spiceql_call("translateNameToCode", {"frame": "LISM_{}_HEAD".format(super().instrument_id), "mission": self.spiceql_mission})
+          self._sensor_frame_id= self.spiceql_call("translateNameToCode", {"frame": "LISM_{}_HEAD".format(super().instrument_id), "mission": self.spiceql_mission})
         return self._sensor_frame_id
 
     @property
@@ -621,7 +621,7 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
         Read the ikid from the cube label
         """
         if not hasattr(self, "_ikid"):
-            self._ikid = self.spiceql_call("translateNameToCode", {"frame": "LISM_{}".format(super().instrument_id), "mission": self.spiceql_mission})
+            self._ikid= self.spiceql_call("translateNameToCode", {"frame": "LISM_{}".format(super().instrument_id), "mission": self.spiceql_mission})
         return self._ikid
 
     @property
@@ -651,7 +651,7 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
           Starting ephemeris time of the image
         """
         if not hasattr(self, "_ephemeris_start_time"):
-          self._ephemeris_start_time = self.spiceql_call("doubleSclkToEt", 
+          self._ephemeris_start_time= self.spiceql_call("doubleSclkToEt", 
                                                          {"frameCode": self.spacecraft_id, 
                                                           "sclk": float(self.spacecraft_clock_start_count), 
                                                           "mission": self.spiceql_mission})
@@ -943,7 +943,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
         """
         if not hasattr(self, "_sensor_frame_id"):
           spectra = self.base_band[3]
-          self._sensor_frame_id = self.spiceql_call("translateNameToCode", {"frame": f"LISM_MI_{spectra}_HEAD", "mission": self.spiceql_mission})
+          self._sensor_frame_id= self.spiceql_call("translateNameToCode", {"frame": f"LISM_MI_{spectra}_HEAD", "mission": self.spiceql_mission})
         return self._sensor_frame_id 
 
     @property
@@ -1000,7 +1000,7 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           ephemeris start time of the image
         """
         if not hasattr(self, "_ephemeris_start_time"):
-          self._ephemeris_start_time = self.spiceql_call("doubleSclkToEt", {"frameCode": self.spacecraft_id, 
+          self._ephemeris_start_time= self.spiceql_call("doubleSclkToEt", {"frameCode": self.spacecraft_id, 
                                                                          "sclk": self.spacecraft_clock_start_count, 
                                                                          "mission": self.spiceql_mission})
         return self._ephemeris_start_time
@@ -1289,7 +1289,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
           start time
         """
         if not hasattr(self, "_ephemeris_start_time"):
-           self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc" : self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+           self._ephemeris_start_time= self.spiceql_call("utcToEt", {"utc" : self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
         return self._ephemeris_start_time
 
     @property
@@ -1305,7 +1305,7 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
         """
         if not hasattr(self, "_sensor_frame_id"):
           spectra = self.base_band[3]
-          self._sensor_frame_id = self.spiceql_call("translateNameToCode", {"frame": f"LISM_MI_{spectra}_HEAD", "mission": self.spiceql_mission})
+          self._sensor_frame_id= self.spiceql_call("translateNameToCode", {"frame": f"LISM_MI_{spectra}_HEAD", "mission": self.spiceql_mission})
         return self._sensor_frame_id
 
     @property

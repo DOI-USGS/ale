@@ -458,7 +458,7 @@ class NewHorizonsMvicTdiIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpi
             # Attempt to get the frame code using frame name,
             # If that fails, try to get it directly from the cube label
             try:
-                self._ikid = self.spiceql_call("translateNameToCode", {"frame": self.instrument_id, "mission": self.spiceql_mission})
+                self._ikid= self.spiceql_call("translateNameToCode", {"frame": self.instrument_id, "mission": self.spiceql_mission})
             except:
                 self._ikid = self.label["IsisCube"]["Kernels"]["NaifFrameCode"].value
         return self._ikid

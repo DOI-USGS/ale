@@ -6,7 +6,7 @@ import requests
 from multiprocessing.pool import ThreadPool
 import numpy as np
 
-
+from ale import util 
 
 import pyspiceql
 
@@ -87,6 +87,7 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
     Returns : any
                 Any return from a SpiceQL function
     """
+    logger.debug(f"Calling {function_name} with args: {function_args}")
     if use_web == False:
         func = getattr(pyspiceql, function_name)
         return func(**function_args)[0]
@@ -114,9 +115,9 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
         response = requests.get(url, params=clean_function_args, headers=headers, verify=False)
     check_response(response)
     logger.debug(f"Request URL={str(response.url)}, Kernels={str(response.json()['body']['kernels'])}")
-    return response.json()["body"]["return"]
+    return response.json()["body"]["return"], response.json()["body"]["kernels"]
 
-def get_ephem_data(times, function_name, batch_size=400, web=False, function_args={}):
+def get_ephem_data(times, function_name, batch_size=300, web=False, function_args={}):
     """
     This function provides access to ephemeris data aquisition in spiceql. 
     For the web service there is a limited number of times that can be
@@ -153,6 +154,7 @@ def get_ephem_data(times, function_name, batch_size=400, web=False, function_arg
               of lists. Where each element corrisponds to the time
               requested in times.
     """
+    kernels = {} 
     valid_functions = ["getTargetOrientations", "getTargetStates"]
     if function_name not in valid_functions:
         raise ValueError(f"The function name {function_name} is not supported "
@@ -160,21 +162,26 @@ def get_ephem_data(times, function_name, batch_size=400, web=False, function_arg
     if not web:
       func_args = {**function_args}
       func_args["ets"] = times
-      ephemeris_data = spiceql_call(function_name, func_args, web)
-      return ephemeris_data
+      ephemeris_data, kernels = spiceql_call(function_name, func_args, web)
+      return ephemeris_data, kernels
     
     batches = math.ceil(len(times) / batch_size)
     job_args_list = []
+
     for i in range(1, batches+1):
         batch_times = times[(i - 1) * batch_size: i * batch_size]
         func_args = {**function_args}
         func_args["ets"] = batch_times
         job_args_list.append([function_name, func_args, web])
-    with ThreadPool() as pool:
+    with ThreadPool(processes=1) as pool:
         jobs = pool.starmap_async(spiceql_call, job_args_list)
         results = jobs.get()
+
+    for i in range(len(results)):
+        kernels = util.merge_dicts(kernels, results[i][1])
+        results[i] = results[i][0]
 
     flat_results = []
     for i in results:
         flat_results.extend(i)
-    return flat_results
+    return flat_results, kernels

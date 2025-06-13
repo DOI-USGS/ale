@@ -119,10 +119,10 @@ class Chandrayaan1M3Pds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, NoDis
           The start time of the image in ephemeris seconds past the J2000 epoch.
         """
         if not hasattr(self, '_ephemeris_start_time'):
-            et = self.spiceql_call("utcToEt", {"utc" : self.utc_times[0]})
+            et= self.spiceql_call("utcToEt", {"utc" : self.utc_times[0]})
             et -= (.5 * self.line_exposure_duration)
-            clock_time = self.spiceql_call("doubleEtToSclk", {"frameCode" : self.sensor_frame_id, "et" : et, "mission": self.spiceql_mission})
-            self._ephemeris_start_time = self.spiceql_call("strSclkToEt", {"frameCode" : self.sensor_frame_id, "sclk" : clock_time, "mission" : self.spiceql_mission})
+            clock_time= self.spiceql_call("doubleEtToSclk", {"frameCode" : self.sensor_frame_id, "et" : et, "mission": self.spiceql_mission})
+            self._ephemeris_start_time= self.spiceql_call("strSclkToEt", {"frameCode" : self.sensor_frame_id, "sclk" : clock_time, "mission" : self.spiceql_mission})
         return self._ephemeris_start_time 
 
 
@@ -283,7 +283,7 @@ class Chandrayaan1MRFFRIsisLabelNaifSpiceDriver(Radar, IsisLabel, NaifSpice, Cha
           start time
         """
         if not hasattr(self, "_ephemeris_start_time"):
-            self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+            self._ephemeris_start_time= self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
         return self._ephemeris_start_time
 
     @property
@@ -297,7 +297,7 @@ class Chandrayaan1MRFFRIsisLabelNaifSpiceDriver(Radar, IsisLabel, NaifSpice, Cha
           stop time
         """
         if not hasattr(self, "_ephemeris_stop_time"):
-            self._ephemeris_stop_time = self.spiceql_call("utcToEt", {"utc": self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+            self._ephemeris_stop_time= self.spiceql_call("utcToEt", {"utc": self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
         return self._ephemeris_stop_time
 
     @property
