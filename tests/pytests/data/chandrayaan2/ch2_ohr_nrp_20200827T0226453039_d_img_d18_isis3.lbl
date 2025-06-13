@@ -1,0 +1,348 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 2000
+    TileLines   = 1555
+
+    Group = Dimensions
+      Samples = 12000
+      Lines   = 101075
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = UnsignedByte
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName       = Chandrayaan-2
+    InstrumentId         = OHRC
+    TargetName           = Moon
+    StartTime            = 2020-08-27T02:26:45.3039
+    StopTime             = 2020-08-27T02:27:01.6875
+    LineExposureDuration = 0.1621 <ms>
+  End_Group
+
+  Group = Archive
+    JobId                  = OHRXXD18CHO0449302NNNN20240115656269_V1_0
+    OrbitNumber            = 4488
+    DetectorPixelWidth     = 5.2 <micrometers>
+    FocalLength            = 2080 <mm>
+    ReferenceData          = NA
+    OrbitLimbDirection     = Descending
+    SpacecraftYawDirection = True
+    SpacecraftAltitude     = 92.77437229886651 <km>
+    PixelResolution        = 0.23579019352595598 <meters/pixel>
+    Roll                   = -1 <degrees>
+    Pitch                  = -1 <degrees>
+    Yaw                    = -1 <degrees>
+    SunAzimuth             = -1 <degrees>
+    SunElevation           = -1 <degrees>
+    SolarIncidence         = -1 <degrees>
+    Projection             = NA
+    Area                   = NA
+  End_Group
+
+  Group = BandBin
+    Center = 675
+    Width  = 175
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -152270
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = ($base/kernels/pck/pck00009.tpc,
+                                 $base/kernels/pck/lunar_de403_1950-2199_pa.bp-
+                                 c, $base/kernels/fk/lunarMeanEarth001.tf)
+    TargetPosition            = (Table, $base/kernels/spk/de430.bsp)
+    InstrumentPointing        = (Table,
+                                 $chandrayaan2/kernels/ck/ch2_att_27Jul2020_04-
+                                 Sep2020_v1.bc,
+                                 $chandrayaan2/kernels/fk/ch2_v01.tf)
+    Instrument                = $chandrayaan2/kernels/ik/ch2_ohr_v01.ti
+    SpacecraftClock           = $chandrayaan2/kernels/sclk/ch2_sclk_v1.tsc
+    InstrumentPosition        = (Table,
+                                 $chandrayaan2/kernels/spk/ch2_orb_31Jul2020_0-
+                                 2Sep2020_v1.bsp)
+    InstrumentAddendum        = $chandrayaan2/kernels/iak/ohrcAddendum001.ti
+    ShapeModel                = $base/dems/ldem_128ppd_Mar2011_clon180_radius-
+                                _pad.cub
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
+    Source                    = isis
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 1212972489
+  Bytes               = 5200
+  Records             = 130
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-152001, 1)
+  ConstantFrames      = (-152280, -152270, -152001)
+  ConstantRotation    = (6.12323399573677e-17, -1.0, -6.12323399573677e-17,
+                         0.0, 6.12323399573677e-17, -1.0, 1.0,
+                         6.12323399573677e-17, 3.74939945665464e-33)
+  CkTableStartTime    = 651767274.4866
+  CkTableEndTime      = 651767290.87086
+  CkTableOriginalSize = 101076
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = ($chandrayaan2/kernels/ck/ch2_att_27Jul2020_04Sep2020-
+                         _v1.bc, $chandrayaan2/kernels/fk/ch2_v01.tf)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 1212977689
+  Bytes                = 672
+  Records              = 12
+  ByteOrder            = Lsb
+  CacheType            = HermiteSpline
+  SpkTableStartTime    = 651767274.4866
+  SpkTableEndTime      = 651767290.87086
+  SpkTableOriginalSize = 101076.0
+  Description          = "Created by spiceinit"
+  Kernels              = $chandrayaan2/kernels/spk/ch2_orb_31Jul2020_02Sep202-
+                         0_v1.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 1212978361
+  Bytes               = 128
+  Records             = 2
+  ByteOrder           = Lsb
+  TimeDependentFrames = (310002, 1)
+  ConstantFrames      = (310001, 310003, 310000, 310002)
+  ConstantRotation    = (0.99999987852709, -3.09789127116553e-04,
+                         3.83375135592436e-04, 3.09789421617701e-04,
+                         0.999999952015, -7.08797549693787e-07,
+                         -3.83374897618408e-04, 8.27563025111877e-07,
+                         0.9999999265115)
+  CkTableStartTime    = 651767274.4866
+  CkTableEndTime      = 651767290.87086
+  CkTableOriginalSize = 2
+  FrameTypeCode       = 6
+  Description         = "Created by spiceinit"
+  Kernels             = ($base/kernels/spk/de430.bsp,
+                         $base/kernels/pck/pck00009.tpc,
+                         $base/kernels/pck/lunar_de403_1950-2199_pa.bpc,
+                         $base/kernels/fk/lunarMeanEarth001.tf)
+  SolarLongitude      = 63.869509611213
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 1212978489
+  Bytes                = 112
+  Records              = 2
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 651767274.4866
+  SpkTableEndTime      = 651767290.87086
+  SpkTableOriginalSize = 2.0
+  Description          = "Created by spiceinit"
+  Kernels              = $base/kernels/spk/de430.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 1212978601
+  Bytes     = 2641
+End_Object
+
+Object = OriginalXmlLabel
+  Name      = IsisCube
+  StartByte = 1212966291
+  Bytes     = 6198
+  ByteOrder = Lsb
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE               = 301
+  BODY301_RADII           = (1737.4, 1737.4, 1737.4)
+  BODY_FRAME_CODE         = 310001
+  INS-152270_FOCAL_LENGTH = 2080.0
+  INS-152270_PIXEL_SIZE   = 5.2e-06
+  INS-152270_TRANSX       = (0.0, 0.0, 4.807692307692e-04)
+  INS-152270_TRANSY       = (0.0, 4.807692307692e-04, 0.0)
+  INS-152270_ITRANSS      = (0.0, 0.0, 2080.0)
+  INS-152270_ITRANSL      = (0.0, 2080.0, 0.0)
+  INS-152270_CENTER       = (6000.0, 0.5)
+  INS-152270_OD_K         = (0.0, 0.0, 0.0)
+End_Object
+End
