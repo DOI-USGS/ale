@@ -264,7 +264,7 @@ def diff_and_describe(json1, json2, key_array):
         json1 = json1[key]
         json2 = json2[key]
     diff = json1 - json2
-    print(" ".join(key_array) + "\nNum records:", len(diff), "\nMean:", np.mean(diff, axis=(0)), "\nMedian:", np.median(diff, axis=(0)), "\n")
+    ale.logger.info(" ".join(key_array) + "\nNum records:", len(diff), "\nMean:", np.mean(diff, axis=(0)), "\nMedian:", np.median(diff, axis=(0)), "\n")
 
 def compare_isds(json1, json2):
     """
@@ -316,7 +316,7 @@ def main(image):
     try:
         ale.loads(isis_label, props={"kernels": isis_kerns}, only_naif_spice=True)
     except:
-        print("No driver for such Label")
+        ale.logger.info("No driver for such Label")
         exit
     
     # Run spiceinit with ALE
