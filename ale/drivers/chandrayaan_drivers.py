@@ -615,6 +615,34 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         return self.original_naif_sensor_frame_id - 1000
 
     @property
+    def ephemeris_time(self):
+        """
+        Returns an array of times between the start/stop ephemeris times
+        based on the number of lines in the image.
+        Expects ephemeris start/stop times to be defined. These should be
+        floating point numbers containing the start and stop times of the
+        images.
+        Expects image_lines to be defined. This should be an integer containing
+        the number of lines in the image.
+
+        Returns
+        -------
+        : ndarray
+          ephemeris times split based on image lines
+        """
+
+        # Override the parent class logic, as returning the ephemeris time for
+        # every single line does not scale for Chandrayaan2 TMC images, which
+        # can have 189999 lines. Sampling at every 10th line should be enough.
+        num = self.image_lines
+        if num > 20000:
+            num = int(float(num) / 10.0)
+        if not hasattr(self, "_ephemeris_time"):
+            self._ephemeris_time = \
+              numpy.linspace(self.ephemeris_start_time, self.ephemeris_stop_time, num + 1)
+        return self._ephemeris_time
+
+    @property
     def frame_chain(self):
         """
         Returns a modified frame chain with with an additional coordinate transformation from Chandrayaan satellite to camera.
