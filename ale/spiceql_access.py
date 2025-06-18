@@ -89,8 +89,11 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
     """
     logger.debug(f"Calling {function_name} with args: {function_args}")
     if use_web == False:
+        function_args["useWeb"] = False
+        function_args["searchKernels"] = False
         func = getattr(pyspiceql, function_name)
-        return func(**function_args)[0]
+        ret = func(**function_args)[0]
+        return ret
     
     if spiceql_url:
         url = spiceql_url
@@ -114,8 +117,11 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
     else:
         response = requests.get(url, params=clean_function_args, headers=headers, verify=False)
     check_response(response)
-    logger.debug(f"Request URL={str(response.url)}, Kernels={str(response.json()['body']['kernels'])}")
-    return response.json()["body"]["return"], response.json()["body"]["kernels"]
+
+    logger.debug(f"Request URL={str(response.url)}")
+    logger.debug(f"Kernels={str(response.json()['body']['kernels'])}")
+    logger.debug(f"Data={str(response.json()['body']['return'])}")
+    return response.json()["body"]["return"]
 
 def get_ephem_data(times, function_name, batch_size=300, web=False, function_args={}):
     """
@@ -154,7 +160,6 @@ def get_ephem_data(times, function_name, batch_size=300, web=False, function_arg
               of lists. Where each element corrisponds to the time
               requested in times.
     """
-    kernels = {} 
     valid_functions = ["getTargetOrientations", "getTargetStates"]
     if function_name not in valid_functions:
         raise ValueError(f"The function name {function_name} is not supported "
@@ -162,8 +167,8 @@ def get_ephem_data(times, function_name, batch_size=300, web=False, function_arg
     if not web:
       func_args = {**function_args}
       func_args["ets"] = times
-      ephemeris_data, kernels = spiceql_call(function_name, func_args, web)
-      return ephemeris_data, kernels
+      ephemeris_data = spiceql_call(function_name, func_args, web)
+      return ephemeris_data
     
     batches = math.ceil(len(times) / batch_size)
     job_args_list = []
@@ -177,11 +182,7 @@ def get_ephem_data(times, function_name, batch_size=300, web=False, function_arg
         jobs = pool.starmap_async(spiceql_call, job_args_list)
         results = jobs.get()
 
-    for i in range(len(results)):
-        kernels = util.merge_dicts(kernels, results[i][1])
-        results[i] = results[i][0]
-
     flat_results = []
     for i in results:
         flat_results.extend(i)
-    return flat_results, kernels
+    return flat_results

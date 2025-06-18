@@ -106,6 +106,17 @@ def test_kernel_from_cube_list(cube_kernels):
         kernels = kernel_access.generate_kernels_from_cube(cube.name)
     assert kernels == ['$messenger/targetposition0', '$messenger/targetposition1','$messenger/instrumentposition', '$messenger/instrumentpointing0', '$messenger/instrumentpointing1', '$base/attitudeshape', '$messenger/instrument', '$base/clock']
 
+
+def test_kernel_from_cube_list_spiceql(cube_kernels):
+    with tempfile.NamedTemporaryFile('r+') as cube:
+        cube.write(cube_kernels)
+        cube.flush()
+        kernels = kernel_access.generate_kernels_from_cube(cube.name, format_as="spiceql")
+    print(kernels)
+    expected_kernels = {'ck': ['messenger/instrumentpointing0', 'messenger/instrumentpointing1'], 'spk': ['messenger/instrumentposition'], 'pck': ['base/attitudeshape'], 'tspk': ['messenger/targetposition0', 'messenger/targetposition1'], 'fk': [], 'ik': ['messenger/instrument'], 'iak': [], 'sclk': ['base/clock'], 'lsk': [], 'extra': []} 
+    assert kernels == expected_kernels
+
+
 def test_kernel_from_cube_list_expanded(monkeypatch, tmpdir, pvl_four_group, cube_kernels):
     with patch.dict('os.environ', {'ISISROOT': str(tmpdir), 'ISIS3DATA': '$ISISDATA', 'ISISDATA': '/test/path'}):
 

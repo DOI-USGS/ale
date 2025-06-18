@@ -53,6 +53,7 @@ class AleJsonEncoder(json.JSONEncoder):
             return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
+
 def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False, only_naif_spice=False):
     """
     Attempt to load a given label from possible drivers.

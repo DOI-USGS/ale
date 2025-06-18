@@ -90,6 +90,7 @@ def test_mro_marci_load(test_marci_kernels, label_type, kernel_type):
 
     isd_obj = json.loads(isd_str)
     comparison = compare_dicts(isd_obj, compare_isd)
+    print(json.dumps(isd_obj, indent=2))
     print(comparison)
     assert comparison == []
 

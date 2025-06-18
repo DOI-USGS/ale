@@ -51,8 +51,10 @@ class Driver():
         def get_property(prop_name):
             try:
                 return getattr(self, prop_name)
-            except (Exception) as e: 
+            except Exception as e:
+                import traceback
                 ale.logger.debug(f"Failed to get property {prop_name} with type {type(e)}: {e}")
+                ale.logger.debug(traceback.format_exc())
                 return None 
 
         if properties is None:

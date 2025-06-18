@@ -29,7 +29,7 @@ def test_load_pds(test_iss_kernels):
     label_file = get_image_label("N1702360370_1")
     compare_dict = get_isd("cassiniiss")
 
-    isd_str = ale.loads(label_file, props={'kernels': test_iss_kernels})
+    isd_str = ale.loads(label_file, props={'kernels': test_iss_kernels}, verbose=True)
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
     assert compare_dicts(isd_obj, compare_dict) == []
@@ -157,7 +157,7 @@ class test_cassini_iss_pds3_naif(unittest.TestCase):
             original_naif_sensor_frame_id.return_value = -12345
             center_ephemeris_time.return_value = 2.4
             ephemeris_time.return_value = [2.4]
-            frame_chain = self.driver.frame_chain
+            frame_chain  = self.driver.frame_chain
             assert len(frame_chain.nodes()) == 2
             assert 14082360 in frame_chain.nodes()
             assert -12345 in frame_chain.nodes()

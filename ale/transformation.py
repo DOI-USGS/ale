@@ -5,6 +5,7 @@ from numpy.polynomial.polynomial import polyval
 import networkx as nx
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
+import ale
 from ale.spiceql_access import get_ephem_data, spiceql_call
 from ale.rotation import ConstantRotation, TimeDependentRotation
 from ale import util
@@ -120,7 +121,7 @@ class FrameChain(nx.DiGraph):
 
         if exact_ck_times and len(ephemeris_times) > 1 and not nadir:
             try:
-                sensor_times, kernels = spiceql_call("extractExactCkTimes", {"observStart": ephemeris_times[0] + inst_time_bias, 
+                sensor_times = spiceql_call("extractExactCkTimes", {"observStart": ephemeris_times[0] + inst_time_bias, 
                                                                     "observEnd": ephemeris_times[-1] + inst_time_bias, 
                                                                     "targetFrame": sensor_frame,
                                                                     "mission": mission,
@@ -154,12 +155,9 @@ class FrameChain(nx.DiGraph):
         # Build graph async
         with ThreadPool(processes=1) as pool:
             jobs = pool.starmap_async(frame_chain.generate_rotations, frame_tasks)
-            results = jobs.get()
+            jobs.get()
 
-        kernels = {}
-        for r in results: 
-            kernels = util.merge_dicts(kernels, r)
-        return frame_chain, kernels
+        return frame_chain
 
     def frame_trace(self, time, sensorFrame, targetFrame, nadir=False, mission=""):
         jobs = []
@@ -172,13 +170,12 @@ class FrameChain(nx.DiGraph):
                      "initialFrame": targetFrame,
                      "mission": mission,
                      "searchKernels": self.search_kernels})
-        with ThreadPool(processes=1) as pool:
+        
+        ale.logger.debug(f"Frame Trace Jobs: {jobs}")
+        with ThreadPool(processes=2) as pool:
             jobs = pool.starmap_async(spiceql_call, [("frameTrace", job, self.use_web) for job in jobs])
             results = jobs.get()
         
-        for i in range(len(results)): 
-            results[i] = results[i][0] 
-
         if nadir:
             results.insert(0, ([[], []]))
         return results
@@ -283,11 +280,6 @@ class FrameChain(nx.DiGraph):
         with ThreadPool(processes=5) as pool:
             jobs = pool.starmap_async(get_ephem_data, frame_tasks)
             quats_and_avs_per_frame = jobs.get()
-        kernels = {}
-        # get kernels from returns
-        for i in range(len(quats_and_avs_per_frame)):
-            kernels = util.merge_dicts(kernels, quats_and_avs_per_frame[i][1])
-            quats_and_avs_per_frame[i] = quats_and_avs_per_frame[i][0]
 
         for i, frame in enumerate(frames):
             quats_and_avs = quats_and_avs_per_frame[i]
@@ -308,4 +300,3 @@ class FrameChain(nx.DiGraph):
                 rotation = ConstantRotation(quats[0], frame[0], frame[1])
             self.add_edge(rotation=rotation)
         
-        return kernels 

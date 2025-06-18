@@ -216,6 +216,19 @@ def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
                     if kern is not None:
                         mk_paths[kern_list][index] = expandvars(kern, isisprefs['DataDirectory'], case_sensitive=False)
         return mk_paths
+    elif (format_as == 'spiceql'):
+        mk_paths.pop("Clock")
+        mk_paths["ck"] = [k.replace("$", "") for k in mk_paths.pop("InstrumentPointing") if k]
+        mk_paths["spk"] = [k.replace("$", "") for k in mk_paths.pop("InstrumentPosition") if k]
+        mk_paths["pck"] = [k.replace("$", "") for k in mk_paths.pop("TargetAttitudeShape") if k]
+        mk_paths["tspk"] = [k.replace("$", "") for k in mk_paths.pop("TargetPosition") if k]
+        mk_paths["fk"] = [k.replace("$", "") for k in mk_paths.pop("Frame") if k]
+        mk_paths["ik"] = [k.replace("$", "") for k in mk_paths.pop("Instrument") if k]
+        mk_paths["iak"] = [k.replace("$", "") for k in mk_paths.pop("InstrumentAddendum") if k]
+        mk_paths["sclk"] = [k.replace("$", "") for k in mk_paths.pop("SpacecraftClock") if k]
+        mk_paths["lsk"] = [k.replace("$", "") for k in mk_paths.pop("LeapSecond") if k]
+        mk_paths["extra"] = [k.replace("$", "") for k in mk_paths.pop("Extra") if k]
+        return dict(mk_paths)
     else:
         raise Exception(f'{format_as} is not a valid return format')
 

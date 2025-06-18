@@ -296,7 +296,7 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
             except Exception as e:
                 nadir = self._props.get('nadir', False)
                 exact_ck_times = self._props.get('exact_ck_times', True)
-                self._frame_chain, kernels = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
+                self._frame_chain = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
                                                           target_frame=self.target_frame_id,
                                                           center_ephemeris_time=self.center_ephemeris_time,
                                                           ephemeris_times=self.ephemeris_time,
@@ -305,7 +305,6 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
                                                           mission=self.spiceql_mission,
                                                           use_web=self.use_web,
                                                           search_kernels=self.search_kernels)
-                self._kernels = util.merge_dicts(self._kernels, kernels)
                 rotation = ConstantRotation([[0, 0, 1, 0]], self.sensor_frame_id, self._original_naif_sensor_frame_id)
 
                 self._frame_chain.add_edge(rotation=rotation)
@@ -732,7 +731,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
             except Exception as e:
                 nadir = self._props.get('nadir', False)
                 exact_ck_times = self._props.get('exact_ck_times', True)
-                self._frame_chain, kernels = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
+                self._frame_chain = FrameChain.from_spice(sensor_frame=self._original_naif_sensor_frame_id,
                                                           target_frame=self.target_frame_id,
                                                           center_ephemeris_time=self.center_ephemeris_time,
                                                           ephemeris_times=self.ephemeris_time,
@@ -741,7 +740,6 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
                                                           mission=self.spiceql_mission,
                                                           use_web=self.use_web,
                                                           search_kernels=self.search_kernels)
-                self._kernels = util.merge_dicts(self._kernels, kernels)
                 rotation = ConstantRotation([[0, 0, 1, 0]], self.sensor_frame_id, self._original_naif_sensor_frame_id)
 
                 self._frame_chain.add_edge(rotation=rotation)

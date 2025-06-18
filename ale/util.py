@@ -20,6 +20,7 @@ import re
 import networkx as nx
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
+import ale
 
 class CachedDict():
     """
@@ -1018,7 +1019,7 @@ def find_kernels(cube, isis_data, format_as=dict):
         return kernels
 
 
-def merge_dicts(dict1, dict2, strategy='combine'):
+def merge_kernels(dict1, dict2, strategy='combine'):
     """
     Merge two dictionaries with configurable conflict resolution strategies.
 
@@ -1046,17 +1047,23 @@ def merge_dicts(dict1, dict2, strategy='combine'):
 
     Examples
     --------
-    >>> merge_dicts({'a': 1, 'b': 2}, {'b': 3, 'c': 4}, strategy='right')
+    >>> merge_kernels({'a': 1, 'b': 2}, {'b': 3, 'c': 4}, strategy='right')
     {'a': 1, 'b': 3, 'c': 4}
 
-    >>> merge_dicts({'a': 1, 'b': 2}, {'b': 3, 'c': 4}, strategy='left')
+    >>> merge_kernels({'a': 1, 'b': 2}, {'b': 3, 'c': 4}, strategy='left')
     {'a': 1, 'b': 2, 'c': 4}
 
-    >>> merge_dicts({'a': 1, 'b': 2}, {'b': 3, 'c': 4}, strategy='combine')
+    >>> merge_kernels({'a': 1, 'b': 2}, {'b': 3, 'c': 4}, strategy='combine')
     {'a': 1, 'b': [2, 3], 'c': 4}
     """
+    ale.logger.debug(f"merge_kernels: dict1: {dict1}, dict2: {dict2}, strategy: {strategy}")
+    if not dict1:
+        return dict2 
+    if not dict2:
+        return dict1
+
     merged = dict1.copy()
-    
+
     for key, value in dict2.items():
         if key in merged:
             if strategy == 'left':
