@@ -19,6 +19,7 @@ from pathlib import Path, PurePath
 import sys
 import json
 import ale
+import brotli
 import json
 from ale.drivers import AleJsonEncoder
 
