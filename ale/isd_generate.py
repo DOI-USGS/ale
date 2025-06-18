@@ -19,7 +19,6 @@ from pathlib import Path, PurePath
 import sys
 import json
 import ale
-import brotli
 import json
 from ale.drivers import AleJsonEncoder
 
@@ -144,7 +143,6 @@ def main():
     if args.verbose:
         log_level = logging.WARNING
 
-    logging.basicConfig(format="%(message)s", level=log_level)
     logger.setLevel(log_level)
 
     if args.kernel is None:
@@ -244,7 +242,7 @@ def file_to_isd(
 
     if use_web:
         props["web"] = use_web
-
+    
     if search_kernels: 
         props["search_kernels"] = search_kernels
 

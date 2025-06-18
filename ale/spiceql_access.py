@@ -90,7 +90,6 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
     logger.debug(f"Calling {function_name} with args: {function_args}")
     if use_web == False:
         function_args["useWeb"] = False
-        function_args["searchKernels"] = False
         func = getattr(pyspiceql, function_name)
         ret = func(**function_args)[0]
         return ret

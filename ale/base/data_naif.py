@@ -29,9 +29,10 @@ class NaifSpice():
         Called when the context is created. This is used
         to get the kernels furnished.
         """
+        ale.logger.debug(f"Loading kernels: {self.kernels}")
         if isinstance(self.kernels, list) and not self.use_web:
             [pyspiceql.load(k) for k in self.kernels]
-        elif isinstance(self.kernels, dict) and not self.use_web:
+        elif isinstance(self.kernels, dict) and not self.use_web and not self.search_kernels:
             self.kset = pyspiceql.KernelSet(self.kernels)
         elif not self.use_web:
             ale.logger.warn("No kernels were specified. No kernels will be loaded.")
@@ -43,9 +44,9 @@ class NaifSpice():
         this is done, the object is out of scope and the
         kernels can be unloaded.
         """
-        if self.kernels and not self.use_web:
+        if isinstance(self.kernels, list) and not self.use_web:
             [pyspiceql.unload(k) for k in self.kernels]
-        elif isinstance(self.kernels, dict) and not self.use_web:
+        elif isinstance(self.kernels, dict) and not self.use_web and not self.search_kernels:
             del self.kset
 
     @property
@@ -85,7 +86,7 @@ class NaifSpice():
                 except Exception as e:
                     self._kernels =  self._props['kernels']
             elif self.search_kernels == True:
-                kernels = pyspiceql.searchForKernelsets([self.spiceql_mission, self.target_name, "base"], startTime=self.ephemeris_start_time, stopTime=self.ephemeris_stop_time, useWeb=self.use_web, full_kernel_path=not self.use_web)
+                _, kernels = pyspiceql.searchForKernelsets([self.spiceql_mission, self.target_name, "base"], startTime=self.ephemeris_start_time, stopTime=self.ephemeris_stop_time, useWeb=self.use_web)
                 self._kernels = kernels  
             elif ale.spice_root and not self.use_web:
                 search_results = kernel_access.get_metakernels(ale.spice_root, missions=self.short_mission_name, years=self.utc_start_time.year, versions='latest')
@@ -822,11 +823,11 @@ class NaifSpice():
         : json
           Json data from the SpiceQL call
         """
-        ale.logger.debug(f"Calling data_naif spiceql_call function {function_name} with args {function_args}")
         # Use the search kernels for offline mode
         # This will work if a user passed no kernels but still set ISISDATA
         # just might take a bit
         function_args["searchKernels"] = self.search_kernels
+        ale.logger.debug(f"Calling data_naif spiceql_call function {function_name} with args {function_args}")
 
         # Bodge solution for memo funcs in offline mode
         memo_funcs = ["translateNameToCode", "translateCodeToName"]
