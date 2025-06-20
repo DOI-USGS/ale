@@ -204,7 +204,7 @@ class test_chandrayaan2_tmc_isis_naif(unittest.TestCase):
         assert self.driver.light_time_correction == 'LT+S'
 
 # Chandrayaan2 OHRC tests
-class test_chandrayaan2_tmc_isis_naif(unittest.TestCase):
+class test_chandrayaan2_ohrc_isis_naif(unittest.TestCase):
 
     def setUp(self):
         label = get_image_label('ch2_ohr_nrp_20200827T0226453039_d_img_d18', 'isis3')
@@ -241,9 +241,20 @@ class test_chandrayaan2_tmc_isis_naif(unittest.TestCase):
             calls = [call('utcToEt', {'utc': '2020-08-27 02:27:01.687500', 'searchKernels': False}, False)]
             spiceql_call.assert_has_calls(calls)
 
-    # This test fails with an error in the code, it even though it looks that it sets
-    # properly the value that the test will then query.
+    def test_detector_center_sample(self):
+        with patch('ale.spiceql_access.spiceql_call', 
+                   side_effect=[-152270, 
+                                {"frameCode": -152270}, 
+                                {"INS-152270_CENTER": [2003.1, 3003.2]}, {}]) as spiceql_call:
+            assert self.driver.detector_center_sample == 2003.1
+            assert self.driver.detector_center_line   == 3003.2
 
-    # def test_detector_center_sample(self):
-    #     with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, {"frameCode": -12345}, -12345, {"INS-12345_CENTER": [2003.09]}, {}]) as spiceql_call:
-    #         assert self.driver.detector_center_sample == 2003.09
+    def test_focal2pixel_lines(self):
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-152270, {"frameCode": -152270}, {"INS-152270_PIXEL_SIZE": 12}, {}]) as spiceql_call:
+            print("---value is ", self.driver.focal2pixel_lines)
+            assert self.driver.focal2pixel_lines == [0.0, 0.0, 8.333333333333333e-05]
+
+    def test_focal2pixel_samples(self):
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-152270, {"frameCode": -152270}, {"INS-152270_PIXEL_SIZE": 12}, {}]) as spiceql_call:
+            print("---value is ", self.driver.focal2pixel_samples)
+            assert self.driver.focal2pixel_samples == [0.0, -8.333333333333333e-05, 0]
