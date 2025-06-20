@@ -251,10 +251,8 @@ class test_chandrayaan2_ohrc_isis_naif(unittest.TestCase):
 
     def test_focal2pixel_lines(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-152270, {"frameCode": -152270}, {"INS-152270_PIXEL_SIZE": 12}, {}]) as spiceql_call:
-            print("---value is ", self.driver.focal2pixel_lines)
             assert self.driver.focal2pixel_lines == [0.0, 0.0, 8.333333333333333e-05]
 
     def test_focal2pixel_samples(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-152270, {"frameCode": -152270}, {"INS-152270_PIXEL_SIZE": 12}, {}]) as spiceql_call:
-            print("---value is ", self.driver.focal2pixel_samples)
             assert self.driver.focal2pixel_samples == [0.0, -8.333333333333333e-05, 0]
