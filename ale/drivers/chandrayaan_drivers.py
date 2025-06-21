@@ -564,8 +564,9 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         """
         # meters to mm
         pixel_size = self.naif_keywords[f"INS{self.ikid}_PIXEL_SIZE"] * 1000
-        return [0.0, 0.0, 1/pixel_size]
-    
+        #return [0.0, 0.0, 1/pixel_size] # old
+        return [0.0, 1/pixel_size, 0.0] # new
+
     @property
     def focal2pixel_samples(self):
         """
@@ -579,7 +580,8 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         """
         # meters to mm
         pixel_size = self.naif_keywords[f"INS{self.ikid}_PIXEL_SIZE"] * 1000
-        return [0.0, -1/pixel_size, 0.0]
+        #return [0.0, -1/pixel_size, 0.0] # old
+        return [0.0, 0.0, 1/pixel_size] # new
 
     @property
     def original_naif_sensor_frame_id(self):
@@ -670,9 +672,11 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
           # Fix for the the Chandrayaan2 TMC2 instrument as outlined in the
           # original_naif_sensor_frame_id() docstring. This swaps the x and z
           # axes, and negates the y axis.
-          mat = numpy.array([[0, 0, 1],
-                             [0, -1, 0],
-                             [1, 0, 0]])
+          # old
+          #mat = numpy.array([[0, 0, 1], [0, -1, 0], [1, 0, 0]])
+          # new
+          mat = numpy.array([[0, 0, 1], [-1, 0, 0], [0, -1, 0]])
+          
           quats = Rotation.from_matrix(mat).as_quat()
           rotation = ConstantRotation(quats, 
                                       self.sensor_frame_id, 
