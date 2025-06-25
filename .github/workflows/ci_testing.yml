@@ -92,7 +92,7 @@ jobs:
           cmake --build . --target Docs --config Debug
 
   Build-and-Test-Win:
-    runs-on: windows-2020
+    runs-on: windows-2025
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11"]
