@@ -159,7 +159,7 @@ class LroLrocNacPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driv
           Starting ephemeris time of the image
         """
         if not hasattr(self, "_ephemeris_start_time"):
-            self._ephemeris_start_time= self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, 
+            self._ephemeris_start_time = self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, 
                                                                            "sclk": self.label['LRO:SPACECRAFT_CLOCK_PREROLL_COUNT'], 
                                                                            "mission": self.spiceql_mission})
             self._ephemeris_start_time += self.constant_time_offset + self.additional_preroll * self.exposure_duration
@@ -269,9 +269,9 @@ class LroLrocNacPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driv
         """
         if not hasattr(self, "_spacecraft_direction"):
           frame_chain = self.frame_chain
-          lro_bus_id= self.spiceql_call("translateNameToCode", {'frame': 'LRO_SC_BUS', 'mission': self.spiceql_mission})
+          lro_bus_id = self.spiceql_call("translateNameToCode", {'frame': 'LRO_SC_BUS', 'mission': self.spiceql_mission})
           time = self.ephemeris_start_time
-          lt_states= self.spiceql_call("getTargetStates", {'ets': [time], 
+          lt_states = self.spiceql_call("getTargetStates", {'ets': [time], 
                                                            'target': self.spacecraft_name, 
                                                            'observer': self.target_name, 
                                                            'frame': 'J2000', 
@@ -390,7 +390,7 @@ class LroLrocNacIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driv
           Starting ephemeris time of the image
         """
         if not hasattr(self, "_ephemeris_start_time"):
-          self._ephemeris_start_time= self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, 
+          self._ephemeris_start_time = self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, 
                                                                 "sclk": self.label['IsisCube']['Instrument']['SpacecraftClockPrerollCount'], 
                                                                 "mission": self.spiceql_mission})
           self._ephemeris_start_time += self.constant_time_offset + self.additional_preroll * self.exposure_duration
@@ -513,9 +513,9 @@ class LroLrocNacIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driv
         """
         if not hasattr(self, "_spacecraft_direction"):
           frame_chain = self.frame_chain
-          lro_bus_id= self.spiceql_call("translateNameToCode", {'frame': 'LRO_SC_BUS', 'mission': self.spiceql_mission})
+          lro_bus_id = self.spiceql_call("translateNameToCode", {'frame': 'LRO_SC_BUS', 'mission': self.spiceql_mission})
           time = self.ephemeris_start_time
-          lt_states= self.spiceql_call("getTargetStates", {'ets': [time], 
+          lt_states = self.spiceql_call("getTargetStates", {'ets': [time], 
                                                            'target': self.spacecraft_name, 
                                                            'observer': self.target_name, 
                                                            'frame': 'J2000', 
@@ -832,7 +832,7 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
           start time
         """
         if not hasattr(self, "_ephemeris_start_time"):
-            self._ephemeris_start_time= self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+            self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
             self._ephemeris_start_time -= self.line_exposure_duration
         return self._ephemeris_start_time
 

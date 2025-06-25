@@ -157,7 +157,7 @@ class test_cassini_iss_pds3_naif(unittest.TestCase):
             original_naif_sensor_frame_id.return_value = -12345
             center_ephemeris_time.return_value = 2.4
             ephemeris_time.return_value = [2.4]
-            frame_chain  = self.driver.frame_chain
+            frame_chain = self.driver.frame_chain
             assert len(frame_chain.nodes()) == 2
             assert 14082360 in frame_chain.nodes()
             assert -12345 in frame_chain.nodes()

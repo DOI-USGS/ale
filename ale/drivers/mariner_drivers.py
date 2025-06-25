@@ -82,7 +82,7 @@ class Mariner10IsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistorti
           start time
         """
         if not hasattr(self, "_ephemeris_start_time"):
-            self._ephemeris_start_time= self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})  - (self.exposure_duration / 2.0)
+            self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})  - (self.exposure_duration / 2.0)
         return self._ephemeris_start_time
     
     @property

@@ -45,7 +45,7 @@ class TGOCassisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistorti
           ephemeris start time of the image.
         """
         if not hasattr(self, "_ephemeris_start_time"):
-            self._ephemeris_start_time= self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+            self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
         return self._ephemeris_start_time
 
     @property

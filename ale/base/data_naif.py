@@ -231,7 +231,7 @@ class NaifSpice():
           Naif ID used to for identifying the instrument in Spice kernels
         """
         if not hasattr(self, "_ikid"):
-            self._ikid= self.spiceql_call("translateNameToCode", {"frame": self.instrument_id, "mission": self.spiceql_mission})
+            self._ikid = self.spiceql_call("translateNameToCode", {"frame": self.instrument_id, "mission": self.spiceql_mission})
         return self._ikid
 
     @property
@@ -263,7 +263,7 @@ class NaifSpice():
           Naif ID code for the target body
         """
         if not hasattr(self, "_target_id"):
-            self._target_id= self.spiceql_call("translateNameToCode", {"frame": self.target_name, "mission": self.spiceql_mission})
+            self._target_id = self.spiceql_call("translateNameToCode", {"frame": self.target_name, "mission": self.spiceql_mission})
         return self._target_id
 
     @property
@@ -279,7 +279,7 @@ class NaifSpice():
           Naif ID code for the target frame
         """
         if not hasattr(self, "_target_frame_id"):
-            frame_info= self.spiceql_call("getTargetFrameInfo", {"targetId": self.target_id, "mission": self.spiceql_mission})
+            frame_info = self.spiceql_call("getTargetFrameInfo", {"targetId": self.target_id, "mission": self.spiceql_mission})
             self._target_frame_id = frame_info["frameCode"]
         return self._target_frame_id
 
@@ -415,7 +415,7 @@ class NaifSpice():
         """
         if not hasattr(self, "_reference_frame"):
             try:
-                frame_info= self.spiceql_call("getTargetFrameInfo", {"targetId": self.target_id, "mission": self.spiceql_mission})
+                frame_info = self.spiceql_call("getTargetFrameInfo", {"targetId": self.target_id, "mission": self.spiceql_mission})
                 self._reference_frame = frame_info["frameName"]
             except:
                 self._reference_frame = 'IAU_{}'.format(self.target_name)
@@ -443,7 +443,7 @@ class NaifSpice():
             positions = []
             velocities = []
 
-            sun_lt_states= self.spiceql_call("getTargetStates",{"ets": times,
+            sun_lt_states = self.spiceql_call("getTargetStates",{"ets": times,
                                                                  "target": "SUN",
                                                                  "observer": self.target_name,
                                                                  "frame": self.reference_frame,
@@ -611,7 +611,7 @@ class NaifSpice():
                 # Get the default line translation with no potential flipping
                 # from the driver
                 trans_x_key = f"INS{self.ikid}_ITRANSL"
-                trans_x= self.spiceql_call("findMissionKeywords", {"key": trans_x_key, 
+                trans_x = self.spiceql_call("findMissionKeywords", {"key": trans_x_key, 
                                                                     "mission": self.spiceql_mission})[trans_x_key]
                 if (trans_x[0] < trans_x[1]):
                     velocity_axis = 1
@@ -657,7 +657,7 @@ class NaifSpice():
           Starting ephemeris time of the image
         """
         if not hasattr(self, "_ephemeris_start_time"):
-            self._ephemeris_start_time= self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": self.spacecraft_clock_start_count, "mission": self.spiceql_mission})
+            self._ephemeris_start_time = self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": self.spacecraft_clock_start_count, "mission": self.spiceql_mission})
         return self._ephemeris_start_time
 
     @property
@@ -674,7 +674,7 @@ class NaifSpice():
           Ephemeris stop time of the image
         """
         if not hasattr(self, "_ephemeris_stop_time"):
-            self._ephemeris_stop_time= self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": self.spacecraft_clock_stop_count, "mission": self.spiceql_mission})
+            self._ephemeris_stop_time = self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": self.spacecraft_clock_stop_count, "mission": self.spiceql_mission})
         return self._ephemeris_stop_time
 
     @property
@@ -767,8 +767,8 @@ class NaifSpice():
 
             self._naif_keywords['BODY_FRAME_CODE'] = self.target_frame_id
             self._naif_keywords['BODY_CODE'] = self.target_id
-            mission_keywords= self.spiceql_call("findMissionKeywords", {"key": f"*{self.ikid}*", "mission": self.spiceql_mission})
-            target_keywords= self.spiceql_call("findTargetKeywords", {"key": f"*{self.target_id}*", "mission": self.spiceql_mission})
+            mission_keywords = self.spiceql_call("findMissionKeywords", {"key": f"*{self.ikid}*", "mission": self.spiceql_mission})
+            target_keywords = self.spiceql_call("findTargetKeywords", {"key": f"*{self.target_id}*", "mission": self.spiceql_mission})
 
             if mission_keywords: 
                 self._naif_keywords = self.naif_keywords | mission_keywords
@@ -776,7 +776,7 @@ class NaifSpice():
                 self._naif_keywords = self._naif_keywords | target_keywords
             
             try:
-                frame_keywords= self.spiceql_call("findMissionKeywords", {"key": f"*{self.fikid}*", "mission": self.spiceql_mission})
+                frame_keywords = self.spiceql_call("findMissionKeywords", {"key": f"*{self.fikid}*", "mission": self.spiceql_mission})
                 if frame_keywords: 
                     self._naif_keywords = self._naif_keywords | frame_keywords 
             except AttributeError as error:
