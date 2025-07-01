@@ -891,14 +891,16 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
             An updated dictionary of NAIF keywords with the correct TRANSX/Y and ITRANSS/L
             values computed
         """
-        naif_keywords = super().naif_keywords
-        ground_range_resolution = self.label['IsisCube']['Instrument']["ScaledPixelHeight"]
-        icode = "INS" + str(self.ikid)
-        naif_keywords[icode + "_TRANSX"] = [-1.0 * ground_range_resolution, ground_range_resolution, 0.0]
-        naif_keywords[icode + "_TRANSY"] = [0.0, 0.0, 0.0]
-        naif_keywords[icode + "_ITRANSS"] = [1.0, 1.0 / ground_range_resolution, 0.0]
-        naif_keywords[icode + "_ITRANSL"] = [0.0, 0.0, 0.0]
-        return naif_keywords
+        if not hasattr(self, "_naif_keywords"):
+          self._naif_keywords = super().naif_keywords
+          ground_range_resolution = self.label['IsisCube']['Instrument']["ScaledPixelHeight"]
+          icode = "INS" + str(self.ikid)
+          print("BANANA", icode)
+          self._naif_keywords[icode + "_TRANSX"] = [-1.0 * ground_range_resolution, ground_range_resolution, 0.0]
+          self._naif_keywords[icode + "_TRANSY"] = [0.0, 0.0, 0.0]
+          self._naif_keywords[icode + "_ITRANSS"] = [1.0, 1.0 / ground_range_resolution, 0.0]
+          self._naif_keywords[icode + "_ITRANSL"] = [0.0, 0.0, 0.0]
+        return self._naif_keywords
 
 class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, RadialDistortion, Driver):
     @property

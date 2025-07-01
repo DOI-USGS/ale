@@ -306,13 +306,13 @@ class test_marci_isis_naif(unittest.TestCase):
 
     def test_focal2pixel_samples(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, {}]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.mro_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_ITRANSS": [0.0, 111.11111111111, 0.0]}
             assert self.driver.focal2pixel_samples == [0.0, 111.11111111111, 0.0]
 
     def test_focal2pixel_lines(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, {}]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.mro_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_ITRANSL": [0.0, 0.0, 111.11111111111]}
             assert self.driver.focal2pixel_lines == [0.0, 0.0, 111.11111111111]
 

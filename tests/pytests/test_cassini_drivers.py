@@ -291,7 +291,7 @@ class test_cassini_vims_isis_naif(unittest.TestCase):
     def test_compute_vims_time(self):
         # This value isn't used for anything in the test, as it's only used for the
         # default focal length calculation if the filter can't be found.
-        with patch('ale.base.data_naif.NaifSpice.spiceql_call', return_value=12345) as sclkToEt:
+        with patch('ale.drivers.co_drivers.NaifSpice.spiceql_call', return_value=12345) as sclkToEt:
             assert self.driver.compute_vims_time(1, 1, self.driver.image_samples, "VIS")
             sclkToEt.assert_called_with("strSclkToEt", {'frameCode': 12345, 'sclk': '1514284191', 'mission': 'cassini'})
 

@@ -114,7 +114,7 @@ class test_dawn_fc_pds3_naif(unittest.TestCase):
 
     def test_usgscsm_distortion_model(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.dawn_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_RAD_DIST_COEFF": [12345]}
             dist = self.driver.usgscsm_distortion_model
             assert dist['dawnfc']['coefficients'] == [12345]
@@ -124,7 +124,7 @@ class test_dawn_fc_pds3_naif(unittest.TestCase):
 
     def test_focal2pixel_samples(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.dawn_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_PIXEL_SIZE": [1000]}
             assert self.driver.focal2pixel_samples == [0, 1, 0]
             calls = [call('translateNameToCode', {'frame': 'DAWN_FC2_FILTER_6', 'mission': 'fc2', 'searchKernels': False}, False)]
@@ -133,7 +133,7 @@ class test_dawn_fc_pds3_naif(unittest.TestCase):
 
     def test_focal2pixel_lines(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.dawn_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_PIXEL_SIZE": [1000]}
             assert self.driver.focal2pixel_lines == [0, 0, 1]
             calls = [call('translateNameToCode', {'frame': 'DAWN_FC2_FILTER_6', 'mission': 'fc2', 'searchKernels': False}, False)]
@@ -145,7 +145,7 @@ class test_dawn_fc_pds3_naif(unittest.TestCase):
 
     def test_detector_center_sample(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.dawn_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_CCD_CENTER": [12345, 100]}
             assert self.driver.detector_center_sample == 12345.5
             calls = [call('translateNameToCode', {'frame': 'DAWN_FC2_FILTER_6', 'mission': 'fc2', 'searchKernels': False}, False)]
@@ -154,7 +154,7 @@ class test_dawn_fc_pds3_naif(unittest.TestCase):
 
     def test_detector_center_line(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.dawn_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_CCD_CENTER": [12345, 100]}
             assert self.driver.detector_center_line == 100.5
             calls = [call('translateNameToCode', {'frame': 'DAWN_FC2_FILTER_6', 'mission': 'fc2', 'searchKernels': False}, False)]

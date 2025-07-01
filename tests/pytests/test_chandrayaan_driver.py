@@ -82,21 +82,17 @@ class test_chandrayaan_m3_pds_naif(unittest.TestCase):
     def test_image_samples(self):
         assert self.driver.image_samples == 608
 
-    # def test_ephemeris_start_time(self):
-    #     label_file = get_image_label("M3T20090630T083407_V03_L1B_cropped", label_type="pds3")
-    #     with patch("ale.drivers.chandrayaan_drivers.spice.scs2e", return_value=12345) as scs2e,\
-    #           patch("ale.drivers.chandrayaan_drivers.spice.utc2et", return_value=12345) as utc2et,\
-    #             patch("ale.drivers.chandrayaan_drivers.spice.sce2s", return_value=12345) as sce2s,\
-    #              patch("ale.drivers.chandrayaan_drivers.Chandrayaan1M3Pds3NaifSpiceDriver.utc_time_table", os.path.dirname(label_file)+"/M3T20090630T083407_V03_TIM_cropped.TAB"):
-    #         assert self.driver.ephemeris_start_time == 12345
+    def test_ephemeris_start_time(self):
+        label_file = get_image_label("M3T20090630T083407_V03_L1B_cropped", label_type="pds3")
+        with patch("ale.drivers.chandrayaan_drivers.NaifSpice.spiceql_call", return_value=12345) as spiceql_call,\
+             patch("ale.drivers.chandrayaan_drivers.Chandrayaan1M3Pds3NaifSpiceDriver.utc_time_table", os.path.dirname(label_file)+"/M3T20090630T083407_V03_TIM_cropped.TAB"):
+            assert self.driver.ephemeris_start_time == 12345
 
-    # def test_ephemeris_stop_time(self):
-    #     label_file = get_image_label("M3T20090630T083407_V03_L1B_cropped", label_type="pds3")
-    #     with patch("ale.drivers.chandrayaan_drivers.spice.scs2e", return_value=12345) as scs2e,\
-    #           patch("ale.drivers.chandrayaan_drivers.spice.utc2et", return_value=12345) as utc2et,\
-    #             patch("ale.drivers.chandrayaan_drivers.spice.sce2s", return_value=12345) as sce2s,\
-    #              patch("ale.drivers.chandrayaan_drivers.Chandrayaan1M3Pds3NaifSpiceDriver.utc_time_table", os.path.dirname(label_file)+"/M3T20090630T083407_V03_TIM_cropped.TAB"):
-    #         assert self.driver.ephemeris_stop_time == 12345.2544
+    def test_ephemeris_stop_time(self):
+        label_file = get_image_label("M3T20090630T083407_V03_L1B_cropped", label_type="pds3")
+        with patch("ale.drivers.chandrayaan_drivers.NaifSpice.spiceql_call", return_value=12345) as scs2e,\
+             patch("ale.drivers.chandrayaan_drivers.Chandrayaan1M3Pds3NaifSpiceDriver.utc_time_table", os.path.dirname(label_file)+"/M3T20090630T083407_V03_TIM_cropped.TAB"):
+            assert self.driver.ephemeris_stop_time == 12345.2544
 
     def test_utc_times(self):
         label_file = get_image_label("M3T20090630T083407_V03_L1B_cropped", label_type="pds3")
@@ -171,12 +167,10 @@ class test_chandrayaan_mrffr_isis_naif(unittest.TestCase):
         assert self.driver.ground_range_resolution == 202.952153
 
     def test_range_conversion_coefficients(self):
-        with patch('ale.drivers.chandrayaan_drivers.spice.str2et', return_value=12345) as str2et:
-          assert len(self.driver.range_conversion_coefficients) == 20
+        assert len(self.driver.range_conversion_coefficients) == 20
 
     def test_range_conversion_times(self):
-        with patch('ale.drivers.chandrayaan_drivers.spice.str2et', return_value=12345) as str2et:
-          assert len(self.driver.range_conversion_coefficients) == 20
+        assert len(self.driver.range_conversion_coefficients) == 20
 
     def test_scaled_pixel_width(self):
         assert self.driver.scaled_pixel_width == 75

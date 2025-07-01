@@ -124,7 +124,7 @@ class test_lorri_isis_naif(unittest.TestCase):
             assert self.driver.ikid == -98301
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.base.data_naif.NaifSpice.spiceql_call', return_value=12345) as spice:
+        with patch('ale.drivers.nh_drivers.NaifSpice.spiceql_call', return_value=12345) as spice:
             assert self.driver.ephemeris_stop_time == 12345
             spice.assert_called_with('strSclkToEt', {'frameCode': 12345, 'sclk': '1/0034974379:47125', 'mission': 'lorri'})
 

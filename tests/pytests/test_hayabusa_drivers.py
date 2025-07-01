@@ -35,7 +35,7 @@ class test_amica_isis_naif(unittest.TestCase):
         assert self.driver.instrument_id == "HAYABUSA_AMICA"
 
     def test_center_ephemeris_time(self):
-        with patch('ale.base.data_naif.NaifSpice.spiceql_call', return_value=12345) as sclkToEt:
+        with patch('ale.drivers.hayabusa_drivers.NaifSpice.spiceql_call', return_value=12345) as sclkToEt:
             assert self.driver.center_ephemeris_time == 12345 + 0.0109
             sclkToEt.assert_called_with('strSclkToEt', {'frameCode': 12345, 'sclk': '2457499394', 'mission': 'amica'})
     

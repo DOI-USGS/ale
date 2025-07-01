@@ -128,24 +128,24 @@ class test_data_naif(unittest.TestCase):
             assert "74999" in i or "-74021" in i or "499" in i or i is "BODY_FRAME_CODE" or i is "BODY_CODE"
 
 def test_light_time_correction_keyword():
-    with patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords, \
-         patch('ale.base.data_naif.NaifSpice.ikid', new_callable=PropertyMock) as ikid:
+    with patch.object(NaifSpice, 'naif_keywords', new_callable=PropertyMock) as naif_keywords, \
+         patch.object(NaifSpice, 'ikid', new_callable=PropertyMock) as ikid:
         ikid.return_value = -12345
         naif_keywords.return_value = {"INS-12345_LIGHTTIME_CORRECTION": "NONE"}
         assert NaifSpice().light_time_correction == 'NONE'
 
 @pytest.mark.parametrize(("key_val, return_val"), [(True, True), (False, False)])
 def test_swap_observer_target_keyword(key_val, return_val):
-    with patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords, \
-         patch('ale.base.data_naif.NaifSpice.ikid', new_callable=PropertyMock) as ikid:
+    with patch.object(NaifSpice, 'naif_keywords', new_callable=PropertyMock) as naif_keywords, \
+         patch.object(NaifSpice, 'ikid', new_callable=PropertyMock) as ikid:
         ikid.return_value = -12345
         naif_keywords.return_value = {"INS-12345_SWAP_OBSERVER_TARGET": key_val}
         assert NaifSpice().swap_observer_target == return_val
 
 @pytest.mark.parametrize(("key_val, return_val"), [(True, True), (False, False)])
 def test_correct_lt_to_surface_keyword(key_val, return_val):
-    with patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords, \
-         patch('ale.base.data_naif.NaifSpice.ikid', new_callable=PropertyMock) as ikid:
+    with patch.object(NaifSpice, 'naif_keywords', new_callable=PropertyMock) as naif_keywords, \
+         patch.object(NaifSpice, 'ikid', new_callable=PropertyMock) as ikid:
         ikid.return_value = -12345
         naif_keywords.return_value = {"INS-12345_LT_SURFACE_CORRECT": key_val}
         assert NaifSpice().correct_lt_to_surface == return_val

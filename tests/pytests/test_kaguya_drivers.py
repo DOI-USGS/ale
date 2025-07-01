@@ -91,7 +91,7 @@ class test_kaguyatc_pds_naif(unittest.TestCase):
 
     def test_focal2pixel_samples(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.selene_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_PIXEL_SIZE": 2}
             assert self.driver.focal2pixel_samples == [0, 0, -1/2]
             calls = [call('translateNameToCode', {'frame': 'LISM_TC1', 'mission': 'kaguya', 'searchKernels': False}, False)]
@@ -100,7 +100,7 @@ class test_kaguyatc_pds_naif(unittest.TestCase):
 
     def test_focal2pixel_lines(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.selene_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_PIXEL_SIZE": 2}
             assert self.driver.focal2pixel_lines == [0, 1/2, 0]
             calls = [call('translateNameToCode', {'frame': 'LISM_TC1', 'mission': 'kaguya', 'searchKernels': False}, False)]
@@ -148,7 +148,7 @@ class test_kaguyami_isis3_naif(unittest.TestCase):
 
     def test_detector_center_line(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.selene_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_CENTER": [54321, 12345]}
             assert self.driver.detector_center_line == 12344.5
             calls = [call('translateNameToCode', {'frame': 'LISM_MI-NIR1', 'mission': 'kaguya', 'searchKernels': False}, False)]
@@ -157,7 +157,7 @@ class test_kaguyami_isis3_naif(unittest.TestCase):
 
     def test_detector_center_sample(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.selene_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_CENTER": [54321, 12345]}
             assert self.driver.detector_center_sample == 54320.5
             calls = [call('translateNameToCode', {'frame': 'LISM_MI-NIR1', 'mission': 'kaguya', 'searchKernels': False}, False)]
@@ -166,7 +166,7 @@ class test_kaguyami_isis3_naif(unittest.TestCase):
 
     def test_focal2pixel_samples(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.selene_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_PIXEL_SIZE": 2}
             assert self.driver.focal2pixel_samples == [0, 0, -1/2]
             calls = [call('translateNameToCode', {'frame': 'LISM_MI-NIR1', 'mission': 'kaguya', 'searchKernels': False}, False)]
@@ -175,7 +175,7 @@ class test_kaguyami_isis3_naif(unittest.TestCase):
 
     def test_focal2pixel_lines(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.selene_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_PIXEL_SIZE": 2}
             assert self.driver.focal2pixel_lines == [0, 1/2, 0]
             calls = [call('translateNameToCode', {'frame': 'LISM_MI-NIR1', 'mission': 'kaguya', 'searchKernels': False}, False)]
@@ -266,7 +266,7 @@ class test_kaguyatc_isis3_naif(unittest.TestCase):
 
     def test_focal2pixel_samples(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.selene_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_PIXEL_SIZE": 2}
             assert self.driver.focal2pixel_samples == [0, 0, -1/2]
             calls = [call('translateNameToCode', {'frame': 'LISM_TC1', 'mission': 'kaguya', 'searchKernels': False}, False)]
@@ -275,7 +275,7 @@ class test_kaguyatc_isis3_naif(unittest.TestCase):
 
     def test_focal2pixel_lines(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.selene_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_PIXEL_SIZE": 2}
             assert self.driver.focal2pixel_lines == [0, 1/2, 0]
             calls = [call('translateNameToCode', {'frame': 'LISM_TC1', 'mission': 'kaguya', 'searchKernels': False}, False)]

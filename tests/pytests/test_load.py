@@ -56,6 +56,7 @@ def test_loads_invalid_label():
 def test_load_invalid_spice_root(monkeypatch):
     monkeypatch.delenv('ALESPICEROOT', raising=False)
     reload(ale)
+    reload(ale.base.data_naif)
 
     label_file = get_image_label('EN1072174528M')
     with pytest.raises(Exception):
@@ -66,6 +67,7 @@ def test_load_mes_from_metakernels(tmpdir, monkeypatch, mess_kernels):
     with patch.dict('os.environ', {'ALESPICEROOT': str(tmpdir)}):
         # reload module to repopulate ale.spice_root
         reload(ale)
+        reload(ale.base.data_naif)
 
         updated_kernels = mess_kernels
         print(updated_kernels)
@@ -76,18 +78,22 @@ def test_load_mes_from_metakernels(tmpdir, monkeypatch, mess_kernels):
             print(mk_str)
             mk_file.write(mk_str)
 
-        usgscsm_isd_obj = ale.load(label_file, verbose=True)
+
+        usgscsm_isd_obj = ale.load(label_file, verbose=False)
 
     assert usgscsm_isd_obj['name_platform'] == 'MESSENGER'
     assert usgscsm_isd_obj['name_sensor'] == 'MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA'
     assert usgscsm_isd_obj['name_model'] == 'USGS_ASTRO_FRAME_SENSOR_MODEL'
     reload(ale)
+    reload(ale.base.data_naif)
     assert not ale.spice_root
+    assert not ale.base.data_naif.spice_root
 
 def test_load_mes_with_no_metakernels(tmpdir, monkeypatch, mess_kernels):
     with patch.dict('os.environ', {'ALESPICEROOT': str(tmpdir)}):
         # reload module to repopulate ale.spice_root
         reload(ale)
+        reload(ale.base.data_naif)
 
         updated_kernels = mess_kernels
         label_file = get_image_label('EN1072174528M')
@@ -103,4 +109,6 @@ def test_load_mes_with_no_metakernels(tmpdir, monkeypatch, mess_kernels):
             usgscsm_isd_obj = ale.load(label_file, verbose=True)
 
     reload(ale)
+    reload(ale.base.data_naif)
     assert not ale.spice_root
+    assert not ale.base.data_naif.spice_root
