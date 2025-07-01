@@ -3,10 +3,10 @@ import math
 import os
 import requests
 
-from multiprocessing.pool import ThreadPool
 import numpy as np
 
-from ale import util 
+from ale import util
+from concurrent.futures import ThreadPoolExecutor
 
 import pyspiceql
 
@@ -170,16 +170,18 @@ def get_ephem_data(times, function_name, batch_size=300, web=False, function_arg
       return ephemeris_data
     
     batches = math.ceil(len(times) / batch_size)
-    job_args_list = []
+    with ThreadPoolExecutor(max_workers=20) as executor:
+        futures = []
+        for i in range(1, batches+1):
+            batch_times = times[(i - 1) * batch_size: i * batch_size]
+            func_args = {**function_args}
+            func_args["ets"] = batch_times
+            futures.append(executor.submit(spiceql_call, function_name, func_args, web))
 
-    for i in range(1, batches+1):
-        batch_times = times[(i - 1) * batch_size: i * batch_size]
-        func_args = {**function_args}
-        func_args["ets"] = batch_times
-        job_args_list.append([function_name, func_args, web])
-    with ThreadPool(processes=1) as pool:
-        jobs = pool.starmap_async(spiceql_call, job_args_list)
-        results = jobs.get()
+        results = []
+        for i in range(0, len(futures)):
+            results.append(futures[i].result())
+
 
     flat_results = []
     for i in results:

@@ -2,8 +2,8 @@ from networkx.algorithms.shortest_paths.generic import shortest_path
 
 import json 
 
-import ale
 from ale.base.type_sensor import LineScanner, Framer, Radar, PushFrame
+from ale import logger
 
 def to_isd(driver):
     """
@@ -21,7 +21,7 @@ def to_isd(driver):
     """
      
     driver_data = driver.to_dict()
-    ale.logger.debug(f"driver_data:\n{driver_data}")
+    logger.debug(f"driver_data:\n{driver_data}")
     isd = {}
     isd['isis_camera_version'] = driver_data["sensor_model_version"]
 

@@ -1,14 +1,14 @@
-from multiprocessing.pool import ThreadPool
+from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 from numpy.polynomial.polynomial import polyval
 import networkx as nx
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
-import ale
 from ale.spiceql_access import get_ephem_data, spiceql_call
 from ale.rotation import ConstantRotation, TimeDependentRotation
 from ale import util
+from ale import logger
 
 def create_rotations(rotation_table):
     """
@@ -145,17 +145,19 @@ class FrameChain(nx.DiGraph):
         target_constant_frames = list(zip(target_constant_frames[:-1], target_constant_frames[1:]))
 
         constant_frames.extend(target_constant_frames)
-        frame_tasks = []
-        # Add all time dependent frame edges to the graph
-        frame_tasks.append([sensor_time_dependent_frames, sensor_times, inst_time_bias, TimeDependentRotation, mission])
-        frame_tasks.append([target_time_dependent_frames, target_times, 0, TimeDependentRotation, mission])
-        # Add all constant frames to the graph
-        frame_tasks.append([constant_frames, [ephemeris_times[0]], 0, ConstantRotation, mission])
 
         # Build graph async
-        with ThreadPool(processes=1) as pool:
-            jobs = pool.starmap_async(frame_chain.generate_rotations, frame_tasks)
-            jobs.get()
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            futures = [
+                
+                # Add all time dependent frame edges to the graph
+                executor.submit(frame_chain.generate_rotations, sensor_time_dependent_frames, sensor_times, inst_time_bias, TimeDependentRotation, mission),
+                executor.submit(frame_chain.generate_rotations, target_time_dependent_frames, target_times, 0, TimeDependentRotation, mission),
+                
+                # Add all constant frames to the graph
+                executor.submit(frame_chain.generate_rotations, constant_frames, [ephemeris_times[0]], 0, ConstantRotation, mission)
+            ]
+            results = [future.result() for future in futures]
 
         return frame_chain
 
@@ -171,11 +173,11 @@ class FrameChain(nx.DiGraph):
                      "mission": mission,
                      "searchKernels": self.search_kernels})
         
-        ale.logger.debug(f"Frame Trace Jobs: {jobs}")
-        with ThreadPool(processes=2) as pool:
-            jobs = pool.starmap_async(spiceql_call, [("frameTrace", job, self.use_web) for job in jobs])
-            results = jobs.get()
-        
+        logger.debug(f"Frame Trace Jobs: {jobs}")
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            futures = [executor.submit(spiceql_call, "frameTrace", job, self.use_web) for job in jobs]
+            results = [future.result() for future in futures]
+
         if nadir:
             results.insert(0, ([[], []]))
         return results
@@ -273,13 +275,12 @@ class FrameChain(nx.DiGraph):
         if isinstance(times, list) and isinstance(times[0], np.floating):
             times = np.array(times)
         
-        frame_tasks = []
-        for s, d in frames:
-            function_args = {"toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels}
-            frame_tasks.append([times, "getTargetOrientations", 150, self.use_web, function_args])
-        with ThreadPool(processes=5) as pool:
-            jobs = pool.starmap_async(get_ephem_data, frame_tasks)
-            quats_and_avs_per_frame = jobs.get()
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            futures = []
+            for s, d in frames:
+                function_args = {"toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels}
+                futures.append(executor.submit(get_ephem_data, times, "getTargetOrientations", 150, self.use_web, function_args))
+            quats_and_avs_per_frame = [future.result() for future in futures]
 
         for i, frame in enumerate(frames):
             quats_and_avs = quats_and_avs_per_frame[i]

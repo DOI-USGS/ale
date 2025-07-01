@@ -1,13 +1,13 @@
 import numpy as np
 import pvl
 
-import ale
 from ale.base import Driver
 from ale.base.type_distortion import NoDistortion, LegendreDistortion
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
 from ale.base.type_sensor import LineScanner
+from ale import logger
 
 class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
     """
@@ -461,9 +461,9 @@ class NewHorizonsMvicTdiIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpi
             try:
                 self._ikid = self.spiceql_call("translateNameToCode", {"frame": self.instrument_id, "mission": self.spiceql_mission})
             except Exception as e:
-                ale.logger.debug("Failed to get with spiceql: {e}")
+                logger.debug("Failed to get with spiceql: {e}")
                 self._ikid = self.label["IsisCube"]["Kernels"]["NaifFrameCode"].value
-        ale.logger.debug("IKID: {}".format(self._ikid))
+        logger.debug("IKID: {}".format(self._ikid))
         return self._ikid
 
     @property

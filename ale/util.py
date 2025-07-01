@@ -20,7 +20,7 @@ import re
 import networkx as nx
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
-import ale
+from ale import logger
 
 class CachedDict():
     """
@@ -618,7 +618,7 @@ def write_metakernel_from_kernel_list(kernels):
     kernels = [os.path.abspath(k) for k in kernels]
     common_prefix = os.path.commonprefix(kernels)
 
-    kernels = ["'"+"$PREFIX"+k[len(common_prefix):]+"'" for k in kernels]
+    kernels = ["'"+"$PREFIX/"+k[len(common_prefix):]+"'" for k in kernels]
     body = '\n\n'.join([
             'KPL/MK',
             f'Metakernel Generated from a kernel list by Ale',
@@ -1056,7 +1056,7 @@ def merge_kernels(dict1, dict2, strategy='combine'):
     >>> merge_kernels({'a': 1, 'b': 2}, {'b': 3, 'c': 4}, strategy='combine')
     {'a': 1, 'b': [2, 3], 'c': 4}
     """
-    ale.logger.debug(f"merge_kernels: dict1: {dict1}, dict2: {dict2}, strategy: {strategy}")
+    logger.debug(f"merge_kernels: dict1: {dict1}, dict2: {dict2}, strategy: {strategy}")
     if not dict1:
         return dict2 
     if not dict2:

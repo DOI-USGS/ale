@@ -4,6 +4,7 @@ from ale import drivers
 from ale.base.base import Driver
 from ale.base.data_isis import IsisSpice
 from ale.base.label_isis import IsisLabel
+from ale import logger
 
 from networkx.algorithms.shortest_paths.generic import shortest_path
 from importlib import reload
@@ -264,7 +265,7 @@ def diff_and_describe(json1, json2, key_array):
         json1 = json1[key]
         json2 = json2[key]
     diff = json1 - json2
-    ale.logger.info(" ".join(key_array) + "\nNum records:", len(diff), "\nMean:", np.mean(diff, axis=(0)), "\nMedian:", np.median(diff, axis=(0)), "\n")
+    logger.info(" ".join(key_array) + "\nNum records:", len(diff), "\nMean:", np.mean(diff, axis=(0)), "\nMedian:", np.median(diff, axis=(0)), "\n")
 
 def compare_isds(json1, json2):
     """
@@ -316,7 +317,7 @@ def main(image):
     try:
         ale.loads(isis_label, props={"kernels": isis_kerns}, only_naif_spice=True)
     except:
-        ale.logger.info("No driver for such Label")
+        logger.info("No driver for such Label")
         exit
     
     # Run spiceinit with ALE

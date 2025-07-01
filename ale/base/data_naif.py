@@ -1,7 +1,7 @@
 import spiceypy as spice 
 
 import warnings
-from multiprocessing.pool import ThreadPool
+from concurrent.futures import ThreadPoolExecutor
 import logging
 import json 
 
@@ -10,11 +10,11 @@ import scipy.constants
 from scipy.spatial.transform import Rotation as R
 import pyspiceql
 
-import ale
 from ale.base import spiceql_mission_map
 from ale.transformation import FrameChain
 from ale.rotation import TimeDependentRotation
 from ale import kernel_access
+from ale import logger
 from ale import spiceql_access
 from ale import spice_root
 from ale import util
@@ -29,13 +29,13 @@ class NaifSpice():
         Called when the context is created. This is used
         to get the kernels furnished.
         """
-        ale.logger.debug(f"Loading kernels: {self.kernels}")
+        logger.debug(f"Loading kernels: {self.kernels}")
         if isinstance(self.kernels, list) and not self.use_web:
             [pyspiceql.load(k) for k in self.kernels]
         elif isinstance(self.kernels, dict) and not self.use_web and not self.search_kernels:
             self.kset = pyspiceql.KernelSet(self.kernels)
         elif not self.use_web:
-            ale.logger.warn("No kernels were specified. No kernels will be loaded.")
+            logger.warn("No kernels were specified. No kernels will be loaded.")
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -88,15 +88,15 @@ class NaifSpice():
             elif self.search_kernels == True:
                 _, kernels = pyspiceql.searchForKernelsets([self.spiceql_mission, self.target_name, "base"], startTime=self.ephemeris_start_time, stopTime=self.ephemeris_stop_time, useWeb=self.use_web)
                 self._kernels = kernels  
-            elif ale.spice_root and not self.use_web:
-                search_results = kernel_access.get_metakernels(ale.spice_root, missions=self.short_mission_name, years=self.utc_start_time.year, versions='latest')
+            elif spice_root and not self.use_web:
+                search_results = kernel_access.get_metakernels(spice_root, missions=self.short_mission_name, years=self.utc_start_time.year, versions='latest')
 
                 if search_results['count'] == 0:
-                    raise ValueError(f'Failed to find metakernels. mission: {self.short_mission_name}, year:{self.utc_start_time.year}, versions="latest" spice root = "{ale.spice_root}"')
+                    raise ValueError(f'Failed to find metakernels. mission: {self.short_mission_name}, year:{self.utc_start_time.year}, versions="latest" spice root = "{spice_root}"')
                 self._kernels = [search_results['data'][0]['path']]
             else:
                 self._kernels = {}
-            ale.logger.debug(f"kernels: {json.dumps(self._kernels, indent=2)}")
+            logger.debug(f"kernels: {json.dumps(self._kernels, indent=2)}")
 
         return self._kernels
 
@@ -475,11 +475,11 @@ class NaifSpice():
         : (positions, velocities, times)
           a tuple containing a list of positions, a list of velocities, and a list of times
         """
-        ale.logger.debug("Calling base sensor position")
+        logger.debug("Calling base sensor position")
         if not hasattr(self, '_position') or \
            not hasattr(self, '_velocity') or \
            not hasattr(self, '_ephem'):
-            ale.logger.debug("Generating Sensor Positions")            
+            logger.debug("Generating Sensor Positions")            
             ephem = self.ephemeris_time
 
             # if isinstance(ephem, np.ndarray):
@@ -502,28 +502,27 @@ class NaifSpice():
             # location of the target. For more information, see:
             # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
             if self.correct_lt_to_surface and self.light_time_correction.upper() == 'LT+S':
-                position_tasks = []
-                kwargs = {"target": target,
-                          "observer": observer,
-                          "frame": "J2000",
-                          "abcorr": self.light_time_correction,
-                          "mission": self.spiceql_mission,
-                          "searchKernels": self.search_kernels}
-                position_tasks.append([ephem, "getTargetStates", 400, self.use_web, kwargs])
+                with ThreadPoolExecutor(max_workers=2) as executor:
+                    futures = []
+                    kwargs = {"target": target,
+                            "observer": observer,
+                            "frame": "J2000",
+                            "abcorr": self.light_time_correction,
+                            "mission": self.spiceql_mission,
+                            "searchKernels": self.search_kernels}
+                    futures.append(executor.submit(spiceql_access.get_ephem_data, ephem, "getTargetStates", 400, self.use_web, kwargs))
 
-                # ssb to spacecraft
-                kwargs = {"target": observer,
-                          "observer": "SSB",
-                          "frame": "J2000",
-                          "abcorr": "NONE",
-                          "mission": self.spiceql_mission,
-                          "searchKernels": self.search_kernels}
-                position_tasks.append([ephem, "getTargetStates", 400, self.use_web, kwargs])
+                    # ssb to spacecraft
+                    kwargs = {"target": observer,
+                            "observer": "SSB",
+                            "frame": "J2000",
+                            "abcorr": "NONE",
+                            "mission": self.spiceql_mission,
+                            "searchKernels": self.search_kernels}
+                    futures.append(executor.submit(spiceql_access.get_ephem_data, ephem, "getTargetStates", 400, self.use_web, kwargs))
 
-                # Build graph async
-                with ThreadPool(processes=5) as pool:
-                    jobs = pool.starmap_async(spiceql_access.get_ephem_data, position_tasks)
-                    results = jobs.get()
+                    # Build graph async
+                    results = [future.result() for future in futures]
                 
                 obs_tars, ssb_obs = results
 
@@ -767,14 +766,16 @@ class NaifSpice():
 
             self._naif_keywords['BODY_FRAME_CODE'] = self.target_frame_id
             self._naif_keywords['BODY_CODE'] = self.target_id
-            mission_keywords = self.spiceql_call("findMissionKeywords", {"key": f"*{self.ikid}*", "mission": self.spiceql_mission})
-            target_keywords = self.spiceql_call("findTargetKeywords", {"key": f"*{self.target_id}*", "mission": self.spiceql_mission})
+            with ThreadPoolExecutor(max_workers=3) as executor:
+                futures = []
+                futures.append(executor.submit(self.spiceql_call, "findMissionKeywords", {"key": f"*{self.ikid}*", "mission": self.spiceql_mission}))
+                futures.append(executor.submit(self.spiceql_call, "findTargetKeywords", {"key": f"*{self.target_id}*", "mission": self.spiceql_mission}))
 
-            if mission_keywords: 
-                self._naif_keywords = self.naif_keywords | mission_keywords
-            if target_keywords: 
-                self._naif_keywords = self._naif_keywords | target_keywords
-            
+                for future in futures:
+                    result = future.result()
+                    if result:
+                        self._naif_keywords = self.naif_keywords | result
+
             try:
                 frame_keywords = self.spiceql_call("findMissionKeywords", {"key": f"*{self.fikid}*", "mission": self.spiceql_mission})
                 if frame_keywords: 
@@ -827,7 +828,7 @@ class NaifSpice():
         # This will work if a user passed no kernels but still set ISISDATA
         # just might take a bit
         function_args["searchKernels"] = self.search_kernels
-        ale.logger.debug(f"Calling data_naif spiceql_call function {function_name} with args {function_args}")
+        logger.debug(f"Calling data_naif spiceql_call function {function_name} with args {function_args}")
 
         # Bodge solution for memo funcs in offline mode
         memo_funcs = ["translateNameToCode", "translateCodeToName"]
@@ -840,6 +841,6 @@ class NaifSpice():
         if function_name in memo_funcs and data_dir == "" and self.use_web == False:
             function_name = f"{function_name}"
         ret = spiceql_access.spiceql_call(function_name, function_args, self.use_web)
-        ale.logger.debug(f"Returning data_naif spiceql_call function ret: {ret}")
+        logger.debug(f"Returning data_naif spiceql_call function ret: {ret}")
         return ret
     

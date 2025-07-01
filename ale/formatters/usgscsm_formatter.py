@@ -3,8 +3,8 @@ import numpy as np
 from scipy.interpolate import interp1d, BPoly
 import time 
 
-import ale
 from ale.transformation import FrameChain
+from ale import logger
 
 from ale.base.type_sensor import LineScanner, Framer, Radar
 from ale.rotation import ConstantRotation, TimeDependentRotation
@@ -48,7 +48,7 @@ def to_usgscsm(driver):
         'unit' : 'm'
     }
     t1 = time.process_time()
-    ale.logger.info(f"Total time to get positions: {t1-t0}")
+    logger.info(f"Total time to get positions: {t1-t0}")
 
     t0 = time.process_time()
     sun_positions, sun_velocities, _ = driver.sun_position
@@ -58,7 +58,7 @@ def to_usgscsm(driver):
         'unit' : 'm'
     }
     t1 = time.process_time()
-    ale.logger.info(f"Total time to get orientations: {t1-t0}")
+    logger.info(f"Total time to get orientations: {t1-t0}")
 
     if (driver.projection != ""):
         isd_data["projection"] = driver.projection

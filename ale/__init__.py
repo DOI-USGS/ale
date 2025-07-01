@@ -23,15 +23,17 @@ try:
 except PackageNotFoundError:
     __version__ = 'Please install this project with setup.py'
 
-logger = logging.getLogger("ale")
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s [ALE %(filename)s:%(lineno)d] %(levelname)s: %(message)s ')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.propagate = False
+logger = None
+if not logger:
+    logger = logging.getLogger("ale")
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(asctime)s [ALE %(filename)s:%(lineno)d] %(levelname)s: %(message)s ')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.propagate = False
 
-log_level = os.environ.get("ALE_LOG_LEVEL", "INFO").upper()
-logger.setLevel(getattr(logging, log_level, logging.INFO))
+    log_level = os.environ.get("ALE_LOG_LEVEL", "INFO").upper()
+    logger.setLevel(getattr(logging, log_level, logging.INFO))
 
 logger.debug(f"ALE version: {__version__}")
 logger.debug(f"ALE python version: {sys.version.split(' ')[0]}")
