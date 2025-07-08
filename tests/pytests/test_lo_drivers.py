@@ -76,7 +76,7 @@ class test_high_isis3_naif(unittest.TestCase):
 
     def test_naif_keywords(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-533001]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as data_naif_keywords:
+             patch('ale.drivers.lo_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as data_naif_keywords:
             data_naif_keywords.return_value = {}
 
             naif_keywords = {

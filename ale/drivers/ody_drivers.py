@@ -1,4 +1,3 @@
-import ale
 import math
 from ale.base.base import Driver
 from ale.base.type_distortion import ThemisIrDistortion, NoDistortion

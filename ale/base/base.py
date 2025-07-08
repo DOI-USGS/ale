@@ -3,10 +3,12 @@ import sys
 
 import tempfile
 import os 
-from multiprocessing.pool import ThreadPool
+from concurrent.futures import ThreadPoolExecutor
 
 import time
 import pvl
+
+from ale import logger
 
 class Driver():
     """
@@ -49,8 +51,10 @@ class Driver():
         def get_property(prop_name):
             try:
                 return getattr(self, prop_name)
-            except (Exception) as e: 
-                print(f"Failed to get property {prop_name} with type {type(e)}: {e}", file=sys.stderr)
+            except Exception as e:
+                import traceback
+                logger.debug(f"Failed to get property {prop_name} with type {type(e)}: {e}")
+                logger.debug(traceback.format_exc())
                 return None 
 
         if properties is None:
@@ -66,12 +70,17 @@ class Driver():
                        "target_id", 
                        "target_frame_id",
                        "reference_frame",
-                       "sensor_frame_id"]
+                       "sensor_frame_id", 
+                       "naif_keywords"]
 
         # Remove position and orientation properties
         ephemeris_props = ["sensor_position", "sun_position", "frame_chain"]
-        for prop in ephemeris_props or prop in spice_props:
+        for prop in ephemeris_props:
             properties.remove(prop)
+
+        for prop in spice_props:
+            if prop in properties:
+                properties.remove(prop)
 
         if "fikid" in properties:
             properties.remove("fikid")
@@ -80,30 +89,37 @@ class Driver():
             properties.remove("sensor_orientation")
 
         data = {}
+        num_procs = max(os.cpu_count(), 10)
+        logger.info(f"Num procs {num_procs}")
         
+        logger.info(f"Getting props {spice_props}")
         start = time.time()
-        with ThreadPool() as pool:
-          jobs = pool.starmap_async(get_property, [(name,) for name in spice_props])
-          jobs = jobs.get()
+        with ThreadPoolExecutor(max_workers=num_procs) as executor:
+          futures = [executor.submit(get_property, name) for name in spice_props]
+          results = [future.result() for future in futures]
 
-          for result, property_name in zip(jobs, spice_props):
+          for result, property_name in zip(results, spice_props):
               data[property_name] = result
         end = time.time()
+        logger.info(f"Time to get spice_props {end - start}")
         
+        logger.info(f"Getting props {properties}")
         start = time.time()
         for prop in properties:
             data[prop] = get_property(prop)
-            if prop == "line_scan_rate":
-                end = time.time()
+        end = time.time()
+        logger.info(f"Time to get other_props {end - start}")
         
+        logger.info(f"Getting props {ephemeris_props}")
         start = time.time()
-        with ThreadPool() as pool:
-          jobs = pool.starmap_async(get_property, [(name,) for name in ephemeris_props])
-          jobs = jobs.get()
+        with ThreadPoolExecutor(max_workers=num_procs) as executor:
+          futures = [executor.submit(get_property, name) for name in ephemeris_props]
+          results = [future.result() for future in futures]
 
-          for result, property_name in zip(jobs, ephemeris_props):
+          for result, property_name in zip(results, ephemeris_props):
               data[property_name] = result
         end = time.time()
+        logger.info(f"Time to get ephem_props {end - start}")
         return data
     
     @property

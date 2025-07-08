@@ -3,6 +3,7 @@ import time
 import json
 
 from ale.rotation import ConstantRotation, TimeDependentRotation
+from ale import logger
 
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
@@ -89,14 +90,14 @@ def to_isis(driver):
     velocities = j2000_rotation.rotate_velocity_at(positions, velocities, times)/1000
     positions = j2000_rotation.apply_at(positions, times)/1000
     t1 = time.process_time()
-    print(f"Total time to get orientations: {t1-t0}")
+    logger.info(f"Total time to get orientations: {t1-t0}")
 
     t0 = time.process_time()
     instrument_position['Positions'] = positions
     instrument_position['Velocities'] = velocities
     meta_data['InstrumentPosition'] = instrument_position
     t1 = time.process_time()
-    print(f"Total time to get positions: {t1-t0}")
+    logger.info(f"Total time to get positions: {t1-t0}")
 
     t0 = time.process_time()
     sun_position = {}
@@ -112,6 +113,6 @@ def to_isis(driver):
     sun_position['Velocities'] = velocities
     meta_data['SunPosition'] = sun_position
     t1 = time.process_time()
-    print(f"Total time to get sun positions: {t1-t0}")
+    logger.info(f"Total time to get sun positions: {t1-t0}")
 
     return meta_data

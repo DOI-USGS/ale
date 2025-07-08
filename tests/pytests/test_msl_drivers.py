@@ -76,7 +76,7 @@ class test_mastcam_pds_naif(unittest.TestCase):
 
     def test_focal2pixel_lines(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-76220]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.msl_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-76220_FOCAL_LENGTH": 100}
             np.testing.assert_allclose(self.driver.focal2pixel_lines, [0, 0, 137.96844341513602])
             calls = [call('translateNameToCode', {'frame': 'MSL_MASTCAM_RIGHT', 'mission': '', 'searchKernels': False}, False)]
@@ -85,7 +85,7 @@ class test_mastcam_pds_naif(unittest.TestCase):
 
     def test_focal2pixel_samples(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-76220]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.msl_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-76220_FOCAL_LENGTH": 100}
             np.testing.assert_allclose(self.driver.focal2pixel_samples, [0, 137.96844341513602, 0])
             calls = [call('translateNameToCode', {'frame': 'MSL_MASTCAM_RIGHT', 'mission': '', 'searchKernels': False}, False)]

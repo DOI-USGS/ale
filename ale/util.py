@@ -20,6 +20,7 @@ import re
 import networkx as nx
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
+from ale import logger
 
 class CachedDict():
     """
@@ -617,7 +618,7 @@ def write_metakernel_from_kernel_list(kernels):
     kernels = [os.path.abspath(k) for k in kernels]
     common_prefix = os.path.commonprefix(kernels)
 
-    kernels = ["'"+"$PREFIX"+k[len(common_prefix):]+"'" for k in kernels]
+    kernels = ["'"+"$PREFIX/"+k[len(common_prefix):]+"'" for k in kernels]
     body = '\n\n'.join([
             'KPL/MK',
             f'Metakernel Generated from a kernel list by Ale',
@@ -1016,4 +1017,70 @@ def find_kernels(cube, isis_data, format_as=dict):
     else:
         warnings.warn(f"{format_as} is not a valid format, returning as dict")
         return kernels
+
+
+def merge_kernels(dict1, dict2, strategy='combine'):
+    """
+    Merge two dictionaries with configurable conflict resolution strategies.
+
+    Parameters
+    ----------
+    dict1 : dict
+        The first dictionary to merge.
+    dict2 : dict
+        The second dictionary to merge.
+    strategy : {'right', 'left', 'combine'}, optional
+        The strategy to use when both dictionaries have the same key:
+        
+        - 'right': Values from `dict2` take precedence over `dict1`.
+        - 'left': Values from `dict1` take precedence over `dict2`.
+        - 'combine': If a key exists in both, combine the values into a list
+          (removing duplicates). If either value is already a list, the result
+          will be a flattened list of unique values.
+
+        Default is 'combine'.
+
+    Returns
+    -------
+    merged : dict
+        The merged dictionary according to the specified strategy.
+
+    Examples
+    --------
+    >>> merge_kernels({'a': 1, 'b': 2}, {'b': 3, 'c': 4}, strategy='right')
+    {'a': 1, 'b': 3, 'c': 4}
+
+    >>> merge_kernels({'a': 1, 'b': 2}, {'b': 3, 'c': 4}, strategy='left')
+    {'a': 1, 'b': 2, 'c': 4}
+
+    >>> merge_kernels({'a': 1, 'b': 2}, {'b': 3, 'c': 4}, strategy='combine')
+    {'a': 1, 'b': [2, 3], 'c': 4}
+    """
+    logger.debug(f"merge_kernels: dict1: {dict1}, dict2: {dict2}, strategy: {strategy}")
+    if not dict1:
+        return dict2 
+    if not dict2:
+        return dict1
+
+    merged = dict1.copy()
+
+    for key, value in dict2.items():
+        if key in merged:
+            if strategy == 'left':
+                continue  # Keep dict1 value
+            elif strategy == 'right':
+                merged[key] = value  # Use dict2 value
+            elif strategy == 'combine':
+                # Combine into list
+                if not isinstance(merged[key], list):
+                    merged[key] = [merged[key]]
+                if isinstance(value, list):
+                    merged[key] = merged[key] + value
+                    merged[key] = list(set(merged[key]))
+                elif value not in merged[key]:
+                    merged[key].append(value)
+        else:
+            merged[key] = value
     
+    return merged
+ 

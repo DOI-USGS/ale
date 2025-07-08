@@ -1,7 +1,7 @@
 from ale.base.base import Driver
 
 spiceql_mission_map = {
-    "APOLLO_METRIC" : "apollo", 
+    "APOLLO_METRIC" : "apollo15_metric", 
     "CHANDRAYAAN-1_M3": "m3",
     "CHANDRAYAAN-1_MRFFR": "mrffr",
     "CHANDRAYAAN-2 ORBITER": "chandrayaan2",

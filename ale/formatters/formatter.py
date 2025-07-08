@@ -1,6 +1,9 @@
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
+import json 
+
 from ale.base.type_sensor import LineScanner, Framer, Radar, PushFrame
+from ale import logger
 
 def to_isd(driver):
     """
@@ -18,6 +21,7 @@ def to_isd(driver):
     """
      
     driver_data = driver.to_dict()
+    logger.debug(f"driver_data:\n{driver_data}")
     isd = {}
     isd['isis_camera_version'] = driver_data["sensor_model_version"]
 
@@ -37,7 +41,6 @@ def to_isd(driver):
         isd['name_model'] = 'USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL'
         isd['interpolation_method'] = 'lagrange'
         
-        print(driver_data["line_scan_rate"])
         start_lines, start_times, scan_rates = driver_data["line_scan_rate"]
         isd['line_scan_rate'] = [[line, time, rate] for line, time, rate in zip(start_lines, start_times, scan_rates)]
         isd['starting_ephemeris_time'] = driver_data["ephemeris_start_time"]
@@ -202,5 +205,14 @@ def to_isd(driver):
     # check that there is a valid sensor model name
     if 'name_model' not in isd:
         raise Exception('No CSM sensor model name found!')
+
+    # remove extra qualities
+    # TODO: Rewuires SpiceQL API update to get relative kernels
+    # if driver.kernels and isinstance(driver.kernels, dict): 
+    #     isd["kernels"] = {k: v for k, v in driver.kernels.items() if not "_quality" in k or driver.spiceql_mission in k }
+    # elif driver.kernels and isinstance(driver.kernels, list): 
+    #     isd["kernels"] = driver.kernels
+    # else: 
+    #     isd["kernels"] = {}
 
     return isd

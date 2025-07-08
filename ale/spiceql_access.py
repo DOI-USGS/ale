@@ -3,10 +3,10 @@ import math
 import os
 import requests
 
-from multiprocessing.pool import ThreadPool
 import numpy as np
 
-
+from ale import util
+from concurrent.futures import ThreadPoolExecutor
 
 import pyspiceql
 
@@ -87,9 +87,12 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
     Returns : any
                 Any return from a SpiceQL function
     """
+    logger.debug(f"Calling {function_name} with args: {function_args}")
     if use_web == False:
+        function_args["useWeb"] = False
         func = getattr(pyspiceql, function_name)
-        return func(**function_args)[0]
+        ret = func(**function_args)[0]
+        return ret
     
     if spiceql_url:
         url = spiceql_url
@@ -113,10 +116,13 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
     else:
         response = requests.get(url, params=clean_function_args, headers=headers, verify=False)
     check_response(response)
-    logger.debug(f"Request URL={str(response.url)}, Kernels={str(response.json()['body']['kernels'])}")
+
+    logger.debug(f"Request URL={str(response.url)}")
+    logger.debug(f"Kernels={str(response.json()['body']['kernels'])}")
+    logger.debug(f"Data={str(response.json()['body']['return'])}")
     return response.json()["body"]["return"]
 
-def get_ephem_data(times, function_name, batch_size=400, web=False, function_args={}):
+def get_ephem_data(times, function_name, batch_size=300, web=False, function_args={}):
     """
     This function provides access to ephemeris data aquisition in spiceql. 
     For the web service there is a limited number of times that can be
@@ -164,15 +170,18 @@ def get_ephem_data(times, function_name, batch_size=400, web=False, function_arg
       return ephemeris_data
     
     batches = math.ceil(len(times) / batch_size)
-    job_args_list = []
-    for i in range(1, batches+1):
-        batch_times = times[(i - 1) * batch_size: i * batch_size]
-        func_args = {**function_args}
-        func_args["ets"] = batch_times
-        job_args_list.append([function_name, func_args, web])
-    with ThreadPool() as pool:
-        jobs = pool.starmap_async(spiceql_call, job_args_list)
-        results = jobs.get()
+    with ThreadPoolExecutor(max_workers=20) as executor:
+        futures = []
+        for i in range(1, batches+1):
+            batch_times = times[(i - 1) * batch_size: i * batch_size]
+            func_args = {**function_args}
+            func_args["ets"] = batch_times
+            futures.append(executor.submit(spiceql_call, function_name, func_args, web))
+
+        results = []
+        for i in range(0, len(futures)):
+            results.append(futures[i].result())
+
 
     flat_results = []
     for i in results:

@@ -16,6 +16,7 @@ from ale.base.type_sensor import LineScanner
 
 from ale.rotation import ConstantRotation
 from ale.transformation import FrameChain
+from ale import util
 from scipy.spatial.transform import Rotation
 
 vims_id_lookup = {
@@ -304,7 +305,6 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
                                                           mission=self.spiceql_mission,
                                                           use_web=self.use_web,
                                                           search_kernels=self.search_kernels)
-
                 rotation = ConstantRotation([[0, 0, 1, 0]], self.sensor_frame_id, self._original_naif_sensor_frame_id)
 
                 self._frame_chain.add_edge(rotation=rotation)
@@ -740,7 +740,6 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
                                                           mission=self.spiceql_mission,
                                                           use_web=self.use_web,
                                                           search_kernels=self.search_kernels)
-
                 rotation = ConstantRotation([[0, 0, 1, 0]], self.sensor_frame_id, self._original_naif_sensor_frame_id)
 
                 self._frame_chain.add_edge(rotation=rotation)

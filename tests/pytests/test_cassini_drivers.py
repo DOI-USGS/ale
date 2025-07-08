@@ -29,7 +29,7 @@ def test_load_pds(test_iss_kernels):
     label_file = get_image_label("N1702360370_1")
     compare_dict = get_isd("cassiniiss")
 
-    isd_str = ale.loads(label_file, props={'kernels': test_iss_kernels})
+    isd_str = ale.loads(label_file, props={'kernels': test_iss_kernels}, verbose=True)
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
     assert compare_dicts(isd_obj, compare_dict) == []
@@ -291,7 +291,7 @@ class test_cassini_vims_isis_naif(unittest.TestCase):
     def test_compute_vims_time(self):
         # This value isn't used for anything in the test, as it's only used for the
         # default focal length calculation if the filter can't be found.
-        with patch('ale.base.data_naif.NaifSpice.spiceql_call', return_value=12345) as sclkToEt:
+        with patch('ale.drivers.co_drivers.NaifSpice.spiceql_call', return_value=12345) as sclkToEt:
             assert self.driver.compute_vims_time(1, 1, self.driver.image_samples, "VIS")
             sclkToEt.assert_called_with("strSclkToEt", {'frameCode': 12345, 'sclk': '1514284191', 'mission': 'cassini'})
 

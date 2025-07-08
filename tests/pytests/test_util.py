@@ -482,3 +482,27 @@ Objects  Interval Begin ET        Interval End ET          AV
                                  check=True,
                                  text=True)
     assert frames == [-236002, -236001, -236000]
+
+
+def test_merge_kernels(): 
+    d1 = { 
+        "key1" : [1,2,3],
+        "key2" : "test",
+        "key3" : "value3"
+    }
+    d2 = { 
+        "key1" : [4,5,6],
+        "key2" : "test2", 
+        "key4" : "value4"
+    }
+    
+    expected = {
+        "key1" : [1,2,3,4,5,6],
+        "key2" : ["test", "test2"],
+        "key3" : "value3",
+        "key4" : "value4"
+    }
+
+    print(len(util.merge_kernels(d1, d2)["key1"]))
+    result = util.merge_kernels(d1, d2)
+    assert result == expected

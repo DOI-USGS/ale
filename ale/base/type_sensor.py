@@ -6,6 +6,7 @@ from scipy.spatial.transform import Rotation
 
 from ale.transformation import FrameChain
 from ale.transformation import ConstantRotation, TimeDependentRotation
+from ale import util 
 
 class LineScanner():
     """

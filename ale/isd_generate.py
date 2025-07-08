@@ -133,13 +133,17 @@ def main():
         nargs="+",
         help="Path to image or label file (or multiple)."
     )
+    parser.add_argument(
+        "-s", "--search_kernels",
+        action="store_true",
+        help="Search for kernels using SpiceQL. Only applies to naif data based drivers"
+    )
     args = parser.parse_args()
 
     log_level = logging.INFO
     if args.verbose:
         log_level = logging.WARNING
 
-    logging.basicConfig(format="%(message)s", level=log_level)
     logger.setLevel(log_level)
 
     if args.kernel is None:
@@ -160,7 +164,10 @@ def main():
 
     if len(args.input) == 1:
         try:
-            file_to_isd(args.input[0], args.out, radii, kernels=k, log_level=log_level, compress=args.compress, only_isis_spice=args.only_isis_spice, only_naif_spice=args.only_naif_spice, local=args.local, nadir=args.nadir)
+            file_to_isd(args.input[0], args.out, radii, kernels=k, log_level=log_level, 
+                        compress=args.compress, only_isis_spice=args.only_isis_spice, 
+                        only_naif_spice=args.only_naif_spice, use_web=args.use_web_spice, 
+                        local=args.local, nadir=args.nadir, search_kernels=args.search_kernels)
         except Exception as err:
             # Seriously, this just throws a generic Exception?
             sys.exit(f"File {args.input[0]}: {err}")
@@ -202,7 +209,8 @@ def file_to_isd(
     only_naif_spice=False,
     local=False,
     nadir=False,
-    use_web=False):
+    use_web=False,
+    search_kernels=False):
     """
     Returns nothing, but acts as a thin wrapper to take the *file* and generate
     an ISD at *out* (if given, defaults to replacing the extension on *file*
@@ -235,6 +243,9 @@ def file_to_isd(
 
     if use_web:
         props["web"] = use_web
+    
+    if search_kernels: 
+        props["search_kernels"] = search_kernels
 
     if kernels is not None:
         kernels = [str(PurePath(p)) for p in kernels]

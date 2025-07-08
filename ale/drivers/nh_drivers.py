@@ -7,6 +7,7 @@ from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
 from ale.base.type_sensor import LineScanner
+from ale import logger
 
 class NewHorizonsLorriIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
     """
@@ -459,8 +460,10 @@ class NewHorizonsMvicTdiIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpi
             # If that fails, try to get it directly from the cube label
             try:
                 self._ikid = self.spiceql_call("translateNameToCode", {"frame": self.instrument_id, "mission": self.spiceql_mission})
-            except:
+            except Exception as e:
+                logger.debug("Failed to get with spiceql: {e}")
                 self._ikid = self.label["IsisCube"]["Kernels"]["NaifFrameCode"].value
+        logger.debug("IKID: {}".format(self._ikid))
         return self._ikid
 
     @property

@@ -6,7 +6,6 @@ import numpy as np
 
 from scipy.interpolate import CubicSpline
 
-import ale
 from ale.base import Driver
 from ale.base.label_isis import IsisLabel
 from ale.base.data_naif import NaifSpice

@@ -14,6 +14,7 @@ from ale.drivers.lro_drivers import LroLrocNacIsisLabelNaifSpiceDriver
 from ale.drivers.lro_drivers import LroLrocWacIsisLabelNaifSpiceDriver
 from ale.drivers.lro_drivers import LroLrocWacIsisLabelIsisSpiceDriver
 from ale.drivers.lro_drivers import LroMiniRfIsisLabelNaifSpiceDriver
+from ale.base.data_naif import NaifSpice
 from ale.transformation import TimeDependentRotation
 
 from conftest import get_image, get_image_label, get_isd, get_image_kernels, convert_kernels, compare_dicts
@@ -103,7 +104,7 @@ class test_pds_naif(unittest.TestCase):
 
     def test_odtk(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.lro_drivers.LroLrocNacPds3LabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_OD_K": [1.0]}
             assert self.driver.odtk == [1.0]
             calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
@@ -158,7 +159,7 @@ class test_pds_naif(unittest.TestCase):
             np.testing.assert_array_equal(np.array([1, 1, 1]), mxv.call_args[0][1])
 
     def test_focal2pixel_lines(self):
-        with patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords, \
+        with patch('ale.drivers.lro_drivers.LroLrocNacPds3LabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords, \
              patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, 321]) as spiceql_call, \
              patch('ale.drivers.lro_drivers.LroLrocNacPds3LabelNaifSpiceDriver.spacecraft_direction', \
              new_callable=PropertyMock) as spacecraft_direction:
@@ -187,7 +188,7 @@ class test_isis_naif(unittest.TestCase):
 
     def test_usgscsm_distortion_model(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.lro_drivers.LroLrocNacIsisLabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_OD_K": [1.0]}
             distortion_model = self.driver.usgscsm_distortion_model
             assert distortion_model['lrolrocnac']['coefficients'] == [1.0]
@@ -197,7 +198,7 @@ class test_isis_naif(unittest.TestCase):
 
     def test_odtk(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.lro_drivers.LroLrocNacIsisLabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_OD_K": [1.0]}
             assert self.driver.odtk == [1.0]
             calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
@@ -209,7 +210,7 @@ class test_isis_naif(unittest.TestCase):
 
     def test_detector_center_sample(self):
         with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, 321]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+             patch('ale.drivers.lro_drivers.LroLrocNacIsisLabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-12345_BORESIGHT_SAMPLE": 1.0}
             assert self.driver.detector_center_sample == 0.5
             calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
@@ -264,7 +265,7 @@ class test_isis_naif(unittest.TestCase):
             np.testing.assert_array_equal(np.array([1, 1, 1]), mxv.call_args[0][1])
 
     def test_focal2pixel_lines(self):
-        with patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords, \
+        with patch('ale.drivers.lro_drivers.LroLrocNacIsisLabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords, \
              patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, 321]) as spiceql_call, \
              patch('ale.drivers.lro_drivers.LroLrocNacIsisLabelNaifSpiceDriver.spacecraft_direction', \
              new_callable=PropertyMock) as spacecraft_direction:
@@ -309,9 +310,10 @@ class test_miniRf(unittest.TestCase):
             spiceql_call.assert_has_calls(calls)
             assert spiceql_call.call_count == 1
 
-    @patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock, return_value={})
+    @patch('ale.drivers.lro_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock)
     def test_naif_keywords(self, naif_keywords):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
+        with patch('ale.drivers.lro_drivers.NaifSpice.ikid', new_callable=PropertyMock, return_value=12345) as ikid:
+            naif_keywords.return_value = {}
             np.testing.assert_array_almost_equal(self.driver.naif_keywords["INS12345_ITRANSL"], [0.0, 0.0, 0.0])
             np.testing.assert_array_almost_equal(self.driver.naif_keywords["INS12345_ITRANSS"], [1.0, 0.13333333333333, 0])
             np.testing.assert_array_almost_equal(self.driver.naif_keywords["INS12345_TRANSX"], [-7.5, 7.5, 0])
@@ -339,21 +341,18 @@ class test_wac_isis_naif(unittest.TestCase):
             assert spiceql_call.call_count == 2
 
     def test_detector_center_sample(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[{}, {"INS-85641_BORESIGHT_SAMPLE": [1.0]}, {}, {}, {}, {}]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
-            naif_keywords.return_value = {}
+        with patch('ale.drivers.lro_drivers.LroLrocWacIsisLabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-85641_BORESIGHT_SAMPLE": [1.0]}
             assert self.driver.detector_center_sample == 0.5
 
     def test_detector_center_line(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[{}, {}, {"INS-85641_BORESIGHT_LINE": [1.0]}, {}, {}, {}]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
-            naif_keywords.return_value = {}
+        with patch('ale.drivers.lro_drivers.LroLrocWacIsisLabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-85641_BORESIGHT_LINE": [1.0]}
             assert self.driver.detector_center_line == 0.5
 
     def test_odtk(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[{}, {}, {}, {}, {}, {"INS-85641_OD_K": [1.0]}]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
-            naif_keywords.return_value = {}
+        with patch('ale.drivers.lro_drivers.LroLrocWacIsisLabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-85641_OD_K": [1.0]}
             assert self.driver.odtk == [-1.0]
 
     def test_light_time_correction(self):
@@ -384,15 +383,13 @@ class test_wac_isis_naif(unittest.TestCase):
         assert self.driver.fikid == -85641
 
     def test_pixel2focal_x(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[{}, {}, {}, {"INS-85641_TRANSX": [0, 0, -0.009]}, {}, {}]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
-            naif_keywords.return_value = {}
+        with patch('ale.drivers.lro_drivers.LroLrocWacIsisLabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-85641_TRANSX": [0, 0, -0.009]}
             assert self.driver.pixel2focal_x == [0, 0, -0.009]
 
     def test_pixel2focal_y(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[{}, {}, {}, {"INS-85641_TRANSY": [0, 0.009, 0]}, {}, {}]) as spiceql_call, \
-             patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
-            naif_keywords.return_value = {}
+        with patch('ale.drivers.lro_drivers.LroLrocWacIsisLabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-85641_TRANSY": [0, 0.009, 0]}
             assert self.driver.pixel2focal_y == [0, 0.009, 0]
 
     def test_detector_start_line(self):

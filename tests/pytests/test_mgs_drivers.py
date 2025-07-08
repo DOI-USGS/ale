@@ -79,12 +79,12 @@ class test_wac_isis3_naif(unittest.TestCase):
        
 
     def test_detector_center_sample(self):
-        with patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+        with patch('ale.drivers.mgs_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-94032_CENTER": [1727.5, 0]}
             assert self.driver.detector_center_sample == 1727.5
 
     def test_detector_center_line(self):
-        with patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+        with patch('ale.drivers.mgs_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-94032_CENTER": [0, 1727.5]}
             assert self.driver.detector_center_line == 1727.5
 
@@ -132,12 +132,12 @@ class test_nac_isis3_naif(unittest.TestCase):
        
 
     def test_detector_center_sample(self):
-        with patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+        with patch('ale.drivers.mgs_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-94031_CENTER": [1727.5, 0]}
             assert self.driver.detector_center_sample == 1727.5
 
     def test_detector_center_line(self):
-        with patch('ale.base.data_naif.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+        with patch('ale.drivers.mgs_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
             naif_keywords.return_value = {"INS-94031_CENTER": [0, 1727.5]}
             assert self.driver.detector_center_line == 1727.5
 
