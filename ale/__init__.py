@@ -27,7 +27,7 @@ logger = None
 if not logger:
     logger = logging.getLogger("ale")
     handler = logging.StreamHandler()
-    formatter = logging.Formatter('%(asctime)s [ALE %(filename)s:%(lineno)d] %(levelname)s: %(message)s ')
+    formatter = logging.Formatter('ALE [%(asctime)s] [%(levelname)s] [%(filename)s:%(lineno)d %(funcName)s] %(message)s', datefmt='%H:%M:%S %z')
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.propagate = False

@@ -117,25 +117,7 @@ class FrameChain(nx.DiGraph):
         target_times = ephemeris_times
         if len(target_times) > 1:
             target_times = [ephemeris_times[0], ephemeris_times[-1]]
-        sensor_times = []
 
-        if exact_ck_times and len(ephemeris_times) > 1 and not nadir:
-            try:
-                sensor_times = spiceql_call("extractExactCkTimes", {"observStart": ephemeris_times[0] + inst_time_bias, 
-                                                                    "observEnd": ephemeris_times[-1] + inst_time_bias, 
-                                                                    "targetFrame": sensor_frame,
-                                                                    "mission": mission,
-                                                                    "searchKernels": frame_chain.search_kernels},
-                                                                    use_web=frame_chain.use_web)
-            except Exception as e:
-                pass
-
-        if (len(sensor_times) == 0):
-            sensor_times = ephemeris_times
-            if isinstance(sensor_times, np.ndarray):
-                sensor_times = sensor_times.tolist()
-        frames = frame_chain.frame_trace(center_ephemeris_time, sensor_frame, target_frame, nadir, mission)
-        
         sensor_time_dependent_frames, sensor_constant_frames = frames[0]
         target_time_dependent_frames, target_constant_frames = frames[1]
 
@@ -151,7 +133,7 @@ class FrameChain(nx.DiGraph):
             futures = [
                 
                 # Add all time dependent frame edges to the graph
-                executor.submit(frame_chain.generate_rotations, sensor_time_dependent_frames, sensor_times, inst_time_bias, TimeDependentRotation, mission),
+                executor.submit(frame_chain.generate_rotations, sensor_time_dependent_frames, ephemeris_times, inst_time_bias, TimeDependentRotation, mission),
                 executor.submit(frame_chain.generate_rotations, target_time_dependent_frames, target_times, 0, TimeDependentRotation, mission),
                 
                 # Add all constant frames to the graph
@@ -275,12 +257,13 @@ class FrameChain(nx.DiGraph):
         if isinstance(times, list) and isinstance(times[0], np.floating):
             times = np.array(times)
         
-        with ThreadPoolExecutor(max_workers=3) as executor:
-            futures = []
-            for s, d in frames:
-                function_args = {"toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels}
-                futures.append(executor.submit(get_ephem_data, times, "getTargetOrientations", 150, self.use_web, function_args))
-            quats_and_avs_per_frame = [future.result() for future in futures]
+        start_et = min(times)
+        stop_et = max(times) 
+        quats_and_avs_per_frame = []
+        
+        for s, d in frames:
+            function_args = {"startEt": start_et, "stopEt": stop_et, "toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels}
+            quats_and_avs_per_frame.append(spiceql_call("getExactTargetOrientations", function_args, self.use_web))
 
         for i, frame in enumerate(frames):
             quats_and_avs = quats_and_avs_per_frame[i]
