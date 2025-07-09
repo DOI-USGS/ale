@@ -581,15 +581,29 @@ class NaifSpice():
                     rotated_state = spice.mxvg(matrix, state)
                     states.append(rotated_state)
             else:
-                kwargs = {"target": target,
-                          "observer": observer,
-                          "frame": self.reference_frame,
-                          "abcorr": self.light_time_correction,
-                          "mission": self.spiceql_mission,
-                          "searchKernels": self.search_kernels}
-                states = spiceql_access.get_ephem_data(ephem, "getTargetStates", web=self.use_web, function_args=kwargs)
-                states = np.array(states)[:,0:6]
-
+                if isinstance(self, LineScanner) and self.use_web:
+                    logger.debug("Sensor is a Line Scanner, using alt API")
+                    start_ets, stop_ets, exposure_durations = self.exposure_rates
+                    kwargs = {"startEts": start_ets,
+                              "stopEts": stop_ets,
+                              "exposureDuration": exposure_durations,
+                              "target": target,
+                              "observer": observer,
+                              "frame": "J2000",
+                              "abcorr": self.light_time_correction,
+                              "mission": self.spiceql_mission,
+                              "searchKernels": self.search_kernels}
+                    states = self.spiceql_call("getTargetStates", web=self.use_web, function_args=kwargs)
+                else:
+                    kwargs = {"target": target,
+                             "observer": observer,
+                             "frame": self.reference_frame,
+                             "abcorr": self.light_time_correction,
+                             "mission": self.spiceql_mission,
+                             "searchKernels": self.search_kernels}
+                    states = spiceql_access.get_ephem_data(ephem, "getTargetStates", web=self.use_web, function_args=kwargs)
+                    states = np.array(states)[:,0:6]
+                    
             for state in states:
                 if self.swap_observer_target:
                     pos.append(-state[:3])
