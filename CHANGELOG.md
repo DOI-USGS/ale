@@ -36,6 +36,7 @@ release.
 ## [Unreleased]
 ### Changed
 - Changed velocities to be after positions in ALE unified formatter for easier comparison with older ISDs [#650](https://github.com/DOI-USGS/ale/pull/650)
+- Pinned SpiceQL to 1.2.1
 
 ## [0.11.0] - 2025-04-11
 ### Changed
