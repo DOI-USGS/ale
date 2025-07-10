@@ -46,6 +46,38 @@ class LineScanner():
         t0_ephemeris = self.ephemeris_start_time - self.center_ephemeris_time
         return [[0.5], [t0_ephemeris], [self.exposure_duration]]
 
+
+    @property
+    def exposure_rates(self):
+      """
+      Returns the start/stop times and exposure durations for the sensor.
+
+      Returns
+      -------
+      : list
+        list of start ets 
+      : list
+        list of stop ets
+      : list
+        list of exposure durations
+      """
+      # Convert line scan rate into start/stop times and exposure durations
+      start_ets = []
+      stop_ets = []
+      exposure_durations = []
+      scan_rate = self.line_scan_rate
+      num_lines = self.image_lines 
+      for i in range(len(scan_rate))-1: 
+          start_line, line_time, exposure_duration = scan_rate[i]
+          start_ets.append(line_time)
+          stop_ets.append(line_time + (exposure_duration*(scan_rate[i+1][0] - start_line)))
+          exposure_durations.append(exposure_duration)
+      start_ets.append(scan_rate[-1][1])
+      stop_ets.append(scan_rate[-1][1] + (scan_rate[-1][0]-num_lines)*scan_rate[-1][2])
+      exposure_durations.append(scan_rate[-1][2])
+      return start_ets, stop_ets, exposure_durations
+
+
     @property
     def ephemeris_time(self):
         """

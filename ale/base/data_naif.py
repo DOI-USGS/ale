@@ -11,6 +11,7 @@ from scipy.spatial.transform import Rotation as R
 import pyspiceql
 
 from ale.base import spiceql_mission_map
+from ale.base.type_sensor import LineScanner
 from ale.transformation import FrameChain
 from ale.rotation import TimeDependentRotation
 from ale import kernel_access
@@ -502,29 +503,60 @@ class NaifSpice():
             # location of the target. For more information, see:
             # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
             if self.correct_lt_to_surface and self.light_time_correction.upper() == 'LT+S':
-                with ThreadPoolExecutor(max_workers=2) as executor:
-                    futures = []
-                    kwargs = {"target": target,
-                            "observer": observer,
-                            "frame": "J2000",
-                            "abcorr": self.light_time_correction,
-                            "mission": self.spiceql_mission,
-                            "searchKernels": self.search_kernels}
-                    futures.append(executor.submit(spiceql_access.get_ephem_data, ephem, "getTargetStates", 400, self.use_web, kwargs))
+                if isinstance(self, LineScanner) and self.use_web:
+                    logger.debug("Sensor is a Line Scanner, using alt API")
+                    # Convert line scan rate into start/stop times and exposure durations
+                    start_ets, stop_ets, exposure_durations = self.exposure_rates
 
-                    # ssb to spacecraft
-                    kwargs = {"target": observer,
-                            "observer": "SSB",
-                            "frame": "J2000",
-                            "abcorr": "NONE",
-                            "mission": self.spiceql_mission,
-                            "searchKernels": self.search_kernels}
-                    futures.append(executor.submit(spiceql_access.get_ephem_data, ephem, "getTargetStates", 400, self.use_web, kwargs))
+                    logger.debug(f"start_ets: {start_ets}")
+                    logger.debug(f"stop_ets: {stop_ets}")
+                    logger.debug(f"exposure_durations: {exposure_durations}")
+                    
+                    kwargs = {
+                              "startEts": start_ets,
+                              "stopEts": stop_ets,
+                              "exposureDuration": exposure_durations,
+                              "target": target,
+                              "observer": observer,
+                              "frame": "J2000",
+                              "abcorr": self.light_time_correction,
+                              "mission": self.spiceql_mission,
+                              "searchKernels": self.search_kernels}
+                    obs_tars = self.spiceql_call("getTargetStates", web=self.use_web, function_args=kwargs)
 
-                    # Build graph async
-                    results = [future.result() for future in futures]
-                
-                obs_tars, ssb_obs = results
+                    kwargs = {"startEts": start_ets,
+                              "stopEts": stop_ets,
+                              "exposureDuration": exposure_durations,
+                              "target": observer,
+                              "observer": "SSB",
+                              "frame": "J2000",
+                              "abcorr": "NONE",
+                              "mission": self.spiceql_mission,
+                              "searchKernels": self.search_kernels} 
+                    ssb_obs = self.spiceql_call("getTargetStates", web=self.use_web, function_args=kwargs)
+                else:       
+                    with ThreadPoolExecutor(max_workers=2) as executor:
+                        futures = []
+                        kwargs = {"target": target,
+                                "observer": observer,
+                                "frame": "J2000",
+                                "abcorr": self.light_time_correction,
+                                "mission": self.spiceql_mission,
+                                "searchKernels": self.search_kernels}
+                        futures.append(executor.submit(spiceql_access.get_ephem_data, ephem, "getTargetStates", 400, self.use_web, kwargs))
+
+                        # ssb to spacecraft
+                        kwargs = {"target": observer,
+                                "observer": "SSB",
+                                "frame": "J2000",
+                                "abcorr": "NONE",
+                                "mission": self.spiceql_mission,
+                                "searchKernels": self.search_kernels}
+                        futures.append(executor.submit(spiceql_access.get_ephem_data, ephem, "getTargetStates", 400, self.use_web, kwargs))
+
+                        # Build graph async
+                        results = [future.result() for future in futures]
+                        obs_tars, ssb_obs = results   
 
                 obs_tar_lts = np.array(obs_tars)[:,-1]
                 ssb_obs_states = np.array(ssb_obs)[:,0:6]
@@ -549,15 +581,29 @@ class NaifSpice():
                     rotated_state = spice.mxvg(matrix, state)
                     states.append(rotated_state)
             else:
-                kwargs = {"target": target,
-                          "observer": observer,
-                          "frame": self.reference_frame,
-                          "abcorr": self.light_time_correction,
-                          "mission": self.spiceql_mission,
-                          "searchKernels": self.search_kernels}
-                states = spiceql_access.get_ephem_data(ephem, "getTargetStates", web=self.use_web, function_args=kwargs)
-                states = np.array(states)[:,0:6]
-
+                if isinstance(self, LineScanner) and self.use_web:
+                    logger.debug("Sensor is a Line Scanner, using alt API")
+                    start_ets, stop_ets, exposure_durations = self.exposure_rates
+                    kwargs = {"startEts": start_ets,
+                              "stopEts": stop_ets,
+                              "exposureDuration": exposure_durations,
+                              "target": target,
+                              "observer": observer,
+                              "frame": "J2000",
+                              "abcorr": self.light_time_correction,
+                              "mission": self.spiceql_mission,
+                              "searchKernels": self.search_kernels}
+                    states = self.spiceql_call("getTargetStates", web=self.use_web, function_args=kwargs)
+                else:
+                    kwargs = {"target": target,
+                             "observer": observer,
+                             "frame": self.reference_frame,
+                             "abcorr": self.light_time_correction,
+                             "mission": self.spiceql_mission,
+                             "searchKernels": self.search_kernels}
+                    states = spiceql_access.get_ephem_data(ephem, "getTargetStates", web=self.use_web, function_args=kwargs)
+                    states = np.array(states)[:,0:6]
+                    
             for state in states:
                 if self.swap_observer_target:
                     pos.append(-state[:3])
