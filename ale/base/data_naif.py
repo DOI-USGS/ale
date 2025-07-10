@@ -512,8 +512,7 @@ class NaifSpice():
                     logger.debug(f"stop_ets: {stop_ets}")
                     logger.debug(f"exposure_durations: {exposure_durations}")
                     
-                    kwargs = {
-                              "startEts": start_ets,
+                    kwargs = {"startEts": start_ets,
                               "stopEts": stop_ets,
                               "exposureDuration": exposure_durations,
                               "target": target,
@@ -538,11 +537,11 @@ class NaifSpice():
                     with ThreadPoolExecutor(max_workers=2) as executor:
                         futures = []
                         kwargs = {"target": target,
-                                "observer": observer,
-                                "frame": "J2000",
-                                "abcorr": self.light_time_correction,
-                                "mission": self.spiceql_mission,
-                                "searchKernels": self.search_kernels}
+                                  "observer": observer,
+                                  "frame": "J2000",
+                                  "abcorr": self.light_time_correction,
+                                  "mission": self.spiceql_mission,
+                                  "searchKernels": self.search_kernels}
                         futures.append(executor.submit(spiceql_access.get_ephem_data, ephem, "getTargetStates", 400, self.use_web, kwargs))
 
                         # ssb to spacecraft
