@@ -67,7 +67,7 @@ class LineScanner():
       exposure_durations = []
       scan_rate = self.line_scan_rate
       num_lines = self.image_lines 
-      for i in range(len(scan_rate))-1: 
+      for i in range(len(scan_rate) - 1): 
           start_line, line_time, exposure_duration = scan_rate[i]
           start_ets.append(line_time)
           stop_ets.append(line_time + (exposure_duration*(scan_rate[i+1][0] - start_line)))
