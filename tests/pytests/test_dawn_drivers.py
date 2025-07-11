@@ -205,8 +205,9 @@ class test_dawn_vir_isis3_naif(unittest.TestCase):
         np.testing.assert_array_equal(self.driver.line_exposure_duration, [0.5])
 
     def test_focal_length(self):
-        with patch('ale.drivers.dawn_drivers.spice.gdpool', return_value=[152.0]) as gdpool:
-             assert self.driver.focal_length == 152.0
+        with patch('ale.drivers.dawn_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            naif_keywords.return_value = {"INS-203213_FOCAL_LENGTH": 152.0}
+            assert self.driver.focal_length == 152.0
 
     def test_ikid(self):
         assert self.driver.ikid == -203213
@@ -218,7 +219,7 @@ class test_dawn_vir_isis3_naif(unittest.TestCase):
 
     def test_line_scan_rate(self):
         with patch('ale.drivers.dawn_drivers.read_table_data', return_value=12345) as read_table_data, \
-             patch('ale.drivers.dawn_drivers.spice.scs2e', return_value=362681649.6134113) as scs2e, \
+             patch('ale.drivers.dawn_drivers.NaifSpice.spiceql_call', return_value=362681633.8634121) as spiceql_call, \
              patch('ale.drivers.dawn_drivers.parse_table', return_value={'ScetTimeClock': ['362681634.09', '362681650.09', '362681666.09'], \
                                                                 'ShutterStatus': ['closed', 'open', 'open'], \
                                                                 'MirrorSin': [0.066178, -0.037118, -0.037118], \
@@ -240,7 +241,7 @@ class test_dawn_vir_isis3_naif(unittest.TestCase):
 
     def test_hk_ephemeris_time(self):
         with patch('ale.drivers.dawn_drivers.read_table_data', return_value=12345) as read_table_data, \
-             patch('ale.drivers.dawn_drivers.spice.scs2e', return_value=362681633.8634121) as scs2e, \
+             patch('ale.drivers.dawn_drivers.NaifSpice.spiceql_call', return_value=362681633.8634121) as spiceql_call, \
              patch('ale.drivers.dawn_drivers.parse_table', return_value={'ScetTimeClock': ['362681634.09', '362681650.09', '362681666.09'], \
                                                                 'ShutterStatus': ['closed', 'open', 'open'], \
                                                                 'MirrorSin': [0.066178, -0.037118, -0.037118], \
@@ -250,7 +251,7 @@ class test_dawn_vir_isis3_naif(unittest.TestCase):
 
     def test_ephemeris_start_time(self):
         with patch('ale.drivers.dawn_drivers.read_table_data', return_value=12345) as read_table_data, \
-             patch('ale.drivers.dawn_drivers.spice.scs2e', return_value=362681633.8634121) as scs2e, \
+             patch('ale.drivers.dawn_drivers.NaifSpice.spiceql_call', return_value=362681633.8634121) as spiceql_call, \
              patch('ale.drivers.dawn_drivers.parse_table', return_value={'ScetTimeClock': ['362681634.09', '362681650.09', '362681666.09'], \
                                                                 'ShutterStatus': ['closed', 'open', 'open'], \
                                                                 'MirrorSin': [0.066178, -0.037118, -0.037118], \
@@ -260,7 +261,7 @@ class test_dawn_vir_isis3_naif(unittest.TestCase):
 
     def test_ephemeris_stop_time(self):
         with patch('ale.drivers.dawn_drivers.read_table_data', return_value=12345) as read_table_data, \
-             patch('ale.drivers.dawn_drivers.spice.scs2e', return_value=362682578.1133645) as scs2e, \
+             patch('ale.drivers.dawn_drivers.NaifSpice.spiceql_call', return_value=362682578.1133645) as spiceql_call, \
              patch('ale.drivers.dawn_drivers.parse_table', return_value={'ScetTimeClock': ['362681634.09', '362681650.09', '362681666.09'], \
                                                                 'ShutterStatus': ['closed', 'open', 'open'], \
                                                                 'MirrorSin': [0.066178, -0.037118, -0.037118], \

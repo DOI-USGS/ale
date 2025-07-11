@@ -17,6 +17,7 @@ from ale.base.data_isis import read_table_data
 from ale.base.data_isis import parse_table
 from ale.transformation import TimeDependentRotation
 from ale.transformation import ConstantRotation
+from ale import spiceql_access
 
 ID_LOOKUP = {
     "FC1" : "DAWN_FC1",
@@ -442,7 +443,9 @@ class DawnVirIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDisto
     
     @property
     def focal_length(self):
-      return float(spice.gdpool('INS{}_FOCAL_LENGTH'.format(self.ikid), 0, 1)[0])
+      if not hasattr(self, "_focal_length"):
+        self._focal_length = float(self.naif_keywords['INS{}_FOCAL_LENGTH'.format(self.ikid)])
+      return self._focal_length
     
     @property
     def detector_center_sample(self):
@@ -598,7 +601,7 @@ class DawnVirIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDisto
         line_times = []
         scet_times = self.housekeeping_table["ScetTimeClock"]
         for scet in scet_times:
-          line_midtime = spice.scs2e(self.spacecraft_id, scet)
+          line_midtime = self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": scet, "mission": self.spiceql_mission})
           line_times.append(line_midtime)
 
         return line_times
@@ -679,12 +682,16 @@ class DawnVirIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDisto
         time_dep_quats = np.zeros((len(self.hk_ephemeris_time), 4))
         avs = []
 
-        for i, time in enumerate(self.hk_ephemeris_time):
-          try:
-            state_matrix = spice.sxform("J2000", spice.frmnam(self.sensor_frame_id), time)
-          except:
-            rotation_matrix = spice.pxform("J2000", spice.frmnam(self.sensor_frame_id), time)
-            state_matrix = spice.rav2xf(rotation_matrix, [0, 0, 0])
+        function_args = {"toFrame": self.sensor_frame_id, "refFrame": 1, "mission": self.spiceql_mission, "searchKernels": self.search_kernels}
+        rotations = spiceql_access.get_ephem_data(self.hk_ephemeris_time, "getTargetOrientations", web=self.use_web, function_args=function_args)
+
+        for i, rotation in enumerate(rotations):
+          quaternion = rotation[:4]
+          av = [0, 0, 0]
+          if (len(rotation) > 4):
+            av = rotation[4:]
+          rotation_matrix = spice.q2m(quaternion)
+          state_matrix = spice.rav2xf(rotation_matrix, av)
 
           opt_angle = self.optical_angles[i]
           

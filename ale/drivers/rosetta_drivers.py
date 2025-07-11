@@ -13,6 +13,8 @@ from ale.base.label_isis import IsisLabel
 from ale.base.type_distortion import RadialDistortion
 from ale.base.type_sensor import LineScanner
 from ale.transformation import ConstantRotation, FrameChain, TimeDependentRotation
+from ale import spiceql_access
+
 
 
 class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDistortion, Driver):
@@ -297,12 +299,16 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
         time_dep_quats = np.zeros((len(self.hk_ephemeris_time), 4))
         avs = []
 
-        for i, time in enumerate(self.hk_ephemeris_time):
-          try:
-            state_matrix = spice.sxform("J2000", spice.frmnam(self.sensor_frame_id), time)
-          except:
-            rotation_matrix = spice.pxform("J2000", spice.frmnam(self.sensor_frame_id), time)
-            state_matrix = spice.rav2xf(rotation_matrix, [0, 0, 0])
+        function_args = {"toFrame": self.sensor_frame_id, "refFrame": 1, "mission": self.spiceql_mission, "searchKernels": self.search_kernels}
+        rotations = spiceql_access.get_ephem_data(self.hk_ephemeris_time, "getTargetOrientations", web=self.use_web, function_args=function_args)
+
+        for i, rotation in enumerate(rotations):
+          quaternion = rotation[:4]
+          av = [0, 0, 0]
+          if (len(rotation) > 4):
+            av = rotation[4:]
+          rotation_matrix = spice.q2m(quaternion)
+          state_matrix = spice.rav2xf(rotation_matrix, av)
 
           opt_angle = self.optical_angle[i]
 

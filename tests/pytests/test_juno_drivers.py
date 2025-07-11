@@ -19,7 +19,7 @@ def test_kernels():
         os.remove(kern)
 
 @pytest.mark.parametrize("label_type", ['isis3'])
-def test_mro_load(test_kernels, label_type):
+def test_juno_load(test_kernels, label_type):
     label_file = get_image_label('JNCR_2016240_01M06152_V01', label_type)
     isd_str = ale.loads(label_file, props={'kernels': test_kernels})
     isd_obj = json.loads(isd_str)
