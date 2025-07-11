@@ -128,8 +128,6 @@ class FrameChain(nx.DiGraph):
 
         constant_frames.extend(target_constant_frames)
 
-        print("SENSOR TIME DEP FRAMES:", sensor_time_dependent_frames)
-
         # Do this call so we know if we can get exact ck times for our data
         if exact_ck_times and len(ephemeris_times) > 1 and not nadir:
             try:
@@ -148,7 +146,7 @@ class FrameChain(nx.DiGraph):
                 logger.debug(f"Failed to extract exact ck times: {e}")
 
         # Build graph async
-        with ThreadPoolExecutor(max_workers=1) as executor:
+        with ThreadPoolExecutor(max_workers=3) as executor:
             futures = [
                 
                 # Add all time dependent frame edges to the graph
