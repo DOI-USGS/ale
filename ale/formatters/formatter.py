@@ -49,7 +49,7 @@ def to_isd(driver):
     # frame sensor model specifics
     if isinstance(driver, Framer):
         isd['name_model'] = 'USGS_ASTRO_FRAME_SENSOR_MODEL'
-        isd['center_ephemeris_time'] = driver.center_ephemeris_time
+        isd['center_ephemeris_time'] = driver_data["center_ephemeris_time"]
 
     if isinstance(driver, PushFrame):
         isd['name_model'] = 'USGS_ASTRO_PUSH_FRAME_SENSOR_MODEL'
@@ -141,15 +141,15 @@ def to_isd(driver):
     isd['instrument_pointing'] = instrument_pointing
 
     # interiror orientation
-    isd['naif_keywords'] = driver.naif_keywords
+    isd['naif_keywords'] = driver_data["naif_keywords"]
 
     if isinstance(driver,LineScanner) or isinstance(driver, Framer) or isinstance(driver, PushFrame):
 
-        isd['detector_sample_summing'] = driver.sample_summing
-        isd['detector_line_summing'] = driver.line_summing
+        isd['detector_sample_summing'] = driver_data["sample_summing"]
+        isd['detector_line_summing'] = driver_data["line_summing"]
 
         isd['focal_length_model'] = {
-            'focal_length' : driver.focal_length
+            'focal_length' : driver_data["focal_length"]
         }
         isd['detector_center'] = {
             'line' : driver_data["detector_center_line"],
