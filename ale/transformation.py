@@ -281,7 +281,7 @@ class FrameChain(nx.DiGraph):
         quats_and_avs_per_frame = []
 
         logger.debug(f"Generate rotation times: {times}")
-        with ThreadPoolExecutor(max_workers=1) as executor:
+        with ThreadPoolExecutor(max_workers=3) as executor:
             futures = []
 
             for s, d in frames:
