@@ -250,7 +250,9 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
         : dict
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
-        return {**super().naif_keywords, **self.spiceql_call("findMissionKeywords", {"key": f"*{self.base_ikid}*", "mission": self.spiceql_mission})}
+        if not hasattr(self, "_naif_keywords"):
+          self._naif_keywords = {**super().naif_keywords, **self.spiceql_call("findMissionKeywords", {"key": f"*{self.base_ikid}*", "mission": self.spiceql_mission})}
+        return self._naif_keywords
 
     @property
     def sensor_name(self):
