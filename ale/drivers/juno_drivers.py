@@ -41,7 +41,6 @@ class JunoJunoCamIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistor
             initial_time = super().ephemeris_start_time
             frame_number = self.label['IsisCube']['Instrument']['FrameNumber']
             inter_frame_delay = self.label['IsisCube']['Instrument']['InterFrameDelay'].value
-            print("BANANA: ", self.naif_keywords)
             start_time_bias = self.naif_keywords[f'INS{self.ikid}_START_TIME_BIAS']
             inter_frame_delay_bias = self.naif_keywords[f'INS{self.ikid}_INTERFRAME_DELTA']
             self._ephemeris_start_time = initial_time + start_time_bias + (frame_number - 1) * (inter_frame_delay + inter_frame_delay_bias)

@@ -65,11 +65,13 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
         : float
           start time
         """
-        try:
-            # first line's middle et - 1/2 exposure duration = cube start time
-            return self.hk_ephemeris_time[0] - (self.line_exposure_duration/2)
-        except:
-            return self.spiceql_call("strSclkToEt", {"frameCode" : self.spacecraft_id, "sclk" : self.label['IsisCube']['Instrument']['SpacecraftClockStartCount'], "mission" : self.spiceql_mission})
+        if not hasattr(self, "_ephemeris_start_time"):
+          try:
+              # first line's middle et - 1/2 exposure duration = cube start time
+              self._ephemeris_start_time = self.hk_ephemeris_time[0] - (self.line_exposure_duration/2)
+          except:
+              self._ephemeris_start_time = self.spiceql_call("strSclkToEt", {"frameCode" : self.spacecraft_id, "sclk" : self.label['IsisCube']['Instrument']['SpacecraftClockStartCount'], "mission" : self.spiceql_mission})
+        return self._ephemeris_start_time
 
 
     @property
@@ -82,12 +84,13 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
         : float
           stop time
         """
-
-        try:
-            #  last line's middle et + 1/2 exposure duration = cube start time
-            return self.hk_ephemeris_time[-1] + (self.line_exposure_duration/2)
-        except:
-            return self.spiceql_call("strSclkToEt", {"frameCode" : self.spacecraft_id, "sclk" : self.label['IsisCube']['Instrument']['SpacecraftClockStopCount'], "mission" : self.spiceql_mission})
+        if not hasattr(self, "_ephemeris_stop_time"):
+          try:
+              #  last line's middle et + 1/2 exposure duration = cube start time
+              self._ephemeris_stop_time = self.hk_ephemeris_time[-1] + (self.line_exposure_duration/2)
+          except:
+              self._ephemeris_stop_time = self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": self.label['IsisCube']['Instrument']['SpacecraftClockStopCount'], "mission": self.spiceql_mission})
+        return self._ephemeris_stop_time
 
     @property
     def housekeeping(self):
@@ -140,7 +143,7 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
                     else:
                         opt_angles[i] = cs(i+1)
 
-            line_mid_times = [self.spiceql_call("scs2e", {"frameCode" : self.spacecraft_id, "sclk" : str(round(i,5)), "mission": self.spiceql_mission} ) for i in data_scet]
+            line_mid_times = [self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": str(round(i,5)), "mission": self.spiceql_mission} ) for i in data_scet]
             self._hk_ephemeris_time = line_mid_times
             self._optical_angle = opt_angles
             self._housekeeping= True
@@ -283,9 +286,10 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
         -------
         : FrameChain
         """
-        frame_chain = super().frame_chain
-        frame_chain.add_edge(rotation=self.inst_pointing_rotation)
-        return frame_chain
+        if not hasattr(self, "_frame_chain"):
+          self._frame_chain = super().frame_chain
+          self._frame_chain.add_edge(rotation=self.inst_pointing_rotation)
+        return self._frame_chain
 
     @property
     def inst_pointing_rotation(self):
@@ -296,32 +300,33 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
         : TimeDependentRotation
           Instrument pointing rotation
         """
-        time_dep_quats = np.zeros((len(self.hk_ephemeris_time), 4))
-        avs = []
+        if not hasattr(self, "_inst_pointing_rotation"):
+          time_dep_quats = np.zeros((len(self.hk_ephemeris_time), 4))
+          avs = []
 
-        function_args = {"toFrame": self.sensor_frame_id, "refFrame": 1, "mission": self.spiceql_mission, "searchKernels": self.search_kernels}
-        rotations = spiceql_access.get_ephem_data(self.hk_ephemeris_time, "getTargetOrientations", web=self.use_web, function_args=function_args)
+          function_args = {"toFrame": self.sensor_frame_id, "refFrame": 1, "mission": self.spiceql_mission, "searchKernels": self.search_kernels}
+          rotations = spiceql_access.get_ephem_data(self.hk_ephemeris_time, "getTargetOrientations", web=self.use_web, function_args=function_args)
 
-        for i, rotation in enumerate(rotations):
-          quaternion = rotation[:4]
-          av = [0, 0, 0]
-          if (len(rotation) > 4):
-            av = rotation[4:]
-          rotation_matrix = spice.q2m(quaternion)
-          state_matrix = spice.rav2xf(rotation_matrix, av)
+          for i, rotation in enumerate(rotations):
+            quaternion = rotation[:4]
+            av = [0, 0, 0]
+            if (len(rotation) > 4):
+              av = rotation[4:]
+            rotation_matrix = spice.q2m(quaternion)
+            state_matrix = spice.rav2xf(rotation_matrix, av)
 
-          opt_angle = self.optical_angle[i]
+            opt_angle = self.optical_angle[i]
 
-          xform = spice.eul2xf([0, -opt_angle, 0, 0, 0, 0], 1, 2, 3)
-          xform2 = spice.mxmg(xform, state_matrix)
+            xform = spice.eul2xf([0, -opt_angle, 0, 0, 0, 0], 1, 2, 3)
+            xform2 = spice.mxmg(xform, state_matrix)
 
-          rot_mat, av = spice.xf2rav(xform2)
-          avs.append(av)
+            rot_mat, av = spice.xf2rav(xform2)
+            avs.append(av)
 
-          quat_from_rotation = spice.m2q(rot_mat)
-          time_dep_quats[i,:3] = -quat_from_rotation[1:]
-          time_dep_quats[i, 3] = -quat_from_rotation[0]
+            quat_from_rotation = spice.m2q(rot_mat)
+            time_dep_quats[i,:3] = -quat_from_rotation[1:]
+            time_dep_quats[i, 3] = -quat_from_rotation[0]
 
-        time_dep_rot = TimeDependentRotation(time_dep_quats, self.hk_ephemeris_time, 1, self.sensor_frame_id, av=avs)
+          self._inst_pointing_rotation = TimeDependentRotation(time_dep_quats, self.hk_ephemeris_time, 1, self.sensor_frame_id, av=avs)
 
-        return time_dep_rot
+        return self._inst_pointing_rotation

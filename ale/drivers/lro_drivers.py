@@ -895,7 +895,6 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
           self._naif_keywords = super().naif_keywords
           ground_range_resolution = self.label['IsisCube']['Instrument']["ScaledPixelHeight"]
           icode = "INS" + str(self.ikid)
-          print("BANANA", icode)
           self._naif_keywords[icode + "_TRANSX"] = [-1.0 * ground_range_resolution, ground_range_resolution, 0.0]
           self._naif_keywords[icode + "_TRANSY"] = [0.0, 0.0, 0.0]
           self._naif_keywords[icode + "_ITRANSS"] = [1.0, 1.0 / ground_range_resolution, 0.0]
@@ -1176,14 +1175,15 @@ class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, Radial
         : dict
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
-        _naifKeywords = {**super().naif_keywords,
-                         **self.spiceql_call("findMissionKeywords", {"key": f"*_FOCAL_LENGTH", "mission": self.spiceql_mission}),
-                         **self.spiceql_call("findMissionKeywords", {"key": f"*_BORESIGHT_SAMPLE", "mission": self.spiceql_mission}),
-                         **self.spiceql_call("findMissionKeywords", {"key": f"*_BORESIGHT_LINE", "mission": self.spiceql_mission}),
-                         **self.spiceql_call("findMissionKeywords", {"key": f"*_TRANS*", "mission": self.spiceql_mission}),
-                         **self.spiceql_call("findMissionKeywords", {"key": f"*_ITRANS*", "mission": self.spiceql_mission}),
-                         **self.spiceql_call("findMissionKeywords", {"key": f"*_OD_K", "mission": self.spiceql_mission})}
-        return _naifKeywords
+        if not hasattr(self, "_naif_keywords"):
+          self._naifKeywords = {**super().naif_keywords,
+                                **self.spiceql_call("findMissionKeywords", {"key": f"*_FOCAL_LENGTH", "mission": self.spiceql_mission}),
+                                **self.spiceql_call("findMissionKeywords", {"key": f"*_BORESIGHT_SAMPLE", "mission": self.spiceql_mission}),
+                                **self.spiceql_call("findMissionKeywords", {"key": f"*_BORESIGHT_LINE", "mission": self.spiceql_mission}),
+                                **self.spiceql_call("findMissionKeywords", {"key": f"*_TRANS*", "mission": self.spiceql_mission}),
+                                **self.spiceql_call("findMissionKeywords", {"key": f"*_ITRANS*", "mission": self.spiceql_mission}),
+                                **self.spiceql_call("findMissionKeywords", {"key": f"*_OD_K", "mission": self.spiceql_mission})}
+        return self._naifKeywords
 
 
     @property
