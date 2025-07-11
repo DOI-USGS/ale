@@ -2,6 +2,7 @@ import spiceypy as spice
 
 import warnings
 from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import as_completed
 import logging
 import json 
 
@@ -574,10 +575,19 @@ class NaifSpice():
 
                 _states = ssb_tar_states - ssb_obs_states
 
+                reference_frame_id = self.spiceql_call("translateNameToCode", {"frame": self.reference_frame, "mission": self.spiceql_mission})
+                function_args = {"toFrame": reference_frame_id, "refFrame": 1, "mission": self.spiceql_mission, "searchKernels": self.search_kernels}
+                rotations = spiceql_access.get_ephem_data(ephem, "getTargetOrientations", web=self.use_web, function_args=function_args)
+
                 states = []
-                for i, state in enumerate(_states):
-                    matrix = spice.sxform("J2000", self.reference_frame, ephem[i])
-                    rotated_state = spice.mxvg(matrix, state)
+                for i, rotation in enumerate(rotations):
+                    quaternion = rotation[:4]
+                    av = [0, 0, 0]
+                    if (len(rotation) > 4):
+                        av = rotation[4:]
+                    rotation_matrix = spice.q2m(quaternion)
+                    matrix = spice.rav2xf(rotation_matrix, av)
+                    rotated_state = spice.mxvg(matrix, _states[i])
                     states.append(rotated_state)
             else:
                 if isinstance(self, LineScanner) and self.use_web:
@@ -811,15 +821,16 @@ class NaifSpice():
 
             self._naif_keywords['BODY_FRAME_CODE'] = self.target_frame_id
             self._naif_keywords['BODY_CODE'] = self.target_id
-            with ThreadPoolExecutor(max_workers=3) as executor:
+
+            with ThreadPoolExecutor(max_workers=2) as executor:
                 futures = []
                 futures.append(executor.submit(self.spiceql_call, "findMissionKeywords", {"key": f"*{self.ikid}*", "mission": self.spiceql_mission}))
                 futures.append(executor.submit(self.spiceql_call, "findTargetKeywords", {"key": f"*{self.target_id}*", "mission": self.spiceql_mission}))
 
-                for future in futures:
+                for future in as_completed(futures):
                     result = future.result()
                     if result:
-                        self._naif_keywords = self.naif_keywords | result
+                        self._naif_keywords = self._naif_keywords | result
 
             try:
                 frame_keywords = self.spiceql_call("findMissionKeywords", {"key": f"*{self.fikid}*", "mission": self.spiceql_mission})
