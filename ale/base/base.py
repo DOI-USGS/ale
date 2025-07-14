@@ -63,15 +63,11 @@ class Driver():
               if isinstance(getattr(self.__class__, attr, None), property):
                   properties.append(attr)
 
-        spice_props = ["ikid", 
-                       "ephemeris_start_time", 
-                       "ephemeris_stop_time", 
-                       "spacecraft_id", 
+        spice_props = ["spacecraft_id", 
                        "target_id", 
                        "target_frame_id",
                        "reference_frame",
-                       "sensor_frame_id", 
-                       "naif_keywords"]
+                       "sensor_frame_id"]
 
         # Remove position and orientation properties
         ephemeris_props = ["sensor_position", "sun_position", "frame_chain"]
@@ -91,6 +87,9 @@ class Driver():
         data = {}
         num_procs = max(os.cpu_count(), 10)
         logger.info(f"Num procs {num_procs}")
+        # Get ikid and naif_keywords to avoid race conditions
+        data["ikid"] = get_property("ikid")
+        data["naif_keywords"] = get_property("naif_keywords")
         
         logger.info(f"Getting props {spice_props}")
         start = time.time()
