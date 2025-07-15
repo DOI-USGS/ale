@@ -137,6 +137,8 @@ class NaifSpice():
                     warnings.warn(f"Web value {web_prop} not a boolean type, setting web to False")
                     web_prop = False
                 self._use_web = web_prop
+            if self._use_web:
+                logger.warn("!!! SpiceQL web calls in ALE are experimental. Report any issues to https://github.com/DOI-USGS/ale/issues !!!")
 
         return self._use_web
 
