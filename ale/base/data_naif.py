@@ -128,7 +128,6 @@ class NaifSpice():
         : bool
           Boolean defining if you are running web enabled(True) or Disabled(False)
         """
-        logger.warn("use_web is experimental. Report any issues to https://github.com/DOI-USGS/ale/issues")
         if not hasattr(self, '_use_web'):
             self._use_web = False 
 
@@ -138,6 +137,8 @@ class NaifSpice():
                     warnings.warn(f"Web value {web_prop} not a boolean type, setting web to False")
                     web_prop = False
                 self._use_web = web_prop
+            if self._use_web:
+                logger.warn("!!! use_web is experimental. Report any issues to https://github.com/DOI-USGS/ale/issues !!!")
 
         return self._use_web
 
