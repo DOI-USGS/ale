@@ -38,6 +38,9 @@ release.
 - Changed velocities to be after positions in ALE unified formatter for easier comparison with older ISDs [#650](https://github.com/DOI-USGS/ale/pull/650)
 - Pinned SpiceQL to 1.2.1
 
+### Added
+- Added Chandrayaan2 OHRC driver and tests [#654](https://github.com/DOI-USGS/ale/pull/654)
+
 ## [0.11.0] - 2025-04-11
 ### Changed
 - Enabled Hayabusa2 drivers [#596](https://github.com/DOI-USGS/ale/pull/596)
