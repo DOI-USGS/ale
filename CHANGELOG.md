@@ -41,6 +41,7 @@ release.
 - Changed SpiceQL pin to >=1.2.1 [#660](https://github.com/DOI-USGS/ale/pull/660)
 - Changed `get_kernels_from_isis_pvl` to add any dsks from the ISIS kernels group to its kernel output [#627](https://github.com/DOI-USGS/ale/issues/627)
 - Changed `isd_generate` to access SpiceQL [#656](https://github.com/DOI-USGS/ale/pull/656)
+- Make SpiceQL import optional [#666](https://github.com/DOI-USGS/ale/pull/666)
 
 ### Added
 - Added Chandrayaan2 OHRC driver and tests [#654](https://github.com/DOI-USGS/ale/pull/654)
