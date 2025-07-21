@@ -8,8 +8,6 @@ import numpy as np
 from ale import util
 from concurrent.futures import ThreadPoolExecutor
 
-import pyspiceql
-
 logger = logging.getLogger(__name__)
 logging.basicConfig(format="%(message)s", level=logging.INFO)
 
@@ -18,6 +16,12 @@ log_level = os.environ.get('ALESPICEQL_LOG_LEVEL')
 if log_level is not None and log_level.lower() == "debug":
     logger.setLevel(logging.DEBUG)
 
+try:
+    import pyspiceql
+except ImportError:
+    logger.info("Optional package 'pyspiceql' was not imported, " \
+                "install 'spiceql' to use this feature. " \
+                "NOTE: SpiceQL is not supported on Windows.") 
 
 def stringify_web_args(function_args):
     """
