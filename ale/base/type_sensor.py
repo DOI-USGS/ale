@@ -7,6 +7,7 @@ from scipy.spatial.transform import Rotation
 from ale.transformation import FrameChain
 from ale.transformation import ConstantRotation, TimeDependentRotation
 from ale import util 
+from ale import logger
 
 class LineScanner():
     """
@@ -65,16 +66,26 @@ class LineScanner():
       start_ets = []
       stop_ets = []
       exposure_durations = []
-      scan_rate = self.line_scan_rate
+      start_line, line_time, exposure_duration = self.line_scan_rate
       num_lines = self.image_lines 
-      for i in range(len(scan_rate) - 1): 
-          start_line, line_time, exposure_duration = scan_rate[i]
-          start_ets.append(line_time)
-          stop_ets.append(line_time + (exposure_duration*(scan_rate[i+1][0] - start_line)))
+      
+      # Handle the case where there is only one line scan rate
+      if len(start_line) == 1:
+          start_ets.append(self.ephemeris_start_time)
+          stop_ets.append(self.ephemeris_stop_time)
+          exposure_durations.append(exposure_duration[0])
+      else:
+          for i in range(len(start_line) - 1): 
+              start_ets.append(line_time[i])
+              stop_ets.append(line_time[i] + (exposure_duration * (start_line[i+1] - start_line[i])))
+              exposure_durations.append(exposure_duration)
+          start_ets.append(line_time[-1])
+          stop_ets.append(line_time[-1] + (start_line[-1] - num_lines) * exposure_duration)
           exposure_durations.append(exposure_duration)
-      start_ets.append(scan_rate[-1][1])
-      stop_ets.append(scan_rate[-1][1] + (scan_rate[-1][0]-num_lines)*scan_rate[-1][2])
-      exposure_durations.append(scan_rate[-1][2])
+
+      logger.debug(f"Start ETS: {start_ets}")
+      logger.debug(f"Stop ETS: {stop_ets}")
+      logger.debug(f"Exposure Durations: {exposure_durations}")
       return start_ets, stop_ets, exposure_durations
 
 

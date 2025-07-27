@@ -452,6 +452,8 @@ class NaifSpice():
                                                                  "observer": self.target_name,
                                                                  "frame": self.reference_frame,
                                                                  "abcorr": "LT+S",
+                                                                 "limitCk": -1, 
+                                                                 "limitSpk" : 1,
                                                                  "mission": self.spiceql_mission})
             for sun_state in sun_lt_states:
                 sun_state = np.array(sun_state)
@@ -523,8 +525,9 @@ class NaifSpice():
                               "frame": "J2000",
                               "abcorr": self.light_time_correction,
                               "mission": self.spiceql_mission,
-                              "searchKernels": self.search_kernels}
-                    obs_tars = self.spiceql_call("getTargetStates", web=self.use_web, function_args=kwargs)
+                              "searchKernels": self.search_kernels,
+                              "useWeb": self.use_web}
+                    obs_tars = self.spiceql_call("getTargetStates", function_args=kwargs)
 
                     kwargs = {"startEts": start_ets,
                               "stopEts": stop_ets,
@@ -534,8 +537,9 @@ class NaifSpice():
                               "frame": "J2000",
                               "abcorr": "NONE",
                               "mission": self.spiceql_mission,
+                              "useWeb": self.use_web,
                               "searchKernels": self.search_kernels} 
-                    ssb_obs = self.spiceql_call("getTargetStates", web=self.use_web, function_args=kwargs)
+                    ssb_obs = self.spiceql_call("getTargetStates", function_args=kwargs)
                 else:       
                     with ThreadPoolExecutor(max_workers=2) as executor:
                         futures = []
@@ -603,16 +607,18 @@ class NaifSpice():
                               "frame": "J2000",
                               "abcorr": self.light_time_correction,
                               "mission": self.spiceql_mission,
-                              "searchKernels": self.search_kernels}
-                    states = self.spiceql_call("getTargetStates", web=self.use_web, function_args=kwargs)
+                              "searchKernels": self.search_kernels,
+                              "useWeb": self.use_web}
+                    states = self.spiceql_call("getTargetStates", function_args=kwargs)
                 else:
                     kwargs = {"target": target,
                              "observer": observer,
                              "frame": self.reference_frame,
                              "abcorr": self.light_time_correction,
                              "mission": self.spiceql_mission,
-                             "searchKernels": self.search_kernels}
-                    states = spiceql_access.get_ephem_data(ephem, "getTargetStates", web=self.use_web, function_args=kwargs)
+                             "searchKernels": self.search_kernels,
+                             "useWeb": self.use_web}
+                    states = spiceql_access.get_ephem_data(ephem, "getTargetStates", function_args=kwargs)
                     states = np.array(states)[:,0:6]
                     
             for state in states:

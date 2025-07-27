@@ -284,7 +284,7 @@ class FrameChain(nx.DiGraph):
 
             for s, d in frames:
                 if exact_ck_times and len(times) > 1:
-                    function_args = {"startEt": start_et+time_bias, "stopEt": stop_et+time_bias, "toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels, "ckQualities": ["smithed", "reconstructed"], "fullKernelPath": False}
+                    function_args = {"startEt": start_et+time_bias, "stopEt": stop_et+time_bias, "toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels, "fullKernelPath": False}
                     futures.append(executor.submit(spiceql_call, "getExactTargetOrientations", function_args, self.use_web))
                 else:
                     function_args = {"toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels}

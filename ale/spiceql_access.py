@@ -160,6 +160,7 @@ def get_ephem_data(times, function_name, batch_size=300, web=False, function_arg
               requested in times.
     """
     valid_functions = ["getTargetOrientations", "getTargetStates"]
+    
     if function_name not in valid_functions:
         raise ValueError(f"The function name {function_name} is not supported "
                           "by this function please pass one of the following: " + str(valid_functions))
