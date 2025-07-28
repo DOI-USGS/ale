@@ -526,6 +526,8 @@ class NaifSpice():
                               "abcorr": self.light_time_correction,
                               "mission": self.spiceql_mission,
                               "searchKernels": self.search_kernels,
+                              "limitCk": -1, 
+                              "limitSpk" : 1,
                               "useWeb": self.use_web}
                     obs_tars = self.spiceql_call("getTargetStates", function_args=kwargs)
 
@@ -536,9 +538,11 @@ class NaifSpice():
                               "observer": "SSB",
                               "frame": "J2000",
                               "abcorr": "NONE",
+                              "limitCk": -1, 
+                              "limitSpk" : 1,
                               "mission": self.spiceql_mission,
                               "useWeb": self.use_web,
-                              "searchKernels": self.search_kernels} 
+                              "searchKernels": self.search_kernels}
                     ssb_obs = self.spiceql_call("getTargetStates", function_args=kwargs)
                 else:       
                     with ThreadPoolExecutor(max_workers=2) as executor:
@@ -548,6 +552,8 @@ class NaifSpice():
                                   "frame": "J2000",
                                   "abcorr": self.light_time_correction,
                                   "mission": self.spiceql_mission,
+                                  "limitCk": -1, 
+                                  "limitSpk" : 1,
                                   "searchKernels": self.search_kernels}
                         futures.append(executor.submit(spiceql_access.get_ephem_data, ephem, "getTargetStates", 400, self.use_web, kwargs))
 
@@ -556,6 +562,8 @@ class NaifSpice():
                                 "observer": "SSB",
                                 "frame": "J2000",
                                 "abcorr": "NONE",
+                                "limitCk": -1, 
+                                "limitSpk" : 1,
                                 "mission": self.spiceql_mission,
                                 "searchKernels": self.search_kernels}
                         futures.append(executor.submit(spiceql_access.get_ephem_data, ephem, "getTargetStates", 400, self.use_web, kwargs))
@@ -574,6 +582,8 @@ class NaifSpice():
                           "observer": "SSB",
                           "frame": "J2000",
                           "abcorr": "NONE",
+                          "limitCk": -1, 
+                          "limitSpk" : 1,
                           "mission": self.spiceql_mission,
                           "searchKernels": self.search_kernels}
                 ssb_tars = spiceql_access.get_ephem_data(adjusted_time, "getTargetStates", web=self.use_web, function_args=kwargs)
@@ -605,6 +615,8 @@ class NaifSpice():
                               "target": target,
                               "observer": observer,
                               "frame": "J2000",
+                              "limitCk": -1, 
+                              "limitSpk" : 1,
                               "abcorr": self.light_time_correction,
                               "mission": self.spiceql_mission,
                               "searchKernels": self.search_kernels,
@@ -616,6 +628,8 @@ class NaifSpice():
                              "frame": self.reference_frame,
                              "abcorr": self.light_time_correction,
                              "mission": self.spiceql_mission,
+                             "limitCk": -1, 
+                             "limitSpk" : 1,
                              "searchKernels": self.search_kernels,
                              "useWeb": self.use_web}
                     states = spiceql_access.get_ephem_data(ephem, "getTargetStates", function_args=kwargs)

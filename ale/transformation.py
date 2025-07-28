@@ -131,7 +131,7 @@ class FrameChain(nx.DiGraph):
         # Do this call so we know if we can get exact ck times for our data
         if exact_ck_times and len(ephemeris_times) > 1 and not nadir:
             try:
-                times = spiceql_call("extractExactCkTimes", {"observStart": ephemeris_times[0] + inst_time_bias, 
+                ephemeris_times = spiceql_call("extractExactCkTimes", {"observStart": ephemeris_times[0] + inst_time_bias, 
                                                              "observEnd": ephemeris_times[-1] + inst_time_bias, 
                                                              "targetFrame": sensor_frame,
                                                              "mission": mission,
@@ -145,6 +145,7 @@ class FrameChain(nx.DiGraph):
                 exact_ck_times = False
                 logger.debug(f"Failed to extract exact ck times: {e}")
 
+        
         # Build graph async
         with ThreadPoolExecutor(max_workers=3) as executor:
             futures = [
@@ -279,41 +280,51 @@ class FrameChain(nx.DiGraph):
         quats_and_avs_per_frame = []
 
         logger.debug(f"Generate rotation times: {times}")
-        with ThreadPoolExecutor(max_workers=3) as executor:
+        with ThreadPoolExecutor(max_workers=1) as executor:
             futures = []
-
             for s, d in frames:
                 if exact_ck_times and len(times) > 1:
                     function_args = {"startEt": start_et+time_bias, "stopEt": stop_et+time_bias, "toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels, "fullKernelPath": False}
+                    logger.debug(f"Exact CK times function args: {function_args}")
                     futures.append(executor.submit(spiceql_call, "getExactTargetOrientations", function_args, self.use_web))
                 else:
-                    function_args = {"toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels}
+                    function_args = {"ets": times, "toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels}
+                    logger.debug(f"Non-exact CK times function args: {function_args}")
                     futures.append(executor.submit(get_ephem_data, times, "getTargetOrientations", 150, self.use_web, function_args))
 
-            quats_and_avs_per_frame = np.array([future.result() for future in futures])
-        logger.debug(f"Quats and AVs per frame: {quats_and_avs_per_frame}")
+            quats_and_avs_per_frame = [future.result() for future in futures]
+            logger.debug(f"Returned Quats and AVs per frame: {quats_and_avs_per_frame}")
+            # quats_and_avs_per_frame = np.asarray(quats_and_avs_per_frame)
 
         if exact_ck_times and len(times) > 1 and len(frames) > 0:
             times = [quat_av[0] for quat_av in quats_and_avs_per_frame[0]]
-            quats_and_avs_per_frame = np.array([quats_and_avs[:,1:] for quats_and_avs in quats_and_avs_per_frame])
+            quats_and_avs_per_frame = [quats_and_avs[:][1:] for quats_and_avs in quats_and_avs_per_frame]
 
         for i, frame in enumerate(frames):
             quats_and_avs = quats_and_avs_per_frame[i]
+            logger.debug(f"Quats and AVs per frame: {quats_and_avs}")
             quats = np.zeros((len(times), 4))
             avs = []
-            _quats = np.array(quats_and_avs)[:, 0:4]
+            _quats = np.asarray(quats_and_avs)[:, 0:4]
             logger.debug(f"Quats: {_quats}")
             for j, quat in enumerate(_quats):
-                quats[j,:3] = quat[1:]
-                quats[j, 3] = quat[0]
+                quats[j, 0] = quat[3]
+                quats[j, 1:4] = quat[0:3]
 
             if (len(quats_and_avs[0]) > 4):
                 avs = np.array(quats_and_avs)[:, 4:]
 
             biased_times = [time - time_bias for time in times]
             if rotation_type == TimeDependentRotation:
+                logger.debug(f"Time Dependent Quats: {quats}")
+                logger.debug(f"Biased times: {biased_times}")
+                logger.debug(f"Frame: {frame}")
+                logger.debug(f"AVs: {avs}")
                 rotation = TimeDependentRotation(quats, biased_times, frame[0], frame[1], av=avs)
             else:
+                logger.debug(f"Constant Quats: {quats}")
+                logger.debug(f"Frame: {frame}")
                 rotation = ConstantRotation(quats[0], frame[0], frame[1])
+            logger.debug(f"Rotation: {rotation}")
             self.add_edge(rotation=rotation)
         
