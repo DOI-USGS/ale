@@ -447,14 +447,12 @@ class NaifSpice():
             positions = []
             velocities = []
 
-            sun_lt_states = self.spiceql_call("getTargetStates",{"ets": times,
-                                                                 "target": "SUN",
-                                                                 "observer": self.target_name,
-                                                                 "frame": self.reference_frame,
-                                                                 "abcorr": "LT+S",
-                                                                 "limitCk": -1, 
-                                                                 "limitSpk" : 1,
-                                                                 "mission": self.spiceql_mission})
+            sun_lt_states = self.spiceql_call("getTargetStates", {"ets": times,
+                                                                  "target": "SUN",
+                                                                  "observer": self.target_name,
+                                                                  "frame": self.reference_frame,
+                                                                  "abcorr": "LT+S",
+                                                                  "mission": self.spiceql_mission})
             for sun_state in sun_lt_states:
                 sun_state = np.array(sun_state)
                 positions.append(sun_state[:3])
@@ -510,39 +508,36 @@ class NaifSpice():
             if self.correct_lt_to_surface and self.light_time_correction.upper() == 'LT+S':
                 if isinstance(self, LineScanner) and self.use_web:
                     logger.debug("Sensor is a Line Scanner, using alt API")
-                    # Convert line scan rate into start/stop times and exposure durations
-                    start_ets, stop_ets, exposure_durations = self.exposure_rates
-
-                    logger.debug(f"start_ets: {start_ets}")
-                    logger.debug(f"stop_ets: {stop_ets}")
-                    logger.debug(f"exposure_durations: {exposure_durations}")
+                    start_et = self.ephemeris_start_time
+                    stop_et = self.ephemeris_stop_time
+                    num_records = self.image_lines + 1
                     
-                    kwargs = {"startEts": start_ets,
-                              "stopEts": stop_ets,
-                              "exposureDuration": exposure_durations,
+                    kwargs = {"startEt": start_et,
+                              "stopEt": stop_et,
+                              "numRecords": num_records,
                               "target": target,
                               "observer": observer,
                               "frame": "J2000",
                               "abcorr": self.light_time_correction,
                               "mission": self.spiceql_mission,
+                              "ckQualities" : ["reconstructed"],
+                              "spkQualities" : ["reconstructed"],
                               "searchKernels": self.search_kernels,
-                              "limitCk": -1, 
-                              "limitSpk" : 1,
                               "useWeb": self.use_web}
                     obs_tars = self.spiceql_call("getTargetStates", function_args=kwargs)
 
-                    kwargs = {"startEts": start_ets,
-                              "stopEts": stop_ets,
-                              "exposureDuration": exposure_durations,
+                    kwargs = {"startEt": start_et,
+                              "stopEt": stop_et,
+                              "numRecords": num_records,
                               "target": observer,
                               "observer": "SSB",
                               "frame": "J2000",
                               "abcorr": "NONE",
-                              "limitCk": -1, 
-                              "limitSpk" : 1,
                               "mission": self.spiceql_mission,
-                              "useWeb": self.use_web,
-                              "searchKernels": self.search_kernels}
+                              "ckQualities" : ["reconstructed"],
+                              "spkQualities" : ["reconstructed"],
+                              "searchKernels": self.search_kernels,
+                              "useWeb": self.use_web}
                     ssb_obs = self.spiceql_call("getTargetStates", function_args=kwargs)
                 else:       
                     with ThreadPoolExecutor(max_workers=2) as executor:
@@ -552,8 +547,6 @@ class NaifSpice():
                                   "frame": "J2000",
                                   "abcorr": self.light_time_correction,
                                   "mission": self.spiceql_mission,
-                                  "limitCk": -1, 
-                                  "limitSpk" : 1,
                                   "searchKernels": self.search_kernels}
                         futures.append(executor.submit(spiceql_access.get_ephem_data, ephem, "getTargetStates", 400, self.use_web, kwargs))
 
@@ -562,8 +555,6 @@ class NaifSpice():
                                 "observer": "SSB",
                                 "frame": "J2000",
                                 "abcorr": "NONE",
-                                "limitCk": -1, 
-                                "limitSpk" : 1,
                                 "mission": self.spiceql_mission,
                                 "searchKernels": self.search_kernels}
                         futures.append(executor.submit(spiceql_access.get_ephem_data, ephem, "getTargetStates", 400, self.use_web, kwargs))
@@ -582,8 +573,6 @@ class NaifSpice():
                           "observer": "SSB",
                           "frame": "J2000",
                           "abcorr": "NONE",
-                          "limitCk": -1, 
-                          "limitSpk" : 1,
                           "mission": self.spiceql_mission,
                           "searchKernels": self.search_kernels}
                 ssb_tars = spiceql_access.get_ephem_data(adjusted_time, "getTargetStates", web=self.use_web, function_args=kwargs)
@@ -608,16 +597,20 @@ class NaifSpice():
             else:
                 if isinstance(self, LineScanner) and self.use_web:
                     logger.debug("Sensor is a Line Scanner, using alt API")
-                    start_ets, stop_ets, exposure_durations = self.exposure_rates
-                    kwargs = {"startEts": start_ets,
-                              "stopEts": stop_ets,
-                              "exposureDuration": exposure_durations,
+                    start_et = self.ephemeris_start_time
+                    stop_et = self.ephemeris_stop_time
+                    num_records = self.image_lines + 1
+                    kwargs = {"startEt": start_et,
+                              "stopEt": stop_et,
+                              "numRecords": num_records,
                               "target": target,
                               "observer": observer,
                               "frame": "J2000",
                               "limitCk": -1, 
                               "limitSpk" : 1,
                               "abcorr": self.light_time_correction,
+                              "ckQualities" : ["reconstructed"],
+                              "spkQualities" : ["reconstructed"],
                               "mission": self.spiceql_mission,
                               "searchKernels": self.search_kernels,
                               "useWeb": self.use_web}
@@ -628,12 +621,10 @@ class NaifSpice():
                              "frame": self.reference_frame,
                              "abcorr": self.light_time_correction,
                              "mission": self.spiceql_mission,
-                             "limitCk": -1, 
-                             "limitSpk" : 1,
                              "searchKernels": self.search_kernels,
                              "useWeb": self.use_web}
                     states = spiceql_access.get_ephem_data(ephem, "getTargetStates", function_args=kwargs)
-                    states = np.array(states)[:,0:6]
+                states = np.array(states)[:,0:6]
                     
             for state in states:
                 if self.swap_observer_target:

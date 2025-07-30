@@ -135,11 +135,15 @@ class FrameChain(nx.DiGraph):
                                                              "observEnd": ephemeris_times[-1] + inst_time_bias, 
                                                              "targetFrame": sensor_frame,
                                                              "mission": mission,
+                                                             "ckQualities" : ["reconstructed"],
                                                              "searchKernels": frame_chain.search_kernels},
                                                              use_web=frame_chain.use_web)
 
                 if len(times) == 0:
+                    logger.debug(f"No exact CK times found")
                     exact_ck_times = False
+                else:
+                    logger.debug(f"Found {len(times)} time(s)")
 
             except Exception as e:
                 exact_ck_times = False
@@ -167,10 +171,14 @@ class FrameChain(nx.DiGraph):
             jobs.append({"et": time, 
                         "initialFrame": sensorFrame,
                         "mission": mission,
+                        "ckQualities" : ["reconstructed"],
+                        "spkQualities" : ["reconstructed"],
                         "searchKernels": self.search_kernels})
         jobs.append({"et": time, 
                      "initialFrame": targetFrame,
                      "mission": mission,
+                     "ckQualities" : ["reconstructed"],
+                     "spkQualities" : ["reconstructed"],
                      "searchKernels": self.search_kernels})
         
         logger.debug(f"Frame Trace Jobs: {jobs}")
@@ -258,7 +266,7 @@ class FrameChain(nx.DiGraph):
         return None
 
 
-    def generate_rotations(self, frames, times, time_bias, rotation_type, sensor_frame, frame_chain, nadir, exact_ck_times, mission=""):
+    def generate_rotations(self, frames, times, time_bias, rotation_type, exact_ck_frame, frame_chain, nadir, exact_ck_times, mission=""):
         """
         Computes the rotations based on a list of tuples that define the
         relationships between frames as (source, destination) and a list of times to
@@ -284,11 +292,23 @@ class FrameChain(nx.DiGraph):
             futures = []
             for s, d in frames:
                 if exact_ck_times and len(times) > 1:
-                    function_args = {"startEt": start_et+time_bias, "stopEt": stop_et+time_bias, "toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels, "fullKernelPath": False}
+                    function_args = {"startEt": start_et+time_bias, 
+                                     "stopEt": stop_et+time_bias, 
+                                     "toFrame": d, 
+                                     "refFrame": s, 
+                                     "exactCkFrame": exact_ck_frame, 
+                                     "mission": mission, 
+                                     "ckQualities" : ["reconstructed"],
+                                     "searchKernels": self.search_kernels, 
+                                     "fullKernelPath": False}
                     logger.debug(f"Exact CK times function args: {function_args}")
                     futures.append(executor.submit(spiceql_call, "getExactTargetOrientations", function_args, self.use_web))
                 else:
-                    function_args = {"toFrame": d, "refFrame": s, "mission": mission, "searchKernels": self.search_kernels}
+                    function_args = {"toFrame": d, 
+                                     "refFrame": s, 
+                                     "mission": mission, 
+                                     "ckQualities" : ["reconstructed"],
+                                     "searchKernels": self.search_kernels}
                     logger.debug(f"Non-exact CK times function args: {function_args}")
                     futures.append(executor.submit(get_ephem_data, times, "getTargetOrientations", 150, self.use_web, function_args))
 

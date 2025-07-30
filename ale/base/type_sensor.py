@@ -66,26 +66,17 @@ class LineScanner():
       start_ets = []
       stop_ets = []
       exposure_durations = []
-      start_line, line_time, exposure_duration = self.line_scan_rate
-      num_lines = self.image_lines 
-      
-      # Handle the case where there is only one line scan rate
-      if len(start_line) == 1:
-          start_ets.append(self.ephemeris_start_time)
-          stop_ets.append(self.ephemeris_stop_time)
-          exposure_durations.append(exposure_duration[0])
-      else:
-          for i in range(len(start_line) - 1): 
-              start_ets.append(line_time[i])
-              stop_ets.append(line_time[i] + (exposure_duration * (start_line[i+1] - start_line[i])))
-              exposure_durations.append(exposure_duration)
-          start_ets.append(line_time[-1])
-          stop_ets.append(line_time[-1] + (start_line[-1] - num_lines) * exposure_duration)
-          exposure_durations.append(exposure_duration)
-
-      logger.debug(f"Start ETS: {start_ets}")
-      logger.debug(f"Stop ETS: {stop_ets}")
-      logger.debug(f"Exposure Durations: {exposure_durations}")
+      start_lines, line_times, exposure_durations = self.line_scan_rate
+      start_lines = [line - 0.5 for line in start_lines]
+      num_lines = self.image_lines + 1
+      for i in range(len(start_lines)):
+          start_ets.append(line_times[i] + self.center_ephemeris_time)
+          if i + 1 > len(start_lines) - 1:
+            lines = num_lines - start_lines[i]
+          else:
+            lines = start_lines[i + 1] - start_lines[i]
+          stop_time = (line_times[i] + (exposure_durations[i] * lines)) + self.center_ephemeris_time
+          stop_ets.append(stop_time)
       return start_ets, stop_ets, exposure_durations
 
 
