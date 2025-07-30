@@ -508,9 +508,9 @@ class NaifSpice():
             if self.correct_lt_to_surface and self.light_time_correction.upper() == 'LT+S':
                 if isinstance(self, LineScanner) and self.use_web:
                     logger.debug("Sensor is a Line Scanner, using alt API")
-                    start_et = self.ephemeris_start_time
-                    stop_et = self.ephemeris_stop_time
-                    num_records = self.image_lines + 1
+                    start_et = ephem[0]
+                    stop_et = ephem[-1]
+                    num_records = len(ephem)
                     
                     kwargs = {"startEt": start_et,
                               "stopEt": stop_et,
@@ -597,17 +597,15 @@ class NaifSpice():
             else:
                 if isinstance(self, LineScanner) and self.use_web:
                     logger.debug("Sensor is a Line Scanner, using alt API")
-                    start_et = self.ephemeris_start_time
-                    stop_et = self.ephemeris_stop_time
-                    num_records = self.image_lines + 1
+                    start_et = ephem[0]
+                    stop_et = ephem[-1]
+                    num_records = len(ephem)
                     kwargs = {"startEt": start_et,
                               "stopEt": stop_et,
                               "numRecords": num_records,
                               "target": target,
                               "observer": observer,
-                              "frame": "J2000",
-                              "limitCk": -1, 
-                              "limitSpk" : 1,
+                              "frame": self.reference_frame,
                               "abcorr": self.light_time_correction,
                               "ckQualities" : ["reconstructed"],
                               "spkQualities" : ["reconstructed"],
@@ -621,9 +619,8 @@ class NaifSpice():
                              "frame": self.reference_frame,
                              "abcorr": self.light_time_correction,
                              "mission": self.spiceql_mission,
-                             "searchKernels": self.search_kernels,
-                             "useWeb": self.use_web}
-                    states = spiceql_access.get_ephem_data(ephem, "getTargetStates", function_args=kwargs)
+                             "searchKernels": self.search_kernels}
+                    states = spiceql_access.get_ephem_data(ephem, "getTargetStates", web=self.use_web, function_args=kwargs)
                 states = np.array(states)[:,0:6]
                     
             for state in states:
