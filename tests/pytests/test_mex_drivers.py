@@ -7,6 +7,7 @@ from unittest.mock import patch, PropertyMock, call
 import unittest
 from conftest import get_image_label, get_image_kernels, convert_kernels, get_isd, compare_dicts
 import ale
+from ale.drivers import AleJsonEncoder
 
 from ale.drivers.mex_drivers import MexHrscPds3LabelNaifSpiceDriver, MexHrscIsisLabelNaifSpiceDriver, MexSrcPds3LabelNaifSpiceDriver, MexSrcIsisLabelNaifSpiceDriver
 
@@ -50,14 +51,11 @@ def test_mex_load(test_mex_hrsc_kernels, label):
                new_callable=PropertyMock) as binary_exposure_durations, \
         patch('ale.drivers.mex_drivers.MexHrscPds3LabelNaifSpiceDriver.binary_lines', \
                new_callable=PropertyMock) as binary_lines, \
-        patch('ale.base.type_sensor.LineScanner.ephemeris_time', \
-               new_callable=PropertyMock) as ephemeris_time, \
         patch('ale.drivers.mex_drivers.read_table_data', return_value=12345) as read_table_data, \
         patch('ale.drivers.mex_drivers.parse_table', return_value={'EphemerisTime': [255744599.02748165, 255744684.33197814, 255744684.34504557], \
                                                                    'ExposureTime': [0.012800790786743165, 0.012907449722290038, 0.013227428436279297], \
                                                                    'LineStart': [1, 6665, 6666]}) as parse_table:
 
-        ephemeris_time.return_value = [255744599.02748165, 255744684.33197814, 255744684.34504557]
         binary_ephemeris_times.return_value = [255744599.02748165, 255744599.04028246, 255744795.73322123]
         binary_exposure_durations.return_value = [0.012800790786743165, 0.012800790786743165, 0.013227428436279297]
         binary_lines.return_value = [0.5, 6664.5, 6665.5]
