@@ -90,6 +90,19 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
     logger.debug(f"Calling {function_name} with args: {function_args}")
     if use_web == False:
         function_args["useWeb"] = False
+        ephem_funcs = ["getTargetStates", "getTargetOrientations"]
+        if function_name in ephem_funcs and "ets" not in function_args.keys():
+            if ("startEt" in function_args.keys() and 
+                "stopEt" in function_args.keys() and 
+                "numRecords" in function_args.keys()):
+                start = function_args.pop("startEt")
+                stop = function_args.pop("stopEt")
+                num_records = function_args.pop("numRecords")
+                ets = np.linspace(start, stop, num_records)
+                function_args['ets'] = ets
+            else:
+                raise RuntimeError(f"No ephemeris data provided, {function_name} needs 'ets' or " + 
+                                    "'startEt', 'stopet', 'numRecords' in `function_args`")
         func = getattr(pyspiceql, function_name)
         ret = func(**function_args)[0]
         return ret

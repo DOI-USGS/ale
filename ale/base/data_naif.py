@@ -498,36 +498,29 @@ class NaifSpice():
                 observer = self.spacecraft_name
 
             # Setup extra keywords for use later
-            if self.use_web:
-                logger.debug("Using alt API to get states")
-                ephem_kwargs = {"startEt": ephem[0],
-                                "stopEt": ephem[-1],
-                                "numRecords": len(ephem),
-                                "ckQualities" : ["reconstructed"],
-                                "spkQualities" : ["reconstructed"],
-                                "searchKernels": self.search_kernels,
-                                "useWeb": self.use_web}
-            else:
-                ephem_kwargs = {"ets": ephem,
-                                "searchKernels": self.search_kernels}
+            ephem_kwargs = {"startEt": ephem[0],
+                            "stopEt": ephem[-1],
+                            "numRecords": len(ephem),
+                            "ckQualities" : ["reconstructed"],
+                            "spkQualities" : ["reconstructed"]}
 
             # spkezr returns a vector from the observer's location to the aberration-corrected
             # location of the target. For more information, see:
             # https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/spicelib/spkezr.html
             if self.correct_lt_to_surface and self.light_time_correction.upper() == 'LT+S':
-                obs_tars_kwargs = {"target": target,
+                obs_tars_kwargs = {**ephem_kwargs,
+                                  "target": target,
                                    "observer": observer,
                                    "frame": "J2000",
                                    "abcorr": self.light_time_correction,
                                    "mission": self.spiceql_mission}
 
-                ssb_obs_kwargs = {"target": observer,
+                ssb_obs_kwargs = {**ephem_kwargs,
+                                  "target": observer,
                                   "observer": "SSB",
                                   "frame": "J2000",
                                   "abcorr": "NONE",
                                   "mission": self.spiceql_mission}
-                obs_tars_kwargs = {**ephem_kwargs, **obs_tars_kwargs}
-                ssb_obs_kwargs = {**ephem_kwargs, **ssb_obs_kwargs}
 
                 obs_tars = self.spiceql_call("getTargetStates", function_args=obs_tars_kwargs)
                 ssb_obs = self.spiceql_call("getTargetStates", function_args=ssb_obs_kwargs)
@@ -538,27 +531,25 @@ class NaifSpice():
                 radius_lt = (self.target_body_radii[2] + self.target_body_radii[0]) / 2 / (scipy.constants.c/1000.0)
                 adjusted_time = ephem - obs_tar_lts + radius_lt
 
-                kwargs = {"target": target,
+                kwargs = {**ephem_kwargs,
+                          "target": target,
                           "observer": "SSB",
                           "frame": "J2000",
                           "abcorr": "NONE",
                           "mission": self.spiceql_mission}
-
-                kwargs = {**ephem_kwargs, **kwargs}
-
                 ssb_tars = self.spiceql_call("getTargetStates", function_args=kwargs)
                 ssb_tar_states = np.array(ssb_tars)[:,0:6]
 
                 _states = ssb_tar_states - ssb_obs_states
 
                 reference_frame_id = self.spiceql_call("translateNameToCode", {"frame": self.reference_frame, "mission": self.spiceql_mission})
-                function_args = {"toFrame": reference_frame_id, 
+
+                function_args = {**ephem_kwargs,
+                                 "toFrame": reference_frame_id, 
                                  "refFrame": 1, 
-                                 "mission": self.spiceql_mission, 
-                                 "searchKernels": self.search_kernels}
-               
-                # Fix this call
-                rotations = spiceql_access.get_ephem_data(ephem, "getTargetOrientations", web=self.use_web, function_args=function_args)
+                                 "mission": self.spiceql_mission}
+                function_args.pop("spkQualities")
+                rotations = self.spiceql_call("getTargetOrientations", function_args=function_args)
 
                 states = []
                 for i, rotation in enumerate(rotations):
@@ -571,12 +562,12 @@ class NaifSpice():
                     rotated_state = spice.mxvg(matrix, _states[i])
                     states.append(rotated_state)
             else:
-                kwargs = {"target": target,
+                kwargs = {**ephem_kwargs,
+                          "target": target,
                           "observer": observer,
                           "frame": self.reference_frame,
                           "abcorr": self.light_time_correction,
                           "mission": self.spiceql_mission}
-                kwargs = {**ephem_kwargs, **kwargs}
 
                 states = self.spiceql_call("getTargetStates", function_args=kwargs)
                 states = np.array(states)[:,0:6]
@@ -679,7 +670,7 @@ class NaifSpice():
           Starting ephemeris time of the image
         """
         if not hasattr(self, "_ephemeris_start_time"):
-            self._ephemeris_start_time = self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": self.spacecraft_clock_start_count, "searchKernels": self.search_kernels, "mission": self.spiceql_mission})
+            self._ephemeris_start_time = self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": self.spacecraft_clock_start_count, "mission": self.spiceql_mission})
         return self._ephemeris_start_time
 
     @property
@@ -696,7 +687,7 @@ class NaifSpice():
           Ephemeris stop time of the image
         """
         if not hasattr(self, "_ephemeris_stop_time"):
-            self._ephemeris_stop_time = self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": self.spacecraft_clock_stop_count, "searchKernels": self.search_kernels, "mission": self.spiceql_mission})
+            self._ephemeris_stop_time = self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": self.spacecraft_clock_stop_count, "mission": self.spiceql_mission})
         return self._ephemeris_stop_time
 
     @property

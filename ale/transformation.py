@@ -304,13 +304,17 @@ class FrameChain(nx.DiGraph):
                     logger.debug(f"Exact CK times function args: {function_args}")
                     futures.append(executor.submit(spiceql_call, "getExactTargetOrientations", function_args, self.use_web))
                 else:
-                    function_args = {"toFrame": d, 
+                    ephem_kwargs = {"startEt": start_et,
+                                    "stopEt": stop_et,
+                                    "numRecords": len(times),
+                                    "ckQualities" : ["reconstructed"]}
+                    function_args = {**ephem_kwargs,
+                                     "toFrame": d, 
                                      "refFrame": s, 
                                      "mission": mission, 
-                                     "ckQualities" : ["reconstructed"],
                                      "searchKernels": self.search_kernels}
                     logger.debug(f"Non-exact CK times function args: {function_args}")
-                    futures.append(executor.submit(get_ephem_data, times, "getTargetOrientations", 150, self.use_web, function_args))
+                    futures.append(executor.submit(spiceql_call, "getTargetOrientations", function_args, self.use_web))
 
             quats_and_avs_per_frame = np.array([future.result() for future in futures])
             logger.debug(f"Returned Quats and AVs per frame: {quats_and_avs_per_frame}")
