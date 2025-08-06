@@ -7,6 +7,7 @@ from scipy.spatial.transform import Rotation
 from ale.transformation import FrameChain
 from ale.transformation import ConstantRotation, TimeDependentRotation
 from ale import util 
+from ale import logger
 
 class LineScanner():
     """
@@ -65,16 +66,17 @@ class LineScanner():
       start_ets = []
       stop_ets = []
       exposure_durations = []
-      scan_rate = self.line_scan_rate
-      num_lines = self.image_lines 
-      for i in range(len(scan_rate) - 1): 
-          start_line, line_time, exposure_duration = scan_rate[i]
-          start_ets.append(line_time)
-          stop_ets.append(line_time + (exposure_duration*(scan_rate[i+1][0] - start_line)))
-          exposure_durations.append(exposure_duration)
-      start_ets.append(scan_rate[-1][1])
-      stop_ets.append(scan_rate[-1][1] + (scan_rate[-1][0]-num_lines)*scan_rate[-1][2])
-      exposure_durations.append(scan_rate[-1][2])
+      start_lines, line_times, exposure_durations = self.line_scan_rate
+      start_lines = [line - 0.5 for line in start_lines]
+      num_lines = self.image_lines + 1
+      for i in range(len(start_lines)):
+          start_ets.append(line_times[i] + self.center_ephemeris_time)
+          if i + 1 > len(start_lines) - 1:
+            lines = num_lines - start_lines[i]
+          else:
+            lines = start_lines[i + 1] - start_lines[i]
+          stop_time = (line_times[i] + (exposure_durations[i] * lines)) + self.center_ephemeris_time
+          stop_ets.append(stop_time)
       return start_ets, stop_ets, exposure_durations
 
 

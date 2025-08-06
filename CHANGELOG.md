@@ -35,6 +35,10 @@ release.
 
 ## [Unreleased]
 
+### Changed
+- Changed all `getTargetStates` and `getTargetOrientations` calls to use a start, stop and number of records rather than passing all ephemeris times [#667](https://github.com/DOI-USGS/ale/pull/667)
+- Changed all `getTargetStates` and `getTargetOrientations` calls to only look for "reconstructed" cks and spks [#667](https://github.com/DOI-USGS/ale/pull/667)
+
 ## [1.0] - 2025-07-15
 ### Changed
 - Changed velocities to be after positions in ALE unified formatter for easier comparison with older ISDs [#650](https://github.com/DOI-USGS/ale/pull/650)
