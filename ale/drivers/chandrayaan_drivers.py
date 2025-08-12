@@ -913,7 +913,10 @@ class Chandrayaan2OHRCIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
                                  center_ephemeris_time=self.center_ephemeris_time,
                                  ephemeris_times=self.ephemeris_time,
                                  exact_ck_times= exact_ck_times,
-                                 inst_time_bias=self.instrument_time_bias)
+                                 inst_time_bias=self.instrument_time_bias
+                                 use_web=self.use_web,
+                                 mission=self.spiceql_mission,
+                                 search_kernels=self.search_kernels)
 
           # Fix for the the Chandrayaan2 OHRC instrument as outlined in the
           # original_naif_sensor_frame_id() docstring. This swaps the x and z
