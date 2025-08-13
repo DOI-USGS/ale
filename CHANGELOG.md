@@ -35,6 +35,11 @@ release.
 
 ## [Unreleased]
 
+## [1.0.1]
+
+### Fixed 
+- Fixed bug in CH-2 drivers where SpiceQL calls did not pass search for kernels or use web parameters.[#668](https://github.com/DOI-USGS/ale/pull/668)
+
 ### Changed
 - Changed all `getTargetStates` and `getTargetOrientations` calls to use a start, stop and number of records rather than passing all ephemeris times [#667](https://github.com/DOI-USGS/ale/pull/667)
 - Changed all `getTargetStates` and `getTargetOrientations` calls to only look for "reconstructed" cks and spks [#667](https://github.com/DOI-USGS/ale/pull/667)
