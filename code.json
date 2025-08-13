@@ -385,7 +385,7 @@
     },
 
     "homepageURL": "https://code.usgs.gov/astrogeology/ale/-/tree/1.0.1",
-    "downloadURL": "https://code.usgs.gov/astrogeology/ale/-/archive/1.0.0/ale-1.0.1.zip",
+    "downloadURL": "https://code.usgs.gov/astrogeology/ale/-/archive/1.0.1/ale-1.0.1.zip",
     "disclaimerURL": "https://code.usgs.gov/astrogeology/ale/-/raw/1.0.1/DISCLAIMER.md",
     "repositoryURL": "https://code.usgs.gov/astrogeology/ale.git",
     "vcs": "git",
@@ -406,12 +406,12 @@
     ],
 
     "contact": {
-      "name": "Adam Paquette",
-      "email": "acpaquette@usgs.gov"
+      "name": "Kelvin Rodriguez",
+      "email": "krodriguez@usgs.gov"
     },
 
     "date": {
-      "metadataLastUpdated": "2025-07-15"
+      "metadataLastUpdated": "2025-08-13"
     }
   }
 ]
