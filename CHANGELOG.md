@@ -38,6 +38,7 @@ release.
 ## [1.0.1]
 
 ### Fixed 
+- Fixed bug where generic CH2 kernels were using for TMC-2 [#672](https://github.com/DOI-USGS/ale/pull/672)
 - Fixed bug in CH-2 drivers where SpiceQL calls did not pass search for kernels or use web parameters.[#668](https://github.com/DOI-USGS/ale/pull/668)
 
 ### Changed
