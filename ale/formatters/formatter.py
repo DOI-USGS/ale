@@ -207,12 +207,13 @@ def to_isd(driver):
         raise Exception('No CSM sensor model name found!')
 
     # remove extra qualities
-    # TODO: Rewuires SpiceQL API update to get relative kernels
-    # if driver.kernels and isinstance(driver.kernels, dict): 
-    #     isd["kernels"] = {k: v for k, v in driver.kernels.items() if not "_quality" in k or driver.spiceql_mission in k }
-    # elif driver.kernels and isinstance(driver.kernels, list): 
-    #     isd["kernels"] = driver.kernels
-    # else: 
-    #     isd["kernels"] = {}
+    # TODO: Rewires SpiceQL API update to get relative kernels
+    logger.info(f"spiceql_mission={str(driver.spiceql_mission)}, kernels={str(driver.kernels)}, type={str(type(driver.kernels))}")
+    if driver.kernels and isinstance(driver.kernels, dict): 
+        isd["kernels"] = {k: v for k, v in driver.kernels.items() if not "_quality" in k and driver.spiceql_mission in k }
+    elif driver.kernels and isinstance(driver.kernels, list): 
+        isd["kernels"] = driver.kernels
+    else: 
+        isd["kernels"] = {}
 
     return isd
