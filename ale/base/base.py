@@ -509,10 +509,9 @@ class Driver():
               from osgeo import gdal
               gdal.UseExceptions()
             except: 
-                self._projection = ""
-                return self._projection
+                self._geodata = None
+                return self._geodata
 
-            self._geodata = None
             if isinstance(self._file, pvl.PVLModule):
                 # save it to a temp folder
                 with tempfile.NamedTemporaryFile() as tmp:

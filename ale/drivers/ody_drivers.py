@@ -111,6 +111,13 @@ class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, The
             else:
                 # if not milliseconds, the units are probably seconds
                 offset = offset.value
+        elif isinstance(offset, dict):
+            units = offset["unit"]
+            if "ms" in units.lower():
+                offset = offset["value"] * 0.001
+            else:
+                # if not milliseconds, the units are probably seconds
+                offset = offset["value"]
 
         return og_start_time + offset
     
@@ -321,6 +328,13 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
             else:
                 # if not milliseconds, the units are probably seconds
                 offset = offset.value
+        elif isinstance(offset, dict):
+            units = offset["unit"]
+            if "ms" in units.lower():
+                offset = offset["value"] * 0.001
+            else:
+                # if not milliseconds, the units are probably seconds
+                offset = offset["value"]
 
         return og_start_time + offset - (self.exposure_duration / 2)
     
