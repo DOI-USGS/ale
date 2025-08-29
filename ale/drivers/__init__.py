@@ -125,7 +125,10 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
         if verbose:
             logger.info("First parse attempt failed with")
             logger.info(e)
-        # If pds3 label fails, try isis grammar
+        parsed_label = None
+
+    # If pds3 label fails, try isis grammar
+    if not parsed_label:
         try:
             parsed_label = parse_label(label, pvl.grammar.ISISGrammar())
         except Exception as e:
@@ -133,6 +136,19 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
                 logger.info("Second parse attempt failed with")
                 logger.info(e)
             # If both fail, then don't parse the label, and just pass the driver a file.
+            parsed_label = None
+
+    # If pvl label loading fails, try gdal
+    if not parsed_label:
+        try:
+            from osgeo import gdal
+            gdal.UseExceptions()
+            geodata = gdal.Open(label)
+            parsed_label = json.loads(geodata.GetMetadata("json:ISIS3")["doc"])
+        except Exception as e:
+            if verbose:
+                logger.info("Gdal parse attempt failed with")
+                logger.info(e)
             parsed_label = None
 
     if verbose:

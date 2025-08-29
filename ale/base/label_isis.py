@@ -23,14 +23,36 @@ class IsisLabel():
         if not hasattr(self, "_label"):
             if isinstance(self._file, pvl.PVLModule):
                 self._label = self._file
+                return self._label
+            else:
+                self._label = None
+
             grammar = pvl.grammar.ISISGrammar()
             grammar.comments+=(("#", "\n"), )
+
             try:
                 self._label = pvl.loads(self._file, grammar=grammar)
-            except Exception:
-                self._label = pvl.load(self._file, grammar=grammar)
             except:
+                pass
+
+            if not self._label:
+                try:
+                    self._label = pvl.load(self._file, grammar=grammar)
+                except:
+                    pass
+                
+            if not self._label:
+                try:
+                    from osgeo import gdal
+                    gdal.UseExceptions()
+                    geodata = gdal.Open(label)
+                    self._label = json.loads(geodata.GetMetadata("json:ISIS3")["doc"])
+                except:
+                    pass
+
+            if not self._label:
                 raise ValueError("{} is not a valid label".format(self._file))
+
         return self._label
 
     @property
@@ -196,6 +218,9 @@ class IsisLabel():
             if isinstance(self._clock_start_count, pvl.Quantity):
                 self._clock_start_count = self._clock_start_count.value
 
+            if isinstance(self._clock_start_count, dict):
+                self._clock_start_count = self._clock_start_count["value"]
+
             self._clock_start_count = str(self._clock_start_count)
 
         return self._clock_start_count
@@ -221,6 +246,9 @@ class IsisLabel():
 
             if isinstance(self._clock_stop_count, pvl.Quantity):
                 self._clock_stop_count = self._clock_stop_count.value
+
+            if isinstance(self._clock_stop_count, dict):
+                self._clock_stop_count = self._clock_stop_count["value"]
 
             self._clock_stop_count = str(self._clock_stop_count)
 
@@ -274,6 +302,13 @@ class IsisLabel():
                 else:
                     # if not milliseconds, the units are probably seconds
                     exposure_duration = exposure_duration.value
+            elif isinstance(exposure_duration, dict):
+                units = exposure_duration["units"]
+                if "ms" in units.lower() or 'milliseconds' in units.lower():
+                    exposure_duration = exposure_duration["value"] * 0.001
+                else:
+                    # if not milliseconds, the units are probably seconds
+                    exposure_duration = exposure_duration["value"]
             else:
                 # if no units are available, assume the exposure duration is given in milliseconds
                 exposure_duration = exposure_duration * 0.001
@@ -299,6 +334,13 @@ class IsisLabel():
             else:
                 # if not milliseconds, the units are probably seconds
                 line_exposure_duration = line_exposure_duration.value
+        elif isinstance(line_exposure_duration, dict):
+            units = line_exposure_duration["unit"]
+            if "ms" in units.lower():
+                line_exposure_duration = line_exposure_duration["value"] * 0.001
+            else:
+                # if not milliseconds, the units are probably seconds
+                line_exposure_duration = line_exposure_duration["value"]
         else:
             # if no units are available, assume the exposure duration is given in milliseconds
             line_exposure_duration = line_exposure_duration * 0.001
@@ -323,6 +365,13 @@ class IsisLabel():
             else:
                 # if not milliseconds, the units are probably seconds
                 interframe_delay = interframe_delay.value
+        elif isinstance(interframe_delay, dict):
+            units = interframe_delay["units"]
+            if "ms" in units.lower():
+                interframe_delay = interframe_delay["value"] * 0.001
+            else:
+                # if not milliseconds, the units are probably seconds
+                interframe_delay = interframe_delay["value"]
         else:
             # if no units are available, assume the interframe delay is given in milliseconds
             interframe_delay = interframe_delay * 0.001
