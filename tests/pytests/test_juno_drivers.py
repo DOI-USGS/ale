@@ -21,7 +21,7 @@ def test_kernels():
 @pytest.mark.parametrize("label_type", ['isis3'])
 def test_juno_load(test_kernels, label_type):
     label_file = get_image_label('JNCR_2016240_01M06152_V01', label_type)
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels})
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels, 'remove_kernels': True})
     isd_obj = json.loads(isd_str)
     compare_dict = get_isd('juno')
     # print(json.dumps(isd_obj, indent=2))

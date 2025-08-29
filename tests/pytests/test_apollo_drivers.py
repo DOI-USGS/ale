@@ -23,7 +23,7 @@ def test_kernels():
 def test_load(test_kernels):
     label_file = get_image_label('AS15-M-1450', 'isis3')
     compare_dict = get_isd("apollometric")
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels}, verbose=True, remove_kernels=True)
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels, 'remove_kernels': True}, verbose=True)
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
     print("======================")

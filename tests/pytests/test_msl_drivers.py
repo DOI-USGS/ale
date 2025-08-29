@@ -24,7 +24,7 @@ def test_msl_mastcam_load_local(test_mastcam_kernels):
     label_file = get_image_label('2264ML0121141200805116C00_DRCL', "pds3")
     compare_dict = get_isd("msl")
 
-    isd_str = ale.loads(label_file, props={'kernels': test_mastcam_kernels, 'local': True})
+    isd_str = ale.loads(label_file, props={'kernels': test_mastcam_kernels, 'local': True, 'remove_kernels': True})
     isd_obj = json.loads(isd_str)
     assert compare_dicts(isd_obj, compare_dict) == []
 
@@ -32,7 +32,7 @@ def test_msl_mastcam_load_nadir(test_mastcam_kernels):
     label_file = get_image_label('2264ML0121141200805116C00_DRCL', "pds3")
     compare_dict = get_isd("msl_nadir")
 
-    isd_str = ale.loads(label_file, props={'kernels': test_mastcam_kernels, 'nadir': True})
+    isd_str = ale.loads(label_file, props={'kernels': test_mastcam_kernels, 'nadir': True, 'remove_kernels': True})
     isd_obj = json.loads(isd_str)
     assert compare_dicts(isd_obj, compare_dict) == []
 

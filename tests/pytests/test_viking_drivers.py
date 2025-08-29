@@ -268,7 +268,7 @@ def test_viking1_load(test_kernels, label_type, kernel_type, image):
     label_file = get_image_label(image, label_type)
     if kernel_type == "naif":
         label_file = get_image_label(image, label_type)
-        isd = ale.loads(label_file, props={'kernels': test_kernels[image]}, verbose=True)
+        isd = ale.loads(label_file, props={'kernels': test_kernels[image], 'remove_kernels': True}, verbose=True)
     else:
         label_file = os.path.join(data_root, "{}/{}.cub".format(image, image))
         isd = ale.loads(label_file)

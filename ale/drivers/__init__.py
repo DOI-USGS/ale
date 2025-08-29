@@ -150,6 +150,8 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
             res.instrument_id
             with res as driver:
                 isd = formatter(driver)
+                if 'remove_kernels' in props and props['remove_kernels'] is True and 'kernels' in props:
+                    del isd['kernels']
                 if verbose:
                     logger.info(f"Success with: {driver.__class__.__name__}")
                     logger.info(f"ISD:\n{json.dumps(isd, indent=2, cls=AleJsonEncoder)}")
@@ -163,7 +165,7 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
     raise Exception('No Such Driver for Label')
 
 
-def loads(label, props='', formatter='ale', indent = 2, verbose=False, only_isis_spice=False, only_naif_spice=False, remove_kernels=False):
+def loads(label, props='', formatter='ale', indent = 2, verbose=False, only_isis_spice=False, only_naif_spice=False):
     """
     Attempt to load a given label from all possible drivers.
 
@@ -187,8 +189,6 @@ def loads(label, props='', formatter='ale', indent = 2, verbose=False, only_isis
     :func:`~ale.drivers.load`
     """
     res = load(label, props, formatter, verbose, only_isis_spice, only_naif_spice)
-    if remove_kernels and 'kernels' in res:
-        del res['kernels']
     return json.dumps(res, indent=indent, cls=AleJsonEncoder)
 
 def parse_label(label, grammar=pvl.grammar.PVLGrammar()):

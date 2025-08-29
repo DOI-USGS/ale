@@ -29,7 +29,7 @@ image_dict = {
 def test_load(test_kernels, label_type, image, kernel_type):
     if(kernel_type == "naif"):
         label_file = get_image_label(image, label_type)
-        isd_str = ale.loads(label_file, props={'kernels': test_kernels})
+        isd_str = ale.loads(label_file, props={'kernels': test_kernels, 'remove_kernels': True})
         compare_isd = image_dict[image]
     else: 
         label_file = get_image(image)

@@ -33,7 +33,7 @@ def test_mex_hrsc_kernels(scope="module", autouse=True):
 def test_mex_src_load(test_mex_src_kernels, label):
     label_file = get_image_label("H0010_0023_SR2", label)
     compare_dict = get_isd("mexsrc")
-    isd_str = ale.loads(label_file, props={'kernels': test_mex_src_kernels}, verbose=True)
+    isd_str = ale.loads(label_file, props={'kernels': test_mex_src_kernels, 'remove_kernels': True}, verbose=True)
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
     assert compare_dicts(isd_obj, compare_dict) == []
@@ -60,7 +60,7 @@ def test_mex_load(test_mex_hrsc_kernels, label):
         binary_exposure_durations.return_value = [0.012800790786743165, 0.012800790786743165, 0.013227428436279297]
         binary_lines.return_value = [0.5, 6664.5, 6665.5]
 
-        usgscsm_isd = ale.load(label_file, props={'kernels': test_mex_hrsc_kernels})
+        usgscsm_isd = ale.load(label_file, props={'kernels': test_mex_hrsc_kernels, 'remove_kernels': True})
         if label == "isis3":
           compare_isd = get_isd('mexhrsc_isis')
         else:
