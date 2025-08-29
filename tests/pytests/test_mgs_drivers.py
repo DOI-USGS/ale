@@ -24,7 +24,7 @@ def test_nac_load(test_nac_kernels):
     label_file = get_image_label('m0402852', 'isis')
     compare_dict = get_isd("mgsmocna")
 
-    isd_str = ale.loads(label_file, props={'kernels': test_nac_kernels})
+    isd_str = ale.loads(label_file, props={'kernels': test_nac_kernels, 'remove_kernels': True})
     isd_obj = json.loads(isd_str)
     assert compare_dicts(isd_obj, compare_dict) == []
 
@@ -41,7 +41,7 @@ def test_wac_load(test_wac_kernels):
     label_file = get_image_label('ab102401', 'isis3')
     compare_dict = get_isd("mgsmocwa")
 
-    isd_str = ale.loads(label_file, props={'kernels': test_wac_kernels})
+    isd_str = ale.loads(label_file, props={'kernels': test_wac_kernels, 'remove_kernels': True})
     isd_obj = json.loads(isd_str)
     assert compare_dicts(isd_obj, compare_dict) == []
 
