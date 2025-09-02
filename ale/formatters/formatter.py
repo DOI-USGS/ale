@@ -208,11 +208,12 @@ def to_isd(driver):
 
     # remove extra qualities
     # TODO: Rewires SpiceQL API update to get relative kernels
-    if driver.kernels and isinstance(driver.kernels, dict): 
-        isd["kernels"] = {k: v for k, v in driver.kernels.items() if not "_quality" in k and driver.spiceql_mission in k }
-    elif driver.kernels and isinstance(driver.kernels, list): 
-        isd["kernels"] = driver.kernels
-    else: 
-        isd["kernels"] = {}
+    if 'kernels' in driver_data:
+        if isinstance(driver.kernels, dict): 
+            isd["kernels"] = {k: v for k, v in driver.kernels.items() if not "_quality" in k and driver.spiceql_mission in k }
+        elif isinstance(driver.kernels, list): 
+            isd["kernels"] = driver.kernels
+        else: 
+            isd["kernels"] = {}
 
     return isd
