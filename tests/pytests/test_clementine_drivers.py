@@ -20,7 +20,7 @@ def test_uvvis_kernels():
 
 def test_uvvis_load(test_uvvis_kernels):
     label_file = get_image_label('LUA3107H.161', 'isis3')
-    isd_str = ale.loads(label_file, props={'kernels': test_uvvis_kernels, 'exact_ck_times': False})
+    isd_str = ale.loads(label_file, props={'kernels': test_uvvis_kernels, 'exact_ck_times': False, 'remove_kernels': True})
     isd_obj = json.loads(isd_str)
     compare_isd = get_isd('clem_uvvis')
     assert compare_dicts(isd_obj, compare_isd) == []
@@ -35,7 +35,7 @@ def test_hires_kernels():
 
 def test_hires_load(test_hires_kernels):
     label_file = get_image_label('LHA0775Q.001', 'isis3')
-    isd_str = ale.loads(label_file, props={'kernels': test_hires_kernels, 'exact_ck_times': False}, verbose=True)
+    isd_str = ale.loads(label_file, props={'kernels': test_hires_kernels, 'exact_ck_times': False, 'remove_kernels': True}, verbose=True)
     isd_obj = json.loads(isd_str)
     compare_isd = get_isd('clem_hires')
     assert compare_dicts(isd_obj, compare_isd) == []
@@ -50,7 +50,7 @@ def test_nir_kernels():
 
 def test_nir_load(test_nir_kernels):
     label_file = get_image_label('LNB4653M.093', 'isis3')
-    isd_str = ale.loads(label_file, props={'kernels': test_nir_kernels, 'exact_ck_times': False}, verbose=True)
+    isd_str = ale.loads(label_file, props={'kernels': test_nir_kernels, 'exact_ck_times': False, 'remove_kernels': True}, verbose=True)
     isd_obj = json.loads(isd_str)
     compare_isd = get_isd('clem_nir')
     assert compare_dicts(isd_obj, compare_isd) == []
@@ -65,7 +65,7 @@ def test_lwir_kernels():
 
 def test_lwir_load(test_lwir_kernels):
     label_file = get_image_label('LLA5391Q.209', 'isis3')
-    isd_str = ale.loads(label_file, props={'kernels': test_lwir_kernels, 'exact_ck_times': False}, verbose=True)
+    isd_str = ale.loads(label_file, props={'kernels': test_lwir_kernels, 'exact_ck_times': False, 'remove_kernels': True}, verbose=True)
     isd_obj = json.loads(isd_str)
     compare_isd = get_isd('clem_lwir')
     assert compare_dicts(isd_obj, compare_isd) == []

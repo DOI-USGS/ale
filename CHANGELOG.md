@@ -35,6 +35,9 @@ release.
 
 ## [Unreleased]
 
+### Added
+- Added optional boolean flag `remove_kernels` to the `props` dict in the `loads()` func to allow the user to add the `kernels` key in the output ISD [#675](https://github.com/DOI-USGS/ale/pull/675)
+
 ## [1.0.2]
 
 - Fixed bug where generic CH2 kernels were using for TMC-2 [#672](https://github.com/DOI-USGS/ale/pull/672)

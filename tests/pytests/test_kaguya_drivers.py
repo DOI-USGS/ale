@@ -41,7 +41,7 @@ def test_kaguya_load(test_kernels, label_type, image):
         compare_isd = get_isd(image_dict[image])
     label_file = get_image_label(image, label_type)
 
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]}, verbose=False)
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image], 'remove_kernels': True}, verbose=False)
     isd_obj = json.loads(isd_str)
 
     assert compare_dicts(isd_obj, compare_isd) == []
