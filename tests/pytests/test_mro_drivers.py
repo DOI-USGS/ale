@@ -51,7 +51,7 @@ def test_mro_ctx_load(test_ctx_kernels, label_type, kernel_type):
 
     if label_type == 'isis3' and kernel_type == 'isis':
         label_file = get_image('B10_013341_1010_XN_79S172W')
-        isd_str = ale.loads(label_file)
+        isd_str = ale.loads(label_file, props={'remove_kernels': True})
         compare_isd = get_isd('ctx_isis')
     else:
         isd_str = ale.loads(label_file, props={'kernels': test_ctx_kernels, 'remove_kernels': True}, verbose=True)
