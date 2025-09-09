@@ -209,7 +209,7 @@ def convert_kernels(kernels):
         if 'x' in split_kernel[1].lower():
             # Get the full path to the kernel then truncate it to the relative path
             path = os.path.join(data_root, kernel)
-            path = os.path.abspath(path)
+            path = os.path.relpath(path)
             try:
                 bin_output = subprocess.run(['tobin', path],
                                             capture_output=True, check=True)
@@ -218,10 +218,10 @@ def convert_kernels(kernels):
                     warnings.warn('Failed to convert transfer kernel, ' + kernel + ', skipping...')
                 else:
                     kernel = matches.group(1)
-                    binary_kernels.append(kernel)
+                    binary_kernels.append(os.path.abspath(kernel))
             except:
                 raise Exception(f"Unable to convert {path} to binary kernel")
-        updated_kernels.append(kernel)
+        updated_kernels.append(os.path.abspath(kernel))
     
     # Sort Kernels
     # Ensure that the ISIS Addendum kernel is last in case it overrides
