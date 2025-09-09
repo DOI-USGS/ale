@@ -49,7 +49,7 @@ def test_load_lroc_nac(test_kernels, label_type, image, kernel_type):
         compare_isd = image_dict[image]
     else:
         label_file = get_image(image)
-        isd_str = ale.loads(label_file)
+        isd_str = ale.loads(label_file, props={'remove_kernels': True})
         compare_isd = get_isd('lro_isis')
     print(isd_str)
     isd_obj = json.loads(isd_str)

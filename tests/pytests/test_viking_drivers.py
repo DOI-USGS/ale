@@ -271,7 +271,7 @@ def test_viking1_load(test_kernels, label_type, kernel_type, image):
         isd = ale.loads(label_file, props={'kernels': test_kernels[image], 'remove_kernels': True}, verbose=True)
     else:
         label_file = os.path.join(data_root, "{}/{}.cub".format(image, image))
-        isd = ale.loads(label_file)
+        isd = ale.loads(label_file, props={'remove_kernels': True})
     isd_name = image
     if kernel_type == "isis":
         isd_name = isd_name + '_isis'

@@ -42,7 +42,7 @@ def test_load_isis():
         return get_table_data("N1702360370_1", table_label["Name"])
 
     with patch('ale.base.data_isis.read_table_data', side_effect=read_detached_table):
-        isd_str = ale.loads(label_file)
+        isd_str = ale.loads(label_file, props={'remove_kernels': True})
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
     x = compare_dicts(isd_obj, compare_dict)
