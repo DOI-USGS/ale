@@ -31,6 +31,17 @@ def test_load(test_kernels):
     assert compare_dicts(isd_obj, compare_dict) == []
 
 
+def test_load_kernels(test_kernels):
+    label_file = get_image_label('AS15-M-1450', 'isis3')
+    compare_dict = get_isd("apollometric")
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels}, verbose=True)
+    isd_obj = json.loads(isd_str)
+    print(json.dumps(isd_obj, indent=2))
+    print("======================")
+    print(json.dumps(compare_dict, indent=2))
+    assert isd_obj['kernels']['misc']
+
+
 class test_isis3_naif(unittest.TestCase):
     def setUp(self):
         label = get_image_label("AS15-M-1450", "isis3")
