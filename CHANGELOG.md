@@ -36,7 +36,7 @@ release.
 ## [Unreleased]
 
 ### Added
-- Added optional boolean flag `remove_kernels` to the `props` dict in the `loads()` func to allow the user to add the `kernels` key in the output ISD [#675](https://github.com/DOI-USGS/ale/pull/675)
+- Added optional boolean flag `remove_kernels` to the `props` dict in the `loads()` func to allow the user to add the `kernels` key in the output ISD. Added the `misc` kernel key for user-entered kernels. Format the kernels value to always be dict type in ISD generation. [#675](https://github.com/DOI-USGS/ale/pull/675)
 
 ## [1.0.2]
 

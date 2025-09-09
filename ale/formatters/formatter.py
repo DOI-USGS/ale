@@ -211,7 +211,15 @@ def to_isd(driver):
     if 'kernels' in driver_data and isinstance(driver.kernels, dict):
         isd["kernels"] = {k: v for k, v in driver.kernels.items() if not "_quality" in k and not driver.spiceql_mission in k }
     elif 'kernels' in driver_data and isinstance(driver.kernels, list): 
-        isd["kernels"] = driver.kernels
+        kernels_dict  = {}
+        for k in driver.kernels:
+            k_split = k.split('/')
+            k_type = k_split[2]
+            if k_type in kernels_dict and isinstance(kernels_dict[k_type], list):
+                kernels_dict[k_type].append(k)
+            else:
+                kernels_dict.update({k_type: [k]})
+        isd["kernels"] = kernels_dict
     else: 
         isd["kernels"] = {}
 

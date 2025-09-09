@@ -150,9 +150,6 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
             res.instrument_id
             with res as driver:
                 isd = formatter(driver)
-                if 'kernel_format' in props and 'kernels' in isd:
-                    if props['kernel_format'].lower() == 'list':
-                        isd['kernels'] = list(chain.from_iterable(val if isinstance(val, (list, tuple)) else [val] for val in isd['kernels'].values()))
                 if 'remove_kernels' in props and props['remove_kernels'] is True and 'kernels' in isd:
                     del isd['kernels']
                 if verbose:
