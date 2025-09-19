@@ -150,7 +150,7 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
             res.instrument_id
             with res as driver:
                 isd = formatter(driver)
-                if 'remove_kernels' in props and props['remove_kernels'] is True and 'kernels' in isd:
+                if 'attach_kernels' in props and props['attach_kernels'] is False and 'kernels' in isd:
                     del isd['kernels']
                 if verbose:
                     logger.info(f"Success with: {driver.__class__.__name__}")
