@@ -97,7 +97,11 @@ class LineScanner():
           ephemeris times split based on image lines
         """
         if not hasattr(self, "_ephemeris_time"):
-            self._ephemeris_time = np.linspace(self.ephemeris_start_time, self.ephemeris_stop_time, self.image_lines + 1)
+            # A pose sample very 10 lines is more than enough. Otherwise
+            # the .json files become very large and very slow to load.
+            numSamples = max(self.image_lines/10, 100)
+            numSamples = min(numSamples, self.image_lines)
+            self._ephemeris_time = np.linspace(self.ephemeris_start_time, self.ephemeris_stop_time, numSamples + 1)
         return self._ephemeris_time
 
     @property
