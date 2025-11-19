@@ -192,7 +192,7 @@ class test_chandrayaan2_tmc_isis_naif(unittest.TestCase):
         assert self.driver.short_mission_name == 'chandrayaan'
 
     def test_instrument_id(self):
-        assert self.driver.instrument_id == 'CHANDRAYAAN-2 ORBITER'
+        assert self.driver.instrument_id == 'CH2_TMC_FORE'
 
     def test_spacecraft_name(self):
         assert self.driver.spacecraft_name == 'Chandrayaan-2'
@@ -217,7 +217,7 @@ class test_chandrayaan2_ohrc_isis_naif(unittest.TestCase):
         assert self.driver.spacecraft_name == 'Chandrayaan-2'
 
     def test_instrument_id(self):
-        assert self.driver.instrument_id == 'CHANDRAYAAN-2 ORBITER'
+        assert self.driver.instrument_id == 'CH2_OHRC'
 
     def test_ikid(self):
         assert self.driver.ikid == -152270
