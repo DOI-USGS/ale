@@ -140,9 +140,9 @@ def main():
     )
     args = parser.parse_args()
 
-    log_level = logging.INFO
+    log_level = logging.ERROR
     if args.verbose:
-        log_level = logging.WARNING
+        log_level = logging.INFO
 
     logger.setLevel(log_level)
 
@@ -203,7 +203,7 @@ def file_to_isd(
     out: os.PathLike = None,
     radii: list = None,
     kernels: list = None,
-    log_level=logging.WARNING,
+    log_level=logging.ERROR,
     compress=False,
     only_isis_spice=False,
     only_naif_spice=False,
