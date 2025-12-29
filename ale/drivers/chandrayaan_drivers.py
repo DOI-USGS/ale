@@ -451,10 +451,13 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         : str
           Frame Reference for chandrayaan2 terrain mapping camera
         """
-        inst_id_lookup = {
-            "TMC-2" : "CHANDRAYAAN-2 ORBITER"
+
+        naif_to_inst_id_lookup = {
+            -152211 : "CH2_TMC_FORE",
+            -152210 : "CH2_TMC_NADIR",
+            -152212 : "CH2_TMC_AFT"
         }
-        return inst_id_lookup[super().instrument_id] 
+        return naif_to_inst_id_lookup[self.ikid]
     
     @property
     def ikid(self):
@@ -701,7 +704,7 @@ class Chandrayaan2OHRCIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
           Frame Reference for Chandrayaan2 Orbiter High Resolution Camera
         """
         inst_id_lookup = {
-            "OHRC" : "CHANDRAYAAN-2 ORBITER"
+            "OHRC" : "CH2_OHRC"
         }
         return inst_id_lookup[super().instrument_id] 
     
