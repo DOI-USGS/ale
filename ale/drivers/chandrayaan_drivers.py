@@ -512,21 +512,6 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         return self._ephemeris_start_time
 
     @property
-    def ephemeris_stop_time(self):
-        """
-        The spacecraft clock stop count, frequently used to determine the stop time
-        of the image.
-
-        Returns
-        -------
-        : str
-          Spacecraft clock stop count
-        """
-        if not hasattr(self, "_ephemeris_stop_time"):
-            self._ephemeris_stop_time = self.spiceql_call("utcToEt", {"utc": self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
-        return self._ephemeris_stop_time
-
-    @property
     def detector_center_line(self):
         """
         The center of the CCD in detector pixels
