@@ -909,13 +909,15 @@ class Chandrayaan2OHRCIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
           # Fix for the the Chandrayaan2 OHRC instrument as outlined in the
           # original_naif_sensor_frame_id() docstring. This swaps the x and z
           # axes, and negates the y axis.
-          mat = numpy.array([[0, 0, 1],
-                             [0, -1, 0],
-                             [1, 0, 0]])
-          quats = Rotation.from_matrix(mat).as_quat()
-          rotation = ConstantRotation(quats, 
-                                      self.sensor_frame_id, 
-                                      self.original_naif_sensor_frame_id)
+          rot = Rotation.from_euler(
+            seq='zxy',        
+            angles=[0.0, 90.0, -90.0],
+            degrees=True)
+
+          rotation = ConstantRotation(
+                                      rot.as_quat(),
+                                      self.original_naif_sensor_frame_id,
+                                      self.sensor_frame_id)
           self._frame_chain.add_edge(rotation=rotation)
 
         return self._frame_chain
