@@ -801,7 +801,7 @@ class Chandrayaan2OHRCIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         """
         # meters to mm
         pixel_size = self.naif_keywords[f"INS{self.ikid}_PIXEL_SIZE"] * 1000
-        return [0.0, 0.0, 1/pixel_size]
+        return [0.0, 1/pixel_size, 0.0]
     
     @property
     def focal2pixel_samples(self):
@@ -816,7 +816,7 @@ class Chandrayaan2OHRCIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         """
         # meters to mm
         pixel_size = self.naif_keywords[f"INS{self.ikid}_PIXEL_SIZE"] * 1000
-        return [0.0, -1/pixel_size, 0.0]
+        return [0.0, 0.0, 1/pixel_size]
 
     @property
     def original_naif_sensor_frame_id(self):
@@ -847,9 +847,7 @@ class Chandrayaan2OHRCIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
           Frame id that applies a correction.
         """
         
-        # Subtract 1000 as all ids are negative and any subsequent one usually
-        # has increasing magnitude.
-        return self.original_naif_sensor_frame_id - 1000
+        return self.original_naif_sensor_frame_id - 10
 
     @property
     def ephemeris_time(self):
@@ -878,46 +876,3 @@ class Chandrayaan2OHRCIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
             self._ephemeris_time = \
               numpy.linspace(self.ephemeris_start_time, self.ephemeris_stop_time, num + 1)
         return self._ephemeris_time
-
-    @property
-    def frame_chain(self):
-        """
-        Returns a modified frame chain with with an additional coordinate transformation from Chandrayaan satellite to camera.
-
-        Returns
-        -------
-        : object
-          A networkx frame chain object
-        """
-        
-        if not hasattr(self, '_frame_chain'):
-        
-          nadir = self._props.get('nadir', False)
-          exact_ck_times = self._props.get('exact_ck_times', True)
-        
-          self._frame_chain = \
-           FrameChain.from_spice(sensor_frame=self.original_naif_sensor_frame_id,
-                                 target_frame=self.target_frame_id,
-                                 center_ephemeris_time=self.center_ephemeris_time,
-                                 ephemeris_times=self.ephemeris_time,
-                                 exact_ck_times= exact_ck_times,
-                                 inst_time_bias=self.instrument_time_bias,
-                                 use_web=self.use_web,
-                                 mission=self.spiceql_mission,
-                                 search_kernels=self.search_kernels)
-
-          # Fix for the the Chandrayaan2 OHRC instrument as outlined in the
-          # original_naif_sensor_frame_id() docstring. This swaps the x and z
-          # axes, and negates the y axis.
-          rot = Rotation.from_euler(
-            seq='zxy',        
-            angles=[0.0, 90.0, -90.0],
-            degrees=True)
-
-          rotation = ConstantRotation(
-                                      rot.as_quat(),
-                                      self.original_naif_sensor_frame_id,
-                                      self.sensor_frame_id)
-          self._frame_chain.add_edge(rotation=rotation)
-
-        return self._frame_chain
