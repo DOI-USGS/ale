@@ -7,6 +7,8 @@ from ale.base.base import Driver
 from ale.transformation import FrameChain
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
+from conftest import compare_quats
+
 class TestDriver(Driver):
     """
     Test Driver implementation with dummy values.
@@ -169,7 +171,7 @@ def test_instrument_pointing(driver):
     assert pointing['CkTableEndTime'] == 1
     assert pointing['CkTableOriginalSize'] == 2
     np.testing.assert_equal(pointing['EphemerisTimes'], np.array([0, 1]))
-    np.testing.assert_equal(pointing['Quaternions'], np.array([[-1, 0, 0, 0], [-1, 0, 0, 0]]))
+    assert compare_quats(pointing['Quaternions'], np.array([[-1, 0, 0, 0], [-1, 0, 0, 0]]))
 
 def test_instrument_position(driver):
     meta_data = isis_formatter.to_isis(driver)
@@ -189,7 +191,7 @@ def test_body_rotation(driver):
     assert rotation['CkTableEndTime'] == 1
     assert rotation['CkTableOriginalSize'] == 2
     np.testing.assert_equal(rotation['EphemerisTimes'], np.array([0, 1]))
-    np.testing.assert_equal(rotation['Quaternions'], np.array([[-1, 0, 0, 0], [-1, 0, 0, 0]]))
+    assert compare_quats(rotation['Quaternions'], np.array([[-1, 0, 0, 0], [-1, 0, 0, 0]]))
 
 def test_sun_position(driver):
     meta_data = isis_formatter.to_isis(driver)

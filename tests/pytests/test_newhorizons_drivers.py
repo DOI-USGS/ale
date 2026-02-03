@@ -10,7 +10,6 @@ from unittest.mock import patch, call
 from conftest import get_image_label, get_image_kernels, convert_kernels, compare_dicts, get_isd
 
 from ale.drivers.nh_drivers import NewHorizonsLorriIsisLabelNaifSpiceDriver, NewHorizonsLeisaIsisLabelNaifSpiceDriver, NewHorizonsMvicIsisLabelNaifSpiceDriver, NewHorizonsMvicTdiIsisLabelNaifSpiceDriver
-from conftest import get_image_kernels, convert_kernels, get_image_label, get_isd
 
 image_dict = {
     'lor_0034974380_0x630_sci_1': get_isd("nhlorri"),

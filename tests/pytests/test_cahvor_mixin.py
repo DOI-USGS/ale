@@ -5,6 +5,7 @@ import pvl
 import numpy as np
 
 import ale
+from conftest import compare_quats
 
 from ale.base.type_sensor import Cahvor
 
@@ -55,8 +56,7 @@ class test_cahvor_sensor(unittest.TestCase):
       assert -76000 in frame_chain.nodes()
       assert -76562 in frame_chain.nodes()
       from_spice.assert_called_with(center_ephemeris_time=0, ephemeris_times=[0], sensor_frame=-76000, target_frame=10014, nadir=False, exact_ck_times=False, mission='msl', use_web=False, search_kernels=False)
-      print(frame_chain[-76562][-76000]['rotation'].quat[3])
-      np.testing.assert_allclose(frame_chain[-76562][-76000]['rotation'].quat, [-0.09914206260782343, 0.3330938313054434, 0.8940825953723198, -0.28255205470925904])
+      assert compare_quats(frame_chain[-76562][-76000]['rotation'].quat, np.array([-0.09914206260782343, 0.3330938313054434, 0.8940825953723198, -0.28255205470925904]))
 
     @patch("ale.base.type_sensor.Cahvor.cahvor_camera_dict", new_callable=PropertyMock, return_value=cahvor_camera_dict())
     def test_cahvor_detector_center_line(self, cahvor_camera_dict):

@@ -1,4 +1,3 @@
-from cgi import test
 import pytest
 import ale
 import os
