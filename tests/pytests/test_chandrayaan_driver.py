@@ -28,6 +28,22 @@ def mrffr_kernels(scope="module", autouse=True):
     for kern in binary_kernels:
         os.remove(kern)
 
+@pytest.fixture(scope='module')
+def tmc2_kernels():
+    kernels = get_image_kernels("ch2_tmc_ncf_20231101T0125121344_d_img_d18")
+    updated_kernels, binary_kernels = convert_kernels(kernels)
+    yield updated_kernels
+    for kern in binary_kernels:
+        os.remove(kern)
+
+@pytest.fixture(scope='module')
+def ohrc_kernels():
+    kernels = get_image_kernels("ch2_ohr_nrp_20200827T0226453039_d_img_d18")
+    updated_kernels, binary_kernels = convert_kernels(kernels)
+    yield updated_kernels
+    for kern in binary_kernels:
+        os.remove(kern)
+
 def test_chandrayaan_load(m3_kernels):
     label_file = get_image_label("M3T20090630T083407_V03_RDN", label_type="isis")
     compare_dict = get_isd("chandrayannM3")
@@ -59,6 +75,22 @@ def test_chandrayaan_m3_pds_load(m3_kernels):
         print(compare_dicts(isd_obj, compare_dict))
         x = compare_dicts(isd_obj, compare_dict)
         assert x == []
+
+def test_chandrayaan2_tmc2_load(tmc2_kernels):
+    label_file = get_image_label("ch2_tmc_ncf_20231101T0125121344_d_img_d18", label_type="isis")
+    compare_dict = get_isd("chandrayaan2_tmc2")
+    isd_str = ale.loads(label_file, props={"kernels": tmc2_kernels}, verbose=True)
+    isd_obj = json.loads(isd_str)
+    x = compare_dicts(isd_obj, compare_dict)
+    assert x == []
+
+def test_chandrayaan2_ohrc_load(ohrc_kernels):
+    label_file = get_image_label("ch2_ohr_nrp_20200827T0226453039_d_img_d18", label_type="isis")
+    compare_dict = get_isd("chandrayaan2_ohrc")
+    isd_str = ale.loads(label_file, props={"kernels": ohrc_kernels}, verbose=True)
+    isd_obj = json.loads(isd_str)
+    x = compare_dicts(isd_obj, compare_dict)
+    assert x == []
 
 class test_chandrayaan_m3_pds_naif(unittest.TestCase):
 
