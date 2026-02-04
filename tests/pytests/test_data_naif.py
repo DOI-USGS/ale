@@ -7,7 +7,7 @@ from unittest.mock import patch, PropertyMock
 import numpy as np
 import pyspiceql
 
-from conftest import get_image_kernels, convert_kernels
+from conftest import get_image_kernels, convert_kernels, compare_quats
 
 from unittest.mock import patch, call
 
@@ -105,7 +105,7 @@ class test_data_naif(unittest.TestCase):
         self.driver.ephemeris_time = [297088762.61698407]
         self.driver._props = {}
         orientation = self.driver.sensor_orientation
-        np.testing.assert_allclose(orientation[0], [0.0841078479898943, 0.0177246897808410, 0.9945884195952942, 0.0583573550258824])
+        assert compare_quats(orientation[0], np.asarray([0.0841078479898943, 0.0177246897808410, 0.9945884195952942, 0.0583573550258824]))
 
     def test_sensor_position(self):
         self.driver.ephemeris_time = [297088762.61698407]
@@ -118,7 +118,7 @@ class test_data_naif(unittest.TestCase):
         self.driver.ephemeris_time = [297088762.61698407]
         self.driver._props = {'nadir': True}
         orientation = self.driver.sensor_orientation
-        np.testing.assert_allclose(orientation[0], [-0.08443224924851939, -0.017974644466439982, -0.9949019866167608, -0.052135827116906064])
+        assert compare_quats(orientation[0], np.asarray([-0.08443224924851939, -0.017974644466439982, -0.9949019866167608, -0.052135827116906064]))
 
     def test_naif_keywords(self):
         assert len(self.driver.naif_keywords) == 51

@@ -9,7 +9,7 @@ from ale.transformation import FrameChain
 from ale.base.data_naif import NaifSpice
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
-from conftest import get_image_label
+from conftest import get_image_label, compare_quats
 
 class DummyNaifSpiceDriver(Driver, NaifSpice):
     """
@@ -311,7 +311,7 @@ def test_instrument_pointing(driver):
     assert pointing['ck_table_end_time'] == 900
     assert pointing['ck_table_original_size'] == 2
     np.testing.assert_equal(pointing['ephemeris_times'], np.array([800, 900]))
-    np.testing.assert_equal(pointing['quaternions'], np.array([[-1, 0, 0, 0], [-1, 0, 0, 0]]))
+    assert compare_quats(pointing['quaternions'], np.array([[-1, 0, 0, 0], [-1, 0, 0, 0]]))
 
 def test_instrument_position(driver):
     meta_data = formatter.to_isd(driver)
@@ -331,7 +331,7 @@ def test_body_rotation(driver):
     assert rotation['ck_table_end_time'] == 900
     assert rotation['ck_table_original_size'] == 2
     np.testing.assert_equal(rotation['ephemeris_times'], np.array([800, 900]))
-    np.testing.assert_equal(rotation['quaternions'], np.array([[-1, 0, 0, 0], [-1, 0, 0, 0]]))
+    assert compare_quats(rotation['quaternions'], np.array([[-1, 0, 0, 0], [-1, 0, 0, 0]]))
 
 def test_sun_position(driver):
     meta_data = formatter.to_isd(driver)

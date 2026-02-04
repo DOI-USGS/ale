@@ -9,7 +9,7 @@ from ale.transformation import FrameChain
 from ale.base.data_naif import NaifSpice
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
-from conftest import get_image_label
+from conftest import get_image_label, compare_quats
 
 class TestDriver(Driver, NaifSpice):
     """
@@ -287,7 +287,7 @@ def test_sensor_orientation(test_frame_driver):
     isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
     sensor_orientation_obj = isd['sensor_orientation']
 
-    assert sensor_orientation_obj['quaternions'].tolist() ==  [[0, 0, 0, -1], [0, 0, 0, -1]]
+    assert compare_quats(sensor_orientation_obj['quaternions'], np.array([[0, 0, 0, -1], [0, 0, 0, -1]]))
 
 def test_detector_start(test_frame_driver):
     isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
