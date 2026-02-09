@@ -35,6 +35,8 @@ release.
 
 ## [Unreleased]
 
+- Sets ALE's default log level to ERROR instead of INFO, which was too verbose. [#679](https://github.com/DOI-USGS/ale/pull/679)
+
 ## [1.0.2]
 
 - Fixed bug where generic CH2 kernels were using for TMC-2 [#672](https://github.com/DOI-USGS/ale/pull/672)

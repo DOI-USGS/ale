@@ -32,8 +32,8 @@ if not logger:
     logger.addHandler(handler)
     logger.propagate = False
 
-    log_level = os.environ.get("ALE_LOG_LEVEL", "INFO").upper()
-    logger.setLevel(getattr(logging, log_level, logging.INFO))
+    log_level = os.environ.get("ALE_LOG_LEVEL", "ERROR").upper()
+    logger.setLevel(getattr(logging, log_level, logging.ERROR))
 
 logger.debug(f"ALE version: {__version__}")
 logger.debug(f"ALE python version: {sys.version.split(' ')[0]}")
