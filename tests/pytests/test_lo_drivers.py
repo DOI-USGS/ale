@@ -24,7 +24,7 @@ def test_high_load(test_high_kernels):
     label_file = get_image_label('3133_high_res_1', 'isis')
     compare_dict = get_isd("lohighcamera")
 
-    isd_str = ale.loads(label_file, props={'kernels': test_high_kernels}, verbose=False)
+    isd_str = ale.loads(label_file, props={'kernels': test_high_kernels, 'attach_kernels': False}, verbose=False)
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
     assert compare_dicts(isd_obj, compare_dict) == []
@@ -109,7 +109,7 @@ def test_medium_load(test_medium_kernels):
     label_file = get_image_label('3133_med_res', 'isis')
     compare_dict = get_isd("lomediumcamera")
 
-    isd_str = ale.loads(label_file, props={'kernels': test_medium_kernels}, verbose=True)
+    isd_str = ale.loads(label_file, props={'kernels': test_medium_kernels, 'attach_kernels': False}, verbose=True)
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
     assert compare_dicts(isd_obj, compare_dict) == []

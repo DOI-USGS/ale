@@ -20,7 +20,7 @@ def test_mariner10_load(test_mariner10_kernels):
     label_file = get_image_label('27265', 'isis')
     compare_dict = get_isd("mariner10")
 
-    isd_str = ale.loads(label_file, props={'kernels': test_mariner10_kernels})
+    isd_str = ale.loads(label_file, props={'kernels': test_mariner10_kernels, 'attach_kernels': False})
     isd_obj = json.loads(isd_str)
     assert compare_dicts(isd_obj, compare_dict) == []
     

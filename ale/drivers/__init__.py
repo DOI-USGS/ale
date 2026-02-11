@@ -150,6 +150,8 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
             res.instrument_id
             with res as driver:
                 isd = formatter(driver)
+                if 'attach_kernels' in props and props['attach_kernels'] is False and 'kernels' in isd:
+                    del isd['kernels']
                 if verbose:
                     logger.info(f"Success with: {driver.__class__.__name__}")
                     logger.info(f"ISD:\n{json.dumps(isd, indent=2, cls=AleJsonEncoder)}")

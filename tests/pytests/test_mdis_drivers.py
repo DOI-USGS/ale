@@ -29,11 +29,11 @@ image_dict = {
 def test_load(test_kernels, label_type, image, kernel_type):
     if(kernel_type == "naif"):
         label_file = get_image_label(image, label_type)
-        isd_str = ale.loads(label_file, props={'kernels': test_kernels})
+        isd_str = ale.loads(label_file, props={'kernels': test_kernels, 'attach_kernels': False})
         compare_isd = image_dict[image]
     else: 
         label_file = get_image(image)
-        isd_str = ale.loads(label_file)
+        isd_str = ale.loads(label_file, props={'attach_kernels': False})
         compare_isd = get_isd("messmdis_isis")
 
     isd_obj = json.loads(isd_str)

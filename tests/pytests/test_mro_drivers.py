@@ -51,10 +51,10 @@ def test_mro_ctx_load(test_ctx_kernels, label_type, kernel_type):
 
     if label_type == 'isis3' and kernel_type == 'isis':
         label_file = get_image('B10_013341_1010_XN_79S172W')
-        isd_str = ale.loads(label_file)
+        isd_str = ale.loads(label_file, props={'attach_kernels': False})
         compare_isd = get_isd('ctx_isis')
     else:
-        isd_str = ale.loads(label_file, props={'kernels': test_ctx_kernels}, verbose=True)
+        isd_str = ale.loads(label_file, props={'kernels': test_ctx_kernels, 'attach_kernels': False}, verbose=True)
         compare_isd = get_isd('ctx')
 
     isd_obj = json.loads(isd_str)
@@ -72,7 +72,7 @@ def test_mro_ctx_load(test_ctx_kernels, label_type, kernel_type):
 def test_mro_hirise_load(test_hirise_kernels, label_type, kernel_type):
     label_file = get_image_label("PSP_001446_1790_BG12_0", label_type)
     
-    isd_str = ale.loads(label_file, props={'kernels': test_hirise_kernels}, verbose=True)
+    isd_str = ale.loads(label_file, props={'kernels': test_hirise_kernels, 'attach_kernels': False}, verbose=True)
     compare_isd = get_isd('hirise')
 
     isd_obj = json.loads(isd_str)
@@ -84,7 +84,7 @@ def test_mro_hirise_load(test_hirise_kernels, label_type, kernel_type):
 @pytest.mark.parametrize("label_type, kernel_type", [('isis3', 'naif')])
 def test_mro_marci_load(test_marci_kernels, label_type, kernel_type):
     label_file = get_image_label('U02_071865_1322_MA_00N193W', label_type)
-    isd_str = ale.loads(label_file, props={'kernels': test_marci_kernels})
+    isd_str = ale.loads(label_file, props={'kernels': test_marci_kernels, 'attach_kernels': False})
 
     compare_isd = get_isd('marci')
 
@@ -96,7 +96,7 @@ def test_mro_marci_load(test_marci_kernels, label_type, kernel_type):
 
 def test_mro_crism_load(test_crism_kernels):
     label_file = get_image_label('FRT00003B73_01_IF156S_TRR2', 'isis3')
-    isd_str = ale.loads(label_file, props={'kernels': test_crism_kernels, 'exact_ck_times': False}, verbose=True)
+    isd_str = ale.loads(label_file, props={'kernels': test_crism_kernels, 'exact_ck_times': False, 'attach_kernels': False}, verbose=True)
     isd_obj = json.loads(isd_str)
     compare_isd = get_isd('crism')
     print(json.dumps(isd_obj))

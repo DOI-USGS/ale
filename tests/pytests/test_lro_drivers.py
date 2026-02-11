@@ -45,11 +45,11 @@ def test_kernels():
 def test_load_lroc_nac(test_kernels, label_type, image, kernel_type):
     if kernel_type == 'naif':
         label_file = get_image_label(image, label_type)
-        isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]}, verbose=False)
+        isd_str = ale.loads(label_file, props={'kernels': test_kernels[image], 'attach_kernels': False}, verbose=False)
         compare_isd = image_dict[image]
     else:
         label_file = get_image(image)
-        isd_str = ale.loads(label_file)
+        isd_str = ale.loads(label_file, props={'attach_kernels': False})
         compare_isd = get_isd('lro_isis')
     print(isd_str)
     isd_obj = json.loads(isd_str)
@@ -62,7 +62,7 @@ def test_load_lroc_nac(test_kernels, label_type, image, kernel_type):
 @pytest.mark.parametrize("image", ['wac0000a1c4.uv.even'])
 def test_load_lroc_wac(test_kernels, label_type, image, kernel_type):
     label_file = get_image_label(image, label_type)
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels[image], 'attach_kernels': False})
     compare_isd = image_dict[image]
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj))
@@ -73,7 +73,7 @@ def test_load_lroc_wac(test_kernels, label_type, image, kernel_type):
 # Test load of MiniRF labels
 def test_load_minirf(test_kernels):
     label_file = get_image_label('03821_16N196_S1', 'isis3')
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels['03821_16N196_S1']})
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels['03821_16N196_S1'], 'attach_kernels': False})
     isd_obj = json.loads(isd_str)
     comparison = compare_dicts(isd_obj, image_dict['03821_16N196_S1'])
     assert comparison == []

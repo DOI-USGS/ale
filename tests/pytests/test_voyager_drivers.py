@@ -303,7 +303,7 @@ def test_voyager_load(test_kernels, label_type, image):
     print(test_kernels[image])
     label_file = get_image_label(image, label_type)
 
-    usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]}, verbose=False)
+    usgscsm_isd_str = ale.loads(label_file, props={'kernels': test_kernels[image], 'attach_kernels': False}, verbose=False)
     usgscsm_isd_obj = json.loads(usgscsm_isd_str)
 
     isd_name = image

@@ -28,7 +28,7 @@ def test_galileo_load(test_kernels, label_type, kernel_type):
         isd_str = ale.loads(label_file)
         compare_isd = get_isd('galileossi_isis')
     else:
-        isd_str = ale.loads(label_file, props={'kernels': test_kernels})
+        isd_str = ale.loads(label_file, props={'kernels': test_kernels, 'attach_kernels': False})
         compare_isd = get_isd('galileossi')
 
     isd_obj = json.loads(isd_str)

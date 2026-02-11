@@ -23,12 +23,45 @@ def test_kernels():
 def test_load(test_kernels):
     label_file = get_image_label('AS15-M-1450', 'isis3')
     compare_dict = get_isd("apollometric")
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels}, verbose=True)
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels, 'attach_kernels': False}, verbose=True)
     isd_obj = json.loads(isd_str)
     print(json.dumps(isd_obj, indent=2))
     print("======================")
     print(json.dumps(compare_dict, indent=2))
     assert compare_dicts(isd_obj, compare_dict) == []
+
+
+def test_load_kernels(test_kernels):
+    label_file = get_image_label('AS15-M-1450', 'isis3')
+    compare_dict = get_isd("apollometric")
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels}, verbose=True)
+    isd_obj = json.loads(isd_str)
+    print(json.dumps(isd_obj, indent=2))
+    print("======================")
+    print(json.dumps(compare_dict, indent=2))
+    assert isd_obj['kernels']
+    assert type(isd_obj['kernels']) == dict
+    assert isd_obj['kernels']['misc']
+    assert type(isd_obj['kernels']['misc']) == list
+
+
+def test_bad_kernels():
+    label_file = get_image_label('AS15-M-1450', 'isis3')
+
+    # test invalid kernel type
+    kernels_dict = {"ck": "test_ck", "spk": "test_spk", "unknown": "test_unknown"}
+    with pytest.raises(Exception) as e:
+        isd_str = ale.loads(label_file, props={'kernels': kernels_dict}, verbose=True)
+    
+    # test invalid kernel quality type
+    kernels_dict = {"ck": "test_ck", "spk": "test_spk", "abc_ck_quality": "test_unknown_quality"}
+    with pytest.raises(Exception) as e:
+        isd_str = ale.loads(label_file, props={'kernels': kernels_dict}, verbose=True)
+    
+    # test invalid kernel value
+    kernels_dict = {"ck": "test_ck", "spk": "test_spk"}
+    with pytest.raises(Exception) as e:
+        isd_str = ale.loads(label_file, props={'kernels': kernels_dict}, verbose=True)
 
 
 class test_isis3_naif(unittest.TestCase):

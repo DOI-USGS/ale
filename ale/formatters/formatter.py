@@ -207,12 +207,30 @@ def to_isd(driver):
         raise Exception('No CSM sensor model name found!')
 
     # remove extra qualities
-    # TODO: Rewuires SpiceQL API update to get relative kernels
-    # if driver.kernels and isinstance(driver.kernels, dict): 
-    #     isd["kernels"] = {k: v for k, v in driver.kernels.items() if not "_quality" in k or driver.spiceql_mission in k }
-    # elif driver.kernels and isinstance(driver.kernels, list): 
-    #     isd["kernels"] = driver.kernels
-    # else: 
-    #     isd["kernels"] = {}
+    if 'kernels' in driver_data and isinstance(driver.kernels, dict):
+        for k,v in driver.kernels.items():
+            # check that the keys are valid kernel types or quality types
+            if k not in ["ck", "spk", "tspk", "fk", "ik", "iak", "pck", "lsk", "sclk", "misc", driver.spiceql_mission+"_spk_quality", driver.spiceql_mission+"_ck_quality"]:
+                raise ValueError(f"Kernels key [{k}] is not valid.")
+            if k in ["ck", "spk", "tspk", "fk", "ik", "iak", "pck", "lsk", "sclk", "misc"]:
+                if not isinstance(v, list):
+                    raise ValueError(f"Kernel [{k}] must be set to a list of kernels.")
+                isd["kernels"] = driver.kernels
+            elif k in [driver.spiceql_mission+"_spk_quality", driver.spiceql_mission+"_ck_quality"]:
+                if not isinstance(v, str):
+                    raise ValueError(f"Kernel quality type [{k}] must be set to a string.")
+        isd["kernels"] = driver.kernels #{k: v for k, v in driver.kernels.items() if not "_quality" in k and not driver.spiceql_mission in k }
+    elif 'kernels' in driver_data and isinstance(driver.kernels, list): 
+        kernels_dict  = {}
+        for k in driver.kernels:
+            k_split = k.split('/')
+            k_type = k_split[2]
+            if k_type in kernels_dict and isinstance(kernels_dict[k_type], list):
+                kernels_dict[k_type].append(k)
+            else:
+                kernels_dict.update({k_type: [k]})
+        isd["kernels"] = kernels_dict
+    else: 
+        isd["kernels"] = {}
 
     return isd

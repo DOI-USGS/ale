@@ -86,7 +86,19 @@ class NaifSpice():
                 try:
                     self._kernels = kernel_access.get_kernels_from_isis_pvl(self._props['kernels'])
                 except Exception as e:
-                    self._kernels =  self._props['kernels']
+                    if isinstance(self._props['kernels'], list):
+                        self._kernels = { "misc": self._props['kernels'] }
+                    elif isinstance(self._props['kernels'], dict):
+                        for k,v in self._props['kernels'].items():
+                            # check that the keys are valid kernel types
+                            if k not in ["ck", "spk", "tspk", "fk", "ik", "iak", "pck", "lsk", "sclk"]:
+                                raise ValueError(f"Unknown kernel type: {k}")
+                            # check that kernel values are in list format
+                            if not isinstance(v, list):
+                                raise ValueError(f"Kernels for {k} must be in list format.")
+                        self._kernels = self._props['kernels']
+                    else:
+                        self._kernels = self._props['kernels']
             elif self.search_kernels == True:
                 _, kernels = pyspiceql.searchForKernelsets([self.spiceql_mission, self.target_name, "base"], startTime=self.ephemeris_start_time, stopTime=self.ephemeris_stop_time, useWeb=self.use_web)
                 self._kernels = kernels  

@@ -21,7 +21,7 @@ def test_amica_load(test_amica_kernels):
     label_file = get_image_label('st_2458542208_v', 'isis')
     compare_dict = get_isd("hayabusaamica")
 
-    isd_str = ale.loads(label_file, props={'kernels': test_amica_kernels})
+    isd_str = ale.loads(label_file, props={'kernels': test_amica_kernels, 'attach_kernels': False})
     isd_obj = json.loads(isd_str)
     assert compare_dicts(isd_obj, compare_dict) == []
 
@@ -59,7 +59,7 @@ def test_nirs_load(test_nirs_kernels):
     label_file = get_image_label('2392975548_lvl3_0', 'isis')
     compare_dict = get_isd("hayabusanirs")
 
-    isd_str = ale.loads(label_file, props={'kernels': test_nirs_kernels}, verbose=True)
+    isd_str = ale.loads(label_file, props={'kernels': test_nirs_kernels, 'attach_kernels': False}, verbose=True)
     isd_obj = json.loads(isd_str)
     assert compare_dicts(isd_obj, compare_dict) == []
 

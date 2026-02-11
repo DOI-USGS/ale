@@ -165,7 +165,7 @@ def test_load(test_kernels, label_type, image):
     patch('ale.drivers.rosetta_drivers.RosettaVirtisIsisLabelNaifSpiceDriver.optical_angle', opt_ang):
 
         label_file = get_image_label(image, label_type)
-        isd_str = ale.loads(label_file, props={'kernels': test_kernels[image]})
+        isd_str = ale.loads(label_file, props={'kernels': test_kernels[image], 'attach_kernels': False})
         isd_obj = json.loads(isd_str)
         compare_dict = image_dict[image]
         assert compare_dicts(isd_obj, compare_dict) == []

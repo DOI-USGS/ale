@@ -59,7 +59,7 @@ def test_fc_load(fc_kernels, label_type):
 
     label_file = get_image_label(label_prefix_file, label_type=label_type)
 
-    isd_str = ale.loads(label_file, props={'kernels': fc_kernels})
+    isd_str = ale.loads(label_file, props={'kernels': fc_kernels, 'attach_kernels': False})
     isd_obj = json.loads(isd_str)
     # print(json.dumps(isd_obj, indent=2))
     assert compare_dicts(isd_obj, compare_dict) == []
@@ -79,7 +79,7 @@ def test_vir_load(vir_kernels):
 
         compare_dict = get_isd("dawnvir")
         
-        isd_str = ale.loads(label_file, props={"kernels": vir_kernels, "nadir": False}, verbose=False)
+        isd_str = ale.loads(label_file, props={"kernels": vir_kernels, "nadir": False, 'attach_kernels': False}, verbose=False)
         print(isd_str)
         isd_obj = json.loads(isd_str)
         x = compare_dicts(isd_obj, compare_dict)

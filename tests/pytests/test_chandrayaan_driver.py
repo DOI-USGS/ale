@@ -32,7 +32,7 @@ def test_chandrayaan_load(m3_kernels):
     label_file = get_image_label("M3T20090630T083407_V03_RDN", label_type="isis")
     compare_dict = get_isd("chandrayannM3")
     print("kernels: ", m3_kernels)
-    isd_str = ale.loads(label_file, props={"kernels": m3_kernels}, verbose=False)
+    isd_str = ale.loads(label_file, props={"kernels": m3_kernels, 'attach_kernels': False}, verbose=False)
     isd_obj = json.loads(isd_str)
     print(isd_str)
     x = compare_dicts(isd_obj, compare_dict)
@@ -42,7 +42,7 @@ def test_chandrayaan_mrffr_load(mrffr_kernels):
     label_file = get_image_label("fsb_00720_1cd_xhu_84n209_v1", label_type="isis3")
     compare_dict = get_isd("chandrayaan_mrffr")
 
-    isd_str = ale.loads(label_file, props={"kernels": mrffr_kernels, "nadir": True}, verbose=True)
+    isd_str = ale.loads(label_file, props={"kernels": mrffr_kernels, "nadir": True, 'attach_kernels': False}, verbose=True)
     isd_obj = json.loads(isd_str)
     x = compare_dicts(isd_obj, compare_dict)
     assert x == []
@@ -53,7 +53,7 @@ def test_chandrayaan_m3_pds_load(m3_kernels):
 
     # Patch the full path of the timing table onto the driver
     with patch("ale.drivers.chandrayaan_drivers.Chandrayaan1M3Pds3NaifSpiceDriver.utc_time_table", os.path.dirname(label_file)+"/M3T20090630T083407_V03_TIM_cropped.TAB"):
-        isd_str = ale.loads(label_file, props={"kernels": m3_kernels, "nadir": True})
+        isd_str = ale.loads(label_file, props={"kernels": m3_kernels, "nadir": True, 'attach_kernels': False})
         isd_obj = json.loads(isd_str)
         print(isd_obj)
         print(compare_dicts(isd_obj, compare_dict))

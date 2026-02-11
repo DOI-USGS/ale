@@ -21,7 +21,7 @@ def test_kernels():
 @pytest.mark.parametrize("label_type", ['isis'])
 def test_msi_load(test_kernels, label_type):
     label_file = get_image_label('m0126888978f7_2p', label_type)
-    isd_str = ale.loads(label_file, props={'kernels': test_kernels}, verbose=True)
+    isd_str = ale.loads(label_file, props={'kernels': test_kernels, 'attach_kernels': False}, verbose=True)
     isd_obj = json.loads(isd_str)
     compare_dict = get_isd('msi')
     print(json.dumps(isd_obj, indent=2))
