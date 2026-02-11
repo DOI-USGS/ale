@@ -138,6 +138,11 @@ def main():
         action="store_true",
         help="Search for kernels using SpiceQL. Only applies to naif data based drivers"
     )
+    parser.add_argument(
+        "-A", "--attach_kernels",
+        action="store_true",
+        help="Attach kernels to the ISD. Only applies to naif data based drivers"
+    )
     args = parser.parse_args()
 
     log_level = logging.ERROR
@@ -167,7 +172,8 @@ def main():
             file_to_isd(args.input[0], args.out, radii, kernels=k, log_level=log_level, 
                         compress=args.compress, only_isis_spice=args.only_isis_spice, 
                         only_naif_spice=args.only_naif_spice, use_web=args.use_web_spice, 
-                        local=args.local, nadir=args.nadir, search_kernels=args.search_kernels)
+                        local=args.local, nadir=args.nadir, search_kernels=args.search_kernels,
+                        attach_kernels=args.attach_kernels)
         except Exception as err:
             # Seriously, this just throws a generic Exception?
             sys.exit(f"File {args.input[0]}: {err}")
@@ -184,7 +190,8 @@ def main():
                                        "only_naif_spice": args.only_naif_spice,
                                        "local": args.local,
                                        "nadir": args.nadir,
-                                       "use_web":args.use_web_spice}
+                                       "use_web":args.use_web_spice,
+                                       "attach_kernels": args.attach_kernels}
                 ): f for f in args.input
             }
             for f in concurrent.futures.as_completed(futures):
@@ -210,7 +217,8 @@ def file_to_isd(
     local=False,
     nadir=False,
     use_web=False,
-    search_kernels=False):
+    search_kernels=False,
+    attach_kernels=False):
     """
     Returns nothing, but acts as a thin wrapper to take the *file* and generate
     an ISD at *out* (if given, defaults to replacing the extension on *file*
@@ -243,6 +251,9 @@ def file_to_isd(
 
     if use_web:
         props["web"] = use_web
+
+    if attach_kernels:
+        props["attach_kernels"] = attach_kernels
     
     if search_kernels: 
         props["search_kernels"] = search_kernels
