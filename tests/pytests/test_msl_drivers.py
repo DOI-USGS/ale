@@ -8,7 +8,6 @@ import ale
 from conftest import get_image_label, get_isd, get_image_kernels, convert_kernels, compare_dicts
 from ale.drivers.msl_drivers import MslMastcamPds3NaifSpiceDriver
 
-from conftest import get_image_label
 from unittest.mock import PropertyMock, patch, call
 
 

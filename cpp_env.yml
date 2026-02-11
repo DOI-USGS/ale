@@ -10,5 +10,5 @@ dependencies:
   - nlohmann_json
   - numpy
   - pytz
-  - scipy>=1.4.0,<1.11
+  - scipy
   - spiceypy>=6.0.0

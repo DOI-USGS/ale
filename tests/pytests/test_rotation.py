@@ -4,6 +4,8 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 from ale.rotation import ConstantRotation, TimeDependentRotation
 
+from conftest import compare_quats
+
 def test_constant_constant_composition():
     rot1_2 = ConstantRotation([1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)], 1, 2)
     rot2_3 = ConstantRotation([0, 1.0/np.sqrt(2), 0, 1.0/np.sqrt(2)], 2, 3)
@@ -23,9 +25,9 @@ def test_constant_time_dependent_composition():
     assert isinstance(rot1_3, TimeDependentRotation)
     assert rot1_3.source == 1
     assert rot1_3.dest == 3
-    expected_quats = [[0.5, 0.5, -0.5, 0.5],[1.0/np.sqrt(2), 0, -1.0/np.sqrt(2), 0]]
+    expected_quats = np.asarray([[0.5, 0.5, -0.5, 0.5],[1.0/np.sqrt(2), 0, -1.0/np.sqrt(2), 0]])
     np.testing.assert_equal(rot1_3.times, times)
-    np.testing.assert_almost_equal(rot1_3.quats, expected_quats)
+    assert compare_quats(rot1_3.quats, expected_quats)
     np.testing.assert_almost_equal(rot1_3.av, av)
 
 def test_time_dependent_constant_composition():
@@ -38,9 +40,9 @@ def test_time_dependent_constant_composition():
     assert isinstance(rot1_3, TimeDependentRotation)
     assert rot1_3.source == 1
     assert rot1_3.dest == 3
-    expected_quats = [[1, 0, 0, 0],[1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)]]
+    expected_quats = np.asarray([[1, 0, 0, 0],[1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)]])
     np.testing.assert_equal(rot1_3.times, times)
-    np.testing.assert_almost_equal(rot1_3.quats, expected_quats)
+    assert compare_quats(rot1_3.quats, expected_quats)
     np.testing.assert_almost_equal(rot1_3.av, av)
 
 def test_time_dependent_time_dependent_composition():
@@ -61,10 +63,10 @@ def test_time_dependent_time_dependent_composition():
     assert rot1_3.source == 1
     assert rot1_3.dest == 3
     expected_times = [0, 1, 2]
-    expected_quats = [[0, 0, 0, -1], [1, 0, 0, 0], [0, 0, 0, -1]]
+    expected_quats = np.asarray([[0, 0, 0, -1], [1, 0, 0, 0], [0, 0, 0, -1]])
     expected_av = [[np.pi, 0, 0], [np.pi, 0, 0], [np.pi, 0, 0]]
     np.testing.assert_equal(rot1_3.times, expected_times)
-    np.testing.assert_almost_equal(rot1_3.quats, expected_quats)
+    assert compare_quats(rot1_3.quats, expected_quats)
     np.testing.assert_almost_equal(rot1_3.av, expected_av)
 
 def test_constant_inverse():
@@ -72,8 +74,8 @@ def test_constant_inverse():
     rot2_1 = rot1_2.inverse()
     assert rot2_1.source == 2
     assert rot2_1.dest == 1
-    expected_quats = [1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)]
-    np.testing.assert_almost_equal(rot2_1.quat, expected_quats)
+    expected_quats = np.asarray([1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)])
+    assert compare_quats(rot2_1.quat, expected_quats)
 
 def test_time_dependent_inverse():
     quats1_2 = [[1.0/np.sqrt(2), 0, 0, 1.0/np.sqrt(2)],[1, 0, 0, 0]]
@@ -83,10 +85,10 @@ def test_time_dependent_inverse():
     rot2_1 = rot1_2.inverse()
     assert rot2_1.source == 2
     assert rot2_1.dest == 1
-    expected_quats = [[1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)],[1, 0, 0, 0]]
+    expected_quats = np.asarray([[1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)],[1, 0, 0, 0]])
     expected_av = [[-np.pi/2, 0, 0], [-np.pi/2, 0, 0]]
     np.testing.assert_equal(rot2_1.times, times1_2)
-    np.testing.assert_almost_equal(rot2_1.quats, expected_quats)
+    assert compare_quats(rot2_1.quats, expected_quats)
     np.testing.assert_almost_equal(rot2_1.av, expected_av)
 
 def test_time_dependent_inverse_no_av():
@@ -96,9 +98,9 @@ def test_time_dependent_inverse_no_av():
     rot2_1 = rot1_2.inverse()
     assert rot2_1.source == 2
     assert rot2_1.dest == 1
-    expected_quats = [[1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)],[1, 0, 0, 0]]
+    expected_quats = np.asarray([[1.0/np.sqrt(2), 0, 0, -1.0/np.sqrt(2)],[1, 0, 0, 0]])
     np.testing.assert_equal(rot2_1.times, times1_2)
-    np.testing.assert_almost_equal(rot2_1.quats, expected_quats)
+    assert compare_quats(rot2_1.quats, expected_quats)
     assert rot2_1.av is None
 
 def test_rotation_matrix():
@@ -113,8 +115,8 @@ def test_from_euler():
     times = [0, 1]
     seq = 'XYZ'
     rot = TimeDependentRotation.from_euler(seq, angles, times, 0, 1)
-    expected_quats = [[0.5, 0.5, 0.5, 0.5], [-0.5, -0.5, 0.5, 0.5]]
-    np.testing.assert_almost_equal(rot.quats, expected_quats)
+    expected_quats = np.asarray([[0.5, 0.5, 0.5, 0.5], [-0.5, -0.5, 0.5, 0.5]])
+    assert compare_quats(rot.quats, expected_quats)
     assert rot.av is None
     np.testing.assert_equal(rot.times, times)
     assert rot.source == 0
@@ -127,7 +129,7 @@ def test_from_euler_degrees():
                      [-90, -90, 0]]
     rad_rot = TimeDependentRotation.from_euler('XYZ', rad_angles, [0, 1], 0, 1)
     degree_rot = TimeDependentRotation.from_euler('XYZ', degree_angles, [0, 1], 0, 1, degrees=True)
-    np.testing.assert_almost_equal(rad_rot.quats, degree_rot.quats)
+    assert compare_quats(rad_rot.quats, degree_rot.quats)
     assert degree_rot.av is None
 
 def test_from_matrix():
@@ -136,27 +138,28 @@ def test_from_matrix():
            [0, 1, 0]]
     rot = ConstantRotation.from_matrix(mat, 0, 1)
     expected_quats = np.asarray([0.5, 0.5, 0.5, 0.5])
-    np.testing.assert_almost_equal(rot.quat, expected_quats)
+    assert compare_quats(rot.quat, expected_quats)
     assert rot.source == 0
     assert rot.dest == 1
 
 def test_slerp():
-    test_quats = Rotation.from_euler('x', np.array([-135, -90, 0, 45, 90]), degrees=True).as_quat()
+    test_quats = Rotation.from_euler('x', np.array([[-135], [-90], [0], [45], [90]]), degrees=True).as_quat()
     rot = TimeDependentRotation(test_quats, [-0.5, 0, 1, 1.5, 2], 1, 2)
     new_rots, new_avs = rot._slerp(np.arange(-3, 5))
     expected_rot = Rotation.from_euler('x',
-                                       [-360, -270, -180, -90, 0, 90, 180, 270],
+                                       [[-360], [-270], [-180], [-90], [0], [90], [180], [270]],
                                        degrees=True)
-    np.testing.assert_almost_equal(new_rots.as_quat(),
-                                   expected_rot.as_quat())
+    assert compare_quats(new_rots.as_quat(),
+                         expected_rot.as_quat())
     np.testing.assert_almost_equal(np.degrees(new_avs),
                                    np.repeat([[90, 0, 0]], 8, 0))
 
 def test_slerp_constant_rotation():
     rot = TimeDependentRotation([[0, 0, 0, 1]], [0], 1, 2)
     new_rot, new_avs = rot._slerp([-1, 3])
-    np.testing.assert_equal(new_rot.as_quat(),
-                            [[0, 0, 0, 1], [0, 0, 0, 1]])
+    expected_quats = np.asarray([[0, 0, 0, 1], [0, 0, 0, 1]])
+    assert compare_quats(new_rot.as_quat(),
+                         expected_quats)
     np.testing.assert_equal(new_avs,
                             [[0, 0, 0], [0, 0, 0]])
 
@@ -164,9 +167,9 @@ def test_slerp_single_time():
     rot = TimeDependentRotation([[0, 0, 0, 1]], [0], 1, 2, av=[[np.pi/2, 0, 0]])
     new_rot, new_avs = rot._slerp([-1, 3])
     expected_quats = [[-1/np.sqrt(2), 0, 0, 1/np.sqrt(2)], [1/np.sqrt(2), 0, 0, -1/np.sqrt(2)]]
-    expected_av = [[np.pi/2, 0, 0], [np.pi/2, 0, 0]]
-    np.testing.assert_almost_equal(new_rot.as_quat(),
-                                   expected_quats)
+    expected_av = np.asarray([[np.pi/2, 0, 0], [np.pi/2, 0, 0]])
+    assert compare_quats(new_rot.as_quat(),
+                         expected_quats)
     np.testing.assert_equal(new_avs,
                             expected_av)
 
@@ -186,8 +189,8 @@ def test_slerp_variable_velocity():
                                         [-90, 180, 45],
                                         [-90, 180, 135]],
                                        degrees=True)
-    np.testing.assert_almost_equal(new_rots.as_quat(),
-                                   expected_rot.as_quat())
+    assert compare_quats(new_rots.as_quat(),
+                         expected_rot.as_quat())
     np.testing.assert_almost_equal(np.degrees(new_avs),
                                    [[-90, 0, 0],
                                     [-90, 0 ,0],
@@ -203,14 +206,14 @@ def test_reinterpolate():
     np.testing.assert_equal(new_rot.times, np.arange(-3, 5))
 
 def test_apply_at_single_time():
-    test_quats = Rotation.from_euler('x', np.array([-90, 0, 45]), degrees=True).as_quat()
+    test_quats = Rotation.from_euler('x', np.asarray([[-90], [0], [45]]), degrees=True).as_quat()
     rot = TimeDependentRotation(test_quats, [0, 1, 1.5], 1, 2)
     input_vec = np.asarray([1, 2, 3])
     rot_vec = rot.apply_at(input_vec, 0)
     np.testing.assert_almost_equal(rot_vec, np.asarray([[1, 3, -2]]))
 
 def test_apply_at_vector_time():
-    test_quats = Rotation.from_euler('x', np.array([-90, 0, 45]), degrees=True).as_quat()
+    test_quats = Rotation.from_euler('x', np.asarray([[-90], [0], [45]]), degrees=True).as_quat()
     rot = TimeDependentRotation(test_quats, [0, 1, 1.5], 1, 2)
     input_vec = np.asarray([[1, 2, 3], [1, 2, 3]])
     rot_vec = rot.apply_at(input_vec, [0, 2])

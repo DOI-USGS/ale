@@ -140,9 +140,9 @@ def main():
     )
     args = parser.parse_args()
 
-    log_level = logging.INFO
+    log_level = logging.ERROR
     if args.verbose:
-        log_level = logging.WARNING
+        log_level = logging.INFO
 
     logger.setLevel(log_level)
 
@@ -203,7 +203,7 @@ def file_to_isd(
     out: os.PathLike = None,
     radii: list = None,
     kernels: list = None,
-    log_level=logging.WARNING,
+    log_level=logging.ERROR,
     compress=False,
     only_isis_spice=False,
     only_naif_spice=False,
@@ -250,9 +250,9 @@ def file_to_isd(
     if kernels is not None:
         kernels = [str(PurePath(p)) for p in kernels]
         props["kernels"] = kernels
-        usgscsm_str = ale.loads(file, props=props, verbose=log_level>logging.INFO, only_isis_spice=only_isis_spice, only_naif_spice=only_naif_spice)
+        usgscsm_str = ale.loads(file, props=props, verbose=log_level<=logging.INFO, only_isis_spice=only_isis_spice, only_naif_spice=only_naif_spice)
     else:
-        usgscsm_str = ale.loads(file, props=props, verbose=log_level>logging.INFO, only_isis_spice=only_isis_spice, only_naif_spice=only_naif_spice)
+        usgscsm_str = ale.loads(file, props=props, verbose=log_level<=logging.INFO, only_isis_spice=only_isis_spice, only_naif_spice=only_naif_spice)
 
     if radii is not None:
         # first convert to kilometers for ISD

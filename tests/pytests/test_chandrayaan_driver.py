@@ -1,4 +1,3 @@
-from cgi import test
 import pytest
 import ale
 import os
@@ -192,7 +191,7 @@ class test_chandrayaan2_tmc_isis_naif(unittest.TestCase):
         assert self.driver.short_mission_name == 'chandrayaan'
 
     def test_instrument_id(self):
-        assert self.driver.instrument_id == 'CHANDRAYAAN-2 ORBITER'
+        assert self.driver.instrument_id == 'CH2_TMC_FORE'
 
     def test_spacecraft_name(self):
         assert self.driver.spacecraft_name == 'Chandrayaan-2'
@@ -217,7 +216,7 @@ class test_chandrayaan2_ohrc_isis_naif(unittest.TestCase):
         assert self.driver.spacecraft_name == 'Chandrayaan-2'
 
     def test_instrument_id(self):
-        assert self.driver.instrument_id == 'CHANDRAYAAN-2 ORBITER'
+        assert self.driver.instrument_id == 'CH2_OHRC'
 
     def test_ikid(self):
         assert self.driver.ikid == -152270
@@ -250,9 +249,9 @@ class test_chandrayaan2_ohrc_isis_naif(unittest.TestCase):
             assert self.driver.detector_center_line   == 3003.2
 
     def test_focal2pixel_lines(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-152270, {"frameCode": -152270}, {"INS-152270_PIXEL_SIZE": 12}, {}]) as spiceql_call:
-            assert self.driver.focal2pixel_lines == [0.0, 0.0, 8.333333333333333e-05]
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-152270, {"frameCode": -152270}, {"INS-152270_PIXEL_SIZE": 0.0000052}, {}]) as spiceql_call:
+            assert self.driver.focal2pixel_lines == [0.0, 192.30769230769232, 0.0]
 
     def test_focal2pixel_samples(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-152270, {"frameCode": -152270}, {"INS-152270_PIXEL_SIZE": 12}, {}]) as spiceql_call:
-            assert self.driver.focal2pixel_samples == [0.0, -8.333333333333333e-05, 0]
+        with patch('ale.spiceql_access.spiceql_call', side_effect=[-152270, {"frameCode": -152270}, {"INS-152270_PIXEL_SIZE": 0.0000052}, {}]) as spiceql_call:
+            assert self.driver.focal2pixel_samples == [0.0, 0.0, 192.30769230769232]
