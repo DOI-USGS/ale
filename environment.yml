@@ -1,4 +1,4 @@
-# name: ale
+name: ale
 channels:
   - conda-forge
 
@@ -13,7 +13,7 @@ dependencies:
   - networkx
   - nlohmann_json
   - numpy
-  - spiceql=1.2.4=*_6
+  - spiceql>=1.2.4
   - pvl
   - pytest
   - pytest-cov
