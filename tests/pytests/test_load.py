@@ -48,8 +48,9 @@ def test_mess_load(class_truth, return_val, mess_kernels):
 def test_mess_load_gtiff(mess_kernels):
     label_file = "tests/pytests/data/EN1072174528M/EN1072174528M.tiff"
 
-    usgscsm_isd_str = ale.loads(label_file, {'kernels': mess_kernels})
+    usgscsm_isd_str = ale.loads(label_file, {'kernels': mess_kernels, "attach_kernels": False})
     usgscsm_isd_obj = json.loads(usgscsm_isd_str)
+    print(usgscsm_isd_obj)
 
     compare_isd = get_isd("messmdis")
 
