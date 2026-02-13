@@ -343,8 +343,10 @@ class NewHorizonsMvicIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Lege
             band_times = self.label['IsisCube']['BandBin']['UtcTime']
             self._ephem_band_times = []
             for time in band_times:
-                if type(time) is pvl.Quantity:
-                   time = time.value
+                if isinstance(time, pvl.collections.Quantity):
+                    time = time.value
+                elif isinstance(time, dict):
+                    time = time["value"]
                 self._ephem_band_times.append(self.spiceql_call("utcToEt", {"utc": time.strftime("%Y-%m-%d %H:%M:%S.%f")}))
         return self._ephem_band_times
 

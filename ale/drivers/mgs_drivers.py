@@ -53,7 +53,7 @@ class MgsMocNarrowAngleCameraIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, Na
         the ephemeris stop time of the image, so compute the ephemeris stop time
         from the start time and the exposure duration.
         """
-        return self.ephemeris_start_time + (self.exposure_duration/1000 * ((self.image_lines) * self.label['IsisCube']['Instrument']['DowntrackSumming']))
+        return self.ephemeris_start_time + (self.exposure_duration * ((self.image_lines) * self.label['IsisCube']['Instrument']['DowntrackSumming']))
 
     @property
     def detector_start_sample(self):
@@ -186,7 +186,7 @@ class MgsMocWideAngleCameraIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, Naif
         the ephemeris stop time of the image, so compute the ephemeris stop time
         from the start time and the exposure duration.
         """
-        return self.ephemeris_start_time + (self.exposure_duration/1000 * ((self.image_lines) * self.label['IsisCube']['Instrument']['DowntrackSumming']))
+        return self.ephemeris_start_time + (self.exposure_duration * ((self.image_lines) * self.label['IsisCube']['Instrument']['DowntrackSumming']))
 
     @property
     def detector_start_sample(self):

@@ -37,8 +37,13 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
         float :
             The image start ephemeris time
         """
-
-        return self.label.get('IsisCube').get('Instrument').get("EphemerisTime").value
+        if not hasattr(self, "_ephemeris_start_time"):
+            self._ephemeris_start_time = self.label['IsisCube']['Instrument']["EphemerisTime"]
+            if isinstance(self._ephemeris_start_time, pvl.collections.Quantity):
+                self._ephemeris_start_time = self._ephemeris_start_time.value
+            elif isinstance(self._ephemeris_start_time, dict):
+                self._ephemeris_start_time = self._ephemeris_start_time["value"]
+        return self._ephemeris_start_time
 
 
     @property

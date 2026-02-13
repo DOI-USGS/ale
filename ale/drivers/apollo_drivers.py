@@ -74,14 +74,22 @@ class ApolloMetricIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDisto
         # Check for units on the PVL keyword
         if isinstance(exposure_duration, pvl.collections.Quantity):
             units = exposure_duration.units
-            if "ms" in units.lower() or 'milliseconds' in units.lower():
-                exposure_duration = exposure_duration.value * 0.001
-            else:
-                # if not milliseconds, the units are probably seconds
-                exposure_duration = exposure_duration.value
+            value = exposure_duration.value
+        elif isinstance(exposure_duration, dict):
+            units = ""
+            value = exposure_duration["value"]
+            if "unit" in exposure_duration:
+                units = exposure_duration["unit"]
         else:
             # if no units are available, assume the exposure duration is given in milliseconds
-            exposure_duration = exposure_duration * 0.001
+            units = "ms"
+            value = exposure_duration
+
+        if "ms" in units.lower() or 'milliseconds' in units.lower():
+            exposure_duration = value * 0.001
+        else:
+            # if not milliseconds, the units are probably seconds
+            exposure_duration = value
         return exposure_duration
 
     @property

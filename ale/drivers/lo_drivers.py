@@ -1,5 +1,7 @@
 import numpy as np
+import pvl
 import spiceypy as spice
+
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
@@ -151,11 +153,21 @@ class LoHighCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, LoDisto
         if (not hasattr(self, "_naif_keywords")):
           # From ISIS LoCameraFiducialMap
 
+          p_fidSamples = self.label['IsisCube']['Instrument']['FiducialSamples']
+          p_fidLines = self.label['IsisCube']['Instrument']['FiducialLines']
+          p_fidXCoords = self.label['IsisCube']['Instrument']['FiducialXCoordinates']
+          p_fidYCoords = self.label['IsisCube']['Instrument']['FiducialYCoordinates']
           # Read Fiducials
-          p_fidSamples = self.label['IsisCube']['Instrument']['FiducialSamples'].value
-          p_fidLines = self.label['IsisCube']['Instrument']['FiducialLines'].value
-          p_fidXCoords = self.label['IsisCube']['Instrument']['FiducialXCoordinates'].value
-          p_fidYCoords = self.label['IsisCube']['Instrument']['FiducialYCoordinates'].value
+          if isinstance(p_fidSamples, pvl.collections.Quantity):
+            p_fidSamples = p_fidSamples.value
+            p_fidLines = p_fidLines.value
+            p_fidXCoords = p_fidXCoords.value
+            p_fidYCoords = p_fidYCoords.value
+          elif isinstance(p_fidSamples, dict):
+            p_fidSamples = p_fidSamples["value"]
+            p_fidLines = p_fidLines["value"]
+            p_fidXCoords = p_fidXCoords["value"]
+            p_fidYCoords = p_fidYCoords["value"]
 
           # Create Affine Transformation
           p_src = [p_fidSamples, p_fidLines]

@@ -1,6 +1,6 @@
-import spiceypy as spice 
-
 import numpy as np
+import pvl
+import spiceypy as spice 
 
 from pyspiceql import pyspiceql
 from ale.base import Driver
@@ -756,7 +756,11 @@ class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):
         """
 
         # Get float value of frequency in GHz
-        frequency = self.label['IsisCube']['Instrument']['Frequency'].value
+        frequency = self.label['IsisCube']['Instrument']['Frequency']
+        if isinstance(frequency, pvl.collections.Quantity):
+            frequency = frequency.value
+        elif isinstance(frequency, dict):
+            frequency = frequency["value"]
         #wavelength = spice.clight() / frequency / 1000.0
         wavelength = 299792.458 / frequency / 1000.0
         return wavelength

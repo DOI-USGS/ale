@@ -155,7 +155,7 @@ def main():
         k = None
     else:
         try:
-            k = ale.util.generate_kernels_from_cube(args.kernel, expand=True)
+            k = ale.kernel_access.generate_kernels_from_cube(args.kernel, expand=True)
         except (KeyError, pvl.exceptions.LexerError):
             k = [args.kernel, ]
 

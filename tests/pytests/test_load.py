@@ -13,7 +13,7 @@ from ale.base.data_isis import IsisSpice
 
 from ale.drivers.mess_drivers import MessengerMdisPds3NaifSpiceDriver
 
-from conftest import get_image_label, get_image_kernels, convert_kernels
+from conftest import get_image_label, get_image_kernels, convert_kernels, get_isd, compare_dicts
 
 @pytest.fixture()
 def mess_kernels():
@@ -44,6 +44,18 @@ def test_mess_load(class_truth, return_val, mess_kernels):
     except Exception as load_failure:
         assert str(load_failure) == "No Such Driver for Label"
         assert return_val is False
+
+def test_mess_load_gtiff(mess_kernels):
+    label_file = "tests/pytests/data/EN1072174528M/EN1072174528M.tiff"
+
+    usgscsm_isd_str = ale.loads(label_file, {'kernels': mess_kernels, "attach_kernels": False})
+    usgscsm_isd_obj = json.loads(usgscsm_isd_str)
+    print(usgscsm_isd_obj)
+
+    compare_isd = get_isd("messmdis")
+
+    comparison = compare_dicts(usgscsm_isd_obj, compare_isd)
+    assert comparison == []
 
 def test_load_invalid_label():
     with pytest.raises(Exception):

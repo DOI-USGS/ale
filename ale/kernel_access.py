@@ -5,9 +5,11 @@ import os
 from os import path
 import re
 import warnings
+from collections.abc import Iterable
 
 import numpy as np
 import pvl
+import json
 
 from ale import spice_root
 from ale.util import get_isis_preferences
@@ -130,16 +132,25 @@ def generate_kernels_from_cube(cube,  expand=False, format_as='list'):
         Dictionary of lists of kernels with the keys being the Keywords from the Kernels group of
         cube itself, and the values being the values associated with that Keyword in the cube.
     """
-    # enforce key order
-    mk_paths = OrderedDict.fromkeys(
-        ['TargetPosition', 'InstrumentPosition',
-         'InstrumentPointing', 'Frame', 'TargetAttitudeShape',
-         'Instrument', 'InstrumentAddendum', 'LeapSecond',
-         'SpacecraftClock', 'Extra'])
-
     # just work with full path
     cube = os.path.abspath(cube)
-    cubelabel = pvl.load(cube)
+    cubelabel = None
+    try:
+        cubelabel = pvl.load(cube)
+    except:
+        cubelabel = None
+    
+    if (cubelabel == None):
+        try:
+            from osgeo import gdal
+            gdal.UseExceptions()
+            geodata = gdal.Open(cube)
+            cubelabel = json.loads(geodata.GetMetadata("json:ISIS3")[0])
+        except Exception as e:
+            cubelabel = None
+    
+    if (cubelabel == None):
+        raise RuntimeError(f"Could not parse {cube} for pvl or json label")
 
     try:
         kernel_group = cubelabel['IsisCube']
@@ -155,33 +166,28 @@ def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
         ['TargetPosition', 'InstrumentPosition',
          'InstrumentPointing', 'Frame', 'TargetAttitudeShape',
          'Instrument', 'InstrumentAddendum', 'LeapSecond',
-         'SpacecraftClock', 'Extra'])
-
+         'SpacecraftClock', 'Extra', 'Clock', 'ShapeModel'])
 
     if isinstance(kernel_group, str):
         kernel_group = pvl.loads(kernel_group)
 
     kernel_group = kernel_group["Kernels"]
 
-    def load_table_data(key):
+    def read_kernels(key):
         mk_paths[key] = kernel_group.get(key, None)
-        if isinstance(mk_paths[key], str):
+        if (mk_paths[key] == "Null"):
+            mk_paths[key] = None
+        if isinstance(mk_paths[key], str) or mk_paths[key] == None:
             mk_paths[key] = [mk_paths[key]]
         while 'Table' in mk_paths[key]: mk_paths[key].remove('Table')
         while 'Nadir' in mk_paths[key]: mk_paths[key].remove('Nadir')
 
-    load_table_data('TargetPosition')
-    load_table_data('InstrumentPosition')
-    load_table_data('InstrumentPointing')
-    load_table_data('TargetAttitudeShape')
-    # the rest
-    mk_paths['Frame'] = [kernel_group.get('Frame', None)]
-    mk_paths['Instrument'] = [kernel_group.get('Instrument', None)]
-    mk_paths['InstrumentAddendum'] = [kernel_group.get('InstrumentAddendum', None)]
-    mk_paths['SpacecraftClock'] = [kernel_group.get('SpacecraftClock', None)]
-    mk_paths['LeapSecond'] = [kernel_group.get('LeapSecond', None)]
-    mk_paths['Clock'] = [kernel_group.get('Clock', None)]
-    mk_paths['Extra'] = [kernel_group.get('Extra', None)]
+    for key in mk_paths.keys():
+        read_kernels(key)
+
+    if (mk_paths['ShapeModel'][0]):
+        if (os.path.splitext(mk_paths['ShapeModel'][0])[-1] != "bds"):
+            mk_paths['ShapeModel'] = [None]
 
     # handles issue with OsirisRex instrument kernels being in a 2d list
     if isinstance(mk_paths['Instrument'][0], list):
@@ -218,6 +224,7 @@ def get_kernels_from_isis_pvl(kernel_group, expand=True, format_as="list"):
         return mk_paths
     elif (format_as == 'spiceql'):
         mk_paths.pop("Clock")
+        mk_paths.pop("ShapeModel")
         mk_paths["ck"] = [k.replace("$", "") for k in mk_paths.pop("InstrumentPointing") if k]
         mk_paths["spk"] = [k.replace("$", "") for k in mk_paths.pop("InstrumentPosition") if k]
         mk_paths["pck"] = [k.replace("$", "") for k in mk_paths.pop("TargetAttitudeShape") if k]

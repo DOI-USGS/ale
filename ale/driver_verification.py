@@ -320,7 +320,7 @@ def main(image):
     run_spiceinit_isis(image_isis_path)
 
     # try ale.loads
-    isis_kerns = ale.util.generate_kernels_from_cube(image_isis_path, expand=True)
+    isis_kerns = ale.kernel_access.generate_kernels_from_cube(image_isis_path, expand=True)
     # this can be uncommented and used when the PVL loads fix PR goes in (#587)
     isis_label = pvl.load(image_isis_path)
     try:
@@ -333,7 +333,7 @@ def main(image):
     run_spiceinit_ale(image_ale_path)
 
     # try ale.loads
-    ale_kerns = ale.util.generate_kernels_from_cube(image_ale_path, expand=True)
+    ale_kerns = ale.kernel_access.generate_kernels_from_cube(image_ale_path, expand=True)
     ale.loads(image_ale_path, props={"kernels": ale_kerns}, only_naif_spice=True)
     
     # Generate ISD for both ALE and ISIS
