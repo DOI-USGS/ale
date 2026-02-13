@@ -1,4 +1,6 @@
 import pvl
+import json
+import datetime
 
 class IsisLabel():
     """
@@ -21,7 +23,7 @@ class IsisLabel():
             Raised when an invalid label is provided.
         """
         if not hasattr(self, "_label"):
-            if isinstance(self._file, pvl.PVLModule):
+            if isinstance(self._file, pvl.PVLModule) or isinstance(self._file, dict):
                 self._label = self._file
                 return self._label
             else:
@@ -40,13 +42,19 @@ class IsisLabel():
                     self._label = pvl.load(self._file, grammar=grammar)
                 except:
                     pass
+
+            if not self._label:
+                try:
+                    self._label = json.loads(self._file)
+                except:
+                    pass
                 
             if not self._label:
                 try:
                     from osgeo import gdal
                     gdal.UseExceptions()
-                    geodata = gdal.Open(label)
-                    self._label = json.loads(geodata.GetMetadata("json:ISIS3")["doc"])
+                    geodata = gdal.Open(self._file)
+                    self._label = json.loads(geodata.GetMetadata("json:ISIS3")[0])
                 except:
                     pass
 
@@ -266,7 +274,10 @@ class IsisLabel():
         : datetime
           Start time of the image in UTC
         """
-        return self.label['IsisCube']['Instrument']['StartTime']
+        utc_time = self.label['IsisCube']['Instrument']['StartTime']
+        if isinstance(utc_time, str):
+            utc_time = datetime.datetime.fromisoformat(utc_time)
+        return utc_time
 
     @property
     def utc_stop_time(self):
@@ -280,7 +291,10 @@ class IsisLabel():
         : datetime
           Stop time of the image in UTC
         """
-        return self.label['IsisCube']['Instrument']['StopTime']
+        utc_time = self.label['IsisCube']['Instrument']['StopTime']
+        if isinstance(utc_time, str):
+            utc_time = datetime.datetime.fromisoformat(utc_time)
+        return utc_time
 
     @property
     def exposure_duration(self):
@@ -297,21 +311,23 @@ class IsisLabel():
             # Check for units on the PVL keyword
             if isinstance(exposure_duration, pvl.collections.Quantity):
                 units = exposure_duration.units
-                if "ms" in units.lower() or 'milliseconds' in units.lower():
-                    exposure_duration = exposure_duration.value * 0.001
-                else:
-                    # if not milliseconds, the units are probably seconds
-                    exposure_duration = exposure_duration.value
+                value = exposure_duration.value
             elif isinstance(exposure_duration, dict):
-                units = exposure_duration["units"]
-                if "ms" in units.lower() or 'milliseconds' in units.lower():
-                    exposure_duration = exposure_duration["value"] * 0.001
-                else:
-                    # if not milliseconds, the units are probably seconds
-                    exposure_duration = exposure_duration["value"]
+                units = ""
+                value = exposure_duration["value"]
+                if "unit" in exposure_duration:
+                    units = exposure_duration["unit"]
             else:
                 # if no units are available, assume the exposure duration is given in milliseconds
-                exposure_duration = exposure_duration * 0.001
+                units = "ms"
+                value = exposure_duration
+
+            if "ms" in units.lower() or 'milliseconds' in units.lower():
+                exposure_duration = value * 0.001
+            else:
+                # if not milliseconds, the units are probably seconds
+                exposure_duration = value
+
             return exposure_duration
         else:
             return self.line_exposure_duration
@@ -327,23 +343,26 @@ class IsisLabel():
           Line exposure duration in seconds
         """
         line_exposure_duration = self.label['IsisCube']['Instrument']['LineExposureDuration']
+        # Check for units on the PVL keyword
         if isinstance(line_exposure_duration, pvl.collections.Quantity):
             units = line_exposure_duration.units
-            if "ms" in units.lower():
-                line_exposure_duration = line_exposure_duration.value * 0.001
-            else:
-                # if not milliseconds, the units are probably seconds
-                line_exposure_duration = line_exposure_duration.value
+            value = line_exposure_duration.value
         elif isinstance(line_exposure_duration, dict):
-            units = line_exposure_duration["unit"]
-            if "ms" in units.lower():
-                line_exposure_duration = line_exposure_duration["value"] * 0.001
-            else:
-                # if not milliseconds, the units are probably seconds
-                line_exposure_duration = line_exposure_duration["value"]
+            units = ""
+            value = line_exposure_duration["value"]
+            if "unit" in line_exposure_duration:
+                units = line_exposure_duration["unit"]
         else:
             # if no units are available, assume the exposure duration is given in milliseconds
-            line_exposure_duration = line_exposure_duration * 0.001
+            units = "ms"
+            value = line_exposure_duration
+
+        if "ms" in units.lower() or 'milliseconds' in units.lower():
+            line_exposure_duration = value * 0.001
+        else:
+            # if not milliseconds, the units are probably seconds
+            line_exposure_duration = value
+
         return line_exposure_duration
 
 
@@ -357,23 +376,26 @@ class IsisLabel():
         : float
           interframe delay in seconds
         """
-        interframe_delay = self.label['IsisCube']['Instrument']['InterframeDelay']
+        interframe_delay = self.label['IsisCube']['Instrument'].get('InterframeDelay', None)
+        if interframe_delay == None:
+            interframe_delay = self.label['IsisCube']['Instrument'].get('InterFrameDelay', None)
         if isinstance(interframe_delay, pvl.collections.Quantity):
             units = interframe_delay.units
-            if "ms" in units.lower():
-                interframe_delay = interframe_delay.value * 0.001
-            else:
-                # if not milliseconds, the units are probably seconds
-                interframe_delay = interframe_delay.value
+            value = interframe_delay.value
         elif isinstance(interframe_delay, dict):
-            units = interframe_delay["units"]
-            if "ms" in units.lower():
-                interframe_delay = interframe_delay["value"] * 0.001
-            else:
-                # if not milliseconds, the units are probably seconds
-                interframe_delay = interframe_delay["value"]
+            units = "ms"
+            value = interframe_delay["value"]
+            if "unit" in interframe_delay:
+                units = interframe_delay["unit"]
         else:
             # if no units are available, assume the interframe delay is given in milliseconds
-            interframe_delay = interframe_delay * 0.001
+            units = "ms"
+            value = interframe_delay
+
+        if "ms" in units.lower() or 'milliseconds' in units.lower():
+            interframe_delay = interframe_delay.value * 0.001
+        else:
+            # if not milliseconds, the units are probably seconds
+            interframe_delay = interframe_delay.value
 
         return interframe_delay

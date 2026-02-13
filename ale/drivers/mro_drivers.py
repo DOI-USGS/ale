@@ -101,7 +101,7 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
             }
             self._filters = self.label["IsisCube"]["BandBin"]["FilterName"]
 
-            self._framelet_rate = self.label["IsisCube"]["Instrument"]["InterframeDelay"].value
+            self._framelet_rate = self.interframe_delay
             framelet_height = 16
 
             self._actual_framelet_height = framelet_height / sum_mode
