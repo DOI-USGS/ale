@@ -1,4 +1,5 @@
 import numpy as np
+import pvl
 
 from pyspiceql import pyspiceql
 from ale.base import Driver
@@ -347,7 +348,11 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
           f_t = np.poly1d(coeffs[::-1])
 
           # eval at the focal_plane_temperature
-          self._focal_length = f_t(self.label['IsisCube']['Instrument']['FocalPlaneTemperature'].value)
+          focal_temp = self.label['IsisCube']['Instrument']['FocalPlaneTemperature']
+          if isinstance(focal_temp, pvl.collections.Quantity):
+            self._focal_length = f_t(focal_temp.value)
+          elif isinstance(focal_temp, dict):
+            self._focal_length = f_t(focal_temp["value"])
         return self._focal_length
 
     @property

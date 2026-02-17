@@ -375,11 +375,14 @@ class CassiniVimsIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoD
             exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration']
 
             for i in exposure_duration:
-                if i.units == "VIS":
-                    exposure_duration = i
+                if isinstance(i, pvl.collections.Quantity):
+                    if i.units == "VIS":
+                        exposure_duration = i.value
+                elif isinstance(i, dict):
+                    if i["unit"] == "VIS":
+                        exposure_duration = i["value"]
 
-            exposure_duration = exposure_duration.value * 0.001
-            return exposure_duration
+            return exposure_duration * 0.001
         else:
             return self.line_exposure_duration
 
@@ -502,13 +505,15 @@ class CassiniVimsIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoD
         """
         if 'ExposureDuration' in self.label['IsisCube']['Instrument']:
             exposure_duration = self.label['IsisCube']['Instrument']['ExposureDuration']
-
             for i in exposure_duration:
-                if i.units == "VIS":
-                    exposure_duration = i
+                if isinstance(exposure_duration, pvl.collections.Quantity):
+                    if i.units == "VIS":
+                        exposure_duration = i.value
+                elif isinstance(exposure_duration, dict):
+                    if i["unit"] == "VIS":
+                        exposure_duration = i["value"]
 
-            exposure_duration = exposure_duration.value * 0.001
-            return exposure_duration
+            return exposure_duration * 0.001
         else:
             return self.line_exposure_duration
 
