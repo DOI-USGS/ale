@@ -465,7 +465,7 @@
     "name": "ale",
     "organization": "U.S. Geological Survey",
     "description": "GitLab repository for the Abstraction Layer for Ephemerides package",
-    "version": "1.0.3",
+    "version": "1.1.0",
     "status": "Production",
 
     "permissions": {
@@ -473,14 +473,14 @@
       "licenses": [
         {
           "name": "Public Domain, CC0-1.0",
-          "URL": "https://code.usgs.gov/astrogeology/ale/-/raw/1.0.3/LICENSE.md"
+          "URL": "https://code.usgs.gov/astrogeology/ale/-/raw/1.1.0/LICENSE.md"
         }
       ]
     },
 
-    "homepageURL": "https://code.usgs.gov/astrogeology/ale/-/tree/1.0.3",
-    "downloadURL": "https://code.usgs.gov/astrogeology/ale/-/archive/1.0.3/ale-1.0.3.zip",
-    "disclaimerURL": "https://code.usgs.gov/astrogeology/ale/-/raw/1.0.3/DISCLAIMER.md",
+    "homepageURL": "https://code.usgs.gov/astrogeology/ale/-/tree/1.1.0",
+    "downloadURL": "https://code.usgs.gov/astrogeology/ale/-/archive/1.1.0/ale-1.1.0.zip",
+    "disclaimerURL": "https://code.usgs.gov/astrogeology/ale/-/raw/1.1.0/DISCLAIMER.md",
     "repositoryURL": "https://code.usgs.gov/astrogeology/ale.git",
     "vcs": "git",
 
