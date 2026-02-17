@@ -35,10 +35,22 @@ release.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-02-17
+
+### Fixed
+- Fixed ephemeris stop time in Chandrayaan2 TMC2 driver. [#681](https://github.com/DOI-USGS/ale/pull/681/changes)
+
+- Fixed focal plane to detector lines/samples as well as rely on IAK for rotation corrections in Chandrayaan2 OHRC driver. [#682](https://github.com/DOI-USGS/ale/pull/682)
+
+### Added
+- Added TMC_FORE, TMC_NADIR, and TMC_AFT instrument IDs to Chandrayaan2 driver. [#678](https://github.com/DOI-USGS/ale/pull/678)
 
 - Added optional boolean flag `remove_kernels` to the `props` dict in the `loads()` func to allow the user to add the `kernels` key in the output ISD. Added the `misc` kernel key for user-entered kernels. Format the kernels value to always be dict type in ISD generation. [#675](https://github.com/DOI-USGS/ale/pull/675)
-- Sets ALE's default log level to ERROR instead of INFO, which was too verbose. [#679](https://github.com/DOI-USGS/ale/pull/679)
 
+- Added support for loading ISIS metadata from GDAL drivers when using GDAL 3.12.0 or newer. [#676](https://github.com/DOI-USGS/ale/pull/676)
+
+### Changed
+- Sets ALE's default log level to ERROR instead of INFO, which was too verbose. [#679](https://github.com/DOI-USGS/ale/pull/679)
 
 ## [1.0.2]
 
