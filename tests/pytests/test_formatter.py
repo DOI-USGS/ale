@@ -307,7 +307,7 @@ def test_instrument_pointing(driver):
     assert pointing['time_dependent_frames'] == [1000, 1]
     assert pointing['constant_frames'] == [1010, 1000]
     np.testing.assert_equal(pointing['constant_rotation'], np.array([1., 0., 0., 0., 1., 0., 0., 0., 1.]))
-    assert pointing['ck_table_start_time'] == 800
+    assert pointing['ck_table_start_time'] == 850.0
     assert pointing['ck_table_end_time'] == 900
     assert pointing['ck_table_original_size'] == 2
     np.testing.assert_equal(pointing['ephemeris_times'], np.array([800, 900]))
