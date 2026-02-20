@@ -37,6 +37,7 @@ release.
 
 ## [1.1.1] - 2026-02-20
 
+### Fixed
 - Adjust instrument pointing information to match ISIS [#686](https://github.com/DOI-USGS/ale/pull/686)
 
 ## [1.1.0] - 2026-02-17
