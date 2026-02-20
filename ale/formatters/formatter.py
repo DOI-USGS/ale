@@ -123,9 +123,9 @@ def to_isd(driver):
     # (destination, intermediate, ..., intermediate, source)
     instrument_pointing['time_dependent_frames'] = shortest_path(frame_chain, destination_frame, J2000)
     time_dependent_rotation = frame_chain.compute_rotation(J2000, destination_frame)
-    instrument_pointing['ck_table_start_time'] = time_dependent_rotation.times[0]
-    instrument_pointing['ck_table_end_time'] = time_dependent_rotation.times[-1]
-    instrument_pointing['ck_table_original_size'] = len(time_dependent_rotation.times)
+    instrument_pointing['ck_table_start_time'] = driver_data["ephemeris_time"][0]
+    instrument_pointing['ck_table_end_time'] = driver_data["ephemeris_time"][-1]
+    instrument_pointing['ck_table_original_size'] = len(driver_data["ephemeris_time"])
     instrument_pointing['ephemeris_times'] = time_dependent_rotation.times
     instrument_pointing['quaternions'] = time_dependent_rotation.quats[:, [3, 0, 1, 2]]
     instrument_pointing['angular_velocities'] = time_dependent_rotation.av
