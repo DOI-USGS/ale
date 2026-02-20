@@ -4,7 +4,7 @@ import sys
 from setuptools import setup, find_packages
 
 NAME = "Ale"
-VERSION = "1.1.0"
+VERSION = "1.1.1"
 
 # To install the library, run the following
 #
