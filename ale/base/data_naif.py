@@ -868,6 +868,5 @@ class NaifSpice():
         if function_name in memo_funcs and data_dir == "" and self.use_web == False:
             function_name = f"{function_name}"
         ret = spiceql_access.spiceql_call(function_name, function_args, self.use_web)
-        logger.debug(f"Returning data_naif spiceql_call function ret: {ret}")
         return ret
     
