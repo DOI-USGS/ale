@@ -24,7 +24,7 @@ TEST(PyInterfaceTest, LoadValidLabel) {
 
 TEST(PyInterfaceTest, LoadValidLabelOnlyIsisSpice) {
   std::string label = "../pytests/data/EN1072174528M/EN1072174528M_spiceinit.lbl";
-  ale::load(label, "", "isis", false, true, false);
+  ale::load(label, "", "isis", true, true, false);
 }
 
 TEST(PyInterfaceTest, LoadValidLabelOnlyNaifSpice) {
