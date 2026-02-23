@@ -1,7 +1,7 @@
 import pvl
 import spiceypy as spice
 
-from ale.base import Driver
+from ale.base import Driver, WrongInstrumentException
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice, read_table_data, parse_table
 from ale.base.label_isis import IsisLabel
@@ -23,7 +23,10 @@ class ApolloMetricIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDisto
         inst_id_lookup = {
             "METRIC" : "APOLLO_METRIC"
         }
-        return inst_id_lookup[super().instrument_id] 
+        key = super().instrument_id
+        if key not in inst_id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return inst_id_lookup[key] 
     
     @property
     def ikid(self):
@@ -163,7 +166,10 @@ class ApolloPanIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoDis
             "APOLLO_PAN": "APOLLO PANORAMIC CAMERA"
         }
 
-        return id_lookup[super().instrument_id]
+        key = super().instrument_id
+        if key not in id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return id_lookup[key]
 
 
     @property

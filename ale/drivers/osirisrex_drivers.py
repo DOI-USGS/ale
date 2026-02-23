@@ -3,6 +3,7 @@ from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
 from ale.base.base import Driver
 from ale.base.type_distortion import RadialDistortion
+from ale.base import WrongInstrumentException
 
 from ale import util
 
@@ -26,7 +27,10 @@ class OsirisRexCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Radi
         "PolyCam" : "POLYCAM",
         "SamCam" : "SAMCAM"
         }
-        return 'ORX_OCAMS_' + sensor_lookup[super().instrument_id]
+        key = super().instrument_id
+        if key not in sensor_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return 'ORX_OCAMS_' + sensor_lookup[key]
     
     @property
     def polyCamFocusPositionNaifId(self):

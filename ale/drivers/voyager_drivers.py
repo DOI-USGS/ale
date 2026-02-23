@@ -4,6 +4,7 @@ from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
 from ale.base.type_distortion import NoDistortion
 from ale.base.base import Driver
+from ale.base import WrongInstrumentException
 
 class VoyagerCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
 
@@ -17,7 +18,12 @@ class VoyagerCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDist
         "NARROW_ANGLE_CAMERA" : "ISSNA",
         "WIDE_ANGLE_CAMERA" : "ISSWA"
         }
-        return sc_lookup[super().spacecraft_name] + '_' + sensor_lookup[super().instrument_id]
+        sc = super().spacecraft_name
+        ins = super().instrument_id
+        if sc not in sc_lookup or ins not in sensor_lookup:
+            missing = sc if sc not in sc_lookup else ins
+            raise WrongInstrumentException(f"Unknown instrument or spacecraft id: {missing}.")
+        return sc_lookup[sc] + '_' + sensor_lookup[ins]
 
     @property
     def sensor_name(self):

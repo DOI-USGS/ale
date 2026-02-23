@@ -1,4 +1,5 @@
 import pvl
+from ale.base import WrongLabelTypeException
 
 class Pds3Label():
     """
@@ -43,7 +44,10 @@ class Pds3Label():
         : str
           Short name of the instrument
         """
-        return self.label['INSTRUMENT_ID']
+        try:
+          return self.label['INSTRUMENT_ID']
+        except KeyError:
+          raise WrongLabelTypeException(f"Missing Instrument ID keyword. Expected INSTRUMENT_ID in PDS3 label.")
 
 
     @property

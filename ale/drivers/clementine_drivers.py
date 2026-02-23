@@ -1,4 +1,4 @@
-from ale.base import Driver
+from ale.base import Driver, WrongInstrumentException
 from ale.base.label_isis import IsisLabel
 from ale.base.data_naif import NaifSpice
 from ale.base.type_distortion import NoDistortion
@@ -30,7 +30,10 @@ class ClementineIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistort
         "HIRES": "High Resolution Camera",
         "LWIR": "Long Wave Infrared Camera"
         }
-        return lookup_table[super().instrument_id]
+        key = super().instrument_id
+        if key not in lookup_table:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return lookup_table[key]
 
     @property
     def sensor_name(self):

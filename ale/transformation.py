@@ -340,9 +340,9 @@ class FrameChain(nx.DiGraph):
             biased_times = [time - time_bias for time in times]
             if rotation_type == TimeDependentRotation:
                 logger.debug(f"Time Dependent Quats: {quats}")
-                logger.debug(f"Biased times: {biased_times}")
+                logger.debug(f"First 10 Biased times: {biased_times[:10]}...")
                 logger.debug(f"Frame: {frame}")
-                logger.debug(f"AVs: {avs}")
+                logger.debug(f"First 10 AVs: {avs[:10]} ...")
                 rotation = TimeDependentRotation(quats, biased_times, frame[0], frame[1], av=avs)
             else:
                 logger.debug(f"Constant Quats: {quats}")

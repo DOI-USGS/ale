@@ -1,15 +1,34 @@
 from ale.base.base import Driver
 
+class WrongInstrumentException(Exception):
+    """
+    Exception raised when an instrument is not recognized or is invalid.
+    """
+    pass
+
+class WrongLabelTypeException(Exception):
+    """
+    Exception raised when a label is not recognized or is invalid.
+    """
+    pass
+
+
+class IsdCreationException(Exception):
+    """
+    Exception raised when an ISD cannot be created.
+    """
+    pass
+
 spiceql_mission_map = {
     "APOLLO_METRIC" : "apollo15_metric", 
     "CHANDRAYAAN-1_M3": "m3",
     "CHANDRAYAAN-1_MRFFR": "mrffr",
     "CHANDRAYAAN-2 ORBITER": "chandrayaan2",
     "TMC-2" : "tmc2",
-    "CH2_TMC_FORE" : "chandrayaan2",
-    "CH2_TMC_NADIR" : "chandrayaan2",
-    "CH2_TMC_AFT" : "chandrayaan2",
-    "CH2_OHRC" : "chandrayaan2",
+    "CH2_TMC_FORE" : "tmc2",
+    "CH2_TMC_NADIR" : "tmc2",
+    "CH2_TMC_AFT" : "tmc2",
+    "CH2_OHRC" : "ohrc",
     "M3": "m3", 
     "CASSINI_ISS_NAC": "cassini",
     "CASSINI_ISS_WAC": "cassini",

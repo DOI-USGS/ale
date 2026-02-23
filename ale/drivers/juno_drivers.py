@@ -4,6 +4,7 @@ from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
 from ale.base.type_distortion import NoDistortion
 from ale.base.base import Driver
+from ale.base import WrongInstrumentException
 
 class JunoJunoCamIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
     """
@@ -22,7 +23,10 @@ class JunoJunoCamIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistor
           instrument id
         """
         look_up = {'JNC': 'JUNO_JUNOCAM'}
-        return look_up[super().instrument_id]
+        key = super().instrument_id
+        if key not in look_up:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return look_up[key]
 
     @property
     def ephemeris_start_time(self):

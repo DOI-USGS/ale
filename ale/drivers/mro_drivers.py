@@ -1,4 +1,4 @@
-from ale.base import Driver
+from ale.base import Driver, WrongInstrumentException
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
 from ale.base.label_pds3 import Pds3Label
@@ -38,8 +38,11 @@ class MroMarciIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
           }
         }
         # This should likely return a list but would only matter in USGSCSM
-        band_bin = self.label["IsisCube"]["BandBin"]["FilterName"][0]
-        return id_lookup[super().instrument_id][band_bin]
+        try:
+            band_bin = self.label["IsisCube"]["BandBin"]["FilterName"][0]
+            return id_lookup[super().instrument_id][band_bin]
+        except KeyError:
+            raise WrongInstrumentException(f"Missing FilterName keyword. Expected FilterName in ISIS label.")
 
     @property
     def base_ikid(self):
@@ -289,7 +292,10 @@ class MroCtxIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, RadialDi
         id_lookup = {
         "CTX" : "MRO_CTX"
         }
-        return id_lookup[super().instrument_id]
+        key = super().instrument_id
+        if key not in id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return id_lookup[key]
 
     @property
     def spacecraft_id(self):
@@ -343,7 +349,10 @@ class MroCtxIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDi
         id_lookup = {
         "CTX" : "MRO_CTX"
         }
-        return id_lookup[super().instrument_id]
+        key = super().instrument_id
+        if key not in id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return id_lookup[key]
 
     @property
     def sensor_name(self):
@@ -438,8 +447,10 @@ class MroCtxPds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDi
             'CONTEXT CAMERA':'MRO_CTX',
             'CTX':'MRO_CTX'
         }
-
-        return id_lookup[super().instrument_id]
+        key = super().instrument_id
+        if key not in id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return id_lookup[key]
 
     @property
     def spacecraft_name(self):
@@ -544,7 +555,10 @@ class MroHiRiseIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Radia
         id_lookup = {
             "HIRISE" : "MRO_HIRISE"
         }
-        return id_lookup[super().instrument_id]
+        key = super().instrument_id
+        if key not in id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return id_lookup[key]
 
     @property
     def sensor_name(self):
@@ -721,8 +735,13 @@ class MroCrismIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDist
           "J" : "MRO_CRISM_VNIR",
           "L" : "MRO_CRISM_IR"
         }
-        
-        return id_lookup[self.label["IsisCube"]["Instrument"]["SensorId"]]
+        try:
+          key = self.label["IsisCube"]["Instrument"]["SensorId"]
+        except KeyError:
+          raise WrongInstrumentException(f"Missing SensorId keyword. Expected SensorId in ISIS label.")
+        if key not in id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return id_lookup[key]
 
     @property
     def ephemeris_start_time(self):

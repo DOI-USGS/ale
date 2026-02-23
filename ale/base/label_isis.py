@@ -379,6 +379,11 @@ class IsisLabel():
         interframe_delay = self.label['IsisCube']['Instrument'].get('InterframeDelay', None)
         if interframe_delay == None:
             interframe_delay = self.label['IsisCube']['Instrument'].get('InterFrameDelay', None)
+        # if still None, return 0.0 delay
+        if interframe_delay == None:
+            interframe_delay = 0.0
+            return interframe_delay
+    
         if isinstance(interframe_delay, pvl.collections.Quantity):
             units = interframe_delay.units
             value = interframe_delay.value

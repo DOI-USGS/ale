@@ -2,7 +2,7 @@ import numpy as np
 import pvl
 
 from pyspiceql import pyspiceql
-from ale.base import Driver
+from ale.base import Driver, WrongInstrumentException
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
@@ -67,7 +67,10 @@ class MessengerMdisIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDist
         : str
           instrument id
         """
-        return ID_LOOKUP[super().instrument_id]
+        key = super().instrument_id
+        if key not in ID_LOOKUP:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return ID_LOOKUP[key]
 
 class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortion, Driver):
     """
@@ -125,7 +128,10 @@ class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortio
         : str
           instrument id
         """
-        return ID_LOOKUP[super().instrument_id]
+        key = super().instrument_id
+        if key not in ID_LOOKUP:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return ID_LOOKUP[key]
 
     @property
     def sampling_factor(self):
@@ -284,7 +290,10 @@ class MessengerMdisIsisLabelNaifSpiceDriver(IsisLabel, NaifSpice, Framer, NoDist
         : str
           instrument id
         """
-        return ID_LOOKUP[super().instrument_id]
+        key = super().instrument_id
+        if key not in ID_LOOKUP:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return ID_LOOKUP[key]
 
     @property
     def usgscsm_distortion_model(self):

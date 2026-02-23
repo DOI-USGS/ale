@@ -6,6 +6,7 @@ from ale.base.type_sensor import Framer
 from ale.base.type_distortion import RadialDistortion
 from ale.base.base import Driver
 from pyspiceql import pyspiceql
+from ale.base import WrongInstrumentException
 
 ssi_id_lookup = {
     "SOLID STATE IMAGING SYSTEM" : "GLL_SSI_PLATFORM"
@@ -27,7 +28,10 @@ class GalileoSsiIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
         : str
           instrument id
         """
-        return ssi_id_lookup[super().instrument_id]
+        key = super().instrument_id
+        if key not in ssi_id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return ssi_id_lookup[key]
 
     @property
     def sensor_name(self):

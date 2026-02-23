@@ -4,6 +4,7 @@ from ale.base.data_isis import read_table_data, parse_table
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import LineScanner, Framer, RollingShutter
 from ale.base.type_distortion import NoDistortion
+from ale.base import WrongInstrumentException
 
 ############################## HARD CODED VALUES ###############################
 # These values are hard coded from the SIS. As the kernels mature, they will
@@ -84,7 +85,10 @@ class ClipperEISWACFCIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDi
             "EIS WAC FC": "EUROPAM_EIS_WAC"
         }
 
-        return id_lookup[super().instrument_id]
+        key = super().instrument_id
+        if key not in id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return id_lookup[key]
 
     @property
     def fikid(self):
@@ -221,7 +225,10 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
             "EIS WAC PB": "EUROPAM_EIS_WAC"
         }
 
-        return id_lookup[super().instrument_id]
+        key = super().instrument_id
+        if key not in id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return id_lookup[key]
 
     @property
     def fikid(self):
@@ -358,7 +365,10 @@ class ClipperEISNACFCIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDi
             "EIS NAC FC": "EUROPAM_EIS_NAC"
         }
 
-        return id_lookup[super().instrument_id]
+        key = super().instrument_id
+        if key not in id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return id_lookup[key]
 
     @property
     def fikid(self):
@@ -554,7 +564,10 @@ class ClipperEISNACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
             "EIS NAC PB": "EUROPAM_EIS_NAC"
         }
 
-        return id_lookup[super().instrument_id]
+        key = super().instrument_id
+        if key not in id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return id_lookup[key]
 
     @property
     def fikid(self):

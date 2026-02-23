@@ -5,7 +5,7 @@ import numpy as np
 
 import pvl
 from pyspiceql import pyspiceql
-from ale.base import Driver
+from ale.base import Driver, WrongInstrumentException
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
 from ale.base.label_pds3 import Pds3Label
@@ -141,7 +141,10 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
         : str
           instrument id
         """
-        return iss_id_lookup[super().instrument_id]
+        try:
+            return iss_id_lookup[super().instrument_id]
+        except KeyError:
+            raise WrongInstrumentException(f"Unknown instrument id: {super().instrument_id}.")
 
     @property
     def spacecraft_name(self):
@@ -320,7 +323,10 @@ class CassiniVimsIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoD
     @property
     def vims_channel(self):
         if not hasattr(self, '_vims_channel'):
-            self._vims_channel = self.label['IsisCube']["Instrument"]["Channel"]
+            try:
+                self._vims_channel = self.label['IsisCube']["Instrument"]["Channel"]
+            except KeyError:
+                raise WrongInstrumentException(f"Missing Channel keyword. Expected Channel in ISIS label.")
         return self._vims_channel
 
     @property
@@ -337,7 +343,10 @@ class CassiniVimsIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoD
         : str
           instrument id
         """
-        return vims_id_lookup[super().instrument_id + "_" + self.vims_channel]
+        key = super().instrument_id + "_" + self.vims_channel
+        if key not in vims_id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return vims_id_lookup[key]
 
     @property
     def sensor_name(self):
@@ -468,8 +477,15 @@ class CassiniVimsIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, NoD
           instrument id
         """
 
-        image_type = self.label['IsisCube']["Instrument"]["Channel"]
-        return vims_id_lookup[super().instrument_id + "_" + image_type]
+        try:
+            image_type = self.label['IsisCube']["Instrument"]["Channel"]
+        except KeyError:
+            raise WrongInstrumentException(f"Unknown instrument id: {super().instrument_id}.")
+        
+        key = super().instrument_id + "_" + image_type
+        if key not in vims_id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return vims_id_lookup[key]
 
     @property
     def sensor_name(self):
@@ -538,7 +554,10 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         : str
           instrument id
         """
-        return iss_id_lookup[super().instrument_id]
+        try:
+            return iss_id_lookup[super().instrument_id]
+        except KeyError:
+            raise WrongInstrumentException(f"Unknown instrument id: {super().instrument_id}.")
 
     @property
     def focal_epsilon(self):
@@ -763,7 +782,10 @@ class CassiniIssIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistort
         : str
           ID of the sensor
         """
-        return iss_id_lookup[super().instrument_id]
+        try:
+            return iss_id_lookup[super().instrument_id]
+        except KeyError:
+            raise WrongInstrumentException(f"Unknown instrument id: {super().instrument_id}.")
 
     @property
     def sensor_name(self):

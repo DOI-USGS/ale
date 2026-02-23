@@ -1,6 +1,7 @@
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
 import json 
+import logging 
 
 from ale.base.type_sensor import LineScanner, Framer, Radar, PushFrame
 from ale import logger
@@ -21,7 +22,25 @@ def to_isd(driver):
     """
      
     driver_data = driver.to_dict()
-    logger.debug(f"driver_data:\n{driver_data}")
+    if logger.isEnabledFor(logging.DEBUG):
+        for k, v in driver_data.items():
+            if isinstance(v, list):
+                    if len(v) > 100: v = v[:10] + [f"..."] + v[-10:]
+                    logger.debug(f"{k}: {v}")
+            logger.debug(f"{k}: {v}")
+    
+    if driver_data["frame_chain"] is None:
+        raise ValueError("Frame chain is empty, no rotation information available.")
+
+    if driver_data["sensor_position"] is None:
+        raise ValueError("Sensor position is empty, no position information available.")
+
+    if driver_data["sun_position"] is None:
+        raise ValueError("Sun position is empty, no position information available.")
+
+    if driver_data["naif_keywords"] is None:
+        raise ValueError("Naif keywords are empty, no keywords available.")
+
     isd = {}
     isd['isis_camera_version'] = driver_data["sensor_model_version"]
 

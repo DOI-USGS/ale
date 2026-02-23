@@ -138,7 +138,12 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
 
     logger.debug(f"Request URL={str(response.url)}")
     logger.debug(f"Kernels={str(response.json()['body']['kernels'])}")
-    logger.debug(f"Data={str(response.json()['body']['return'])}")
+    if logger.isEnabledFor(logging.DEBUG):
+        if isinstance(response.json()['body']['return'], list) and len(response.json()['body']['return']) > 100:
+            datastr = response.json()['body']['return'][:10] + [f"..."] + response.json()['body']['return'][-10:]
+        else:
+            datastr = str(response.json()['body']['return'])
+    logger.debug(f"Data={datastr}")
     return response.json()["body"]["return"]
 
 def get_ephem_data(times, function_name, batch_size=300, web=False, function_args={}):

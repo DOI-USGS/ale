@@ -3,6 +3,7 @@ from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
 from ale.base.type_distortion import RadialDistortion, NoDistortion
 from ale.base.base import Driver
+from ale.base import WrongInstrumentException
 
 class HayabusaAmicaIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDistortion, Driver):
 
@@ -17,7 +18,10 @@ class HayabusaAmicaIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Radial
           Name of the instrument
         """
         lookup_table = {'AMICA': 'HAYABUSA_AMICA'}
-        return lookup_table[super().instrument_id]
+        key = super().instrument_id
+        if key not in lookup_table:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return lookup_table[key]
     
     @property
     def center_ephemeris_time(self):
@@ -68,7 +72,10 @@ class HayabusaNirsIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDisto
           Name of the instrument
         """
         lookup_table = {'NIRS': 'HAYABUSA_NIRS'}
-        return lookup_table[super().instrument_id]
+        key = super().instrument_id
+        if key not in lookup_table:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return lookup_table[key]
 
     @property
     def sensor_model_version(self):
