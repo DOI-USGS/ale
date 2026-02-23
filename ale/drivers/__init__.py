@@ -107,7 +107,10 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
     """
     if isinstance(formatter, str):
         formatter = __formatters__[formatter]
-    
+
+    if isinstance(props, str):
+        props = json.loads(props)
+
     logger_level = logger.getEffectiveLevel()
     if verbose:
         logger.setLevel(logging.DEBUG)
