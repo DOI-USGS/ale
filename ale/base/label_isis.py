@@ -73,7 +73,10 @@ class IsisLabel():
         : str
           instrument id
         """
-        return self.label['IsisCube']['Instrument']['InstrumentId']
+        try:
+            return self.label['IsisCube']['Instrument']['InstrumentId']
+        except KeyError:
+            raise WrongLabelTypeException(f"Missing InstrumentId keyword. Expected InstrumentId in ISIS label.")
 
     @property
     def platform_name(self):
