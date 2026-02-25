@@ -40,11 +40,7 @@ logger.debug(f"ALE python version: {sys.version.split(' ')[0]}")
 logger.debug(f"ALE Log Level {log_level}")
 
 try:
-    spice_root = os.environ.get('ALESPICEROOT', None) 
-    if spice_root is None:
-        spice_root = os.environ.get('ISISDATA', None)
-        if spice_root is None:
-            spice_root = os.environ.get('SPICEROOT', None)
+    spice_root = os.environ['ALESPICEROOT']
 except:
     spice_root = None
 
