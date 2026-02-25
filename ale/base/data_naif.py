@@ -101,7 +101,7 @@ class NaifSpice():
                     else:
                         self._kernels = self._props['kernels']
             elif self.search_kernels == True:
-                pyspiceql.setCacheDir(str(Path(spice_root) / "base"))
+                pyspiceql.setDbFilePath(str(Path(spice_root) / "base"))
                 _, kernels = pyspiceql.searchForKernelsets([self.spiceql_mission, self.target_name, "base"], startTime=self.ephemeris_start_time, stopTime=self.ephemeris_stop_time, useWeb=self.use_web)
                 self._kernels = kernels  
             elif spice_root and not self.use_web:
