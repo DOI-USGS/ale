@@ -13,12 +13,6 @@ class WrongLabelTypeException(Exception):
     pass
 
 
-class IsdCreationException(Exception):
-    """
-    Exception raised when an ISD cannot be created.
-    """
-    pass
-
 spiceql_mission_map = {
     "APOLLO_METRIC" : "apollo15_metric", 
     "CHANDRAYAAN-1_M3": "m3",
