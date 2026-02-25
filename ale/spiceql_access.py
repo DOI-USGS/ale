@@ -143,7 +143,6 @@ def spiceql_call(function_name = "", function_args = {}, use_web=False):
             datastr = response.json()['body']['return'][:10] + [f"..."] + response.json()['body']['return'][-10:]
         else:
             datastr = str(response.json()['body']['return'])
-    logger.debug(f"Data={datastr}")
     return response.json()["body"]["return"]
 
 def get_ephem_data(times, function_name, batch_size=300, web=False, function_args={}):
