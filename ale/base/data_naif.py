@@ -10,6 +10,7 @@ import numpy as np
 import scipy.constants
 from scipy.spatial.transform import Rotation as R
 import pyspiceql
+from pathlib import Path
 
 from ale.base import spiceql_mission_map
 from ale.base.type_sensor import LineScanner
@@ -100,6 +101,7 @@ class NaifSpice():
                     else:
                         self._kernels = self._props['kernels']
             elif self.search_kernels == True:
+                pyspiceql.setCacheDir(str(Path(spice_root) / "base"))
                 _, kernels = pyspiceql.searchForKernelsets([self.spiceql_mission, self.target_name, "base"], startTime=self.ephemeris_start_time, stopTime=self.ephemeris_stop_time, useWeb=self.use_web)
                 self._kernels = kernels  
             elif spice_root and not self.use_web:
