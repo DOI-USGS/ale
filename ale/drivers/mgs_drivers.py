@@ -1,4 +1,4 @@
-from ale.base import Driver
+from ale.base import Driver, WrongInstrumentException
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
 from ale.base.label_pds3 import Pds3Label
@@ -32,7 +32,10 @@ class MgsMocNarrowAngleCameraIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, Na
         id_lookup = {
         "MOC-NA" : "MGS_MOC_NA"
         }
-        return id_lookup[super().instrument_id]
+        key = super().instrument_id
+        if key not in id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return id_lookup[key]
 
 
     @property
@@ -164,7 +167,10 @@ class MgsMocWideAngleCameraIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, Naif
         id_lookup = {
         "MOC-WA" : "MGS_MOC_WA_"
         }
-        pref = id_lookup[super().instrument_id]
+        key = super().instrument_id
+        if key not in id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        pref = id_lookup[key]
         bandbin_filter = self.label['IsisCube']['BandBin']['FilterName']
         return pref+bandbin_filter
 

@@ -5,6 +5,7 @@ from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
 from ale.base.type_distortion import NoDistortion
 from ale.base.base import Driver
+from ale.base import WrongInstrumentException
 from pyspiceql import pyspiceql
 
 sensor_name_lookup = {
@@ -37,7 +38,7 @@ class VikingIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
         instrument_id = super().instrument_id
 
         if(instrument_id not in sensor_name_lookup):
-            raise Exception (f'Instrument ID [{instrument_id}] is wrong.')
+            raise WrongInstrumentException (f'Instrument ID [{instrument_id}] is wrong.')
 
         return instrument_id
 
@@ -183,7 +184,7 @@ class VikingIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistortion,
         instrument_id = super().instrument_id
 
         if(instrument_id not in sensor_name_lookup):
-            raise Exception (f'Instrument ID [{instrument_id}] is wrong.')
+            raise WrongInstrumentException (f'Instrument ID [{instrument_id}] is wrong.')
 
         return instrument_id
 

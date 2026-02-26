@@ -1,6 +1,6 @@
 from ale.base.data_isis import IsisSpice
 from ale.base.label_isis import IsisLabel
-from ale.base import Driver
+from ale.base import Driver, WrongInstrumentException
 from ale.base.type_sensor import LineScanner
 from ale.base.type_distortion import NoDistortion
 
@@ -23,7 +23,7 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
         instrument_id = super().instrument_id
 
         if instrument_id != "IdealCamera":
-            raise Exception(f"Instrument ID is {instrument_id} when it should be \"IdealCamera\"")
+            raise WrongInstrumentException(f"Instrument ID is {instrument_id} when it should be \"IdealCamera\"")
 
         return instrument_id
 

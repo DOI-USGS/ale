@@ -8,7 +8,7 @@ import struct
 import warnings
 
 from pyspiceql import pyspiceql
-from ale.base import Driver
+from ale.base import Driver, WrongInstrumentException
 from ale.base.data_isis import read_table_data
 from ale.base.data_isis import parse_table
 from ale.base.data_naif import NaifSpice
@@ -159,7 +159,7 @@ class MexHrscPds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, NoDisto
           Short name of the instrument
         """
         if(super().instrument_id != "HRSC"):
-            raise Exception ("Instrument ID is wrong.")
+            raise WrongInstrumentException ("Instrument ID is wrong.")
         return self.label['DETECTOR_ID']
 
 
@@ -509,7 +509,7 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDisto
         Name of the instrument
       """
       if(super().instrument_id != "HRSC"):
-          raise Exception ("Instrument ID is wrong.")
+          raise WrongInstrumentException ("Instrument ID is wrong.")
       return self.label['IsisCube']['Archive']['DetectorId']
 
 
@@ -751,11 +751,12 @@ class MexSrcPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortion,
         : str
           Short name of the instrument
         """
-        if(super().instrument_id != "HRSC"):
-            raise Exception ("Instrument ID is wrong.")
-        return self.label['DETECTOR_ID']
+        try:
+          return self.label['DETECTOR_ID']
+        except KeyError:
+          raise WrongInstrumentException (f"Unknown instrument id. Expected DETECTOR_ID in PDS3 label.")
 
-
+          
     @property
     def sensor_name(self):
         """
@@ -902,7 +903,7 @@ class MexSrcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
           Short name of the instrument
         """
         if(super().instrument_id != "SRC"):
-            raise Exception ("Instrument ID is wrong.")
+            raise WrongInstrumentException ("Instrument ID is wrong.")
         return self.label['IsisCube']['Archive']['DetectorId']
 
 

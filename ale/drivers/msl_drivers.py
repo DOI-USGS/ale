@@ -6,6 +6,7 @@ from ale.base.type_sensor import Framer
 from ale.base.type_distortion import CahvorDistortion
 from ale.base.type_sensor import Cahvor
 from ale.base.base import Driver
+from ale.base import WrongInstrumentException
 
 class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, CahvorDistortion, Driver):
     """
@@ -45,7 +46,10 @@ class MslMastcamPds3NaifSpiceDriver(Cahvor, Framer, Pds3Label, NaifSpice, Cahvor
           "NAV_RIGHT_B": 'NAVCAM_RIGHT_B',
           "NAV_LEFT_B": 'NAVCAM_LEFT_B'
         }
-        return self.instrument_host_id + "_" + lookup[super().instrument_id]
+        key = super().instrument_id
+        if key not in lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return self.instrument_host_id + "_" + lookup[key]
 
     @property
     def is_navcam(self):

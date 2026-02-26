@@ -1,5 +1,6 @@
 import math
 from ale.base.base import Driver
+from ale.base import WrongInstrumentException
 from ale.base.type_distortion import ThemisIrDistortion, NoDistortion
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
@@ -24,7 +25,7 @@ class OdyThemisIrIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, The
         inst_id = super().instrument_id
 
         if inst_id not in ["THEMIS_IR"]:
-            raise Exception(f"{inst_id} is not a valid THEMIS IR instrument name. Expecting THEMIS_IR")
+            raise WrongInstrumentException(f"{inst_id} is not a valid THEMIS IR instrument name. Expecting THEMIS_IR")
         return inst_id
 
     @property
@@ -263,7 +264,7 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
         inst_id = super().instrument_id
 
         if inst_id not in ["THEMIS_VIS"]:
-            raise Exception(f"{inst_id} is not a valid THEMIS VIS instrument name. Expecting \"THEMIS_VIS\"")
+            raise WrongInstrumentException(f"{inst_id} is not a valid THEMIS VIS instrument name. Expecting \"THEMIS_VIS\"")
 
         return inst_id
 

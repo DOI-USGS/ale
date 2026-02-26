@@ -6,7 +6,7 @@ import numpy as np
 
 from scipy.interpolate import CubicSpline
 
-from ale.base import Driver
+from ale.base import Driver, WrongInstrumentException
 from ale.base.label_isis import IsisLabel
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
@@ -47,7 +47,8 @@ class DawnFcPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, Driver):
         """
         instrument_id = super().instrument_id
         filter_number = self.filter_number
-
+        if instrument_id not in ID_LOOKUP:
+            raise WrongInstrumentException(f"Unknown instrument id: {instrument_id}.")
         return "{}_FILTER_{}".format(ID_LOOKUP[instrument_id], filter_number)
 
     @property
@@ -231,12 +232,17 @@ class DawnFcIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion,
         : str
           instrument id
         """
-        if not hasattr(self, "_instrument_id"):
-          instrument_id = super().instrument_id
-          filter_number = self.filter_number
-          self._instrument_id = "{}_FILTER_{}".format(ID_LOOKUP[instrument_id], filter_number)
+        try: 
+          if not hasattr(self, "_instrument_id"):
+            instrument_id = super().instrument_id
+            filter_number = self.filter_number
+            if instrument_id not in ID_LOOKUP:
+                raise WrongInstrumentException(f"Unknown instrument id: {instrument_id}.")
+            self._instrument_id = "{}_FILTER_{}".format(ID_LOOKUP[instrument_id], filter_number)
 
-        return self._instrument_id
+          return self._instrument_id
+        except KeyError:
+          raise WrongInstrumentException(f"Unknown instrument id. Expected FC1 or FC2 in ISIS label.")
     
     @property
     def filter_number(self):
@@ -415,7 +421,10 @@ class DawnVirIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDisto
           Name of the instrument
         """
         lookup_table = {'VIR': 'Visual and Infrared Spectrometer'}
-        return lookup_table[super().instrument_id]
+        key = super().instrument_id
+        if key not in lookup_table:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return lookup_table[key]
     
     @property
     def sensor_name(self):

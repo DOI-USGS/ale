@@ -10,6 +10,8 @@ import json
 import numpy as np
 import os
 import traceback
+from ale.base import WrongInstrumentException, WrongLabelTypeException
+import logging
 
 from ale.formatters.usgscsm_formatter import to_usgscsm
 from ale.formatters.isis_formatter import to_isis
@@ -105,7 +107,17 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
     """
     if isinstance(formatter, str):
         formatter = __formatters__[formatter]
-    
+
+    if isinstance(props, str):
+        if props == "": 
+            props = {}
+        else:
+            props = json.loads(props)
+
+    logger_level = logger.getEffectiveLevel()
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
     driver_mask = [only_isis_spice, only_naif_spice]
     class_list = [IsisSpice, NaifSpice]
     class_list = list(compress(class_list, driver_mask))
@@ -171,13 +183,21 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
                 if verbose:
                     logger.info(f"Success with: {driver.__class__.__name__}")
                     logger.info(f"ISD:\n{json.dumps(isd, indent=2, cls=AleJsonEncoder)}")
+                    logger.setLevel(logger_level)
                 return isd
+        except WrongLabelTypeException as e:
+            if verbose:
+                logger.info(f"Wrong label type for driver {driver.__class__.__name__}: {e}. Skipping driver.")
+        except WrongInstrumentException as e:
+            if verbose:
+                logger.info(f"Wrong instrument id for driver {driver.__class__.__name__}: {e}. Skipping driver.")
         except Exception as e:
             if verbose:
                 traceback.print_exc()
         if verbose:
-            logger.info(f'End {driver}\n\n')
-
+            logger.info(f'End {driver}\n')
+    if verbose:
+        logger.setLevel(logger_level)
     raise Exception('No Such Driver for Label')
 
 

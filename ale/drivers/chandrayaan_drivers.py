@@ -1,6 +1,6 @@
 import spiceypy as spice
 
-from ale.base import Driver
+from ale.base import Driver, WrongInstrumentException
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.label_pds3 import Pds3Label
@@ -216,7 +216,10 @@ class Chandrayaan1M3IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, 
         inst_id_lookup = {
             "M3" : "CHANDRAYAAN-1_M3"
         }
-        return inst_id_lookup[super().instrument_id] 
+        key = super().instrument_id
+        if key not in inst_id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return inst_id_lookup[key] 
     
     @property
     def sensor_model_version(self):
@@ -245,7 +248,10 @@ class Chandrayaan1MRFFRIsisLabelNaifSpiceDriver(Radar, IsisLabel, NaifSpice, Cha
         inst_id_lookup = {
             "MRFFR" : "CHANDRAYAAN-1_MRFFR"
         }
-        return inst_id_lookup[super().instrument_id] 
+        key = super().instrument_id
+        if key not in inst_id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return inst_id_lookup[key] 
 
     @property
     def spacecraft_name(self):
@@ -457,8 +463,11 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
             -152210 : "CH2_TMC_NADIR",
             -152212 : "CH2_TMC_AFT"
         }
-        return naif_to_inst_id_lookup[self.ikid]
-    
+        try:
+            return naif_to_inst_id_lookup[self.ikid]
+        except KeyError:
+            raise WrongInstrumentException(f"Unknown instrument ikid: {self.ikid}.")
+   
     @property
     def ikid(self):
         """
@@ -645,7 +654,10 @@ class Chandrayaan2OHRCIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         inst_id_lookup = {
             "OHRC" : "CH2_OHRC"
         }
-        return inst_id_lookup[super().instrument_id] 
+        key = super().instrument_id
+        if key not in inst_id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return inst_id_lookup[key] 
     
     @property
     def ikid(self):

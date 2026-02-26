@@ -6,7 +6,7 @@ from scipy.spatial.transform import Rotation
 from scipy.interpolate import CubicSpline
 
 
-from ale.base import Driver
+from ale.base import Driver, WrongInstrumentException
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import read_table_data, parse_table
 from ale.base.label_isis import IsisLabel
@@ -32,7 +32,15 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
             "VIRTIS_M_VIS" : "ROS_VIRTIS-M_VIS",
             "VIRTIS_M_IR" : "ROS_VIRTIS-M_IR",
         }
-        return inst_id_lookup[self.label['IsisCube']['Instrument']['ChannelID']] 
+        
+        try:
+          key = self.label['IsisCube']['Instrument']['ChannelID']
+        except KeyError:
+          raise WrongInstrumentException(f"Missing ChannelID keyword. Expected ChannelID in ISIS label.")
+        
+        if key not in inst_id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return inst_id_lookup[key] 
     
 
     @property

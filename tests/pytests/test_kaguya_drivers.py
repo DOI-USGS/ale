@@ -194,7 +194,7 @@ class test_kaguyatc_isis_isis(unittest.TestCase):
 
     def test_bad_instrument_id(self):
         self.driver.label['IsisCube']['Instrument']['InstrumentId'] = 'FAIL'
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ale.base.WrongInstrumentException):
             self.driver.instrument_id
 
     def test_spacecraft_name(self):

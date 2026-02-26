@@ -1,7 +1,7 @@
 
 from pyspiceql import pyspiceql
 
-from ale.base import Driver
+from ale.base import Driver, WrongInstrumentException, WrongLabelTypeException
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
 from ale.base.label_pds3 import Pds3Label
@@ -18,7 +18,7 @@ class KaguyaTcIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, Kaguya
     def instrument_id(self):
       iid = self.label['IsisCube']['Instrument']['InstrumentId']
       if iid not in self.VALID_INSTRUMENT_IDS:
-        raise ValueError(f"Instrument ID: '{iid}' not in VALID_INSTRUMENT_IDS list. Failing.")
+        raise WrongInstrumentException(f"Instrument ID: '{iid}' not in VALID_INSTRUMENT_IDS list. Failing.")
       return iid
 
 
@@ -593,7 +593,10 @@ class KaguyaTcIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, Driver
         : str
           instrument id
         """
+        VALID_INSTRUMENT_IDS = ['TC1', 'TC2']
         instrument = super().instrument_id
+        if instrument not in VALID_INSTRUMENT_IDS:
+            raise WrongInstrumentException(f"Unknown instrument id: {instrument}. Expected one of: {VALID_INSTRUMENT_IDS}")
         swath = self.label["IsisCube"]["Instrument"]["SwathModeId"][0]
         sd = self.label["IsisCube"]["Archive"]["ProductSetId"].split("_")[1].upper()
 
@@ -912,7 +915,10 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
             "MN3" : "MI-NIR3",
             "MN4" : "MI-NIR4"
         }
-        base_band = band_map[self.label.get("BASE_BAND")]
+        try:
+          base_band = band_map[self.label.get("BASE_BAND")]
+        except KeyError:
+          raise WrongLabelTypeException(f"Missing Base Band keyword. Expected BASE_BAND in PDS3 label.")
         return base_band
 
     @property
@@ -927,7 +933,10 @@ class KaguyaMiPds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, KaguyaSelen
           instrument id
         """
 
-        id = f"LISM_{self.base_band}"
+        try:
+          id = f"LISM_{self.base_band}"
+        except KeyError:
+          raise WrongLabelTypeException(f"Missing Base Band keyword. Expected BASE_BAND in PDS3 label.")
         return id
 
     @property
@@ -1247,7 +1256,10 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
             "MN3" : "MI-NIR3",
             "MN4" : "MI-NIR4"
         }
-        base_band = band_map[self.label['IsisCube']['BandBin']['BaseBand']]
+        try: 
+          base_band = band_map[self.label['IsisCube']['BandBin']['BaseBand']]
+        except KeyError:
+          raise WrongLabelTypeException(f"Missing Base Band keyword. Expected BaseBand in ISIS label.")
         return base_band
 
     @property
@@ -1261,7 +1273,6 @@ class KaguyaMiIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Kaguya
         : str
           instrument id
         """
-
         id = f"LISM_{self.base_band}"
         return id
 

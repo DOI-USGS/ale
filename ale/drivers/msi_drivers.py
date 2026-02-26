@@ -1,4 +1,4 @@
-from ale.base import Driver
+from ale.base import Driver, WrongInstrumentException
 from ale.base.label_isis import IsisLabel
 from ale.base.data_naif import NaifSpice
 from ale.base.type_distortion import NoDistortion
@@ -28,7 +28,10 @@ class MsiIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Dr
           instrument id
         """
         lookup_table = {"MSI": "NEAR EARTH ASTEROID RENDEZVOUS"}
-        return lookup_table[super().instrument_id]
+        key = super().instrument_id
+        if key not in lookup_table:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return lookup_table[key]
     
     @property
     def center_ephemeris_time(self):

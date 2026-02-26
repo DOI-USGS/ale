@@ -73,7 +73,10 @@ class IsisLabel():
         : str
           instrument id
         """
-        return self.label['IsisCube']['Instrument']['InstrumentId']
+        try:
+            return self.label['IsisCube']['Instrument']['InstrumentId']
+        except KeyError:
+            raise WrongLabelTypeException(f"Missing InstrumentId keyword. Expected InstrumentId in ISIS label.")
 
     @property
     def platform_name(self):
@@ -379,6 +382,11 @@ class IsisLabel():
         interframe_delay = self.label['IsisCube']['Instrument'].get('InterframeDelay', None)
         if interframe_delay == None:
             interframe_delay = self.label['IsisCube']['Instrument'].get('InterFrameDelay', None)
+        # if still None, return 0.0 delay
+        if interframe_delay == None:
+            interframe_delay = 0.0
+            return interframe_delay
+    
         if isinstance(interframe_delay, pvl.collections.Quantity):
             units = interframe_delay.units
             value = interframe_delay.value
