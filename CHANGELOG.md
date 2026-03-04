@@ -35,6 +35,8 @@ release.
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-03-03
+
 ## Added
 - Added better logging when running verbose on ale::load [#688](https://github.com/DOI-USGS/ale/pull/688)
 
