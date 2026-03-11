@@ -109,10 +109,12 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
         formatter = __formatters__[formatter]
 
     if isinstance(props, str):
-        if props == "": 
+        if props in ("", "null"): 
             props = {}
         else:
             props = json.loads(props)
+    else:
+        props = {}
 
     logger_level = logger.getEffectiveLevel()
     if verbose:
