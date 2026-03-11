@@ -35,9 +35,12 @@ release.
 
 ## [Unreleased]
 
+### Fixed
+- Fixed the `props` checker to catch string "null" [#690](https://github.com/DOI-USGS/ale/pull/690)
+
 ## [1.1.2] - 2026-03-03
 
-## Added
+### Added
 - Added better logging when running verbose on ale::load [#688](https://github.com/DOI-USGS/ale/pull/688)
 
 ## [1.1.1] - 2026-02-20
