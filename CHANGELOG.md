@@ -36,7 +36,7 @@ release.
 ## [Unreleased]
 
 ### Fixed
-- Fixed the `props` checker to catch string "null" and default to an empty dict [#690](https://github.com/DOI-USGS/ale/pull/690)
+- Fixed the `props` checker to catch string "null" [#690](https://github.com/DOI-USGS/ale/pull/690)
 
 ## [1.1.2] - 2026-03-03
 
