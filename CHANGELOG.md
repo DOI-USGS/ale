@@ -33,7 +33,7 @@ heading to indicate that only the bug fixes and security fixes are in the bug fi
 release.
 -->
 
-## [Unreleased]
+## [1.1.3] - 2026-03-12
 
 ### Fixed
 - Fixed the `props` checker to catch string "null" [#690](https://github.com/DOI-USGS/ale/pull/690)

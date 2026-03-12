@@ -573,7 +573,7 @@
     },
 
     "homepageURL": "https://code.usgs.gov/astrogeology/ale/-/tree/1.1.2",
-    "downloadURL": "https://code.usgs.gov/astrogeology/ale/-/archive/1.1.1/ale-1.1.2.zip",
+    "downloadURL": "https://code.usgs.gov/astrogeology/ale/-/archive/1.1.2/ale-1.1.2.zip",
     "disclaimerURL": "https://code.usgs.gov/astrogeology/ale/-/raw/1.1.2/DISCLAIMER.md",
     "repositoryURL": "https://code.usgs.gov/astrogeology/ale.git",
     "vcs": "git",
@@ -601,4 +601,52 @@
     "date": {
       "metadataLastUpdated": "2026-03-03"
     }
+  },
+  {
+    "name": "ale",
+    "organization": "U.S. Geological Survey",
+    "description": "GitLab repository for the Abstraction Layer for Ephemerides package",
+    "version": "1.1.3",
+    "status": "Production",
+
+    "permissions": {
+      "usageType": "openSource",
+      "licenses": [
+        {
+          "name": "Public Domain, CC0-1.0",
+          "URL": "https://code.usgs.gov/astrogeology/ale/-/raw/1.1.3/LICENSE.md"
+        }
+      ]
+    },
+
+    "homepageURL": "https://code.usgs.gov/astrogeology/ale/-/tree/1.1.3",
+    "downloadURL": "https://code.usgs.gov/astrogeology/ale/-/archive/1.1.3/ale-1.1.3.zip",
+    "disclaimerURL": "https://code.usgs.gov/astrogeology/ale/-/raw/1.1.3/DISCLAIMER.md",
+    "repositoryURL": "https://code.usgs.gov/astrogeology/ale.git",
+    "vcs": "git",
+
+    "laborHours": 480,
+
+    "tags": [
+      "Planetary",
+      "Remote Sensing",
+      "Data Processing",
+      "Ephemerides",
+      "Community Sensor Model"
+    ],
+
+    "languages": [
+      "C++",
+      "Python"
+    ],
+
+    "contact": {
+      "name": "Christine Kim",
+      "email": "chkim@usgs.gov"
+    },
+
+    "date": {
+      "metadataLastUpdated": "2026-03-12"
+    }
+  }
 ]
