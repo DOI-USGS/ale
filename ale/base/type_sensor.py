@@ -99,13 +99,12 @@ class LineScanner():
         if not hasattr(self, "_ephemeris_time"):
             # Sample at most every 10th line to keep ISD file size in check
             # for large linescan images (e.g., 177k lines for Chandrayaan-2 TMC).
-            # For small images (under ~250 lines), keep one sample per line
-            # to avoid reducing below the USGSCSM minimum of 25 samples.
-            # Can be overridden via props['num_ephem_samples'].
+            # For images under ~1000 lines, keep one sample per line to avoid
+            # reducing below 100 samples. Can be overridden via props.
             num_samples = self._props.get('num_ephem_samples', None) if hasattr(self, '_props') else None
             if num_samples is None:
                 reduced = self.image_lines // 10 + 1
-                num_samples = reduced if reduced >= 25 else self.image_lines + 1
+                num_samples = reduced if reduced >= 100 else self.image_lines + 1
             self._ephemeris_time = np.linspace(self.ephemeris_start_time, self.ephemeris_stop_time, num_samples)
         return self._ephemeris_time
 
