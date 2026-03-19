@@ -9,6 +9,7 @@ from itertools import chain, compress
 import json
 import numpy as np
 import os
+import os.path
 import traceback
 from ale.base import WrongInstrumentException, WrongLabelTypeException
 import logging
@@ -127,6 +128,10 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
     driver_list = [inspect.getmembers(dmod, predicate) for dmod in __driver_modules__]
     drivers = chain.from_iterable(driver_list)
     drivers = sort_drivers([d[1] for d in drivers])
+
+    if not os.path.isfile(label):
+        raise Exception("File not found.")
+        
 
     if verbose:
         logger.info("Attempting to pre-parse label file")
