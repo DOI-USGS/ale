@@ -130,8 +130,10 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
     drivers = sort_drivers([d[1] for d in drivers])
 
     if not os.path.isfile(label):
-        raise Exception("File not found.")
-        
+        raise FileNotFoundError('File "' + label + '" not found. \n' + 
+                                'Current Working Directory: "' + os.getcwd() + 
+                                '". \nMake sure your cube is present in your working directory, ' +
+                                'or that you specify the full and correct path to your cube.')
 
     if verbose:
         logger.info("Attempting to pre-parse label file")
