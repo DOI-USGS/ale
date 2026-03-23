@@ -97,14 +97,23 @@ class LineScanner():
           ephemeris times split based on image lines
         """
         if not hasattr(self, "_ephemeris_time"):
-            # Sample at most every 10th line to keep ISD file size in check
-            # for large linescan images (e.g., 177k lines for Chandrayaan-2 TMC).
-            # For images under ~1000 lines, keep one sample per line to avoid
-            # reducing below 100 samples. Can be overridden via props.
-            num_samples = self._props.get('num_ephem_samples', None) if hasattr(self, '_props') else None
-            if num_samples is None:
-                reduced = self.image_lines // 10 + 1
+            # Determine reduction mode. Default is "linear" (subsample every
+            # Nth line). Set reduction=None via props to keep one-per-line.
+            props = self._props if hasattr(self, '_props') else {}
+            reduction = props.get('reduction', 'linear')
+            rate = props.get('ephem_sample_rate', 10)
+
+            if reduction == 'linear':
+                # Sample at most every Nth line to keep ISD file size in check
+                # for large linescan images (e.g., 177k lines for Chandrayaan-2
+                # TMC). For images under ~1000 lines, keep one sample per line
+                # to avoid reducing below 100 samples.
+                reduced = self.image_lines // rate + 1
                 num_samples = reduced if reduced >= 100 else self.image_lines + 1
+            else:
+                # No reduction: one sample per line (original behavior)
+                num_samples = self.image_lines + 1
+
             self._ephemeris_time = np.linspace(self.ephemeris_start_time, self.ephemeris_stop_time, num_samples)
         return self._ephemeris_time
 
