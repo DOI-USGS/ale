@@ -33,6 +33,14 @@ heading to indicate that only the bug fixes and security fixes are in the bug fi
 release.
 -->
 
+## [Unreleased]
+
+### Changed
+- Reduced linescan ISD ephemeris sampling from one-per-line to every 10th line for images with 1000+ lines, significantly reducing ISD file sizes and load times for large sensors. Configurable via `reduction` and `ephem_sample_rate` props. [#677](https://github.com/DOI-USGS/ale/pull/677)
+
+### Fixed
+- Fixed Eigen 5.x compatibility by removing version constraint in CMakeLists.txt [#677](https://github.com/DOI-USGS/ale/pull/677)
+
 ## [1.1.3] - 2026-03-12
 
 ### Fixed
