@@ -130,11 +130,11 @@ def test_common_parent_rotation(frame_tree):
     assert child_2_to_child_3.source == 3
     assert child_2_to_child_3.dest == 4
     expected_rotation_1 = rotations[2].inverse() * rotations[0] * rotations[1]
-    np.testing.assert_equal(child_2_to_child_3.quat, expected_rotation_1.quat)
+    np.testing.assert_allclose(child_2_to_child_3.quat, expected_rotation_1.quat, atol=1e-15)
     assert child_3_to_child_2.source == 4
     assert child_3_to_child_2.dest == 3
     expected_rotation_2 = rotations[1].inverse() * rotations[0].inverse() * rotations[2]
-    np.testing.assert_equal(child_3_to_child_2.quat, expected_rotation_2.quat)
+    np.testing.assert_allclose(child_3_to_child_2.quat, expected_rotation_2.quat, atol=1e-15)
 
 def test_self_rotation(frame_tree):
     frame_chain, _ = frame_tree

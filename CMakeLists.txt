@@ -31,7 +31,7 @@ else()
 endif()
 
 if(ALE_USE_EXTERNAL_EIGEN)
-  find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+  find_package(Eigen3 REQUIRED NO_MODULE)
 else()
   add_library (eigen INTERFACE)
   add_library (Eigen3::Eigen ALIAS eigen)
