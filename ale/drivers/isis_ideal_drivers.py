@@ -1,4 +1,5 @@
 from ale.base.data_isis import IsisSpice
+from ale.base.data_isis import get_naif_keyword
 from ale.base.label_isis import IsisLabel
 from ale.base import Driver, WrongInstrumentException
 from ale.base.type_sensor import LineScanner
@@ -129,7 +130,8 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
         : list<double>
           detector to focal plane x
        """
-        return self.naif_keywords.get('IDEAL_TRANSX')
+        return get_naif_keyword(self, 'pixel2focal_x', 'IDEAL_TRANSX') 
+        #return self.naif_keywords.get('IDEAL_TRANSX')
 
 
     @property
@@ -142,7 +144,8 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
         : list<double>
           detector to focal plane y
        """
-        return self.naif_keywords.get('IDEAL_TRANSY')
+        return get_naif_keyword(self, 'pixel2focal_y', 'IDEAL_TRANSY') 
+        #return self.naif_keywords.get('IDEAL_TRANSY')
 
 
     @property
@@ -155,8 +158,8 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
         : list<double>
           focal plane to detector lines
        """
-
-        return self.naif_keywords.get('IDEAL_TRANSL')
+        return get_naif_keyword(self, 'focal2pixel_lines', 'IDEAL_TRANSL') 
+        #return self.naif_keywords.get('IDEAL_TRANSL')
 
 
     @property
@@ -169,7 +172,8 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
         : list<double>
           focal plane to detector samples
        """
-        return self.naif_keywords.get('IDEAL_TRANSS')
+        return get_naif_keyword(self, 'focal2pixel_samples', 'IDEAL_TRANSS') 
+        #return self.naif_keywords.get('IDEAL_TRANSS')
 
     @property
     def focal_length(self):
@@ -183,7 +187,8 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
         float :
             The focal length in millimeters
         """
-        return self.naif_keywords.get('IDEAL_FOCAL_LENGTH', None)
+        return get_naif_keyword(self, 'focal_length', 'IDEAL_FOCAL_LENGTH') 
+        #return self.naif_keywords.get('IDEAL_FOCAL_LENGTH', None)
 
     @property
     def detector_center_sample(self):
