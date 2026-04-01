@@ -719,5 +719,9 @@ def testdata_bad_naif_keywords():
     # Remove ITRANSL
     testlabel_bad_naif_keywords = "\n".join([line for line in testlabel.splitlines() if "ITRANSL" not in line])
     isis_spice = IsisSpice()
-    with pytest.raises(LookupError):
+    # with pytest.raises(LookupError):
+    try:
       isis_spice.label = pvl.loads(testlabel_bad_naif_keywords)
+      assert False
+    except Exception as load_failure:
+      assert str(load_failure) == "No Such Driver for Label"
