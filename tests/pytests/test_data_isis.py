@@ -519,11 +519,13 @@ def test_sun_position(testdata):
 
 
 def test_detector_center_sample(testdata):
-    assert testdata.detector_center_sample == None
+    with pytest.raises(LookupError):
+         testdata.detector_center_sample
 
 
 def test_detector_center_line(testdata):
-    assert testdata.detector_center_line == None
+    with pytest.raises(LookupError):
+        testdata.detector_center_line
 
 
 def test_focal_length(testdata):
@@ -714,14 +716,3 @@ def test_no_tables():
         test_mix_in.inst_position_table
     with pytest.raises(ValueError):
         test_mix_in.sun_position_table
-
-def testdata_bad_naif_keywords():
-    # Remove ITRANSL
-    testlabel_bad_naif_keywords = "\n".join([line for line in testlabel.splitlines() if "ITRANSL" not in line])
-    isis_spice = IsisSpice()
-    # with pytest.raises(LookupError):
-    try:
-      isis_spice.label = pvl.loads(testlabel_bad_naif_keywords)
-      assert False
-    except Exception as load_failure:
-      assert str(load_failure) == "No Such Driver for Label"
