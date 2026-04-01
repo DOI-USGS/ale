@@ -15,7 +15,6 @@ from ale.transformation import FrameChain
 from scipy.interpolate import interp1d, BPoly
 
 from ale.base.label_isis import IsisLabel
-from ale.base import get_naif_keyword
 
 def read_table_data(table_label, cube):
     """
@@ -151,7 +150,7 @@ def rotate_state(table, rotation):
 def get_naif_keyword(self, ale_name, naif_key):
     val = self.naif_keywords.get(naif_key, None)
     if val is None:
-        raise Exception('Could not find a value for {} using the NAIF Keyword {}'.format(ale_name, naif_key))
+        raise LookupError('Could not find a value for {} using the NAIF Keyword {}'.format(ale_name, naif_key))
     return val
 class IsisSpice():
     """

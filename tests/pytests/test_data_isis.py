@@ -714,3 +714,10 @@ def test_no_tables():
         test_mix_in.inst_position_table
     with pytest.raises(ValueError):
         test_mix_in.sun_position_table
+
+def testdata_bad_naif_keywords():
+    # Remove ITRANSL
+    testlabel_bad_naif_keywords = "\n".join([line for line in testlabel.splitlines() if "ITRANSL" not in line])
+    isis_spice = IsisSpice()
+    with pytest.raises(LookupError):
+      isis_spice.label = pvl.loads(testlabel_bad_naif_keywords)
