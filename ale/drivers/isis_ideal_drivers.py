@@ -131,7 +131,6 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
           detector to focal plane x
        """
         return get_naif_keyword(self, 'pixel2focal_x', 'IDEAL_TRANSX') 
-        #return self.naif_keywords.get('IDEAL_TRANSX')
 
 
     @property
@@ -145,7 +144,6 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
           detector to focal plane y
        """
         return get_naif_keyword(self, 'pixel2focal_y', 'IDEAL_TRANSY') 
-        #return self.naif_keywords.get('IDEAL_TRANSY')
 
 
     @property
@@ -159,7 +157,6 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
           focal plane to detector lines
        """
         return get_naif_keyword(self, 'focal2pixel_lines', 'IDEAL_TRANSL') 
-        #return self.naif_keywords.get('IDEAL_TRANSL')
 
 
     @property
@@ -173,7 +170,6 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
           focal plane to detector samples
        """
         return get_naif_keyword(self, 'focal2pixel_samples', 'IDEAL_TRANSS') 
-        #return self.naif_keywords.get('IDEAL_TRANSS')
 
     @property
     def focal_length(self):
@@ -188,7 +184,6 @@ class IdealLsIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, NoDisto
             The focal length in millimeters
         """
         return get_naif_keyword(self, 'focal_length', 'IDEAL_FOCAL_LENGTH') 
-        #return self.naif_keywords.get('IDEAL_FOCAL_LENGTH', None)
 
     @property
     def detector_center_sample(self):

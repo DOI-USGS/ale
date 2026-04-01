@@ -831,4 +831,3 @@ class CassiniIssIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistort
         """
         filters = self.label["IsisCube"]["BandBin"]['FilterName'].split("/")
         return get_naif_keyword(self, 'focal_length', 'INS{}_{}_{}_FOCAL_LENGTH'.format(self.ikid, filters[0], filters[1]))
-        #return self.naif_keywords.get('INS{}_{}_{}_FOCAL_LENGTH'.format(self.ikid, filters[0], filters[1]), None)
