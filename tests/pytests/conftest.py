@@ -148,7 +148,7 @@ def get_table_data(image, table_name):
     return read_table_data(table_label["Table"], table_file[0])
 
 
-def get_isd(instrument):
+def get_isd_path(instrument):
     if not isinstance(instrument, str):
         raise KeyError('instrument name is not a string')
 
@@ -156,7 +156,11 @@ def get_isd(instrument):
     if not label_file:
         raise Exception(f'Could not find label file for {instrument}')
 
-    return json.load(open(label_file[0]))
+    return label_file[0]
+
+
+def get_isd(instrument):
+    return json.load(open(get_isd_path(instrument)))
 
 
 def get_image_kernels(image):
