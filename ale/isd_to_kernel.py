@@ -3,6 +3,7 @@ import json
 import logging
 import os, sys
 import pyspiceql as psql
+import spiceypy as spice
 
 from enum import Enum
 from datetime import datetime
@@ -72,143 +73,6 @@ def main():
                         log_level=log_level)
     except Exception as err:
         sys.exit(f"Could not complete isd_to_kernel task: {err}")
-
-# NAIFs 'Built In' Inertial Reference Frames
-# Source: "https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/frames.html#Appendix.%20%60%60Built%20in''%20Inertial%20Reference%20Frames"
-reference_frame_map = {
-    1: "J2000",
-    2: "B1950",
-    3: "FK4",
-    4: "DE-118",
-    5: "DE-96",
-    6: "DE-102",
-    7: "DE-108",
-    8: "DE-111",
-    9: "DE-114",
-    10: "DE-122",
-    11: "DE-125",
-    12: "DE-130",
-    13: "GALACTIC",
-    14: "DE-200",
-    15: "DE-202",
-    16: "MARSIAU",
-    17: "ECLIPJ2000",
-    18: "ECLIPB1950",
-    19: "DE-140",
-    20: "DE-142",
-    21: "DE-143",
-}
-    
-
-class KernelType(Enum):
-    """
-    An enumeration representing supported SPICE kernel types and their 
-    associated file extensions.
-
-    This class serves as the central authority for mapping kernel names 
-    (e.g., 'SPK', 'CK') to their standard NAIF file extensions and provides 
-    utility methods for distinguishing between binary and text-based kernels.
-    """
-    SPK = ".bsp"
-    CK = ".bc"
-    FK = ".tf"
-    IK = ".ti"
-    LSK = ".tls"
-    MK = ".tm"
-    PCK = ".tpc"
-    SCLK = ".tsc"
-
-    @classmethod
-    def get_ext(cls, kernel_type: str) -> str:
-        """
-        Retrieves the file extension for a given kernel type string.
-
-        Parameters
-        ----------
-        kernel_type : str
-            Kernel type name
-
-        Returns
-        -------
-        str
-            Corresponding file extension including the leading dot
-        """
-        try:
-            return cls[kernel_type.upper()].value
-        except KeyError:
-            raise KeyError(f"Kernel type [{kernel_type}] is not valid. Choose from the following: {[member.name for member in KernelType]}")
-
-    @classmethod
-    def is_spk(cls, kernel_type: str) -> bool:
-        """
-        Checks if kernel type is an SPK.        
-
-        Parameters
-        ----------
-        kernel_type : str
-            Kernel type name
-
-        Returns
-        -------
-        bool
-            Whether kernel type is SPK
-        """
-        return kernel_type.upper() == KernelType.SPK.name
-    
-    @classmethod
-    def is_ck(cls, kernel_type: str) -> bool:
-        """
-        Checks if kernel type is a CK.        
-
-        Parameters
-        ----------
-        kernel_type : str
-            Kernel type name
-
-        Returns
-        -------
-        bool
-            Whether kernel type is CK
-        """
-        return kernel_type.upper() == KernelType.CK.name
-    
-    @classmethod
-    def is_binary_kernel(cls, kernel_type: str) -> bool:
-        """
-        Determines if the kernel type is a binary format (SPK or CK).
-        
-        Parameters
-        ----------
-        kernel_type : str
-            Kernel type name
-
-        Returns
-        -------
-        bool
-            Whether kernel type is binary kernel
-        """
-        binary_types = {cls.SPK.name, cls.CK.name}
-        return kernel_type.upper() in binary_types
-
-    @classmethod
-    def is_text_kernel(cls, kernel_type: str) -> bool:
-        """
-        Determines if the kernel type is a text-based format (FK, IK, LSK, MK, PCK, SCLK).
-        
-        Parameters
-        ----------
-        kernel_type : str
-            Kernel type name
-
-        Returns
-        -------
-        bool
-            Whether kernel type is text kernel
-        """
-        name = kernel_type.upper()
-        if name not in cls.__members__:
-            return False            
-        return not cls.is_binary_kernel(name)
 
     
 def spk_comment(outfile: str,
@@ -533,16 +397,16 @@ def isd_to_kernel(
     # If outfile is not specified, name output file as same
     # name as isd_file with appropriate kernel file extension
     if outfile is None:
-        if KernelType.is_binary_kernel(kernel_type):
+        if psql.Kernel.isBinary(kernel_type):
             if isd_file is None:
                 raise Exception("Missing ISD file.")
             elif Path(isd_file).suffix != ".json":
                 raise Exception("ISD must be in JSON.")
-            outfile = Path(isd_file).with_suffix(KernelType.get_ext(kernel_type))
-        elif KernelType.is_text_kernel(kernel_type):
+            outfile = Path(isd_file).with_suffix(psql.Kernel.getExt(kernel_type))
+        elif psql.Kernel.isText(kernel_type):
             raise Exception("Must enter an outfile name for text kernels.")
         else:
-            raise Exception(f"{KernelType.get_ext(kernel_type)}")
+            raise Exception(f"{psql.Kernel.getExt(kernel_type)}")
     outfile = str(os.path.abspath(outfile))
     logger.info(f"outfile={outfile}")
 
@@ -557,7 +421,7 @@ def isd_to_kernel(
 
     # Check that the outfile extension matches the kernel_type
     # If not, append correct extension and proceed
-    expected_ext = KernelType.get_ext(kernel_type)
+    expected_ext = psql.Kernel.getExt(kernel_type)
     if ext.lower() != expected_ext.lower():
         outfile = str(Path(filename).with_suffix(expected_ext))
         logger.info(
@@ -566,7 +430,7 @@ def isd_to_kernel(
             f"The kernel will output to file [{outfile}] instead."
         )
 
-    if KernelType.is_binary_kernel(kernel_type):
+    if psql.Kernel.isBinary(kernel_type):
         # Get properties from isd_file
         with open(isd_file, 'r') as f:
             isd_data = f.read()
@@ -604,6 +468,7 @@ def isd_to_kernel(
         _, kernels = psql.searchForKernelsets(spiceqlNames=["base", mission_name], startTime=start_time, stopTime=end_time)
         sclk_kernels = kernels["sclk"]
         lsk_kernels = kernels["lsk"][0]
+        logger.info(f"sclk_kernels={sclk_kernels}, lsk_kernels={lsk_kernels}")
 
         # Translate codes to name
         target_name, _ = psql.translateCodeToName(target_code, mission_name, False, False)
@@ -625,10 +490,10 @@ def isd_to_kernel(
 
         # Get referenceFrame
         reference_frame_id = isd_dict["instrument_position"]["reference_frame"]
-        reference_frame = reference_frame_map.get(reference_frame_id)
+        reference_frame = spice.frmnam(reference_frame_id)
         logger.info(f"reference_frame={reference_frame}")
         
-        if KernelType.is_spk(kernel_type):
+        if psql.Kernel.isSpk(kernel_type):
             if len(state_positions) != len(state_times):
                 raise ValueError("Positions and Times length mismatch!")
             
@@ -659,7 +524,7 @@ def isd_to_kernel(
                 state_velocities,
                 out_comment
             )
-        elif KernelType.is_ck(kernel_type):  
+        elif psql.Kernel.isCk(kernel_type):  
             out_comment = ck_comment(
                 outfile=outfile,
                 segment_id=segment_id,
@@ -687,7 +552,7 @@ def isd_to_kernel(
                 inst_pt_velocities,
                 out_comment
             )
-    elif KernelType.is_text_kernel(kernel_type):
+    elif psql.Kernel.isText(kernel_type):
 
         def is_valid_json(json_str):
             try:
