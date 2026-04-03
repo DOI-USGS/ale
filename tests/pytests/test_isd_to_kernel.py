@@ -122,7 +122,8 @@ def test_invalid_isd_extension():
 
 def test_invalid_kernel_type():
     """Verify that invalid kernel types raise an error."""
-    expected_msg = "Kernel type [abc] is not valid. Choose from the following: ['SPK', 'CK', 'FK', 'IK', 'LSK', 'MK', 'PCK', 'SCLK']"
+    # SpiceQL error
+    expected_msg = "std::exception: abc is not a valid kernel type"
     with pytest.raises(Exception, match=re.escape(expected_msg)):
         isd_to_kernel(isd_file="test.json", kernel_type="abc")
 

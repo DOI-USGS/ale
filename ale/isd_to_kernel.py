@@ -459,16 +459,21 @@ def isd_to_kernel(
         has_av = len(inst_pt_velocities) > 0
 
         # Get frame and mission names
-        frame_name = next(v for k, v in isd_dict["naif_keywords"].items()
-                if k.startswith("FRAME_") and k.endswith("_NAME"))
+        frame_name = next((v for k, v in isd_dict.get("naif_keywords", {}).items()
+                   if k.startswith("FRAME_") and k.endswith("_NAME")), None)
+        if not frame_name:
+            frame_name = isd_dict["name_platform"]
+            logger.info(f"Could not find 'FRAME_*_NAME' in ISD 'naif_keywords. "
+                        f"Attempt platform name [{frame_name}] instead to get mission name.")
         mission_name = psql.getSpiceqlName(frame_name)
+        if not mission_name:
+            logger.info(f"Check SpiceQL's 'aliasMap' to verify that frame name [{frame_name}] is valid.")
+            raise Exception(f"Could not find mission name for frame name [{frame_name}].")
         logger.info(f"frame_name={frame_name}, mission_name={mission_name}")
 
         # Get kernels
         _, kernels = psql.searchForKernelsets(spiceqlNames=["base", mission_name], startTime=start_time, stopTime=end_time)
-        sclk_kernels = kernels["sclk"]
-        lsk_kernels = kernels["lsk"][0]
-        logger.info(f"sclk_kernels={sclk_kernels}, lsk_kernels={lsk_kernels}")
+        logger.info(f"kernels={kernels}")
 
         # Translate codes to name
         target_name, _ = psql.translateCodeToName(target_code, mission_name, False, False)
@@ -484,9 +489,12 @@ def isd_to_kernel(
         
         # Create segmentId
         # Note: 40 char limit
-        sensor_name = isd_dict["name_sensor"]
-        segment_id = f"{mission_name}:{sensor_name}"
-        logger.info(f"segment_id={segment_id}, len={str(len(segment_id))}")
+        # sensor_name = isd_dict["name_sensor"]
+        segment_id = f"{mission_name}:{frame_name}"
+        if len(segment_id) > 40:
+            logger.info(f"Segment ID [{segment_id}] with length {str(len(segment_id))} " 
+                         "is over the 40 char max limit. Truncating.")
+        logger.info(f"segment_id={segment_id}")
 
         # Get referenceFrame
         reference_frame_id = isd_dict["instrument_position"]["reference_frame"]
@@ -525,6 +533,17 @@ def isd_to_kernel(
                 out_comment
             )
         elif psql.Kernel.isCk(kernel_type):  
+            # Get sclks and lsk
+            if "sclk" in kernels:
+                sclk_kernels = kernels["sclk"]
+            else:
+                raise Exception(f"Could not find SCLKs for [{isd_file}].")
+            if "lsk" in kernels:
+                lsk_kernels = kernels["lsk"][0]
+            else:
+                raise Exception(f"Could not find LSK for [{isd_file}].")
+            logger.info(f"sclk_kernels={sclk_kernels}, lsk_kernels={lsk_kernels}")
+
             out_comment = ck_comment(
                 outfile=outfile,
                 segment_id=segment_id,
