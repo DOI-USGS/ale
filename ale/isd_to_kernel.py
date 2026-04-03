@@ -5,10 +5,8 @@ import os, sys
 import pyspiceql as psql
 import spiceypy as spice
 
-from enum import Enum
 from datetime import datetime
 from pathlib import Path
-from pyspiceql.ck_writer import write_ck
 
 
 logger = logging.getLogger(__name__)
@@ -539,10 +537,10 @@ def isd_to_kernel(
             else:
                 raise Exception(f"Could not find SCLKs for [{isd_file}].")
             if "lsk" in kernels:
-                lsk_kernels = kernels["lsk"][0]
+                lsk_kernel = kernels["lsk"][0]
             else:
                 raise Exception(f"Could not find LSK for [{isd_file}].")
-            logger.info(f"sclk_kernels={sclk_kernels}, lsk_kernels={lsk_kernels}")
+            logger.info(f"sclk_kernels={sclk_kernels}, lsk_kernel={lsk_kernel}")
 
             out_comment = ck_comment(
                 outfile=outfile,
@@ -559,17 +557,17 @@ def isd_to_kernel(
                 has_av=has_av,
                 kernels=kernels,
                 comment=comment)
-            write_ck(
+            psql.writeCk(
                 outfile,
                 inst_pt_quaternions,
                 inst_pt_times,
                 inst_frame_code,
                 reference_frame,
                 segment_id,
-                sclk_kernels,
-                lsk_kernels,
+                ",".join(sclk_kernels),
+                str(lsk_kernel),
                 inst_pt_velocities,
-                out_comment
+                comment
             )
     elif psql.Kernel.isText(kernel_type):
 
