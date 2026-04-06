@@ -39,7 +39,7 @@ def test_spk_generation(mock_write_spk, mock_translate, mock_get_name, mock_sear
     assert args[3] == isd_data["naif_keywords"]["BODY_CODE"]                    # body code
     assert args[4] == isd_data["naif_keywords"]["BODY_FRAME_CODE"]              # body frame code
     assert args[5] == "J2000"                                                   # reference frame
-    assert args[6] == f"{mock_get_name.return_value}:{isd_data['name_sensor']}" # segment id
+    assert args[6] == f"{mock_get_name.return_value}:{'MRO_CTX'}"               # segment id
     assert args[7] == 1                                                         # degree
     assert args[8][0] == isd_data["instrument_position"]["velocities"][0]       # state velocities
     assert "USGS ALE Generated SPK Kernel" in args[9]                           # comment header
@@ -50,7 +50,7 @@ def test_spk_generation(mock_write_spk, mock_translate, mock_get_name, mock_sear
 @patch("pyspiceql.getSpiceqlName")
 @patch("pyspiceql.searchForKernelsets")
 @patch("pyspiceql.translateCodeToName")
-@patch("ale.isd_to_kernel.write_ck")
+@patch("pyspiceql.writeCk")
 def test_ck_generation(mock_write_ck, mock_translate, mock_search, mock_get_name, tmp_path):
     """Test that isd_to_kernel correctly handles CK generation."""
     
@@ -72,7 +72,7 @@ def test_ck_generation(mock_write_ck, mock_translate, mock_search, mock_get_name
         isd_file=isd_file,
         kernel_type="ck",
         outfile=outfile,
-        overwrite=True
+        comment="test comment"
     )
     
     assert mock_write_ck.called
@@ -83,7 +83,7 @@ def test_ck_generation(mock_write_ck, mock_translate, mock_search, mock_get_name
     assert args[2][0] == isd_data["instrument_pointing"]["ephemeris_times"][0]      # ephemeris times
     assert args[3] == isd_data["instrument_pointing"]["time_dependent_frames"][0]   # instrument frame code
     assert args[4] == "J2000"                                                       # reference frame
-    assert args[6] == ["mex_sclk.tsc"]                                              # sclk kernels list
+    assert args[6] == "mex_sclk.tsc"                                                # sclk kernels list
     assert args[7] == "naif0012.tls"                                                # lsk kernel (first element of list)
     assert args[8][0] == isd_data["instrument_pointing"]["angular_velocities"][0]   # angular velocities
     assert "USGS ALE Generated CK Kernel" in args[9]                                # comment header

@@ -50,6 +50,11 @@ def main():
         help="Optional boolean flag on overwriting an existing kernel."
     )
     parser.add_argument(
+        "--web",
+        action="store_true",
+        help="Enable web SpiceQL search."
+    )
+    parser.add_argument(
         "-v", "--verbose",
         action="store_true",
         help="Display information as program runs."
@@ -68,6 +73,7 @@ def main():
                         outfile=args.outfile,
                         data=args.data,
                         overwrite=args.overwrite,
+                        use_web=args.web,
                         log_level=log_level)
     except Exception as err:
         sys.exit(f"Could not complete isd_to_kernel task: {err}")
@@ -352,6 +358,7 @@ def isd_to_kernel(
     data: str = None,
     comment: str = None,
     overwrite: bool = False,
+    use_web: bool = False,
     log_level=logging.ERROR
 ):
     """
@@ -442,9 +449,16 @@ def isd_to_kernel(
         state_velocities = isd_dict["instrument_position"]["velocities"]
 
         # ck properties
-        inst_pt_velocities = isd_dict["instrument_pointing"]["angular_velocities"]
         inst_pt_quaternions = isd_dict["instrument_pointing"]["quaternions"]
         inst_pt_times = isd_dict["instrument_pointing"]["ephemeris_times"]
+
+        # angular velocities
+        has_av = True
+        inst_pt_velocities = isd_dict.get("instrument_pointing")["angular_velocities"]
+        if inst_pt_velocities is None:
+            logger.info(f"ISD [{isd_file}] does not have angular velocities.")
+            inst_pt_velocities = []
+            has_av = False
         
         # Comment properties
         body_code = isd_dict["naif_keywords"]["BODY_CODE"]             
@@ -454,28 +468,61 @@ def isd_to_kernel(
         inst_frame_code = isd_dict["instrument_pointing"]["time_dependent_frames"][0]
         target_code = int(inst_frame_code/1000)
         records = len(state_positions)
-        has_av = len(inst_pt_velocities) > 0
-
+        logger.info(f"start_time={start_time}, end_time={end_time}")
+        
         # Get frame and mission names
-        frame_name = next((v for k, v in isd_dict.get("naif_keywords", {}).items()
-                   if k.startswith("FRAME_") and k.endswith("_NAME")), None)
-        if not frame_name:
-            frame_name = isd_dict["name_platform"]
-            logger.info(f"Could not find 'FRAME_*_NAME' in ISD 'naif_keywords. "
-                        f"Attempt platform name [{frame_name}] instead to get mission name.")
-        mission_name = psql.getSpiceqlName(frame_name)
+        # Priority:
+        # 1. NAIF keyword: FRAME_<code>_NAME
+        # 2. Sensor name: name_sensor
+        # 3. Platform name: name_platform
+        # 4. Custom combination name: <platform_name>_<sensor_name>
+        # FYI, combination name necessary for apolloPanImage_isd.json
+        platform_sensor = f"{isd_dict.get('name_platform')}_{isd_dict.get('name_sensor')}"
+        frame_candidates = [
+            (next((v for k, v in isd_dict.get("naif_keywords", {}).items() 
+                if k.startswith("FRAME_") and k.endswith("_NAME")), None), "naif_keywords"),
+            (isd_dict.get("name_sensor"), "name_sensor"),
+            (isd_dict.get("name_platform"), "name_platform"),
+            (platform_sensor, "platform_sensor")
+        ]
+
+        mission_name = None
+        for candidate_value, label in frame_candidates:
+            if not candidate_value:
+                continue
+            result = psql.getSpiceqlName(candidate_value)
+            if result:
+                frame_name = candidate_value
+                mission_name = result
+                logger.info(f"Resolved mission_name [{mission_name}] using {label} [{frame_name}]")
+                break
+            else:
+                logger.info(f"Frame name [{candidate_value}] from {label} not found in SpiceQL aliasMap.")
+
         if not mission_name:
-            logger.info(f"Check SpiceQL's 'aliasMap' to verify that frame name [{frame_name}] is valid.")
-            raise Exception(f"Could not find mission name for frame name [{frame_name}].")
+            raise Exception(
+                f"Could not find a valid mission name. Checked NAIF keywords, "
+                f"sensor name [{isd_dict.get('name_sensor')}], "
+                f"platform name [{isd_dict.get('name_platform')}], "
+                f"and custom PLATFORM_SENSOR name [{platform_sensor}]."
+            )
         logger.info(f"frame_name={frame_name}, mission_name={mission_name}")
 
+
+
         # Get kernels
-        _, kernels = psql.searchForKernelsets(spiceqlNames=["base", mission_name], startTime=start_time, stopTime=end_time)
+        _, kernels = psql.searchForKernelsets(
+            spiceqlNames=["base", mission_name], 
+            startTime=start_time, 
+            stopTime=end_time,
+            ckQualities=["smithed", "reconstructed"],
+            spkQualities=["smithed", "reconstructed"],
+            useWeb=use_web)
         logger.info(f"kernels={kernels}")
 
         # Translate codes to name
-        target_name, _ = psql.translateCodeToName(target_code, mission_name, False, False)
-        body_name, _ = psql.translateCodeToName(body_code, mission_name, False, False)
+        target_name, _ = psql.translateCodeToName(target_code, mission_name, use_web, True)
+        body_name, _ = psql.translateCodeToName(body_code, mission_name, use_web, True)
         
         # Calculate degree
         number_of_states = len(state_positions[0])
@@ -487,11 +534,11 @@ def isd_to_kernel(
         
         # Create segmentId
         # Note: 40 char limit
-        # sensor_name = isd_dict["name_sensor"]
         segment_id = f"{mission_name}:{frame_name}"
         if len(segment_id) > 40:
             logger.info(f"Segment ID [{segment_id}] with length {str(len(segment_id))} " 
                          "is over the 40 char max limit. Truncating.")
+            segment_id = segment_id[:40]
         logger.info(f"segment_id={segment_id}")
 
         # Get referenceFrame
@@ -533,11 +580,11 @@ def isd_to_kernel(
         elif psql.Kernel.isCk(kernel_type):  
             # Get sclks and lsk
             if "sclk" in kernels:
-                sclk_kernels = kernels["sclk"]
+                sclk_kernels = ",".join(kernels["sclk"])
             else:
                 raise Exception(f"Could not find SCLKs for [{isd_file}].")
             if "lsk" in kernels:
-                lsk_kernel = kernels["lsk"][0]
+                lsk_kernel = str(kernels["lsk"][0])
             else:
                 raise Exception(f"Could not find LSK for [{isd_file}].")
             logger.info(f"sclk_kernels={sclk_kernels}, lsk_kernel={lsk_kernel}")
@@ -564,10 +611,10 @@ def isd_to_kernel(
                 inst_frame_code,
                 reference_frame,
                 segment_id,
-                ",".join(sclk_kernels),
-                str(lsk_kernel),
+                sclk_kernels,
+                lsk_kernel,
                 inst_pt_velocities,
-                comment
+                out_comment
             )
     elif psql.Kernel.isText(kernel_type):
 
