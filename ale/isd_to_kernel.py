@@ -460,15 +460,22 @@ def isd_to_kernel(
             inst_pt_velocities = []
             has_av = False
         
-        # Comment properties
+        # properties
+        records = len(state_positions)
         body_code = isd_dict["naif_keywords"]["BODY_CODE"]             
         body_frame_code = isd_dict["naif_keywords"]["BODY_FRAME_CODE"]       
         start_time = isd_dict["instrument_pointing"]["ck_table_start_time"]
         end_time = isd_dict["instrument_pointing"]["ck_table_end_time"]
+        logger.info(f"start_time={start_time}, end_time={end_time}")
+
+        # verify valid frame and target code
+        # FYI - necessary for chandrayaan_m2_nadir_isd.json
         inst_frame_code = isd_dict["instrument_pointing"]["time_dependent_frames"][0]
         target_code = int(inst_frame_code/1000)
-        records = len(state_positions)
-        logger.info(f"start_time={start_time}, end_time={end_time}")
+        if target_code == 0:
+            target_code = inst_frame_code
+            inst_frame_code = inst_frame_code*1000
+        logger.info(f"frame_code={inst_frame_code}, target_code={target_code}")
         
         # Get frame and mission names
         # Priority:
@@ -507,8 +514,6 @@ def isd_to_kernel(
                 f"and custom PLATFORM_SENSOR name [{platform_sensor}]."
             )
         logger.info(f"frame_name={frame_name}, mission_name={mission_name}")
-
-
 
         # Get kernels
         _, kernels = psql.searchForKernelsets(
