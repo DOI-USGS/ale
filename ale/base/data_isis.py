@@ -629,10 +629,17 @@ class IsisSpice():
             this is formatted as semimajor, semimajor,
             semiminor
         """
+        logger.debug('Hit target_body_radii')
         regex = re.compile(r'BODY-?\d*_RADII')
         for key in self.naif_keywords:
             if re.match(regex, key[0]):
+                logger.debug(f"regex match key[0]: {key[0]}")
                 return self.naif_keywords[key[0]]
+
+            # gdal
+            elif re.match(regex, key):
+                logger.debug(f"regex match key: {key}")
+                return self.naif_keywords[key]
 
     @property
     def frame_chain(self):
