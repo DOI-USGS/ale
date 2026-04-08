@@ -2,6 +2,8 @@ import os
 import re
 import struct
 from glob import glob
+import binascii
+from ale import logger
 
 import numpy as np
 from numpy.polynomial.polynomial import polyval, polyder
@@ -15,6 +17,29 @@ from ale.transformation import FrameChain
 from scipy.interpolate import interp1d, BPoly
 
 from ale.base.label_isis import IsisLabel
+
+def read_table(self, priv_name, table_name): 
+
+    if not hasattr(self, priv_name):
+        tables = []
+        if "Table" in self.label:
+            tables = self.label.getall('Table')
+
+        for table in tables:
+            if table['Name'] == table_name:
+                binary_data = read_table_data(table, self._file)
+                setattr(self, priv_name, parse_table(table, binary_data))
+                return getattr(self, priv_name)
+
+        # GDAL
+        if isinstance(self.label[f"Table_{table_name}"], dict): 
+            setattr(self, priv_name, parse_table_json(self.label[f"Table_{table_name}"]))
+            return getattr(self, priv_name)
+
+        raise ValueError(f'Could not find {table_name} table on file {self._file}')
+        
+    return getattr(self, priv_name)
+
 
 def read_table_data(table_label, cube):
     """
@@ -63,6 +88,7 @@ def parse_table(table_label, data):
 
     # Parse the binary data
     fields = table_label.getall('Field')
+    #logger.debug(f"Parse Table Fields: {fields}")
     results = {field['Name']:[] for field in fields}
     offset = 0
     for record in range(table_label['Records']):
@@ -80,6 +106,71 @@ def parse_table(table_label, data):
 
     # Parse the keywords from the label
     results.update({key : value for key, value in table_label.items() if not isinstance(value, pvl.collections.PVLGroup)})
+
+    return results
+
+def parse_table_json(table_label):
+    """
+    Parse an ISIS table into a dictionary.
+
+    Parameters
+    ----------
+    table_label : PVLModule
+                  The ISIS table label
+    data : bytes
+           The binary component of the ISIS table
+
+    Returns
+    -------
+    dict :
+           The table as a dictionary with the keywords from the label and the
+           binary data
+    """
+
+    data = table_label['_data']
+
+    data_sizes = {'Integer' : 8,
+                  'Double'  : 16,
+                  'Real'    : 8,
+                  'Text'    : 2}
+    data_formats = {'Integer' : 'i',
+                    'Double'  : 'd',
+                    'Real'    : 'f'}
+
+    # logger.debug("Parsing JSON Table.")
+
+    fields = {table_label[k]['Name']: v for k, v in table_label.items() if k.startswith("Field")}
+    results = {metadata['Name']:[] for field, metadata in fields.items()}
+    # logger.debug(f"Getting values for these fields: {results}")
+    offset = 0
+    for record in range(table_label['Records']):
+        for field, metadata in fields.items():
+            # logger.debug(f"Metadata in field:{metadata}")
+            if metadata['Type'] == 'Text':
+                logger.debug("Data Format: Text (Untested).")
+                #field_data = data[offset:offset+field['Size']].decode(encoding='latin_1')
+            else:
+                # Unpack numeric data
+                data_format = data_formats[metadata['Type']] * metadata['Size']
+                data_chunk = data[offset:offset+data_sizes[metadata['Type']]]
+                field_data  = struct.unpack(data_format, binascii.unhexlify(data_chunk))
+
+                if len(field_data) == 1:
+                    field_data = field_data[0]
+
+                # logger.debug(f"Unpacked Data: {field_data}; Format: {data_format}; Hex: {data_chunk}")
+
+            results[metadata['Name']].append(field_data)
+            offset += data_sizes[metadata['Type']] * metadata['Size']
+
+    # Parse the keywords from the label
+    results.update({key : value for key, value in table_label.items() if not isinstance(value, pvl.collections.PVLGroup)})
+
+    #Remove extra keys
+    extra_keys = [k for k in results if k.startswith("Field_")]
+    extra_keys.extend(["_type", "_container_name", "_data"])
+    for key in extra_keys:
+        results.pop(key, None)
 
     return results
 
@@ -200,18 +291,20 @@ class IsisSpice():
         : dict
           Instrument pointing table
         """
-        if not hasattr(self, "_inst_pointing_table"):
-            tables = []
-            if "Table" in self.label:
-                tables = self.label.getall('Table')
+        return read_table(self, "_inst_pointing_table", "InstrumentPointing")
 
-            for table in tables:
-                if table['Name'] == 'InstrumentPointing':
-                    binary_data = read_table_data(table, self._file)
-                    self._inst_pointing_table = parse_table(table, binary_data)
-                    return self._inst_pointing_table
-            raise ValueError(f'Could not find InstrumentPointing table on file {self._file}')
-        return self._inst_pointing_table
+        # if not hasattr(self, "_inst_pointing_table"):
+        #     tables = []
+        #     if "Table" in self.label:
+        #         tables = self.label.getall('Table')
+
+        #     for table in tables:
+        #         if table['Name'] == 'InstrumentPointing':
+        #             binary_data = read_table_data(table, self._file)
+        #             self._inst_pointing_table = parse_table(table, binary_data)
+        #             return self._inst_pointing_table
+        #     raise ValueError(f'Could not find InstrumentPointing table on file {self._file}')
+        # return self._inst_pointing_table
 
     @property
     def body_orientation_table(self):
@@ -224,18 +317,21 @@ class IsisSpice():
         : dict
           Body orientation table
         """
-        if not hasattr(self, "_body_orientation_table"):
-            tables = []
-            if "Table" in self.label:
-                tables = self.label.getall('Table')
+
+        return read_table(self, "_body_orientation_table", "BodyRotation")
+
+        # if not hasattr(self, "_body_orientation_table"):
+        #     tables = []
+        #     if "Table" in self.label:
+        #         tables = self.label.getall('Table')
                 
-            for table in tables:
-                if table['Name'] == 'BodyRotation':
-                    binary_data = read_table_data(table, self._file)
-                    self._body_orientation_table = parse_table(table, binary_data)
-                    return self._body_orientation_table
-            raise ValueError(f'Could not find BodyRotation table on file {self._file}')
-        return self._body_orientation_table
+        #     for table in tables:
+        #         if table['Name'] == 'BodyRotation':
+        #             binary_data = read_table_data(table, self._file)
+        #             self._body_orientation_table = parse_table(table, binary_data)
+        #             return self._body_orientation_table
+        #     raise ValueError(f'Could not find BodyRotation table on file {self._file}')
+        # return self._body_orientation_table
 
     @property
     def inst_position_table(self):
@@ -248,18 +344,21 @@ class IsisSpice():
         : dict
           Instrument position table
         """
-        if not hasattr(self, "_inst_position_table"):
-            tables = []
-            if "Table" in self.label:
-                tables = self.label.getall('Table')
 
-            for table in tables:
-                if table['Name'] == 'InstrumentPosition':
-                    binary_data = read_table_data(table, self._file)
-                    self._inst_position_table = parse_table(table, binary_data)
-                    return self._inst_position_table
-            raise ValueError(f'Could not find InstrumentPosition table on file {self._file}')
-        return self._inst_position_table
+        return read_table(self, "_inst_position_table", 'InstrumentPosition')
+
+        # if not hasattr(self, "_inst_position_table"):
+        #     tables = []
+        #     if "Table" in self.label:
+        #         tables = self.label.getall('Table')
+
+        #     for table in tables:
+        #         if table['Name'] == 'InstrumentPosition':
+        #             binary_data = read_table_data(table, self._file)
+        #             self._inst_position_table = parse_table(table, binary_data)
+        #             return self._inst_position_table
+        #     raise ValueError(f'Could not find InstrumentPosition table on file {self._file}')
+        # return self._inst_position_table
 
     @property
     def sun_position_table(self):
@@ -272,18 +371,26 @@ class IsisSpice():
         : dict
           Sun position table
         """
-        if not hasattr(self, "_sun_position_table"):
-            tables = []
-            if "Table" in self.label:
-                tables = self.label.getall('Table')
 
-            for table in tables:
-                if table['Name'] == 'SunPosition':
-                    binary_data = read_table_data(table, self._file)
-                    self._sun_position_table = parse_table(table, binary_data)
-                    return self._sun_position_table
-            raise ValueError(f'Could not find SunPosition table on file {self._file}')
-        return self._sun_position_table
+        return read_table(self, "_sun_position_table", "SunPosition")
+
+        # if not hasattr(self, "_sun_position_table"):
+        #     tables = []
+        #     if "Table" in self.label:
+        #         tables = self.label.getall('Table')
+
+        #     for table in tables:
+        #         if table['Name'] == 'SunPosition':
+        #             binary_data = read_table_data(table, self._file)
+        #             self._sun_position_table = parse_table(table, binary_data)
+        #             return self._sun_position_table
+        #     # GDAL
+        #     t_name='SunPosition'
+        #     if isinstance(self.label[f"Table_{t_name}"], dict): 
+        #         self._sun_position_table = parse_table_json(self.label[f"Table_{t_name}"])
+        #         return self._sun_position_table
+        #     raise ValueError(f'Could not find SunPosition table on file {self._file}')
+        # return self._sun_position_table
 
     def __enter__(self):
         """
@@ -322,6 +429,22 @@ class IsisSpice():
                 # the PVL library strips them off (ie. 0000000000002040 becomes
                 # 2040). Pad to 16 in case this happens.
                 return str(key[1]).zfill(16)
+
+            # In gtiffs, looks like:
+            # "CLOCK_ET_-236_2":{
+            #     "0072174528:989000_COMPUTED":"4a1edaaeddcbbc41"
+            # }
+
+            elif key.startswith('CLOCK_ET_'):
+                for subkey in self.naif_keywords[key]:
+                    if subkey.endswith('_COMPUTED'):
+                        logger.debug(f"Computed sClock Hex: {self.naif_keywords[key][subkey]}")
+                        return str(self.naif_keywords[key][subkey]).zfill(16)
+                        
+
+                    
+
+
         raise ValueError("No computed spacecraft clock time found in NaifKeywords.")
 
     @property
