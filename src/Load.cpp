@@ -151,12 +151,13 @@ namespace ale {
     }
 
     PyObject *pResultStr = PyObject_Str(pResult);
-    Py_DECREF(pResult);
-
     PyObject *temp_bytes = PyUnicode_AsUTF8String(pResultStr); // Owned reference
-    Py_DECREF(pResultStr);
+
 
     if(!temp_bytes){
+      Py_DECREF(pResult);
+      Py_DECREF(pResultStr);
+
       std::string error = getPyTraceback();
       throw invalid_argument(error);
     }
@@ -164,9 +165,12 @@ namespace ale {
     std::string cResult;
 
     char *temp_str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
-    Py_DECREF(temp_bytes);
 
     cResult = temp_str; // copy into std::string
+
+    Py_DECREF(pResult);
+    Py_DECREF(pResultStr);
+    Py_DECREF(temp_bytes);
     
     return cResult;
   }
