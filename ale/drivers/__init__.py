@@ -205,7 +205,7 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
             logger.info(f'End {driver}\n')
     if verbose:
         logger.setLevel(logger_level)
-    raise Exception('No Such Driver for Label')
+    raise Exception('No viable Driver for Label.')
 
 
 def loads(label, props='', formatter='ale', indent = 2, verbose=False, only_isis_spice=False, only_naif_spice=False):
