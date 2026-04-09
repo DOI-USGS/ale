@@ -41,6 +41,7 @@ release.
 
 ### Fixed
 - Fixed Eigen 5.x compatibility by removing version constraint in CMakeLists.txt [#677](https://github.com/DOI-USGS/ale/pull/677)
+- Fixed C++ load(s) call failing when called again after throwing an error [#6967](https://github.com/DOI-USGS/ale/pull/696)
 
 ## [1.1.3] - 2026-03-12
 
