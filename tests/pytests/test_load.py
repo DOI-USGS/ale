@@ -42,7 +42,7 @@ def test_mess_load(class_truth, return_val, mess_kernels):
         assert usgscsm_isd_obj['name_sensor'] == 'MERCURY DUAL IMAGING SYSTEM NARROW ANGLE CAMERA'
         assert usgscsm_isd_obj['name_model'] == 'USGS_ASTRO_FRAME_SENSOR_MODEL'
     except Exception as load_failure:
-        assert str(load_failure) == "No Such Driver for Label"
+        assert str(load_failure) == "No viable Driver for Label."
         assert return_val is False
 
 def test_mess_load_gtiff(mess_kernels):
