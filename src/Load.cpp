@@ -153,11 +153,9 @@ namespace ale {
     PyObject *pResultStr = PyObject_Str(pResult);
     PyObject *temp_bytes = PyUnicode_AsUTF8String(pResultStr); // Owned reference
 
-
     if(!temp_bytes){
       Py_DECREF(pResult);
       Py_DECREF(pResultStr);
-
       std::string error = getPyTraceback();
       throw invalid_argument(error);
     }
@@ -171,7 +169,6 @@ namespace ale {
     Py_DECREF(pResult);
     Py_DECREF(pResultStr);
     Py_DECREF(temp_bytes);
-    
     return cResult;
   }
 
