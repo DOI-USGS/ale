@@ -1,3 +1,4 @@
+import pyspiceql
 import spiceypy as spice
 
 from ale.base import Driver, WrongInstrumentException
@@ -36,7 +37,7 @@ class Chandrayaan1M3Pds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, NoDis
         : int
           Naif ID code for the sensor frame
         """
-        return self.spiceql_call("translateNameToCode", {"frame": "CH1", "mission": self.spiceql_mission})
+        return pyspiceql.translateNameToCode(frame="CH1", mission=self.spiceql_mission, searchKernels=self.search_kernels, useWeb=self.use_web)[0]
 
     @property
     def spacecraft_name(self):
@@ -113,10 +114,10 @@ class Chandrayaan1M3Pds3NaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, NoDis
           The start time of the image in ephemeris seconds past the J2000 epoch.
         """
         if not hasattr(self, '_ephemeris_start_time'):
-            et = self.spiceql_call("utcToEt", {"utc" : self.utc_times[0]})
+            et = pyspiceql.utcToEt(utc=self.utc_times[0], searchKernels=self.search_kernels, useWeb=self.use_web)[0]
             et -= (.5 * self.line_exposure_duration)
-            clock_time = self.spiceql_call("doubleEtToSclk", {"frameCode" : self.sensor_frame_id, "et" : et, "mission": self.spiceql_mission})
-            self._ephemeris_start_time = self.spiceql_call("strSclkToEt", {"frameCode" : self.sensor_frame_id, "sclk" : clock_time, "mission" : self.spiceql_mission})
+            clock_time = pyspiceql.doubleEtToSclk(frameCode=self.sensor_frame_id, et=et, mission=self.spiceql_mission, searchKernels=self.search_kernels, useWeb=self.use_web)[0]
+            self._ephemeris_start_time = pyspiceql.strSclkToEt(frameCode=self.sensor_frame_id, sclk=clock_time, mission=self.spiceql_mission, searchKernels=self.search_kernels, useWeb=self.use_web)[0]
         return self._ephemeris_start_time 
 
     @property
@@ -278,7 +279,7 @@ class Chandrayaan1MRFFRIsisLabelNaifSpiceDriver(Radar, IsisLabel, NaifSpice, Cha
           start time
         """
         if not hasattr(self, "_ephemeris_start_time"):
-            self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+            self._ephemeris_start_time = pyspiceql.utcToEt(utc=self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"), searchKernels=self.search_kernels, useWeb=self.use_web)[0]
         return self._ephemeris_start_time
 
     @property
@@ -292,7 +293,7 @@ class Chandrayaan1MRFFRIsisLabelNaifSpiceDriver(Radar, IsisLabel, NaifSpice, Cha
           stop time
         """
         if not hasattr(self, "_ephemeris_stop_time"):
-            self._ephemeris_stop_time = self.spiceql_call("utcToEt", {"utc": self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+            self._ephemeris_stop_time = pyspiceql.utcToEt(utc=self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S.%f"), searchKernels=self.search_kernels, useWeb=self.use_web)[0]
         return self._ephemeris_stop_time
 
     @property
@@ -385,7 +386,7 @@ class Chandrayaan1MRFFRIsisLabelNaifSpiceDriver(Radar, IsisLabel, NaifSpice, Cha
         """
         if not hasattr(self, "range_coefficients_et"):
           range_coefficients_utc = self.label['IsisCube']['Instrument']['RangeCoefficientSet']
-          self._range_coefficients_et = [self.spiceql_call("utcToEt", {"utc": elt[0]}) for elt in range_coefficients_utc]
+          self._range_coefficients_et = [pyspiceql.utcToEt(utc=elt[0], searchKernels=self.search_kernels, useWeb=self.use_web)[0] for elt in range_coefficients_utc]
         return self._range_coefficients_et
 
     @property
@@ -517,7 +518,7 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
           Spacecraft clock start count
         """
         if not hasattr(self, "_ephemeris_start_time"):
-          self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+          self._ephemeris_start_time = pyspiceql.utcToEt(utc=self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"), searchKernels=self.search_kernels, useWeb=self.use_web)[0]
         return self._ephemeris_start_time
 
     @property
@@ -680,7 +681,7 @@ class Chandrayaan2OHRCIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
           Spacecraft clock start count
         """
         if not hasattr(self, "_ephemeris_start_time"):
-          self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+          self._ephemeris_start_time = pyspiceql.utcToEt(utc=self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"), searchKernels=self.search_kernels, useWeb=self.use_web)[0]
         return self._ephemeris_start_time
 
     @property
@@ -695,7 +696,7 @@ class Chandrayaan2OHRCIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
           Spacecraft clock stop count
         """
         if not hasattr(self, "_ephemeris_stop_time"):
-            self._ephemeris_stop_time = self.spiceql_call("utcToEt", {"utc": self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+            self._ephemeris_stop_time = pyspiceql.utcToEt(utc=self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S.%f"), searchKernels=self.search_kernels, useWeb=self.use_web)[0]
         return self._ephemeris_stop_time
 
     @property

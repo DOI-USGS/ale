@@ -1,5 +1,6 @@
 import numpy as np
 import pvl
+import pyspiceql
 import spiceypy as spice
 
 from ale.base.data_naif import NaifSpice
@@ -77,7 +78,7 @@ class LoHighCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, LoDisto
           ephemeris time of the image
         """
         if not hasattr(self, "_ephemeris_start_time"):
-          self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+          self._ephemeris_start_time = pyspiceql.utcToEt(utc=self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"), searchKernels=self.search_kernels, useWeb=self.use_web)[0]
         return self._ephemeris_start_time
     
     @property
@@ -319,7 +320,7 @@ class LoMediumCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDis
           ephemeris time of the image
         """
         
-        return self.spiceql_call("utcToEt", {"utc" : self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+        return pyspiceql.utcToEt(utc=self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"), searchKernels=self.search_kernels, useWeb=self.use_web)[0]
     
     @property
     def ephemeris_stop_time(self):

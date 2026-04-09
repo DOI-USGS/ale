@@ -78,21 +78,18 @@ class test_mex_pds3_naif(unittest.TestCase):
         assert self.driver.short_mission_name=='mex'
 
     def test_ikid(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call, \
-             patch('ale.drivers.mex_drivers.MexHrscPds3LabelNaifSpiceDriver.fikid', \
-                    new_callable=PropertyMock) as fikid:
-            fikid.return_value = -41218
+        with patch('ale.drivers.mex_drivers.pyspiceql.translateNameToCode', return_value=[12345]) as translateNameToCode:
             assert self.driver.ikid == 12345
-            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_HEAD', 'mission': 'hrsc', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
+            calls = [call(frame='MEX_HRSC_HEAD', mission='hrsc', searchKernels=False, useWeb=False)]
+            translateNameToCode.assert_has_calls(calls)
+            assert translateNameToCode.call_count == 1
 
     def test_fikid(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
+        with patch('ale.drivers.mex_drivers.pyspiceql.translateNameToCode', return_value=[12345]) as translateNameToCode:
             assert self.driver.fikid == 12345
-            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
+            calls = [call(frame='MEX_HRSC_IR', mission='hrsc', searchKernels=False, useWeb=False)]
+            translateNameToCode.assert_has_calls(calls)
+            assert translateNameToCode.call_count == 1
 
     def test_instrument_id(self):
         assert self.driver.instrument_id == 'MEX_HRSC_IR'
@@ -195,41 +192,35 @@ class test_mex_isis3_naif(unittest.TestCase):
         assert self.driver.instrument_id == 'MEX_HRSC_IR'
 
     def test_ikid(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
+        with patch('ale.drivers.mex_drivers.pyspiceql.translateNameToCode', return_value=[12345]) as translateNameToCode:
             assert self.driver.ikid == 12345
-            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_HEAD', 'mission': 'hrsc', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
+            calls = [call(frame='MEX_HRSC_HEAD', mission='hrsc', searchKernels=False, useWeb=False)]
+            translateNameToCode.assert_has_calls(calls)
+            assert translateNameToCode.call_count == 1
 
     def test_fikid(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
+        with patch('ale.drivers.mex_drivers.pyspiceql.translateNameToCode', return_value=[12345]) as translateNameToCode:
             assert self.driver.fikid == 12345
-            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
+            calls = [call(frame='MEX_HRSC_IR', mission='hrsc', searchKernels=False, useWeb=False)]
+            translateNameToCode.assert_has_calls(calls)
+            assert translateNameToCode.call_count == 1
 
     def test_focal_length(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-41218]) as spiceql_call:
+        with patch.object(MexHrscIsisLabelNaifSpiceDriver, 'fikid', new_callable=PropertyMock) as fikid:
+            fikid.return_value = -41218
             assert self.driver.focal_length == 174.82
-            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
 
     def test_focal2pixel_lines(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-41218]) as spiceql_call:
+        with patch.object(MexHrscIsisLabelNaifSpiceDriver, 'fikid', new_callable=PropertyMock) as fikid:
+            fikid.return_value = -41218
             np.testing.assert_almost_equal(self.driver.focal2pixel_lines,
                                            [-7113.11359717265, 0.062856784318668, 142.857129028729])
-            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
 
     def test_focal2pixel_samples(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-41218]) as spiceql_call:
+        with patch.object(MexHrscIsisLabelNaifSpiceDriver, 'fikid', new_callable=PropertyMock) as fikid:
+            fikid.return_value = -41218
             np.testing.assert_almost_equal(self.driver.focal2pixel_samples,
                                            [-0.778052433438109, -142.857129028729, 0.062856784318668])
-            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_IR', 'mission': 'hrsc', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
 
     def test_ephemeris_start_time(self):
         with patch('ale.drivers.mex_drivers.read_table_data', return_value=12345) as read_table_data, \
@@ -277,18 +268,18 @@ class test_mex_src_pds3_naif(unittest.TestCase):
         assert self.driver.short_mission_name=='mex'
 
     def test_ikid(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
+        with patch('ale.drivers.mex_drivers.pyspiceql.translateNameToCode', return_value=[12345]) as translateNameToCode:
             assert self.driver.ikid == 12345
-            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_SRC', 'mission': 'src', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
+            calls = [call(frame='MEX_HRSC_SRC', mission='src', searchKernels=False, useWeb=False)]
+            translateNameToCode.assert_has_calls(calls)
+            assert translateNameToCode.call_count == 1
 
     def test_ephemeris_start_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
+        with patch('ale.drivers.mex_drivers.pyspiceql.utcToEt', return_value=[12345]) as utcToEt:
             assert self.driver.ephemeris_start_time == 12344.998488
-            calls = [call('utcToEt', {'utc': '2004-01-10 14:02:57.817000', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
+            calls = [call(utc='2004-01-10 14:02:57.817000', searchKernels=False, useWeb=False)]
+            utcToEt.assert_has_calls(calls)
+            assert utcToEt.call_count == 1
 
     def test_instrument_id(self):
         assert self.driver.instrument_id == 'MEX_HRSC_SRC'
@@ -323,19 +314,18 @@ class test_mex_src_isis_naif(unittest.TestCase):
         assert self.driver.short_mission_name=='mex'
 
     def test_ikid(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
+        with patch('ale.drivers.mex_drivers.pyspiceql.translateNameToCode', return_value=[12345]) as translateNameToCode:
             assert self.driver.ikid == 12345
-            calls = [call('translateNameToCode', {'frame': 'MEX_HRSC_SRC', 'mission': 'src', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
-            assert self.driver.ikid == 12345
+            calls = [call(frame='MEX_HRSC_SRC', mission='src', searchKernels=False, useWeb=False)]
+            translateNameToCode.assert_has_calls(calls)
+            assert translateNameToCode.call_count == 1
 
     def test_ephemeris_start_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
+        with patch('ale.drivers.mex_drivers.pyspiceql.utcToEt', return_value=[12345]) as utcToEt:
             assert self.driver.ephemeris_start_time == 12344.998488
-            calls = [call('utcToEt', {'utc': '2004-01-10 14:02:57.817000', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
+            calls = [call(utc='2004-01-10 14:02:57.817000', searchKernels=False, useWeb=False)]
+            utcToEt.assert_has_calls(calls)
+            assert utcToEt.call_count == 1
 
     def test_instrument_id(self):
         assert self.driver.instrument_id == 'MEX_HRSC_SRC'

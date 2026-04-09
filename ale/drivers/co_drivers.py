@@ -2,9 +2,9 @@ import os
 from glob import glob
 
 import numpy as np
-
-import pvl
 from pyspiceql import pyspiceql
+import pvl
+
 from ale.base import Driver, WrongInstrumentException
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
@@ -182,7 +182,7 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
           start time
         """
         if not hasattr(self, "_ephemeris_start_time"):
-            self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+            self._ephemeris_start_time = pyspiceql.utcToEt(utc=self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"), useWeb=self.use_web)
         return self._ephemeris_start_time
 
     @property
@@ -294,7 +294,7 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
             try:
                 # Call frinfo to check if the ISIS iak has been loaded with the
                 # additional reference frame. Otherwise, Fail and add it manually
-                _ = self.spiceql_call("getFrameInfo", {"frame": self.sensor_frame_id, "mission": self.spiceql_mission})
+                _ = pyspiceql.getFrameInfo(frame=self.sensor_frame_id, mission=self.spiceql_mission, useWeb=self.use_web)
                 self._frame_chain = super().frame_chain
             except Exception as e:
                 nadir = self._props.get('nadir', False)
@@ -420,10 +420,10 @@ class CassiniVimsIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoD
         time = str(instrument_group["NativeStartTime"])
         int_time, decimal_time = str(time).split(".")
 
-        ephemeris_time = self.spiceql_call("strSclkToEt", {"frameCode" : self.spacecraft_id, "sclk" : int_time, "mission" : self.spiceql_mission})
+        ephemeris_time = pyspiceql.strSclkToEt(frameCode=self.spacecraft_id, sclk=int_time, mission=self.spiceql_mission, searchKernels=self.search_kernels, useWeb=self.use_web)[0]
         ephemeris_time += float(decimal_time) / 15959.0
 
-        ir_exp = float(instrument_group["ExposureDuration"][0]) * 1.01725 / 1000.0;
+        ir_exp = float(instrument_group["ExposureDuration"][0]) * 1.01725 / 1000.0
         vis_exp = float(instrument_group["ExposureDuration"][1]) / 1000.0
 
         interline_delay = (float(instrument_group["InterlineDelayDuration"]) * 1.01725) / 1000.0
@@ -570,7 +570,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
         : float
           focal epsilon
         """
-        return float(self.naif_keywords['INS{}_FL_UNCERTAINTY'.format(self.ikid)][0])
+        return float(self.naif_keywords['INS{}_FL_UNCERTAINTY'.format(self.ikid)])
 
     @property
     def spacecraft_name(self):
@@ -750,7 +750,7 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
             try:
                 # Call frinfo to check if the ISIS iak has been loaded with the
                 # additional reference frame. Otherwise, Fail and add it manually
-                _ = self.spiceql_call("getFrameInfo", {"frame": self.sensor_frame_id, "mission": self.spiceql_mission})
+                _ = pyspiceql.getFrameInfo(frame=self.sensor_frame_id, mission=self.spiceql_mission, useWeb=self.use_web)
                 self._frame_chain = super().frame_chain
             except Exception as e:
                 nadir = self._props.get('nadir', False)

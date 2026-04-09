@@ -1,10 +1,11 @@
 import re
-import spiceypy as spice
 import math
+
 import numpy as np
+import pyspiceql
 from scipy.spatial.transform import Rotation
 from scipy.interpolate import CubicSpline
-
+import spiceypy as spice
 
 from ale.base import Driver, WrongInstrumentException
 from ale.base.data_naif import NaifSpice
@@ -78,7 +79,11 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
               # first line's middle et - 1/2 exposure duration = cube start time
               self._ephemeris_start_time = self.hk_ephemeris_time[0] - (self.line_exposure_duration/2)
           except:
-              self._ephemeris_start_time = self.spiceql_call("strSclkToEt", {"frameCode" : self.spacecraft_id, "sclk" : self.label['IsisCube']['Instrument']['SpacecraftClockStartCount'], "mission" : self.spiceql_mission})
+              self._ephemeris_start_time = pyspiceql.strSclkToEt(frameCode=self.spacecraft_id, 
+                                                                 sclk=self.label['IsisCube']['Instrument']['SpacecraftClockStartCount'], 
+                                                                 mission=self.spiceql_mission,
+                                                                 searchKernels=self.search_kernels,
+                                                                 seWeb=self.use_web)[0]
         return self._ephemeris_start_time
 
 
@@ -97,7 +102,11 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
               #  last line's middle et + 1/2 exposure duration = cube start time
               self._ephemeris_stop_time = self.hk_ephemeris_time[-1] + (self.line_exposure_duration/2)
           except:
-              self._ephemeris_stop_time = self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": self.label['IsisCube']['Instrument']['SpacecraftClockStopCount'], "mission": self.spiceql_mission})
+              self._ephemeris_stop_time = pyspiceql.strSclkToEt(frameCode=self.spacecraft_id, 
+                                                                sclk=self.label['IsisCube']['Instrument']['SpacecraftClockStopCount'], 
+                                                                mission=self.spiceql_mission,
+                                                                searchKernels=self.search_kernels,
+                                                                useWeb=self.use_web)[0]
         return self._ephemeris_stop_time
 
     @property
@@ -151,7 +160,7 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
                     else:
                         opt_angles[i] = cs(i+1)
 
-            line_mid_times = [self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": str(round(i,5)), "mission": self.spiceql_mission} ) for i in data_scet]
+            line_mid_times = [pyspiceql.strSclkToEt(frameCode=self.spacecraft_id, sclk=str(round(i,5)), mission=self.spiceql_mission, searchKernels=self.search_kernels, useWeb=self.use_web)[0] for i in data_scet]
             self._hk_ephemeris_time = line_mid_times
             self._optical_angle = opt_angles
             self._housekeeping= True
@@ -312,8 +321,12 @@ class RosettaVirtisIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, R
           time_dep_quats = np.zeros((len(self.hk_ephemeris_time), 4))
           avs = []
 
-          function_args = {"toFrame": self.sensor_frame_id, "refFrame": 1, "mission": self.spiceql_mission, "searchKernels": self.search_kernels}
-          rotations = spiceql_access.get_ephem_data(self.hk_ephemeris_time, "getTargetOrientations", web=self.use_web, function_args=function_args)
+          rotations = pyspiceql.getTargetOrientations(ets=self.hk_ephemeris_time, 
+                                                      toFrame=self.sensor_frame_id, 
+                                                      refFrame=1, 
+                                                      mission=self.spiceql_mission, 
+                                                      searchKernels=self.search_kernels, 
+                                                      useWeb=self.use_web)[0]
 
           for i, rotation in enumerate(rotations):
             quaternion = rotation[:4]

@@ -1,3 +1,5 @@
+import pyspiceql
+
 from ale.base import Driver, WrongInstrumentException
 from ale.base.label_isis import IsisLabel
 from ale.base.data_naif import NaifSpice
@@ -74,7 +76,7 @@ class ClementineIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistort
     @property
     def ephemeris_start_time(self):
         if not hasattr(self, "_ephemeris_start_time"):
-            self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+            self._ephemeris_start_time = pyspiceql.utcToEt(utc=self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"), searchKernels=self.search_kernels, useWeb=self.use_web)[0]
         return self._ephemeris_start_time
         
     @property
