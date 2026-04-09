@@ -63,13 +63,13 @@ namespace ale {
     static bool first_run = true;
 
     if(first_run) {
-       // Initialize the Python interpreter but only once.
-       first_run = !first_run;
-       Py_Initialize();
+      //  Initialize the Python interpreter but only once.
+      first_run = !first_run;
+      Py_Initialize();
     }
 
     // Import the file as a Python module.
-    PyObject *pModule = PyImport_Import(PyUnicode_FromString("ale"));
+    PyObject *pModule = PyImport_ImportModule("ale");
     if(!pModule) {
       throw runtime_error("Failed to import ale. Make sure the ale python library is correctly installed.");
     }
@@ -79,6 +79,7 @@ namespace ale {
     // Get the add method from the dictionary.
     PyObject *pFunc = PyDict_GetItemString(pDict, "loads");
     if(!pFunc) {
+      Py_DECREF(pModule);
       // import errors do not set a PyError flag, need to use a custom
       // error message instead.
       throw runtime_error("Failed to import ale.loads function from Python."
@@ -90,6 +91,7 @@ namespace ale {
     // Create a Python tuple to hold the arguments to the method.
     PyObject *pArgs = PyTuple_New(7);
     if(!pArgs) {
+      Py_DECREF(pModule);
       throw runtime_error(getPyTraceback());
     }
 
@@ -133,23 +135,8 @@ namespace ale {
 
     // Call the function with the arguments.
     PyObject* pResult = PyObject_CallObject(pFunc, pArgs);
-    if(!pResult) {
-      throw invalid_argument("No Valid instrument found for label.");
-    }
 
-    PyObject *pResultStr = PyObject_Str(pResult);
-    PyObject *temp_bytes = PyUnicode_AsUTF8String(pResultStr); // Owned reference
-
-    if(!temp_bytes){
-      throw invalid_argument(getPyTraceback());
-    }
-
-    std::string cResult;
-
-    char *temp_str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
-    cResult = temp_str; // copy into std::string
-
-    Py_DECREF(pResultStr);
+    Py_DECREF(pModule);
 
     Py_DECREF(pStringFileName);
     Py_DECREF(pStringProps);
@@ -159,6 +146,28 @@ namespace ale {
 
     Py_DECREF(pArgs);
 
+    if(!pResult) {
+      throw invalid_argument(getPyTraceback());
+    }
+
+    PyObject *pResultStr = PyObject_Str(pResult);
+    Py_DECREF(pResult);
+
+    PyObject *temp_bytes = PyUnicode_AsUTF8String(pResultStr); // Owned reference
+    Py_DECREF(pResultStr);
+
+    if(!temp_bytes){
+      std::string error = getPyTraceback();
+      throw invalid_argument(error);
+    }
+
+    std::string cResult;
+
+    char *temp_str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
+    Py_DECREF(temp_bytes);
+
+    cResult = temp_str; // copy into std::string
+    
     return cResult;
   }
 
