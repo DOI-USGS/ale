@@ -424,18 +424,30 @@ class IsisSpice():
         """
         regex = re.compile('CLOCK_ET_.*_COMPUTED')
         for key in self.naif_keywords:
-            if re.match(regex, key[0]):
-                # If the hex string is only numbers and contains leading 0s,
-                # the PVL library strips them off (ie. 0000000000002040 becomes
-                # 2040). Pad to 16 in case this happens.
-                return str(key[1]).zfill(16)
+            
+            
+            # if isinstance(key, tuple) and re.match(regex, key[0]):
+            #     logger.debug(f"regex match key[0]: {key[0]}")
+            #     return self.naif_keywords[key[0]]
+
+            # # gdal
+            # elif isinstance(key, str) and re.match(regex, key):
+            #     #logger.debug(f"regex match key: {key}")
+            #     return self.naif_keywords[key]
+
+
+            if isinstance(key, tuple) and re.match(regex, key[0]):
+                    # If the hex string is only numbers and contains leading 0s,
+                    # the PVL library strips them off (ie. 0000000000002040 becomes
+                    # 2040). Pad to 16 in case this happens.
+                    return str(key[1]).zfill(16)
 
             # In gtiffs, looks like:
             # "CLOCK_ET_-236_2":{
             #     "0072174528:989000_COMPUTED":"4a1edaaeddcbbc41"
             # }
 
-            elif key.startswith('CLOCK_ET_'):
+            elif isinstance(key, str) and key.startswith('CLOCK_ET_'):
                 for subkey in self.naif_keywords[key]:
                     if subkey.endswith('_COMPUTED'):
                         logger.debug(f"Computed sClock Hex: {self.naif_keywords[key][subkey]}")
@@ -629,16 +641,18 @@ class IsisSpice():
             this is formatted as semimajor, semimajor,
             semiminor
         """
-        logger.debug('Hit target_body_radii')
+        #logger.debug('Hit target_body_radii')
+
         regex = re.compile(r'BODY-?\d*_RADII')
         for key in self.naif_keywords:
-            if re.match(regex, key[0]):
-                logger.debug(f"regex match key[0]: {key[0]}")
+            #logger.debug(f"tbr key: {key}")
+            if isinstance(key, tuple) and re.match(regex, key[0]):
+                #logger.debug(f"regex match key[0]: {key[0]}")
                 return self.naif_keywords[key[0]]
 
             # gdal
-            elif re.match(regex, key):
-                logger.debug(f"regex match key: {key}")
+            elif isinstance(key, str) and re.match(regex, key):
+                #logger.debug(f"regex match key: {key}")
                 return self.naif_keywords[key]
 
     @property
