@@ -36,7 +36,7 @@ def read_table(self, priv_name, table_name):
             setattr(self, priv_name, parse_table_json(self.label[f"Table_{table_name}"]))
             return getattr(self, priv_name)
 
-        raise ValueError(f'Could not find {table_name} table on file {self._file}')
+        raise KeyError(f'Could not find {table_name} table on file {self._file}')
         
     return getattr(self, priv_name)
 
