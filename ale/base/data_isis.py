@@ -88,7 +88,6 @@ def parse_table(table_label, data):
 
     # Parse the binary data
     fields = table_label.getall('Field')
-    #logger.debug(f"Parse Table Fields: {fields}")
     results = {field['Name']:[] for field in fields}
     offset = 0
     for record in range(table_label['Records']):
@@ -137,17 +136,13 @@ def parse_table_json(table_label):
                     'Double'  : 'd',
                     'Real'    : 'f'}
 
-    # logger.debug("Parsing JSON Table.")
-
     fields = {table_label[k]['Name']: v for k, v in table_label.items() if k.startswith("Field")}
     results = {metadata['Name']:[] for field, metadata in fields.items()}
-    # logger.debug(f"Getting values for these fields: {results}")
     offset = 0
     for record in range(table_label['Records']):
         for field, metadata in fields.items():
-            # logger.debug(f"Metadata in field:{metadata}")
             if metadata['Type'] == 'Text':
-                logger.debug("Data Format: Text (Untested).")
+                logger.debug("Data Format: Text (Untested for JSON Format/.gtiff images).")
                 #field_data = data[offset:offset+field['Size']].decode(encoding='latin_1')
             else:
                 # Unpack numeric data
@@ -157,8 +152,6 @@ def parse_table_json(table_label):
 
                 if len(field_data) == 1:
                     field_data = field_data[0]
-
-                # logger.debug(f"Unpacked Data: {field_data}; Format: {data_format}; Hex: {data_chunk}")
 
             results[metadata['Name']].append(field_data)
             offset += data_sizes[metadata['Type']] * metadata['Size']
@@ -424,17 +417,6 @@ class IsisSpice():
         """
         regex = re.compile('CLOCK_ET_.*_COMPUTED')
         for key in self.naif_keywords:
-            
-            
-            # if isinstance(key, tuple) and re.match(regex, key[0]):
-            #     logger.debug(f"regex match key[0]: {key[0]}")
-            #     return self.naif_keywords[key[0]]
-
-            # # gdal
-            # elif isinstance(key, str) and re.match(regex, key):
-            #     #logger.debug(f"regex match key: {key}")
-            #     return self.naif_keywords[key]
-
 
             if isinstance(key, tuple) and re.match(regex, key[0]):
                     # If the hex string is only numbers and contains leading 0s,
@@ -446,17 +428,11 @@ class IsisSpice():
             # "CLOCK_ET_-236_2":{
             #     "0072174528:989000_COMPUTED":"4a1edaaeddcbbc41"
             # }
-
             elif isinstance(key, str) and key.startswith('CLOCK_ET_'):
                 for subkey in self.naif_keywords[key]:
                     if subkey.endswith('_COMPUTED'):
-                        logger.debug(f"Computed sClock Hex: {self.naif_keywords[key][subkey]}")
                         return str(self.naif_keywords[key][subkey]).zfill(16)
                         
-
-                    
-
-
         raise ValueError("No computed spacecraft clock time found in NaifKeywords.")
 
     @property
@@ -641,18 +617,12 @@ class IsisSpice():
             this is formatted as semimajor, semimajor,
             semiminor
         """
-        #logger.debug('Hit target_body_radii')
 
         regex = re.compile(r'BODY-?\d*_RADII')
         for key in self.naif_keywords:
-            #logger.debug(f"tbr key: {key}")
             if isinstance(key, tuple) and re.match(regex, key[0]):
-                #logger.debug(f"regex match key[0]: {key[0]}")
                 return self.naif_keywords[key[0]]
-
-            # gdal
-            elif isinstance(key, str) and re.match(regex, key):
-                #logger.debug(f"regex match key: {key}")
+            elif isinstance(key, str) and re.match(regex, key): # gdal
                 return self.naif_keywords[key]
 
     @property
