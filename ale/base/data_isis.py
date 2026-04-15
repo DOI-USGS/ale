@@ -286,19 +286,6 @@ class IsisSpice():
         """
         return read_table(self, "_inst_pointing_table", "InstrumentPointing")
 
-        # if not hasattr(self, "_inst_pointing_table"):
-        #     tables = []
-        #     if "Table" in self.label:
-        #         tables = self.label.getall('Table')
-
-        #     for table in tables:
-        #         if table['Name'] == 'InstrumentPointing':
-        #             binary_data = read_table_data(table, self._file)
-        #             self._inst_pointing_table = parse_table(table, binary_data)
-        #             return self._inst_pointing_table
-        #     raise ValueError(f'Could not find InstrumentPointing table on file {self._file}')
-        # return self._inst_pointing_table
-
     @property
     def body_orientation_table(self):
         """
@@ -310,21 +297,7 @@ class IsisSpice():
         : dict
           Body orientation table
         """
-
         return read_table(self, "_body_orientation_table", "BodyRotation")
-
-        # if not hasattr(self, "_body_orientation_table"):
-        #     tables = []
-        #     if "Table" in self.label:
-        #         tables = self.label.getall('Table')
-                
-        #     for table in tables:
-        #         if table['Name'] == 'BodyRotation':
-        #             binary_data = read_table_data(table, self._file)
-        #             self._body_orientation_table = parse_table(table, binary_data)
-        #             return self._body_orientation_table
-        #     raise ValueError(f'Could not find BodyRotation table on file {self._file}')
-        # return self._body_orientation_table
 
     @property
     def inst_position_table(self):
@@ -337,21 +310,7 @@ class IsisSpice():
         : dict
           Instrument position table
         """
-
         return read_table(self, "_inst_position_table", 'InstrumentPosition')
-
-        # if not hasattr(self, "_inst_position_table"):
-        #     tables = []
-        #     if "Table" in self.label:
-        #         tables = self.label.getall('Table')
-
-        #     for table in tables:
-        #         if table['Name'] == 'InstrumentPosition':
-        #             binary_data = read_table_data(table, self._file)
-        #             self._inst_position_table = parse_table(table, binary_data)
-        #             return self._inst_position_table
-        #     raise ValueError(f'Could not find InstrumentPosition table on file {self._file}')
-        # return self._inst_position_table
 
     @property
     def sun_position_table(self):
@@ -364,26 +323,7 @@ class IsisSpice():
         : dict
           Sun position table
         """
-
         return read_table(self, "_sun_position_table", "SunPosition")
-
-        # if not hasattr(self, "_sun_position_table"):
-        #     tables = []
-        #     if "Table" in self.label:
-        #         tables = self.label.getall('Table')
-
-        #     for table in tables:
-        #         if table['Name'] == 'SunPosition':
-        #             binary_data = read_table_data(table, self._file)
-        #             self._sun_position_table = parse_table(table, binary_data)
-        #             return self._sun_position_table
-        #     # GDAL
-        #     t_name='SunPosition'
-        #     if isinstance(self.label[f"Table_{t_name}"], dict): 
-        #         self._sun_position_table = parse_table_json(self.label[f"Table_{t_name}"])
-        #         return self._sun_position_table
-        #     raise ValueError(f'Could not find SunPosition table on file {self._file}')
-        # return self._sun_position_table
 
     def __enter__(self):
         """
