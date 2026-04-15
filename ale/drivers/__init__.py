@@ -84,10 +84,10 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
             For example, Drivers that use the NaifSpice mix-in use the 'kernels'
             property to specify an explicit set of kernels and load order.
 
-    formatter : {'ale', 'isis', 'usgscsm'}
-                Output format for the ISD. As of 0.8.0, it is recommended that
-                the `ale` formatter is used. The `isis` and `usgscsm` formatters
-                are retrained for backwards compatibility.
+    formatter : {'ale'} ('isis', and 'usgscsm' are deprecated)
+                Output format for the ISD. As of 1.2.0, only the
+                `ale` formatter can be used. The parameter is retrained 
+                for backwards compatibility.
 
     verbose : bool
               If True, displays debug output specifying which drivers were
@@ -106,8 +106,16 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
     dict
          The ISD as a dictionary
     """
+
+    logger_level = logger.getEffectiveLevel()
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
     if isinstance(formatter, str):
-        formatter = __formatters__[formatter]
+        if str == 'ale'
+            formatter = __formatters__[formatter]
+        else
+            logger.error("'ale' is the only available formatter.  All other formatters are deprecated.")
 
     if isinstance(props, str):
         if props in ("", "null"): 
@@ -115,9 +123,7 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
         else:
             props = json.loads(props)
 
-    logger_level = logger.getEffectiveLevel()
-    if verbose:
-        logger.setLevel(logging.DEBUG)
+    
 
     driver_mask = [only_isis_spice, only_naif_spice]
     class_list = [IsisSpice, NaifSpice]
