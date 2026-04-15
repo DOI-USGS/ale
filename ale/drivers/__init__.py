@@ -108,7 +108,7 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
     # usgscsm and isis formatter deprecation warning
     if isinstance(formatter, str):
         if str is not 'ale':
-            logger.warn("'ale' is the only available formatter, and will always be used.  All other formatters are deprecated.")
+            logger.warning("'ale' is the only available formatter, and will always be used.  All other formatters are deprecated.")
 
     if isinstance(props, str):
         if props in ("", "null"): 
