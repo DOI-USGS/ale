@@ -115,7 +115,7 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
         if str == 'ale'
             formatter = __formatters__[formatter]
         else
-            logger.error("'ale' is the only available formatter.  All other formatters are deprecated.")
+            raise KeyError("'ale' is the only available formatter.  All other formatters are deprecated.")
 
     if isinstance(props, str):
         if props in ("", "null"): 
