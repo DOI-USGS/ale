@@ -39,6 +39,9 @@ release.
 - Reduced linescan ISD ephemeris sampling from one-per-line to every 10th line for images with 1000+ lines, significantly reducing ISD file sizes and load times for large sensors. Configurable via `reduction` and `ephem_sample_rate` props. [#677](https://github.com/DOI-USGS/ale/pull/677)
 - Throw error when input file does not exist. [#692](https://github.com/DOI-USGS/ale/pull/692)
 
+### Removed
+- Removed isis_formatter and usgscsm_formatter. Ale formatter will always be used. [https://github.com/DOI-USGS/ale/pull/698]
+
 ### Fixed
 - Fixed Eigen 5.x compatibility by removing version constraint in CMakeLists.txt [#677](https://github.com/DOI-USGS/ale/pull/677)
 - Fixed C++ load(s) call failing when called again after throwing an error [#6967](https://github.com/DOI-USGS/ale/pull/696)
