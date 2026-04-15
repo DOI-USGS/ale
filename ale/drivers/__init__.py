@@ -112,9 +112,9 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
         logger.setLevel(logging.DEBUG)
 
     if isinstance(formatter, str):
-        if str == 'ale'
+        if str == 'ale':
             formatter = __formatters__[formatter]
-        else
+        else:
             raise KeyError("'ale' is the only available formatter.  All other formatters are deprecated.")
 
     if isinstance(props, str):
