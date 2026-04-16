@@ -40,7 +40,7 @@ release.
 - Throw error when input file does not exist. [#692](https://github.com/DOI-USGS/ale/pull/692)
 
 ### Removed
-- Removed isis_formatter and usgscsm_formatter. Ale formatter will always be used. [https://github.com/DOI-USGS/ale/pull/698]
+- Removed isis_formatter and usgscsm_formatter. Ale formatter will always be used. [#698](https://github.com/DOI-USGS/ale/pull/698)
 
 ### Fixed
 - Fixed Eigen 5.x compatibility by removing version constraint in CMakeLists.txt [#677](https://github.com/DOI-USGS/ale/pull/677)
