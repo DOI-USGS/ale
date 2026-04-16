@@ -76,12 +76,12 @@ def test_load_invalid_spice_root(monkeypatch):
         ale.load(label_file)
 
 
-def test_load_driver():
+def test_load_driver(mess_kernels):
 
     label_file = get_image_label('EN1072174528M')
 
-    isd_from_load = ale.load(label_file)
-    my_driver = ale.load(label_file, return_driver=True)
+    isd_from_load = ale.load(label_file, {'kernels': mess_kernels})
+    my_driver = ale.load(label_file, {'kernels': mess_kernels}, return_driver=True)
 
     with my_driver(label_file) as driver:
         isd_from_driver = to_isd(driver)
