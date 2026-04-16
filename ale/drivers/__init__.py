@@ -54,7 +54,8 @@ class AleJsonEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False, only_naif_spice=False):
+def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False, only_naif_spice=False, return_driver=False):
+# def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False, only_naif_spice=False):
     """
     Attempt to load a given label from possible drivers.
 
@@ -101,10 +102,18 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
                       Explicitly searches for drivers constructed from the NaifSpice
                       component class
 
+    return_driver : bool
+                    if true, returns the successful driver instead of an ISD
+
     Returns
     -------
     dict
          The ISD as a dictionary
+
+    ale.driver
+         The successful driver (instead of an ISD dict, 
+         if return_driver is set to true)
+         
     """
     if isinstance(formatter, str):
         formatter = __formatters__[formatter]
@@ -180,6 +189,8 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
         if verbose:
             logger.info(f'Trying {driver.__name__}')
         try:
+            if return_driver:    # Save driver class before it is replaced with an instance of itself
+                current_driver = driver
             res = driver(label, props=props, parsed_label=parsed_label)
             # get instrument_id to force early failure
             res.instrument_id
@@ -191,6 +202,8 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
                     logger.info(f"Success with: {driver.__class__.__name__}")
                     logger.info(f"ISD:\n{json.dumps(isd, indent=2, cls=AleJsonEncoder)}")
                     logger.setLevel(logger_level)
+                if return_driver:
+                    return current_driver
                 return isd
         except WrongLabelTypeException as e:
             if verbose:
