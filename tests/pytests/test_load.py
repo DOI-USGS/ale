@@ -10,6 +10,7 @@ from ale import util
 from ale.drivers import sort_drivers
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
+from ale.formatters.formatter import to_isd
 
 from ale.drivers.mess_drivers import MessengerMdisPds3NaifSpiceDriver
 
@@ -74,6 +75,21 @@ def test_load_invalid_spice_root(monkeypatch):
     with pytest.raises(Exception):
         ale.load(label_file)
 
+
+def test_load_driver():
+
+    label_file = get_image_label('EN1072174528M')
+
+    isd_from_load = ale.load(label_file)
+    my_driver = ale.load(label_file, return_driver=True)
+
+    with my_driver(label_file) as driver:
+        isd_from_driver = to_isd(driver)
+
+    comparison = compare_dicts(isd_from_driver, isd_from_load)
+    assert comparison == []
+
+    
 
 def test_load_mes_from_metakernels(tmpdir, monkeypatch, mess_kernels):
     with patch.dict('os.environ', {'ALESPICEROOT': str(tmpdir)}):
