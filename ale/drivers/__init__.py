@@ -79,7 +79,7 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
             property to specify an explicit set of kernels and load order.
 
     formatter : {'ale'} ('isis', and 'usgscsm' are deprecated)
-                Output format for the ISD. As of 1.2.0, the
+                Output format for the ISD. As of 2.0.0, the
                 `ale` formatter is always used. The parameter is retained 
                 for backwards compatibility.
 
