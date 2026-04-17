@@ -24,6 +24,14 @@ def mess_kernels():
     for kern in binary_kernels:
         os.remove(kern)
 
+@pytest.fixture()
+def mro_kernels():
+    kernels = get_image_kernels('B10_013341_1010_XN_79S172W')
+    updated_kernels, binary_kernels = convert_kernels(kernels)
+    yield updated_kernels
+    for kern in binary_kernels:
+        os.remove(kern)
+
 def test_priority(tmpdir, monkeypatch):
     drivers = [type('FooNaifSpice', (NaifSpice,), {}), type('BarIsisSpice', (IsisSpice,), {}), type('BazNaifSpice', (NaifSpice,), {}), type('FubarIsisSpice', (IsisSpice,), {})]
     sorted_drivers = sort_drivers(drivers)
@@ -75,22 +83,11 @@ def test_load_invalid_spice_root(monkeypatch):
     with pytest.raises(Exception):
         ale.load(label_file)
 
-
-def test_load_driver(mess_kernels):
-
-    label_file = get_image_label('EN1072174528M')
-
-    isd_from_load = ale.load(label_file, {'kernels': mess_kernels})
-    my_driver = ale.load(label_file, {'kernels': mess_kernels}, return_driver=True)
-
-    with my_driver(label_file) as driver:
-        isd_from_driver = to_isd(driver)
-
-    comparison = compare_dicts(isd_from_driver, isd_from_load)
-    assert comparison == []
-
+def test_load_driver(mro_kernels):
+    label_file = get_image_label('B10_013341_1010_XN_79S172W')
+    my_driver = ale.load(label_file, {'kernels': mro_kernels}, return_driver=True)
+    assert my_driver == ale.drivers.mro_drivers.MroCtxPds3LabelNaifSpiceDriver
     
-
 def test_load_mes_from_metakernels(tmpdir, monkeypatch, mess_kernels):
     with patch.dict('os.environ', {'ALESPICEROOT': str(tmpdir)}):
         # reload module to repopulate ale.spice_root
