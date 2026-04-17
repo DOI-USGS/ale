@@ -1,7 +1,8 @@
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
 import os
-import json 
+import json
+import logging
 
 from ale.base.type_sensor import LineScanner, Framer, Radar, PushFrame
 from ale import logger

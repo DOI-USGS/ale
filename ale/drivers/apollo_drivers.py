@@ -106,7 +106,7 @@ class ApolloMetricIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDisto
         : str
           Spacecraft clock start count
         """
-        return pyspiceql.utcToEt(utc=self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"), useWeb=self.use_web)[0] 
+        return pyspiceql.utcToEt(utc=self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"), useWeb=self.use_web, searchKernels=self.search_kernels)[0] 
 
     @property
     def ephemeris_stop_time(self):
