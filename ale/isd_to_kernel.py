@@ -484,12 +484,15 @@ def isd_to_kernel(
         # 3. Platform name: name_platform
         # 4. Custom combination name: <platform_name>_<sensor_name>
         # FYI, combination name necessary for apolloPanImage_isd.json
-        platform_sensor = f"{isd_dict.get('name_platform')}_{isd_dict.get('name_sensor')}"
+        naif_frame_name = next((v for k, v in isd_dict.get("naif_keywords", {}).items() 
+                if k.startswith("FRAME_") and k.endswith("_NAME")), None)
+        sensor_name = isd_dict.get("name_sensor")
+        platform_name = isd_dict.get("name_platform")
+        platform_sensor = f"{platform_name}_{sensor_name}"
         frame_candidates = [
-            (next((v for k, v in isd_dict.get("naif_keywords", {}).items() 
-                if k.startswith("FRAME_") and k.endswith("_NAME")), None), "naif_keywords"),
-            (isd_dict.get("name_sensor"), "name_sensor"),
-            (isd_dict.get("name_platform"), "name_platform"),
+            (naif_frame_name, "naif_keywords"),
+            (sensor_name, "name_sensor"),
+            (platform_name, "name_platform"),
             (platform_sensor, "platform_sensor")
         ]
 
@@ -504,13 +507,13 @@ def isd_to_kernel(
                 logger.info(f"Resolved mission_name [{mission_name}] using {label} [{frame_name}]")
                 break
             else:
-                logger.info(f"Frame name [{candidate_value}] from {label} not found in SpiceQL aliasMap.")
+                logger.info(f"Frame name [{candidate_value}] from {label} not found in SpiceQL's aliasMap.")
 
         if not mission_name:
             raise Exception(
-                f"Could not find a valid mission name. Checked NAIF keywords, "
-                f"sensor name [{isd_dict.get('name_sensor')}], "
-                f"platform name [{isd_dict.get('name_platform')}], "
+                f"Could not find a valid mission name. Checked NAIF keyword [{naif_frame_name}], "
+                f"sensor name [{sensor_name}], "
+                f"platform name [{platform_name}], "
                 f"and custom PLATFORM_SENSOR name [{platform_sensor}]."
             )
         logger.info(f"frame_name={frame_name}, mission_name={mission_name}")
