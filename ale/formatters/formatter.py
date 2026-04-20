@@ -231,7 +231,10 @@ def to_isd(driver):
     elif 'kernels' in driver_data and isinstance(driver.kernels, list): 
         kernels_dict  = {}
         for k in driver.kernels:
-            k = k.replace(os.environ["ISISDATA"], "")
+            if "ISISDATA" in os.environ:
+                k = k.replace(os.environ["ISISDATA"], "")
+            if "ALESPICEROOT" in os.environ:
+                k = k.replace(os.environ["ALESPICEROOT"], "")
             if ("base/kernels/spk" in k):
                 k_type = "tspk"
             else:

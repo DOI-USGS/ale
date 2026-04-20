@@ -138,13 +138,13 @@ class FrameChain(nx.DiGraph):
                                                       mission=mission,
                                                       ckQualities=["reconstructed"],
                                                       searchKernels=frame_chain.search_kernels,
-                                                      useWeb=frame_chain.use_web)
+                                                      useWeb=frame_chain.use_web)[0]
 
                 if len(times) == 0:
                     logger.debug(f"No exact CK times found")
                     exact_ck_times = False
                 else:
-                    logger.debug(f"Found {len(times)} exact CK time(s)")
+                    logger.debug(f"Found {len(times)} exact CK time(s) for {sensor_frame}")
 
             except Exception as e:
                 exact_ck_times = False
