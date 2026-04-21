@@ -40,6 +40,9 @@ release.
 - Throw error when input file does not exist. [#692](https://github.com/DOI-USGS/ale/pull/692)
 - Changed all `spiceql_call` functions to use pyspiceql [#695](https://github.com/DOI-USGS/ale/pull/695)
 
+### Removed
+- Removed isis_formatter and usgscsm_formatter. Ale formatter will always be used. [#698](https://github.com/DOI-USGS/ale/pull/698)
+
 ### Fixed
 - Fixed Eigen 5.x compatibility by removing version constraint in CMakeLists.txt [#677](https://github.com/DOI-USGS/ale/pull/677)
 - Fixed C++ load(s) call failing when called again after throwing an error [#6967](https://github.com/DOI-USGS/ale/pull/696)

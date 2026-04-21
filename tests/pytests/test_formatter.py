@@ -1,6 +1,7 @@
 import pytest
 import json
 import numpy as np
+from datetime import datetime
 
 from ale.formatters import formatter
 from ale.base.base import Driver
@@ -175,6 +176,28 @@ class DummyLineScannerDriver(LineScanner, DummyNaifSpiceDriver):
     def exposure_duration(self):
         return .01
 
+    @property
+    def utc_start_time(self):
+        return datetime(2015, 4, 24, 4, 42, 19, 666463)
+
+    @property
+    def kernels(self):
+        return {
+            "ck"  : [],
+            "spk" : [],
+            "tspk": [],
+            "fk"  : [],
+            "ik"  : [],
+            "iak" : [],
+            "pck" : [],
+            "lsk" : [],
+            "sclk": []
+        }
+
+    @property
+    def instrument_id(self):
+        return "APOLLO_METRIC"
+
 @pytest.fixture
 def driver():
     return DummyFramerDriver('')
@@ -210,6 +233,28 @@ class DummyFramerDriver(Framer, DummyNaifSpiceDriver):
     @property
     def image_lines(self):
         return 512
+
+    @property
+    def utc_start_time(self):
+        return datetime(2015, 4, 24, 4, 42, 19, 666463)
+
+    @property
+    def kernels(self):
+        return {
+            "ck"  : [],
+            "spk" : [],
+            "tspk": [],
+            "fk"  : [],
+            "ik"  : [],
+            "iak" : [],
+            "pck" : [],
+            "lsk" : [],
+            "sclk": []
+        }
+
+    @property
+    def instrument_id(self):
+        return "APOLLO_METRIC"
 
 @pytest.fixture
 def test_line_scan_driver():

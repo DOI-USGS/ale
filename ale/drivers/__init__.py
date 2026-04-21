@@ -14,8 +14,6 @@ import traceback
 from ale.base import WrongInstrumentException, WrongLabelTypeException
 import logging
 
-from ale.formatters.usgscsm_formatter import to_usgscsm
-from ale.formatters.isis_formatter import to_isis
 from ale.formatters.formatter import to_isd
 from ale.base.data_isis import IsisSpice
 from ale.base.data_naif import NaifSpice
@@ -31,10 +29,6 @@ __disabled_drivers__ = ["tgo_drivers", "osirisrex_drivers"]
 __all__ = [os.path.splitext(os.path.basename(d))[0] for d in glob(os.path.join(os.path.dirname(__file__), '*_drivers.py'))]
 __all__ = [driver for driver in __all__ if driver not in __disabled_drivers__]
 __driver_modules__ = [importlib.import_module('.'+m, package='ale.drivers') for m in __all__]
-
-__formatters__ = {'usgscsm': to_usgscsm,
-                  'isis': to_isis,
-                  'ale' : to_isd}
 
 def sort_drivers(drivers=[]):
     return list(sorted(set(drivers), key=lambda x:IsisSpice in x.__bases__, reverse=False))
@@ -84,10 +78,10 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
             For example, Drivers that use the NaifSpice mix-in use the 'kernels'
             property to specify an explicit set of kernels and load order.
 
-    formatter : {'ale', 'isis', 'usgscsm'}
-                Output format for the ISD. As of 0.8.0, it is recommended that
-                the `ale` formatter is used. The `isis` and `usgscsm` formatters
-                are retrained for backwards compatibility.
+    formatter : {'ale'} ('isis', and 'usgscsm' are deprecated)
+                Output format for the ISD. As of 2.0.0, the
+                `ale` formatter is always used. The parameter is retained 
+                for backwards compatibility.
 
     verbose : bool
               If True, displays debug output specifying which drivers were
@@ -106,8 +100,15 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
     dict
          The ISD as a dictionary
     """
+
+    logger_level = logger.getEffectiveLevel()
+    if verbose:
+        logger.setLevel(logging.DEBUG)
+
+    # usgscsm and isis formatter deprecation warning
     if isinstance(formatter, str):
-        formatter = __formatters__[formatter]
+        if str is not 'ale':
+            logger.warning("'ale' is the only available formatter, and will always be used.  All other formatters are deprecated.")
 
     if isinstance(props, str):
         if props in ("", "null"): 
@@ -115,9 +116,7 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
         else:
             props = json.loads(props)
 
-    logger_level = logger.getEffectiveLevel()
-    if verbose:
-        logger.setLevel(logging.DEBUG)
+    
 
     driver_mask = [only_isis_spice, only_naif_spice]
     class_list = [IsisSpice, NaifSpice]
@@ -184,7 +183,7 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
             # get instrument_id to force early failure
             res.instrument_id
             with res as driver:
-                isd = formatter(driver)
+                isd = to_isd(driver) # if adding other formatters in the future, set in place of 'to_isd'
                 if 'attach_kernels' in props and props['attach_kernels'] is False and 'kernels' in isd:
                     del isd['kernels']
                 if verbose:

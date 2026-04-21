@@ -34,7 +34,7 @@ def test_mess_load(class_truth, return_val, mess_kernels):
     label_file = get_image_label('EN1072174528M')
 
     try:
-        usgscsm_isd_str = ale.loads(label_file, {'kernels': mess_kernels}, 'usgscsm', False, **class_truth)
+        usgscsm_isd_str = ale.loads(label_file, {'kernels': mess_kernels}, 'ale', False, **class_truth)
         usgscsm_isd_obj = json.loads(usgscsm_isd_str)
 
         assert return_val is True
