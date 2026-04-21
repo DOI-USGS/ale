@@ -103,13 +103,11 @@ class test_pds_naif(unittest.TestCase):
         assert self.driver.sensor_model_version == 2
 
     def test_odtk(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
+        with patch.object(LroLrocNacPds3LabelNaifSpiceDriver, 'ikid', new_callable=PropertyMock) as ikid, \
              patch('ale.drivers.lro_drivers.LroLrocNacPds3LabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            ikid.return_value = -12345
             naif_keywords.return_value = {"INS-12345_OD_K": [1.0]}
             assert self.driver.odtk == [1.0]
-            calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
 
     def test_usgscsm_distortion_model(self):
         with patch('ale.drivers.lro_drivers.LroLrocNacPds3LabelNaifSpiceDriver.odtk', \
@@ -119,17 +117,13 @@ class test_pds_naif(unittest.TestCase):
             assert distortion_model['lrolrocnac']['coefficients'] == [1.0]
 
     def test_ephemeris_start_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[5]) as spiceql_call, \
-             patch('ale.drivers.lro_drivers.LroLrocNacPds3LabelNaifSpiceDriver.exposure_duration', \
-                   new_callable=PropertyMock) as exposure_duration, \
-             patch('ale.drivers.lro_drivers.LroLrocNacPds3LabelNaifSpiceDriver.spacecraft_id', \
-                   new_callable=PropertyMock) as spacecraft_id:
-            exposure_duration.return_value = 0.1
+        with patch('ale.drivers.lro_drivers.pyspiceql.strSclkToEt', return_value=[321]) as strSclkToEt, \
+             patch.object(LroLrocNacPds3LabelNaifSpiceDriver, 'spacecraft_id', new_callable=PropertyMock) as spacecraft_id:
             spacecraft_id.return_value = 1234
-            assert self.driver.ephemeris_start_time == 107.4
-            calls = [call('strSclkToEt', {'frameCode': 1234, 'sclk': '1/270649237:07208', 'mission': 'lroc', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
+            np.testing.assert_almost_equal(self.driver.ephemeris_start_time, 322.05823191)
+            calls = [call(frameCode=1234, sclk='1/270649237:07208', mission='lroc', searchKernels=False, useWeb=False)]
+            strSclkToEt.assert_has_calls(calls)
+            assert strSclkToEt.call_count == 1
 
     def test_exposure_duration(self):
         with patch('ale.base.label_pds3.Pds3Label.exposure_duration', \
@@ -141,37 +135,41 @@ class test_pds_naif(unittest.TestCase):
     @patch('ale.transformation.FrameChain.from_spice', return_value=ale.transformation.FrameChain())
     @patch('ale.transformation.FrameChain.compute_rotation', return_value=TimeDependentRotation([[0, 0, 1, 0]], [0], 0, 0))
     def test_spacecraft_direction(self, compute_rotation, from_spice, frame_chain):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, -12345, [[1, 1, 1, 1, 1, 1, 1]]]) as spiceql_call, \
+        with patch.object(ale.drivers.lro_drivers.NaifSpice, 'ikid', new_callable=PropertyMock) as ikid, \
+             patch('ale.drivers.lro_drivers.pyspiceql.translateNameToCode', return_value=[-12345]) as translateNameToCode, \
+             patch('ale.drivers.lro_drivers.pyspiceql.getTargetStates', return_value=[[[1, 1, 1, 1, 1, 1, 1]]]) as getTargetStates, \
              patch('ale.drivers.lro_drivers.spice.mxv', return_value=[1, 1, 1]) as mxv, \
-             patch('ale.drivers.lro_drivers.LroLrocNacPds3LabelNaifSpiceDriver.target_frame_id', \
-             new_callable=PropertyMock) as target_frame_id, \
-             patch('ale.drivers.lro_drivers.LroLrocNacPds3LabelNaifSpiceDriver.ephemeris_start_time', \
-             new_callable=PropertyMock) as ephemeris_start_time:
+             patch.object(LroLrocNacPds3LabelNaifSpiceDriver, 'sensor_frame_id', new_callable=PropertyMock) as sensor_frame_id, \
+             patch.object(LroLrocNacPds3LabelNaifSpiceDriver, 'target_frame_id', new_callable=PropertyMock) as target_frame_id, \
+             patch.object(LroLrocNacPds3LabelNaifSpiceDriver, 'ephemeris_start_time', new_callable=PropertyMock) as ephemeris_start_time:
+            ikid.return_value = -12345
+            sensor_frame_id.return_value = -12345
+            target_frame_id.return_value = -12345
             ephemeris_start_time.return_value = 0
             assert self.driver.spacecraft_direction > 0
-            calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False),
-                     call('translateNameToCode', {'frame': 'LRO_SC_BUS', 'mission': 'lroc', 'searchKernels': False}, False),
-                     call('getTargetStates', {'ets': [0], 'target': 'LRO', 'observer': 'MOON', 'frame': 'J2000', 'abcorr': 'None', 'mission': 'lroc', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 3
+            calls = [call(frame='LRO_SC_BUS', mission='lroc', searchKernels=False, useWeb=False),
+                     call(ets=[0], target='LRO', observer='MOON', frame='J2000', abcorr='None', mission='lroc', searchKernels=False, useWeb=False)]
+            translateNameToCode.assert_has_calls([calls[0]])
+            assert translateNameToCode.call_count == 1
+
+            getTargetStates.assert_has_calls([calls[1]])
+            assert getTargetStates.call_count == 1
+
             compute_rotation.assert_called_with(1, -12345)
             np.testing.assert_array_equal(np.array([[-1.0, 0.0, 0.0], [0.0, -1.0, 0.0], [0.0, 0.0, 1.0]]), mxv.call_args[0][0])
             np.testing.assert_array_equal(np.array([1, 1, 1]), mxv.call_args[0][1])
 
     def test_focal2pixel_lines(self):
         with patch('ale.drivers.lro_drivers.LroLrocNacPds3LabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords, \
-             patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, 321]) as spiceql_call, \
+             patch.object(LroLrocNacPds3LabelNaifSpiceDriver, 'ikid', new_callable=PropertyMock) as ikid, \
              patch('ale.drivers.lro_drivers.LroLrocNacPds3LabelNaifSpiceDriver.spacecraft_direction', \
              new_callable=PropertyMock) as spacecraft_direction:
             naif_keywords.return_value = {"INS-12345_ITRANSL": [0, 1, 0]}
+            ikid.return_value = -12345
             spacecraft_direction.return_value = -1
             np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, -1, 0])
             spacecraft_direction.return_value = 1
             np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, 1, 0])
-            calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
-
 
 # ========= Test isislabel and naifspice driver =========
 class test_isis_naif(unittest.TestCase):
@@ -187,46 +185,38 @@ class test_isis_naif(unittest.TestCase):
         assert self.driver.instrument_id == 'LRO_LROCNACL'
 
     def test_usgscsm_distortion_model(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
-             patch('ale.drivers.lro_drivers.LroLrocNacIsisLabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords:
-            naif_keywords.return_value = {"INS-12345_OD_K": [1.0]}
+        with patch('ale.drivers.lro_drivers.LroLrocNacIsisLabelNaifSpiceDriver.odtk', \
+                   new_callable=PropertyMock) as odtk:
+            odtk.return_value = [1.0]
             distortion_model = self.driver.usgscsm_distortion_model
             assert distortion_model['lrolrocnac']['coefficients'] == [1.0]
-            calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
 
     def test_odtk(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345]) as spiceql_call, \
+        with patch.object(LroLrocNacIsisLabelNaifSpiceDriver, 'ikid', new_callable=PropertyMock) as ikid, \
              patch('ale.drivers.lro_drivers.LroLrocNacIsisLabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords:
+            ikid.return_value = -12345
             naif_keywords.return_value = {"INS-12345_OD_K": [1.0]}
             assert self.driver.odtk == [1.0]
-            calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
 
     def test_light_time_correction(self):
         assert self.driver.light_time_correction == 'NONE'
 
     def test_detector_center_sample(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, 321]) as spiceql_call, \
-             patch('ale.drivers.lro_drivers.LroLrocNacIsisLabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords:
-            naif_keywords.return_value = {"INS-12345_BORESIGHT_SAMPLE": 1.0}
+        with patch.object(ale.drivers.lro_drivers.NaifSpice, 'detector_center_sample', new_callable=PropertyMock) as detector_center_sample:
+            detector_center_sample.return_value = 1.0
             assert self.driver.detector_center_sample == 0.5
-            calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
 
     def test_exposure_duration(self):
         np.testing.assert_almost_equal(self.driver.exposure_duration, .0010334296)
 
     def test_ephemeris_start_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-85, 321]) as spiceql_call:
+        with patch('ale.drivers.lro_drivers.pyspiceql.strSclkToEt', return_value=[321]) as strSclkToEt, \
+             patch.object(LroLrocNacIsisLabelNaifSpiceDriver, 'spacecraft_id', new_callable=PropertyMock) as spacecraft_id:
+            spacecraft_id.return_value = -85
             np.testing.assert_almost_equal(self.driver.ephemeris_start_time, 322.05823191)
-            calls = [call('translateNameToCode', {'frame': 'LUNAR RECONNAISSANCE ORBITER', 'mission': 'lroc', 'searchKernels': False}, False),
-                     call('strSclkToEt', {'frameCode': -85, 'sclk': '1/270649237:07208', 'mission': 'lroc', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 2
+            calls = [call(frameCode=-85, sclk='1/270649237:07208', mission='lroc', searchKernels=False, useWeb=False)]
+            strSclkToEt.assert_has_calls(calls)
+            assert strSclkToEt.call_count == 1
 
     def test_multiplicative_line_error(self):
         assert self.driver.multiplicative_line_error == 0.0045
@@ -247,36 +237,41 @@ class test_isis_naif(unittest.TestCase):
     @patch('ale.transformation.FrameChain.from_spice', return_value=ale.transformation.FrameChain())
     @patch('ale.transformation.FrameChain.compute_rotation', return_value=TimeDependentRotation([[0, 0, 1, 0]], [0], 0, 0))
     def test_spacecraft_direction(self, compute_rotation, from_spice, frame_chain):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, -12345, [[1, 1, 1, 1, 1, 1, 1]]]) as spiceql_call, \
+        with patch.object(ale.drivers.lro_drivers.NaifSpice, 'ikid', new_callable=PropertyMock) as ikid, \
+             patch('ale.drivers.lro_drivers.pyspiceql.translateNameToCode', return_value=[-12345]) as translateNameToCode, \
+             patch('ale.drivers.lro_drivers.pyspiceql.getTargetStates', return_value=[[[1, 1, 1, 1, 1, 1, 1]]]) as getTargetStates, \
              patch('ale.drivers.lro_drivers.spice.mxv', return_value=[1, 1, 1]) as mxv, \
-             patch('ale.drivers.lro_drivers.LroLrocNacIsisLabelNaifSpiceDriver.target_frame_id', \
-             new_callable=PropertyMock) as target_frame_id, \
-             patch('ale.drivers.lro_drivers.LroLrocNacIsisLabelNaifSpiceDriver.ephemeris_start_time', \
-             new_callable=PropertyMock) as ephemeris_start_time:
+             patch.object(LroLrocNacIsisLabelNaifSpiceDriver, 'sensor_frame_id', new_callable=PropertyMock) as sensor_frame_id, \
+             patch.object(LroLrocNacIsisLabelNaifSpiceDriver, 'target_frame_id', new_callable=PropertyMock) as target_frame_id, \
+             patch.object(LroLrocNacIsisLabelNaifSpiceDriver, 'ephemeris_start_time', new_callable=PropertyMock) as ephemeris_start_time:
+            ikid.return_value = -12345
+            sensor_frame_id.return_value = -12345
+            target_frame_id.return_value = -12345
             ephemeris_start_time.return_value = 0
             assert self.driver.spacecraft_direction > 0
-            calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False),
-                     call('translateNameToCode', {'frame': 'LRO_SC_BUS', 'mission': 'lroc', 'searchKernels': False}, False),
-                     call('getTargetStates', {'ets': [0], 'target': 'LUNAR RECONNAISSANCE ORBITER', 'observer': 'MOON', 'frame': 'J2000', 'abcorr': 'None', 'mission': 'lroc', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 3
+            calls = [call(frame='LRO_SC_BUS', mission='lroc', searchKernels=False, useWeb=False),
+                     call(ets=[0], target='LUNAR RECONNAISSANCE ORBITER', observer='MOON', frame='J2000', abcorr='None', mission='lroc', searchKernels=False, useWeb=False)]
+            translateNameToCode.assert_has_calls([calls[0]])
+            assert translateNameToCode.call_count == 1
+
+            getTargetStates.assert_has_calls([calls[1]])
+            assert getTargetStates.call_count == 1
+
             compute_rotation.assert_called_with(1, -12345)
             np.testing.assert_array_equal(np.array([[-1.0, 0.0, 0.0], [0.0, -1.0, 0.0], [0.0, 0.0, 1.0]]), mxv.call_args[0][0])
             np.testing.assert_array_equal(np.array([1, 1, 1]), mxv.call_args[0][1])
 
     def test_focal2pixel_lines(self):
         with patch('ale.drivers.lro_drivers.LroLrocNacIsisLabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords, \
-             patch('ale.spiceql_access.spiceql_call', side_effect=[-12345, 321]) as spiceql_call, \
+            patch.object(LroLrocNacIsisLabelNaifSpiceDriver, 'ikid', new_callable=PropertyMock) as ikid, \
              patch('ale.drivers.lro_drivers.LroLrocNacIsisLabelNaifSpiceDriver.spacecraft_direction', \
              new_callable=PropertyMock) as spacecraft_direction:
             naif_keywords.return_value = {"INS-12345_ITRANSL": [0, 1, 0]}
+            ikid.return_value = -12345
             spacecraft_direction.return_value = -1
             np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, -1, 0])
             spacecraft_direction.return_value = 1
             np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0, 1, 0])
-            calls = [call('translateNameToCode', {'frame': 'LRO_LROCNACL', 'mission': 'lroc', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
 
 # ========= Test MiniRf isislabel and naifspice driver =========
 class test_miniRf(unittest.TestCase):
@@ -297,18 +292,16 @@ class test_miniRf(unittest.TestCase):
         assert len(self.driver.range_conversion_coefficients) == 20
 
     def test_ephemeris_start_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
+        with patch('ale.drivers.lro_drivers.pyspiceql.utcToEt', return_value=[12345]) as utcToEt:
             assert self.driver.ephemeris_start_time == 12344.995295578527
-            calls = [call('utcToEt', {'utc': '2010-04-25 04:22:31.244874', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
+            calls = [call(utc='2010-04-25 04:22:31.244874', searchKernels=False, useWeb=False)]
+            utcToEt.assert_has_calls(calls)
+            assert utcToEt.call_count == 1
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
+        with patch.object(LroMiniRfIsisLabelNaifSpiceDriver, 'ephemeris_start_time', new_callable=PropertyMock) as ephemeris_start_time:
+            ephemeris_start_time.return_value = 12344.995295578527
             assert self.driver.ephemeris_stop_time == 12348.297799453276
-            calls = [call('utcToEt', {'utc': '2010-04-25 04:22:31.244874', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
 
     @patch('ale.drivers.lro_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock)
     def test_naif_keywords(self, naif_keywords):
@@ -333,12 +326,11 @@ class test_wac_isis_naif(unittest.TestCase):
         assert self.driver.instrument_id == 'LRO_LROCWAC_UV'
 
     def test_ephemeris_start_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-85, 321]) as spiceql_call:
+        with patch.object(ale.drivers.lro_drivers.NaifSpice, 'ephemeris_start_time', new_callable=PropertyMock) as ephemeris_start_time, \
+             patch.object(LroLrocWacIsisLabelNaifSpiceDriver, 'spacecraft_id', new_callable=PropertyMock) as spacecraft_id:
+            ephemeris_start_time.return_value = 321
+            spacecraft_id.return_value = -85
             np.testing.assert_almost_equal(self.driver.ephemeris_start_time, 321.02)
-            calls = [call('translateNameToCode', {'frame': 'LUNAR RECONNAISSANCE ORBITER', 'mission': 'lroc', 'searchKernels': False}, False),
-                     call('strSclkToEt', {'frameCode': -85, 'sclk': '1/274692469:15073', 'mission': 'lroc', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 2
 
     def test_detector_center_sample(self):
         with patch('ale.drivers.lro_drivers.LroLrocWacIsisLabelNaifSpiceDriver.naif_keywords', new_callable=PropertyMock) as naif_keywords:

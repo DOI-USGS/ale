@@ -66,6 +66,7 @@ def test_time_dependent_time_dependent_composition():
     expected_quats = np.asarray([[0, 0, 0, -1], [1, 0, 0, 0], [0, 0, 0, -1]])
     expected_av = [[np.pi, 0, 0], [np.pi, 0, 0], [np.pi, 0, 0]]
     np.testing.assert_equal(rot1_3.times, expected_times)
+    print(rot1_3.quats, expected_quats)
     assert compare_quats(rot1_3.quats, expected_quats)
     np.testing.assert_almost_equal(rot1_3.av, expected_av)
 

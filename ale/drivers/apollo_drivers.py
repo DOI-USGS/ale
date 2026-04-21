@@ -1,5 +1,5 @@
 import pvl
-import spiceypy as spice
+import pyspiceql
 
 from ale.base import Driver, WrongInstrumentException
 from ale.base.data_naif import NaifSpice
@@ -106,7 +106,7 @@ class ApolloMetricIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDisto
         : str
           Spacecraft clock start count
         """
-        return self.spiceql_call("utcToEt", {"utc" : self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})
+        return pyspiceql.utcToEt(utc=self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"), useWeb=self.use_web, searchKernels=self.search_kernels)[0] 
 
     @property
     def ephemeris_stop_time(self):

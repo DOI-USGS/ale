@@ -2,6 +2,8 @@ import pvl
 import json
 import datetime
 
+from ale.base import WrongLabelTypeException
+
 class IsisLabel():
     """
     Mix-in for parsing ISIS Cube labels.

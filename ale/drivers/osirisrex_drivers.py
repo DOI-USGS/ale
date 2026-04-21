@@ -1,3 +1,5 @@
+import pyspiceql
+
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
@@ -6,8 +8,6 @@ from ale.base.type_distortion import RadialDistortion
 from ale.base import WrongInstrumentException
 
 from ale import util
-
-
 
 class OsirisRexCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDistortion, Driver):
     @property
@@ -142,7 +142,7 @@ class OsirisRexCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Radi
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
         if not hasattr(self, "_naif_keywords"):
-          keywords = self.spiceql_call("findMissionKeywords", {"key": str(self.polyCamFocusPositionNaifId), "mission" : self.spiceql_mission})
+          keywords = pyspiceql.findMissionKeywords(key=str(self.polyCamFocusPositionNaifId), mission=self.spiceql_mission, searchKernels=self.search_kernels, useWeb=self.use_web)[0]
           self._naif_keywords = super().naif_keywords
           if keywords: 
             self._naif_keywords = self._naif_keywords | keywords 

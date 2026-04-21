@@ -1,7 +1,7 @@
 import numpy as np
+from pyspiceql import pyspiceql
 import pvl
 
-from pyspiceql import pyspiceql
 from ale.base import Driver, WrongInstrumentException
 from ale.base.data_naif import NaifSpice
 from ale.base.label_pds3 import Pds3Label

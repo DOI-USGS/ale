@@ -102,7 +102,8 @@ class test_chandrayaan_m3_pds_naif(unittest.TestCase):
         assert self.driver.ikid == -86520
 
     def test_sensor_frame_id(self):
-        assert self.driver.sensor_frame_id == -86
+        with patch("ale.drivers.chandrayaan_drivers.pyspiceql.translateNameToCode", return_value=[-86]) as doubleEtToSclk:
+            assert self.driver.sensor_frame_id == -86
 
     def test_spacecraft_name(self):
         assert self.driver.spacecraft_name == 'CH1'
@@ -115,13 +116,19 @@ class test_chandrayaan_m3_pds_naif(unittest.TestCase):
 
     def test_ephemeris_start_time(self):
         label_file = get_image_label("M3T20090630T083407_V03_L1B_cropped", label_type="pds3")
-        with patch("ale.drivers.chandrayaan_drivers.NaifSpice.spiceql_call", return_value=12345) as spiceql_call,\
+        with patch("ale.drivers.chandrayaan_drivers.pyspiceql.doubleEtToSclk", return_value=[12345]) as doubleEtToSclk,\
+             patch("ale.drivers.chandrayaan_drivers.pyspiceql.utcToEt", return_value=[12345]) as utcToEt,\
+             patch("ale.drivers.chandrayaan_drivers.pyspiceql.strSclkToEt", return_value=[12345]) as strSclkToEt,\
+             patch("ale.drivers.chandrayaan_drivers.pyspiceql.translateNameToCode", return_value=[12345]) as strSclkToEt,\
              patch("ale.drivers.chandrayaan_drivers.Chandrayaan1M3Pds3NaifSpiceDriver.utc_time_table", os.path.dirname(label_file)+"/M3T20090630T083407_V03_TIM_cropped.TAB"):
             assert self.driver.ephemeris_start_time == 12345
 
     def test_ephemeris_stop_time(self):
         label_file = get_image_label("M3T20090630T083407_V03_L1B_cropped", label_type="pds3")
-        with patch("ale.drivers.chandrayaan_drivers.NaifSpice.spiceql_call", return_value=12345) as scs2e,\
+        with patch("ale.drivers.chandrayaan_drivers.pyspiceql.doubleEtToSclk", return_value=[12345]) as doubleEtToSclk,\
+             patch("ale.drivers.chandrayaan_drivers.pyspiceql.utcToEt", return_value=[12345]) as utcToEt,\
+             patch("ale.drivers.chandrayaan_drivers.pyspiceql.strSclkToEt", return_value=[12345]) as strSclkToEt,\
+             patch("ale.drivers.chandrayaan_drivers.pyspiceql.translateNameToCode", return_value=[12345]) as strSclkToEt,\
              patch("ale.drivers.chandrayaan_drivers.Chandrayaan1M3Pds3NaifSpiceDriver.utc_time_table", os.path.dirname(label_file)+"/M3T20090630T083407_V03_TIM_cropped.TAB"):
             assert self.driver.ephemeris_stop_time == 12345.2544
 
@@ -147,7 +154,8 @@ class test_chandrayaan_isis_naif(unittest.TestCase):
         assert self.driver.instrument_id == "CHANDRAYAAN-1_M3"
 
     def test_ikid_id(self):
-        assert self.driver.spacecraft_id == -86
+        with patch("ale.drivers.chandrayaan_drivers.pyspiceql.translateNameToCode", return_value=[-86]) as translateNameToCode:
+            assert self.driver.spacecraft_id == -86
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
@@ -169,18 +177,18 @@ class test_chandrayaan_mrffr_isis_naif(unittest.TestCase):
         assert self.driver.sensor_name == "CHANDRAYAAN-1_MRFFR"
 
     def test_ephemeris_start_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
+        with patch("ale.drivers.chandrayaan_drivers.pyspiceql.utcToEt", return_value=[12345]) as utcToEt:
             assert self.driver.ephemeris_start_time == 12345
-            calls = [call('utcToEt', {'utc': '2009-01-07 16:35:29.466477', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
+            calls = [call(utc='2009-01-07 16:35:29.466477', searchKernels=False, useWeb=False)]
+            utcToEt.assert_has_calls(calls)
+            assert utcToEt.call_count == 1
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
+        with patch("ale.drivers.chandrayaan_drivers.pyspiceql.utcToEt", return_value=[12345]) as utcToEt:
             assert self.driver.ephemeris_stop_time == 12345
-            calls = [call('utcToEt', {'utc': '2009-01-07 16:38:07.171000', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
+            calls = [call(utc='2009-01-07 16:38:07.171000', searchKernels=False, useWeb=False)]
+            utcToEt.assert_has_calls(calls)
+            assert utcToEt.call_count == 1
 
     def test_ikid(self):
         assert self.driver.ikid == -86001
@@ -260,30 +268,29 @@ class test_chandrayaan2_ohrc_isis_naif(unittest.TestCase):
         assert self.driver.light_time_correction == 'LT+S'
 
     def test_ephemeris_start_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
+        with patch("ale.drivers.chandrayaan_drivers.pyspiceql.utcToEt", return_value=[12345]) as utcToEt:
             assert self.driver.ephemeris_start_time == 12345
-            calls = [call('utcToEt', {'utc': '2020-08-27 02:26:45.303900', 
-                                      'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
+            calls = [call(utc='2020-08-27 02:26:45.303900', searchKernels=False, useWeb=False)]
+            utcToEt.assert_has_calls(calls)
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
+        with patch("ale.drivers.chandrayaan_drivers.pyspiceql.utcToEt", return_value=[12345]) as utcToEt:
             assert self.driver.ephemeris_stop_time == 12345
-            calls = [call('utcToEt', {'utc': '2020-08-27 02:27:01.687500', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
+            calls = [call(utc='2020-08-27 02:27:01.687500', searchKernels=False, useWeb=False)]
+            utcToEt.assert_has_calls(calls)
 
     def test_detector_center_sample(self):
-        with patch('ale.spiceql_access.spiceql_call', 
-                   side_effect=[-152270, 
-                                {"frameCode": -152270}, 
-                                {"INS-152270_CENTER": [2003.1, 3003.2]}, {}]) as spiceql_call:
+        with patch.object(Chandrayaan2OHRCIsisLabelNaifSpiceDriver, 'naif_keywords', new_callable=PropertyMock) as naif_keywords_call:
+            naif_keywords_call.return_value = {"INS-152270_CENTER": [2003.1, 3003.2]}
             assert self.driver.detector_center_sample == 2003.1
             assert self.driver.detector_center_line   == 3003.2
 
     def test_focal2pixel_lines(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-152270, {"frameCode": -152270}, {"INS-152270_PIXEL_SIZE": 0.0000052}, {}]) as spiceql_call:
+        with patch.object(Chandrayaan2OHRCIsisLabelNaifSpiceDriver, 'naif_keywords', new_callable=PropertyMock) as naif_keywords_call:
+            naif_keywords_call.return_value = {"INS-152270_PIXEL_SIZE": 0.0000052}
             assert self.driver.focal2pixel_lines == [0.0, 192.30769230769232, 0.0]
 
     def test_focal2pixel_samples(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-152270, {"frameCode": -152270}, {"INS-152270_PIXEL_SIZE": 0.0000052}, {}]) as spiceql_call:
+        with patch.object(Chandrayaan2OHRCIsisLabelNaifSpiceDriver, 'naif_keywords', new_callable=PropertyMock) as naif_keywords_call:
+            naif_keywords_call.return_value = {"INS-152270_PIXEL_SIZE": 0.0000052}
             assert self.driver.focal2pixel_samples == [0.0, 0.0, 192.30769230769232]
