@@ -35,6 +35,9 @@ release.
 
 ## [Unreleased]
 
+### Added
+- Added ISD to kernel feature [#602](https://github.com/DOI-USGS/ale/issues/602)
+
 ### Changed
 - Reduced linescan ISD ephemeris sampling from one-per-line to every 10th line for images with 1000+ lines, significantly reducing ISD file sizes and load times for large sensors. Configurable via `reduction` and `ephem_sample_rate` props. [#677](https://github.com/DOI-USGS/ale/pull/677)
 - Throw error when input file does not exist. [#692](https://github.com/DOI-USGS/ale/pull/692)

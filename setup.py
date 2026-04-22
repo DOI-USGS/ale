@@ -28,7 +28,8 @@ setup(
     package_data={'': ['config.yml']},
     entry_points={
         "console_scripts": [
-            "isd_generate=ale.isd_generate:main"
+            "isd_generate=ale.isd_generate:main",
+            "isd_to_kernel=ale.isd_to_kernel:main"
         ],
     },
 )
