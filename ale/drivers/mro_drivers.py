@@ -535,6 +535,298 @@ hirise_ccd_lookup = {
   13: 9
 }
 
+class MroHiRisePds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistortion, Driver):
+    """
+    Driver for reading HiRISE PDS3 EDR labels directly, without requiring
+    an ISIS cube.  Uses NaifSpice for ephemeris data (via SpiceQL local
+    or web service).
+
+    This enables fully ISIS-free processing from PDS EDR download to
+    map-projected GeoTIFF.
+
+    See Also
+    --------
+    MroHiRiseIsisLabelNaifSpiceDriver : equivalent driver for ISIS cube labels.
+    """
+
+    @property
+    def instrument_id(self):
+        """
+        Returns
+        -------
+        : str
+          NAIF instrument identifier
+        """
+        id_lookup = {
+            'HIRISE': 'MRO_HIRISE',
+            'HIGH RESOLUTION IMAGING SCIENCE EXPERIMENT': 'MRO_HIRISE',
+        }
+        key = super().instrument_id
+        if key not in id_lookup:
+            raise WrongInstrumentException(f"Unknown instrument id: {key}.")
+        return id_lookup[key]
+
+    @property
+    def spacecraft_name(self):
+        """
+        Returns
+        -------
+        : str
+          Spacecraft name for NAIF lookups
+        """
+        name_lookup = {
+            'MARS_RECONNAISSANCE_ORBITER': 'MRO',
+            'MARS RECONNAISSANCE ORBITER': 'MRO',
+            'MRO': 'MRO',
+        }
+        # PDS3 HiRISE labels use INSTRUMENT_HOST_NAME, not SPACECRAFT_NAME
+        raw = self.label.get('SPACECRAFT_NAME',
+                             self.label.get('INSTRUMENT_HOST_NAME', ''))
+        return name_lookup[raw]
+
+    @property
+    def sensor_name(self):
+        """
+        Returns
+        -------
+        : str
+          Sensor name
+        """
+        return "HIRISE CAMERA"
+
+    @property
+    def _inst_settings(self):
+        """Access the INSTRUMENT_SETTING_PARAMETERS group."""
+        return self.label['INSTRUMENT_SETTING_PARAMETERS']
+
+    @property
+    def _time_params(self):
+        """Access the TIME_PARAMETERS group."""
+        return self.label['TIME_PARAMETERS']
+
+    @property
+    def spacecraft_clock_start_count(self):
+        """
+        Returns
+        -------
+        : str
+          Spacecraft clock start count from PDS3 label
+        """
+        return str(self._time_params['SPACECRAFT_CLOCK_START_COUNT'])
+
+    @property
+    def spacecraft_clock_stop_count(self):
+        """
+        Returns
+        -------
+        : str
+          Spacecraft clock stop count from PDS3 label
+        """
+        count = str(self._time_params.get('SPACECRAFT_CLOCK_STOP_COUNT', 'N/A'))
+        if count == 'N/A':
+            count = None
+        return count
+
+    @property
+    def utc_start_time(self):
+        """
+        Returns
+        -------
+        : str
+          Start time from PDS3 label
+        """
+        return self._time_params['START_TIME']
+
+    @property
+    def utc_stop_time(self):
+        """
+        Returns
+        -------
+        : str
+          Stop time from PDS3 label
+        """
+        return self._time_params['STOP_TIME']
+
+    @property
+    def _cpmm_number(self):
+        return int(self._inst_settings['MRO:CPMM_NUMBER'])
+
+    @property
+    def _tdi_mode(self):
+        return int(self._inst_settings['MRO:TDI'])
+
+    @property
+    def _bin_mode(self):
+        return int(self._inst_settings['MRO:BINNING'])
+
+    @property
+    def _delta_line_timer_count(self):
+        return int(self._inst_settings['MRO:DELTA_LINE_TIMER_COUNT'])
+
+    @property
+    def line_summing(self):
+        return self._bin_mode
+
+    @property
+    def sample_summing(self):
+        return self._bin_mode
+
+    @property
+    def un_binned_rate(self):
+        """
+        Compute the un-binned line rate from DeltaLineTimerCount.
+        Matches the ISIS HiRise camera model.
+
+        Returns
+        -------
+        : float
+          Un-binned line rate in seconds
+        """
+        if not hasattr(self, "_un_binned_rate"):
+            self._un_binned_rate = (74.0 + (self._delta_line_timer_count / 16.0)) / 1000000.0
+        return self._un_binned_rate
+
+    @property
+    def ephemeris_start_time(self):
+        """
+        Compute ephemeris start time, matching the ISIS HiRise camera model.
+
+        Returns
+        -------
+        : float
+          Starting ephemeris time
+        """
+        if not hasattr(self, "_ephemeris_start_time"):
+            tdi_mode = self._tdi_mode
+            bin_mode = self._bin_mode
+            start_time = self.spiceql_call(
+                "strSclkToEt",
+                {"frameCode": -74999, "sclk": self.spacecraft_clock_start_count,
+                 "mission": self.spiceql_mission},
+            )
+            start_time -= self.un_binned_rate * ((tdi_mode / 2.0) - 0.5)
+            start_time += self.un_binned_rate * ((bin_mode / 2.0) - 0.5)
+            self._ephemeris_start_time = start_time
+        return self._ephemeris_start_time
+
+    @property
+    def exposure_duration(self):
+        """
+        Returns
+        -------
+        : float
+          Exposure duration in seconds
+        """
+        if not hasattr(self, "_exposure_duration"):
+            self._exposure_duration = self.un_binned_rate * self._bin_mode
+        return self._exposure_duration
+
+    @property
+    def image_samples(self):
+        """
+        Override to return science image width (excluding prefix/suffix).
+        The PDS3 label LINE_SAMPLES includes prefix and suffix bytes.
+        The actual science image for a single channel is 1024 / binning.
+
+        Returns
+        -------
+        : int
+          Number of science image samples
+        """
+        return int(self.label['IMAGE']['LINE_SAMPLES'])
+
+    @property
+    def ccd_ikid(self):
+        """
+        Compute the CCD NAIF IK ID using the CPMM-to-CCD lookup.
+
+        Returns
+        -------
+        : int
+          CCD NAIF IK ID
+        """
+        if not hasattr(self, "_ccd_ikid"):
+            ccd_number = hirise_ccd_lookup[self._cpmm_number]
+            self._ccd_ikid = self.spiceql_call(
+                "translateNameToCode",
+                {"frame": f"MRO_HIRISE_CCD{ccd_number}",
+                 "mission": self.spiceql_mission},
+            )
+        return self._ccd_ikid
+
+    @property
+    def sensor_frame_id(self):
+        """
+        Returns
+        -------
+        : int
+          Hard-coded sensor frame ID (from ISIS HiRise camera model)
+        """
+        return -74690
+
+    @property
+    def detector_center_line(self):
+        """
+        Returns
+        -------
+        : float
+          Center detector line (placeholder for ISIS compatibility)
+        """
+        return 0
+
+    @property
+    def detector_center_sample(self):
+        """
+        Returns
+        -------
+        : float
+          Center detector sample (placeholder for ISIS compatibility)
+        """
+        return 0
+
+    @property
+    def naif_keywords(self):
+        """
+        Adds CCD-specific NAIF keywords to the base set.
+
+        Returns
+        -------
+        : dict
+          Combined NAIF keywords
+        """
+        if not hasattr(self, "_mrohirise_naif_keywords"):
+            self._mrohirise_naif_keywords = {
+                **super().naif_keywords,
+                **self.spiceql_call(
+                    "findMissionKeywords",
+                    {"key": f"*{self.ccd_ikid}*",
+                     "mission": self.spiceql_mission},
+                ),
+            }
+        return self._mrohirise_naif_keywords
+
+    @property
+    def sensor_model_version(self):
+        """
+        Returns
+        -------
+        : int
+          ISIS sensor model version
+        """
+        return 1
+
+    @property
+    def platform_name(self):
+        """
+        Returns
+        -------
+        : str
+          Platform name
+        """
+        return self.label.get('SPACECRAFT_NAME',
+                              self.label.get('INSTRUMENT_HOST_NAME', ''))
+
+
 class MroHiRiseIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDistortion, Driver):
     """
     Driver for reading HiRise ISIS labels.
