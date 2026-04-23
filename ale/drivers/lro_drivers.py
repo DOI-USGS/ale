@@ -6,6 +6,7 @@ import pvl
 from ale.base import Driver, WrongInstrumentException
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
+from ale.base.data_isis import get_naif_keyword
 from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import LineScanner, Radar, PushFrame
@@ -603,11 +604,7 @@ class LroLrocNacIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, Driv
         : list
           Radial distortion coefficients. There is only one coefficient for LROC NAC l/r
         """
-        key = 'INS{}_OD_K'.format(self.ikid)
-        ans = self.naif_keywords.get(key, None)
-        if ans is None:
-            raise Exception('Could not parse the distortion model coefficients using key: ' + key)
-        return [ans]
+        return get_naif_keyword(self, 'odtk', 'INS{}_OD_K'.format(self.ikid))
 
     @property
     def detector_center_sample(self):
@@ -1013,13 +1010,9 @@ class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, Radial
         : list
           Radial distortion coefficients.
         """
-        key = 'INS{}_OD_K'.format(self.fikid)
-        ans = self.naif_keywords.get(key, None)
-        if ans is None:
-            raise Exception('Could not parse the distortion model coefficients using key: ' + key)
-
-        ans = [x * -1 for x in ans]
-        return ans
+        val = get_naif_keyword(self, 'odtk', 'INS{}_OD_K'.format(self.fikid))
+        val = [x * -1 for x in val]
+        return val
 
     @property
     def framelet_height(self):
@@ -1039,11 +1032,7 @@ class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, Radial
         : list<double>
         detector to focal plane x
         """
-        key = 'INS{}_TRANSX'.format(self.fikid)
-        ans = self.naif_keywords.get(key, None)
-        if ans is None:
-            raise Exception('Could not parse detector to focal plane x using key: ' + key)
-        return ans
+        return get_naif_keyword(self, 'pixel2focal_x', 'INS{}_TRANSX'.format(self.fikid));
 
     @property
     def pixel2focal_y(self):
@@ -1055,11 +1044,7 @@ class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, Radial
         : list<double>
         detector to focal plane y
         """
-        key = 'INS{}_TRANSY'.format(self.fikid)
-        ans = self.naif_keywords.get(key, None)
-        if ans is None:
-            raise Exception('Could not parse detector to focal plane y using key: ' + key)
-        return ans
+        return get_naif_keyword(self, 'pixel2focal_y', 'INS{}_TRANSY'.format(self.fikid))
 
     @property
     def focal_length(self):
@@ -1075,11 +1060,7 @@ class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, Radial
         float :
             The focal length in millimeters
         """
-        key = 'INS{}_FOCAL_LENGTH'.format(self.fikid)
-        ans = self.naif_keywords.get(key, None)
-        if ans is None:
-            raise Exception('Could not parse the focal length using key: ' + key)
-        return ans
+        return get_naif_keyword(self, 'focal_length', 'INS{}_FOCAL_LENGTH'.format(self.fikid))
 
     @property
     def detector_center_sample(self):
@@ -1093,11 +1074,7 @@ class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, Radial
         list :
             The center of the CCD formatted as line, sample
         """
-        key = 'INS{}_BORESIGHT_SAMPLE'.format(self.fikid)
-        ans = self.naif_keywords.get(key, None)
-        if ans is None:
-            raise Exception('Could not parse the detector center sample using key: ' + key)
-        return ans
+        return get_naif_keyword(self, 'detector_center_sample', 'INS{}_BORESIGHT_SAMPLE'.format(self.fikid))
 
     @property
     def detector_center_line(self):
@@ -1111,11 +1088,7 @@ class LroLrocWacIsisLabelIsisSpiceDriver(PushFrame, IsisLabel, IsisSpice, Radial
         list :
             The center of the CCD formatted as line, sample
         """
-        key = 'INS{}_BORESIGHT_LINE'.format(self.fikid)
-        ans = self.naif_keywords.get(key, None)
-        if ans is None:
-            raise Exception('Could not parse the detector center line using key: ' + key)
-        return ans
+        return get_naif_keyword(self, 'detector_center_sample', 'INS{}_BORESIGHT_LINE'.format(self.fikid))
 
 class LroLrocWacIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, RadialDistortion, Driver):
     """

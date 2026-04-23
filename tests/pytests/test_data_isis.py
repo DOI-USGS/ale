@@ -519,11 +519,13 @@ def test_sun_position(testdata):
 
 
 def test_detector_center_sample(testdata):
-    assert testdata.detector_center_sample == None
+    with pytest.raises(LookupError):
+         testdata.detector_center_sample
 
 
 def test_detector_center_line(testdata):
-    assert testdata.detector_center_line == None
+    with pytest.raises(LookupError):
+        testdata.detector_center_line
 
 
 def test_focal_length(testdata):

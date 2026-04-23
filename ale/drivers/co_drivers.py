@@ -8,6 +8,7 @@ import pvl
 from ale.base import Driver, WrongInstrumentException
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
+from ale.base.data_isis import get_naif_keyword
 from ale.base.label_pds3 import Pds3Label
 from ale.base.label_isis import IsisLabel
 from ale.base.type_distortion import RadialDistortion, NoDistortion
@@ -829,4 +830,4 @@ class CassiniIssIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistort
             The focal length in millimeters
         """
         filters = self.label["IsisCube"]["BandBin"]['FilterName'].split("/")
-        return self.naif_keywords.get('INS{}_{}_{}_FOCAL_LENGTH'.format(self.ikid, filters[0], filters[1]), None)
+        return get_naif_keyword(self, 'focal_length', 'INS{}_{}_{}_FOCAL_LENGTH'.format(self.ikid, filters[0], filters[1]))
