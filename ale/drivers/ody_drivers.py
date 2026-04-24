@@ -1,4 +1,7 @@
 import math
+
+import pyspiceql
+
 from ale.base.base import Driver
 from ale.base import WrongInstrumentException
 from ale.base.type_distortion import ThemisIrDistortion, NoDistortion
@@ -319,7 +322,7 @@ class OdyThemisVisIsisLabelNaifSpiceDriver(PushFrame, IsisLabel, NaifSpice, NoDi
         clock_start_count = self.label['IsisCube']['Instrument']['SpacecraftClockCount']
 
         # ran into weird quirk that if clock count ends with a zero, str() will drop the last zero causing scs2e to return a different et.
-        og_start_time = self.spiceql_call("strSclkToEt", {"frameCode" : self.spacecraft_id, "sclk" : f'{clock_start_count:.3f}'})
+        og_start_time = pyspiceql.strSclkToEt(frameCode=self.spacecraft_id, sclk=f'{clock_start_count:.3f}', searchKernels=self.search_kernels, useWeb=self.use_web)[0]
         
         offset = self.label["IsisCube"]["Instrument"]["SpacecraftClockOffset"]
         if isinstance(offset, pvl.collections.Quantity):

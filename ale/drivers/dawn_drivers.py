@@ -1,10 +1,11 @@
 import re
-import spiceypy as spice
 import os
 import math
-import numpy as np
 
+import numpy as np
+import pyspiceql
 from scipy.interpolate import CubicSpline
+import spiceypy as spice
 
 from ale.base import Driver, WrongInstrumentException
 from ale.base.label_isis import IsisLabel
@@ -615,7 +616,7 @@ class DawnVirIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDisto
         self._hk_ephemeris_time = []
         scet_times = self.housekeeping_table["ScetTimeClock"]
         for scet in scet_times:
-          line_midtime = self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": scet, "mission": self.spiceql_mission})
+          line_midtime = pyspiceql.strSclkToEt(frameCode=self.spacecraft_id, sclk=scet, mission=self.spiceql_mission, searchKernels=self.search_kernels, useWeb=self.use_web)[0]
           self._hk_ephemeris_time.append(line_midtime)
 
       return self._hk_ephemeris_time
@@ -698,8 +699,12 @@ class DawnVirIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDisto
           time_dep_quats = np.zeros((len(self.hk_ephemeris_time), 4))
           avs = []
 
-          function_args = {"toFrame": self.sensor_frame_id, "refFrame": 1, "mission": self.spiceql_mission, "searchKernels": self.search_kernels}
-          rotations = spiceql_access.get_ephem_data(self.hk_ephemeris_time, "getTargetOrientations", web=self.use_web, function_args=function_args)
+          rotations = pyspiceql.getTargetOrientations(ets=self.hk_ephemeris_time, 
+                                                      toFrame=self.sensor_frame_id, 
+                                                      refFrame=1, 
+                                                      mission=self.spiceql_mission, 
+                                                      searchKernels=self.search_kernels, 
+                                                      useWeb=self.use_web)[0]
 
           for i, rotation in enumerate(rotations):
             quaternion = rotation[:4]

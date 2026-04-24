@@ -1,7 +1,7 @@
 import pytest
 import os
 import unittest
-from unittest.mock import patch, call
+from unittest.mock import patch, call, PropertyMock
 import json
 
 from conftest import get_image, get_image_label, get_isd, get_image_kernels, convert_kernels, compare_dicts
@@ -35,9 +35,9 @@ class test_amica_isis_naif(unittest.TestCase):
         assert self.driver.instrument_id == "HAYABUSA_AMICA"
 
     def test_center_ephemeris_time(self):
-        with patch('ale.drivers.hayabusa_drivers.NaifSpice.spiceql_call', return_value=12345) as sclkToEt:
+        with patch.object(HayabusaAmicaIsisLabelNaifSpiceDriver, 'ephemeris_start_time', new_callable=PropertyMock) as ephemeris_start_time:
+            ephemeris_start_time.return_value = 12345
             assert self.driver.center_ephemeris_time == 12345 + 0.0109
-            sclkToEt.assert_called_with('strSclkToEt', {'frameCode': 12345, 'sclk': '2457499394', 'mission': 'amica'})
     
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
@@ -79,18 +79,18 @@ class test_nirs_isis_naif(unittest.TestCase):
         assert self.driver.sensor_name == "HAYABUSA_NIRS"
 
     def test_exposure_duration(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-130, 12345, 12345]) as spiceql_call:
-            assert self.driver.exposure_duration == 0
-            calls = [call('translateNameToCode', {'frame': 'HAYABUSA', 'mission': 'nirs', 'searchKernels': False}, False),
-                     call('strSclkToEt', {'frameCode': -130, 'sclk': '1/2392975548.000', 'mission': 'nirs', 'searchKernels': False}, False),
-                     call('strSclkToEt', {'frameCode': -130, 'sclk': '1/2392973413.133', 'mission': 'nirs', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 3
+        with patch.object(HayabusaNirsIsisLabelNaifSpiceDriver, 'ephemeris_stop_time', new_callable=PropertyMock) as ephemeris_stop_time, \
+             patch.object(HayabusaNirsIsisLabelNaifSpiceDriver, 'ephemeris_start_time', new_callable=PropertyMock) as ephemeris_start_time:
+            ephemeris_stop_time.return_value = 12346
+            ephemeris_start_time.return_value = 12345
+            assert self.driver.exposure_duration == 1
     
     def test_ephemeris_stop_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-130, 12345]) as spiceql_call:
+        with patch.object(ale.drivers.hayabusa_drivers.NaifSpice, 'spacecraft_id', new_callable=PropertyMock) as spacecraft_id, \
+             patch('ale.drivers.hayabusa_drivers.pyspiceql.strSclkToEt', return_value=[12345]) as strSclkToEt:
+            spacecraft_id.return_value = -130
             assert self.driver.ephemeris_stop_time == 12345
-            calls = [call('translateNameToCode', {'frame': 'HAYABUSA', 'mission': 'nirs', 'searchKernels': False}, False),
-                     call('strSclkToEt', {'frameCode': -130, 'sclk': '1/2392975548.000', 'mission': 'nirs', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 2
+
+            calls = [call(frameCode=-130, sclk='1/2392975548.000', mission='nirs', searchKernels=False, useWeb=False)]
+            strSclkToEt.assert_has_calls(calls)
+            assert strSclkToEt.call_count == 1

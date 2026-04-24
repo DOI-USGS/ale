@@ -46,9 +46,9 @@ class test_cassis_isis_naif(unittest.TestCase):
         assert self.driver.instrument_id == "TGO_CASSIS"
 
     def test_ephemeris_start_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[12345]) as spiceql_call:
+        with patch('ale.drivers.tgo_drivers.pyspiceql.utcToEt', side_effect=[12345]) as utcToEt:
             assert self.driver.ephemeris_start_time == 12345
-            calls = [call('utcToEt', {'utc': '2016-11-26 22:32:14.582000', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
+            calls = [call(utc='2016-11-26 22:32:14.582000', searchKernels=False, useWeb=False)]
+            utcToEt.assert_has_calls(calls)
+            assert utcToEt.call_count == 1
 

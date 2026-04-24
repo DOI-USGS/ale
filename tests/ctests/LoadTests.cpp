@@ -34,6 +34,6 @@ TEST(PyInterfaceTest, LoadValidLabelOnlyNaifSpice) {
     FAIL() << "Should not have been able to generate an ISD" << endl;
   }
   catch (exception &e) {
-    EXPECT_THAT(e.what(), HasSubstr("No Valid instrument found for label."));
+    EXPECT_THAT(e.what(), HasSubstr("No viable Driver for Label."));
   }
 }

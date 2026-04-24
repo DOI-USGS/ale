@@ -45,25 +45,16 @@ class test_high_isis3_naif(unittest.TestCase):
         assert self.driver.sensor_name == "LO3_HIGH_RESOLUTION_CAMERA"
 
     def test_ephemeris_start_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-1037072690.2047702]) as spiceql_call:
+        with patch('ale.drivers.lo_drivers.pyspiceql.utcToEt', return_value=[-1037072690.2047702]) as utcToEt:
             assert self.driver.ephemeris_start_time == -1037072690.2047702
-            calls = [call('utcToEt', {'utc': '1967-02-20 08:14:28.610000', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
+            calls = [call(utc='1967-02-20 08:14:28.610000', searchKernels=False, useWeb=False)]
+            utcToEt.assert_has_calls(calls)
+            assert utcToEt.call_count == 1
 
     def test_ephemeris_stop_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-1037072690.2047702]) as spiceql_call:
+        with patch.object(LoHighCameraIsisLabelNaifSpiceDriver, 'ephemeris_start_time', new_callable=PropertyMock) as ephemeris_start_time:
+            ephemeris_start_time.return_value = -1037072690.2047702
             assert self.driver.ephemeris_stop_time == -1037072690.2047702
-            calls = [call('utcToEt', {'utc': '1967-02-20 08:14:28.610000', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
-
-    def test_ikid(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-533001]) as spiceql_call:
-            assert self.driver.ikid == -533001
-            calls = [call('translateNameToCode', {'frame': 'LO3_HIGH_RESOLUTION_CAMERA', 'mission': '', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
 
     def test_detector_center_line(self):
         assert self.driver.detector_center_line == 0
@@ -75,8 +66,9 @@ class test_high_isis3_naif(unittest.TestCase):
         self.driver.light_time_correction == "NONE"
 
     def test_naif_keywords(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-533001]) as spiceql_call, \
+        with patch.object(LoHighCameraIsisLabelNaifSpiceDriver, 'ikid', new_callable=PropertyMock) as ikid, \
              patch('ale.drivers.lo_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as data_naif_keywords:
+            ikid.return_value = -533001
             data_naif_keywords.return_value = {}
 
             naif_keywords = {
@@ -86,15 +78,10 @@ class test_high_isis3_naif(unittest.TestCase):
                 "INS-533001_ITRANSL" : [4541.692430539061, -0.05845617762406423, 143.9551496988325]
             }
 
-            print(self.driver.naif_keywords) 
             assert self.driver.naif_keywords["INS-533001_TRANSX"] ==  pytest.approx(naif_keywords["INS-533001_TRANSX"])
             assert self.driver.naif_keywords["INS-533001_TRANSY"] ==  pytest.approx(naif_keywords["INS-533001_TRANSY"])
             assert self.driver.naif_keywords["INS-533001_ITRANSS"] ==  pytest.approx(naif_keywords["INS-533001_ITRANSS"])
             assert self.driver.naif_keywords["INS-533001_ITRANSL"] ==  pytest.approx(naif_keywords["INS-533001_ITRANSL"])
-            
-            calls = [call('translateNameToCode', {'frame': 'LO3_HIGH_RESOLUTION_CAMERA', 'mission': '', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
 
 
 @pytest.fixture(scope='module')

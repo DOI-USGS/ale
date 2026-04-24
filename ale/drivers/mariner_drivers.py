@@ -1,3 +1,5 @@
+import pyspiceql
+
 from ale.base import spiceql_mission_map
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
@@ -86,7 +88,7 @@ class Mariner10IsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistorti
           start time
         """
         if not hasattr(self, "_ephemeris_start_time"):
-            self._ephemeris_start_time = self.spiceql_call("utcToEt", {"utc": self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f")})  - (self.exposure_duration / 2.0)
+            self._ephemeris_start_time = pyspiceql.utcToEt(utc=self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"), searchKernels=self.search_kernels, useWeb=self.use_web)[0]  - (self.exposure_duration / 2.0)
         return self._ephemeris_start_time
     
     @property
