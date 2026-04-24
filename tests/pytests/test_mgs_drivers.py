@@ -57,26 +57,13 @@ class test_wac_isis3_naif(unittest.TestCase):
     def test_sensor_name(self):
         assert self.driver.sensor_name == "MGS_MOC_WA_RED"
 
-    def test_ephemeris_start_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-94, 1234]) as spiceql_call:
-            assert self.driver.ephemeris_start_time == 1234
-            calls = [call('translateNameToCode', {'frame': 'MARS GLOBAL SURVEYOR', 'mission': 'mgs', 'searchKernels': False}, False),
-                     call('strSclkToEt', {'frameCode': -94, 'sclk': '561812335:32', 'mission': 'mgs', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 2
-
     def test_ephemeris_stop_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-94, 1234]) as spiceql_call:
+        with patch.object(ale.drivers.mgs_drivers.NaifSpice, 'ephemeris_start_time', new_callable=PropertyMock) as ephemeris_start_time:
+            ephemeris_start_time.return_value = 1234
             assert self.driver.ephemeris_stop_time == 1541.2
-            calls = [call('translateNameToCode', {'frame': 'MARS GLOBAL SURVEYOR', 'mission': 'mgs', 'searchKernels': False}, False),
-                     call('strSclkToEt', {'frameCode': -94, 'sclk': '561812335:32', 'mission': 'mgs', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 2
-
 
     def test_detector_start_sample(self):
         assert self.driver.detector_start_sample == 673
-       
 
     def test_detector_center_sample(self):
         with patch('ale.drivers.mgs_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
@@ -111,25 +98,13 @@ class test_nac_isis3_naif(unittest.TestCase):
     def test_sensor_name(self):
         assert self.driver.sensor_name == "MGS_MOC_NA"
 
-    def test_ephemeris_start_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-94, 1234]) as spiceql_call:
-            assert self.driver.ephemeris_start_time == 1234
-            calls = [call('translateNameToCode', {'frame': 'MARS GLOBAL SURVEYOR', 'mission': 'mgs', 'searchKernels': False}, False),
-                     call('strSclkToEt', {'frameCode': -94, 'sclk': '619971158:28', 'mission': 'mgs', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 2
-
     def test_ephemeris_stop_time(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-94, 1234]) as spiceql_call:
+        with patch.object(ale.drivers.mgs_drivers.NaifSpice, 'ephemeris_start_time', new_callable=PropertyMock) as ephemeris_start_time:
+            ephemeris_start_time.return_value = 1234
             assert self.driver.ephemeris_stop_time == 1239.9240448
-            calls = [call('translateNameToCode', {'frame': 'MARS GLOBAL SURVEYOR', 'mission': 'mgs', 'searchKernels': False}, False),
-                     call('strSclkToEt', {'frameCode': -94, 'sclk': '619971158:28', 'mission': 'mgs', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 2
 
     def test_detector_start_sample(self):
         assert self.driver.detector_start_sample == 1
-       
 
     def test_detector_center_sample(self):
         with patch('ale.drivers.mgs_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:

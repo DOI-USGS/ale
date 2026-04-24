@@ -1,3 +1,5 @@
+import pyspiceql
+
 from ale import util
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
@@ -73,7 +75,7 @@ class JunoJunoCamIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistor
         """
         if not hasattr(self, "_naif_keywords"):
           filter_code = self.label['IsisCube']['BandBin']['NaifIkCode']
-          filter_keywords = self.spiceql_call("findMissionKeywords", {"key": f"*{filter_code}*", "mission": self.spiceql_mission})
+          filter_keywords = pyspiceql.findMissionKeywords(key=f"*{filter_code}*", mission=self.spiceql_mission, searchKernels=self.search_kernels, useWeb=self.use_web)[0]
           self._naif_keywords = super().naif_keywords
           if filter_keywords:
             self._naif_keywords = self._naif_keywords | filter_keywords

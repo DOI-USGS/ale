@@ -5,7 +5,8 @@ from numpy.polynomial.polynomial import polyval
 import networkx as nx
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
-from ale.spiceql_access import get_ephem_data, spiceql_call
+import pyspiceql
+
 from ale.rotation import ConstantRotation, TimeDependentRotation
 from ale import util
 from ale import logger
@@ -131,19 +132,19 @@ class FrameChain(nx.DiGraph):
         # Do this call so we know if we can get exact ck times for our data
         if exact_ck_times and len(ephemeris_times) > 1 and not nadir:
             try:
-                times = spiceql_call("extractExactCkTimes", {"observStart": ephemeris_times[0] + inst_time_bias, 
-                                                             "observEnd": ephemeris_times[-1] + inst_time_bias, 
-                                                             "targetFrame": sensor_frame,
-                                                             "mission": mission,
-                                                             "ckQualities" : ["reconstructed"],
-                                                             "searchKernels": frame_chain.search_kernels},
-                                                             use_web=frame_chain.use_web)
+                times = pyspiceql.extractExactCkTimes(observStart=ephemeris_times[0] + inst_time_bias, 
+                                                      observEnd=ephemeris_times[-1] + inst_time_bias, 
+                                                      targetFrame=sensor_frame,
+                                                      mission=mission,
+                                                      ckQualities=["reconstructed"],
+                                                      searchKernels=frame_chain.search_kernels,
+                                                      useWeb=frame_chain.use_web)[0]
 
                 if len(times) == 0:
                     logger.debug(f"No exact CK times found")
                     exact_ck_times = False
                 else:
-                    logger.debug(f"Found {len(times)} time(s)")
+                    logger.debug(f"Found {len(times)} exact CK time(s) for {sensor_frame}")
 
             except Exception as e:
                 exact_ck_times = False
@@ -173,18 +174,20 @@ class FrameChain(nx.DiGraph):
                         "mission": mission,
                         "ckQualities" : ["reconstructed"],
                         "spkQualities" : ["reconstructed"],
-                        "searchKernels": self.search_kernels})
+                        "searchKernels": self.search_kernels,
+                        "useWeb": self.use_web})
         jobs.append({"et": time, 
                      "initialFrame": targetFrame,
                      "mission": mission,
                      "ckQualities" : ["reconstructed"],
                      "spkQualities" : ["reconstructed"],
-                     "searchKernels": self.search_kernels})
+                     "searchKernels": self.search_kernels,
+                     "useWeb": self.use_web})
         
         logger.debug(f"Frame Trace Jobs: {jobs}")
         with ThreadPoolExecutor(max_workers=4) as executor:
-            futures = [executor.submit(spiceql_call, "frameTrace", job, self.use_web) for job in jobs]
-            results = [future.result() for future in futures]
+            futures = [executor.submit(pyspiceql.frameTrace, **job) for job in jobs]
+            results = [future.result()[0] for future in futures]
 
         if nadir:
             results.insert(0, ([[], []]))
@@ -300,23 +303,23 @@ class FrameChain(nx.DiGraph):
                                      "mission": mission, 
                                      "ckQualities" : ["reconstructed"],
                                      "searchKernels": self.search_kernels, 
-                                     "fullKernelPath": False}
+                                     "useWeb": self.use_web}
                     logger.debug(f"Exact CK times function args: {function_args}")
-                    futures.append(executor.submit(spiceql_call, "getExactTargetOrientations", function_args, self.use_web))
+                    futures.append(executor.submit(pyspiceql.getExactTargetOrientations, **function_args))
                 else:
-                    ephem_kwargs = {"startEt": start_et,
-                                    "stopEt": stop_et,
-                                    "numRecords": len(times),
-                                    "ckQualities" : ["reconstructed"]}
-                    function_args = {**ephem_kwargs,
+                    function_args = {"startEt": start_et,
+                                     "stopEt": stop_et,
+                                     "numRecords": len(times),
+                                     "ckQualities" : ["reconstructed"],
                                      "toFrame": d, 
                                      "refFrame": s, 
-                                     "mission": mission, 
-                                     "searchKernels": self.search_kernels}
+                                     "mission": mission,
+                                     "searchKernels": self.search_kernels, 
+                                     "useWeb": self.use_web}
                     logger.debug(f"Non-exact CK times function args: {function_args}")
-                    futures.append(executor.submit(spiceql_call, "getTargetOrientations", function_args, self.use_web))
+                    futures.append(executor.submit(pyspiceql.getTargetOrientationsRanged, **function_args))
 
-            quats_and_avs_per_frame = np.array([future.result() for future in futures])
+            quats_and_avs_per_frame = np.array([future.result()[0] for future in futures])
             logger.debug(f"Returned Quats and AVs per frame: {quats_and_avs_per_frame}")
 
         if exact_ck_times and len(times) > 1 and len(frames) > 0:

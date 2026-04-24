@@ -1,3 +1,5 @@
+import pyspiceql
+
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
@@ -116,7 +118,11 @@ class HayabusaNirsIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDisto
         """
         
         if not hasattr(self, "_ephemeris_stop_time"):
-            self._ephemeris_stop_time = self.spiceql_call("strSclkToEt", {"frameCode": self.spacecraft_id, "sclk": self.spacecraft_clock_stop_count, "mission": self.spiceql_mission})
+            self._ephemeris_stop_time = pyspiceql.strSclkToEt(frameCode=self.spacecraft_id, 
+                                                              sclk=self.spacecraft_clock_stop_count, 
+                                                              mission=self.spiceql_mission, 
+                                                              searchKernels=self.search_kernels,
+                                                              useWeb=self.use_web)[0]
         return self._ephemeris_stop_time
     
     @property

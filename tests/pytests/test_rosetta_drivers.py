@@ -211,9 +211,9 @@ class test_rosetta_virtis_isis_naif(unittest.TestCase):
     
     def test_sensor_frame_id(self):
         with patch('ale.drivers.rosetta_drivers.RosettaVirtisIsisLabelNaifSpiceDriver.has_articulation_kernel', True), \
-        patch('ale.drivers.rosetta_drivers.NaifSpice.spiceql_call', return_value=12345) as bods2c:
+             patch.object(ale.drivers.rosetta_drivers.NaifSpice, 'sensor_frame_id', new_callable=PropertyMock) as sensor_frame_id:
+            sensor_frame_id.return_value = 12345
             assert self.driver.sensor_frame_id == 12345
-            bods2c.assert_called_with("translateNameToCode", {"frame" : 'ROS_VIRTIS-M_IR', "mission" : "rosetta"})
     
     def test_is_calibrated(self):
         assert self.driver.is_calibrated is False

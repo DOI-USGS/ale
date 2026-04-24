@@ -1,7 +1,8 @@
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
-import json 
-import logging 
+import os
+import json
+import logging
 
 from ale.base.type_sensor import LineScanner, Framer, Radar, PushFrame
 from ale import logger
@@ -230,8 +231,15 @@ def to_isd(driver):
     elif 'kernels' in driver_data and isinstance(driver.kernels, list): 
         kernels_dict  = {}
         for k in driver.kernels:
-            k_split = k.split('/')
-            k_type = k_split[2]
+            if "ISISDATA" in os.environ:
+                k = k.replace(os.environ["ISISDATA"], "")
+            if "ALESPICEROOT" in os.environ:
+                k = k.replace(os.environ["ALESPICEROOT"], "")
+            if ("base/kernels/spk" in k):
+                k_type = "tspk"
+            else:
+                k_split = k.split('/')
+                k_type = k_split[-2]
             if k_type in kernels_dict and isinstance(kernels_dict[k_type], list):
                 kernels_dict[k_type].append(k)
             else:

@@ -13,7 +13,7 @@ dependencies:
   - networkx
   - nlohmann_json
   - numpy
-  - spiceql>=1.2.7
+  - spiceql>=1.3.0
   - pvl
   - pytest
   - pytest-cov

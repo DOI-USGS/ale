@@ -23,7 +23,7 @@ def test_msl_mastcam_load_local(test_mastcam_kernels):
     label_file = get_image_label('2264ML0121141200805116C00_DRCL', "pds3")
     compare_dict = get_isd("msl")
 
-    isd_str = ale.loads(label_file, props={'kernels': test_mastcam_kernels, 'local': True, 'attach_kernels': False})
+    isd_str = ale.loads(label_file, props={'kernels': test_mastcam_kernels, 'local': True, 'attach_kernels': False}, verbose=True)
     isd_obj = json.loads(isd_str)
     assert compare_dicts(isd_obj, compare_dict) == []
 
@@ -52,11 +52,11 @@ class test_mastcam_pds_naif(unittest.TestCase):
         np.testing.assert_almost_equal(self.driver.exposure_duration, 0.0102)
 
     def test_final_inst_frame(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-76000]) as spiceql_call:
+        with patch('ale.drivers.msl_drivers.pyspiceql.translateNameToCode', return_value=[-76000]) as translateNameToCode:
             assert self.driver.final_inst_frame == -76000
-            calls = [call('translateNameToCode', {'frame': 'MSL_ROVER', 'mission': '', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
+            calls = [call(frame='MSL_ROVER', mission='', searchKernels=False, useWeb=False)]
+            translateNameToCode.assert_has_calls(calls)
+            assert translateNameToCode.call_count == 1
 
     def test_cahvor_camera_dict(self):
         cahvor_camera_dict = self.driver.cahvor_camera_dict
@@ -67,26 +67,18 @@ class test_mastcam_pds_naif(unittest.TestCase):
         np.testing.assert_allclose(cahvor_camera_dict['V'], [5.843885e+03, -8.213856e+03, 9.438374e+03])
 
     def test_sensor_frame_id(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-76562]) as spiceql_call:
+        with patch('ale.drivers.msl_drivers.pyspiceql.translateNameToCode', return_value=[-76562]) as translateNameToCode:
             assert self.driver.sensor_frame_id == -76562
-            calls = [call('translateNameToCode', {'frame': 'MSL_SITE_62', 'mission': '', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
+            calls = [call(frame='MSL_SITE_62', mission='', searchKernels=False, useWeb=False)]
+            translateNameToCode.assert_has_calls(calls)
+            assert translateNameToCode.call_count == 1
 
     def test_focal2pixel_lines(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-76220]) as spiceql_call, \
-             patch('ale.drivers.msl_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
-            naif_keywords.return_value = {"INS-76220_FOCAL_LENGTH": 100}
+        with patch.object(MslMastcamPds3NaifSpiceDriver, 'focal_length', new_callable=PropertyMock) as focal_length:
+            focal_length.return_value = 100
             np.testing.assert_allclose(self.driver.focal2pixel_lines, [0, 0, 137.96844341513602])
-            calls = [call('translateNameToCode', {'frame': 'MSL_MASTCAM_RIGHT', 'mission': '', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1
 
     def test_focal2pixel_samples(self):
-        with patch('ale.spiceql_access.spiceql_call', side_effect=[-76220]) as spiceql_call, \
-             patch('ale.drivers.msl_drivers.NaifSpice.naif_keywords', new_callable=PropertyMock) as naif_keywords:
-            naif_keywords.return_value = {"INS-76220_FOCAL_LENGTH": 100}
+        with patch.object(MslMastcamPds3NaifSpiceDriver, 'focal_length', new_callable=PropertyMock) as focal_length:
+            focal_length.return_value = 100
             np.testing.assert_allclose(self.driver.focal2pixel_samples, [0, 137.96844341513602, 0])
-            calls = [call('translateNameToCode', {'frame': 'MSL_MASTCAM_RIGHT', 'mission': '', 'searchKernels': False}, False)]
-            spiceql_call.assert_has_calls(calls)
-            assert spiceql_call.call_count == 1

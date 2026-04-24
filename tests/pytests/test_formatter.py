@@ -16,6 +16,10 @@ class DummyNaifSpiceDriver(Driver, NaifSpice):
     Test Driver implementation with dummy values
     """
     @property
+    def instrument_id(self):
+        return "MRO_CTX"
+
+    @property
     def target_body_radii(self):
         return (1100, 1100, 1000)
 
