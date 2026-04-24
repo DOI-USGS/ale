@@ -18,27 +18,22 @@ from scipy.interpolate import interp1d, BPoly
 
 from ale.base.label_isis import IsisLabel
 
-def read_table(self, priv_name, table_name): 
+def read_table(label, file, table_name): 
 
-    if not hasattr(self, priv_name):
-        tables = []
-        if "Table" in self.label:
-            tables = self.label.getall('Table')
+    tables = []
+    if "Table" in label:
+        tables = label.getall('Table')
 
-        for table in tables:
-            if table['Name'] == table_name:
-                binary_data = read_table_data(table, self._file)
-                setattr(self, priv_name, parse_table(table, binary_data))
-                return getattr(self, priv_name)
+    for table in tables:
+        if table['Name'] == table_name:
+            binary_data = read_table_data(table, file)
+            return parse_table(table, binary_data)
 
-        # GDAL
-        if isinstance(self.label[f"Table_{table_name}"], dict): 
-            setattr(self, priv_name, parse_table_json(self.label[f"Table_{table_name}"]))
-            return getattr(self, priv_name)
+    # GDAL
+    if isinstance(label[f"Table_{table_name}"], dict): 
+        return parse_table_json(label[f"Table_{table_name}"])
 
-        raise KeyError(f'Could not find {table_name} table on file {self._file}')
-        
-    return getattr(self, priv_name)
+    raise KeyError(f'Could not find {table_name} table on file {file}')
 
 
 def read_table_data(table_label, cube):
@@ -284,7 +279,12 @@ class IsisSpice():
         : dict
           Instrument pointing table
         """
-        return read_table(self, "_inst_pointing_table", "InstrumentPointing")
+
+        attr_name = '_inst_pointing_table'
+        table_name = 'InstrumentPointing'
+        if not hasattr(self, attr_name):
+            setattr(self, attr_name, read_table(self.label, self._file, table_name))
+        return getattr(self, attr_name)
 
     @property
     def body_orientation_table(self):
@@ -297,7 +297,11 @@ class IsisSpice():
         : dict
           Body orientation table
         """
-        return read_table(self, "_body_orientation_table", "BodyRotation")
+        attr_name = '_body_orientation_table'
+        table_name = 'BodyRotation'
+        if not hasattr(self, attr_name):
+            setattr(self, attr_name, read_table(self.label, self._file, table_name))
+        return getattr(self, attr_name)
 
     @property
     def inst_position_table(self):
@@ -310,7 +314,11 @@ class IsisSpice():
         : dict
           Instrument position table
         """
-        return read_table(self, "_inst_position_table", 'InstrumentPosition')
+        attr_name = '_inst_position_table'
+        table_name = 'InstrumentPosition'
+        if not hasattr(self, attr_name):
+            setattr(self, attr_name, read_table(self.label, self._file, table_name))
+        return getattr(self, attr_name)
 
     @property
     def sun_position_table(self):
@@ -323,7 +331,11 @@ class IsisSpice():
         : dict
           Sun position table
         """
-        return read_table(self, "_sun_position_table", "SunPosition")
+        attr_name = '_sun_position_table'
+        table_name = 'SunPosition'
+        if not hasattr(self, attr_name):
+            setattr(self, attr_name, read_table(self.label, self._file, table_name))
+        return getattr(self, attr_name)
 
     def __enter__(self):
         """
