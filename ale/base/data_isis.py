@@ -20,17 +20,18 @@ from ale.base.label_isis import IsisLabel
 
 def read_table(label, file, table_name): 
 
-    tables = []
-    if "Table" in label:
-        tables = label.getall('Table')
+    if isinstance(label, pvl.PVLModule):
+        tables = []
+        if "Table" in label:
+            tables = label.getall('Table')
 
-    for table in tables:
-        if table['Name'] == table_name:
-            binary_data = read_table_data(table, file)
-            return parse_table(table, binary_data)
+        for table in tables:
+            if table['Name'] == table_name:
+                binary_data = read_table_data(table, file)
+                return parse_table(table, binary_data)
 
     # GDAL
-    if isinstance(label[f"Table_{table_name}"], dict): 
+    elif isinstance(label[f"Table_{table_name}"], dict): 
         return parse_table_json(label[f"Table_{table_name}"])
 
     raise KeyError(f'Could not find {table_name} table on file {file}')
