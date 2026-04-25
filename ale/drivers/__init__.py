@@ -53,9 +53,60 @@ class AleJsonEncoder(json.JSONEncoder):
             return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
+def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False, only_naif_spice=False):
+    return load_from_label(label, props, formatter, verbose, only_isis_spice, only_naif_spice)['isd']
 
-def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False, only_naif_spice=False, return_driver=False):
-# def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False, only_naif_spice=False):
+def load_driver(label, props={}, formatter='ale', verbose=False, only_isis_spice=False, only_naif_spice=False):
+    return load_from_label(label, props, formatter, verbose, only_isis_spice, only_naif_spice)['driver']
+
+def parse_label(label, verbose=False):
+
+    parsed_label = None
+
+    if verbose:
+        logger.info("Attempting to pre-parse label file")
+    try:
+        # Try default grammar for pds3 label
+        parsed_label = parse_label(label)
+    except Exception as e:
+        if verbose:
+            logger.info("First parse attempt failed with")
+            logger.info(e)
+        parsed_label = None
+
+    # If pds3 label fails, try isis grammar
+    if not parsed_label:
+        try:
+            parsed_label = parse_label(label, pvl.grammar.ISISGrammar())
+        except Exception as e:
+            if verbose:
+                logger.info("Second parse attempt failed with")
+                logger.info(e)
+            # If both fail, then don't parse the label, and just pass the driver a file.
+            parsed_label = None
+
+    # If pvl label loading fails, try gdal
+    if not parsed_label:
+        try:
+            from osgeo import gdal
+            gdal.UseExceptions()
+            geodata = gdal.Open(label)
+            parsed_label = json.loads(geodata.GetMetadata("json:ISIS3")["doc"])
+        except Exception as e:
+            if verbose:
+                logger.info("Gdal parse attempt failed with")
+                logger.info(e)
+            parsed_label = None
+
+    if verbose:
+        if parsed_label:
+            logger.info("Successfully pre-parsed label file")
+        else:
+            logger.info("Failed to pre-parse label file. Individual drivers will try again.")
+    
+    return parsed_label
+
+def load_from_label(label, props={}, formatter='ale', verbose=False, only_isis_spice=False, only_naif_spice=False):
     """
     Attempt to load a given label from possible drivers.
 
@@ -144,53 +195,13 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
                                 '". \nMake sure your cube is present in your working directory, ' +
                                 'or that you specify the full and correct path to your cube.')
 
-    if verbose:
-        logger.info("Attempting to pre-parse label file")
-    try:
-        # Try default grammar for pds3 label
-        parsed_label = parse_label(label)
-    except Exception as e:
-        if verbose:
-            logger.info("First parse attempt failed with")
-            logger.info(e)
-        parsed_label = None
-
-    # If pds3 label fails, try isis grammar
-    if not parsed_label:
-        try:
-            parsed_label = parse_label(label, pvl.grammar.ISISGrammar())
-        except Exception as e:
-            if verbose:
-                logger.info("Second parse attempt failed with")
-                logger.info(e)
-            # If both fail, then don't parse the label, and just pass the driver a file.
-            parsed_label = None
-
-    # If pvl label loading fails, try gdal
-    if not parsed_label:
-        try:
-            from osgeo import gdal
-            gdal.UseExceptions()
-            geodata = gdal.Open(label)
-            parsed_label = json.loads(geodata.GetMetadata("json:ISIS3")["doc"])
-        except Exception as e:
-            if verbose:
-                logger.info("Gdal parse attempt failed with")
-                logger.info(e)
-            parsed_label = None
-
-    if verbose:
-        if parsed_label:
-            logger.info("Successfully pre-parsed label file")
-        else:
-            logger.info("Failed to pre-parse label file. Individual drivers will try again.")
+    parsed_label = parse_label(label)
 
     for driver in drivers:
         if verbose:
             logger.info(f'Trying {driver.__name__}')
         try:
-            if return_driver:    # Save driver class before it is replaced with an instance of itself
-                current_driver = driver
+            current_driver = driver
             res = driver(label, props=props, parsed_label=parsed_label)
             # get instrument_id to force early failure
             res.instrument_id
@@ -202,9 +213,7 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
                     logger.info(f"Success with: {driver.__class__.__name__}")
                     logger.info(f"ISD:\n{json.dumps(isd, indent=2, cls=AleJsonEncoder)}")
                     logger.setLevel(logger_level)
-                if return_driver:
-                    return current_driver
-                return isd
+                return { 'isd': isd, 'driver': current_driver }
         except WrongLabelTypeException as e:
             if verbose:
                 logger.info(f"Wrong label type for driver {driver.__class__.__name__}: {e}. Skipping driver.")

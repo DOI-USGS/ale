@@ -85,7 +85,7 @@ def test_load_invalid_spice_root(monkeypatch):
 
 def test_load_driver(mro_kernels):
     label_file = get_image_label('B10_013341_1010_XN_79S172W')
-    my_driver = ale.load(label_file, {'kernels': mro_kernels}, return_driver=True)
+    my_driver = ale.drivers.get_driver_from_label(label_file, {'kernels': mro_kernels})
     assert my_driver == ale.drivers.mro_drivers.MroCtxPds3LabelNaifSpiceDriver
     
 def test_load_mes_from_metakernels(tmpdir, monkeypatch, mess_kernels):
