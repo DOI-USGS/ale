@@ -53,58 +53,76 @@ class AleJsonEncoder(json.JSONEncoder):
             return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
+
 def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False, only_naif_spice=False):
+    """
+    Attempt to load an ISD for a given label from all possible drivers.
+
+    Wrapper for load_from_label, returns only the ISD.
+
+    See load_from_label for shared parameter documentation.
+
+    Returns
+    -------
+    dict
+         The ISD as a dictionary
+
+    See Also
+    --------
+    :func:`~ale.drivers.load_from_label`
+    """
     return load_from_label(label, props, formatter, verbose, only_isis_spice, only_naif_spice)['isd']
 
-def load_driver(label, props={}, formatter='ale', verbose=False, only_isis_spice=False, only_naif_spice=False):
-    return load_from_label(label, props, formatter, verbose, only_isis_spice, only_naif_spice)['driver']
 
-def parse_label(label, verbose=False):
+def get_driver_from_label(label, props={}, verbose=False, only_isis_spice=False, only_naif_spice=False):
+    """
+    Attempt to return the correct driver for a label by testing each driver on the label.
 
-    parsed_label = None
+    Wrapper for load_from_label, returns only the driver.
 
-    if verbose:
-        logger.info("Attempting to pre-parse label file")
-    try:
-        # Try default grammar for pds3 label
-        parsed_label = parse_label(label)
-    except Exception as e:
-        if verbose:
-            logger.info("First parse attempt failed with")
-            logger.info(e)
-        parsed_label = None
+    See load_from_label for shared parameter documentation.
 
-    # If pds3 label fails, try isis grammar
-    if not parsed_label:
-        try:
-            parsed_label = parse_label(label, pvl.grammar.ISISGrammar())
-        except Exception as e:
-            if verbose:
-                logger.info("Second parse attempt failed with")
-                logger.info(e)
-            # If both fail, then don't parse the label, and just pass the driver a file.
-            parsed_label = None
+    Returns
+    -------
+    driver
+        A driver class which can successfully load the given label.
 
-    # If pvl label loading fails, try gdal
-    if not parsed_label:
-        try:
-            from osgeo import gdal
-            gdal.UseExceptions()
-            geodata = gdal.Open(label)
-            parsed_label = json.loads(geodata.GetMetadata("json:ISIS3")["doc"])
-        except Exception as e:
-            if verbose:
-                logger.info("Gdal parse attempt failed with")
-                logger.info(e)
-            parsed_label = None
+    See Also
+    --------
+    :func:`~ale.drivers.load_from_label`
+    """
+    return load_from_label(label, props, 'ale', verbose, only_isis_spice, only_naif_spice)['driver']
 
-    if verbose:
-        if parsed_label:
-            logger.info("Successfully pre-parsed label file")
-        else:
-            logger.info("Failed to pre-parse label file. Individual drivers will try again.")
+
+def get_all_drivers(only_isis_spice=False, only_naif_spice=False):
+    """
+    Returns a chain of all ALE drivers.  Can be filtered by ISIS or NAIF SPICE.
     
-    return parsed_label
+    Parameters
+    ----------
+    only_isis_spice : bool
+                      Explicitly searches for drivers constructed from the IsisSpice
+                      component class
+
+    only_naif_spice : bool
+                      Explicitly searches for drivers constructed from the NaifSpice
+                      component class
+    Returns
+    -------
+    drivers
+         A chain of ALE drivers
+    """
+    driver_mask = [only_isis_spice, only_naif_spice]
+    class_list = [IsisSpice, NaifSpice]
+    class_list = list(compress(class_list, driver_mask))
+    # predicate logic: make sure x is a class, who contains the word "driver" (clipper_drivers) and 
+    # the component classes 
+    predicate = lambda x: inspect.isclass(x) and "_driver" in x.__module__ and [i for i in class_list if i in inspect.getmro(x)] == class_list
+    driver_list = [inspect.getmembers(dmod, predicate) for dmod in __driver_modules__]
+    drivers = chain.from_iterable(driver_list)
+    drivers = sort_drivers([d[1] for d in drivers])
+    return drivers
+
 
 def load_from_label(label, props={}, formatter='ale', verbose=False, only_isis_spice=False, only_naif_spice=False):
     """
@@ -179,15 +197,7 @@ def load_from_label(label, props={}, formatter='ale', verbose=False, only_isis_s
     if verbose:
         logger.setLevel(logging.DEBUG)
 
-    driver_mask = [only_isis_spice, only_naif_spice]
-    class_list = [IsisSpice, NaifSpice]
-    class_list = list(compress(class_list, driver_mask))
-    # predicate logic: make sure x is a class, who contains the word "driver" (clipper_drivers) and 
-    # the component classes 
-    predicate = lambda x: inspect.isclass(x) and "_driver" in x.__module__ and [i for i in class_list if i in inspect.getmro(x)] == class_list
-    driver_list = [inspect.getmembers(dmod, predicate) for dmod in __driver_modules__]
-    drivers = chain.from_iterable(driver_list)
-    drivers = sort_drivers([d[1] for d in drivers])
+    drivers = get_all_drivers(only_isis_spice, only_naif_spice)
 
     if not os.path.isfile(label):
         raise FileNotFoundError('File "' + label + '" not found. \n' + 
@@ -195,7 +205,7 @@ def load_from_label(label, props={}, formatter='ale', verbose=False, only_isis_s
                                 '". \nMake sure your cube is present in your working directory, ' +
                                 'or that you specify the full and correct path to your cube.')
 
-    parsed_label = parse_label(label)
+    parsed_label = pre_parse_label(label)
 
     for driver in drivers:
         if verbose:
@@ -234,9 +244,9 @@ def loads(label, props='', formatter='ale', indent = 2, verbose=False, only_isis
     """
     Attempt to load a given label from all possible drivers.
 
-    This function is the same as load, except it returns a JSON formatted string.
+    This function is the same as load_from_label, except it returns the ISD as a JSON formatted string.
 
-    See load for shared parameter documentation.
+    See load_from_label for shared parameter documentation.
     
     Parameters
     ----------
@@ -251,10 +261,11 @@ def loads(label, props='', formatter='ale', indent = 2, verbose=False, only_isis
 
     See Also
     --------
-    :func:`~ale.drivers.load`
+    :func:`~ale.drivers.load_from_label`
     """
     res = load(label, props, formatter, verbose, only_isis_spice, only_naif_spice)
     return json.dumps(res, indent=indent, cls=AleJsonEncoder)
+
 
 def parse_label(label, grammar=pvl.grammar.PVLGrammar()):
     """
@@ -286,4 +297,72 @@ def parse_label(label, grammar=pvl.grammar.PVLGrammar()):
     except:
         raise ValueError("{} is not a valid label for grammar {}".format(label, grammar.__name__))
 
+    return parsed_label
+
+
+def pre_parse_label(label, verbose=False):
+    """
+    Attempt to parse a PVL label with pds3, then isis, then gdal.
+
+    Parameters
+    ----------
+    label
+        The label as a pvl string, pvl file, or json string.
+
+    verbose: bool
+              If True, displays debug output.
+
+    Returns
+    -------
+    pvl.collections.PVLModule
+        The PVL label deserialized to a Python object
+
+    See Also
+    --------
+    load
+    loads
+    """
+    parsed_label = None
+
+    if verbose:
+        logger.info("Attempting to pre-parse label file")
+    try:
+        # Try default grammar for pds3 label
+        parsed_label = parse_label(label)
+    except Exception as e:
+        if verbose:
+            logger.info("First parse attempt failed with")
+            logger.info(e)
+        parsed_label = None
+
+    # If pds3 label fails, try isis grammar
+    if not parsed_label:
+        try:
+            parsed_label = parse_label(label, pvl.grammar.ISISGrammar())
+        except Exception as e:
+            if verbose:
+                logger.info("Second parse attempt failed with")
+                logger.info(e)
+            # If both fail, then don't parse the label, and just pass the driver a file.
+            parsed_label = None
+
+    # If pvl label loading fails, try gdal
+    if not parsed_label:
+        try:
+            from osgeo import gdal
+            gdal.UseExceptions()
+            geodata = gdal.Open(label)
+            parsed_label = json.loads(geodata.GetMetadata("json:ISIS3")["doc"])
+        except Exception as e:
+            if verbose:
+                logger.info("Gdal parse attempt failed with")
+                logger.info(e)
+            parsed_label = None
+
+    if verbose:
+        if parsed_label:
+            logger.info("Successfully pre-parsed label file")
+        else:
+            logger.info("Failed to pre-parse label file. Individual drivers will try again.")
+    
     return parsed_label
