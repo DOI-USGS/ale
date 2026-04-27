@@ -10,6 +10,7 @@ from ale import util
 from ale.drivers import sort_drivers
 from ale.base.data_naif import NaifSpice
 from ale.base.data_isis import IsisSpice
+from ale.formatters.formatter import to_isd
 
 from ale.drivers.mess_drivers import MessengerMdisPds3NaifSpiceDriver
 
@@ -18,6 +19,14 @@ from conftest import get_image_label, get_image_kernels, convert_kernels, get_is
 @pytest.fixture()
 def mess_kernels():
     kernels = get_image_kernels('EN1072174528M')
+    updated_kernels, binary_kernels = convert_kernels(kernels)
+    yield updated_kernels
+    for kern in binary_kernels:
+        os.remove(kern)
+
+@pytest.fixture()
+def mro_kernels():
+    kernels = get_image_kernels('B10_013341_1010_XN_79S172W')
     updated_kernels, binary_kernels = convert_kernels(kernels)
     yield updated_kernels
     for kern in binary_kernels:
@@ -74,7 +83,11 @@ def test_load_invalid_spice_root(monkeypatch):
     with pytest.raises(Exception):
         ale.load(label_file)
 
-
+def test_load_driver(mro_kernels):
+    label_file = get_image_label('B10_013341_1010_XN_79S172W')
+    my_driver = ale.drivers.get_driver_from_label(label_file, {'kernels': mro_kernels})
+    assert my_driver == ale.drivers.mro_drivers.MroCtxPds3LabelNaifSpiceDriver
+    
 def test_load_mes_from_metakernels(tmpdir, monkeypatch, mess_kernels):
     with patch.dict('os.environ', {'ALESPICEROOT': str(tmpdir)}):
         # reload module to repopulate ale.spice_root

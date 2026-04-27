@@ -56,6 +56,76 @@ class AleJsonEncoder(json.JSONEncoder):
 
 def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False, only_naif_spice=False):
     """
+    Attempt to load an ISD for a given label from all possible drivers.
+
+    Wrapper for load_from_label, returns only the ISD.
+
+    See load_from_label for shared parameter documentation.
+
+    Returns
+    -------
+    dict
+         The ISD as a dictionary
+
+    See Also
+    --------
+    :func:`~ale.drivers.load_from_label`
+    """
+    return load_from_label(label, props, formatter, verbose, only_isis_spice, only_naif_spice)[0]
+
+
+def get_driver_from_label(label, props={}, verbose=False, only_isis_spice=False, only_naif_spice=False):
+    """
+    Attempt to return the correct driver for a label by testing each driver on the label.
+
+    Wrapper for load_from_label, returns only the driver.
+
+    See load_from_label for shared parameter documentation.
+
+    Returns
+    -------
+    driver
+        A driver class which can successfully load the given label.
+
+    See Also
+    --------
+    :func:`~ale.drivers.load_from_label`
+    """
+    return load_from_label(label, props, 'ale', verbose, only_isis_spice, only_naif_spice)[1]
+
+
+def get_all_drivers(only_isis_spice=False, only_naif_spice=False):
+    """
+    Returns a chain of all ALE drivers.  Can be filtered by ISIS or NAIF SPICE.
+    
+    Parameters
+    ----------
+    only_isis_spice : bool
+                      Explicitly searches for drivers constructed from the IsisSpice
+                      component class
+
+    only_naif_spice : bool
+                      Explicitly searches for drivers constructed from the NaifSpice
+                      component class
+    Returns
+    -------
+    drivers
+         A chain of ALE drivers
+    """
+    driver_mask = [only_isis_spice, only_naif_spice]
+    class_list = [IsisSpice, NaifSpice]
+    class_list = list(compress(class_list, driver_mask))
+    # predicate logic: make sure x is a class, who contains the word "driver" (clipper_drivers) and 
+    # the component classes 
+    predicate = lambda x: inspect.isclass(x) and "_driver" in x.__module__ and [i for i in class_list if i in inspect.getmro(x)] == class_list
+    driver_list = [inspect.getmembers(dmod, predicate) for dmod in __driver_modules__]
+    drivers = chain.from_iterable(driver_list)
+    drivers = sort_drivers([d[1] for d in drivers])
+    return drivers
+
+
+def load_from_label(label, props={}, formatter='ale', verbose=False, only_isis_spice=False, only_naif_spice=False):
+    """
     Attempt to load a given label from possible drivers.
 
     This function opens up the label file and attempts to produce an ISD in the
@@ -101,10 +171,15 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
                       Explicitly searches for drivers constructed from the NaifSpice
                       component class
 
+    return_driver : bool
+                    if true, returns the successful driver instead of an ISD
+
     Returns
     -------
-    dict
-         The ISD as a dictionary
+    dict, ale.driver
+         The ISD as a dictionary, and,
+         The successful driver
+         
     """
     if isinstance(formatter, str):
         formatter = __formatters__[formatter]
@@ -119,21 +194,132 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
     if verbose:
         logger.setLevel(logging.DEBUG)
 
-    driver_mask = [only_isis_spice, only_naif_spice]
-    class_list = [IsisSpice, NaifSpice]
-    class_list = list(compress(class_list, driver_mask))
-    # predicate logic: make sure x is a class, who contains the word "driver" (clipper_drivers) and 
-    # the component classes 
-    predicate = lambda x: inspect.isclass(x) and "_driver" in x.__module__ and [i for i in class_list if i in inspect.getmro(x)] == class_list
-    driver_list = [inspect.getmembers(dmod, predicate) for dmod in __driver_modules__]
-    drivers = chain.from_iterable(driver_list)
-    drivers = sort_drivers([d[1] for d in drivers])
+    drivers = get_all_drivers(only_isis_spice, only_naif_spice)
 
     if not os.path.isfile(label):
         raise FileNotFoundError('File "' + label + '" not found. \n' + 
                                 'Current Working Directory: "' + os.getcwd() + 
                                 '". \nMake sure your cube is present in your working directory, ' +
                                 'or that you specify the full and correct path to your cube.')
+
+    parsed_label = pre_parse_label(label)
+
+    for driver in drivers:
+        if verbose:
+            logger.info(f'Trying {driver.__name__}')
+        try:
+            current_driver = driver
+            res = driver(label, props=props, parsed_label=parsed_label)
+            # get instrument_id to force early failure
+            res.instrument_id
+            with res as driver:
+                isd = formatter(driver)
+                if 'attach_kernels' in props and props['attach_kernels'] is False and 'kernels' in isd:
+                    del isd['kernels']
+                if verbose:
+                    logger.info(f"Success with: {driver.__class__.__name__}")
+                    logger.info(f"ISD:\n{json.dumps(isd, indent=2, cls=AleJsonEncoder)}")
+                    logger.setLevel(logger_level)
+                return isd, current_driver
+        except WrongLabelTypeException as e:
+            if verbose:
+                logger.info(f"Wrong label type for driver {driver.__class__.__name__}: {e}. Skipping driver.")
+        except WrongInstrumentException as e:
+            if verbose:
+                logger.info(f"Wrong instrument id for driver {driver.__class__.__name__}: {e}. Skipping driver.")
+        except Exception as e:
+            if verbose:
+                traceback.print_exc()
+        if verbose:
+            logger.info(f'End {driver}\n')
+    if verbose:
+        logger.setLevel(logger_level)
+    raise Exception('No viable Driver for Label.')
+
+
+def loads(label, props='', formatter='ale', indent = 2, verbose=False, only_isis_spice=False, only_naif_spice=False):
+    """
+    Attempt to load a given label from all possible drivers.
+
+    This function is the same as load_from_label, except it returns the ISD as a JSON formatted string.
+
+    See load_from_label for shared parameter documentation.
+    
+    Parameters
+    ----------
+    indent : int
+             The number of spaces to indent each nested component of the JSON string.
+             See json.dumps.
+
+    Returns
+    -------
+    str
+        The ISD as a JSON formatted string
+
+    See Also
+    --------
+    :func:`~ale.drivers.load_from_label`
+    """
+    res = load(label, props, formatter, verbose, only_isis_spice, only_naif_spice)
+    return json.dumps(res, indent=indent, cls=AleJsonEncoder)
+
+
+def parse_label(label, grammar=pvl.grammar.PVLGrammar()):
+    """
+    Attempt to parse a PVL label.
+
+    Parameters
+    ----------
+    label
+        The label as a pvl string or pvl file.
+
+    grammar
+        The pvl grammar with which to parse the label. If None, default to PVLGrammar
+
+
+    Returns
+    -------
+    pvl.collections.PVLModule
+        The PVL label deserialized to a Python object
+
+    See Also
+    --------
+    load
+    loads
+    """
+    try:
+        parsed_label = pvl.loads(label, grammar=grammar)
+    except Exception:
+        parsed_label = pvl.load(label, grammar=grammar)
+    except:
+        raise ValueError("{} is not a valid label for grammar {}".format(label, grammar.__name__))
+
+    return parsed_label
+
+
+def pre_parse_label(label, verbose=False):
+    """
+    Attempt to parse a PVL label with pds3, then isis, then gdal.
+
+    Parameters
+    ----------
+    label
+        The label as a pvl string, pvl file, or json string.
+
+    verbose: bool
+              If True, displays debug output.
+
+    Returns
+    -------
+    pvl.collections.PVLModule
+        The PVL label deserialized to a Python object
+
+    See Also
+    --------
+    load
+    loads
+    """
+    parsed_label = None
 
     if verbose:
         logger.info("Attempting to pre-parse label file")
@@ -175,93 +361,5 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
             logger.info("Successfully pre-parsed label file")
         else:
             logger.info("Failed to pre-parse label file. Individual drivers will try again.")
-
-    for driver in drivers:
-        if verbose:
-            logger.info(f'Trying {driver.__name__}')
-        try:
-            res = driver(label, props=props, parsed_label=parsed_label)
-            # get instrument_id to force early failure
-            res.instrument_id
-            with res as driver:
-                isd = formatter(driver)
-                if 'attach_kernels' in props and props['attach_kernels'] is False and 'kernels' in isd:
-                    del isd['kernels']
-                if verbose:
-                    logger.info(f"Success with: {driver.__class__.__name__}")
-                    logger.info(f"ISD:\n{json.dumps(isd, indent=2, cls=AleJsonEncoder)}")
-                    logger.setLevel(logger_level)
-                return isd
-        except WrongLabelTypeException as e:
-            if verbose:
-                logger.info(f"Wrong label type for driver {driver.__class__.__name__}: {e}. Skipping driver.")
-        except WrongInstrumentException as e:
-            if verbose:
-                logger.info(f"Wrong instrument id for driver {driver.__class__.__name__}: {e}. Skipping driver.")
-        except Exception as e:
-            if verbose:
-                traceback.print_exc()
-        if verbose:
-            logger.info(f'End {driver}\n')
-    if verbose:
-        logger.setLevel(logger_level)
-    raise Exception('No viable Driver for Label.')
-
-
-def loads(label, props='', formatter='ale', indent = 2, verbose=False, only_isis_spice=False, only_naif_spice=False):
-    """
-    Attempt to load a given label from all possible drivers.
-
-    This function is the same as load, except it returns a JSON formatted string.
-
-    See load for shared parameter documentation.
     
-    Parameters
-    ----------
-    indent : int
-             The number of spaces to indent each nested component of the JSON string.
-             See json.dumps.
-
-    Returns
-    -------
-    str
-        The ISD as a JSON formatted string
-
-    See Also
-    --------
-    :func:`~ale.drivers.load`
-    """
-    res = load(label, props, formatter, verbose, only_isis_spice, only_naif_spice)
-    return json.dumps(res, indent=indent, cls=AleJsonEncoder)
-
-def parse_label(label, grammar=pvl.grammar.PVLGrammar()):
-    """
-    Attempt to parse a PVL label.
-
-    Parameters
-    ----------
-    label
-        The label as a pvl string or pvl file.
-
-    grammar
-        The pvl grammar with which to parse the label. If None, default to PVLGrammar
-
-
-    Returns
-    -------
-    pvl.collections.PVLModule
-        The PVL label deserialized to a Python object
-
-    See Also
-    --------
-    load
-    loads
-    """
-    try:
-        parsed_label = pvl.loads(label, grammar=grammar)
-    except Exception:
-        parsed_label = pvl.load(label, grammar=grammar)
-    except:
-        raise ValueError("{} is not a valid label for grammar {}".format(label, grammar.__name__))
-
     return parsed_label
