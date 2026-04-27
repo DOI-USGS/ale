@@ -71,7 +71,7 @@ def load(label, props={}, formatter='ale', verbose=False, only_isis_spice=False,
     --------
     :func:`~ale.drivers.load_from_label`
     """
-    return load_from_label(label, props, formatter, verbose, only_isis_spice, only_naif_spice)['isd']
+    return load_from_label(label, props, formatter, verbose, only_isis_spice, only_naif_spice)[0]
 
 
 def get_driver_from_label(label, props={}, verbose=False, only_isis_spice=False, only_naif_spice=False):
@@ -91,7 +91,7 @@ def get_driver_from_label(label, props={}, verbose=False, only_isis_spice=False,
     --------
     :func:`~ale.drivers.load_from_label`
     """
-    return load_from_label(label, props, 'ale', verbose, only_isis_spice, only_naif_spice)['driver']
+    return load_from_label(label, props, 'ale', verbose, only_isis_spice, only_naif_spice)[1]
 
 
 def get_all_drivers(only_isis_spice=False, only_naif_spice=False):
@@ -176,12 +176,9 @@ def load_from_label(label, props={}, formatter='ale', verbose=False, only_isis_s
 
     Returns
     -------
-    dict
-         The ISD as a dictionary
-
-    ale.driver
-         The successful driver (instead of an ISD dict, 
-         if return_driver is set to true)
+    dict, ale.driver
+         The ISD as a dictionary, and,
+         The successful driver
          
     """
     if isinstance(formatter, str):
@@ -223,7 +220,7 @@ def load_from_label(label, props={}, formatter='ale', verbose=False, only_isis_s
                     logger.info(f"Success with: {driver.__class__.__name__}")
                     logger.info(f"ISD:\n{json.dumps(isd, indent=2, cls=AleJsonEncoder)}")
                     logger.setLevel(logger_level)
-                return { 'isd': isd, 'driver': current_driver }
+                return isd, current_driver
         except WrongLabelTypeException as e:
             if verbose:
                 logger.info(f"Wrong label type for driver {driver.__class__.__name__}: {e}. Skipping driver.")
