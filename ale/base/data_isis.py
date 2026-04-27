@@ -2,6 +2,8 @@ import os
 import re
 import struct
 from glob import glob
+import binascii
+from ale import logger
 
 import numpy as np
 from numpy.polynomial.polynomial import polyval, polyder
@@ -15,6 +17,25 @@ from ale.transformation import FrameChain
 from scipy.interpolate import interp1d, BPoly
 
 from ale.base.label_isis import IsisLabel
+
+def read_table(label, file, table_name): 
+
+    if isinstance(label, pvl.PVLModule):
+        tables = []
+        if "Table" in label:
+            tables = label.getall('Table')
+
+        for table in tables:
+            if table['Name'] == table_name:
+                binary_data = read_table_data(table, file)
+                return parse_table(table, binary_data)
+
+    # GDAL
+    elif isinstance(label[f"Table_{table_name}"], dict): 
+        return parse_table_json(label[f"Table_{table_name}"])
+
+    raise KeyError(f'Could not find {table_name} table on file {file}')
+
 
 def read_table_data(table_label, cube):
     """
@@ -80,6 +101,65 @@ def parse_table(table_label, data):
 
     # Parse the keywords from the label
     results.update({key : value for key, value in table_label.items() if not isinstance(value, pvl.collections.PVLGroup)})
+
+    return results
+
+def parse_table_json(table_label):
+    """
+    Parse an ISIS table into a dictionary.
+
+    Parameters
+    ----------
+    table_label : PVLModule
+                  The ISIS table label
+    data : bytes
+           The binary component of the ISIS table
+
+    Returns
+    -------
+    dict :
+           The table as a dictionary with the keywords from the label and the
+           binary data
+    """
+
+    data = table_label['_data']
+
+    data_sizes = {'Integer' : 8,
+                  'Double'  : 16,
+                  'Real'    : 8,
+                  'Text'    : 2}
+    data_formats = {'Integer' : 'i',
+                    'Double'  : 'd',
+                    'Real'    : 'f'}
+
+    fields = {table_label[k]['Name']: v for k, v in table_label.items() if k.startswith("Field")}
+    results = {metadata['Name']:[] for field, metadata in fields.items()}
+    offset = 0
+    for record in range(table_label['Records']):
+        for field, metadata in fields.items():
+            if metadata['Type'] == 'Text':
+                logger.debug("Data Format: Text (Untested for JSON Format/.gtiff images).")
+                #field_data = data[offset:offset+field['Size']].decode(encoding='latin_1')
+            else:
+                # Unpack numeric data
+                data_format = data_formats[metadata['Type']] * metadata['Size']
+                data_chunk = data[offset:offset+data_sizes[metadata['Type']]]
+                field_data  = struct.unpack(data_format, binascii.unhexlify(data_chunk))
+
+                if len(field_data) == 1:
+                    field_data = field_data[0]
+
+            results[metadata['Name']].append(field_data)
+            offset += data_sizes[metadata['Type']] * metadata['Size']
+
+    # Parse the keywords from the label
+    results.update({key : value for key, value in table_label.items() if not isinstance(value, pvl.collections.PVLGroup)})
+
+    #Remove extra keys
+    extra_keys = [k for k in results if k.startswith("Field_")]
+    extra_keys.extend(["_type", "_container_name", "_data"])
+    for key in extra_keys:
+        results.pop(key, None)
 
     return results
 
@@ -200,18 +280,12 @@ class IsisSpice():
         : dict
           Instrument pointing table
         """
-        if not hasattr(self, "_inst_pointing_table"):
-            tables = []
-            if "Table" in self.label:
-                tables = self.label.getall('Table')
 
-            for table in tables:
-                if table['Name'] == 'InstrumentPointing':
-                    binary_data = read_table_data(table, self._file)
-                    self._inst_pointing_table = parse_table(table, binary_data)
-                    return self._inst_pointing_table
-            raise ValueError(f'Could not find InstrumentPointing table on file {self._file}')
-        return self._inst_pointing_table
+        attr_name = '_inst_pointing_table'
+        table_name = 'InstrumentPointing'
+        if not hasattr(self, attr_name):
+            setattr(self, attr_name, read_table(self.label, self._file, table_name))
+        return getattr(self, attr_name)
 
     @property
     def body_orientation_table(self):
@@ -224,18 +298,11 @@ class IsisSpice():
         : dict
           Body orientation table
         """
-        if not hasattr(self, "_body_orientation_table"):
-            tables = []
-            if "Table" in self.label:
-                tables = self.label.getall('Table')
-                
-            for table in tables:
-                if table['Name'] == 'BodyRotation':
-                    binary_data = read_table_data(table, self._file)
-                    self._body_orientation_table = parse_table(table, binary_data)
-                    return self._body_orientation_table
-            raise ValueError(f'Could not find BodyRotation table on file {self._file}')
-        return self._body_orientation_table
+        attr_name = '_body_orientation_table'
+        table_name = 'BodyRotation'
+        if not hasattr(self, attr_name):
+            setattr(self, attr_name, read_table(self.label, self._file, table_name))
+        return getattr(self, attr_name)
 
     @property
     def inst_position_table(self):
@@ -248,18 +315,11 @@ class IsisSpice():
         : dict
           Instrument position table
         """
-        if not hasattr(self, "_inst_position_table"):
-            tables = []
-            if "Table" in self.label:
-                tables = self.label.getall('Table')
-
-            for table in tables:
-                if table['Name'] == 'InstrumentPosition':
-                    binary_data = read_table_data(table, self._file)
-                    self._inst_position_table = parse_table(table, binary_data)
-                    return self._inst_position_table
-            raise ValueError(f'Could not find InstrumentPosition table on file {self._file}')
-        return self._inst_position_table
+        attr_name = '_inst_position_table'
+        table_name = 'InstrumentPosition'
+        if not hasattr(self, attr_name):
+            setattr(self, attr_name, read_table(self.label, self._file, table_name))
+        return getattr(self, attr_name)
 
     @property
     def sun_position_table(self):
@@ -272,18 +332,11 @@ class IsisSpice():
         : dict
           Sun position table
         """
-        if not hasattr(self, "_sun_position_table"):
-            tables = []
-            if "Table" in self.label:
-                tables = self.label.getall('Table')
-
-            for table in tables:
-                if table['Name'] == 'SunPosition':
-                    binary_data = read_table_data(table, self._file)
-                    self._sun_position_table = parse_table(table, binary_data)
-                    return self._sun_position_table
-            raise ValueError(f'Could not find SunPosition table on file {self._file}')
-        return self._sun_position_table
+        attr_name = '_sun_position_table'
+        table_name = 'SunPosition'
+        if not hasattr(self, attr_name):
+            setattr(self, attr_name, read_table(self.label, self._file, table_name))
+        return getattr(self, attr_name)
 
     def __enter__(self):
         """
@@ -317,11 +370,22 @@ class IsisSpice():
         """
         regex = re.compile('CLOCK_ET_.*_COMPUTED')
         for key in self.naif_keywords:
-            if re.match(regex, key[0]):
-                # If the hex string is only numbers and contains leading 0s,
-                # the PVL library strips them off (ie. 0000000000002040 becomes
-                # 2040). Pad to 16 in case this happens.
-                return str(key[1]).zfill(16)
+
+            if isinstance(key, tuple) and re.match(regex, key[0]):
+                    # If the hex string is only numbers and contains leading 0s,
+                    # the PVL library strips them off (ie. 0000000000002040 becomes
+                    # 2040). Pad to 16 in case this happens.
+                    return str(key[1]).zfill(16)
+
+            # In gtiffs, looks like:
+            # "CLOCK_ET_-236_2":{
+            #     "0072174528:989000_COMPUTED":"4a1edaaeddcbbc41"
+            # }
+            elif isinstance(key, str) and key.startswith('CLOCK_ET_'):
+                for subkey in self.naif_keywords[key]:
+                    if subkey.endswith('_COMPUTED'):
+                        return str(self.naif_keywords[key][subkey]).zfill(16)
+                        
         raise ValueError("No computed spacecraft clock time found in NaifKeywords.")
 
     @property
@@ -506,10 +570,13 @@ class IsisSpice():
             this is formatted as semimajor, semimajor,
             semiminor
         """
+
         regex = re.compile(r'BODY-?\d*_RADII')
         for key in self.naif_keywords:
-            if re.match(regex, key[0]):
+            if isinstance(key, tuple) and re.match(regex, key[0]):
                 return self.naif_keywords[key[0]]
+            elif isinstance(key, str) and re.match(regex, key): # gdal
+                return self.naif_keywords[key]
 
     @property
     def frame_chain(self):
