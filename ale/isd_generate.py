@@ -145,6 +145,15 @@ def main():
     )
     args = parser.parse_args()
 
+    if (not args.kernel and
+        not args.search_kernels and
+        not args.use_web_spice and
+        not args.only_isis_spice and
+        not os.environ.get('ALESPICEROOT')):
+        sys.exit("ALESPICEROOT is unset and no kernel source was provided. "
+                 "Set ALESPICEROOT (e.g. ALESPICEROOT=$ISISDATA), or pass "
+                 "--kernel/--search-kernels/--use-web-spice/--only-isis-spice.")
+
     log_level = logging.ERROR
     if args.verbose:
         log_level = logging.INFO
