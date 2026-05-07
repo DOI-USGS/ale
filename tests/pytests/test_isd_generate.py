@@ -10,10 +10,22 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
+import os
+import sys
 import unittest
 from unittest.mock import call, patch
 
 import ale.isd_generate as isdg
+
+
+class TestMain(unittest.TestCase):
+
+    @patch.dict(os.environ, {}, clear=True)
+    @patch.object(sys, "argv", ["isd_generate", "dummy.cub"])
+    def test_main_errors_on_missing_alespiceroot(self):
+        with self.assertRaises(SystemExit) as ctx:
+            isdg.main()
+        self.assertIn("ALESPICEROOT", str(ctx.exception))
 
 
 class TestFile(unittest.TestCase):
