@@ -49,6 +49,7 @@ release.
 - Fixed Eigen 5.x compatibility by removing version constraint in CMakeLists.txt [#677](https://github.com/DOI-USGS/ale/pull/677)
 - Fixed C++ load(s) call failing when called again after throwing an error [#696](https://github.com/DOI-USGS/ale/pull/696)
 - Fixed misleading "No Such Driver for Label" from `isd_generate` when ALESPICEROOT is unset and no kernel-source flag is given. The CLI now exits early with a message naming ALESPICEROOT and the alternative flags (`--kernel`/`--search-kernels`/`--use-web-spice`/`--only-isis-spice`). [#704](https://github.com/DOI-USGS/ale/pull/704)
+- Fixed metakernels with relative `PATH_VALUES` (e.g. `..`) silently failing when invoked from a working directory other than the metakernel's own directory. `NaifSpice.__enter__` now `chdir`s to each metakernel's directory around `pyspiceql.load`, then restores the prior working directory.
 
 ## [1.1.3] - 2026-03-12
 
