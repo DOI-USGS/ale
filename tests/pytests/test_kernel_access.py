@@ -199,6 +199,29 @@ def test_get_metakernels(tmpdir, search_kwargs, expected):
 
     assert search_result == expected
 
+def test_get_metakernels_year_only_filename(tmpdir):
+    """A metakernel filename with only mission_year (no version segment), e.g.
+    'lro_2013.tm', should parse as year='2013', version='N/A' so that filtering
+    by year picks the right file. Previously the parser inserted 'N/A' as the
+    year and treated '2013' as the version, which caused versions='latest' to
+    pick lro_2018.tm over lro_2013.tm regardless of cube date.
+    """
+    tmpdir.mkdir('lro-b-v01')
+    open(tmpdir.join('lro-b-v01', 'lro_2013.tm'), 'w').close()
+    open(tmpdir.join('lro-b-v01', 'lro_2018.tm'), 'w').close()
+
+    res_2013 = kernel_access.get_metakernels(
+        str(tmpdir), missions='lro', years=2013, versions='latest')
+    assert res_2013['count'] == 1
+    assert res_2013['data'][0]['path'].endswith('lro_2013.tm')
+    assert res_2013['data'][0]['year'] == '2013'
+    assert res_2013['data'][0]['version'] == 'N/A'
+
+    res_2018 = kernel_access.get_metakernels(
+        str(tmpdir), missions='lro', years=2018, versions='latest')
+    assert res_2018['count'] == 1
+    assert res_2018['data'][0]['path'].endswith('lro_2018.tm')
+
 @pytest.mark.parametrize('search_kwargs, expected',
     [({'years':'2009', 'versions':'v01'}, {'count':0, 'data':[]})])
 def test_get_metakernels_no_alespiceroot(monkeypatch, search_kwargs, expected):
