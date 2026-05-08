@@ -82,13 +82,21 @@ def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=
 
         metakernels = []
         for k in metakernel_paths:
-            # mission_year_version filename pattern. When only mission_year is
-            # present (e.g. 'lro_2013.tm'), insert 'N/A' as the version (slot 2)
-            # rather than as the year (slot 1), so 'lro_2013' parses as
-            # year='2013', version='N/A' instead of year='N/A', version='2013'.
+            # mission_year_version filename pattern. When only one segment
+            # follows the mission (e.g. 'lro_2013.tm' or 'ch2_v01.tm'), decide
+            # whether that segment is a year or a version: a 4-digit numeric
+            # segment is treated as the year (insert N/A in the version slot);
+            # anything else is treated as a version (insert N/A in the year
+            # slot, the legacy behavior). This makes 'lro_2013' parse as
+            # year='2013', version='N/A' so versions='latest' picks the right
+            # year, while preserving 'ch2_v01' as year='N/A', version='v01'
+            # so it still matches any-year filter.
             components = path.splitext(path.basename(k))[0].split('_') + [k]
             if len(components) == 3:
-                components.insert(2, 'N/A')
+                if re.fullmatch(r'\d{4}', components[1]):
+                    components.insert(2, 'N/A')
+                else:
+                    components.insert(1, 'N/A')
 
             metakernels.append(dict(zip(metakernel_keys, components)))
 
