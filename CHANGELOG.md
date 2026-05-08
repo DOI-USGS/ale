@@ -49,6 +49,7 @@ release.
 - Fixed Eigen 5.x compatibility by removing version constraint in CMakeLists.txt [#677](https://github.com/DOI-USGS/ale/pull/677)
 - Fixed C++ load(s) call failing when called again after throwing an error [#696](https://github.com/DOI-USGS/ale/pull/696)
 - Fixed misleading "No Such Driver for Label" from `isd_generate` when ALESPICEROOT is unset and no kernel-source flag is given. The CLI now exits early with a message naming ALESPICEROOT and the alternative flags (`--kernel`/`--search-kernels`/`--use-web-spice`/`--only-isis-spice`). [#704](https://github.com/DOI-USGS/ale/pull/704)
+- Fixed `get_metakernels()` mis-parsing `mission_year.tm` filenames (no version segment), e.g. `lro_2013.tm`, as `year='N/A', version='2013'`. With `versions='latest'`, this caused `lro_2018.tm` to be picked over `lro_2013.tm` regardless of cube date. Now parsed correctly as `year='2013', version='N/A'`.
 
 ## [1.1.3] - 2026-03-12
 
