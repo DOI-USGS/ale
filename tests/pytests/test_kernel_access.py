@@ -232,13 +232,22 @@ def test_get_metakernels_version_only_filename(tmpdir):
     """
     tmpdir.mkdir('ch2-b-v01')
     open(tmpdir.join('ch2-b-v01', 'ch2_v01.tm'), 'w').close()
+    tmpdir.mkdir('msl-b-v01')
+    open(tmpdir.join('msl-b-v01', 'msl_v01.tm'), 'w').close()
 
-    res = kernel_access.get_metakernels(
+    res_ch2 = kernel_access.get_metakernels(
         str(tmpdir), missions='ch2', years=2023, versions='latest')
-    assert res['count'] == 1
-    assert res['data'][0]['path'].endswith('ch2_v01.tm')
-    assert res['data'][0]['year'] == 'N/A'
-    assert res['data'][0]['version'] == 'v01'
+    assert res_ch2['count'] == 1
+    assert res_ch2['data'][0]['path'].endswith('ch2_v01.tm')
+    assert res_ch2['data'][0]['year'] == 'N/A'
+    assert res_ch2['data'][0]['version'] == 'v01'
+
+    res_msl = kernel_access.get_metakernels(
+        str(tmpdir), missions='msl', years=2014, versions='latest')
+    assert res_msl['count'] == 1
+    assert res_msl['data'][0]['path'].endswith('msl_v01.tm')
+    assert res_msl['data'][0]['year'] == 'N/A'
+    assert res_msl['data'][0]['version'] == 'v01'
 
 @pytest.mark.parametrize('search_kwargs, expected',
     [({'years':'2009', 'versions':'v01'}, {'count':0, 'data':[]})])
