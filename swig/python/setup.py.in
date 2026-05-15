@@ -1,0 +1,13 @@
+import setuptools
+
+if __name__ == '__main__':
+    setuptools.setup(
+        name='ale_c',
+        version='1.1.0',
+        packages=['ale_c'],
+        package_data={'':['_ale_c.so']},
+        zip_safe=False,  # Some OSes can not dynamically load an so from an egg (zipfile)
+        license='UnLicense',
+        author='acpaquette',
+        author_email='acpaquette@usgs.gov'
+)
