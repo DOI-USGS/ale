@@ -242,6 +242,12 @@ class test_chandrayaan2_tmc_isis_naif(unittest.TestCase):
     def test_light_time_correction(self):
         assert self.driver.light_time_correction == 'LT+S'
 
+    def test_ephemeris_time(self):
+        with patch("ale.drivers.chandrayaan_drivers.pyspiceql.utcToEt", return_value=[12345]) as utcToEt:
+            assert len(self.driver.ephemeris_time) == 101
+            calls = [call(utc='2023-10-30 17:57:32.639100', searchKernels=False, useWeb=False)]
+            utcToEt.assert_has_calls(calls)
+
 # Chandrayaan2 OHRC tests
 class test_chandrayaan2_ohrc_isis_naif(unittest.TestCase):
 
@@ -276,6 +282,12 @@ class test_chandrayaan2_ohrc_isis_naif(unittest.TestCase):
     def test_ephemeris_stop_time(self):
         with patch("ale.drivers.chandrayaan_drivers.pyspiceql.utcToEt", return_value=[12345]) as utcToEt:
             assert self.driver.ephemeris_stop_time == 12345
+            calls = [call(utc='2020-08-27 02:27:01.687500', searchKernels=False, useWeb=False)]
+            utcToEt.assert_has_calls(calls)
+
+    def test_ephemeris_time(self):
+        with patch("ale.drivers.chandrayaan_drivers.pyspiceql.utcToEt", return_value=[12345]) as utcToEt:
+            assert len(self.driver.ephemeris_time) == 10108
             calls = [call(utc='2020-08-27 02:27:01.687500', searchKernels=False, useWeb=False)]
             utcToEt.assert_has_calls(calls)
 
