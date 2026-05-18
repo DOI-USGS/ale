@@ -97,8 +97,8 @@ class LineScanner():
           ephemeris times split based on image lines
         """
         if not hasattr(self, "_ephemeris_time"):
-            # Determine reduction mode. Default is "None" (subsample every
-            # Nth line). Set reduction=Line via props to apply a linear reduction.
+            # Determine reduction mode. Default is "None" (No reduction). 
+            # Set reduction=Linear via props to apply a linear reduction.
             reduction = self._props.get('reduction', 'none').lower()
 
             if reduction == 'linear':
