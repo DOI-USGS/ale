@@ -524,7 +524,7 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
     @property
     def ephemeris_time(self):
         """
-        Forces as reduced set of ephemeris data for chandrayaan2 as
+        Forces a reduced set of ephemeris data for chandrayaan2 as
         many of the images are nearly 200K lines long resulting in
         ISDs that cannot be loaded correctly into the CSM
 
@@ -722,7 +722,7 @@ class Chandrayaan2OHRCIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
     @property
     def ephemeris_time(self):
         """
-        Forces as reduced set of ephemeris data for chandrayaan2 as
+        Forces a reduced set of ephemeris data for chandrayaan2 as
         many of the images are nearly 200K lines long resulting in
         ISDs that cannot be loaded correctly into the CSM
 
