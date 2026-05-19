@@ -38,7 +38,7 @@ release.
 ### Added
 
 - Added a return_driver boolean flag to ale.drivers.load to specify the return of a driver instead of an ISD. [#700](https://github.com/DOI-USGS/ale/pull/700)
-- Added an ISIS-label/NAIF-SPICE driver for KPLO ShadowCam.
+- Added an ISIS-label/NAIF-SPICE driver for KPLO ShadowCam. [#709](https://github.com/DOI-USGS/ale/pull/709)
 
 ### Changed
 - Reduced linescan ISD ephemeris sampling from one-per-line to every 10th line for images with 1000+ lines, significantly reducing ISD file sizes and load times for large sensors. Configurable via `reduction` and `ephem_sample_rate` props. [#677](https://github.com/DOI-USGS/ale/pull/677)
