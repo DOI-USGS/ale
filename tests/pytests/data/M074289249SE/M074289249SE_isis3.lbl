@@ -1,0 +1,46 @@
+Object = IsisCube
+  Object = Core
+    StartByte = 65537
+    Format    = BandSequential
+
+    Group = Dimensions
+      Samples = 3144
+      Lines   = 84992
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = UnsignedByte
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName          = "Korea Pathfinder Lunar Orbiter"
+    InstrumentId            = ShadowCam
+    TargetName              = MOON
+    LineRate                = 1.15705 <ms>
+    PrerollLines            = 1024
+    ExecutionTime           = 2024-12-11T19:02:08.000000Z
+    ExecutionSpacecraftTime = 1301:2967424
+    StartTimeOffset         = 1.9845748
+    PrerollTime             = 2024-12-11T19:02:08.799755Z
+    StartTime               = 2024-12-11T19:02:09.984574Z
+    StopTime                = 2024-12-11T19:03:48.324568Z
+    TDIDirection            = A
+    SampleFirstPixel        = 0
+  End_Group
+
+  Group = BandBin
+    FilterName = BroadBand
+    Center     = 600 <nm>
+    Width      = 300 <nm>
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode = -155151
+  End_Group
+End_Object
+End

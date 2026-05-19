@@ -38,6 +38,8 @@ release.
 ### Added
 
 - Added a return_driver boolean flag to ale.drivers.load to specify the return of a driver instead of an ISD. [#700](https://github.com/DOI-USGS/ale/pull/700)
+- Added an ISIS-label/NAIF-SPICE driver for KPLO ShadowCam (`KploShadowCamIsisLabelNaifSpiceDriver` in `ale/drivers/kplo_drivers.py`). Produces CSM ISDs from ShadowCam SC.cub / SE.cub products, with `kplo_shadowcam` distortion (single-coefficient Y-only cubic, paired with USGSCSM's matching `KPLOSHADOWCAM` distortion type). TDI direction A/B encoded in detector-sample sign via `spacecraft_direction`. Ephemeris start time derived from `ExecutionSpacecraftTime` (SCLK -155) + label `StartTimeOffset` + IAK `CONSTANT_TIME_OFFSET` + `TDI_{A,B}_OFFSET * exposure_duration`.
+- Added `KPLOSHADOWCAM` enum value to `ale::DistortionType` (ale/include/ale/Distortion.h) plus string and JSON-coefficient parsers in `ale/src/Util.cpp` for the matching `kplo_shadowcam` distortion model.
 
 ### Changed
 - Reduced linescan ISD ephemeris sampling from one-per-line to every 10th line for images with 1000+ lines, significantly reducing ISD file sizes and load times for large sensors. Configurable via `reduction` and `ephem_sample_rate` props. [#677](https://github.com/DOI-USGS/ale/pull/677)
