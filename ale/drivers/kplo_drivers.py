@@ -67,17 +67,11 @@ class KploShadowCamIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, D
 
     @property
     def detector_center_sample(self):
-        return float(self.naif_keywords['INS{}_BORESIGHT_SAMPLE'.format(self.ikid)]) - 0.5
-
-    @property
-    def detector_center_line(self):
-        # Match LRO LROC NAC convention: leave BORESIGHT_LINE unshifted (only
-        # the SAMPLE direction gets the -0.5 ISIS-to-CSM half-pixel offset).
-        # LROC NAC ISIS driver only overrides detector_center_sample with -0.5
-        # and inherits the base detector_center_line = BORESIGHT_LINE.
-        # Applying -0.5 to LINE produces a systematic 0.5 px line residual in
-        # cam_test (cube vs CSM ISD) on ShadowCam.
-        return float(self.naif_keywords['INS{}_BORESIGHT_LINE'.format(self.ikid)])
+        # ISIS-to-CSM half-pixel offset applies to SAMPLE only; LRO LROC NAC
+        # uses the same convention. cam_test shows a 0.5 px line residual if
+        # -0.5 is also applied to LINE, so detector_center_line is left as the
+        # NaifSpice base default (BORESIGHT_LINE unshifted).
+        return super().detector_center_sample - 0.5
 
     @property
     def ephemeris_start_time(self):
