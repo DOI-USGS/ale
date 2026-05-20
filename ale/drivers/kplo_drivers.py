@@ -60,10 +60,7 @@ class KploShadowCamIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, D
 
     @property
     def odtk(self):
-        od_k = self.naif_keywords['INS{}_OD_K'.format(self.ikid)]
-        if isinstance(od_k, (list, tuple)):
-            return [float(v) for v in od_k]
-        return [float(od_k)]
+        return [float(self.naif_keywords['INS{}_OD_K'.format(self.ikid)])]
 
     @property
     def detector_center_sample(self):
@@ -106,34 +103,19 @@ class KploShadowCamIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, D
         key = 'INS{}_TDI_{}_OFFSET'.format(self.ikid, tdi_dir)
         if key not in self.naif_keywords:
             raise ValueError(f"Missing IAK keyword for TDI direction {tdi_dir}: {key}")
-        n = self.naif_keywords[key]
-        if isinstance(n, (list, tuple)):
-            n = n[0]
-        return float(n) * self.exposure_duration
+        return float(self.naif_keywords[key]) * self.exposure_duration
 
     @property
     def multiplicative_line_error(self):
-        key = 'INS{}_MULTIPLI_LINE_ERROR'.format(self.ikid)
-        v = self.naif_keywords.get(key, 0.0)
-        if isinstance(v, (list, tuple)):
-            v = v[0]
-        return float(v)
+        return float(self.naif_keywords.get('INS{}_MULTIPLI_LINE_ERROR'.format(self.ikid), 0.0))
 
     @property
     def additive_line_error(self):
-        key = 'INS{}_ADDITIVE_LINE_ERROR'.format(self.ikid)
-        v = self.naif_keywords.get(key, 0.0)
-        if isinstance(v, (list, tuple)):
-            v = v[0]
-        return float(v)
+        return float(self.naif_keywords.get('INS{}_ADDITIVE_LINE_ERROR'.format(self.ikid), 0.0))
 
     @property
     def constant_time_offset(self):
-        key = 'INS{}_CONSTANT_TIME_OFFSET'.format(self.ikid)
-        v = self.naif_keywords.get(key, 0.0)
-        if isinstance(v, (list, tuple)):
-            v = v[0]
-        return float(v)
+        return float(self.naif_keywords.get('INS{}_CONSTANT_TIME_OFFSET'.format(self.ikid), 0.0))
 
     @property
     def sampling_factor(self):
