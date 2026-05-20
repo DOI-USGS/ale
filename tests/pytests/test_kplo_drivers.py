@@ -1,9 +1,11 @@
+import json
 import unittest
 from unittest.mock import patch, PropertyMock
 
 import numpy as np
 
-from conftest import get_image_label
+import ale
+from conftest import compare_dicts, get_image_label, get_isd
 
 from ale.drivers.kplo_drivers import KploShadowCamIsisLabelNaifSpiceDriver
 
@@ -99,3 +101,22 @@ class test_kplo_shadowcam_isis_naif(unittest.TestCase):
             assert call.kwargs['frameCode'] == -155
             assert call.kwargs['sclk'] == '1301:2967424'
             assert call.kwargs['mission'] == 'kplo'
+
+
+# End-to-end ISD comparison. Mirrors the load-and-compare pattern in
+# test_lro_drivers.py: drive ale.loads on the cube label and compare the
+# resulting ISD against a gold fixture. The gold ISD in this repo was
+# produced by isd_generate against the M074289249SE ShadowCam SE cube
+# with the canonical KPLO kernel set on 2026-05-20. Skipped until the
+# minimal kernel bundle is committed under data/M074289249SE/kernels/.
+@unittest.skip("KPLO kernel bundle not yet committed; see PR #709")
+class test_kplo_shadowcam_isd(unittest.TestCase):
+
+    def test_load(self):
+        label_file = get_image_label('M074289249SE', 'isis3')
+        compare_isd = get_isd('kplo_shadowcam')
+        isd_str = ale.loads(label_file, props={'attach_kernels': False},
+                            verbose=False)
+        isd_obj = json.loads(isd_str)
+        differences = compare_dicts(isd_obj, compare_isd)
+        assert differences == []
