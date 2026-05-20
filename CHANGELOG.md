@@ -38,9 +38,10 @@ release.
 ### Added
 
 - Added a return_driver boolean flag to ale.drivers.load to specify the return of a driver instead of an ISD. [#700](https://github.com/DOI-USGS/ale/pull/700)
+- Added the ability to reduce linescan ISD ephemeris sampling from one-per-line to every Nth line, significantly reducing ISD file sizes and load times for large sensors. Configurable via `reduction` and `ephem_sample_rate` props. [#677](https://github.com/DOI-USGS/ale/pull/677)
 
 ### Changed
-- Reduced linescan ISD ephemeris sampling from one-per-line to every 10th line for images with 1000+ lines, significantly reducing ISD file sizes and load times for large sensors. Configurable via `reduction` and `ephem_sample_rate` props. [#677](https://github.com/DOI-USGS/ale/pull/677)
+- Changed chandrayaan2 drivers to reduce the number of ephemeris times obtained, applying a linear reduction. [#707](https://github.com/DOI-USGS/ale/pull/707)
 - Throw error when input file does not exist. [#692](https://github.com/DOI-USGS/ale/pull/692)
 - Read in ISIS SPICE Tables from GDAL .tiff [#697](https://github.com/DOI-USGS/ale/pull/697)
 - Changed all `spiceql_call` functions to use pyspiceql [#695](https://github.com/DOI-USGS/ale/pull/695)
