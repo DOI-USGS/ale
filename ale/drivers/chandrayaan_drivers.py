@@ -538,7 +538,7 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
             reduction = self._props.get('reduction', 'none').lower()
             if (reduction == 'none'):
                 self._props['reduction'] = 'linear'
-            super().ephemeris_time
+            self._ephemeris_time = super().ephemeris_time
         return self._ephemeris_time
 
     @property
@@ -736,7 +736,7 @@ class Chandrayaan2OHRCIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
             reduction = self._props.get('reduction', 'none').lower()
             if (reduction == 'none'):
                 self._props['reduction'] = 'linear'
-            super().ephemeris_time
+            self._ephemeris_time = super().ephemeris_time
         return self._ephemeris_time
 
     @property
