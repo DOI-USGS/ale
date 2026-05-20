@@ -35,6 +35,8 @@ release.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-05-20
+
 ### Added
 
 - Added a return_driver boolean flag to ale.drivers.load to specify the return of a driver instead of an ISD. [#700](https://github.com/DOI-USGS/ale/pull/700)
