@@ -1,11 +1,9 @@
-import json
 import unittest
 from unittest.mock import patch, PropertyMock
 
 import numpy as np
 
-import ale
-from conftest import compare_dicts, get_image_label, get_isd
+from conftest import get_image_label
 
 from ale.drivers.kplo_drivers import KploShadowCamIsisLabelNaifSpiceDriver
 
@@ -102,21 +100,39 @@ class test_kplo_shadowcam_isis_naif(unittest.TestCase):
             assert call.kwargs['sclk'] == '1301:2967424'
             assert call.kwargs['mission'] == 'kplo'
 
+# Test naif_keywords-reading properties
+class test_kplo_shadowcam_naif_keywords_properties(unittest.TestCase):
 
-# End-to-end ISD comparison. Mirrors the load-and-compare pattern in
-# test_lro_drivers.py: drive ale.loads on the cube label and compare the
-# resulting ISD against a gold fixture. The gold ISD in this repo was
-# produced by isd_generate against the M074289249SE ShadowCam SE cube
-# with the canonical KPLO kernel set on 2026-05-20. Skipped until the
-# minimal kernel bundle is committed under data/M074289249SE/kernels/.
-@unittest.skip("KPLO kernel bundle not yet committed; see PR #709")
-class test_kplo_shadowcam_isd(unittest.TestCase):
+    def setUp(self):
+        label = get_image_label('M074289249SE', 'isis3')
+        self.driver = KploShadowCamIsisLabelNaifSpiceDriver(label)
+        self.driver._ikid = -155151
+        self.driver._naif_keywords = dict(self.driver.label['NaifKeywords'])
 
-    def test_load(self):
-        label_file = get_image_label('M074289249SE', 'isis3')
-        compare_isd = get_isd('kplo_shadowcam')
-        isd_str = ale.loads(label_file, props={'attach_kernels': False},
-                            verbose=False)
-        isd_obj = json.loads(isd_str)
-        differences = compare_dicts(isd_obj, compare_isd)
-        assert differences == []
+    def test_odtk_from_label(self):
+        v = self.driver.odtk
+        print(f"[test] odtk = {v}")
+        assert v == [-1.741e-05]
+
+    def test_multiplicative_line_error_from_label(self):
+        v = self.driver.multiplicative_line_error
+        print(f"[test] multiplicative_line_error = {v}")
+        assert v == 0.0
+
+    def test_additive_line_error_from_label(self):
+        v = self.driver.additive_line_error
+        print(f"[test] additive_line_error = {v}")
+        assert v == 0.0
+
+    def test_constant_time_offset_from_label(self):
+        v = self.driver.constant_time_offset
+        print(f"[test] constant_time_offset = {v}")
+        assert v == 0.0
+
+    def test_tdi_offset_seconds_from_label(self):
+        # TDIDirection in the label is 'A', so this reads INS-155151_TDI_A_OFFSET = 64
+        # and multiplies by exposure_duration = LineRate_ms / 1000 (no error terms,
+        # both are 0). Expect 64 * 1.15705e-3 = 0.0740512.
+        v = self.driver.tdi_offset_seconds
+        print(f"[test] tdi_offset_seconds = {v}")
+        np.testing.assert_almost_equal(v, 64 * 1.15705e-3)
