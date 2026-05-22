@@ -35,6 +35,9 @@ release.
 
 ## [Unreleased]
 
+### Fixed
+- Fixed undefined behavior in Rotation::toRotationMatrix by normalizing the quaternion before converting it to a rotation matrix. [#711](https://github.com/DOI-USGS/ale/pull/711)
+
 ## [1.2.0] - 2026-05-20
 
 ### Added
