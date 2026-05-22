@@ -1,0 +1,411 @@
+Object = IsisCube
+  Object = Core
+    StartByte = 65537
+    Format    = BandSequential
+
+    Group = Dimensions
+      Samples = 3144
+      Lines   = 84992
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = UnsignedByte
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName          = "Korea Pathfinder Lunar Orbiter"
+    InstrumentId            = ShadowCam
+    TargetName              = MOON
+    LineRate                = 1.15705 <ms>
+    LineRateCode            = 343
+    PrerollLines            = 1024
+    NumberOfKLines          = 84
+    ExecutionTime           = 2024-12-11T19:02:08.000000Z
+    ExecutionSpacecraftTime = 1301:2967424
+    StartTimeOffset         = 1.9845748
+    PrerollTime             = 2024-12-11T19:02:08.799755Z
+    StartTime               = 2024-12-11T19:02:09.984574Z
+    StopTime                = 2024-12-11T19:03:48.324568Z
+    TemperatureFPAA         = -3.89
+    TemperatureFPAB         = 0.02
+    TemperatureFPGA         = -4.06
+    TemperatureTelescope    = -8.34
+    Bterm1                  = 0
+    Bterm2                  = 8
+    Bterm3                  = 25
+    Bterm4                  = 59
+    Bterm5                  = 128
+    Xterm0                  = 0
+    Xterm1                  = 32
+    Xterm2                  = 136
+    Xterm3                  = 544
+    Xterm4                  = 2208
+    ModeTest                = false
+    TDIDirection            = A
+    GainCh0                 = 48
+    GainCh1                 = 48
+    GainCh2                 = 48
+    GainCh3                 = 38
+    GainCh4                 = 38
+    GainCh5                 = 38
+    OffsetCh0               = 5
+    OffsetCh1               = 0
+    OffsetCh2               = 1
+    OffsetCh3               = 8
+    OffsetCh4               = 4
+    OffsetCh5               = 1
+    SampleFirstPixel        = 0
+    BiasSpread              = 31
+    BiasSpreadCh0           = 27
+    BiasSpreadCh1           = 27
+    BiasSpreadCh2           = 29
+    BiasSpreadCh3           = 21
+    BiasSpreadCh4           = 19
+    BiasSpreadCh5           = 23
+  End_Group
+
+  Group = Archive
+    ProducerId              = KPLO_SHADOWCAM_TEAM
+    ProducerInstitutionName = "ARIZONA STATE UNIVERSITY/INTUITIVE MACHINES"
+    PDSIdentifier           = M074289249SE
+    ProductVersion          = v1.1
+    MissionPhase            = extended
+    DataQualityId           = 0
+    DQIFpaOutOfBounds       = false
+    DQIUnderExposed         = false
+    DQIMissingData          = false
+    DQIMissingSpice         = false
+    DQIUncalibratable       = false
+    DQICorruptionDetected   = false
+    CreationTime            = 2026-01-09T03:10:56.839651Z
+  End_Group
+
+  Group = BandBin
+    FilterName = BroadBand
+    Center     = 600 <nm>
+    Width      = 300 <nm>
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -155151
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = ($kplo/kernels/pck/pck00010.tpc,
+                                 $kplo/kernels/pck/moon_080317.tf,
+                                 $kplo/kernels/pck/moon_assoc_me.tf)
+    TargetPosition            = (Table,
+                                 $kplo/kernels/tspk/moon_pa_de421_1900-2050.bp-
+                                 c, $kplo/kernels/tspk/de430.bsp)
+    InstrumentPointing        = (Table,
+                                 $kplo/kernels/ck/kplo_sc_20241211_20241212_v0-
+                                 0.bc, $kplo/kernels/fk/kplo_v01.tf)
+    Instrument                = $kplo/kernels/ik/kplo_shadowcam_v00.ti
+    SpacecraftClock           = $kplo/kernels/sclk/kplo_sclkscet_v819.tsc
+    InstrumentPosition        = (Table,
+                                 $kplo/kernels/spk/kplo_d_20241209_20241212_v0-
+                                 0.bsp)
+    InstrumentAddendum        = $kplo/kernels/iak/kplo_instrumentAddendum_v02-
+                                .ti
+    ShapeModel                = $base/dems/ldem_128ppd_Mar2011_clon180_radius-
+                                _pad.cub
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
+    Source                    = isis
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 267280385
+  Bytes               = 50496
+  Records             = 789
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-155000, 1)
+  ConstantFrames      = (-155151, -155150, -155000)
+  ConstantRotation    = (-0.7035809491954, 0.7106149686028,
+                         4.62954578236269e-04, -0.71061508043386,
+                         -0.70358054553167, -7.89562752972164e-04,
+                         -2.35349276201394e-04, -8.84503816036078e-04,
+                         0.99999958113177)
+  CkTableStartTime    = 787215799.2346
+  CkTableEndTime      = 787215897.57459
+  CkTableOriginalSize = 84993
+  FrameTypeCode       = 3
+  Description         = "Created by spiceinit"
+  Kernels             = ($kplo/kernels/ck/kplo_sc_20241211_20241212_v00.bc,
+                         $kplo/kernels/fk/kplo_v01.tf)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = InstrumentPosition
+  StartByte            = 267330881
+  Bytes                = 3192
+  Records              = 57
+  ByteOrder            = Lsb
+  CacheType            = HermiteSpline
+  SpkTableStartTime    = 787215799.2346
+  SpkTableEndTime      = 787215897.57459
+  SpkTableOriginalSize = 84993.0
+  Description          = "Created by spiceinit"
+  Kernels              = $kplo/kernels/spk/kplo_d_20241209_20241212_v00.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 267334073
+  Bytes               = 128
+  Records             = 2
+  ByteOrder           = Lsb
+  TimeDependentFrames = (31006, 1)
+  ConstantFrames      = (31001, 31007, 31006)
+  ConstantRotation    = (0.99999987325471, -3.29285422375571e-04,
+                         3.80869618671387e-04, 3.29286000210947e-04,
+                         0.99999994578431, -1.45444093783627e-06,
+                         -3.80869119096078e-04, 1.57985578682691e-06,
+                         0.99999992746811)
+  CkTableStartTime    = 787215799.2346
+  CkTableEndTime      = 787215897.57459
+  CkTableOriginalSize = 2
+  FrameTypeCode       = 6
+  Description         = "Created by spiceinit"
+  Kernels             = ($kplo/kernels/tspk/moon_pa_de421_1900-2050.bpc,
+                         $kplo/kernels/tspk/de430.bsp,
+                         $kplo/kernels/pck/pck00010.tpc,
+                         $kplo/kernels/pck/moon_080317.tf,
+                         $kplo/kernels/pck/moon_assoc_me.tf)
+  SolarLongitude      = 252.33546603608
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 267334201
+  Bytes                = 112
+  Records              = 2
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = 787215799.2346
+  SpkTableEndTime      = 787215897.57459
+  SpkTableOriginalSize = 2.0
+  Description          = "Created by spiceinit"
+  Kernels              = ($kplo/kernels/tspk/moon_pa_de421_1900-2050.bpc,
+                          $kplo/kernels/tspk/de430.bsp)
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 267334313
+  Bytes     = 919
+End_Object
+
+Object = NaifKeywords
+  BODY_CODE                           = 301
+  BODY301_RADII                       = (1737.4, 1737.4, 1737.4)
+  BODY_FRAME_CODE                     = 31001
+  INS-155151_SWAP_OBSERVER_TARGET     = TRUE
+  INS-155151_LIGHTTIME_CORRECTION     = NONE
+  INS-155151_LT_SURFACE_CORRECT       = TRUE
+  INS-155151_FOCAL_LENGTH             = 699.275
+  INS-155151_PIXEL_PITCH              = 0.012
+  INS-155151_CONSTANT_TIME_OFFSET     = 0.0
+  INS-155151_ADDITIVE_LINE_ERROR      = 0.0
+  INS-155151_MULTIPLI_LINE_ERROR      = 0.0
+  INS-155151_TDI_A_OFFSET             = 64.0
+  CLOCK_ET_-155_1301:2967424_COMPUTED = 2a8696dafa75c741
+  INS-155151_TRANSX                   = (0.0, 0.0, 0.012)
+  INS-155151_TRANSY                   = (0.0, 0.012, 0.0)
+  INS-155151_ITRANSS                  = (0.0, 0.0, 83.33333)
+  INS-155151_ITRANSL                  = (0.0, 83.33333, 0.0)
+  INS-155151_BORESIGHT_SAMPLE         = 1558.0
+  INS-155151_BORESIGHT_LINE           = 1.0
+  INS-155151_OD_K                     = -1.741e-05
+End_Object
+End

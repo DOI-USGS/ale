@@ -34,7 +34,13 @@ class NaifSpice():
         """
         logger.debug(f"Loading kernels: {self.kernels}")
         if isinstance(self.kernels, list) and not self.use_web:
-            [pyspiceql.load(k) for k in self.kernels]
+            for k in self.kernels:
+                cwd = os.getcwd()
+                try:
+                    os.chdir(os.path.dirname(os.path.abspath(k)))
+                    pyspiceql.load(k)
+                finally:
+                    os.chdir(cwd)
         elif isinstance(self.kernels, dict) and not self.use_web and not self.search_kernels:
             self.kset = pyspiceql.KernelSet(self.kernels)
         elif not self.use_web:

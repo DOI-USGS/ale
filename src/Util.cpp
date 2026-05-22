@@ -364,6 +364,8 @@ DistortionType getDistortionModel(json isd) {
       return DistortionType::LUNARORBITER;
     } else if (distortion.compare("radtan") == 0) {
       return DistortionType::RADTAN;
+    } else if (distortion.compare("kplo_shadowcam") == 0) {
+      return DistortionType::KPLOSHADOWCAM;
     }
   } catch (...) {
     throw std::runtime_error("Could not parse the distortion model.");
@@ -542,6 +544,19 @@ std::vector<double> getDistortionCoeffs(json isd) {
         throw std::runtime_error(
             "Could not parse the radtan distortion model coefficients.");
         coefficients = std::vector<double>(5, 0.0);
+      }
+    } break;
+    case DistortionType::KPLOSHADOWCAM: {
+      try {
+        coefficients = isd.at("optical_distortion")
+                          .at("kplo_shadowcam")
+                          .at("coefficients")
+                          .get<std::vector<double>>();
+        return coefficients;
+      } catch (...) {
+        throw std::runtime_error(
+            "Could not parse the kplo_shadowcam distortion model coefficients.");
+        coefficients = std::vector<double>(1, 0.0);
       }
     } break;
   }

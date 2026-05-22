@@ -35,12 +35,16 @@ release.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-05-20
+
 ### Added
 
 - Added a return_driver boolean flag to ale.drivers.load to specify the return of a driver instead of an ISD. [#700](https://github.com/DOI-USGS/ale/pull/700)
+- Added the ability to reduce linescan ISD ephemeris sampling from one-per-line to every Nth line, significantly reducing ISD file sizes and load times for large sensors. Configurable via `reduction` and `ephem_sample_rate` props. [#677](https://github.com/DOI-USGS/ale/pull/677)
+- Added an ISIS-label/NAIF-SPICE driver for KPLO ShadowCam. [#709](https://github.com/DOI-USGS/ale/pull/709)
 
 ### Changed
-- Reduced linescan ISD ephemeris sampling from one-per-line to every 10th line for images with 1000+ lines, significantly reducing ISD file sizes and load times for large sensors. Configurable via `reduction` and `ephem_sample_rate` props. [#677](https://github.com/DOI-USGS/ale/pull/677)
+- Changed chandrayaan2 drivers to reduce the number of ephemeris times obtained, applying a linear reduction. [#707](https://github.com/DOI-USGS/ale/pull/707)
 - Throw error when input file does not exist. [#692](https://github.com/DOI-USGS/ale/pull/692)
 - Read in ISIS SPICE Tables from GDAL .tiff [#697](https://github.com/DOI-USGS/ale/pull/697)
 - Changed all `spiceql_call` functions to use pyspiceql [#695](https://github.com/DOI-USGS/ale/pull/695)
@@ -50,6 +54,8 @@ release.
 - Fixed C++ load(s) call failing when called again after throwing an error [#696](https://github.com/DOI-USGS/ale/pull/696)
 - Fixed misleading "No Such Driver for Label" from `isd_generate` when ALESPICEROOT is unset and no kernel-source flag is given. The CLI now exits early with a message naming ALESPICEROOT and the alternative flags (`--kernel`/`--search-kernels`/`--use-web-spice`/`--only-isis-spice`). [#704](https://github.com/DOI-USGS/ale/pull/704)
 - Fixed `get_metakernels()` mis-parsing `mission_year.tm` filenames (no version segment), e.g. `lro_2013.tm`, as `year='N/A', version='2013'`. With `versions='latest'`, this caused `lro_2018.tm` to be picked over `lro_2013.tm` regardless of cube date. Now parsed correctly as `year='2013', version='N/A'`.
+- Fixed metakernels with relative `PATH_VALUES` (e.g. `..`) silently failing when invoked from a working directory other than the metakernel's own directory. `NaifSpice.__enter__` now `chdir`s to each metakernel's directory around `pyspiceql.load`, then restores the prior working directory.
+
 
 ## [1.1.3] - 2026-03-12
 

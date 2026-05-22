@@ -143,7 +143,32 @@ def main():
         action="store_true",
         help="Attach kernels to the ISD. Only applies to naif data based drivers"
     )
+    parser.add_argument(
+        "--reduction",
+        type=str.lower,
+        choices=['none', 'linear'],
+        default='none',
+        help="Type of reduction to apply to the ephemerides generated in the ISD. If linear is selected, "
+             "a default ephem_sample_rate of 10 will be used. The amount of reduction can be controlled "
+             "by setting --ephem_sample_rate."
+    )
+    parser.add_argument(
+        "--ephem_sample_rate",
+        type=int,
+        help="Select every Nth ephemeris time when generating an ISD. This should only be set if a linear "
+             "reduction is applied."
+    )
     args = parser.parse_args()
+
+    if (args.reduction != "linear" and args.ephem_sample_rate):
+        sys.exit(f"User selected an ephem_sample_rate with a reduction option \"{args.reduction}\" "
+                  "that does not use the ephem_sample_rate. Either remove the set ephem_sample_rate or "
+                  "select a different reduction option.\n\nRun \"isd_generate -h\" for reduction options.")
+    elif (args.reduction == "linear" and args.ephem_sample_rate is not None):
+        if (args.ephem_sample_rate <= 0):
+            sys.exit(f"User selected an ephem_sample_rate, \"{args.ephem_sample_rate}\" which is less than or "
+                      "equal to zero. An ephem_sample_rate greater than zero should be selected or "
+                      "no reduction should be applied.\n\nRun \"isd_generate -h\" for reduction options.")
 
     if (not args.kernel and
         not args.search_kernels and
@@ -182,7 +207,8 @@ def main():
                         compress=args.compress, only_isis_spice=args.only_isis_spice, 
                         only_naif_spice=args.only_naif_spice, use_web=args.use_web_spice, 
                         local=args.local, nadir=args.nadir, search_kernels=args.search_kernels,
-                        attach_kernels=args.attach_kernels)
+                        attach_kernels=args.attach_kernels, reduction=args.reduction, 
+                        ephem_sample_rate=args.ephem_sample_rate)
         except Exception as err:
             # Seriously, this just throws a generic Exception?
             sys.exit(f"File {args.input[0]}: {err}")
@@ -200,7 +226,9 @@ def main():
                                        "local": args.local,
                                        "nadir": args.nadir,
                                        "use_web":args.use_web_spice,
-                                       "attach_kernels": args.attach_kernels}
+                                       "attach_kernels": args.attach_kernels,
+                                       "reduction": args.reduction,
+                                       "ephem_sample_rate": args.ephem_sample_rate}
                 ): f for f in args.input
             }
             for f in concurrent.futures.as_completed(futures):
@@ -227,7 +255,9 @@ def file_to_isd(
     nadir=False,
     use_web=False,
     search_kernels=False,
-    attach_kernels=False):
+    attach_kernels=False,
+    reduction=None,
+    ephem_sample_rate=None):
     """
     Returns nothing, but acts as a thin wrapper to take the *file* and generate
     an ISD at *out* (if given, defaults to replacing the extension on *file*
@@ -266,6 +296,12 @@ def file_to_isd(
     
     if search_kernels: 
         props["search_kernels"] = search_kernels
+
+    if reduction: 
+        props["reduction"] = reduction
+        if reduction == "linear":
+            if ephem_sample_rate:
+                props["ephem_sample_rate"] = ephem_sample_rate
 
     if kernels is not None:
         kernels = [str(PurePath(p)) for p in kernels]

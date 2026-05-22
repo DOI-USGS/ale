@@ -10,7 +10,8 @@ namespace ale {
     LROLROCNAC,
     CAHVOR,
     LUNARORBITER,
-    RADTAN
+    RADTAN,
+    KPLOSHADOWCAM
   };
 }
 

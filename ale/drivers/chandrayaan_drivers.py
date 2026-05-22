@@ -522,6 +522,26 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         return self._ephemeris_start_time
 
     @property
+    def ephemeris_time(self):
+        """
+        Forces a reduced set of ephemeris data for chandrayaan2 as
+        many of the images are nearly 200K lines long resulting in
+        ISDs that cannot be loaded correctly into the CSM
+
+        Returns
+        -------
+        : ndarray
+            ephemeris times split based on image lines and ephem_sample_rate passed
+            through props
+        """
+        if not hasattr(self, "_ephemeris_time"):
+            reduction = self._props.get('reduction', 'none').lower()
+            if (reduction == 'none'):
+                self._props['reduction'] = 'linear'
+            self._ephemeris_time = super().ephemeris_time
+        return self._ephemeris_time
+
+    @property
     def detector_center_line(self):
         """
         The center of the CCD in detector pixels
@@ -698,6 +718,26 @@ class Chandrayaan2OHRCIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         if not hasattr(self, "_ephemeris_stop_time"):
             self._ephemeris_stop_time = pyspiceql.utcToEt(utc=self.utc_stop_time.strftime("%Y-%m-%d %H:%M:%S.%f"), searchKernels=self.search_kernels, useWeb=self.use_web)[0]
         return self._ephemeris_stop_time
+
+    @property
+    def ephemeris_time(self):
+        """
+        Forces a reduced set of ephemeris data for chandrayaan2 as
+        many of the images are nearly 200K lines long resulting in
+        ISDs that cannot be loaded correctly into the CSM
+
+        Returns
+        -------
+        : ndarray
+            ephemeris times split based on image lines and ephem_sample_rate passed
+            through props
+        """
+        if not hasattr(self, "_ephemeris_time"):
+            reduction = self._props.get('reduction', 'none').lower()
+            if (reduction == 'none'):
+                self._props['reduction'] = 'linear'
+            self._ephemeris_time = super().ephemeris_time
+        return self._ephemeris_time
 
     @property
     def detector_center_line(self):
