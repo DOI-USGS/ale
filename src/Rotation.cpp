@@ -159,7 +159,8 @@ namespace ale {
 
 
   std::vector<double> Rotation::toStateRotationMatrix(const Vec3d &av) const {
-    Eigen::Quaterniond::Matrix3 rotMat = m_impl->quat.toRotationMatrix();
+    Eigen::Quaterniond normalized = m_impl->quat.normalized();
+    Eigen::Quaterniond::Matrix3 rotMat = normalized.toRotationMatrix();
     Eigen::Quaterniond::Matrix3 avMat = avSkewMatrix(av);
     Eigen::Quaterniond::Matrix3 dtMat = rotMat * avMat;
     return {rotMat(0,0), rotMat(0,1), rotMat(0,2), 0.0,         0.0,         0.0,
@@ -180,7 +181,8 @@ namespace ale {
         axes[2] < 0 || axes[2] > 2) {
       throw std::invalid_argument("Invalid axis number.");
     }
-    Eigen::Vector3d angles = m_impl->quat.toRotationMatrix().eulerAngles(
+    Eigen::Quaterniond normalized = m_impl->quat.normalized();
+    Eigen::Vector3d angles = normalized.toRotationMatrix().eulerAngles(
           axes[0],
           axes[1],
           axes[2]);
@@ -215,7 +217,8 @@ namespace ale {
 
     Eigen::Vector3d positionVector(position.x, position.y, position.z);
     Eigen::Vector3d velocityVector(velocity.x, velocity.y, velocity.z);
-    Eigen::Quaterniond::Matrix3 rotMat = m_impl->quat.toRotationMatrix();
+    Eigen::Quaterniond normalized = m_impl->quat.normalized();
+    Eigen::Quaterniond::Matrix3 rotMat = normalized.toRotationMatrix();
     Eigen::Quaterniond::Matrix3 avMat = avSkewMatrix(av);
     Eigen::Quaterniond::Matrix3 rotationDerivative = rotMat * avMat;
     Eigen::Vector3d rotatedPosition = rotMat * positionVector;
