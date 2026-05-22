@@ -36,7 +36,7 @@ release.
 ## [Unreleased]
 
 ### Fixed
-- Fixed undefined behavior in Rotation::toRotationMatrix by normalizing the quaternion before converting it to a rotation matrix. [#711](https://github.com/DOI-USGS/ale/pull/711)
+- Fixed undefined behavior in Rotation::toRotationMatrix by normalizing the quaternion before converting it to a rotation matrix. See [Eigen 3.4.1 Docs](https://libeigen.gitlab.io/eigen/docs-3.4/classEigen_1_1QuaternionBase.html#a8cf07ab9875baba2eecdd62ff93bfc3f) [#711](https://github.com/DOI-USGS/ale/pull/711)
 
 ## [1.2.0] - 2026-05-20
 
