@@ -3,6 +3,7 @@ from glob import glob
 from itertools import groupby, chain
 import os
 from os import path
+from tempfile import NamedTemporaryFile
 import re
 import warnings
 from collections.abc import Iterable
@@ -12,6 +13,7 @@ import pvl
 import json
 
 from ale import spice_root
+from ale import logger
 from ale.util import get_isis_preferences
 from ale.util import get_isis_mission_translations
 from ale.util import read_pvl
@@ -19,6 +21,58 @@ from ale.util import search_isis_db
 from ale.util import dict_merge
 from ale.util import dict_to_lower
 from ale.util import expandvars
+
+def get_kernels_from_metakernel(metakernel, new_root=spice_root,
+                                old_root='/usgs/cpkgs/isis3/data'):
+    """
+    Read a metakernel .tm file.
+
+    If it has the hard-coded /usgs/cpkgs/isis3/data path, create a temporary
+    version of this file, replace the bad path with $ALESPICEROOT or $ISISDATA,
+    then read the patched version.
+
+    Returns a single-element list, suitable for pyspiceql.load().
+
+    Parameters
+    ----------
+    metakernel : str
+        Path to the .tm metakernel file.
+    new_root : str or None
+        Replacement root (defaults to ALESPICEROOT / ISISDATA).
+    old_root : str
+        Stale root to replace (defaults to /usgs/cpkgs/isis3/data).
+
+    Returns
+    -------
+    list of str
+        Single-element list with the metakernel path.
+    """
+    if not os.path.isfile(metakernel):
+        raise FileNotFoundError(f"Metakernel not found: {metakernel}")
+
+    ext = os.path.splitext(metakernel)[1]
+    if ext.lower() != '.tm':
+        raise ValueError(
+            f"File {metakernel} does not have the .tm extension.")
+
+    if new_root is None:
+        new_root = os.environ.get('ISISDATA')
+        if new_root is not None:
+            warnings.warn(f"ALESPICEROOT not set, using ISISDATA={new_root}")
+
+    with open(metakernel, 'r') as f:
+        text = f.read()
+
+    if isinstance(new_root, str) and old_root in text:
+        corrected = text.replace(old_root, new_root)
+        tmp = NamedTemporaryFile(mode='w', suffix='.tm', delete=False)
+        tmp.write(corrected)
+        tmp.close()
+        warnings.warn(f"Fix incorrect metakernel path: "
+                      f"'{old_root}' -> '{new_root}'")
+        return [tmp.name]
+
+    return [metakernel]
 
 def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=set()):
     """

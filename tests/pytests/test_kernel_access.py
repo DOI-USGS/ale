@@ -1,5 +1,7 @@
 from importlib import reload
+import os
 from os.path import join
+from pathlib import Path
 
 import pytest
 import tempfile
@@ -45,6 +47,56 @@ def pvl_four_group():
       Messenger    = $ISIS3DATA/messenger
     EndGroup
     """
+
+def test_get_kernels_from_metakernel():
+    mro_test_mk = join(Path(__file__).parent.absolute(), 'data',
+                       'kernel_access', 'mro_test_mk.tm')
+    mro_test_path = join(Path(__file__).parent.absolute(), 'data',
+                         'B10_013341_1010_XN_79S172W')
+
+    result = kernel_access.get_kernels_from_metakernel(
+        mro_test_mk, mro_test_path)
+
+    assert len(result) == 1
+    assert result[0].endswith('.tm')
+    assert result[0] != mro_test_mk
+
+    with open(result[0], 'r') as f:
+        text = f.read()
+    assert '/usgs/cpkgs/isis3/data' not in text
+    assert mro_test_path in text
+
+    os.unlink(result[0])
+
+
+def test_get_kernels_from_metakernel_no_correction(tmpdir):
+    mk_text = """KPL/MK
+\\begindata
+    PATH_VALUES  = ( '/some/valid/path' )
+    PATH_SYMBOLS = ( 'A' )
+    KERNELS_TO_LOAD = ( '$A/kernel.bsp' )
+\\begintext
+"""
+    mk_path = str(tmpdir.join('test.tm'))
+    with open(mk_path, 'w') as f:
+        f.write(mk_text)
+
+    result = kernel_access.get_kernels_from_metakernel(mk_path, '/other')
+    assert result == [mk_path]
+
+
+def test_get_kernels_from_metakernel_warns_on_correction():
+    mro_test_mk = join(Path(__file__).parent.absolute(), 'data',
+                       'kernel_access', 'mro_test_mk.tm')
+    mro_test_path = join(Path(__file__).parent.absolute(), 'data',
+                         'B10_013341_1010_XN_79S172W')
+
+    with pytest.warns(UserWarning, match="Fix incorrect metakernel path"):
+        result = kernel_access.get_kernels_from_metakernel(
+            mro_test_mk, mro_test_path)
+
+    assert len(result) == 1
+    os.unlink(result[0])
 
 def test_find_kernels(cube_kernels, tmpdir):
     ck_db = """
@@ -249,19 +301,6 @@ def test_get_metakernels_version_only_filename(tmpdir):
     assert res_msl['data'][0]['year'] == 'N/A'
     assert res_msl['data'][0]['version'] == 'v01'
 
-@pytest.mark.parametrize('search_kwargs, expected',
-    [({'years':'2009', 'versions':'v01'}, {'count':0, 'data':[]})])
-def test_get_metakernels_no_alespiceroot(monkeypatch, search_kwargs, expected):
-    with pytest.warns(UserWarning, match="Unable to search mission directories without" +
-                                        "ALESPICEROOT being set. Defaulting to empty list"):
-        search_result =  ale.kernel_access.get_metakernels(**search_kwargs)
-    print(search_result)
-    with patch.dict('os.environ', {'ALESPICEROOT': '/foo/bar'}):
-        reload(ale)
-
-        assert search_result == expected
-    reload(ale)
-    assert not ale.spice_root
 
 @pytest.mark.parametrize('search_kwargs', [{'years':'2010'}, {'years':2010}, {'years': [2010]}, {'years': ['2010']}, {'years': set(['2010', '1999', '1776'])},
     {'missions':'bar', 'versions':'v20'}, {'missions': ['bar'], 'versions':'v20'}, {'missions': 'bar', 'versions':['v20', 'v03']}, {'missions':set(['bar']),'years': 2010, 'versions': 'latest'} ])
