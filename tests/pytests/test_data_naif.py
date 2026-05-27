@@ -118,7 +118,7 @@ class test_data_naif(unittest.TestCase):
         self.driver.ephemeris_time = [297088762.61698407]
         self.driver._props = {'nadir': True}
         orientation = self.driver.sensor_orientation
-        assert compare_quats(orientation[0], np.asarray([-0.08443224924851939, -0.017974644466439982, -0.9949019866167608, -0.052135827116906064]))
+        assert compare_quats(orientation[0], np.asarray([0.04699262300306872, 0.07241260898650159, 0.6666363444543723, 0.7403675382508145]))
 
     def test_naif_keywords(self):
         assert len(self.driver.naif_keywords) == 51

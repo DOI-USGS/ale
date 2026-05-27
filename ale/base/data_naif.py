@@ -675,7 +675,7 @@ class NaifSpice():
                                                         mission=self.spiceql_mission, 
                                                         searchKernels=self.search_kernels, 
                                                         useWeb=self.use_web)[0][trans_x_key]
-                if (trans_x[0] < trans_x[1]):
+                if (trans_x[1] < trans_x[2]):
                     velocity_axis = 1
 
                 quats = [spice.m2q(spice.twovec(-p_vec[i], 3, v_vec[i], velocity_axis)) for i, time in enumerate(times)]
