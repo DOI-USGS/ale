@@ -36,7 +36,7 @@ release.
 ## [Unreleased]
 
 ### Fixed
-- Auto-correct stale `/usgs/cpkgs/isis3/data` paths in metakernels using ALESPICEROOT or ISISDATA. [#703](https://github.com/DOI-USGS/ale/pull/703)
+- Auto-correct stale `/usgs/cpkgs/isis3/data` paths in metakernels using ALESPICEROOT or ISISDATA. [#712](https://github.com/DOI-USGS/ale/pull/712)
 
 ## [1.2.0] - 2026-05-20
 
