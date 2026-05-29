@@ -36,7 +36,7 @@ release.
 ## [Unreleased]
 
 ### Fixed
-- Nadir velocity axis is now computed from the `INS<ikid>_TRANSX` keyword with a `[1] < [2]` index comparison, matching ISIS's `SpiceRotation::setEphemerisTimeNadir`. Previously it read `ITRANSL` and compared `[0] < [1]`, which selected the wrong axis for some detectors (e.g. Chandrayaan-1 M3). This affects the `nadir=True` codepath used by Chandrayaan-1 M3 and MSL Mastcam. [#713](https://github.com/DOI-USGS/ale/pull/713)
+- Nadir velocity axis is now computed from the `INS<ikid>_TRANSX` keyword with a `[1] < [2]` index comparison, matching ISIS's `SpiceRotation::setEphemerisTimeNadir`. [#713](https://github.com/DOI-USGS/ale/pull/713)
 
 ## [1.2.0] - 2026-05-20
 
