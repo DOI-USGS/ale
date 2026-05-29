@@ -668,12 +668,13 @@ class NaifSpice():
                 v_vec = rotated_velocities
 
                 velocity_axis = 2
-                # Get the default line translation with no potential flipping
-                # from the driver
-                trans_x_key = f"INS{self.ikid}_ITRANSL"
-                trans_x = pyspiceql.findMissionKeywords(key=trans_x_key, 
-                                                        mission=self.spiceql_mission, 
-                                                        searchKernels=self.search_kernels, 
+                # Match ISIS SpiceRotation::setEphemerisTimeNadir, which reads
+                # INS<ikid>_TRANSX (focal-plane x as a function of sample, line)
+                # and compares the sample and line coefficients (elements 1, 2).
+                trans_x_key = f"INS{self.ikid}_TRANSX"
+                trans_x = pyspiceql.findMissionKeywords(key=trans_x_key,
+                                                        mission=self.spiceql_mission,
+                                                        searchKernels=self.search_kernels,
                                                         useWeb=self.use_web)[0][trans_x_key]
                 if (trans_x[1] < trans_x[2]):
                     velocity_axis = 1
