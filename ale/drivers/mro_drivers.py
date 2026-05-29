@@ -569,20 +569,19 @@ class MroHiRisePds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Radia
     @property
     def spacecraft_name(self):
         """
+        HiRISE PDS3 EDR labels carry INSTRUMENT_HOST_NAME rather than
+        SPACECRAFT_NAME, so resolve the name from the base platform_name
+        (which returns INSTRUMENT_HOST_NAME for a PDS3 label).
+
         Returns
         -------
         : str
           Spacecraft name for NAIF lookups
         """
         name_lookup = {
-            'MARS_RECONNAISSANCE_ORBITER': 'MRO',
-            'MARS RECONNAISSANCE ORBITER': 'MRO',
-            'MRO': 'MRO',
+            'MARS RECONNAISSANCE ORBITER': 'MRO'
         }
-        # PDS3 HiRISE labels use INSTRUMENT_HOST_NAME, not SPACECRAFT_NAME
-        raw = self.label.get('SPACECRAFT_NAME',
-                             self.label.get('INSTRUMENT_HOST_NAME', ''))
-        return name_lookup[raw]
+        return name_lookup[super().platform_name]
 
     @property
     def sensor_name(self):
@@ -722,20 +721,6 @@ class MroHiRisePds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Radia
         return self._exposure_duration
 
     @property
-    def image_samples(self):
-        """
-        Override to return science image width (excluding prefix/suffix).
-        The PDS3 label LINE_SAMPLES includes prefix and suffix bytes.
-        The actual science image for a single channel is 1024 / binning.
-
-        Returns
-        -------
-        : int
-          Number of science image samples
-        """
-        return int(self.label['IMAGE']['LINE_SAMPLES'])
-
-    @property
     def ccd_ikid(self):
         """
         Compute the CCD NAIF IK ID using the CPMM-to-CCD lookup.
@@ -766,20 +751,32 @@ class MroHiRisePds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Radia
     @property
     def detector_center_line(self):
         """
+        Returns the center detector line. This mirrors
+        MroHiRiseIsisLabelNaifSpiceDriver: it is a placeholder of 0 that keeps
+        the ISD usable within ISIS but is not the true USGSCSM boresight line.
+        ISIS itself sets the detector origin/offset in the HiRise camera model
+        rather than reading these from the ISD.
+
         Returns
         -------
         : float
-          Center detector line (placeholder for ISIS compatibility)
+          Detector line of the principal point
         """
         return 0
 
     @property
     def detector_center_sample(self):
         """
+        Returns the center detector sample. This mirrors
+        MroHiRiseIsisLabelNaifSpiceDriver: it is a placeholder of 0 that keeps
+        the ISD usable within ISIS but is not the true USGSCSM boresight sample.
+        ISIS itself sets the detector origin/offset in the HiRise camera model
+        rather than reading these from the ISD.
+
         Returns
         -------
         : float
-          Center detector sample (placeholder for ISIS compatibility)
+          Detector sample of the principal point
         """
         return 0
 
@@ -812,17 +809,6 @@ class MroHiRisePds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, Radia
           ISIS sensor model version
         """
         return 1
-
-    @property
-    def platform_name(self):
-        """
-        Returns
-        -------
-        : str
-          Platform name
-        """
-        return self.label.get('SPACECRAFT_NAME',
-                              self.label.get('INSTRUMENT_HOST_NAME', ''))
 
 
 class MroHiRiseIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDistortion, Driver):
