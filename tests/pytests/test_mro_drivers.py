@@ -9,6 +9,7 @@ import pyspiceql as psql
 import ale
 from ale.drivers.mro_drivers import MroCtxPds3LabelNaifSpiceDriver, MroCtxIsisLabelNaifSpiceDriver, MroCtxIsisLabelIsisSpiceDriver
 from ale.drivers.mro_drivers import MroHiRiseIsisLabelNaifSpiceDriver, MroMarciIsisLabelNaifSpiceDriver, MroCrismIsisLabelNaifSpiceDriver
+from ale.drivers.mro_drivers import MroHiRisePds3LabelNaifSpiceDriver
 
 from conftest import get_image, get_image_kernels, get_isd, convert_kernels, get_image_label, compare_dicts, data_root
 
@@ -223,6 +224,98 @@ class test_hirise_isis_naif(unittest.TestCase):
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 1
+
+# ========= Test hirise pds3label and naifspice driver =========
+class test_hirise_pds_naif(unittest.TestCase):
+
+    def setUp(self):
+        label = get_image_label("PSP_001446_1790_BG12_0", "pds3")
+        self.driver = MroHiRisePds3LabelNaifSpiceDriver(label)
+
+    def test_instrument_id(self):
+        assert self.driver.instrument_id == "MRO_HIRISE"
+
+    def test_spacecraft_name(self):
+        assert self.driver.spacecraft_name == "MRO"
+
+    def test_sensor_name(self):
+        assert self.driver.sensor_name == "HIRISE CAMERA"
+
+    def test_spacecraft_clock_start_count(self):
+        assert self.driver.spacecraft_clock_start_count == "848201291:62546"
+
+    def test_spacecraft_clock_stop_count(self):
+        assert self.driver.spacecraft_clock_stop_count == "848201293:41165"
+
+    def test_un_binned_rate(self):
+        assert self.driver.un_binned_rate == 0.0000836875
+
+    def test_ephemeris_start_time(self):
+        with patch('ale.drivers.mro_drivers.pyspiceql.strSclkToEt', return_value=[12345]) as strSclkToEt:
+            assert self.driver.ephemeris_start_time == 12344.997489375
+            strSclkToEt.assert_called_with(frameCode=-74999, sclk='848201291:62546', mission='hirise', searchKernels=False, useWeb=False)
+            assert strSclkToEt.call_count == 1
+
+    def test_exposure_duration(self):
+        assert self.driver.exposure_duration == 0.00033475
+
+    def test_ccd_ikid(self):
+        with patch('ale.drivers.mro_drivers.pyspiceql.translateNameToCode', return_value=[12345]) as translateNameToCode:
+            assert self.driver.ccd_ikid == 12345
+            translateNameToCode.assert_called_with(frame='MRO_HIRISE_CCD12', mission='hirise', searchKernels=False, useWeb=False)
+            assert translateNameToCode.call_count == 1
+
+    def test_sensor_frame_id(self):
+        assert self.driver.sensor_frame_id == -74690
+
+    def test_detector_center_sample(self):
+        assert self.driver.detector_center_sample == 0
+
+    def test_detector_center_line(self):
+        assert self.driver.detector_center_line == 0
+
+    def test_image_samples(self):
+        assert self.driver.image_samples == 256
+
+    def test_image_lines(self):
+        assert self.driver.image_lines == 5000
+
+    def test_sensor_model_version(self):
+        assert self.driver.sensor_model_version == 1
+
+    def test_platform_name(self):
+        assert self.driver.platform_name == "MARS RECONNAISSANCE ORBITER"
+
+# ===== HiRISE PDS3 vs ISIS driver equivalence (same observation) =====
+class test_hirise_pds_vs_isis_equivalence(unittest.TestCase):
+    """
+    The PDS3 and ISIS HiRISE drivers describe the SAME observation
+    (PSP_001446_1790_BG12_0). Given identical SpiceQL results, the properties
+    used to build the ISD must agree between the two drivers. spacecraft_name
+    is intentionally excluded: the PDS3 driver maps it to the NAIF short name
+    'MRO' while the ISIS driver returns the full 'MARS RECONNAISSANCE ORBITER';
+    both are valid for their respective downstream lookups.
+    """
+
+    def setUp(self):
+        self.pds = MroHiRisePds3LabelNaifSpiceDriver(get_image_label("PSP_001446_1790_BG12_0", "pds3"))
+        self.isis = MroHiRiseIsisLabelNaifSpiceDriver(get_image_label("PSP_001446_1790_BG12_0", "isis3"))
+
+    def test_static_properties_match(self):
+        shared = ["instrument_id", "sensor_name", "spacecraft_clock_start_count",
+                  "un_binned_rate", "exposure_duration", "image_samples",
+                  "image_lines", "sensor_frame_id", "detector_center_line",
+                  "detector_center_sample", "sensor_model_version", "spiceql_mission"]
+        for prop in shared:
+            assert getattr(self.pds, prop) == getattr(self.isis, prop), f"{prop} differs between drivers"
+
+    def test_ephemeris_start_time_match(self):
+        with patch('ale.drivers.mro_drivers.pyspiceql.strSclkToEt', return_value=[12345]):
+            assert self.pds.ephemeris_start_time == self.isis.ephemeris_start_time
+
+    def test_ccd_ikid_match(self):
+        with patch('ale.drivers.mro_drivers.pyspiceql.translateNameToCode', return_value=[999]):
+            assert self.pds.ccd_ikid == self.isis.ccd_ikid
 
 # ========= Test marci isislabel and naifspice driver =========
 class test_marci_isis_naif(unittest.TestCase):

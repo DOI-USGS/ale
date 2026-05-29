@@ -1,0 +1,112 @@
+PDS_VERSION_ID                 = PDS3
+RECORD_TYPE                    = UNDEFINED
+
+/* Trimmed PDS3 EDR label for ALE driver testing. Source: attached label  */
+/* of PSP_001446_1790_BG12_0.IMG from the HiRISE PDS node                  */
+/* (https://hirise-pds.lpl.arizona.edu). Only the identification keywords  */
+/* and the TIME_PARAMETERS / INSTRUMENT_SETTING_PARAMETERS / IMAGE groups  */
+/* used by MroHiRisePds3LabelNaifSpiceDriver are kept; the lookup table,   */
+/* engineering, power and temperature groups and the data-object pointers  */
+/* are dropped. All retained values are verbatim from the archive label.   */
+
+/* Identification information. */
+
+DATA_SET_ID                    = "MRO-M-HIRISE-2-EDR-V1.0"
+DATA_SET_NAME                  = "MRO MARS HIGH RESOLUTION IMAGING SCIENCE
+                                 EXPERIMENT EDR V1.0"
+PRODUCER_INSTITUTION_NAME      = "UNIVERSITY OF ARIZONA"
+PRODUCER_ID                    = "UA"
+PRODUCER_FULL_NAME             = "ALFRED MCEWEN"
+OBSERVATION_ID                 = "PSP_001446_1790"
+MRO:COMMANDED_ID               = "PSP_001446_1790"
+PRODUCT_ID                     = "PSP_001446_1790_BG12_0"
+PRODUCT_VERSION_ID             = "1.0"
+SOURCE_FILE_NAME               = "4A_01_4816996600_04_0_01.DAT"
+INSTRUMENT_HOST_NAME           = "MARS RECONNAISSANCE ORBITER"
+INSTRUMENT_HOST_ID             = "MRO"
+INSTRUMENT_NAME                = "HIGH RESOLUTION IMAGING SCIENCE EXPERIMENT"
+INSTRUMENT_ID                  = "HIRISE"
+TARGET_NAME                    = "MARS"
+MISSION_PHASE_NAME             = "PRIMARY SCIENCE PHASE"
+ORBIT_NUMBER                   = 1446
+RATIONALE_DESC                 = "Medusae Fossae Formation sample"
+SOFTWARE_NAME                  = "HiRISE_Observation v2.9.2 (2.43 2006/10/01
+                                 05:41:12)"
+FLIGHT_SOFTWARE_VERSION_ID     = "IE_FSW_V4"
+
+GROUP = TIME_PARAMETERS
+
+    /* Time when power to the CPMM units was applied. */
+    MRO:ANALOG_POWER_START_TIME  = 2006-11-17T03:27:22.490
+    MRO:ANALOG_POWER_START_COUNT = "848201261:21548"
+
+    /* Time when the observation first started. */
+    MRO:OBSERVATION_START_TIME   = 2006-11-17T03:27:52.991
+    MRO:OBSERVATION_START_COUNT  = "848201291:54379"
+
+    /* Time at the beginning of the first calibration image line. */
+    MRO:CALIBRATION_START_TIME   = 2006-11-17T03:27:53.102
+    MRO:CALIBRATION_START_COUNT  = "848201291:61647"
+
+    /* Time at the beginning of the first target image line. */
+    START_TIME                   = 2006-11-17T03:27:53.116
+    SPACECRAFT_CLOCK_START_COUNT = "848201291:62546"
+
+    /* Time at the end of the last target image line. */
+    STOP_TIME                    = 2006-11-17T03:27:54.790
+    SPACECRAFT_CLOCK_STOP_COUNT  = "848201293:41165"
+
+    /* Time when the CPMM readout started. */
+    MRO:READOUT_START_TIME       = 2006-11-17T03:28:01.971
+    MRO:READOUT_START_COUNT      = "848201300:53057"
+
+    /* Time when this EDR product was created. */
+    PRODUCT_CREATION_TIME        = 2007-04-09T21:54:15
+END_GROUP = TIME_PARAMETERS
+
+GROUP = INSTRUMENT_SETTING_PARAMETERS
+    MRO:CPMM_NUMBER                 = 4
+    MRO:CHANNEL_NUMBER              = 0
+    FILTER_NAME                     = "BLUE-GREEN"
+    CENTER_FILTER_WAVELENGTH        = 500 <NANOMETERS>
+    BANDWIDTH                       = 200 <NANOMETERS>
+    MRO:SCAN_EXPOSURE_DURATION      = 83.6875 <MICROSECONDS>
+    MRO:LINE_EXPOSURE_DURATION      = 334.7500 <MICROSECONDS>
+    MRO:IMAGE_EXPOSURE_DURATION     = 1687474.7500 <MICROSECONDS>
+    MRO:DELTA_LINE_TIMER_COUNT      = 155
+    MRO:POWERED_CPMM_FLAG           = (ON, ON, ON, ON, ON, ON, ON, ON, ON, ON,
+                                      ON, ON, ON, ON)
+    MRO:BINNING                     = 4
+    MRO:TDI                         = 64
+    MRO:TRIM_LINES                  = 607
+    MRO:FOCUS_POSITION_COUNT        = 2020
+    MRO:FELICS_COMPRESSION_FLAG     = YES
+    MRO:STIMULATION_LAMP_FLAG       = (OFF, OFF, OFF)
+    MRO:HEATER_CONTROL_MODE         = "CLOSED LOOP"
+    MRO:HEATER_CONTROL_FLAG         = (ON, ON, ON, ON, ON, ON, ON, ON, ON, ON,
+                                      ON, ON, ON, ON)
+    MRO:LOOKUP_TABLE_TYPE           = "STORED"
+    MRO:LOOKUP_TABLE_MINIMUM        = -9998
+    MRO:LOOKUP_TABLE_MAXIMUM        = -9998
+    MRO:LOOKUP_TABLE_MEDIAN         = -9998
+    MRO:LOOKUP_TABLE_K_VALUE        = -9998
+    MRO:LOOKUP_TABLE_NUMBER         = 10
+END_GROUP = INSTRUMENT_SETTING_PARAMETERS
+
+/* Image data description. */
+
+OBJECT = IMAGE
+    LINES             = 5000
+    LINE_SAMPLES      = 256
+    SAMPLE_BITS       = 8
+    SAMPLE_BIT_MASK   = 2#11111111#
+    SAMPLE_TYPE       = MSB_UNSIGNED_INTEGER
+    MISSING_CONSTANT  = 16#FF#
+    LINE_PREFIX_BYTES = 18
+    LINE_SUFFIX_BYTES = 16
+    DESCRIPTION       = "Observation image data."
+END_OBJECT = IMAGE
+
+
+
+END
