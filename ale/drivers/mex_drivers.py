@@ -163,6 +163,23 @@ class MexHrscPds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, NoDisto
 
 
     @property
+    def spiceql_mission(self):
+        """
+        All nine HRSC filter channels (including the stereo channels S1 and S2)
+        belong to the same SpiceQL "hrsc" mission. The instrument_id is filter
+        specific, so it cannot be used as a key into spiceql_mission_map, which
+        only lists one channel. Return the mission directly so every channel is
+        covered.
+
+        Returns
+        -------
+        : str
+          The spiceql mission string
+        """
+        return "hrsc"
+
+
+    @property
     def spacecraft_name(self):
         """
         Spacecraft name used in various SPICE calls to acquire
@@ -510,6 +527,23 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDisto
       if(super().instrument_id != "HRSC"):
           raise WrongInstrumentException ("Instrument ID is wrong.")
       return self.label['IsisCube']['Archive']['DetectorId']
+
+
+  @property
+  def spiceql_mission(self):
+      """
+      All nine HRSC filter channels (including the stereo channels S1 and S2)
+      belong to the same SpiceQL "hrsc" mission. The instrument_id is filter
+      specific, so it cannot be used as a key into spiceql_mission_map, which
+      only lists one channel. Return the mission directly so every channel is
+      covered.
+
+      Returns
+      -------
+      : str
+        The spiceql mission string
+      """
+      return "hrsc"
 
 
   @property

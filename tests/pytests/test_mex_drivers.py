@@ -94,6 +94,17 @@ class test_mex_pds3_naif(unittest.TestCase):
     def test_instrument_id(self):
         assert self.driver.instrument_id == 'MEX_HRSC_IR'
 
+    def test_spiceql_mission_stereo_channels(self):
+        # The stereo channels (DETECTOR_ID MEX_HRSC_S1 / MEX_HRSC_S2) are not
+        # listed in spiceql_mission_map. Before the spiceql_mission override
+        # they raised KeyError: 'MEX_HRSC_S1'. They must resolve to 'hrsc',
+        # like every other HRSC filter channel.
+        for channel in ('MEX_HRSC_S1', 'MEX_HRSC_S2'):
+            with patch.object(MexHrscPds3LabelNaifSpiceDriver, 'instrument_id',
+                              new_callable=PropertyMock) as instrument_id:
+                instrument_id.return_value = channel
+                assert self.driver.spiceql_mission == 'hrsc'
+
     def test_spacecraft_name(self):
         assert self.driver.spacecraft_name =='MEX'
 
@@ -190,6 +201,17 @@ class test_mex_isis3_naif(unittest.TestCase):
 
     def test_instrument_id(self):
         assert self.driver.instrument_id == 'MEX_HRSC_IR'
+
+    def test_spiceql_mission_stereo_channels(self):
+        # The stereo channels (DetectorId MEX_HRSC_S1 / MEX_HRSC_S2) are not
+        # listed in spiceql_mission_map. Before the spiceql_mission override
+        # they raised KeyError: 'MEX_HRSC_S1'. They must resolve to 'hrsc',
+        # like every other HRSC filter channel.
+        for channel in ('MEX_HRSC_S1', 'MEX_HRSC_S2'):
+            with patch.object(MexHrscIsisLabelNaifSpiceDriver, 'instrument_id',
+                              new_callable=PropertyMock) as instrument_id:
+                instrument_id.return_value = channel
+                assert self.driver.spiceql_mission == 'hrsc'
 
     def test_ikid(self):
         with patch('ale.drivers.mex_drivers.pyspiceql.translateNameToCode', return_value=[12345]) as translateNameToCode:

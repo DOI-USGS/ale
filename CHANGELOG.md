@@ -42,6 +42,7 @@ release.
 ### Fixed
 - Fixed undefined behavior in Rotation::toRotationMatrix by normalizing the quaternion before converting it to a rotation matrix. See [Eigen 3.4.1 Docs](https://libeigen.gitlab.io/eigen/docs-3.4/classEigen_1_1QuaternionBase.html#a8cf07ab9875baba2eecdd62ff93bfc3f) [#711](https://github.com/DOI-USGS/ale/pull/711)
 - Nadir velocity axis is now computed from the `INS<ikid>_TRANSX` keyword with a `[1] < [2]` index comparison, matching ISIS's `SpiceRotation::setEphemerisTimeNadir`. [#713](https://github.com/DOI-USGS/ale/pull/713)
+- Fixed `KeyError: 'MEX_HRSC_S1'` when generating an ISD for the MEX HRSC stereo channels (and any non-IR filter channel). The HRSC drivers now override `spiceql_mission` to return `hrsc`, matching the pattern used by the KPLO and Mariner drivers, instead of looking up the filter-specific instrument id in `spiceql_mission_map`, which only lists one channel. [#716](https://github.com/DOI-USGS/ale/pull/716)
 
 ## [1.2.0] - 2026-05-20
 
