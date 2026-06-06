@@ -6,6 +6,7 @@ import numpy as np
 from conftest import get_image_label
 
 from ale.drivers.kplo_drivers import KploShadowCamIsisLabelNaifSpiceDriver
+from ale.base.type_sensor import LineScanner
 
 
 # Tests for the KPLO ShadowCam ISIS-label / NAIF-SPICE driver.
@@ -99,6 +100,25 @@ class test_kplo_shadowcam_isis_naif(unittest.TestCase):
             assert call.kwargs['frameCode'] == -155
             assert call.kwargs['sclk'] == '1301:2967424'
             assert call.kwargs['mission'] == 'kplo'
+
+    def test_ephemeris_reduction_defaults_to_linear(self):
+        # ShadowCam strips are tens of thousands of lines long, so the driver
+        # subsamples the ephemeris by default to keep the ISD small, the same
+        # way the Chandrayaan-2 driver does. Verify the ephemeris_time override
+        # defaults the reduction to "linear", and overrides an explicit "none".
+        # The base ephemeris_time is mocked, so no SPICE kernels are needed.
+        with patch.object(LineScanner, 'ephemeris_time',
+                          new_callable=PropertyMock, return_value=[0.0, 1.0]):
+            _ = self.driver.ephemeris_time
+        assert self.driver._props.get('reduction') == 'linear'
+
+        d = KploShadowCamIsisLabelNaifSpiceDriver(
+            get_image_label('M074289249SE', 'isis3'))
+        d._props['reduction'] = 'none'
+        with patch.object(LineScanner, 'ephemeris_time',
+                          new_callable=PropertyMock, return_value=[0.0]):
+            _ = d.ephemeris_time
+        assert d._props.get('reduction') == 'linear'
 
 # Test naif_keywords-reading properties
 class test_kplo_shadowcam_naif_keywords_properties(unittest.TestCase):
