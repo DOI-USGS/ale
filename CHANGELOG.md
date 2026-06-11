@@ -36,6 +36,7 @@ release.
 ## [Unreleased]
 
 ### Added
+- Re-enabled and fixed the TGO CaSSIS driver: ephemeris time tuple unpacking, the SummingMode enum, the ISIS 0.5-based to CSM 0-based half-pixel detector center, a CaSSIS-scoped surface light-time correction, and emission of the CaSSIS rational distortion model. Validated against ISIS to within ~0.013 pixel across 130 framelets of two real stereo pairs. [#720](https://github.com/DOI-USGS/ale/pull/720)
 - `MroHiRisePds3LabelNaifSpiceDriver`, a PDS3 EDR label driver for HiRISE that generates an ISD directly from a raw EDR label without requiring an ISIS cube, paralleling the existing CTX PDS3 driver. [#702](https://github.com/DOI-USGS/ale/pull/702)
 - Added a catch to try correcting paths in metakernels (using spice_root) if they have been left as default. [#703](https://github.com/DOI-USGS/ale/pull/703)
 
