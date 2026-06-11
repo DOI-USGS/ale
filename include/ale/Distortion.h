@@ -11,7 +11,8 @@ namespace ale {
     CAHVOR,
     LUNARORBITER,
     RADTAN,
-    KPLOSHADOWCAM
+    KPLOSHADOWCAM,
+    CASSIS
   };
 }
 

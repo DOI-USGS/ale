@@ -64,6 +64,34 @@ class NoDistortion():
         """
         return {"radial": {"coefficients": [0.0, 0.0, 0.0]}}
 
+
+class CassisDistortion():
+    """
+    Mix-in for the TGO CaSSIS rational (ratio-of-quadratics) distortion model
+    by Tulyakov/Ivanov (EPFL), the same model ISIS uses in TgoCassisDistortionMap.
+    With chi = [x^2, x*y, y^2, x, y, 1] the two directions are
+        corrected = (A1_corr.chi)/(A3_corr.chi), ...    (distorted -> undistorted)
+        distorted = (A1_dist.chi)/(A3_dist.chi), ...    (undistorted -> distorted)
+    each using three 6-vectors. The 36 coefficients live in the IK/IAK as
+    INS<ikid>_OD_A{1,2,3}_{CORR,DIST}.
+    """
+
+    @property
+    def usgscsm_distortion_model(self):
+        """
+        Returns
+        -------
+        : dict
+          Dictionary with the 36 CaSSIS distortion coefficients, packed in the
+          order A1_corr, A2_corr, A3_corr, A1_dist, A2_dist, A3_dist (6 each),
+          matching the unpacking in USGSCSM Distortion.cpp.
+        """
+        coefficients = []
+        for vec in ["A1_CORR", "A2_CORR", "A3_CORR", "A1_DIST", "A2_DIST", "A3_DIST"]:
+            coefficients.extend(self.naif_keywords["INS{}_OD_{}".format(self.ikid, vec)])
+        return {"cassis": {"coefficients": coefficients}}
+
+
 class KaguyaSeleneDistortion():
     """
     Mix-in for sensors on the Kaguya/Selene mission. 

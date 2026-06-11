@@ -4,9 +4,9 @@ from ale.base import Driver, WrongInstrumentException
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
 from ale.base.type_sensor import Framer
-from ale.base.type_distortion import NoDistortion
+from ale.base.type_distortion import CassisDistortion
 
-class TGOCassisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
+class TGOCassisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, CassisDistortion, Driver):
     """
     Driver for reading TGO Cassis ISIS3 Labels. These are Labels that have been ingested
     into ISIS from PDS EDR images but have not been spiceinit'd yet.
@@ -48,7 +48,7 @@ class TGOCassisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistorti
           ephemeris start time of the image.
         """
         if not hasattr(self, "_ephemeris_start_time"):
-            self._ephemeris_start_time = pyspiceql.utcToEt(utc=self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"), searchKernels=self.search_kernels, useWeb=self.use_web)
+            self._ephemeris_start_time = pyspiceql.utcToEt(utc=self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"), searchKernels=self.search_kernels, useWeb=self.use_web)[0]
         return self._ephemeris_start_time
 
     @property
@@ -68,3 +68,21 @@ class TGOCassisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistorti
     @property
     def sensor_name(self):
         return self.label['IsisCube']['Instrument']['SpacecraftName']
+
+    @property
+    def sample_summing(self):
+        """
+        CaSSIS stores SummingMode as an enum (0 = 1x1, 1 = 2x2, 2 = 4x4), not as
+        the summing factor itself. ISIS converts it as summing = sumMode * 2, then
+        falls back to 1 when that is 0 (see TgoCassisCamera). Replicate that here,
+        otherwise the CSM detector summing becomes 0 and groundToImage diverges.
+        """
+        sum_mode = self.label['IsisCube']['Instrument']['SummingMode']
+        summing = sum_mode * 2
+        if summing <= 0:
+            summing = 1
+        return summing
+
+    @property
+    def line_summing(self):
+        return self.sample_summing

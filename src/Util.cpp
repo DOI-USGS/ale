@@ -366,6 +366,8 @@ DistortionType getDistortionModel(json isd) {
       return DistortionType::RADTAN;
     } else if (distortion.compare("kplo_shadowcam") == 0) {
       return DistortionType::KPLOSHADOWCAM;
+    } else if (distortion.compare("cassis") == 0) {
+      return DistortionType::CASSIS;
     }
   } catch (...) {
     throw std::runtime_error("Could not parse the distortion model.");
@@ -557,6 +559,19 @@ std::vector<double> getDistortionCoeffs(json isd) {
         throw std::runtime_error(
             "Could not parse the kplo_shadowcam distortion model coefficients.");
         coefficients = std::vector<double>(1, 0.0);
+      }
+    } break;
+    case DistortionType::CASSIS: {
+      try {
+        coefficients = isd.at("optical_distortion")
+                          .at("cassis")
+                          .at("coefficients")
+                          .get<std::vector<double>>();
+        return coefficients;
+      } catch (...) {
+        throw std::runtime_error(
+            "Could not parse the cassis distortion model coefficients.");
+        coefficients = std::vector<double>(36, 0.0);
       }
     } break;
   }
