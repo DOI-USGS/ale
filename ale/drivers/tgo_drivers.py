@@ -86,3 +86,22 @@ class TGOCassisIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, CassisDist
     @property
     def line_summing(self):
         return self.sample_summing
+
+    @property
+    def detector_center_sample(self):
+        """
+        ISIS uses 0.5-based CCD coordinates (pixel centers at half integers),
+        so convert the IK boresight sample to the CSM 0-based convention by
+        subtracting 0.5, as the LRO, MRO, Dawn, MESSENGER, MEX, Kaguya and KPLO
+        drivers do. Without this the CSM look is offset from ISIS by half a pixel
+        in sample (and half in line), i.e. sqrt(0.5^2+0.5^2) ~ 0.707 px.
+        """
+        return super().detector_center_sample - 0.5
+
+    @property
+    def detector_center_line(self):
+        """
+        ISIS uses 0.5-based CCD coordinates; convert to the CSM 0-based
+        convention by subtracting 0.5 (see detector_center_sample).
+        """
+        return super().detector_center_line - 0.5
