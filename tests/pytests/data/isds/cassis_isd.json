@@ -416,21 +416,5 @@
       ]
     ],
     "reference_frame": 1
-  },
-  "kernels": {
-    "misc": [
-      "/Users/oalexan1/projects/ale/tests/pytests/data/CAS-MCO-2016-11-26T22.32.14.582-RED-01000-B1/pck00010.tpc",
-      "/Users/oalexan1/projects/ale/tests/pytests/data/CAS-MCO-2016-11-26T22.32.14.582-RED-01000-B1/CAS-MCO-2016-11-26T22.32.14.582-RED-01000-B1.bsp",
-      "/Users/oalexan1/projects/ale/tests/pytests/data/CAS-MCO-2016-11-26T22.32.14.582-RED-01000-B1/cassis_ck_p_160312_191231_190601_sliced-143410.bc",
-      "/Users/oalexan1/projects/ale/tests/pytests/data/CAS-MCO-2016-11-26T22.32.14.582-RED-01000-B1/de-403-masses.tpc",
-      "/Users/oalexan1/projects/ale/tests/pytests/data/CAS-MCO-2016-11-26T22.32.14.582-RED-01000-B1/em16_tgo_cassis_v07.ti",
-      "/Users/oalexan1/projects/ale/tests/pytests/data/CAS-MCO-2016-11-26T22.32.14.582-RED-01000-B1/em16_tgo_ops_v02.tf",
-      "/Users/oalexan1/projects/ale/tests/pytests/data/CAS-MCO-2016-11-26T22.32.14.582-RED-01000-B1/em16_tgo_sc_spm_20161101_20170301_s20190703_v01_sliced-143000.bc",
-      "/Users/oalexan1/projects/ale/tests/pytests/data/CAS-MCO-2016-11-26T22.32.14.582-RED-01000-B1/em16_tgo_step_20190823.tsc",
-      "/Users/oalexan1/projects/ale/tests/pytests/data/CAS-MCO-2016-11-26T22.32.14.582-RED-01000-B1/em16_tgo_v18.tf",
-      "/Users/oalexan1/projects/ale/tests/pytests/data/CAS-MCO-2016-11-26T22.32.14.582-RED-01000-B1/naif0012.tls",
-      "/Users/oalexan1/projects/ale/tests/pytests/data/CAS-MCO-2016-11-26T22.32.14.582-RED-01000-B1/rssd0002.tf",
-      "/Users/oalexan1/projects/ale/tests/pytests/data/CAS-MCO-2016-11-26T22.32.14.582-RED-01000-B1/tgoCassisAddendum007.ti"
-    ]
   }
 }
