@@ -581,13 +581,6 @@ class NaifSpice():
                           "frame": "J2000",
                           "abcorr": "NONE",
                           "mission": self.spiceql_mission}
-                # The target (body) position must be sampled at the surface
-                # light-time-corrected time, not the raw ephemeris time. Without
-                # this the body moves ~tens of meters along its orbit relative to
-                # where ISIS places it (LT_SURFACE_CORRECT), leaving a constant
-                # camera-center bias. adjusted_time is monotonic like ephem.
-                kwargs["startEt"] = adjusted_time[0]
-                kwargs["stopEt"] = adjusted_time[-1]
                 ssb_tars = pyspiceql.getTargetStatesRanged(**kwargs)[0]
                 ssb_tar_states = np.array(ssb_tars)[:,0:6]
 
