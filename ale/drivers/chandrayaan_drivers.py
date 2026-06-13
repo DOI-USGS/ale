@@ -1,8 +1,7 @@
-import sys
-
 import pyspiceql
 import spiceypy as spice
 
+from ale import logger
 from ale.base import Driver, WrongInstrumentException
 from ale.base.data_naif import NaifSpice
 from ale.base.label_isis import IsisLabel
@@ -539,11 +538,11 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         if not hasattr(self, "_ephemeris_time"):
             reduction = self._props.get('reduction', 'none').lower()
             if (reduction == 'none'):
-                print("Chandrayaan-2 TMC-2: per-line ephemeris ISDs are very "
-                      "large. Defaulting reduction to 'linear'. Pass --reduction "
-                      "linear --ephem_sample_rate N to control the sampling. An "
-                      "explicit --reduction none cannot be respected for this "
-                      "sensor.", file=sys.stderr)
+                logger.info("Chandrayaan-2 TMC-2: per-line ephemeris ISDs are "
+                            "very large. Defaulting reduction to 'linear'. Pass "
+                            "--reduction linear --ephem_sample_rate N to control "
+                            "the sampling. An explicit --reduction none cannot be "
+                            "respected for this sensor.")
                 self._props['reduction'] = 'linear'
             self._ephemeris_time = super().ephemeris_time
         return self._ephemeris_time
@@ -742,11 +741,11 @@ class Chandrayaan2OHRCIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         if not hasattr(self, "_ephemeris_time"):
             reduction = self._props.get('reduction', 'none').lower()
             if (reduction == 'none'):
-                print("Chandrayaan-2 OHRC: per-line ephemeris ISDs are very "
-                      "large. Defaulting reduction to 'linear'. Pass --reduction "
-                      "linear --ephem_sample_rate N to control the sampling. An "
-                      "explicit --reduction none cannot be respected for this "
-                      "sensor.", file=sys.stderr)
+                logger.info("Chandrayaan-2 OHRC: per-line ephemeris ISDs are "
+                            "very large. Defaulting reduction to 'linear'. Pass "
+                            "--reduction linear --ephem_sample_rate N to control "
+                            "the sampling. An explicit --reduction none cannot be "
+                            "respected for this sensor.")
                 self._props['reduction'] = 'linear'
             self._ephemeris_time = super().ephemeris_time
         return self._ephemeris_time
