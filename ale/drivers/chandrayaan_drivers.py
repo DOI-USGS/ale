@@ -538,7 +538,7 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         if not hasattr(self, "_ephemeris_time"):
             reduction = self._props.get('reduction', 'none').lower()
             if (reduction == 'none'):
-                logger.info("Chandrayaan-2 TMC-2: per-line ephemeris ISDs are "
+                logger.warning("Chandrayaan-2 TMC-2: per-line ephemeris ISDs are "
                             "very large. Defaulting reduction to 'linear'. Pass "
                             "--reduction linear --ephem_sample_rate N to control "
                             "the sampling. An explicit --reduction none cannot be "
@@ -741,7 +741,7 @@ class Chandrayaan2OHRCIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         if not hasattr(self, "_ephemeris_time"):
             reduction = self._props.get('reduction', 'none').lower()
             if (reduction == 'none'):
-                logger.info("Chandrayaan-2 OHRC: per-line ephemeris ISDs are "
+                logger.warning("Chandrayaan-2 OHRC: per-line ephemeris ISDs are "
                             "very large. Defaulting reduction to 'linear'. Pass "
                             "--reduction linear --ephem_sample_rate N to control "
                             "the sampling. An explicit --reduction none cannot be "

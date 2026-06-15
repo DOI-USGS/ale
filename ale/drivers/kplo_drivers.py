@@ -106,7 +106,7 @@ class KploShadowCamIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, D
         if not hasattr(self, "_ephemeris_time"):
             reduction = self._props.get('reduction', 'none').lower()
             if (reduction == 'none'):
-                logger.info("ShadowCam: per-line ephemeris ISDs are very large. "
+                logger.warning("ShadowCam: per-line ephemeris ISDs are very large. "
                             "Defaulting reduction to 'linear'. Pass --reduction "
                             "linear --ephem_sample_rate N to control the sampling. "
                             "An explicit --reduction none cannot be respected for "
