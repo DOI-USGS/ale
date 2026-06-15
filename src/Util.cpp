@@ -571,7 +571,6 @@ std::vector<double> getDistortionCoeffs(json isd) {
       } catch (...) {
         throw std::runtime_error(
             "Could not parse the cassis distortion model coefficients.");
-        coefficients = std::vector<double>(36, 0.0);
       }
     } break;
   }
