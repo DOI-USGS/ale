@@ -348,6 +348,7 @@ def test_get_metakernels_all_isisdata_shapes(tmpdir):
       mission_year                      lro_2013
       mission_year_VERSION (upper V)    lro_2009_V04
       mission_version (no year)         msl_v01
+      mission_body_provider_m<N>_v<N>   dawn_ceres_dlr_m135_v1  (Dawn, no year)
       SEMANTIC (no year, no version)    MEX_OPS, ROS_OPS, SMART1_OPS, em16_cassis
       SEMANTIC_Vver_date_build (5 seg)  MEX_OPS_V324_20250321_001, em16_cassis_v533_20250325_002
       MISSION_PREDICTED_Vver            CH1_PREDICTED_V00  (skipped)
@@ -364,6 +365,7 @@ def test_get_metakernels_all_isisdata_shapes(tmpdir):
     mk('orx',    'orx_2016_v01.tm', 'orx_noola_2020_v01.tm', 'orx_noola_2020_v06.tm')
     mk('lro',    'lro_2013.tm', 'lro_2018.tm', 'lro_2009_V02.tm', 'lro_2009_V04.tm')
     mk('msl',    'msl_v01.tm')
+    mk('dawn',   'dawn_ceres_dlr_m135_v1.tm', 'dawn_ceres_grv_m100_v1.tm', 'dawn_vesta_grv_m50_v1.tm')
     mk('mex',    'MEX_OPS.TM', 'MEX_OPS_V324_20250321_001.TM')
     mk('ros',    'ROS_OPS.TM', 'ROS_OPS_V350_20220906_001.TM')
     mk('smart1', 'SMART1_OPS.TM')
@@ -383,6 +385,7 @@ def test_get_metakernels_all_isisdata_shapes(tmpdir):
     assert pick('lro', 2013)    == 'lro_2013.tm'              # year-only
     assert pick('lro', 2009)    == 'lro_2009_V04.tm'          # uppercase version
     assert pick('msl', 2023)    == 'msl_v01.tm'               # version-only (year N/A)
+    assert pick('dawn', 2015).startswith('dawn_')            # body/product name, no year
     assert pick('mex', 2005)    == 'MEX_OPS.TM'               # generic over dated snapshot
     assert pick('ros', 2005)    == 'ROS_OPS.TM'
     assert pick('smart1', 2005) == 'SMART1_OPS.TM'            # single semantic metakernel
