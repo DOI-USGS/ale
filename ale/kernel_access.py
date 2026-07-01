@@ -246,6 +246,13 @@ def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=
             # 'noola', version '2020'). Year = a 4- or 8-digit segment (YYYY or
             # YYYYMMDD); version = a v<N> segment; either may be absent ('N/A').
             segments = path.splitext(path.basename(k))[0].split('_')
+            # Skip forecast/planning metakernels (predicted, planning, plan, flip):
+            # they list predicted kernels and are never the right source for an ISD
+            # of archived data. Otherwise such a name (e.g. CH1_PREDICTED_V00 or
+            # em16_plan) can tie with, and be chosen over, the observation metakernel.
+            if any(s.lower() in ('predicted', 'planning', 'plan', 'flip')
+                   for s in segments):
+                continue
             year = next((s for s in segments
                          if re.fullmatch(r'\d{4}(\d{4})?', s)), 'N/A')
             version = next((s for s in reversed(segments)
