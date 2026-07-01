@@ -333,3 +333,71 @@ def test_get_metakernels_search_counts(tmpdir, search_kwargs, expected_count):
 
     search_result =  kernel_access.get_metakernels(str(tmpdir), **search_kwargs)
     assert search_result['count'] == expected_count
+
+def test_get_metakernels_multisegment_filename(tmpdir):
+    """Metakernel names with more segments than mission_year_version must still
+    parse. OSIRIS-REx uses mission_instrument_year_version ('orx_noola_2020_v06');
+    the old positional split mis-parsed these as year='noola', version='2020'.
+    Year is the 4- or 8-digit segment and version the v<N> segment, wherever they
+    appear in the name.
+    """
+    tmpdir.mkdir('orx-b-v01')
+    for year in ('2019', '2020'):
+        for ver in ('v01', 'v06'):
+            open(tmpdir.join('orx-b-v01', f'orx_noola_{year}_{ver}.tm'), 'w').close()
+
+    res = kernel_access.get_metakernels(str(tmpdir), missions='orx',
+                                        years=2020, versions='latest')
+    assert res['count'] == 1
+    assert res['data'][0]['path'].endswith('orx_noola_2020_v06.tm')
+    assert res['data'][0]['year'] == '2020'
+    assert res['data'][0]['version'] == 'v06'
+
+
+def test_get_metakernels_semantic_tgo(tmpdir):
+    """TGO ships semantic metakernels (em16_cassis/ops/plan/flip) plus build-dated
+    variants (em16_cassis_v533_20250325_002.tm). The observation metakernel
+    (em16_cassis) must be selected, not the planning one; the old parser set
+    version='plan' and picked em16_plan via max(). The build-dated variant must
+    parse its 8-digit build date as the year, not leak a filename fragment into
+    the 'path' field.
+    """
+    mk = tmpdir.mkdir('tgo').mkdir('kernels').mkdir('mk')
+    for n in ('em16_cassis', 'em16_ops', 'em16_plan', 'em16_flip',
+              'em16_cassis_v533_20250325_002', 'em16_plan_v533_20250318_001'):
+        open(mk.join(f'{n}.tm'), 'w').close()
+
+    res = kernel_access.get_metakernels(str(tmpdir), missions='tgo',
+                                        years=2018, versions='latest')
+    assert res['count'] == 1
+    assert os.path.basename(res['data'][0]['path']) == 'em16_cassis.tm'
+
+    # the build-dated variant parses without corrupting the path field
+    dated = [m for m in kernel_access.get_metakernels(str(tmpdir), missions='tgo')['data']
+             if m['path'].endswith('em16_cassis_v533_20250325_002.tm')][0]
+    assert dated['year'] == '20250325'
+    assert dated['version'] == 'v533'
+    assert dated['path'].endswith('.tm')
+
+
+def test_get_kernels_from_metakernel_relative_paths(tmpdir, monkeypatch):
+    """A metakernel with relative PATH_VALUES (e.g. '..', as ESA ships) must
+    resolve its kernels against the metakernel's own directory, not the current
+    working directory. Regression: os.path.isfile('../ck/...') was checked
+    relative to CWD and failed unless ALE ran from kernels/mk/.
+    """
+    kroot = tmpdir.mkdir('kernels')
+    mkdir = kroot.mkdir('mk')
+    ckdir = kroot.mkdir('ck')
+    open(ckdir.join('stub.bc'), 'w').close()
+    mk = mkdir.join('test.tm')
+    mk.write("\\begindata\n"
+             "    PATH_VALUES     = ( '..' )\n"
+             "    PATH_SYMBOLS    = ( 'KERNELS' )\n"
+             "    KERNELS_TO_LOAD = ( '$KERNELS/ck/stub.bc' )\n"
+             "\\begintext\n")
+
+    # run from a DIFFERENT directory to prove resolution is anchored to the mk dir
+    monkeypatch.chdir(str(tmpdir.mkdir('elsewhere')))
+    kernels = kernel_access.get_kernels_from_metakernel(str(mk))
+    assert [os.path.realpath(k) for k in kernels] == [os.path.realpath(str(ckdir.join('stub.bc')))]

@@ -120,10 +120,18 @@ def get_kernels_from_metakernel(metakernel, new_root=spice_root, old_root='/usgs
                 spiceroot_paths[key] = re.sub(old_root, new_root, path_values[index])
 
     # Check default mk paths for kernels
+    mk_dir = os.path.dirname(os.path.abspath(metakernel))
     for kernel in listed_kernels:
         default_kernel = kernel
         for symbol, path in default_paths.items():
             default_kernel = default_kernel.replace('$' + symbol, path)
+
+        # PATH_VALUES may be relative (e.g. '..' in ESA-style metakernels). SPICE
+        # resolves these against the metakernel's own directory, not the current
+        # working directory. Anchor relative paths to the metakernel dir so they
+        # resolve regardless of where ALE is invoked from.
+        if not os.path.isabs(default_kernel):
+            default_kernel = os.path.normpath(os.path.join(mk_dir, default_kernel))
 
         if os.path.isfile(default_kernel):
             default_kernels.append(default_kernel)
@@ -228,23 +236,23 @@ def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=
 
         metakernels = []
         for k in metakernel_paths:
-            # mission_year_version filename pattern. When only one segment
-            # follows the mission (e.g. 'lro_2013.tm' or 'ch2_v01.tm'), decide
-            # whether that segment is a year or a version: a 4-digit numeric
-            # segment is treated as the year (insert N/A in the version slot);
-            # anything else is treated as a version (insert N/A in the year
-            # slot, the legacy behavior). This makes 'lro_2013' parse as
-            # year='2013', version='N/A' so versions='latest' picks the right
-            # year, while preserving 'ch2_v01' as year='N/A', version='v01'
-            # so it still matches any-year filter.
-            components = path.splitext(path.basename(k))[0].split('_') + [k]
-            if len(components) == 3:
-                if re.fullmatch(r'\d{4}', components[1]):
-                    components.insert(2, 'N/A')
-                else:
-                    components.insert(1, 'N/A')
-
-            metakernels.append(dict(zip(metakernel_keys, components)))
+            # Extract year and version by PATTERN, not by fixed position.
+            # Metakernel names vary in how many segments precede year/version:
+            #   lro_2013, lro_2013_v01, ch2_v01,
+            #   orx_noola_2020_v06             (mission_instrument_year_version),
+            #   em16_cassis_v533_20250325_002  (ESA: name_version_date_build).
+            # A positional split mis-parses any name with more than
+            # mission_year_version segments (e.g. orx_noola_2020_v06 -> year
+            # 'noola', version '2020'). Year = a 4- or 8-digit segment (YYYY or
+            # YYYYMMDD); version = a v<N> segment; either may be absent ('N/A').
+            segments = path.splitext(path.basename(k))[0].split('_')
+            year = next((s for s in segments
+                         if re.fullmatch(r'\d{4}(\d{4})?', s)), 'N/A')
+            version = next((s for s in reversed(segments)
+                            if re.fullmatch(r'[vV]\d+', s)), 'N/A')
+            mission = segments[0] if segments else 'N/A'
+            metakernels.append({'mission': mission, 'year': year,
+                                'version': version, 'path': k})
 
         # naive filter, do we really need anything else?
         if years:
@@ -252,7 +260,8 @@ def get_metakernels(spice_dir=spice_root, missions=set(), years=set(), versions=
         if versions:
             if versions == 'latest':
                 latest = []
-                # Panda's groupby is overrated
+                # groupby only groups consecutive equal keys, so sort by year first
+                metakernels = sorted(metakernels, key=lambda x: x['year'])
                 for k, g in groupby(metakernels, lambda x:x['year']):
                     items = list(g)
                     latest.append(max(items, key=lambda x:x['version']))

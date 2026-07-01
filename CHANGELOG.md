@@ -49,6 +49,7 @@ release.
 - Fixed `KeyError: 'MEX_HRSC_S1'` when generating an ISD for the MEX HRSC stereo channels (and any non-IR filter channel). The HRSC drivers now override `spiceql_mission` to return `hrsc`, matching the pattern used by the KPLO and Mariner drivers, instead of looking up the filter-specific instrument id in `spiceql_mission_map`, which only lists one channel. [#716](https://github.com/DOI-USGS/ale/pull/716)
 - Fixed printing kernel info via Error message, now a debug message instead. [#717](https://github.com/DOI-USGS/ale/pull/717)
 - Fixed CLOCK_ET in GTIFFs when they are not slash-separated [#718](https://github.com/DOI-USGS/ale/pull/718)
+- Fixed the metakernel lookup so `isd_generate` works out of the box for TGO CaSSIS: `get_metakernels` now reads the year and version from a filename by pattern (fixing multi-segment names such as OSIRIS-REx `orx_noola_2020_v06` and the TGO observation-vs-planning selection), and `get_kernels_from_metakernel` resolves a relative `PATH_VALUES` against the metakernel's own directory. [#725](https://github.com/DOI-USGS/ale/pull/725)
 
 ## [1.2.0] - 2026-05-20
 
