@@ -154,6 +154,76 @@ TEST_F(OrientationTest, InterpolateAtRotation) {
   EXPECT_NEAR(quat[3], 0.5, 1e-10);
 }
 
+// Fixture for the Lagrange rotation interpolation path. Uses a densely sampled,
+// non-constant-rate rotation about the z axis, theta(t) = sin(t), so that the
+// two-point SLERP leaves a visible error that order-N Lagrange removes.
+class LagrangeOrientationTest : public ::testing::Test {
+  protected:
+    void SetUp() override {
+      for (double t = 0.0; t <= 10.0 + 1e-9; t += 0.25) {
+        times.push_back(t);
+        rotations.push_back(truthRot(t));
+      }
+      orientations = Orientations(rotations, times);
+    }
+
+    static Rotation truthRot(double t) {
+      vector<double> axis = {0.0, 0.0, 1.0};
+      return Rotation(axis, sin(t));
+    }
+
+    // Angle in radians between two rotations: 2*acos(|dot of unit quaternions|).
+    static double angleBetween(const Rotation& a, const Rotation& b) {
+      vector<double> qa = a.toQuaternion();
+      vector<double> qb = b.toQuaternion();
+      double dot = fabs(qa[0]*qb[0] + qa[1]*qb[1] + qa[2]*qb[2] + qa[3]*qb[3]);
+      if (dot > 1.0) dot = 1.0;
+      return 2.0 * acos(dot);
+    }
+
+    vector<Rotation> rotations;
+    vector<double> times;
+    Orientations orientations;
+};
+
+TEST_F(LagrangeOrientationTest, ReproducesNodes) {
+  // At a node time, Lagrange must return that node's rotation exactly.
+  double err = angleBetween(orientations.interpolate(5.0, LAGRANGE_ROTATION), truthRot(5.0));
+  EXPECT_LT(err, 1e-9);
+}
+
+TEST_F(LagrangeOrientationTest, MoreAccurateThanSlerp) {
+  // On a non-constant-rate rotation, Lagrange tracks the truth far better than the
+  // two-point SLERP. This is what makes it match ISIS SpiceRotation.
+  double maxLag = 0.0, maxSlerp = 0.0;
+  for (double t = 1.0; t <= 9.0; t += 0.137) {
+    Rotation truth = truthRot(t);
+    double eLag = angleBetween(orientations.interpolate(t, LAGRANGE_ROTATION), truth);
+    double eSlerp = angleBetween(orientations.interpolate(t, SLERP), truth);
+    if (eLag > maxLag) maxLag = eLag;
+    if (eSlerp > maxSlerp) maxSlerp = eSlerp;
+  }
+  EXPECT_LT(maxLag, 1e-5);
+  EXPECT_LT(maxLag, maxSlerp);
+}
+
+TEST_F(LagrangeOrientationTest, SignFlipInvariant) {
+  // Negating alternate input quaternions gives the same rotations. The set-time
+  // sign-continuity fix must make the Lagrange result independent of that.
+  vector<Rotation> flipped;
+  for (size_t i = 0; i < rotations.size(); i++) {
+    vector<double> q = rotations[i].toQuaternion();
+    if (i % 2 == 1) { q[0] = -q[0]; q[1] = -q[1]; q[2] = -q[2]; q[3] = -q[3]; }
+    flipped.push_back(Rotation(q[0], q[1], q[2], q[3]));
+  }
+  Orientations flippedOrientations(flipped, times);
+  for (double t = 1.0; t <= 9.0; t += 0.137) {
+    double d = angleBetween(orientations.interpolate(t, LAGRANGE_ROTATION),
+                            flippedOrientations.interpolate(t, LAGRANGE_ROTATION));
+    EXPECT_LT(d, 1e-6);
+  }
+}
+
 TEST_F(OrientationTest, InterpolateAv) {
   Vec3d interpAv = orientations.interpolateAV(0.25);
   EXPECT_NEAR(interpAv.x, M_PI / (3.0 * sqrt(3.0)), 1e-10);

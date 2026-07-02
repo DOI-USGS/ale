@@ -184,12 +184,39 @@ namespace ale {
      Orientations inverse() const;
 
   private:
+    /**
+     * Interpolate the time dependent rotation at a given time using Lagrange
+     * interpolation of the quaternion components, matching ISIS SpiceRotation.
+     * This reads the sign-continuous quaternion cache (m_quat*), which is built
+     * once when the rotations are set, and renormalizes the interpolated result.
+     *
+     * @param time The time to interpolate at
+     * @param order The order of the Lagrange polynomials to use
+     *
+     * @return The time dependent rotation at the input time
+     */
+    Rotation interpolateTimeDepLagrange(double time, int order=8) const;
+
+    /**
+     * Build the sign-continuous quaternion cache (m_quatW/X/Y/Z) from m_rotations.
+     * Called whenever m_rotations is set.
+     */
+    void computeSignContinuousQuaternions();
+
     std::vector<Rotation> m_rotations; //!< The set of time dependent rotations.
     std::vector<ale::Vec3d> m_avs; //!< The set of angular velocities. Empty if there are no angular velocities.
     std::vector<double> m_times; //!< The set of times
     std::vector<int> m_timeDepFrames; //!< The frame IDs that the time dependent rotations rotate through.
     std::vector<int> m_constFrames; //!< The frame IDs that the constant rotation rotates through.
     Rotation m_constRotation; //!< The constant rotation applied after the time dependent rotations.
+    // Sign-continuous quaternion components (scalar-first: w, x, y, z), one entry per
+    // rotation. These are kept as explicit quaternion components rather than Rotation
+    // objects so that any sign flips between adjacent nodes are resolved once, before
+    // interpolation.
+    std::vector<double> m_quatW;
+    std::vector<double> m_quatX;
+    std::vector<double> m_quatY;
+    std::vector<double> m_quatZ;
   };
 
   /**

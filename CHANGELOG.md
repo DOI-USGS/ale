@@ -36,6 +36,7 @@ release.
 ## [Unreleased]
 
 ### Added
+- Added order-8 Lagrange interpolation of quaternions to `ale::Orientations`, matching ISIS SpiceRotation, selectable via the new `LAGRANGE_ROTATION` interpolation type. [#726](https://github.com/DOI-USGS/ale/pull/726)
 - Re-enabled and fixed the TGO CaSSIS driver, which now emits the CaSSIS rational distortion. Validated against ISIS to within ~0.013 pixel across 130 framelets of two real stereo pairs. [#720](https://github.com/DOI-USGS/ale/pull/720)
 - `MroHiRisePds3LabelNaifSpiceDriver`, a PDS3 EDR label driver for HiRISE that generates an ISD directly from a raw EDR label without requiring an ISIS cube, paralleling the existing CTX PDS3 driver. [#702](https://github.com/DOI-USGS/ale/pull/702)
 - Added a catch to try correcting paths in metakernels (using spice_root) if they have been left as default. [#703](https://github.com/DOI-USGS/ale/pull/703)

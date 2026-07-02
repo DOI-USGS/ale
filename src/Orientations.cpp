@@ -2,6 +2,8 @@
 
 #include "ale/InterpUtils.h"
 
+#include <cmath>
+
 namespace ale {
 
   Orientations::Orientations(
@@ -21,6 +23,46 @@ namespace ale {
     }
     if ( !m_avs.empty() && (m_avs.size() != m_times.size()) ) {
       throw std::invalid_argument("The number of angular velocities and times must be the same.");
+    }
+    // Compute sign-continuous orientations needed for Lagrange interpolation
+    computeSignContinuousQuaternions();
+  }
+
+  // Compute sign-continuous orientations needed for Lagrange interpolation
+  void Orientations::computeSignContinuousQuaternions() {
+    size_t numRotations = m_rotations.size();
+    m_quatW.resize(numRotations);
+    m_quatX.resize(numRotations);
+    m_quatY.resize(numRotations);
+    m_quatZ.resize(numRotations);
+
+    std::vector<std::vector<double>> quats(numRotations);
+    for (size_t i = 0; i < numRotations; i++) {
+      quats[i] = m_rotations[i].toQuaternion(); // scalar-first w, x, y, z
+    }
+
+    // Find the largest-magnitude quaternion coefficient and its coordinate, and use
+    // its sign as a global reference. This matches ASP's fixQuaternionSigns and is
+    // more robust than propagating from a neighbor: one outlier node cannot flip the
+    // sign of the rest.
+    double maxCoef = 0.0;
+    int maxCoord = 0;
+    for (size_t i = 0; i < numRotations; i++) {
+      for (int j = 0; j < 4; j++) {
+        if (std::abs(quats[i][j]) > std::abs(maxCoef)) {
+          maxCoef = quats[i][j];
+          maxCoord = j;
+        }
+      }
+    }
+
+    // Flip any quaternion whose reference coordinate disagrees in sign.
+    for (size_t i = 0; i < numRotations; i++) {
+      std::vector<double>& q = quats[i];
+      if (q[maxCoord] * maxCoef < 0.0) {
+        q[0] = -q[0]; q[1] = -q[1]; q[2] = -q[2]; q[3] = -q[3];
+      }
+      m_quatW[i] = q[0]; m_quatX[i] = q[1]; m_quatY[i] = q[2]; m_quatZ[i] = q[3];
     }
   }
 
@@ -51,12 +93,31 @@ namespace ale {
     return m_constRotation;
   }
 
+  Rotation Orientations::interpolateTimeDepLagrange(double time, int order) const {
+    // The quaternion components are already sign-continuous (built once by
+    // computeSignContinuousQuaternions when the rotations were set). Interpolate
+    // each component, then renormalize (Lagrange does not preserve the unit norm;
+    // the Rotation constructor does not normalize either, so do it here).
+    double w = lagrangeInterpolate(m_times, m_quatW, time, order);
+    double x = lagrangeInterpolate(m_times, m_quatX, time, order);
+    double y = lagrangeInterpolate(m_times, m_quatY, time, order);
+    double z = lagrangeInterpolate(m_times, m_quatZ, time, order);
+    double norm = std::sqrt(w*w + x*x + y*y + z*z);
+    if (norm == 0.0) {
+      throw std::runtime_error("Lagrange quaternion interpolation produced a zero quaternion.");
+    }
+    return Rotation(w/norm, x/norm, y/norm, z/norm);
+  }
+
   Rotation Orientations::interpolateTimeDep(
     double time,
     RotationInterpolation interpType
   ) const {
     Rotation timeDepRotation;
-    if (m_times.size() > 1) {
+    if (m_times.size() > 1 && interpType == LAGRANGE_ROTATION) {
+      timeDepRotation = interpolateTimeDepLagrange(time);
+    }
+    else if (m_times.size() > 1) {
       int interpIndex = interpolationIndex(m_times, time);
       double t = (time - m_times[interpIndex]) / (m_times[interpIndex + 1] - m_times[interpIndex]);
       timeDepRotation = m_rotations[interpIndex].interpolate(m_rotations[interpIndex + 1], t, interpType);
@@ -158,6 +219,7 @@ namespace ale {
     m_times = mergedTimes;
     m_rotations = mergedRotations;
     m_avs = mergedAvs;
+    computeSignContinuousQuaternions();
 
     return *this;
   }
@@ -177,6 +239,7 @@ namespace ale {
 
     m_rotations = updatedRotations;
     m_avs = updatedAvs;
+    computeSignContinuousQuaternions();
 
     return *this;
   }

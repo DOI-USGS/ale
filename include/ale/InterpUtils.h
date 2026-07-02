@@ -12,7 +12,10 @@ namespace ale {
     /// Spherical linear interpolation
     SLERP,
     /// Normalized linear interpolation
-    NLERP
+    NLERP,
+    /// Order-8 Lagrange interpolation of the quaternion components, matching ISIS
+    /// SpiceRotation.
+    LAGRANGE_ROTATION
   };
 
   /// Interpolation enum for defining different methods of interpolating in R
