@@ -1,4 +1,5 @@
 import json
+import os
 import pytest
 import re
 import subprocess
@@ -9,6 +10,20 @@ import spiceypy as spice
 from ale.isd_to_kernel import isd_to_kernel, spk_comment, ck_comment, main
 from conftest import get_isd, get_isd_path
 from unittest.mock import patch, MagicMock
+
+
+@pytest.fixture(autouse=True)
+def setup_spiceql_cache(tmp_path_factory):
+    """Set SPICEQL_CACHE_DIR for all tests in this module."""
+    cache_dir = tmp_path_factory.mktemp("spiceql_cache")
+    old_cache = os.environ.get("SPICEQL_CACHE_DIR")
+    os.environ["SPICEQL_CACHE_DIR"] = str(cache_dir)
+    yield cache_dir
+    # Restore original value
+    if old_cache is not None:
+        os.environ["SPICEQL_CACHE_DIR"] = old_cache
+    else:
+        os.environ.pop("SPICEQL_CACHE_DIR", None)
 
 
 @pytest.fixture
