@@ -2,8 +2,9 @@ import json
 import pytest
 import re
 import subprocess
-import sys
 from pathlib import Path
+
+import spiceypy as spice
 
 from ale.isd_to_kernel import isd_to_kernel, spk_comment, ck_comment, main
 from conftest import get_isd, get_isd_path
@@ -26,8 +27,6 @@ def mock_ctx_kernelsets():
     list
         A tuple of (status, kernels_dict) as returned by searchForKernelsets.
     """
-    import spiceypy as spice
-
     test_data_dir = Path(__file__).parent / "data" / "B10_013341_1010_XN_79S172W"
 
     kernels = {
@@ -53,11 +52,12 @@ def mock_ctx_kernelsets():
 
 @patch("pyspiceql.searchForKernelsets")
 def test_spk_generation(mock_search, mock_ctx_kernelsets, tmp_path):
-    """Test that isd_to_kernel correctly handles SPK generation."""
+    """Test that isd_to_kernel correctly handles SPK generation and verify contents."""
     mock_search.return_value = mock_ctx_kernelsets
 
     outfile = tmp_path / "test_spk.bsp"
     isd_file = get_isd_path("ctx")
+    isd_data = get_isd("ctx")
 
     isd_to_kernel(
         isd_file=isd_file,
@@ -73,16 +73,70 @@ def test_spk_generation(mock_search, mock_ctx_kernelsets, tmp_path):
     # Basic validation - SPK files are typically several KB
     assert outfile.stat().st_size > 10000, f"SPK file seems too small: {outfile.stat().st_size} bytes"
 
-    print(f"✓ SPK kernel successfully generated: {outfile.stat().st_size} bytes")
+    # Verify the SPK can be loaded and contains expected coverage
+    test_data_dir = Path(__file__).parent / "data" / "B10_013341_1010_XN_79S172W"
+    spice.furnsh(str((test_data_dir / "naif0012.tls").absolute()))  # LSK for time
+    spice.furnsh(str((test_data_dir / "pck00008.tpc").absolute()))  # PCK for body info
+    spice.furnsh(str(outfile))
+
+    try:
+        # Get expected values from ISD
+        ephemeris_times = isd_data["instrument_position"]["ephemeris_times"]
+        first_et = ephemeris_times[0]
+        last_et = ephemeris_times[-1]
+
+        # Get the target code from ISD
+        pointing_frames = isd_data.get("instrument_pointing", {}).get("time_dependent_frames", [])
+        if pointing_frames:
+            inst_frame_code = pointing_frames[0]
+            target_code = int(inst_frame_code / 1000)
+            if target_code == 0:
+                target_code = inst_frame_code
+        else:
+            # Fallback
+            target_code = -74
+
+        # Verify SPK contains data for the expected object
+        obj_ids = spice.spkobj(str(outfile))
+        obj_ids_list = [obj_ids[i] for i in range(len(obj_ids))]
+
+        assert target_code in obj_ids_list, \
+            f"SPK should contain data for object {target_code}, but contains: {obj_ids_list}"
+
+        # Verify SPK coverage matches ISD time range
+        cover = spice.spkcov(str(outfile), target_code)
+        assert spice.wncard(cover) > 0, f"No coverage found for target {target_code}"
+
+        # Get the coverage window
+        bounds = spice.wnfetd(cover, 0)
+        coverage_start, coverage_end = bounds[0], bounds[1]
+
+        # Verify coverage includes the ISD time range (with small tolerance for floating point)
+        tolerance = 1e-6  # 1 microsecond tolerance
+        assert coverage_start <= first_et + tolerance, \
+            f"SPK coverage starts at {coverage_start}, but ISD starts at {first_et}"
+        assert coverage_end >= last_et - tolerance, \
+            f"SPK coverage ends at {coverage_end}, but ISD ends at {last_et}"
+
+        print(f"✓ SPK kernel successfully generated and validated: {outfile.stat().st_size} bytes")
+        print(f"  Object {target_code} coverage: {coverage_start} to {coverage_end}")
+        print(f"  ISD time range: {first_et} to {last_et}")
+        print(f"  Note: Full position verification requires planetary SPK chain")
+
+    finally:
+        spice.unload(str(outfile))
+        spice.unload(str((test_data_dir / "naif0012.tls").absolute()))
+        spice.unload(str((test_data_dir / "pck00008.tpc").absolute()))
 
 
 @patch("pyspiceql.searchForKernelsets")
 def test_ck_generation(mock_search, mock_ctx_kernelsets, tmp_path):
-    """Test that isd_to_kernel correctly handles CK generation."""
+    """Test that isd_to_kernel correctly handles CK generation and verify contents."""
     mock_search.return_value = mock_ctx_kernelsets
 
     outfile = tmp_path / "test_ck.bc"
     isd_file = get_isd_path("ctx")
+    isd_data = get_isd("ctx")
 
     isd_to_kernel(
         isd_file=isd_file,
@@ -98,7 +152,57 @@ def test_ck_generation(mock_search, mock_ctx_kernelsets, tmp_path):
     # Basic validation - CK files are typically several KB
     assert outfile.stat().st_size > 5000, f"CK file seems too small: {outfile.stat().st_size} bytes"
 
-    print(f"✓ CK kernel successfully generated: {outfile.stat().st_size} bytes")
+    # Verify the CK can be loaded and contains expected coverage
+    test_data_dir = Path(__file__).parent / "data" / "B10_013341_1010_XN_79S172W"
+    spice.furnsh(str((test_data_dir / "naif0012.tls").absolute()))  # LSK for time
+    spice.furnsh(str((test_data_dir / "mro_sclkscet_00082_65536.tsc").absolute()))  # SCLK
+    spice.furnsh(str((test_data_dir / "mro_v16.tf").absolute()))  # Frame kernel
+    spice.furnsh(str(outfile))
+
+    try:
+        # Get expected values from ISD
+        ephemeris_times = isd_data["instrument_pointing"]["ephemeris_times"]
+        first_et = ephemeris_times[0]
+        last_et = ephemeris_times[-1]
+
+        # Get the frame code from ISD
+        pointing_frames = isd_data.get("instrument_pointing", {}).get("time_dependent_frames", [])
+        if pointing_frames:
+            frame_code = pointing_frames[0]
+        else:
+            frame_code = -74000
+
+        # Verify CK contains data for the expected frame
+        obj_ids = spice.ckobj(str(outfile))
+        obj_ids_list = [obj_ids[i] for i in range(len(obj_ids))]
+
+        assert frame_code in obj_ids_list, \
+            f"CK should contain data for frame {frame_code}, but contains: {obj_ids_list}"
+
+        # Verify CK coverage matches ISD time range
+        cover = spice.ckcov(str(outfile), frame_code, True, "INTERVAL", 0.0, "TDB")
+        assert spice.wncard(cover) > 0, f"No coverage found for frame {frame_code}"
+
+        # Get the coverage window
+        bounds = spice.wnfetd(cover, 0)
+        coverage_start, coverage_end = bounds[0], bounds[1]
+
+        # Verify coverage includes the ISD time range (with small tolerance for floating point)
+        tolerance = 1e-6  # 1 microsecond tolerance
+        assert coverage_start <= first_et + tolerance, \
+            f"CK coverage starts at {coverage_start}, but ISD starts at {first_et}"
+        assert coverage_end >= last_et - tolerance, \
+            f"CK coverage ends at {coverage_end}, but ISD ends at {last_et}"
+
+        print(f"✓ CK kernel successfully generated and validated: {outfile.stat().st_size} bytes")
+        print(f"  Frame {frame_code} coverage: {coverage_start} to {coverage_end}")
+        print(f"  ISD time range: {first_et} to {last_et}")
+
+    finally:
+        spice.unload(str(outfile))
+        spice.unload(str((test_data_dir / "naif0012.tls").absolute()))
+        spice.unload(str((test_data_dir / "mro_sclkscet_00082_65536.tsc").absolute()))
+        spice.unload(str((test_data_dir / "mro_v16.tf").absolute()))
 
 
 @patch("pyspiceql.searchForKernelsets")
@@ -339,33 +443,19 @@ def test_segment_id_truncation(mock_write_spk, mock_search, tmp_path):
     assert len(segment_id) <= 40, f"Segment ID should be <= 40 chars, got {len(segment_id)}"
 
 
+@pytest.mark.parametrize("missing_kernel,kernels_dict,error_msg", [
+    ("sclk", {"lsk": ["naif0012.tls"]}, "Could not find SCLKs"),
+    ("lsk", {"sclk": ["mex_sclk.tsc"]}, "Could not find LSK"),
+])
 @patch("pyspiceql.searchForKernelsets")
-def test_missing_sclk_kernels(mock_search, tmp_path):
-    """Test that missing SCLK kernels raise an appropriate error."""
-    # Return kernels without SCLK
-    mock_search.return_value = [None, {"lsk": ["naif0012.tls"]}]
+def test_missing_required_kernels(mock_search, missing_kernel, kernels_dict, error_msg, tmp_path):
+    """Test that missing required kernels raise appropriate errors."""
+    mock_search.return_value = [None, kernels_dict]
 
-    outfile = tmp_path / "test_no_sclk.bc"
+    outfile = tmp_path / f"test_no_{missing_kernel}.bc"
     isd_file = get_isd_path("ctx")
 
-    with pytest.raises(Exception, match="Could not find SCLKs"):
-        isd_to_kernel(
-            isd_file=isd_file,
-            kernel_type="ck",
-            outfile=outfile
-        )
-
-
-@patch("pyspiceql.searchForKernelsets")
-def test_missing_lsk_kernels(mock_search, tmp_path):
-    """Test that missing LSK kernels raise an appropriate error."""
-    # Return kernels without LSK
-    mock_search.return_value = [None, {"sclk": ["mex_sclk.tsc"]}]
-
-    outfile = tmp_path / "test_no_lsk.bc"
-    isd_file = get_isd_path("ctx")
-
-    with pytest.raises(Exception, match="Could not find LSK"):
+    with pytest.raises(Exception, match=error_msg):
         isd_to_kernel(
             isd_file=isd_file,
             kernel_type="ck",
@@ -422,46 +512,34 @@ def test_file_already_exists_no_overwrite(tmp_path):
 class TestCLI:
     """Test the command-line interface via main() function."""
 
+    @pytest.mark.parametrize("args,expected_kwargs", [
+        # Basic args
+        (["-f", "test.json", "-k", "spk"],
+         {'isd_file_check': 'test.json', 'kernel_type': 'spk'}),
+        # Output file
+        (["-f", "test.json", "-k", "spk", "-o", "output.bsp"],
+         {'outfile': 'output.bsp'}),
+        # Overwrite flag
+        (["-f", "test.json", "-k", "spk", "--overwrite"],
+         {'overwrite': True}),
+        # Web flag
+        (["-f", "test.json", "-k", "spk", "--web"],
+         {'use_web': True}),
+    ])
     @patch("ale.isd_to_kernel.isd_to_kernel")
-    @patch("sys.argv", ["isd_to_kernel", "-f", "test.json", "-k", "spk"])
-    def test_main_with_basic_args(self, mock_isd_to_kernel):
-        """Test main() with basic command-line arguments."""
-        main()
+    def test_main_with_args(self, mock_isd_to_kernel, args, expected_kwargs):
+        """Test main() with various command-line arguments."""
+        with patch("sys.argv", ["isd_to_kernel"] + args):
+            main()
 
         assert mock_isd_to_kernel.called
         call_kwargs = mock_isd_to_kernel.call_args[1]
-        assert str(call_kwargs['isd_file']).endswith('test.json')
-        assert call_kwargs['kernel_type'] == 'spk'
 
-    @patch("ale.isd_to_kernel.isd_to_kernel")
-    @patch("sys.argv", ["isd_to_kernel", "-f", "test.json", "-k", "spk", "-o", "output.bsp"])
-    def test_main_with_output_file(self, mock_isd_to_kernel):
-        """Test main() with custom output file."""
-        main()
-
-        assert mock_isd_to_kernel.called
-        call_kwargs = mock_isd_to_kernel.call_args[1]
-        assert call_kwargs['outfile'] == 'output.bsp'
-
-    @patch("ale.isd_to_kernel.isd_to_kernel")
-    @patch("sys.argv", ["isd_to_kernel", "-f", "test.json", "-k", "spk", "--overwrite"])
-    def test_main_with_overwrite_flag(self, mock_isd_to_kernel):
-        """Test main() with overwrite flag."""
-        main()
-
-        assert mock_isd_to_kernel.called
-        call_kwargs = mock_isd_to_kernel.call_args[1]
-        assert call_kwargs['overwrite'] is True
-
-    @patch("ale.isd_to_kernel.isd_to_kernel")
-    @patch("sys.argv", ["isd_to_kernel", "-f", "test.json", "-k", "spk", "--web"])
-    def test_main_with_web_flag(self, mock_isd_to_kernel):
-        """Test main() with web flag."""
-        main()
-
-        assert mock_isd_to_kernel.called
-        call_kwargs = mock_isd_to_kernel.call_args[1]
-        assert call_kwargs['use_web'] is True
+        for key, expected_value in expected_kwargs.items():
+            if key == 'isd_file_check':
+                assert str(call_kwargs['isd_file']).endswith(expected_value)
+            else:
+                assert call_kwargs[key] == expected_value
 
     @patch("ale.isd_to_kernel.isd_to_kernel")
     @patch("sys.argv", ["isd_to_kernel", "-f", "test.json", "-k", "spk", "-v"])
