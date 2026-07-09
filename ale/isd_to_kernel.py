@@ -384,6 +384,9 @@ def isd_to_kernel(
         overwrite : bool
             If True, deletes an existing outfile path.
             Defaults to False.
+        use_web: bool
+            If True, uses USGS Astrogeology's SpiceQL web service.
+            Defaults to False.
         log_level : int
             Logging severity level. Defaults to logging.ERROR.
 
@@ -443,34 +446,55 @@ def isd_to_kernel(
         # ISD data
         isd_dict = json.loads(isd_data)
 
-        # spk properties
-        state_positions = isd_dict["instrument_position"]["positions"]     
-        state_times = isd_dict["instrument_position"]["ephemeris_times"] 
-        state_velocities = isd_dict["instrument_position"]["velocities"]
+        # Get common properties from ISD
+        body_code = isd_dict["naif_keywords"]["BODY_CODE"]
 
-        # ck properties
-        inst_pt_quaternions = isd_dict["instrument_pointing"]["quaternions"]
-        inst_pt_times = isd_dict["instrument_pointing"]["ephemeris_times"]
+        # Determine kernel type
+        is_spk = psql.Kernel.isSpk(kernel_type)
+        is_ck = psql.Kernel.isCk(kernel_type)
 
-        # angular velocities
-        has_av = True
-        inst_pt_velocities = isd_dict.get("instrument_pointing")["angular_velocities"]
-        if inst_pt_velocities is None:
-            logger.info(f"ISD [{isd_file}] does not have angular velocities.")
-            inst_pt_velocities = []
-            has_av = False
-        
-        # properties
-        records = len(state_positions)
-        body_code = isd_dict["naif_keywords"]["BODY_CODE"]             
-        body_frame_code = isd_dict["naif_keywords"]["BODY_FRAME_CODE"]       
-        start_time = isd_dict["instrument_pointing"]["ck_table_start_time"]
-        end_time = isd_dict["instrument_pointing"]["ck_table_end_time"]
+        if not (is_spk or is_ck):
+            raise Exception(f"Unexpected binary kernel type: {kernel_type}")
+
+        # Validate required section exists
+        if is_spk and "instrument_position" not in isd_dict:
+            raise Exception(f"ISD [{isd_file}] missing 'instrument_position' section required for SPK generation.")
+        if is_ck and "instrument_pointing" not in isd_dict:
+            raise Exception(f"ISD [{isd_file}] missing 'instrument_pointing' section required for CK generation.")
+
+        # Extract time range - try kernel-specific times first, fall back to other section
+        if is_spk:
+            start_time = (isd_dict.get("instrument_position", {}).get("spk_table_start_time") or
+                          isd_dict.get("instrument_pointing", {}).get("ck_table_start_time"))
+            end_time = (isd_dict.get("instrument_position", {}).get("spk_table_end_time") or
+                        isd_dict.get("instrument_pointing", {}).get("ck_table_end_time"))
+        else:  # is_ck
+            start_time = (isd_dict.get("instrument_pointing", {}).get("ck_table_start_time") or
+                          isd_dict.get("instrument_position", {}).get("spk_table_start_time"))
+            end_time = (isd_dict.get("instrument_pointing", {}).get("ck_table_end_time") or
+                        isd_dict.get("instrument_position", {}).get("spk_table_end_time"))
+
+        if not start_time or not end_time:
+            raise Exception(f"ISD [{isd_file}] missing time range in both instrument_position and instrument_pointing sections.")
+
+        # Extract instrument frame code
+        if is_spk:
+            # For SPK, try multiple locations for frame code
+            if "time_dependent_frames" in isd_dict.get("instrument_position", {}):
+                inst_frame_code = isd_dict["instrument_position"]["time_dependent_frames"][0]
+            elif "time_dependent_frames" in isd_dict.get("instrument_pointing", {}):
+                inst_frame_code = isd_dict["instrument_pointing"]["time_dependent_frames"][0]
+            else:
+                # Fall back to deriving from body_code
+                inst_frame_code = body_code * 1000 if body_code < 1000 else body_code
+        else:  # is_ck
+            # For CK, frame code is always in instrument_pointing
+            inst_frame_code = isd_dict["instrument_pointing"]["time_dependent_frames"][0]
+
         logger.info(f"start_time={start_time}, end_time={end_time}")
 
-        # verify valid frame and target code
+        # Verify valid frame and target code
         # FYI - necessary for chandrayaan_m2_nadir_isd.json
-        inst_frame_code = isd_dict["instrument_pointing"]["time_dependent_frames"][0]
         target_code = int(inst_frame_code/1000)
         if target_code == 0:
             target_code = inst_frame_code
@@ -520,43 +544,61 @@ def isd_to_kernel(
 
         # Get kernels
         _, kernels = psql.searchForKernelsets(
-            spiceqlNames=["base", mission_name], 
-            startTime=start_time, 
+            spiceqlNames=["base", mission_name],
+            startTime=start_time,
             stopTime=end_time,
             ckQualities=["smithed", "reconstructed"],
             spkQualities=["smithed", "reconstructed"],
             useWeb=use_web)
         logger.info(f"kernels={kernels}")
 
+        # Validate kernels were found
+        if kernels is None:
+            raise Exception(
+                f"Could not find kernels for mission [{mission_name}] "
+                f"in time range [{start_time}] to [{end_time}]. "
+                f"Verify SpiceQL database contains required kernels."
+            )
+
         # Translate codes to name
         target_name, _ = psql.translateCodeToName(target_code, mission_name, use_web, True)
         body_name, _ = psql.translateCodeToName(body_code, mission_name, use_web, True)
-        
-        # Calculate degree
-        number_of_states = len(state_positions[0])
-        degree_min = min(7, number_of_states-1)
-        degree_output = (((degree_min - 1) / 2) * 2) + 1    
-        if degree_output%2 == 0 or degree_output >= degree_min:
-            degree = degree_output - 1
-            degree = int(degree)
-        
+
         # Create segmentId
         # Note: 40 char limit
         segment_id = f"{mission_name}:{frame_name}"
         if len(segment_id) > 40:
-            logger.info(f"Segment ID [{segment_id}] with length {str(len(segment_id))} " 
+            logger.info(f"Segment ID [{segment_id}] with length {str(len(segment_id))} "
                          "is over the 40 char max limit. Truncating.")
             segment_id = segment_id[:40]
         logger.info(f"segment_id={segment_id}")
 
-        # Get referenceFrame
-        reference_frame_id = isd_dict["instrument_position"]["reference_frame"]
-        reference_frame = spice.frmnam(reference_frame_id)
-        logger.info(f"reference_frame={reference_frame}")
-        
         if psql.Kernel.isSpk(kernel_type):
+            # Extract SPK-specific data from ISD
+            state_positions = isd_dict["instrument_position"]["positions"]
+            state_times = isd_dict["instrument_position"]["ephemeris_times"]
+            state_velocities = isd_dict["instrument_position"]["velocities"]
+
             if len(state_positions) != len(state_times):
                 raise ValueError("Positions and Times length mismatch!")
+
+            records = len(state_positions)
+
+            # Calculate degree for Hermite interpolation (SPK type 13)
+            # Degree must be odd and at most min(7, number_of_states-1)
+            number_of_states = len(state_positions)  # Number of time points
+            degree = min(7, number_of_states - 1)
+            # Ensure degree is odd (required for SPK type 13)
+            if degree % 2 == 0:
+                degree -= 1
+
+            # Get reference frame for SPK
+            spk_reference_frame_id = isd_dict["instrument_position"]["reference_frame"]
+            spk_reference_frame = spice.frmnam(spk_reference_frame_id)
+            logger.info(f"SPK generation: records={records}, degree={degree}, ref_frame={spk_reference_frame}")
+            logger.info(f"  First position: {state_positions[0]}")
+            logger.info(f"  First time: {state_times[0]}")
+            logger.info(f"  Target: {target_code}, Center: {body_code}")
             
             out_comment = spk_comment(
                 outfile=outfile,
@@ -568,24 +610,47 @@ def isd_to_kernel(
                 target_name=target_name,
                 center_body=body_code,
                 center_name=body_name,
-                reference_frame=reference_frame,
+                reference_frame=spk_reference_frame,
                 records=records,
                 degree=degree,
                 kernels=kernels,
                 comment=comment)
+            # Write SPK kernel
+            # bodyCode = target being tracked (spacecraft/instrument)
+            # centerOfMotion = reference point (body like Mars)
             psql.writeSpk(
                 outfile,
                 state_positions,
                 state_times,
-                body_code,
-                body_frame_code,
-                reference_frame,
+                target_code,      # -74 (spacecraft)
+                body_code,        # 499 (Mars center)
+                spk_reference_frame,
                 segment_id,
                 degree,
                 state_velocities,
                 out_comment
             )
-        elif psql.Kernel.isCk(kernel_type):  
+            logger.info(f"SPK written: target={target_code}, center={body_code}, degree={degree}, records={records}")
+        elif psql.Kernel.isCk(kernel_type):
+            # Extract CK-specific data from ISD
+            inst_pt_quaternions = isd_dict["instrument_pointing"]["quaternions"]
+            inst_pt_times = isd_dict["instrument_pointing"]["ephemeris_times"]
+
+            # Angular velocities
+            has_av = True
+            inst_pt_velocities = isd_dict.get("instrument_pointing", {}).get("angular_velocities")
+            if inst_pt_velocities is None:
+                logger.info(f"ISD [{isd_file}] does not have angular velocities.")
+                inst_pt_velocities = []
+                has_av = False
+
+            records = len(inst_pt_quaternions)
+
+            # Get reference frame for CK (last frame in time_dependent_frames chain)
+            ck_reference_frame_id = isd_dict["instrument_pointing"]["time_dependent_frames"][-1]
+            ck_reference_frame = spice.frmnam(ck_reference_frame_id)
+            logger.info(f"ck_reference_frame={ck_reference_frame}")
+
             # Get sclks and lsk
             if "sclk" in kernels:
                 sclk_kernels = ",".join(kernels["sclk"])
@@ -607,7 +672,7 @@ def isd_to_kernel(
                 target_name=target_name,
                 center_body=body_code,
                 center_name=body_name,
-                reference_frame=reference_frame,
+                reference_frame=ck_reference_frame,
                 records=records,
                 has_av=has_av,
                 kernels=kernels,
@@ -617,7 +682,7 @@ def isd_to_kernel(
                 inst_pt_quaternions,
                 inst_pt_times,
                 inst_frame_code,
-                reference_frame,
+                ck_reference_frame,
                 segment_id,
                 sclk_kernels,
                 lsk_kernel,
