@@ -19,7 +19,6 @@ include(GNUInstallDirs)
 set(CMAKE_CXX_STANDARD 11)
 
 option(ALE_BUILD_LOAD "If the C++ Python load interface should be built." ON)
-option(ALE_BUILD_SWIG "If the Python wrappers for ALEs C++ code should be built." ON)
 option(ALE_USE_EXTERNAL_JSON "If an external nlohmann JSON library should be used" ON)
 option(ALE_USE_EXTERNAL_EIGEN "If an external EIGEN library should be used" ON)
 
@@ -142,8 +141,4 @@ if(ALE_BUILD_DOCS)
   add_subdirectory ("docs")
 else()
   message(STATUS "Skipping Docs")
-endif()
-
-if (ALE_BUILD_SWIG)
-  add_subdirectory(swig)
 endif()
