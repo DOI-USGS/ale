@@ -146,7 +146,7 @@ def main():
     parser.add_argument(
         "--reduction",
         type=str.lower,
-        choices=['none', 'linear'],
+        choices=['none', 'linear', 'hermite'],
         default='none',
         help="Type of reduction to apply to the ephemerides generated in the ISD. If linear is selected, "
              "a default ephem_sample_rate of 10 will be used. The amount of reduction can be controlled "
