@@ -30,25 +30,12 @@ namespace ale {
     Vec3d(const std::vector<double>& vec);
     Vec3d(double x, double y, double z);
   };
-}
-namespace std {
-   %template(IntVector) vector<int>;
-   %template(DoubleVector) vector<double>;
-   %template(VectorDoubleVector) vector<vector<double>>;
-   %template(Vec3dVector) vector<ale::Vec3d>;
-}
 
-namespace ale {
   class Rotation {
     Rotation(std::vector<double>& matrix);
     Rotation(double w, double x, double y, double z);
   };
-}
-namespace std {
-   %template(RotationVector) vector<ale::Rotation>;
-}
 
-namespace ale {
   enum RotationInterpolation {
     /// Spherical linear interpolation
     SLERP,
@@ -65,10 +52,18 @@ namespace ale {
     LAGRANGE = 2,
   };
 }
+namespace std {
+   %template(IntVector) vector<int>;
+   %template(DoubleVector) vector<double>;
+   %template(VectorDoubleVector) vector<vector<double>>;
+   %template(Vec3dVector) vector<ale::Vec3d>;
+   %template(RotationVector) vector<ale::Rotation>;
+   %template(StateVector) vector<ale::State>;
+}
 
-%ignore States(const std::vector<double>& ephemTimes, const std::vector<Vec3d>& positions, int refFrame=1);
-%ignore States(const std::vector<double>& ephemTimes, const std::vector<State>& states, int refFrame=1);
-%ignore States(const std::vector<double>& ephemTimes, const std::vector<Vec3d>& positions, const std::vector<Vec3d>& velocities, int refFrame=1);
+%ignore States(const std::vector<double>& ephemTimes, const std::vector<Vec3d>& positions);
+%ignore States(const std::vector<double>& ephemTimes, const std::vector<Vec3d>& positions, const std::vector<Vec3d>& velocities);
+%rename(StatesFromStateVec) States(const std::vector<double>& ephemTimes, const std::vector<State>& states, int refFrame);
 
 %include "../include/ale/States.h"
 %include "../include/ale/Orientations.h"
