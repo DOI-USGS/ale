@@ -3,7 +3,8 @@ import spiceypy as spice
 import warnings
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import as_completed
-import json 
+import json
+import math
 import os
 
 import numpy as np
@@ -20,6 +21,7 @@ from ale import kernel_access
 from ale import logger
 from ale import spice_root
 from ale import util
+from ale import ale_c
 
 class NaifSpice():
     """
@@ -632,6 +634,38 @@ class NaifSpice():
             self._position = 1000 * np.asarray(pos)
             self._velocity = 1000 * np.asarray(vel)
             self._ephem = ephem
+            reduction = self._props.get('reduction', 'none').lower()
+
+            if reduction == 'hermite' and len(self._position) > 3:
+                logger.debug("Applying hermite reduction to positions")
+
+                # Get middle body fixed position in kilometers
+                middle_position = self._position[math.floor(len(self._position)/2.0)] / 1000
+
+                # Compuet a normalized nadir look vector
+                middle_magnitude = np.linalg.norm(middle_position)
+                middle_nadir_lv = middle_position/middle_magnitude
+
+                # Compute a ground coordindate based on target radii
+                a, b, c = self.target_body_radii
+                coord = spice.surfpt([0, 0, 0], middle_nadir_lv, a, b, c)
+
+                # Compute the altitude based on the radius of the ground coordinate
+                # minus the magnitude of the spacecraft
+                radius = np.linalg.norm(coord)
+                altitude = (middle_magnitude - radius) * 1000
+                tol = self.pixel_size * altitude / self.focal_length / 100.
+                logger.debug(f"Minimizing cache with tolerance {tol}")
+
+                state_list = [ale_c.State(i) for i in np.append(self._position/1000.0, self._velocity/1000.0, axis=1)]
+                states = ale_c.StatesFromStateVec(self._ephem, state_list, 1)
+                minimized_states = states.minimizeCache(tol)
+                logger.debug(f"Reduced positions from {len(self._ephem)} to {len(minimized_states.getStates())}")
+                self._position = np.asarray([[position.x, position.y, position.z] for position in minimized_states.getPositions()])
+                self._position *= 1000
+                self._velocity = np.asarray([[velocity.x, velocity.y, velocity.z] for velocity in minimized_states.getVelocities()])
+                self._velocity *= 1000
+                self._ephem = minimized_states.getTimes()
         return self._position, self._velocity, self._ephem
 
     @property
