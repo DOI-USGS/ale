@@ -422,7 +422,7 @@ class NaifSpice():
 
         Returns
         -------
-        : float pixel size
+        : float The size of the CCD pixel in millimeters
         """
         if not hasattr(self, "_pixel_size"):
             try: 
