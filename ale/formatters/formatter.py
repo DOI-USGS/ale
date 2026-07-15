@@ -176,7 +176,7 @@ def to_isd(driver):
     positions, velocities, times = driver_data["sensor_position"]
     instrument_position['spk_table_start_time'] = times[0]
     instrument_position['spk_table_end_time'] = times[-1]
-    instrument_position['spk_table_original_size'] = len(times)
+    instrument_position['spk_table_original_size'] = len(driver_data["ephemeris_time"])
     instrument_position['ephemeris_times'] = times
     # Rotate positions and velocities into J2000 then scale into kilometers
     rotated_positions = j2000_rotation.apply_at(positions, times)/1000
