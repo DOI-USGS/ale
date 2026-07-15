@@ -329,6 +329,23 @@ class MroCtxIsisLabelIsisSpiceDriver(LineScanner, IsisLabel, IsisSpice, RadialDi
         """
         return super().detector_center_sample - 0.5
 
+    @property
+    def pixel_size(self):
+        """
+        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+
+        Returns
+        -------
+        : float
+          The size of the CCD pixel in millimeters
+        """
+        if not hasattr(self, "_pixel_size"):
+            try:
+                self._pixel_size = self.naif_keywords['INS{}_PIXEL_PITCH'.format(self.ikid)][0]
+            except:
+                self._pixel_size = self.naif_keywords['INS{}_PIXEL_PITCH'.format(self.ikid)]
+        return self._pixel_size
+
 class MroCtxIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDistortion, Driver):
     """
     Driver for reading CTX ISIS labels.
@@ -425,6 +442,23 @@ class MroCtxIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, RadialDi
         """
         return 1
 
+    @property
+    def pixel_size(self):
+        """
+        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+
+        Returns
+        -------
+        : float
+          The size of the CCD pixel in millimeters
+        """
+        if not hasattr(self, "_pixel_size"):
+            try:
+                self._pixel_size = self.naif_keywords['INS{}_PIXEL_PITCH'.format(self.ikid)][0]
+            except:
+                self._pixel_size = self.naif_keywords['INS{}_PIXEL_PITCH'.format(self.ikid)]
+        return self._pixel_size
+
 class MroCtxPds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDistortion, Driver):
     """
     Driver for reading CTX PDS3 labels. Requires a Spice mixin to acquire additional
@@ -517,6 +551,22 @@ class MroCtxPds3LabelNaifSpiceDriver(LineScanner, Pds3Label, NaifSpice, RadialDi
         """
         return self.label['SPACECRAFT_NAME']
 
+    @property
+    def pixel_size(self):
+        """
+        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+
+        Returns
+        -------
+        : float
+          The size of the CCD pixel in millimeters
+        """
+        if not hasattr(self, "_pixel_size"):
+            try:
+                self._pixel_size = self.naif_keywords['INS{}_PIXEL_PITCH'.format(self.ikid)][0]
+            except:
+                self._pixel_size = self.naif_keywords['INS{}_PIXEL_PITCH'.format(self.ikid)]
+        return self._pixel_size
 
 hirise_ccd_lookup = {
   0: 0,
