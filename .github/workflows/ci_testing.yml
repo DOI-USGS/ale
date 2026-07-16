@@ -37,7 +37,7 @@ jobs:
           conda list
       - name: Install Python Package
         run: |
-          python setup.py install
+          python setup.py build_ext install
       - name: Test Python Package
         run: |
            mkdir spicedata/
