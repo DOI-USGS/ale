@@ -630,17 +630,19 @@ class NaifSpice():
                     pos.append(state[:3])
                     vel.append(state[3:])
 
-            # By default, SPICE works in km, so convert to m
-            self._position = 1000 * np.asarray(pos)
-            self._velocity = 1000 * np.asarray(vel)
+            self._position = np.asarray(pos)
+            self._velocity = np.asarray(vel)
             self._ephem = ephem
+            
             reduction = self._props.get('reduction', 'none').lower()
-
             if reduction == 'hermite' and len(self._position) > 3:
                 logger.debug("Applying hermite reduction to positions")
+                state_list = [ale_c.State(i) for i in np.append(self._position, self._velocity, axis=1)]
+                states = ale_c.StatesFromStateVec(self._ephem, state_list, 1)
 
-                # Get middle body fixed position in kilometers
-                middle_position = self._position[math.floor(len(self._position)/2.0)] / 1000
+                # Get middle position (it will be in meters)
+                middle_state = states.getState(self.center_ephemeris_time, 1)
+                middle_position = np.asarray([middle_state.x, middle_state.y, middle_state.z])
 
                 # Compuet a normalized nadir look vector
                 middle_magnitude = np.linalg.norm(middle_position)
@@ -649,23 +651,25 @@ class NaifSpice():
                 # Compute a ground coordindate based on target radii
                 a, b, c = self.target_body_radii
                 coord = spice.surfpt([0, 0, 0], middle_nadir_lv, a, b, c)
+                radius = np.linalg.norm(coord)
+                # Ensure the radius is below the spacecraft (largely for landed sensors)
+                radius = min(radius, middle_magnitude - 0.0001)
 
                 # Compute the altitude based on the radius of the ground coordinate
-                # minus the magnitude of the spacecraft
-                radius = np.linalg.norm(coord)
+                # minus the magnitude of the spacecraft position
                 altitude = (middle_magnitude - radius) * 1000
                 tol = self.pixel_size * altitude / self.focal_length / 100.
-                logger.debug(f"Minimizing cache with tolerance {tol}")
+                logger.debug(f"Minimizing positions with tolerance {tol}")
 
-                state_list = [ale_c.State(i) for i in np.append(self._position/1000.0, self._velocity/1000.0, axis=1)]
-                states = ale_c.StatesFromStateVec(self._ephem, state_list, 1)
                 minimized_states = states.minimizeCache(tol)
                 logger.debug(f"Reduced positions from {len(self._ephem)} to {len(minimized_states.getStates())}")
                 self._position = np.asarray([[position.x, position.y, position.z] for position in minimized_states.getPositions()])
-                self._position *= 1000
                 self._velocity = np.asarray([[velocity.x, velocity.y, velocity.z] for velocity in minimized_states.getVelocities()])
-                self._velocity *= 1000
                 self._ephem = minimized_states.getTimes()
+
+            # By default, SPICE works in km, so convert to m
+            self._position *= 1000.0
+            self._velocity *= 1000.0
         return self._position, self._velocity, self._ephem
 
     @property
