@@ -575,15 +575,18 @@ class NaifSpice():
                 ssb_obs_states = np.array(ssb_obs)[:,0:6]
 
                 radius_lt = (self.target_body_radii[2] + self.target_body_radii[0]) / 2 / (scipy.constants.c/1000.0)
-                adjusted_time = ephem - obs_tar_lts + radius_lt
 
-                kwargs = {**ephem_kwargs,
-                          "target": target,
-                          "observer": "SSB",
-                          "frame": "J2000",
-                          "abcorr": "NONE",
-                          "mission": self.spiceql_mission}
-                ssb_tars = pyspiceql.getTargetStatesRanged(**kwargs)[0]
+                ssb_tars_kwargs = {**ephem_kwargs,
+                                   "target": target,
+                                   "observer": "SSB",
+                                   "frame": "J2000",
+                                   "abcorr": "NONE",
+                                   "mission": self.spiceql_mission}
+                if self.instrument_id == "TGO_CASSIS":
+                    adjusted_time = ephem - obs_tar_lts + radius_lt
+                    ssb_tars_kwargs["startEt"] = adjusted_time[0]
+                    ssb_tars_kwargs["stopEt"] = adjusted_time[-1]
+                ssb_tars = pyspiceql.getTargetStatesRanged(**ssb_tars_kwargs)[0]
                 ssb_tar_states = np.array(ssb_tars)[:,0:6]
 
                 _states = ssb_tar_states - ssb_obs_states
