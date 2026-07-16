@@ -1,8 +1,10 @@
+import os
 import pytest
 import json
 from osgeo import gdal
 from datetime import datetime, timezone
 import numpy as np
+from pathlib import Path
 
 import ale
 from ale import base
@@ -12,7 +14,8 @@ from ale.base.data_isis import IsisSpice
 def testdata(monkeypatch):
 
     gdal.UseExceptions()
-    geodataset = gdal.Open("tests/pytests/data/EN1072174528M/EN1072174528M.tiff")
+    data_root = os.path.join(Path(__file__).absolute().parent, 'data')
+    geodataset = gdal.Open(os.path.join(data_root, "EN1072174528M/EN1072174528M.tiff"))
 
     isis_spice = IsisSpice()
     isis_spice.label = json.loads(geodataset.GetMetadata("json:ISIS3")[0])

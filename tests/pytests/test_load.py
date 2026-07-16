@@ -4,6 +4,7 @@ from unittest.mock import patch
 from importlib import reload
 import json
 import os
+from pathlib import Path
 
 import ale
 from ale import util
@@ -55,7 +56,8 @@ def test_mess_load(class_truth, return_val, mess_kernels):
         assert return_val is False
 
 def test_mess_load_gtiff(mess_kernels):
-    label_file = "tests/pytests/data/EN1072174528M/EN1072174528M.tiff"
+    data_root = os.path.join(Path(__file__).absolute().parent, 'data')
+    label_file = os.path.join(data_root, "EN1072174528M/EN1072174528M.tiff")
 
     usgscsm_isd_str = ale.loads(label_file, {'kernels': mess_kernels, "attach_kernels": False})
     usgscsm_isd_obj = json.loads(usgscsm_isd_str)

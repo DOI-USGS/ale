@@ -1,7 +1,9 @@
+import os
 import pytest
 import json
 from osgeo import gdal
 from datetime import datetime, timezone
+from pathlib import Path
 
 import ale
 from ale import base
@@ -9,7 +11,8 @@ from ale.base.label_isis import IsisLabel
 
 @pytest.fixture
 def test_gtiff_label(monkeypatch):
-    geodataset = gdal.Open("tests/pytests/data/EN1072174528M/EN1072174528M.tiff")
+    data_root = os.path.join(Path(__file__).absolute().parent, 'data')
+    geodataset = gdal.Open(os.path.join(data_root, "EN1072174528M/EN1072174528M.tiff"))
     label = geodataset.GetMetadata("json:ISIS3")[0]
 
     isis_label = IsisLabel()

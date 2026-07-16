@@ -9988,7 +9988,7 @@
   "instrument_position": {
     "spk_table_start_time": 302228504.36824864,
     "spk_table_end_time": 302228558.33807606,
-    "spk_table_original_size": 25,
+    "spk_table_original_size": 2,
     "ephemeris_times": [
       302228504.36824864,
       302228511.056534,
