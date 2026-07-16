@@ -19,6 +19,7 @@ import subprocess
 import difflib
 from pathlib import Path
 import numpy as np
+np.set_printoptions(formatter={'float': lambda x: f"{x:.16g}"})
 
 class ReadIsis(IsisSpice, IsisLabel, Driver):
     def sensor_model_version(self):
@@ -49,8 +50,9 @@ def run_spiceinit_isis(image_path):
     
     # Run spiceinit with ISIS
     try:
-        subprocess.run(['spiceinit', f'from={image_path}']) # I believe this is where the crashes are coming from
-    except:
+        subprocess.run(['spiceinit', f'from={image_path}', "spkpredicted=true"])
+    except Exception as e:
+        logger.error(e.what())
         pass
     
     # Move the drivers back
@@ -73,7 +75,7 @@ def run_spiceinit_ale(image_path):
 
     """
     # Run spiceinit with ALE
-    subprocess.run(['spiceinit', f'from={image_path}'])
+    subprocess.run(['spiceinit', f'from={image_path}', "spkpredicted=true"])
 
 
 def generate_body_rotation(driver, target_frame_id):
@@ -187,7 +189,7 @@ def generate_instrument_position(driver):
     instrument_position['spk_table_start_time'] = times[0]
     instrument_position['spk_table_end_time'] = times[-1]
     instrument_position['spk_table_original_size'] = len(times)
-    instrument_position['ephemeris_times'] = times
+    instrument_position['ephemeris_times'] = np.asarray(times)
     # Rotate positions and velocities into J2000 then scale into kilometers
     # velocities = j2000_rotation.rotate_velocity_at(positions, velocities, times)/1000
     # positions = j2000_rotation.apply_at(positions, times)/1000
@@ -214,7 +216,7 @@ def generate_sun_position(driver):
     sun_position['spk_table_start_time'] = times[0]
     sun_position['spk_table_end_time'] = times[-1]
     sun_position['spk_table_original_size'] = len(times)
-    sun_position['ephemeris_times'] = times
+    sun_position['ephemeris_times'] = np.asarray(times)
     # Rotate positions and velocities into J2000 then scale into kilometers
     # velocities = j2000_rotation.rotate_velocity_at(positions, velocities, times)/1000
     # positions = j2000_rotation.apply_at(positions, times)/1000
@@ -264,17 +266,33 @@ def diff_and_describe(json1, json2, key_array):
     for key in key_array:
         json1 = json1[key]
         json2 = json2[key]
-    if json1 is None or json2 is None:
-        logger.info(f"No data available for keys {key_array}, skipping diff")
+
+    if json1 is None:
+        print(f"No data available for keys {key_array} in first json, skipping diff")
         return
-    print(key)
-    diff = json1 - json2
-    logger.info(
-    f"{' '.join(key_array)}\n"
-    f"Num records: {len(diff)}\n"
-    f"Mean: {np.mean(diff, axis=0)}\n"
-    f"Median: {np.median(diff, axis=0)}"
-)
+
+    if json2 is None:
+        print(f"No data available for keys {key_array} in second json, skipping diff")
+        return
+
+    if json1.shape == json2.shape:
+        diff = np.abs(json1 - json2)
+        print(
+        "\n"
+        f"{' '.join(key_array)}\n"
+        f"Num records: {len(diff)}\n"
+        f"Num Diff records: {np.count_nonzero(diff, axis=0)}\n"
+        f"Max: {np.max(diff, axis=0)}\n"
+        f"Max IDX: {np.argmax(diff, axis=0)}\n"
+        f"Min: {np.min(diff, axis=0)}\n"
+        f"Min IDX: {np.argmin(diff, axis=0)}\n"
+        f"Mean: {np.mean(diff, axis=0)}\n"
+        f"Median: {np.median(diff, axis=0)}"
+        "\n")
+    else:
+        print(f"Arrays at {key_array} are not the same shape")
+    logger.info(f"\n{json1}")
+    logger.info(f"\n{json2}")
 
 def compare_isds(json1, json2):
     """
@@ -292,16 +310,20 @@ def compare_isds(json1, json2):
     None
 
     """
+    diff_and_describe(json1, json2, ["instrument_position", "ephemeris_times"])
     diff_and_describe(json1, json2, ["instrument_position", "positions"])
     diff_and_describe(json1, json2, ["instrument_position", "velocities"])
+    diff_and_describe(json1, json2, ["sun_position", "ephemeris_times"])
     diff_and_describe(json1, json2, ["sun_position", "positions"])
     diff_and_describe(json1, json2, ["sun_position", "velocities"])
+    diff_and_describe(json1, json2, ["instrument_rotation", "ephemeris_times"])
     diff_and_describe(json1, json2, ["instrument_rotation", "quaternions"])
     diff_and_describe(json1, json2, ["instrument_rotation", "angular_velocities"])
+    diff_and_describe(json1, json2, ["body_rotation", "ephemeris_times"])
     diff_and_describe(json1, json2, ["body_rotation", "quaternions"])
     diff_and_describe(json1, json2, ["body_rotation", "angular_velocities"])
 
-def main(image):
+def main(image, only_diff):
     """
     Generate and compare an ALE ISD and an ISIS ISD.
 
@@ -311,31 +333,36 @@ def main(image):
         The name of the file for which to generate and compare ISDs.
     """
     # Duplicate the image for ALE and ISIS processing
-    image_ale_path = Path(f"{image}_ALE.cub")
-    image_isis_path = Path(f"{image}_ISIS.cub")
-    shutil.copy(image, image_ale_path)
-    shutil.copy(image, image_isis_path)
+    image_no_ext = os.path.splitext(image)[0]
+    image_ale_path = Path(f"{image_no_ext}.ALE.cub")
+    image_isis_path = Path(f"{image_no_ext}.ISIS.cub")
+    if only_diff:
+        if not os.path.isfile(image_ale_path):
+            logger.error(f"{image_ale_path} does not exist, cannot run with only_diff")
+            exit
+        elif not os.path.isfile(image_isis_path):
+            logger.error(f"{image_isis_path} does not exist, cannot run with onyl_diff")
+            exit
+    else:
+        shutil.copy(image, image_ale_path)
+        shutil.copy(image, image_isis_path)
 
-    # Run spiceinit with ISIS
-    run_spiceinit_isis(image_isis_path)
+        # Run spiceinit with ISIS
+        run_spiceinit_isis(image_isis_path)
 
-    # try ale.loads
-    isis_kerns = ale.kernel_access.generate_kernels_from_cube(image_isis_path, expand=True)
-    # this can be uncommented and used when the PVL loads fix PR goes in (#587)
-    isis_label = pvl.load(image_isis_path)
-    try:
-        ale.loads(image_isis_path, props={"kernels": isis_kerns}, only_naif_spice=True)
-    except:
-        logger.info("No driver for such Label")
-        exit
-    
-    # Run spiceinit with ALE
-    run_spiceinit_ale(image_ale_path)
+        # try ale.loads
+        isis_kerns = ale.kernel_access.generate_kernels_from_cube(image_isis_path, expand=True)
+        # this can be uncommented and used when the PVL loads fix PR goes in (#587)
+        isis_label = pvl.load(image_isis_path)
+        try:
+            ale.loads(image_isis_path, props={"kernels": isis_kerns}, only_naif_spice=True)
+        except:
+            print("No driver for such Label")
+            exit
+        
+        # Run spiceinit with ALE
+        run_spiceinit_ale(image_ale_path)
 
-    # try ale.loads
-    ale_kerns = ale.kernel_access.generate_kernels_from_cube(image_ale_path, expand=True)
-    ale.loads(image_ale_path, props={"kernels": ale_kerns}, only_naif_spice=True)
-    
     # Generate ISD for both ALE and ISIS
     read_ale_driver = ReadIsis(image_ale_path)
     ale_json_dump = create_json_dump(read_ale_driver, read_ale_driver.sensor_frame_id, read_ale_driver.target_frame_id)
@@ -349,8 +376,10 @@ def main(image):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Script to compare ALE driver and ISIS3 driver against an image.")
     parser.add_argument('image', type=str, help='Image to process.')
+    parser.add_argument('-d', '--only_diff',
+                        action='store_true')
     args = parser.parse_args()
 
     # Call the main function
-    main(args.image)
+    main(args.image, args.only_diff)
 
