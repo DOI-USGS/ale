@@ -23,7 +23,7 @@ ale_c_module = Extension(
     language="c++",
     swig_opts=['-c++'],
     extra_compile_args=["-std=c++17"],
-    include_dirs=[os.path.join(conda_path, "include/eigen3")]
+    include_dirs=[os.path.join(conda_path, "include/eigen3"), "include/"]
 )
 
 setup(
