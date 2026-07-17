@@ -19,6 +19,7 @@ conda_path = os.environ["CONDA_PREFIX"]
 ale_c_module = Extension(
     name='ale/_ale_c',
     sources=['ale/ale_c.i', 'src/States.cpp', 'src/Orientations.cpp', 'src/InterpUtils.cpp', 'src/Rotation.cpp', 'src/Vectors.cpp'],
+    depends=['include/ale/States.h', 'include/ale/Orientations.h', 'include/ale/InterpUtils.h', 'include/ale/Rotation.h', 'include/ale/Vectors.h'],
     language="c++",
     swig_opts=['-c++'],
     extra_compile_args=["-std=c++17"],
