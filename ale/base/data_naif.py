@@ -422,7 +422,7 @@ class NaifSpice():
 
         Returns
         -------
-        : float The size of the CCD pixel in millimeters
+        : float The size of the CCD pixel in meters
         """
         if not hasattr(self, "_pixel_size"):
             try: 
@@ -643,7 +643,7 @@ class NaifSpice():
                 state_list = [ale_c.State(i) for i in np.append(self._position, self._velocity, axis=1)]
                 states = ale_c.StatesFromStateVec(self._ephem, state_list, 1)
 
-                # Get middle position (it will be in meters)
+                # Get middle position (it will be in kilometers)
                 middle_state = states.getState(self.center_ephemeris_time, 1)
                 middle_position = np.asarray([middle_state.x, middle_state.y, middle_state.z])
 
@@ -660,7 +660,11 @@ class NaifSpice():
 
                 # Compute the altitude based on the radius of the ground coordinate
                 # minus the magnitude of the spacecraft position
+                # pixel_size and focal_length are in meters so convert the altitude
+                # to meters
                 altitude = (middle_magnitude - radius) * 1000
+                # Compute an approximate instanious resolution for the camera
+                # then make the tolerance 1/100th of that pixel resolution
                 tol = self.pixel_size * altitude / self.focal_length / 100.
                 logger.debug(f"Minimizing positions with tolerance {tol}")
 

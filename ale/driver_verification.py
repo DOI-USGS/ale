@@ -52,7 +52,7 @@ def run_spiceinit_isis(image_path):
     try:
         subprocess.run(['spiceinit', f'from={image_path}', "spkpredicted=true"])
     except Exception as e:
-        logger.error(e.what())
+        logger.error(e)
         pass
     
     # Move the drivers back

@@ -14,7 +14,9 @@ VERSION = "1.2.0"
 # prerequisite: setuptools
 # http://pypi.python.org/pypi/setuptools
 
-conda_path = os.environ["CONDA_PREFIX"]
+conda_path = os.environ.get("CONDA_PREFIX", None)
+if not conda_path:
+    raise Exception("A conda environment is expected to build this package.")
 
 ale_c_module = Extension(
     name='ale/_ale_c',
