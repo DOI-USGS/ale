@@ -645,7 +645,9 @@ class NaifSpice():
 
                 # Get middle position (it will be in kilometers)
                 middle_state = states.getState(self.center_ephemeris_time, 1)
-                middle_position = np.asarray([middle_state.x, middle_state.y, middle_state.z])
+                middle_position = np.asarray([middle_state.position.x, 
+                                              middle_state.position.y, 
+                                              middle_state.position.z])
 
                 # Compuet a normalized nadir look vector
                 middle_magnitude = np.linalg.norm(middle_position)
