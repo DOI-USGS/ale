@@ -45,6 +45,7 @@ release.
 ### Changed
 - Reordered the `ale::DistortionType` enum so `RADIAL` and `TRANSVERSE` come in the same order as the matching enum in USGSCSM. The two enums are meant to share integer values (USGSCSM stores the selected type as this integer in the model state), but they had `RADIAL` and `TRANSVERSE` swapped. ALE never serializes this integer, it emits the distortion by name in the ISD, so aligning the ALE order to USGSCSM changes no on-disk data and only removes the mismatch. [#728](https://github.com/DOI-USGS/ale/pull/728)
 - The KPLO ShadowCam driver now subsamples the ephemeris by default (linear reduction, one sample per ~10 lines), as the Chandrayaan-2 driver does, so ISDs for the long ShadowCam strips no longer reach ~20 MB. When the driver defaults the reduction (including when the caller passes `--reduction none`, which cannot be respected for this sensor), it now logs a notice via the ale logger. The Chandrayaan-2 TMC-2 and OHRC drivers, which override the reduction the same way, log the same notice. [#719](https://github.com/DOI-USGS/ale/pull/719)
+- Updated web CK generation in isd_to_kernel to use SpiceQL's `etsToSclkTicks`. [#733](https://github.com/DOI-USGS/ale/pull/733)
 
 ### Fixed
 - `getDistortionModel` now throws on an unrecognized distortion model name in the ISD instead of silently returning `TRANSVERSE`. The silent default applied the wrong distortion, or none, with no warning, and it masked typos and unsupported models. [#728](https://github.com/DOI-USGS/ale/pull/728)
