@@ -370,6 +370,33 @@ def ck_comment(outfile: str,
     return ck_comment
 
 
+def check_env(use_web: bool = False):
+    """
+    Checks environment setup for SpiceQL.
+
+    When using the web SpiceQL service, no local SPICE data is required: kernel
+    searching and any ET->SCLK encoding needed to write binary kernels are done
+    server-side.
+
+    When using local data, SpiceQL requires ISISDATA and SPICEQL_CACHE_DIR. ALE
+    defaults SPICEQL_CACHE_DIR to $ISISDATA if it is not already set.
+
+    Parameters
+    -------
+        use_web: bool
+            If True, uses USGS Astrogeology's SpiceQL web service.
+            Defaults to False.
+    """
+    if not use_web:
+        cache_dir = os.environ.get("SPICEQL_CACHE_DIR")
+        if not cache_dir:
+            isisdata = os.environ.get("ISISDATA")
+            if not isisdata:
+                raise Exception("ISISDATA and SPICEQL_CACHE_DIR are not set.")
+            os.environ["SPICEQL_CACHE_DIR"] = isisdata
+            logger.info(f"SPICEQL_CACHE_DIR not set; defaulting to ISISDATA [{isisdata}].")
+
+
 def isd_to_kernel(
     isd_file: os.PathLike = None,
     kernel_type: str = "mk",
@@ -415,6 +442,9 @@ def isd_to_kernel(
     """
     logging.basicConfig(format="%(message)s", level=log_level)
     logger.setLevel(log_level)
+
+    # Ensure the environment is set up before any SpiceQL calls are made
+    check_env(use_web)
 
     # Default comment if empty
     if comment is None:
@@ -684,6 +714,18 @@ def isd_to_kernel(
                 raise Exception(f"Could not find LSK for [{isd_file}].")
             logger.info(f"sclk_kernels={sclk_kernels}, lsk_kernel={lsk_kernel}")
 
+            # Writing a CK requires encoding the ephemeris times to SCLK ticks,
+            # which normally furnishes the SCLK/LSK from a local SPICE data dir.
+            # In web mode we do that encoding server-side (etsToSclkTicks) and
+            # hand writeCk the pre-encoded ticks so no local data dir is needed.
+            ck_times = inst_pt_times
+            times_are_ticks = False
+            if use_web:
+                sc_id = int(inst_frame_code / 1000)
+                ck_times, _ = psql.etsToSclkTicks(sc_id, inst_pt_times, mission_name, True)
+                times_are_ticks = True
+                logger.info(f"Encoded {len(ck_times)} ETs to SCLK ticks via web for sc={sc_id}.")
+
             out_comment = ck_comment(
                 outfile=outfile,
                 segment_id=segment_id,
@@ -699,17 +741,19 @@ def isd_to_kernel(
                 has_av=has_av,
                 kernels=kernels,
                 comment=comment)
+
             psql.writeCk(
                 outfile,
                 inst_pt_quaternions,
-                inst_pt_times,
+                ck_times,
                 inst_frame_code,
                 ck_reference_frame,
                 segment_id,
                 sclk_kernels,
                 lsk_kernel,
                 inst_pt_velocities,
-                out_comment
+                out_comment,
+                times_are_ticks
             )
     elif psql.Kernel.isText(kernel_type):
 
