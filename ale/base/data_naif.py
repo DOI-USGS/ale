@@ -649,7 +649,7 @@ class NaifSpice():
                                               middle_state.position.y, 
                                               middle_state.position.z])
 
-                # Compuet a normalized nadir look vector
+                # Compute a normalized nadir look vector
                 middle_magnitude = np.linalg.norm(middle_position)
                 middle_nadir_lv = middle_position/middle_magnitude
 
