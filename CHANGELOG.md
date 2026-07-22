@@ -41,6 +41,7 @@ release.
 - `MroHiRisePds3LabelNaifSpiceDriver`, a PDS3 EDR label driver for HiRISE that generates an ISD directly from a raw EDR label without requiring an ISIS cube, paralleling the existing CTX PDS3 driver. [#702](https://github.com/DOI-USGS/ale/pull/702)
 - Added a catch to try correcting paths in metakernels (using spice_root) if they have been left as default. [#703](https://github.com/DOI-USGS/ale/pull/703)
 - Added ISD to kernel feature [#602](https://github.com/DOI-USGS/ale/issues/602)
+- Added the ability to reduce the ephemeris positions via a hermite spline [#731](https://github.com/DOI-USGS/ale/pull/731)
 
 ### Changed
 - Reordered the `ale::DistortionType` enum so `RADIAL` and `TRANSVERSE` come in the same order as the matching enum in USGSCSM. The two enums are meant to share integer values (USGSCSM stores the selected type as this integer in the model state), but they had `RADIAL` and `TRANSVERSE` swapped. ALE never serializes this integer, it emits the distortion by name in the ISD, so aligning the ALE order to USGSCSM changes no on-disk data and only removes the mismatch. [#728](https://github.com/DOI-USGS/ale/pull/728)
