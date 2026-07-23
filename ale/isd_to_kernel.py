@@ -392,9 +392,38 @@ def check_env(use_web: bool = False):
         if not cache_dir:
             isisdata = os.environ.get("ISISDATA")
             if not isisdata:
-                raise Exception("ISISDATA and SPICEQL_CACHE_DIR are not set.")
+                raise Exception("ISISDATA is not set. Point ISISDATA to " \
+                                "your local data area.")
             os.environ["SPICEQL_CACHE_DIR"] = isisdata
             logger.info(f"SPICEQL_CACHE_DIR not set; defaulting to ISISDATA [{isisdata}].")
+
+
+def load_isd(isd_file: os.PathLike) -> dict:
+    """
+    Read and parse an ISD JSON file into a dictionary.
+
+    Validates that the file is present and is JSON (by extension and content),
+    raising a clear exception on any failure.
+
+    Parameters
+    ----------
+        isd_file : os.PathLike
+            Path to the input ISD JSON file.
+
+    Returns
+    ----------
+        dict: The parsed ISD contents.
+    """
+    if isd_file is None:
+        raise Exception("Missing ISD file.")
+    if Path(isd_file).suffix != ".json":
+        raise Exception("ISD must be in JSON.")
+    with open(isd_file, "r") as f:
+        contents = f.read()
+    try:
+        return json.loads(contents)
+    except ValueError:
+        raise Exception(f"ISD [{isd_file}] is not valid JSON.")
 
 
 def isd_to_kernel(
@@ -419,12 +448,17 @@ def isd_to_kernel(
     ----------
         isd_file : os.PathLike, optional
             Path to the input ISD JSON file. Required for binary kernels.
+            For text kernels it is optional; when provided, its 'naif_keywords'
+            are written to the kernel.
         kernel_type : str
             The type of kernel to create. Defaults to 'mk'.
         outfile : os.PathLike, optional
             The desired output kernel file name/path.
+            Defaults to ISD filename + kernel extension.
         data : str, optional
-            A JSON string containing keyword-value pairs. Required for text kernels.
+            A JSON string containing keyword-value pairs. For text kernels this
+            is required only when no ISD is provided; when both are given, these
+            keywords are appended after (and override) the ISD's naif_keywords.
         comment : str, optional 
             Custom user text to include in the kernel comment area.
         overwrite : bool
@@ -444,7 +478,8 @@ def isd_to_kernel(
     logger.setLevel(log_level)
 
     # Ensure the environment is set up before any SpiceQL calls are made
-    check_env(use_web)
+    if not use_web and psql.Kernel.isBinary(kernel_type):
+        check_env(use_web)
 
     # Default comment if empty
     if comment is None:
@@ -489,11 +524,7 @@ def isd_to_kernel(
 
     if psql.Kernel.isBinary(kernel_type):
         # Get properties from isd_file
-        with open(isd_file, 'r') as f:
-            isd_data = f.read()
-        
-        # ISD data
-        isd_dict = json.loads(isd_data)
+        isd_dict = load_isd(isd_file)
 
         # Get common properties from ISD
         naif_keywords = isd_dict[ISD_KEY_NAIF_KEYWORDS]
@@ -764,18 +795,34 @@ def isd_to_kernel(
             except ValueError:
                 return False
 
-        if data is None:
-            raise Exception(f"Must enter JSON keywords to generate kernel [{outfile}].")
-        elif not is_valid_json(data):
-            raise Exception("The 'data' payload is not valid JSON.")
-        
-        data = json.loads(data)
+        # Text kernel keywords can come from an ISD's naif_keywords, from the
+        # user-provided data payload, or both. When an ISD is given, its
+        # naif_keywords are used; any user data is appended after (and takes
+        # precedence over) them. When no ISD is given, the user must supply data.
+        keywords = {}
+
+        if isd_file is not None:
+            naif_keywords = load_isd(isd_file).get(ISD_KEY_NAIF_KEYWORDS, {})
+            if not naif_keywords:
+                logger.info(f"ISD [{isd_file}] has no '{ISD_KEY_NAIF_KEYWORDS}' to add.")
+            keywords.update(naif_keywords)
+
+        if data is not None:
+            if not is_valid_json(data):
+                raise Exception("The 'data' payload is not valid JSON.")
+            keywords.update(json.loads(data))
+
+        if not keywords:
+            raise Exception(
+                f"Must provide an ISD with '{ISD_KEY_NAIF_KEYWORDS}' and/or JSON "
+                f"data to generate text kernel [{outfile}]."
+            )
 
         logger.info(f"Generating text kernel type [{kernel_type}]")
         psql.writeTextKernel(
             outfile,
             kernel_type,
-            data,
+            keywords,
             out_comment
         )
     else:

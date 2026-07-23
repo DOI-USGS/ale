@@ -7,7 +7,7 @@ from pathlib import Path
 
 import spiceypy as spice
 
-from ale.isd_to_kernel import isd_to_kernel, spk_comment, ck_comment, main
+from ale.isd_to_kernel import isd_to_kernel, spk_comment, ck_comment, main, load_isd
 from conftest import get_isd, get_isd_path
 from unittest.mock import patch, MagicMock
 
@@ -243,6 +243,96 @@ def test_text_kernel_generation(mock_search, tmp_path):
     assert "TEST_VALUE" in content
 
 
+def test_text_kernel_from_isd(tmp_path):
+    """Text kernel generation uses the ISD's naif_keywords when no data is given."""
+    isd_file = get_isd_path("ctx")
+    naif_keywords = get_isd("ctx")["naif_keywords"]
+
+    outfile = tmp_path / "test.ti"
+    isd_to_kernel(
+        kernel_type="ik",
+        isd_file=isd_file,
+        outfile=outfile
+    )
+
+    assert outfile.exists()
+    content = outfile.read_text()
+    # Every naif_keyword from the ISD should appear in the generated kernel
+    for key in naif_keywords:
+        assert key in content, f"Expected naif_keyword [{key}] in text kernel"
+
+
+def test_text_kernel_isd_and_data(tmp_path):
+    """User-provided data is appended after and overrides the ISD's naif_keywords."""
+    isd_file = get_isd_path("ctx")
+    naif_keywords = get_isd("ctx")["naif_keywords"]
+
+    # Override an existing naif_keyword and add a brand new one
+    override_key = next(iter(naif_keywords))
+    data = json.dumps({override_key: 987654, "MY_EXTRA_KEYWORD": "EXTRA"})
+
+    outfile = tmp_path / "test.ti"
+    isd_to_kernel(
+        kernel_type="ik",
+        isd_file=isd_file,
+        data=data,
+        outfile=outfile
+    )
+
+    assert outfile.exists()
+    content = outfile.read_text()
+    assert "MY_EXTRA_KEYWORD" in content
+    assert "EXTRA" in content
+    # User value overrides the ISD's value for the shared key
+    assert "987654" in content
+    # A non-overridden ISD keyword is still present
+    other_key = [k for k in naif_keywords if k != override_key][0]
+    assert other_key in content
+
+
+def test_text_kernel_no_isd_no_data(tmp_path):
+    """Without an ISD, text kernel generation requires a data payload."""
+    outfile = tmp_path / "test.ti"
+    abs_outfile = str(outfile.resolve())
+
+    expected_msg = (
+        f"Must provide an ISD with 'naif_keywords' and/or JSON data "
+        f"to generate text kernel [{abs_outfile}]."
+    )
+
+    with pytest.raises(Exception, match=re.escape(expected_msg)):
+        isd_to_kernel(kernel_type="ik", outfile=outfile)
+
+
+def test_load_isd_valid():
+    """load_isd returns the parsed ISD dictionary."""
+    isd_dict = load_isd(get_isd_path("ctx"))
+    assert isinstance(isd_dict, dict)
+    assert "naif_keywords" in isd_dict
+
+
+def test_load_isd_none():
+    """load_isd raises when no ISD file is given."""
+    with pytest.raises(Exception, match="Missing ISD file."):
+        load_isd(None)
+
+
+def test_load_isd_bad_extension():
+    """load_isd raises when the file is not a .json file."""
+    with pytest.raises(Exception, match="ISD must be in JSON."):
+        load_isd("test.txt")
+
+
+def test_load_isd_invalid_json(tmp_path):
+    """load_isd raises a clear error when the file is not valid JSON."""
+    bad_isd = tmp_path / "bad.json"
+    bad_isd.write_text("{not valid json")
+
+    expected_msg = f"ISD [{bad_isd}] is not valid JSON."
+    with pytest.raises(Exception, match=re.escape(expected_msg)):
+        load_isd(bad_isd)
+
+
 def test_invalid_isd_extension():
     """Verify that non-JSON files raise an error."""
     expected_msg = "ISD must be in JSON"
@@ -259,12 +349,15 @@ def test_invalid_kernel_type():
 
 
 def test_empty_data(tmp_path):
-    """Verify that text kernels require a data payload."""
+    """Verify that text kernels require an ISD or a data payload."""
     outfile = tmp_path / "test.tf"
-    abs_outfile = str(outfile.resolve()) 
-    
-    expected_msg = f"Must enter JSON keywords to generate kernel [{abs_outfile}]."
-    
+    abs_outfile = str(outfile.resolve())
+
+    expected_msg = (
+        f"Must provide an ISD with 'naif_keywords' and/or JSON data "
+        f"to generate text kernel [{abs_outfile}]."
+    )
+
     with pytest.raises(Exception, match=re.escape(expected_msg)):
         isd_to_kernel(kernel_type="fk", outfile=outfile)
 
