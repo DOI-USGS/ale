@@ -750,12 +750,9 @@ def isd_to_kernel(
             # In web mode we do that encoding server-side (etsToSclkTicks) and
             # hand writeCk the pre-encoded ticks so no local data dir is needed.
             ck_times = inst_pt_times
-            times_are_ticks = False
-            if use_web:
-                sc_id = int(inst_frame_code / 1000)
-                ck_times, _ = psql.etsToSclkTicks(sc_id, inst_pt_times, mission_name, True)
-                times_are_ticks = True
-                logger.info(f"Encoded {len(ck_times)} ETs to SCLK ticks via web for sc={sc_id}.")
+            sc_id = int(inst_frame_code / 1000)
+            ck_times, _ = psql.doubleEtsToSclkTicks(sc_id, inst_pt_times, mission_name, use_web)
+            logger.info(f"Encoded {len(ck_times)} ETs to SCLK ticks via web for sc={sc_id}.")
 
             out_comment = ck_comment(
                 outfile=outfile,
@@ -780,11 +777,8 @@ def isd_to_kernel(
                 inst_frame_code,
                 ck_reference_frame,
                 segment_id,
-                sclk_kernels,
-                lsk_kernel,
                 inst_pt_velocities,
-                out_comment,
-                times_are_ticks
+                out_comment
             )
     elif psql.Kernel.isText(kernel_type):
 
