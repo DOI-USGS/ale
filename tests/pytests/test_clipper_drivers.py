@@ -42,10 +42,10 @@ class test_EIS_WAC_FC_isis_naif(unittest.TestCase):
         assert self.driver.focal_length == 46.25
 
     def test_focal2pixel_lines(self):
-        np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0.0, 0.0, 1.0 / 0.014])
+        np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0.0, 0.0, -1.0 / 0.014])
 
     def test_focal2pixel_samples(self):
-        np.testing.assert_array_equal(self.driver.focal2pixel_samples, [0.0, -1.0 / 0.014, 0.0])
+        np.testing.assert_array_equal(self.driver.focal2pixel_samples, [0.0, 1.0 / 0.014, 0.0])
 
 
 # ========= Test EIS WAC PB isislabel and naifspice driver =========
@@ -65,25 +65,25 @@ class test_EIS_WAC_PB_isis_naif(unittest.TestCase):
         assert self.driver.filter_name == "BLU"
 
     def test_detector_center_sample(self):
-        assert self.driver.detector_center_sample == 2048
+        assert self.driver.detector_center_sample == 2047.0
 
     def test_detector_center_line(self):
-        assert self.driver.detector_center_line == 1024
+        assert self.driver.detector_center_line == 0.0
 
     def test_detector_start_line(self):
-        assert self.driver.detector_start_line == 351
+        assert self.driver.detector_start_line == 1023.5
 
     def test_detector_start_sample(self):
-        assert self.driver.detector_start_sample == 32
+        assert self.driver.detector_start_sample == 0.0
 
     def test_focal_length(self):
         assert self.driver.focal_length == 46.25
 
     def test_focal2pixel_lines(self):
-        np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0.0, 0.0, 1.0 / 0.014])
+        np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0.0, 0.0, -1.0 / 0.014])
 
     def test_focal2pixel_samples(self):
-        np.testing.assert_array_equal(self.driver.focal2pixel_samples, [0.0, -1.0 / 0.014, 0.0])
+        np.testing.assert_array_equal(self.driver.focal2pixel_samples, [0.0, 1.0 / 0.014, 0.0])
 
 
 # ========= Test EIS NAC FC isislabel and naifspice driver =========
@@ -138,10 +138,10 @@ class test_EIS_NAC_FC_isis_naif(unittest.TestCase):
             table_mock.assert_called()
 
     def test_focal2pixel_lines(self):
-        np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0.0, 0.0, 1.0 / 0.014])
+        np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0.0, 0.0, -1.0 / 0.014])
 
     def test_focal2pixel_samples(self):
-        np.testing.assert_array_equal(self.driver.focal2pixel_samples, [0.0, -1.0 / 0.014, 0.0])
+        np.testing.assert_array_equal(self.driver.focal2pixel_samples, [0.0, 1.0 / 0.014, 0.0])
 
 
 # ========= Test EIS NAC PB isislabel and naifspice driver =========
@@ -161,22 +161,22 @@ class test_EIS_NAC_PB_isis_naif(unittest.TestCase):
         assert self.driver.filter_name == "NUV"
 
     def test_detector_center_sample(self):
-        assert self.driver.detector_center_sample == 2048
+        assert self.driver.detector_center_sample == 2047
 
     def test_detector_center_line(self):
-        assert self.driver.detector_center_line == 1024
+        assert self.driver.detector_center_line == 0.0
 
     def test_detector_start_line(self):
-        assert self.driver.detector_start_line == 415
+        assert self.driver.detector_start_line == 1023.5
 
     def test_detector_start_sample(self):
-        assert self.driver.detector_start_sample == 32
+        assert self.driver.detector_start_sample == 0.0
 
     def test_focal_length(self):
         assert self.driver.focal_length == 1002.7
 
     def test_focal2pixel_lines(self):
-        np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0.0, 0.0, 1.0 / 0.014])
+        np.testing.assert_array_equal(self.driver.focal2pixel_lines, [0.0, 0.0, -1.0 / 0.014])
 
     def test_focal2pixel_samples(self):
-        np.testing.assert_array_equal(self.driver.focal2pixel_samples, [0.0, -1.0 / 0.014, 0.0])
+        np.testing.assert_array_equal(self.driver.focal2pixel_samples, [0.0, 1.0 / 0.014, 0.0])

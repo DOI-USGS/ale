@@ -21,10 +21,11 @@ Object = IsisCube
 
     Group = Instrument
         SpacecraftName   = "Europa Clipper"
-        InstrumentId     = "EIS NAC PB"
+        InstrumentId     = "NAC-PUSHBROOM"
         TargetName       = Didymos
         StartTime        = 2021-03-06T04:05:27.77
         ExposureDuration = 1.0 <seconds>
+        DetectorOffset   = 0
     End_Group
 
     Group = BandBin
