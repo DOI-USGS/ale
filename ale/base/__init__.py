@@ -35,6 +35,8 @@ spiceql_mission_map = {
     "DAWN_FC2_FILTER_6": "fc2",
     "DAWN_FC2_FILTER_7": "fc2",
     "DAWN_FC2_FILTER_8": "fc2",
+    "EUROPAM_EIS_WAC": "clipper",
+    "EUROPAM_EIS_NAC": "clipper",
     "GLL_SSI_PLATFORM": "galileo",
     "HAYABUSA_AMICA": "amica",
     "HAYABUSA_NIRS": "nirs",
