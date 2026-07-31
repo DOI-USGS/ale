@@ -231,10 +231,6 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         return id_lookup[key]
 
     @property
-    def sensor_name(self):
-      return ""
-
-    @property
     def spacecraft_name(self):
       spacecraft_name_lookup = {
         "Clipper": "EUROPA_CLIPPER"
