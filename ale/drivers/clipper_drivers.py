@@ -286,7 +286,7 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         float :
             The center line of the detector
         """
-        return 1.0
+        return 0.0
 
     @property
     def detector_start_line(self):
@@ -310,7 +310,7 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         : int
           Zero based Detector sample corresponding to the first image sample
         """
-        return 0
+        return 0.0
 
     @property
     def focal_length(self):
@@ -691,7 +691,7 @@ class ClipperEISNACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         float :
             The center line of the detector
         """
-        return 1.0
+        return 0.0
 
     @property
     def detector_start_line(self):
@@ -715,7 +715,7 @@ class ClipperEISNACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         : int
           Zero based Detector sample corresponding to the first image sample
         """
-        return 0
+        return 0.0
 
     @property
     def focal_length(self):
