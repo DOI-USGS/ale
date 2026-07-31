@@ -277,7 +277,7 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         float :
             The center sample of the detector
         """
-        return (4096 / 2) - 0.5
+        return (4096 / 2) - 1.0
 
     @property
     def detector_center_line(self):
@@ -290,7 +290,7 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         float :
             The center line of the detector
         """
-        return (2048 / 2) - 0.5
+        return 1.0
 
     @property
     def detector_start_line(self):
@@ -302,7 +302,7 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         : int
           Zero based Detector line corresponding to the first image line
         """
-        return -(self.label['IsisCube']['Instrument']['DetectorOffset'] - 1024.0);
+        return -(self.label['IsisCube']['Instrument']['DetectorOffset']+0.5 - 1024)
 
     @property
     def detector_start_sample(self):
@@ -314,7 +314,7 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         : int
           Zero based Detector sample corresponding to the first image sample
         """
-        return 0.5
+        return 0
 
     @property
     def focal_length(self):
@@ -682,7 +682,7 @@ class ClipperEISNACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         float :
             The center sample of the detector
         """
-        return 4096 / 2
+        return (4096 / 2) - 1.0
 
     @property
     def detector_center_line(self):
@@ -695,7 +695,7 @@ class ClipperEISNACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         float :
             The center line of the detector
         """
-        return 2048 / 2
+        return 1.0
 
     @property
     def detector_start_line(self):
@@ -707,7 +707,7 @@ class ClipperEISNACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         : int
           Zero based Detector line corresponding to the first image line
         """
-        return EIS_FILTER_START_LINES[self.filter_name]
+        return -(self.label['IsisCube']['Instrument']['DetectorOffset']+0.5 - 1024)
 
     @property
     def detector_start_sample(self):
@@ -719,7 +719,7 @@ class ClipperEISNACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         : int
           Zero based Detector sample corresponding to the first image sample
         """
-        return EIS_FILTER_START_SAMPLES[self.filter_name]
+        return 0
 
     @property
     def focal_length(self):
