@@ -236,6 +236,9 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         "Clipper": "EUROPA_CLIPPER"
       }
 
+      if not super().spacecraft_name in spacecraft_name_lookup.keys():
+        raise KeyError(f"Spacecraft name {super().spacecraft_name} not in spacecraft_name_lookup")
+
       return spacecraft_name_lookup[super().spacecraft_name]
 
     @property
@@ -365,17 +368,19 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
         : dict
           Dictionary with EphemerisTime, ExposureTime, and LineStart.
         """
-        lineScanTable = None
-        allTables = self.label.getall("Table")
-        for table in allTables:
-          if table["Name"] == "LineScanTimes":
-            lineScanTable = table
+        if not hasattr(self, "_times_table"):
+            lineScanTable = None
+            allTables = self.label.getall("Table")
+            for table in allTables:
+                if table["Name"] == "LineScanTimes":
+                    lineScanTable = table
 
-        if lineScanTable == None:
-          raise Exception(f'Could not find LineScanTable in label.')
+            if lineScanTable is None:
+                raise Exception(f'Could not find LineScanTable in label.')
 
-        isis_bytes = read_table_data(lineScanTable, self._file)
-        return parse_table(lineScanTable, isis_bytes)
+            isis_bytes = read_table_data(lineScanTable, self._file)
+            self._times_table = parse_table(lineScanTable, isis_bytes)
+        return self._times_table
 
     @property
     def line_scan_rate(self):
@@ -386,11 +391,13 @@ class ClipperEISWACPBIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice,
           list of lines, list of ephemeris times, and list of exposure
           times
         """
-        times = self.times_table['EphemerisTime']
-        times = [time - self.center_ephemeris_time for time in times]
-        start_lines = self.times_table['LineStart']
-        start_lines = [line - .5 for line in start_lines]
-        return start_lines, times, self.times_table['ExposureTime']
+        if not hasattr(self, "_line_scan_rate"):
+            times = self.times_table['EphemerisTime']
+            times = [time - self.center_ephemeris_time for time in times]
+            start_lines = self.times_table['LineStart']
+            start_lines = [line - .5 for line in start_lines]
+            self._line_scan_rate = start_lines, times, self.times_table['ExposureTime']
+        return self._line_scan_rate
 
     @property
     def ephemeris_start_time(self):
