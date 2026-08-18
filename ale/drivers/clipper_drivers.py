@@ -15,7 +15,7 @@ EIS_FOCAL_LENGTHS = {
     "EUROPAM_EIS_NAC" : 1002.7
 }
 
-# According to diagrams in the SIS, increasing lines are +Y and increasing samples are -X
+# According to diagrams in the SIS, increasing lines are -Y and increasing samples are +X
 # Focal to detector transforms assume 0.014 mm pixel pitch.
 EIS_ITRANSL = [0.0, 0.0, -1.0 / 0.014]
 EIS_ITRANSS = [0.0, 1.0 / 0.014,  0.0]
