@@ -7,7 +7,7 @@ dependencies:
   - brotli
   - brotli-python
   - cmake>=3.15
-  - cxx-compiler
+  - cxx-compiler <2
   - eigen
   - gdal >=3.12.2
   - jupyter
