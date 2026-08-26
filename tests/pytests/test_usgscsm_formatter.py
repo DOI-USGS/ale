@@ -219,6 +219,21 @@ def test_line_scan_name_model(test_line_scan_driver):
     isd = usgscsm_formatter.to_usgscsm(test_line_scan_driver)
     assert isd['name_model'] == 'USGS_ASTRO_LINE_SCANNER_SENSOR_MODEL'
 
+def test_line_scan_rotation_interpolation_default(test_line_scan_driver):
+    # SLERP is the default and the formatter still produces quaternions
+    assert test_line_scan_driver.rotation_interpolation == 'slerp'
+    isd = usgscsm_formatter.to_usgscsm(test_line_scan_driver)
+    assert len(isd['sensor_orientation']['quaternions']) > 0
+
+def test_line_scan_rotation_interpolation_lagrange():
+    # The rotation_interpolation prop selects the Lagrange path and the formatter runs
+    driver = TestLineScanner("", props={'rotation_interpolation': 'lagrange'})
+    assert driver.rotation_interpolation == 'lagrange'
+    isd = usgscsm_formatter.to_usgscsm(driver)
+    quats = np.asarray(isd['sensor_orientation']['quaternions'])
+    assert quats.shape[1] == 4
+    np.testing.assert_allclose(np.linalg.norm(quats, axis=1), 1.0, atol=1e-8)
+
 def test_name_platform(test_frame_driver):
     isd = usgscsm_formatter.to_usgscsm(test_frame_driver)
     assert isd['name_platform'] == 'Test Platform'

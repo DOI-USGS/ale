@@ -150,7 +150,7 @@ def to_usgscsm(driver):
         isd_data['starting_ephemeris_time'] = driver.ephemeris_start_time
         isd_data['center_ephemeris_time'] = center_time
 
-        rotation_interp = sensor_to_target.reinterpolate(interp_times)
+        rotation_interp = sensor_to_target.reinterpolate(interp_times, method=driver.rotation_interpolation)
         isd_data['sensor_orientation'] = {
             'quaternions' : rotation_interp.quats
         }

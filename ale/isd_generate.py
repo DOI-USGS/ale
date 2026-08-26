@@ -158,6 +158,17 @@ def main():
         help="Select every Nth ephemeris time when generating an ISD. This should only be set if a linear "
              "reduction is applied."
     )
+    parser.add_argument(
+        "--rotation_interpolation",
+        type=str.lower,
+        choices=['slerp', 'lagrange'],
+        default='slerp',
+        help="Method used to reinterpolate the sensor orientation onto the ISD quaternion grid. "
+             "'slerp' (default) is the historical 2-point spherical linear interpolation. 'lagrange' "
+             "uses order-8 Lagrange interpolation of the quaternion components, matching ISIS and "
+             "USGSCSM, which is more accurate when the rotation rate is not constant. Only applies to "
+             "line scan sensors."
+    )
     args = parser.parse_args()
 
     if (args.reduction != "linear" and args.ephem_sample_rate):
@@ -207,8 +218,9 @@ def main():
                         compress=args.compress, only_isis_spice=args.only_isis_spice, 
                         only_naif_spice=args.only_naif_spice, use_web=args.use_web_spice, 
                         local=args.local, nadir=args.nadir, search_kernels=args.search_kernels,
-                        attach_kernels=args.attach_kernels, reduction=args.reduction, 
-                        ephem_sample_rate=args.ephem_sample_rate)
+                        attach_kernels=args.attach_kernels, reduction=args.reduction,
+                        ephem_sample_rate=args.ephem_sample_rate,
+                        rotation_interpolation=args.rotation_interpolation)
         except Exception as err:
             # Seriously, this just throws a generic Exception?
             sys.exit(f"File {args.input[0]}: {err}")
@@ -228,7 +240,8 @@ def main():
                                        "use_web":args.use_web_spice,
                                        "attach_kernels": args.attach_kernels,
                                        "reduction": args.reduction,
-                                       "ephem_sample_rate": args.ephem_sample_rate}
+                                       "ephem_sample_rate": args.ephem_sample_rate,
+                                       "rotation_interpolation": args.rotation_interpolation}
                 ): f for f in args.input
             }
             for f in concurrent.futures.as_completed(futures):
@@ -257,7 +270,8 @@ def file_to_isd(
     search_kernels=False,
     attach_kernels=False,
     reduction=None,
-    ephem_sample_rate=None):
+    ephem_sample_rate=None,
+    rotation_interpolation='slerp'):
     """
     Returns nothing, but acts as a thin wrapper to take the *file* and generate
     an ISD at *out* (if given, defaults to replacing the extension on *file*
@@ -297,11 +311,14 @@ def file_to_isd(
     if search_kernels: 
         props["search_kernels"] = search_kernels
 
-    if reduction: 
+    if reduction:
         props["reduction"] = reduction
         if reduction == "linear":
             if ephem_sample_rate:
                 props["ephem_sample_rate"] = ephem_sample_rate
+
+    if rotation_interpolation and rotation_interpolation != 'slerp':
+        props["rotation_interpolation"] = rotation_interpolation
 
     if kernels is not None:
         kernels = [str(PurePath(p)) for p in kernels]

@@ -81,6 +81,22 @@ class LineScanner():
 
 
     @property
+    def rotation_interpolation(self):
+        """
+        The method used to reinterpolate the sensor orientation onto the ISD
+        quaternion grid. Either 'slerp' (default, the historical 2-point spherical
+        linear interpolation) or 'lagrange' (order-8 Lagrange interpolation of the
+        quaternion components, matching ISIS and USGSCSM). Set 'lagrange' via the
+        'rotation_interpolation' prop to obtain an ISIS-consistent reconstruction.
+
+        Returns
+        -------
+        : str
+          The interpolation method, 'slerp' or 'lagrange'.
+        """
+        return self._props.get('rotation_interpolation', 'slerp').lower()
+
+    @property
     def ephemeris_time(self):
         """
         Returns an array of times between the start/stop ephemeris times
@@ -97,7 +113,7 @@ class LineScanner():
           ephemeris times split based on image lines
         """
         if not hasattr(self, "_ephemeris_time"):
-            # Determine reduction mode. Default is "None" (No reduction). 
+            # Determine reduction mode. Default is "None" (No reduction).
             # Set reduction=Linear via props to apply a linear reduction.
             reduction = self._props.get('reduction', 'none').lower()
 

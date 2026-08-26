@@ -2,6 +2,63 @@ from scipy.spatial.transform import Rotation
 
 import numpy as np
 
+def lagrange_interpolate(times, values, time, order=8):
+    """
+    Interpolate a single value with an order-N Lagrange polynomial.
+
+    This is a Python port of ale::lagrangeInterpolate (src/InterpUtils.cpp), so
+    the ALE Python ISD path and the ALE C++ runtime path reconstruct pointing the
+    same way. The window is centered on the query time and clamped symmetrically
+    when there are not enough surrounding nodes, so the effective order degrades
+    to 2/4/6 near the ends and for short caches.
+
+    Parameters
+    ----------
+    times : 1darray
+            The node times, sorted in ascending order.
+    values : 1darray
+             The node values, one per time.
+    time : float
+           The time to interpolate at.
+    order : int
+            The interpolation order. Defaults to 8.
+
+    Returns
+    -------
+     : float
+       The interpolated value.
+    """
+    times = np.asarray(times)
+    values = np.asarray(values)
+    if times.size != values.size:
+        raise ValueError("Times and values must have the same length.")
+
+    # Find the interpolation index, matching ale::interpolationIndex: the first node
+    # strictly after the query time, clamped to the last node, then stepped back one.
+    index = int(np.searchsorted(times, time, side='right'))
+    if index >= times.size:
+        index = times.size - 1
+    if index != 0:
+        index -= 1
+
+    # Symmetric window clamped to the available nodes and to order / 2
+    window = min(index + 1, times.size - index - 1)
+    window = min(window, order // 2)
+    start = index - window + 1
+    end = index + window + 1
+
+    result = 0.0
+    for i in range(start, end):
+        weight = 1.0
+        numerator = 1.0
+        for j in range(start, end):
+            if i == j:
+                continue
+            weight *= times[i] - times[j]
+            numerator *= time - times[j]
+        result += numerator * values[i] / weight
+    return result
+
 class ConstantRotation:
     """
     A constant rotation between two 3D reference frames.
@@ -307,7 +364,55 @@ class TimeDependentRotation:
         return interp_rots, interp_av
 
 
-    def reinterpolate(self, times):
+    def _lagrange(self, times, order=8):
+        """
+        Reconstruct the rotation at specific times with order-N Lagrange
+        interpolation of the quaternion components.
+
+        This matches the interpolation ISIS SpiceRotation and USGSCSM use, and
+        is more accurate than SLERP when the rotation rate is not constant,
+        because SLERP is only a 2-point (linear on the sphere) scheme and does
+        not see curvature across the cache. The quaternions are made
+        sign-continuous before interpolation (a quaternion and its negative are
+        the same rotation, but a sign jump between nodes corrupts a component-wise
+        interpolation), and the result is renormalized to unit length.
+
+        Parameters
+        ----------
+        times : 1darray or float
+                The new times to interpolate at.
+        order : int
+                The order of the Lagrange interpolation. Defaults to 8. The window
+                is clamped symmetrically when fewer nodes are available.
+
+        Returns
+        -------
+         : 2darray
+           The interpolated quaternions in scalar last format (x, y, z, w)
+        """
+        vec_times = np.atleast_1d(times)
+        if vec_times.ndim > 1:
+            raise ValueError('Input times must be either a float or a 1d iterable of floats')
+
+        # self.quats already returns sign-continuous quaternions (it flips any
+        # quaternion whose dominant coefficient disagrees with the global sign).
+        node_times = np.asarray(self.times)
+        node_quats = self.quats
+
+        interp_quats = np.empty((len(vec_times), 4))
+        for k, t in enumerate(vec_times):
+            for j in range(4):
+                interp_quats[k, j] = lagrange_interpolate(node_times, node_quats[:, j], t, order)
+
+        # Renormalize each interpolated quaternion to unit length
+        norms = np.linalg.norm(interp_quats, axis=1)
+        norms[norms == 0] = 1.0
+        interp_quats /= norms[:, None]
+
+        return interp_quats
+
+
+    def reinterpolate(self, times, method='slerp'):
         """
         Reinterpolate the rotation at a given set of times.
 
@@ -315,14 +420,26 @@ class TimeDependentRotation:
         ----------
         times : 1darray or float
                 The new times to interpolate at.
+        method : str
+                 The interpolation method, either 'slerp' (default) or 'lagrange'.
+                 'slerp' is the historical 2-point spherical linear interpolation.
+                 'lagrange' uses order-8 Lagrange interpolation of the quaternion
+                 components, matching ISIS and USGSCSM, and is more accurate when
+                 the rotation rate is not constant.
 
         Returns
         -------
          : TimeDependentRotation
            The new rotation at the input times
         """
-        new_rots, av = self._slerp(times)
-        return TimeDependentRotation(new_rots.as_quat(), times, self.source, self.dest, av=av)
+        if method == 'lagrange':
+            new_quats = self._lagrange(times)
+            return TimeDependentRotation(new_quats, times, self.source, self.dest)
+        elif method == 'slerp':
+            new_rots, av = self._slerp(times)
+            return TimeDependentRotation(new_rots.as_quat(), times, self.source, self.dest, av=av)
+        else:
+            raise ValueError(f"Unknown interpolation method '{method}', must be 'slerp' or 'lagrange'.")
 
     def __mul__(self, other):
         """

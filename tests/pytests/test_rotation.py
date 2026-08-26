@@ -2,7 +2,7 @@ import pytest
 
 import numpy as np
 from scipy.spatial.transform import Rotation
-from ale.rotation import ConstantRotation, TimeDependentRotation
+from ale.rotation import ConstantRotation, TimeDependentRotation, lagrange_interpolate
 
 from conftest import compare_quats
 
@@ -205,6 +205,69 @@ def test_reinterpolate():
     assert new_rot.source == rot.source
     assert new_rot.dest == rot.dest
     np.testing.assert_equal(new_rot.times, np.arange(-3, 5))
+
+def test_lagrange_interpolate_reproduces_polynomial():
+    # An order-8 Lagrange interpolation reproduces a low-degree polynomial exactly
+    times = np.linspace(0, 10, 11)
+    values = 2.0 + 0.5 * times - 0.1 * times**2 + 0.01 * times**3
+    for t in [1.3, 4.7, 8.2]:
+        expected = 2.0 + 0.5 * t - 0.1 * t**2 + 0.01 * t**3
+        np.testing.assert_allclose(lagrange_interpolate(times, values, t), expected)
+
+def _wobble_quats(times):
+    # A rotation about the x-axis whose angle theta(t) = sin(t) is not a constant
+    # rate, so SLERP (a 2-point scheme) cannot reproduce it but Lagrange can.
+    rotvec = np.zeros((len(times), 3))
+    rotvec[:, 0] = np.sin(times)
+    return Rotation.from_rotvec(rotvec)
+
+def test_reinterpolate_lagrange_reproduces_nodes():
+    # At the node times, Lagrange reconstruction returns the input rotations exactly
+    times = np.linspace(0, 10, 21)
+    quats = _wobble_quats(times).as_quat()
+    rot = TimeDependentRotation(quats, times, 1, 2)
+    new_rot = rot.reinterpolate(times, method='lagrange')
+    assert compare_quats(new_rot.quats, rot.quats)
+
+def test_reinterpolate_lagrange_more_accurate_than_slerp():
+    # On a rotation whose rate is not constant, Lagrange is far more accurate than
+    # SLERP, because SLERP is only a 2-point scheme and misses the curvature.
+    times = np.linspace(0, 10, 41)
+    quats = _wobble_quats(times).as_quat()
+    rot = TimeDependentRotation(quats, times, 1, 2)
+
+    # Query interior points, where the full order-8 window is available. Near the
+    # ends the window necessarily shrinks (fewer surrounding nodes), as in ISIS.
+    query = np.linspace(1.0, 9.0, 200)
+    truth = _wobble_quats(query)
+
+    lagrange = rot.reinterpolate(query, method='lagrange')
+    slerp = rot.reinterpolate(query, method='slerp')
+
+    lagrange_err = (Rotation.from_quat(lagrange.quats) * truth.inv()).magnitude().max()
+    slerp_err = (Rotation.from_quat(slerp.quats) * truth.inv()).magnitude().max()
+
+    assert lagrange_err < 1e-4
+    assert lagrange_err < slerp_err
+
+def test_reinterpolate_lagrange_sign_flip_invariant():
+    # Negating alternate input quaternions (same rotations, opposite sign branch)
+    # must not change the Lagrange result, because the quaternions are made
+    # sign-continuous before interpolation.
+    times = np.linspace(0, 10, 21)
+    quats = _wobble_quats(times).as_quat()
+    flipped = quats.copy()
+    flipped[::2] *= -1.0
+
+    query = np.linspace(0.05, 9.95, 50)
+    a = TimeDependentRotation(quats, times, 1, 2).reinterpolate(query, method='lagrange')
+    b = TimeDependentRotation(flipped, times, 1, 2).reinterpolate(query, method='lagrange')
+    assert compare_quats(a.quats, b.quats)
+
+def test_reinterpolate_invalid_method():
+    rot = TimeDependentRotation([[0, 0, 0, 1], [0, 0, 0, 1]], [0, 1], 1, 2)
+    with pytest.raises(ValueError):
+        rot.reinterpolate([0.5], method='bogus')
 
 def test_apply_at_single_time():
     test_quats = Rotation.from_euler('x', np.asarray([[-90], [0], [45]]), degrees=True).as_quat()
