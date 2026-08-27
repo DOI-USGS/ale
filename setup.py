@@ -3,6 +3,7 @@
 import os
 import sys
 from setuptools import setup, find_packages, Extension
+from setuptools.command.build_py import build_py
 
 NAME = "Ale"
 VERSION = "1.3.0"
@@ -28,6 +29,11 @@ ale_c_module = Extension(
     include_dirs=[os.path.join(conda_path, "include/eigen3"), "include/"]
 )
 
+class BuildPy(build_py):
+    def run(self):
+        self.run_command('build_ext')
+        super(build_py, self).run()
+
 setup(
     name=NAME,
     version=VERSION,
@@ -48,4 +54,7 @@ setup(
         ],
     },
     ext_modules=[ale_c_module],
+    cmdclass={
+        'build_py': BuildPy,
+    },
 )
