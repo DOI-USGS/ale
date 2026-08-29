@@ -183,7 +183,7 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
           start time
         """
         if not hasattr(self, "_ephemeris_start_time"):
-            self._ephemeris_start_time = pyspiceql.utcToEt(utc=self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"), useWeb=self.use_web)
+            self._ephemeris_start_time = pyspiceql.utcToEt(utc=self.utc_start_time.strftime("%Y-%m-%d %H:%M:%S.%f"), useWeb=self.use_web)[0]
         return self._ephemeris_start_time
 
     @property
@@ -222,6 +222,15 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
             return [0, float('-8e-6'), 0]
 
     @property
+    def detector_center_line(self):
+        # ISIS CCD coordinates are 0.5-based (pixel centers at half integers); CSM is 0-based.
+        return super().detector_center_line - 0.5
+
+    @property
+    def detector_center_sample(self):
+        return super().detector_center_sample - 0.5
+
+    @property
     def focal_length(self):
         """
         NAC uses multiple filter pairs, each filter combination has a different focal length.
@@ -236,13 +245,14 @@ class CassiniIssIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDis
           except:
             default_focal_len = float(self.naif_keywords['INS{}_FOV_CENTER_PIXEL'.format(self.ikid)][0])
 
-            filters = tuple(self.label["IsisCube"]["BandBin"]['FilterName'].split("/"))
+          # Apply the filter-specific focal length.
+          filters = tuple(self.label["IsisCube"]["BandBin"]['FilterName'].split("/"))
 
-            if self.instrument_id == "CASSINI_ISS_NAC":
-                self._focal_length = nac_filter_to_focal_length.get(filters, default_focal_len)
+          if self.instrument_id == "CASSINI_ISS_NAC":
+              self._focal_length = nac_filter_to_focal_length.get(filters, default_focal_len)
 
-            elif self.instrument_id == "CASSINI_ISS_WAC":
-                self._focal_length = wac_filter_to_focal_length.get(filters, default_focal_len)
+          elif self.instrument_id == "CASSINI_ISS_WAC":
+              self._focal_length = wac_filter_to_focal_length.get(filters, default_focal_len)
         return self._focal_length
 
     @property
@@ -771,7 +781,37 @@ class CassiniIssPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, RadialDis
 
         return self._frame_chain
 
-class CassiniIssIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDistortion, Driver):
+class CassiniIssIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, RadialDistortion, Driver):
+
+    @property
+    def odtk(self):
+        """
+        The radial distortion coeffs are not defined in the ik kernels, instead
+        they are defined in the ISS Data User Guide (Knowles). Therefore, we
+        manually specify the codes here.
+        Expects instrument_id to be defined. This should be a string containing either
+        CASSINI_ISS_WAC or CASSINI_ISIS_NAC
+
+        Returns
+        -------
+        : list<float>
+          radial distortion coefficients
+        """
+        if self.instrument_id == 'CASSINI_ISS_WAC':
+            # WAC
+            return [0, float('-6.2e-5'), 0]
+        elif self.instrument_id == 'CASSINI_ISS_NAC':
+            # NAC
+            return [0, float('-8e-6'), 0]
+
+    @property
+    def detector_center_line(self):
+        # ISIS CCD coordinates are 0.5-based (pixel centers at half integers); CSM is 0-based.
+        return super().detector_center_line - 0.5
+
+    @property
+    def detector_center_sample(self):
+        return super().detector_center_sample - 0.5
 
     @property
     def instrument_id(self):
