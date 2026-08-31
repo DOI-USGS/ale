@@ -35,6 +35,9 @@ release.
 
 ## [Unreleased]
 
+### Added
+- The NEAR MSI driver now emits the single-parameter radial optical distortion (from the `INS<ikid>_K1` coefficient) that ISIS models, and subtracts 0.5 from the detector center to match the ISIS 0.5-based detector-coordinate convention. The resulting CSM camera agrees with the ISIS camera to sub-pixel (cam_test pixel difference drops from ~0.7 px to ~1e-8 px on a real NEAR MSI image). [#XXXX](https://github.com/DOI-USGS/ale/pull/XXXX)
+
 ### Fixed
 - Cassini ISS drivers now produce a CSM camera that matches ISIS (ASP cam_test on a NAC image shows the ISIS-SPICE, NAIF-SPICE and PDS3 drivers agree with ISIS to ~5e-4 px). Fixes:
   - ISIS-SPICE driver: emit the radial optical distortion (was none).
