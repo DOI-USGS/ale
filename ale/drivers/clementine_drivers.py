@@ -130,5 +130,43 @@ class ClementineIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistort
           }
 
           return lookup_table[filter.upper()] * 0.038
-        
+
         return super().focal_length
+
+    @property
+    def usgscsm_distortion_model(self):
+        """
+        The four Clementine cameras use different optical distortion models in
+        ISIS. Only the NIR camera is modeled here as a single-parameter radial
+        distortion: ISIS NirCamera uses RadialDistortionMap(this, -0.0006364),
+        i.e. undistorted = distorted * (1 + k1 * r^2) with k1 = -0.0006364. The
+        USGSCSM RADIAL model applies undistorted = distorted * (1 - (c0 + c1 r^2
+        + c2 r^4)), so matching gives coefficients [0, -k1, 0] = [0, 0.0006364, 0].
+        The UVVIS (radial + decentering), HiRes (generic radial) and LWIR
+        (zero-coefficient) cameras are left distortion-free here.
+
+        Returns
+        -------
+        : dict
+          Dictionary containing the usgscsm distortion model
+        """
+        if self.instrument_id == "Near Infrared Camera":
+            return {"radial": {"coefficients": [0.0, 0.0006364, 0.0]}}
+        return {"radial": {"coefficients": [0.0, 0.0, 0.0]}}
+
+    @property
+    def detector_center_line(self):
+        # ISIS detector coordinates are 0.5-based (pixel centers at half integers);
+        # CSM is 0-based. Subtract 0.5 for the NIR camera, whose distortion is
+        # modeled above, as the LRO, MRO, Dawn and Cassini ISS drivers already do.
+        # UVVIS and HiRes distortion are not modeled here, so their detector center
+        # is left unchanged.
+        if self.instrument_id == "Near Infrared Camera":
+            return super().detector_center_line - 0.5
+        return super().detector_center_line
+
+    @property
+    def detector_center_sample(self):
+        if self.instrument_id == "Near Infrared Camera":
+            return super().detector_center_sample - 0.5
+        return super().detector_center_sample

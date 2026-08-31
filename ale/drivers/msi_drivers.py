@@ -1,17 +1,45 @@
 from ale.base import Driver, WrongInstrumentException
 from ale.base.label_isis import IsisLabel
 from ale.base.data_naif import NaifSpice
-from ale.base.type_distortion import NoDistortion
+from ale.base.type_distortion import RadialDistortion
 from ale.base.type_sensor import Framer
-from ale.base.type_distortion import NoDistortion
 
 from ale import util
 
 
-class MsiIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
+class MsiIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDistortion, Driver):
     """
     Driver for reading Multi-Spectral Image ISIS3 Labels
     """
+
+    @property
+    def odtk(self):
+        """
+        The NEAR MSI camera uses a single-parameter radial distortion model.
+        ISIS (MsiCamera + RadialDistortionMap) computes the undistorted focal
+        plane as undistorted = distorted * (1 + k1 * r^2), where k1 is the
+        INS<ikid>_K1 coefficient from the instrument kernel. The USGSCSM RADIAL
+        model applies undistorted = distorted * (1 - (c0 + c1*r^2 + c2*r^4)), so
+        matching the two models gives coefficients [0, -k1, 0].
+
+        Returns
+        -------
+        : list<float>
+          radial distortion coefficients [0, -k1, 0]
+        """
+        k1 = self.naif_keywords['INS{}_K1'.format(self.ikid)]
+        return [0.0, -k1, 0.0]
+
+    @property
+    def detector_center_line(self):
+        # ISIS detector coordinates are 0.5-based (pixel centers at half integers);
+        # CSM is 0-based. Subtract 0.5, as the LRO, MRO, Dawn, MESSENGER, MEX,
+        # Kaguya, KPLO and Cassini ISS drivers already do.
+        return super().detector_center_line - 0.5
+
+    @property
+    def detector_center_sample(self):
+        return super().detector_center_sample - 0.5
 
     @property
     def instrument_id(self):
