@@ -191,8 +191,8 @@
     "focal_length": 166.85
   },
   "detector_center": {
-    "line": 206.5,
-    "sample": 269.0
+    "line": 206.0,
+    "sample": 268.5
   },
   "focal2pixel_lines": [
     0.0,
@@ -208,7 +208,7 @@
     "radial": {
       "coefficients": [
         0.0,
-        0.0,
+        7e-05,
         0.0
       ]
     }
