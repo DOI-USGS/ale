@@ -128,8 +128,8 @@
     "focal_length": 2003.09
   },
   "detector_center": {
-    "line": 512.5,
-    "sample": 512.5
+    "line": 512.0,
+    "sample": 512.0
   },
   "starting_detector_line": 0,
   "starting_detector_sample": 0,
@@ -147,7 +147,7 @@
     "radial": {
       "coefficients": [
         0.0,
-        0.0,
+        -8e-06,
         0.0
       ]
     }
