@@ -3,11 +3,11 @@ import pyspiceql
 from ale.base import Driver, WrongInstrumentException
 from ale.base.label_isis import IsisLabel
 from ale.base.data_naif import NaifSpice
-from ale.base.type_distortion import NoDistortion
+from ale.base.type_distortion import RadialDistortion
 from ale.base.type_sensor import Framer
 
 
-class ClementineIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistortion, Driver):
+class ClementineIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, RadialDistortion, Driver):
     """
     Driver for reading UUVIS, HIRES, NIR, and LWIR ISIS3 Labels
     """
@@ -134,7 +134,7 @@ class ClementineIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistort
         return super().focal_length
 
     @property
-    def usgscsm_distortion_model(self):
+    def odtk(self):
         """
         The four Clementine cameras use different optical distortion models in
         ISIS. Only the NIR camera is modeled here as a single-parameter radial
@@ -147,12 +147,12 @@ class ClementineIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, NoDistort
 
         Returns
         -------
-        : dict
-          Dictionary containing the usgscsm distortion model
+        : list<float>
+          radial distortion coefficients [0, -k1, 0]
         """
         if self.instrument_id == "Near Infrared Camera":
-            return {"radial": {"coefficients": [0.0, 0.0006364, 0.0]}}
-        return {"radial": {"coefficients": [0.0, 0.0, 0.0]}}
+            return [0.0, 0.0006364, 0.0]
+        return [0.0, 0.0, 0.0]
 
     @property
     def detector_center_line(self):
