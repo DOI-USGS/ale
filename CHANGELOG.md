@@ -46,6 +46,9 @@ release.
   - NAIF-SPICE driver: `focal_length` no longer raises `AttributeError` when `INS_FOCAL_LENGTH` is defined.
   - NAIF-SPICE driver: `ephemeris_start_time` uses the scalar from `utcToEt` (was a tuple). [#739](https://github.com/DOI-USGS/ale/pull/739)
 
+### Changed
+- `isd_generate`: default `--reduction` to `linear` (sampling every 10th line for line-scan images with >= 1000 lines). This avoids creating oversized ISDs (tens of thousands of pose samples) for long line-scan sensors such as LRO NAC, MRO CTX, and HRSC. Pass `--reduction none` to disable reduction and restore per-line sampling.
+
 ## [1.3.0] - 2026-08-25
 
 ### Added
