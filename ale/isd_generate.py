@@ -147,10 +147,11 @@ def main():
         "--reduction",
         type=str.lower,
         choices=['none', 'linear', 'hermite'],
-        default='none',
-        help="Type of reduction to apply to the ephemerides generated in the ISD. If linear is selected, "
-             "a default ephem_sample_rate of 10 will be used. The amount of reduction can be controlled "
-             "by setting --ephem_sample_rate."
+        default='linear',
+        help="Type of reduction to apply to the ephemerides generated in the ISD. "
+             "Defaults to 'linear' (sampling every 10th line for images with >= 1000 lines). "
+             "Pass 'none' to disable reduction. If linear is selected, "
+             "the amount of reduction can be controlled by setting --ephem_sample_rate."
     )
     parser.add_argument(
         "--ephem_sample_rate",

@@ -27,6 +27,28 @@ class TestMain(unittest.TestCase):
             isdg.main()
         self.assertIn("ALESPICEROOT", str(ctx.exception))
 
+    @patch.dict(os.environ, {"ALESPICEROOT": "/some/path"})
+    @patch("ale.isd_generate.file_to_isd")
+    @patch.object(sys, "argv", ["isd_generate", "dummy.cub"])
+    def test_main_default_reduction_is_linear(self, m_file_to_isd):
+        isdg.main()
+        self.assertEqual(m_file_to_isd.call_args.kwargs.get("reduction"), "linear")
+
+    @patch.dict(os.environ, {"ALESPICEROOT": "/some/path"})
+    @patch("ale.isd_generate.file_to_isd")
+    @patch.object(sys, "argv", ["isd_generate", "dummy.cub", "--reduction", "none"])
+    def test_main_reduction_none_override(self, m_file_to_isd):
+        isdg.main()
+        self.assertEqual(m_file_to_isd.call_args.kwargs.get("reduction"), "none")
+
+    @patch.dict(os.environ, {"ALESPICEROOT": "/some/path"})
+    @patch("ale.isd_generate.file_to_isd")
+    @patch.object(sys, "argv", ["isd_generate", "dummy.cub", "--ephem_sample_rate", "5"])
+    def test_main_reduction_custom_sample_rate(self, m_file_to_isd):
+        isdg.main()
+        self.assertEqual(m_file_to_isd.call_args.kwargs.get("reduction"), "linear")
+        self.assertEqual(m_file_to_isd.call_args.kwargs.get("ephem_sample_rate"), 5)
+
 
 class TestFile(unittest.TestCase):
 
