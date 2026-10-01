@@ -294,6 +294,22 @@ class LroLrocNacPds3LabelNaifSpiceDriver(LineScanner, NaifSpice, Pds3Label, Driv
           self._spacecraft_direction = rotated_velocity[0]
         return self._spacecraft_direction
 
+    @property
+    def pixel_size(self):
+        """
+        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+
+        Returns
+        -------
+        : float The size of the CCD pixel in meters
+        """
+        if not hasattr(self, "_pixel_size"):
+            try: 
+                self._pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)][0]
+            except:
+                self._pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]
+        return self._pixel_size
+
 class LroLrocNacIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driver):
     @property
     def instrument_id(self):
@@ -550,6 +566,21 @@ class LroLrocNacIsisLabelNaifSpiceDriver(LineScanner, NaifSpice, IsisLabel, Driv
           self._spacecraft_direction = rotated_velocity[0]
         return self._spacecraft_direction
 
+    @property
+    def pixel_size(self):
+        """
+        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+
+        Returns
+        -------
+        : float The size of the CCD pixel in meters
+        """
+        if not hasattr(self, "_pixel_size"):
+            try: 
+                self._pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)][0]
+            except:
+                self._pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]
+        return self._pixel_size
 
 class LroLrocNacIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, Driver):
     @property
@@ -749,6 +780,22 @@ class LroLrocNacIsisLabelIsisSpiceDriver(LineScanner, IsisSpice, IsisLabel, Driv
         if (self.instrument_id == 'LRO_LROCNACR'):
           return -rotated_velocity[0]
         return rotated_velocity[0]
+
+    @property
+    def pixel_size(self):
+        """
+        Expects ikid to be defined. This must be the integer Naif id code of the instrument
+
+        Returns
+        -------
+        : float The size of the CCD pixel in meters
+        """
+        if not hasattr(self, "_pixel_size"):
+            try: 
+                self._pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)][0]
+            except:
+                self._pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]
+        return self._pixel_size
 
 
 class LroMiniRfIsisLabelNaifSpiceDriver(Radar, NaifSpice, IsisLabel, Driver):

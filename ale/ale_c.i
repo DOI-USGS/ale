@@ -22,20 +22,6 @@
 %}
 
 namespace ale {
-  struct Vec3d {
-    public:
-    double x;
-    double y;
-    double z;
-    Vec3d(const std::vector<double>& vec);
-    Vec3d(double x, double y, double z);
-  };
-
-  class Rotation {
-    Rotation(std::vector<double>& matrix);
-    Rotation(double w, double x, double y, double z);
-  };
-
   enum RotationInterpolation {
     /// Spherical linear interpolation
     SLERP,
@@ -51,6 +37,24 @@ namespace ale {
     /// Interpolate using Lagrange polynomials up to 8th order
     LAGRANGE = 2,
   };
+
+  struct Vec3d {
+    public:
+    double x;
+    double y;
+    double z;
+    Vec3d(const std::vector<double>& vec);
+    Vec3d(double x, double y, double z);
+  };
+
+  class Rotation {
+    public:
+    Rotation(std::vector<double>& matrix);
+    Rotation(double w, double x, double y, double z);
+    std::vector<double> toQuaternion() const;
+    Rotation interpolate(const Rotation& nextRotation, double t, RotationInterpolation interpType) const;
+  };
+
 }
 namespace std {
    %template(IntVector) vector<int>;

@@ -2,6 +2,8 @@
 
 #include "ale/InterpUtils.h"
 
+#include <iostream>
+#include <iomanip>
 #include <cmath>
 
 namespace ale {
@@ -77,6 +79,7 @@ namespace ale {
   }
 
 
+
   std::vector<double> Orientations::getTimes() const {
     return m_times;
   }
@@ -91,6 +94,104 @@ namespace ale {
 
   Rotation Orientations::getConstantRotation() const {
     return m_constRotation;
+  }
+
+  Orientations Orientations::minimizeCache(double tolerance) const {
+    if (m_rotations.size() <= 2) {
+      throw std::invalid_argument("Cache size is 2, cannot minimize.");
+    }
+
+    // find all indices needed to reduce the number of rotations within the appropriate tolerance
+    std::vector<int> indexList = computeIndicies(tolerance);
+
+    // Update m_states and m_ephemTimes to only save the necessary indicies in the index list
+    std::vector<Rotation> tempRotations(indexList.size());
+    std::vector<double> tempTimes(indexList.size(), 0);
+    std::vector<Vec3d> tempAvs(indexList.size());
+
+    int vectorIdx = 0;
+    for(int i : indexList) {
+      tempRotations.at(vectorIdx) = m_rotations.at(i);
+      tempTimes.at(vectorIdx) = m_times.at(i);
+      tempAvs.at(vectorIdx) = m_avs.at(i);
+      vectorIdx++;
+    }
+    return Orientations(tempRotations, tempTimes, tempAvs, m_constRotation, m_constFrames, m_timeDepFrames);
+  }
+
+  std::vector<int> Orientations::computeIndicies(double tolerance) const {
+    int start = 0;
+    int end = m_rotations.size() - 1;
+    int previous_end = end;
+    int j = start + 1;
+    bool fitOk = false;
+    bool binaryFound = false;
+    double angle = 0;
+
+    std::vector<int> indexList = {0};
+
+    while (start < end) {
+      while (!fitOk && start != end) {
+        for (int i = j; i < end; i++) {
+          double frac = (m_times[i] - m_times[start]) / (m_times[end] - m_times[start]);
+
+          Rotation leftRotation = m_rotations[start];
+          Rotation rightRotation = m_rotations[end];
+
+          std::vector<double> lineQuat = m_rotations[i].toQuaternion();
+          std::vector<double> interpQuat = leftRotation.interpolate(rightRotation, frac, SLERP).toQuaternion();
+
+          double w = (lineQuat[0] - interpQuat[0]);
+          double x = (lineQuat[1] - interpQuat[1]);
+          double y = (lineQuat[2] - interpQuat[2]);
+          double z = (lineQuat[3] - interpQuat[3]);
+          double dist2a = w * w + x * x + y * y + z * z;
+
+          w = (lineQuat[0] + interpQuat[0]);
+          x = (lineQuat[1] + interpQuat[1]);
+          y = (lineQuat[2] + interpQuat[2]);
+          z = (lineQuat[3] + interpQuat[3]);
+          double dist2b = w * w + x * x + y * y + z * z;
+
+          double dist2 = std::min(dist2a, dist2b);
+
+          angle = asin(sqrt(dist2) / 2.) * 4.;
+
+          if (angle > tolerance) {
+            break;
+          }
+        }
+        // if we found the bookends of the binary search
+        // start a linear search from the right handside down
+        if ((angle < tolerance) && !binaryFound) {
+          binaryFound = true;
+          end = previous_end;
+        }
+        // if we are linearly searching and have good tolerances
+        // end the search
+        else if ((angle < tolerance) && binaryFound) {
+          fitOk = true;
+        }
+        // Currently binary searching
+        else if (!binaryFound) {
+          previous_end = end;
+          end = int((start + end) / 2);
+        }
+        // If we don't meet the tolerance criteria but are in the linear
+        // search progress the end
+        else if (binaryFound) {
+          end = end - 1;
+        }
+      }
+
+      indexList.push_back(end);
+      fitOk = false;
+      binaryFound = false;
+      start = indexList.back() + 1;
+      end = m_rotations.size() - 1;
+      j = start + 1;
+    }
+    return indexList;
   }
 
   Rotation Orientations::interpolateTimeDepLagrange(double time, int order) const {
