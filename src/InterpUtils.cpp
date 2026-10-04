@@ -97,7 +97,7 @@ namespace ale {
   /** Evaluate velocities using a Cubic Hermite Spline at a time a, within some interval in x, **/
  double evaluateCubicHermiteFirstDeriv(const double interpTime, const std::vector<double>& deriv,
                                        const std::vector<double>& times, const std::vector<double>& y) {
-    if(deriv.size() != times.size()) {
+    if( (deriv.size() != times.size()) || (deriv.size() != y.size()) ) {
        throw std::invalid_argument("EvaluateCubicHermiteFirstDeriv - The size of the first derivative vector does not match the number of (x,y) data points.");
     }
 

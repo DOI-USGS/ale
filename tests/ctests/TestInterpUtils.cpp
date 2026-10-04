@@ -70,10 +70,18 @@ TEST(EvaluateCubicHermiteFirstDeriv, InvalidDervisTimes) {
   EXPECT_THROW(ale::evaluateCubicHermiteFirstDeriv(0.0, derivs, times, y), invalid_argument);
 }
 
+TEST(EvaluateCubicHermiteFirstDeriv, InvalidDerivsY) {
+  std::vector<double> derivs = {5.0, 6.0};
+  std::vector<double> times = {0.0, 1.0};
+  std::vector<double> y = {1.0};
+
+  EXPECT_THROW(ale::evaluateCubicHermiteFirstDeriv(0.0, derivs, times, y), invalid_argument);
+}
+
 TEST(EvaluateCubicHermiteFirstDeriv, InvalidVelocities) {
   std::vector<double> derivs = {5.0, 6.0};
   std::vector<double> times = {1.0, 1.0};
-  std::vector<double> y = {1.0};
+  std::vector<double> y = {1.0, 2.0};
 
   EXPECT_THROW(ale::evaluateCubicHermiteFirstDeriv(0.0, derivs, times, y), invalid_argument);
 }
