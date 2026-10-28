@@ -6,6 +6,7 @@ from concurrent.futures import as_completed
 import json
 import math
 import os
+from collections.abc import Iterable
 
 import numpy as np
 import scipy.constants
@@ -424,7 +425,7 @@ class NaifSpice():
         Returns
         -------
         : float
-          focal length
+          focal length in millimeters
         """
         if not hasattr(self, "_focal_length"):
             self._focal_length = self.naif_keywords['INS{}_FOCAL_LENGTH'.format(self.ikid)]
@@ -440,10 +441,18 @@ class NaifSpice():
         : float The size of the CCD pixel in meters
         """
         if not hasattr(self, "_pixel_size"):
-            try: 
-                self._pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)][0] * 0.001
-            except:
-                self._pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)] * 0.001
+            self._pixel_size = 0
+            if 'INS{}_PIXEL_SIZE'.format(self.ikid) in self.naif_keywords:
+                self._pixel_size = self.naif_keywords['INS{}_PIXEL_SIZE'.format(self.ikid)]
+            elif 'INS{}_PIXEL_PITCH'.format(self.ikid) in self.naif_keywords:
+                self._pixel_size = self.naif_keywords['INS{}_PIXEL_PITCH'.format(self.ikid)]
+            else:
+                raise ValueError("Unable to determine pixel size")
+            
+            if isinstance(self._pixel_size, Iterable):
+                self._pixel_size = self._pixel_size[0]
+            # Convert to meters
+            self._pixel_size *= 0.001
         return self._pixel_size
 
     @property
@@ -677,12 +686,15 @@ class NaifSpice():
 
                 # Compute the altitude based on the radius of the ground coordinate
                 # minus the magnitude of the spacecraft position
-                # pixel_size and focal_length are in meters so convert the altitude
-                # to meters
+                # Make sure all units are in meters when computing the tolerance
+                # Convert the altitude from kilometers to meters
                 altitude = (middle_magnitude - radius) * 1000
+                # Convert focal length from millimeters to meters
+                focal_length = self.focal_length / 1000
+                # pixel_size is alreadu in meters
                 # Compute an approximate instanious resolution for the camera
-                # then make the tolerance 1/100th of that pixel resolution
-                tol = self.pixel_size * altitude / self.focal_length / 100.
+                # then make the tolerance 1/100th of that meters/pixel resolution
+                tol = self.pixel_size * altitude / focal_length / 100.
                 logger.debug(f"Minimizing positions with tolerance {tol}")
 
                 minimized_states = states.minimizeCache(tol)
