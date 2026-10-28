@@ -8,6 +8,7 @@ dependencies:
   - brotli-python
   - cmake>=3.15
   - cxx-compiler <2
+  - doxygen
   - eigen
   - gdal >=3.12.2
   - jupyter
