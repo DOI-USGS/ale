@@ -48,7 +48,7 @@ release.
 
 ### Changed
 - `isd_generate`: default `--reduction` to `linear` (sampling every 10th line for line-scan images with >= 1000 lines). This avoids creating oversized ISDs (tens of thousands of pose samples) for long line-scan sensors such as LRO NAC, MRO CTX, and HRSC. Pass `--reduction none` to disable reduction and restore per-line sampling. [#744](https://github.com/DOI-USGS/ale/pull/744)
-
+- Change the `linear` reduction option to apply to all drivers rather than just drivers built with the `LineScanner` mixin. [#752](https://github.com/DOI-USGS/ale/pull/752)
 ## [1.3.0] - 2026-08-25
 
 ### Added
