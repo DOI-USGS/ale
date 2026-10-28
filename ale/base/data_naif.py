@@ -550,8 +550,9 @@ class NaifSpice():
                 rate = self._props.get('ephem_sample_rate', 10)
                 reduced = self.image_lines // rate + 1
                 # Add check to avoid reducing below 100 samples.
-                if reduced >= 100:
-                    ephem = np.linspace(ephem[0], ephem[-1], reduced)
+                if reduced < 100:
+                    reduced = 100
+                ephem = np.linspace(ephem[0], ephem[-1], reduced)
 
             pos = []
             vel = []
@@ -723,8 +724,9 @@ class NaifSpice():
                 rate = self._props.get('ephem_sample_rate', 10)
                 reduced = self.image_lines // rate + 1
                 # Add check to avoid reducing below 100 samples.
-                if reduced >= 100:
-                    ephemeris_time = np.linspace(ephemeris_time[0], ephemeris_time[-1], reduced)
+                if reduced < 100:
+                    reduced = 100
+                ephemeris_time = np.linspace(ephemeris_time[0], ephemeris_time[-1], reduced)
             self._frame_chain = FrameChain.from_spice(sensor_frame=self.sensor_frame_id,
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
