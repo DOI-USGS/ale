@@ -6,10 +6,12 @@ import networkx as nx
 from networkx.algorithms.shortest_paths.generic import shortest_path
 
 import pyspiceql
+import spiceypy as spice
 
 from ale.rotation import ConstantRotation, TimeDependentRotation
 from ale import util
 from ale import logger
+from ale.ale_c import Orientations, Rotation, Vec3d
 
 def create_rotations(rotation_table):
     """
@@ -109,6 +111,7 @@ class FrameChain(nx.DiGraph):
                                                     ephemeris_times=[], 
                                                     nadir=False, 
                                                     exact_ck_times=False,
+                                                    reduction="none",
                                                     inst_time_bias=0,
                                                     use_web=False, 
                                                     search_kernels=False, 
@@ -156,11 +159,11 @@ class FrameChain(nx.DiGraph):
             futures = [
                 
                 # Add all time dependent frame edges to the graph
-                executor.submit(frame_chain.generate_rotations, sensor_time_dependent_frames, ephemeris_times, inst_time_bias, TimeDependentRotation, sensor_frame, frame_chain, nadir, exact_ck_times, mission),
-                executor.submit(frame_chain.generate_rotations, target_time_dependent_frames, target_times, 0, TimeDependentRotation, sensor_frame, frame_chain, nadir, False, mission),
+                executor.submit(frame_chain.generate_rotations, sensor_time_dependent_frames, ephemeris_times, inst_time_bias, TimeDependentRotation, sensor_frame, nadir, exact_ck_times, reduction, mission),
+                executor.submit(frame_chain.generate_rotations, target_time_dependent_frames, target_times, 0, TimeDependentRotation, sensor_frame, nadir, False, reduction, mission),
                 
                 # Add all constant frames to the graph
-                executor.submit(frame_chain.generate_rotations, constant_frames, [ephemeris_times[0]], 0, ConstantRotation, sensor_frame, frame_chain, nadir, False, mission)
+                executor.submit(frame_chain.generate_rotations, constant_frames, [ephemeris_times[0]], 0, ConstantRotation, sensor_frame, nadir, False, "None", mission)
             ]
             results = [future.result() for future in futures]
 
@@ -269,7 +272,7 @@ class FrameChain(nx.DiGraph):
         return None
 
 
-    def generate_rotations(self, frames, times, time_bias, rotation_type, exact_ck_frame, frame_chain, nadir, exact_ck_times, mission=""):
+    def generate_rotations(self, frames, times, time_bias, rotation_type, exact_ck_frame, nadir, exact_ck_times, reduction="none", mission=""):
         """
         Computes the rotations based on a list of tuples that define the
         relationships between frames as (source, destination) and a list of times to
@@ -287,7 +290,7 @@ class FrameChain(nx.DiGraph):
             times = np.array(times)
         
         start_et = min(times)
-        stop_et = max(times) 
+        stop_et = max(times)
         quats_and_avs_per_frame = []
 
         logger.debug(f"Generate rotation times: {times}")
@@ -327,20 +330,32 @@ class FrameChain(nx.DiGraph):
             quats_and_avs_per_frame = [quats_and_avs[:, 1:] for quats_and_avs in quats_and_avs_per_frame]
 
         for i, frame in enumerate(frames):
+            quat_times = times
             quats_and_avs = quats_and_avs_per_frame[i]
             logger.debug(f"Quats and AVs per frame: {quats_and_avs}")
             quats = np.zeros((len(times), 4))
             avs = []
             _quats = np.asarray(quats_and_avs)[:, 0:4]
+            if (len(quats_and_avs[0]) > 4):
+                avs = np.array(quats_and_avs)[:, 4:]
+
+            if rotation_type == TimeDependentRotation and not exact_ck_times and reduction == 'hermite' and len(_quats) > 3:
+                rotation_vec = [Rotation(i[0], i[1], i[2], i[3]) for i in _quats]
+                av_vec = [Vec3d(i[0], i[1], i[2]) for i in avs]
+                orientations = Orientations(rotation_vec, times, av_vec, Rotation(1, 0, 0, 0), [], [])
+                tolerance = 0.000000017453
+                minimized_orientations = orientations.minimizeCache(tolerance)
+                _quats = np.asarray([rotation.toQuaternion() for rotation in minimized_orientations.getRotations()])
+                quat_times = minimized_orientations.getTimes()
+                quats = np.zeros((len(quat_times), 4))
+                avs = np.asarray([[av.x, av.y, av.z] for av in minimized_orientations.getAngularVelocities()])
+
             logger.debug(f"Quats: {_quats}")
             for j, quat in enumerate(_quats):
                 quats[j,:3] = quat[1:]
                 quats[j, 3] = quat[0]
 
-            if (len(quats_and_avs[0]) > 4):
-                avs = np.array(quats_and_avs)[:, 4:]
-
-            biased_times = [time - time_bias for time in times]
+            biased_times = [time - time_bias for time in quat_times]
             if rotation_type == TimeDependentRotation:
                 logger.debug(f"Time Dependent Quats: {quats}")
                 logger.debug(f"First 10 Biased times: {biased_times[:10]}...")

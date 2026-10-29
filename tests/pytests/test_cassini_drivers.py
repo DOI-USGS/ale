@@ -145,7 +145,7 @@ class test_cassini_iss_pds3_naif(unittest.TestCase):
             assert len(frame_chain.nodes()) == 2
             assert 14082360 in frame_chain.nodes()
             assert -12345 in frame_chain.nodes()
-            from_spice.assert_called_with(center_ephemeris_time=2.4, ephemeris_times=[2.4], sensor_frame=-12345, target_frame=-800, exact_ck_times=True, nadir=False, inst_time_bias=0, mission='cassini', use_web=False, search_kernels=False)
+            from_spice.assert_called_with(center_ephemeris_time=2.4, ephemeris_times=[2.4], sensor_frame=-12345, target_frame=-800, exact_ck_times=True, reduction='none', nadir=False, inst_time_bias=0, mission='cassini', use_web=False, search_kernels=False)
 
     @patch('ale.transformation.FrameChain.from_spice', return_value=ale.transformation.FrameChain())
     def test_custom_frame_chain_iak(self, from_spice):
@@ -156,7 +156,7 @@ class test_cassini_iss_pds3_naif(unittest.TestCase):
             target_frame_id.return_value = -800
             frame_chain = self.driver.frame_chain
             assert len(frame_chain.nodes()) == 0
-            from_spice.assert_called_with(center_ephemeris_time=2.4, ephemeris_times=[2.4], nadir=False, sensor_frame=14082360, target_frame=-800, exact_ck_times=True,  inst_time_bias=0, mission='cassini', use_web=False, search_kernels=False)
+            from_spice.assert_called_with(center_ephemeris_time=2.4, ephemeris_times=[2.4], nadir=False, sensor_frame=14082360, target_frame=-800, exact_ck_times=True, reduction='none', inst_time_bias=0, mission='cassini', use_web=False, search_kernels=False)
 
 # ========= Test cassini ISS isislabel and naifspice driver =========
 class test_cassini_iss_isis_naif(unittest.TestCase):
@@ -235,7 +235,7 @@ class test_cassini_iss_isis_naif(unittest.TestCase):
             assert len(frame_chain.nodes()) == 2
             assert 14082360 in frame_chain.nodes()
             assert -12345 in frame_chain.nodes()
-            from_spice.assert_called_with(center_ephemeris_time=2.4, ephemeris_times=[2.4], sensor_frame=-12345, target_frame=-800, exact_ck_times=True, nadir=False, inst_time_bias=0, mission='cassini', use_web=False, search_kernels=False)
+            from_spice.assert_called_with(center_ephemeris_time=2.4, ephemeris_times=[2.4], sensor_frame=-12345, target_frame=-800, exact_ck_times=True, reduction='none', nadir=False, inst_time_bias=0, mission='cassini', use_web=False, search_kernels=False)
 
     @patch('ale.transformation.FrameChain.from_spice', return_value=ale.transformation.FrameChain())
     def test_custom_frame_chain_iak(self, from_spice):
@@ -248,7 +248,7 @@ class test_cassini_iss_isis_naif(unittest.TestCase):
             target_frame_id.return_value = -800
             frame_chain = self.driver.frame_chain
             assert len(frame_chain.nodes()) == 0
-            from_spice.assert_called_with(center_ephemeris_time=2.4000000000000004, ephemeris_times=[2.4000000000000004], nadir=False, sensor_frame=14082360, target_frame=-800, exact_ck_times=True, inst_time_bias=0, mission='cassini', use_web=False, search_kernels=False)
+            from_spice.assert_called_with(center_ephemeris_time=2.4000000000000004, ephemeris_times=[2.4000000000000004], nadir=False, sensor_frame=14082360, target_frame=-800, exact_ck_times=True, reduction='none', inst_time_bias=0, mission='cassini', use_web=False, search_kernels=False)
 
 # ========= Test cassini ISS pds3label and naifspice driver =========
 class test_cassini_vims_isis_naif(unittest.TestCase):
