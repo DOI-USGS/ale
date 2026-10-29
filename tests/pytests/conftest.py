@@ -60,7 +60,7 @@ def compare_dicts(ldict, rdict):
             differences.extend(compare_dicts(item, rdict[key]))
         elif isinstance(item, np.ndarray) or isinstance(item, list):
             if len(item) != len(rdict[key]):
-                differences.append(f'Array sizes of key {key} are not equal {item} : {rdict[key]}.')
+                differences.append(f'Array sizes of key {key} are not equal {len(item)} : {len(rdict[key])}.')
             else:
                 list_item = np.array(item).flat[0]
                 # quaternion (q) and its additive inverse (qi) yield the same rotation.  Equivalent quaternions should pass
