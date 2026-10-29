@@ -193,7 +193,28 @@ class NaifSpice():
             if self.use_web:
                 self._search_kernels = True
         return self._search_kernels
-                
+
+    @property
+    def reduction(self):
+        """
+        Reduction property that reads a provided reduction method in the properties.
+
+        If no reduction is provided, or an unknown reduction is set reduction 
+        will be set to 'none' (no reduction)
+
+        Returns
+        -------
+        : str
+          The checked and defined reduction
+        """
+        if not hasattr(self, "_reduction"):
+            self._reduction = self._props.get('reduction', 'none').lower()
+            reduction_types = ["linear", "hermite", "none"]
+            if self._reduction not in reduction_types:
+                logger.warning(f"Unknown reduction value {self._reduction}, setting reduction to none")
+                self._reduction = "none"
+        return self._reduction
+
     @property
     def light_time_correction(self):
         """
@@ -545,14 +566,12 @@ class NaifSpice():
             logger.debug("Generating Sensor Positions")            
             ephem = self.ephemeris_time
 
-            reduction = self._props.get('reduction', 'none').lower()
-            if reduction == 'linear' and ephem.size() != 1:
+            if self.reduction == 'linear' and len(ephem) != 1:
                 rate = self._props.get('ephem_sample_rate', 10)
                 reduced = self.image_lines // rate + 1
                 # Add check to avoid reducing below 100 samples.
-                if reduced < 100:
-                    reduced = 100
-                ephem = np.linspace(ephem[0], ephem[-1], reduced)
+                if reduced >= 100:
+                    ephem = np.linspace(ephem[0], ephem[-1], reduced)
 
             pos = []
             vel = []
@@ -661,7 +680,7 @@ class NaifSpice():
             self._velocity = np.asarray(vel)
             self._ephem = ephem
             
-            if reduction == 'hermite' and len(self._position) > 3:
+            if self.reduction == 'hermite' and len(self._position) > 3:
                 logger.debug("Applying hermite reduction to positions")
                 state_list = [ale_c.State(i) for i in np.append(self._position, self._velocity, axis=1)]
                 states = ale_c.StatesFromStateVec(self._ephem, state_list, 1)
@@ -718,15 +737,13 @@ class NaifSpice():
         if not hasattr(self, '_frame_chain'):
             nadir = self._props.get('nadir', False)
             exact_ck_times = self._props.get('exact_ck_times', True)
-            reduction = self._props.get('reduction', 'none').lower()
             ephemeris_time = self.ephemeris_time
-            if reduction == 'linear' and ephem.size() != 1:
+            if self.reduction == 'linear' and len(ephemeris_time) != 1:
                 rate = self._props.get('ephem_sample_rate', 10)
                 reduced = self.image_lines // rate + 1
                 # Add check to avoid reducing below 100 samples.
-                if reduced < 100:
-                    reduced = 100
-                ephemeris_time = np.linspace(ephemeris_time[0], ephemeris_time[-1], reduced)
+                if reduced >= 100:
+                    ephemeris_time = np.linspace(ephemeris_time[0], ephemeris_time[-1], reduced)
             self._frame_chain = FrameChain.from_spice(sensor_frame=self.sensor_frame_id,
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,

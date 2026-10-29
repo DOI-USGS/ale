@@ -85,6 +85,9 @@ class test_data_naif(unittest.TestCase):
     def test_swap_observer_target(self):
         assert not self.driver.swap_observer_target
 
+    def test_reduction(self):
+        assert self.driver.reduction == "none"
+
     def test_light_time_correction(self):
         assert self.driver.light_time_correction == "LT+S"
 

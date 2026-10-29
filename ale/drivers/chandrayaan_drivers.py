@@ -639,7 +639,7 @@ class Chandrayaan2TMC2IsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         return self.original_naif_sensor_frame_id - 10
 
 class Chandrayaan2OHRCIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDistortion, Driver):
-    
+
     @property
     def instrument_id(self):
         """
@@ -726,29 +726,25 @@ class Chandrayaan2OHRCIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice
         return self._ephemeris_stop_time
 
     @property
-    def ephemeris_time(self):
+    def reduction(self):
         """
-        Forces a reduced set of ephemeris data for chandrayaan2 as
-        many of the images are nearly 200K lines long resulting in
-        ISDs that cannot be loaded correctly into the CSM
+        Reduction property override that sets the default reduction to linear.
 
         Returns
         -------
-        : ndarray
-            ephemeris times split based on image lines and ephem_sample_rate passed
-            through props
+        : str
+          The checked and defined reduction
         """
-        if not hasattr(self, "_ephemeris_time"):
-            reduction = self._props.get('reduction', 'none').lower()
-            if (reduction == 'none'):
-                logger.warning("Chandrayaan-2 OHRC: per-line ephemeris ISDs are "
-                               "very large. Defaulting reduction to 'linear'. Pass "
-                               "--reduction linear --ephem_sample_rate N to control "
-                               "the sampling. An explicit --reduction none cannot be "
-                               "respected for this sensor.")
-                self._props['reduction'] = 'linear'
-            self._ephemeris_time = super().ephemeris_time
-        return self._ephemeris_time
+        if not hasattr(self, "_reduction"):
+            self._reduction = super().reduction
+            if self._reduction == "none":
+                self._reduction = "linear"
+            logger.warning("Chandrayaan-2 OHRC: per-line ephemeris ISDs are "
+                           "very large. Defaulting reduction to 'linear'. Pass "
+                           "--reduction linear --ephem_sample_rate N to control "
+                           "the sampling. An explicit --reduction none cannot be "
+                           "respected for this sensor.")
+        return self._reduction
 
     @property
     def detector_center_line(self):
