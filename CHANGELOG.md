@@ -40,6 +40,7 @@ release.
 - The Clementine NIR camera now emits the single-parameter radial optical distortion (k1 = -0.0006364, as in the ISIS `NirCamera` + `RadialDistortionMap`) that ISIS models, and subtracts 0.5 from its detector center to match the ISIS 0.5-based detector-coordinate convention. The resulting CSM camera agrees with the ISIS camera to sub-pixel (cam_test pixel difference drops from ~1.2 px median, ~6 px max to ~1e-7 px on a real Clementine NIR image). The UVVIS, HiRes and LWIR Clementine cameras are unchanged; only NIR is modeled here. [#740](https://github.com/DOI-USGS/ale/pull/740)
 
 ### Fixed
+- `evaluateCubicHermiteFirstDeriv` now checks that `y` has as many points as the derivatives and times, instead of reading past the end of `y`. [#749](https://github.com/DOI-USGS/ale/pull/749)
 - Cassini ISS drivers now produce a CSM camera that matches ISIS (ASP cam_test on a NAC image shows the ISIS-SPICE, NAIF-SPICE and PDS3 drivers agree with ISIS to ~5e-4 px). Fixes:
   - ISIS-SPICE driver: emit the radial optical distortion (was none).
   - ISIS-SPICE and NAIF-SPICE drivers: subtract 0.5 from the detector center (ISIS 0.5-based to CSM 0-based).
