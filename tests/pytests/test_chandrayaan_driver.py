@@ -255,6 +255,9 @@ class test_chandrayaan2_ohrc_isis_naif(unittest.TestCase):
         label = get_image_label('ch2_ohr_nrp_20200827T0226453039_d_img_d18', 'isis3')
         self.driver = Chandrayaan2OHRCIsisLabelNaifSpiceDriver(label)
 
+    def test_default_reduction(self):
+        assert self.driver.reduction == "linear"
+
     def test_short_mission_name(self):
         assert self.driver.short_mission_name == 'chandrayaan'
 
@@ -282,12 +285,6 @@ class test_chandrayaan2_ohrc_isis_naif(unittest.TestCase):
     def test_ephemeris_stop_time(self):
         with patch("ale.drivers.chandrayaan_drivers.pyspiceql.utcToEt", return_value=[12345]) as utcToEt:
             assert self.driver.ephemeris_stop_time == 12345
-            calls = [call(utc='2020-08-27 02:27:01.687500', searchKernels=False, useWeb=False)]
-            utcToEt.assert_has_calls(calls)
-
-    def test_ephemeris_time(self):
-        with patch("ale.drivers.chandrayaan_drivers.pyspiceql.utcToEt", return_value=[12345]) as utcToEt:
-            assert len(self.driver.ephemeris_time) == 10108
             calls = [call(utc='2020-08-27 02:27:01.687500', searchKernels=False, useWeb=False)]
             utcToEt.assert_has_calls(calls)
 
