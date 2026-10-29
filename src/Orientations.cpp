@@ -101,19 +101,23 @@ namespace ale {
       throw std::invalid_argument("Cache size is 2, cannot minimize.");
     }
 
+    bool hasAvs = !m_avs.empty();
+
     // find all indices needed to reduce the number of rotations within the appropriate tolerance
     std::vector<int> indexList = computeIndicies(tolerance);
 
     // Update m_states and m_ephemTimes to only save the necessary indicies in the index list
     std::vector<Rotation> tempRotations(indexList.size());
     std::vector<double> tempTimes(indexList.size(), 0);
-    std::vector<Vec3d> tempAvs(indexList.size());
+    std::vector<Vec3d> tempAvs(hasAvs ? indexList.size() : 0);
 
     int vectorIdx = 0;
     for(int i : indexList) {
       tempRotations.at(vectorIdx) = m_rotations.at(i);
       tempTimes.at(vectorIdx) = m_times.at(i);
-      tempAvs.at(vectorIdx) = m_avs.at(i);
+      if (hasAvs) {
+        tempAvs.at(vectorIdx) = m_avs.at(i);
+      }
       vectorIdx++;
     }
     return Orientations(tempRotations, tempTimes, tempAvs, m_constRotation, m_constFrames, m_timeDepFrames);
