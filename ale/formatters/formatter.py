@@ -5,6 +5,7 @@ import json
 import logging
 
 from ale.base.type_sensor import LineScanner, Framer, Radar, PushFrame
+from ale.base import InvalidISDError
 from ale import logger
 
 def to_isd(driver):
@@ -23,6 +24,17 @@ def to_isd(driver):
     """
      
     driver_data = driver.to_dict()
+
+    # driver.to_dict() returns None for any property whose computation raised
+    # (for example a failed SPICE/SpiceQL query). These are required for any
+    # CSM model, and accepting them as null writes a broken ISD that fails only
+    # later, opaquely, in usgscsm. Fail here instead, naming the null fields.
+    required = ['frame_chain', 'sensor_position', 'sun_position']
+    null_fields = [k for k in required if driver_data.get(k) is None]
+    if null_fields:
+        raise InvalidISDError("Could not generate a valid ISD. Required field(s) "
+                              "are null: " + ", ".join(null_fields))
+
     if logger.isEnabledFor(logging.DEBUG):
         for k, v in driver_data.items():
             if isinstance(v, list):
@@ -171,12 +183,12 @@ def to_isd(driver):
         isd['starting_detector_sample'] = driver_data["detector_start_sample"]
 
         # these interior-orientation fields are required for any CSM model
-        required = ['focal_length', 'detector_center_line', 'detector_center_sample',
-                    'focal2pixel_lines', 'focal2pixel_samples']
-        null_fields = [k for k in required if driver_data.get(k) is None]
-        if null_fields:
-            raise RuntimeError("Could not generate a valid ISD. Required field(s) "
-                               "are null: " + ", ".join(null_fields))
+        io_required = ['focal_length', 'detector_center_line', 'detector_center_sample',
+                       'focal2pixel_lines', 'focal2pixel_samples']
+        io_null = [k for k in io_required if driver_data.get(k) is None]
+        if io_null:
+            raise InvalidISDError("Could not generate a valid ISD. Required field(s) "
+                                  "are null: " + ", ".join(io_null))
 
     j2000_rotation = frame_chain.compute_rotation(target_frame, J2000)
 

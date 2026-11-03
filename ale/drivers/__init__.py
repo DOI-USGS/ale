@@ -11,7 +11,7 @@ import numpy as np
 import os
 import os.path
 import traceback
-from ale.base import WrongInstrumentException, WrongLabelTypeException
+from ale.base import WrongInstrumentException, WrongLabelTypeException, InvalidISDError
 import logging
 
 from ale.formatters.formatter import to_isd
@@ -220,6 +220,10 @@ def load_from_label(label, props={}, formatter='ale', verbose=False, only_isis_s
         except WrongInstrumentException as e:
             if verbose:
                 logger.info(f"Wrong instrument id for driver {driver.__class__.__name__}: {e}. Skipping driver.")
+        except InvalidISDError:
+            # the driver matched the label but produced an invalid ISD, so do
+            # not retry other drivers, surface the real error to the user
+            raise
         except Exception as e:
             if verbose:
                 traceback.print_exc()
