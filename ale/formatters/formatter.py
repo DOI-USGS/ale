@@ -24,17 +24,6 @@ def to_isd(driver):
     """
      
     driver_data = driver.to_dict()
-
-    # driver.to_dict() returns None for any property whose computation raised
-    # (for example a failed SPICE/SpiceQL query). These are required for any
-    # CSM model, and accepting them as null writes a broken ISD that fails only
-    # later, opaquely, in usgscsm. Fail here instead, naming the null fields.
-    required = ['frame_chain', 'sensor_position', 'sun_position']
-    null_fields = [k for k in required if driver_data.get(k) is None]
-    if null_fields:
-        raise InvalidISDError("Could not generate a valid ISD. Required field(s) "
-                              "are null: " + ", ".join(null_fields))
-
     if logger.isEnabledFor(logging.DEBUG):
         for k, v in driver_data.items():
             if isinstance(v, list):
