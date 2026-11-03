@@ -46,7 +46,7 @@ release.
   - ISIS-SPICE and NAIF-SPICE drivers: subtract 0.5 from the detector center (ISIS 0.5-based to CSM 0-based).
   - NAIF-SPICE driver: `focal_length` no longer raises `AttributeError` when `INS_FOCAL_LENGTH` is defined.
   - NAIF-SPICE driver: `ephemeris_start_time` uses the scalar from `utcToEt` (was a tuple). [#739](https://github.com/DOI-USGS/ale/pull/739)
-- `isd_generate` now raises instead of writing an ISD with null interior-orientation fields (`focal_length`, `detector_center`, `focal2pixel_lines`, `focal2pixel_samples`). SpiceQL can return these as null (for example when a web query fails), and accepting them silently produces a camera that crashes or behaves undefined downstream in usgscsm, such as an empty focal2pixel transform or a zero focal length. [#750](https://github.com/DOI-USGS/ale/pull/750)
+- `isd_generate` now raises instead of writing an ISD with null interior-orientation fields (`focal_length`, `detector_center`, `focal2pixel_lines`, `focal2pixel_samples`). SpiceQL can return these as null (for example when a web query fails), and accepting them silently produces a camera that crashes or behaves undefined downstream in usgscsm, such as an empty focal2pixel transform or a zero focal length. [#754](https://github.com/DOI-USGS/ale/pull/754)
 
 ### Changed
 - `isd_generate`: default `--reduction` to `linear` (sampling every 10th line for line-scan images with >= 1000 lines). This avoids creating oversized ISDs (tens of thousands of pose samples) for long line-scan sensors such as LRO NAC, MRO CTX, and HRSC. Pass `--reduction none` to disable reduction and restore per-line sampling. [#744](https://github.com/DOI-USGS/ale/pull/744)
