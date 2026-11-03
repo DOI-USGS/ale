@@ -92,23 +92,22 @@ conda activate ale
 
 
 ### Building ALE
-After you've set up and activated your conda environment, you may then build ALE. Inside
-of a cloned fork of the repository, follow these steps:
-
-```bash
-python setup.py install
-cd build
-cmake ..
-make
-```
-
 Keep in mind that you will need to clone the repository with the `--recursive` flag in order to
 retrieve the gtest submodule for testing. If you have already cloned without the `--recursive` flag,
-running the following command will retrieve the gtest submodule manually:
+running the following command inside of a cloned fork of the repository will retrieve the gtest submodule manually:
 ```bash
 git submodule update --init --recursive
 ```
 
+After you've set up and activated your conda environment and cloned the necessary repos, you may then build ALE. Inside
+of a cloned fork of the repository, follow these steps:
+
+```bash
+python setup.py build build_ext -b ./ install 
+cd build
+cmake .. -DALE_BUILD_DOCS=OFF
+make
+```
 
 ## Adding ALE as a dependency
 
@@ -125,4 +124,4 @@ target_link_libraries(my_library ale::ale)
 
 To test the c++ part of ALE, run `ctest` from the build directory. 
 
-To test the python part of ALE, run `pytest tests/pytests`
+To test the python part of ALE, run `pytest tests/pytests` from the root of the repository.
