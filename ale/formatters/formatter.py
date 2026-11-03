@@ -170,6 +170,14 @@ def to_isd(driver):
         isd['starting_detector_line'] = driver_data["detector_start_line"]
         isd['starting_detector_sample'] = driver_data["detector_start_sample"]
 
+        # these interior-orientation fields are required for any CSM model
+        required = ['focal_length', 'detector_center_line', 'detector_center_sample',
+                    'focal2pixel_lines', 'focal2pixel_samples']
+        null_fields = [k for k in required if driver_data.get(k) is None]
+        if null_fields:
+            raise RuntimeError("Could not generate a valid ISD. Required field(s) "
+                               "are null: " + ", ".join(null_fields))
+
     j2000_rotation = frame_chain.compute_rotation(target_frame, J2000)
 
     instrument_position = {}
