@@ -72,6 +72,57 @@ class MessengerMdisIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDist
             raise WrongInstrumentException(f"Unknown instrument id: {key}.")
         return ID_LOOKUP[key]
 
+    @property
+    def odtx(self):
+        """
+        Returns the x coefficient for the Taylor series optical distortion model.
+
+        Returns
+        -------
+        : list
+          10 Taylor series x coefficients
+        """
+        if not hasattr(self, "_odtx"):
+            odtx = self.naif_keywords['INS{}_OD_T_X'.format(self.ikid)]
+            if not isinstance(odtx, list):
+                odtx = [odtx]
+            self._odtx = odtx
+        return self._odtx
+
+    @property
+    def odty(self):
+        """
+        Returns the y coefficient for the Taylor series optical distortion model.
+
+        Returns
+        -------
+        : list
+          10 Taylor series y coefficients
+        """
+        if not hasattr(self, "_odty"):
+            odty = self.naif_keywords['INS{}_OD_T_Y'.format(self.ikid)]
+            if not isinstance(odty, list):
+                odty = [odty]
+            self._odty = odty
+        return self._odty
+
+    @property
+    def usgscsm_distortion_model(self):
+        """
+        Returns the USGSCSM transverse distortion model for MESSENGER MDIS.
+
+        Returns
+        -------
+        : dict
+          USGSCSM transverse distortion specification
+        """
+        return {
+            "transverse": {
+                "x": self.odtx,
+                "y": self.odty
+            }
+        }
+
 class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortion, Driver):
     """
     Driver for reading MDIS PDS3 labels. Requires a Spice mixin to acquire additional
