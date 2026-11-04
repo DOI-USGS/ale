@@ -72,6 +72,23 @@ class MessengerMdisIsisLabelIsisSpiceDriver(Framer, IsisLabel, IsisSpice, NoDist
             raise WrongInstrumentException(f"Unknown instrument id: {key}.")
         return ID_LOOKUP[key]
 
+    @property
+    def usgscsm_distortion_model(self):
+        """
+        Returns the USGSCSM transverse distortion model for MESSENGER MDIS.
+
+        Returns
+        -------
+        : dict
+          USGSCSM transverse distortion specification
+        """
+        return {
+            "transverse": {
+                "x": self.odtx,
+                "y": self.odty
+            }
+        }
+
 class MessengerMdisPds3NaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortion, Driver):
     """
     Driver for reading MDIS PDS3 labels. Requires a Spice mixin to acquire additional
