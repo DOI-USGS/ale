@@ -103,11 +103,23 @@ After you've set up and activated your conda environment and cloned the necessar
 of a cloned fork of the repository, follow these steps:
 
 ```bash
-python setup.py build build_ext -b ./ install 
-cd build
-cmake .. -DALE_BUILD_DOCS=OFF
-make
+python setup.py build_ext install 
 ```
+
+This will create a build directory containing the built `ale` python package under something like `build/lib.macosx-11.0-arm64-cpython-314`. 
+The full folder name will likely look different depending on what system the package was built by. You can check that everything 
+is installed under `$CONDA_PREFIX/lib/python3.14/site-packages/ale/`, you're python version may differ.
+
+Now we can build and install the C++ library. If you are just working on the python side of ALE you can skip the next 
+steps:
+
+```bash
+cd build
+cmake .. -DALE_BUILD_DOCS=OFF -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX
+make install
+```
+
+The C++ library should be installed under `$CONDA_PREFIX/lib/` as `libale`.
 
 ## Adding ALE as a dependency
 
