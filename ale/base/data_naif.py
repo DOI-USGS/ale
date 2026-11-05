@@ -23,6 +23,32 @@ from ale import spice_root
 from ale import util
 from ale import ale_c
 
+def reduce_ephem(ephem_times, sample_rate, minimum=101):
+    """
+    Stand alone function to linearly reduce ephemeris times
+
+    Parameters
+    ----------
+    ephem_times : list
+        A list of ephemeris times to reduce over
+
+    sample_rate : int
+        The rate of sampling between the first and last time in
+        ephem_times
+
+    minimum : int
+        The minimum number of ephemeris times to not reduce
+        below
+    """
+    reduced = len(ephem_times) // sample_rate + 1
+    # Add check to avoid reducing below the minimum
+    if reduced < minimum:
+        logger.warning(f"Requested sampling of {sample_rate} would reduce total samples ({reduced}) below {minimum}. "
+                       f"Setting minimum sample size to {minimum}")
+        reduced = minimum
+    reduced_times = np.linspace(ephem_times[0], ephem_times[-1], reduced)
+    return reduced_times
+
 class NaifSpice():
     """
     Mix-in for reading data from NAIF SPICE Kernels.
@@ -193,7 +219,28 @@ class NaifSpice():
             if self.use_web:
                 self._search_kernels = True
         return self._search_kernels
-                
+
+    @property
+    def reduction(self):
+        """
+        Reduction property that reads a provided reduction method in the properties.
+
+        If no reduction is provided, or an unknown reduction is set reduction 
+        will be set to 'none' (no reduction)
+
+        Returns
+        -------
+        : str
+          The checked and defined reduction
+        """
+        if not hasattr(self, "_reduction"):
+            self._reduction = self._props.get('reduction', 'none').lower()
+            reduction_types = ["linear", "hermite", "none"]
+            if self._reduction not in reduction_types:
+                logger.warning(f"Unknown reduction value {self._reduction}, setting reduction to none")
+                self._reduction = "none"
+        return self._reduction
+
     @property
     def light_time_correction(self):
         """
@@ -543,7 +590,10 @@ class NaifSpice():
            not hasattr(self, '_velocity') or \
            not hasattr(self, '_ephem'):
             logger.debug("Generating Sensor Positions")            
+            rate = self._props.get('ephem_sample_rate', 10)
             ephem = self.ephemeris_time
+            if self.reduction == 'linear' and len(ephem) != 1:
+                ephemeris_time = reduce_ephem(ephem, rate)
 
             pos = []
             vel = []
@@ -652,8 +702,7 @@ class NaifSpice():
             self._velocity = np.asarray(vel)
             self._ephem = ephem
             
-            reduction = self._props.get('reduction', 'none').lower()
-            if reduction == 'hermite' and len(self._position) > 3:
+            if self.reduction == 'hermite' and len(self._position) > 3:
                 logger.debug("Applying hermite reduction to positions")
                 state_list = [ale_c.State(i) for i in np.append(self._position, self._velocity, axis=1)]
                 states = ale_c.StatesFromStateVec(self._ephem, state_list, 1)
@@ -710,13 +759,16 @@ class NaifSpice():
         if not hasattr(self, '_frame_chain'):
             nadir = self._props.get('nadir', False)
             exact_ck_times = self._props.get('exact_ck_times', True)
-            reduction = self._props.get('reduction', 'none').lower()
+            rate = self._props.get('ephem_sample_rate', 10)
+            ephemeris_time = self.ephemeris_time
+            if self.reduction == 'linear' and len(ephemeris_time) != 1:
+                ephemeris_time = reduce_ephem(ephemeris_time, rate)
             self._frame_chain = FrameChain.from_spice(sensor_frame=self.sensor_frame_id,
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
-                                                      ephemeris_times=self.ephemeris_time,
+                                                      ephemeris_times=ephemeris_time,
                                                       nadir=nadir, exact_ck_times=exact_ck_times,
-                                                      reduction=reduction,
+                                                      reduction=self.reduction,
                                                       inst_time_bias=self.instrument_time_bias,
                                                       mission=self.spiceql_mission,
                                                       use_web=self.use_web,
