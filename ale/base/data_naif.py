@@ -681,7 +681,7 @@ class NaifSpice():
                 # to meters
                 altitude = (middle_magnitude - radius) * 1000
                 # Compute an approximate instanious resolution for the camera
-                # then make the tolerance 1/100th of that pixel resolution
+                # then make the tolerance 1/100th of that meters/pixel resolution
                 tol = self.pixel_size * altitude / self.focal_length / 100.
                 logger.debug(f"Minimizing positions with tolerance {tol}")
 
@@ -710,11 +710,13 @@ class NaifSpice():
         if not hasattr(self, '_frame_chain'):
             nadir = self._props.get('nadir', False)
             exact_ck_times = self._props.get('exact_ck_times', True)
+            reduction = self._props.get('reduction', 'none').lower()
             self._frame_chain = FrameChain.from_spice(sensor_frame=self.sensor_frame_id,
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
                                                       ephemeris_times=self.ephemeris_time,
                                                       nadir=nadir, exact_ck_times=exact_ck_times,
+                                                      reduction=reduction,
                                                       inst_time_bias=self.instrument_time_bias,
                                                       mission=self.spiceql_mission,
                                                       use_web=self.use_web,

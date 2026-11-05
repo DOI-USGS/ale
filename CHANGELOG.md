@@ -38,6 +38,7 @@ release.
 ### Added
 - The NEAR MSI driver now emits the single-parameter radial optical distortion (from the `INS<ikid>_K1` coefficient) that ISIS models, and subtracts 0.5 from the detector center to match the ISIS 0.5-based detector-coordinate convention. The resulting CSM camera agrees with the ISIS camera to sub-pixel (cam_test pixel difference drops from ~0.7 px to ~1e-8 px on a real NEAR MSI image). [#740](https://github.com/DOI-USGS/ale/pull/740)
 - The Clementine NIR camera now emits the single-parameter radial optical distortion (k1 = -0.0006364, as in the ISIS `NirCamera` + `RadialDistortionMap`) that ISIS models, and subtracts 0.5 from its detector center to match the ISIS 0.5-based detector-coordinate convention. The resulting CSM camera agrees with the ISIS camera to sub-pixel (cam_test pixel difference drops from ~1.2 px median, ~6 px max to ~1e-7 px on a real Clementine NIR image). The UVVIS, HiRes and LWIR Clementine cameras are unchanged; only NIR is modeled here. [#740](https://github.com/DOI-USGS/ale/pull/740)
+- Quaternion reduction based on the naif spice fortran routine `ck3sdn`. This uses a tolerance to reduce the number of quaternions for ISDs that don't extract the exact CK times from the kernels. [#747](https://github.com/DOI-USGS/ale/pull/747)
 
 ### Fixed
 - Fixed MEX HRSC SRC detector center to match latest IAK. [#753](https://github.com/DOI-USGS/ale/pull/753)

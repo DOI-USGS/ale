@@ -64,6 +64,10 @@ namespace ale {
      */
     Rotation getConstantRotation() const;
 
+    Orientations minimizeCache(double tolerance) const;
+
+    std::vector<int> computeIndicies(double tolerance) const;
+
     /**
      * Get the time dependent component of the interpolated rotation at a specific time.
      *

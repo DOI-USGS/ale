@@ -613,11 +613,13 @@ class Cahvor():
         """
         if not hasattr(self, '_frame_chain'):
             nadir = self._props.get("nadir", False)
+            reduction = self._props.get('reduction', 'none').lower()
             self._frame_chain = FrameChain.from_spice(sensor_frame=self.final_inst_frame,
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
                                                       ephemeris_times=self.ephemeris_time,
                                                       nadir=nadir, exact_ck_times=False,
+                                                      reduction=reduction,
                                                       mission=self.spiceql_mission,
                                                       use_web=self.use_web,
                                                       search_kernels=self.search_kernels)
