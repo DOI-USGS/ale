@@ -23,17 +23,31 @@ from ale import spice_root
 from ale import util
 from ale import ale_c
 
-def reduce_ephem(ephem_times, sample_rate):
+def reduce_ephem(ephem_times, sample_rate, minimum=101):
     """
     Stand alone function to linearly reduce ephemeris times
+
+    Parameters
+    ----------
+    ephem_times : list
+        A list of ephemeris times to reduce over
+
+    sample_rate : int
+        The rate of sampling between the first and last time in
+        ephem_times
+
+    minimum : int
+        The minimum number of ephemeris times to not reduce
+        below
     """
     reduced = len(ephem_times) // sample_rate + 1
-    # Add check to avoid reducing below 100 samples.
-    if reduced >= 100:
-        reduced_times = np.linspace(ephem_times[0], ephem_times[-1], reduced)
-        return reduced_times
-
-    return ephem_times
+    # Add check to avoid reducing below the minimum
+    if reduced < minimum:
+        logger.warning(f"Requested sampling of {sample_rate} would reduce total samples ({reduced}) below {minimum}. "
+                       f"Setting minimum sample size to {minimum}")
+        reduced = minimum
+    reduced_times = np.linspace(ephem_times[0], ephem_times[-1], reduced)
+    return reduced_times
 
 class NaifSpice():
     """
