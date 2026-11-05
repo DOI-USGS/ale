@@ -48,7 +48,9 @@ release.
   - ISIS-SPICE and NAIF-SPICE drivers: subtract 0.5 from the detector center (ISIS 0.5-based to CSM 0-based).
   - NAIF-SPICE driver: `focal_length` no longer raises `AttributeError` when `INS_FOCAL_LENGTH` is defined.
   - NAIF-SPICE driver: `ephemeris_start_time` uses the scalar from `utcToEt` (was a tuple). [#739](https://github.com/DOI-USGS/ale/pull/739)
+- `isd_generate` now fails with an error instead of writing an ISD with null required fields. [#754](https://github.com/DOI-USGS/ale/pull/754)
 - Fixed kernel quality check to allow quality keys from different missions [#758](https://github.com/DOI-USGS/ale/pull/758)
+
 
 ### Changed
 - `isd_generate`: default `--reduction` to `linear` (sampling every 10th line for line-scan images with >= 1000 lines). This avoids creating oversized ISDs (tens of thousands of pose samples) for long line-scan sensors such as LRO NAC, MRO CTX, and HRSC. Pass `--reduction none` to disable reduction and restore per-line sampling. [#744](https://github.com/DOI-USGS/ale/pull/744)
