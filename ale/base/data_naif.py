@@ -23,6 +23,18 @@ from ale import spice_root
 from ale import util
 from ale import ale_c
 
+def reduce_ephem(ephem_times, sample_rate):
+    """
+    Stand alone function to linearly reduce ephemeris times
+    """
+    reduced = len(ephem_times) // sample_rate + 1
+    # Add check to avoid reducing below 100 samples.
+    if reduced >= 100:
+        reduced_times = np.linspace(ephem_times[0], ephem_times[-1], reduced)
+        return reduced_times
+
+    return ephem_times
+
 class NaifSpice():
     """
     Mix-in for reading data from NAIF SPICE Kernels.
@@ -564,14 +576,10 @@ class NaifSpice():
            not hasattr(self, '_velocity') or \
            not hasattr(self, '_ephem'):
             logger.debug("Generating Sensor Positions")            
+            rate = self._props.get('ephem_sample_rate', 10)
             ephem = self.ephemeris_time
-
             if self.reduction == 'linear' and len(ephem) != 1:
-                rate = self._props.get('ephem_sample_rate', 10)
-                reduced = self.image_lines // rate + 1
-                # Add check to avoid reducing below 100 samples.
-                if reduced >= 100:
-                    ephem = np.linspace(ephem[0], ephem[-1], reduced)
+                ephemeris_time = reduce_ephem(ephem, rate)
 
             pos = []
             vel = []
@@ -737,19 +745,16 @@ class NaifSpice():
         if not hasattr(self, '_frame_chain'):
             nadir = self._props.get('nadir', False)
             exact_ck_times = self._props.get('exact_ck_times', True)
+            rate = self._props.get('ephem_sample_rate', 10)
             ephemeris_time = self.ephemeris_time
             if self.reduction == 'linear' and len(ephemeris_time) != 1:
-                rate = self._props.get('ephem_sample_rate', 10)
-                reduced = self.image_lines // rate + 1
-                # Add check to avoid reducing below 100 samples.
-                if reduced >= 100:
-                    ephemeris_time = np.linspace(ephemeris_time[0], ephemeris_time[-1], reduced)
+                ephemeris_time = reduce_ephem(ephemeris_time, rate)
             self._frame_chain = FrameChain.from_spice(sensor_frame=self.sensor_frame_id,
                                                       target_frame=self.target_frame_id,
                                                       center_ephemeris_time=self.center_ephemeris_time,
-                                                      ephemeris_times=self.ephemeris_time,
+                                                      ephemeris_times=ephemeris_time,
                                                       nadir=nadir, exact_ck_times=exact_ck_times,
-                                                      reduction=reduction,
+                                                      reduction=self.reduction,
                                                       inst_time_bias=self.instrument_time_bias,
                                                       mission=self.spiceql_mission,
                                                       use_web=self.use_web,
