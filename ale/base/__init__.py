@@ -12,6 +12,14 @@ class WrongLabelTypeException(Exception):
     """
     pass
 
+class InvalidISDError(Exception):
+    """
+    Exception raised when a driver matches the label but the generated ISD is
+    invalid, for example a required field is null. Unlike a wrong-driver
+    exception, this is not retried against other drivers.
+    """
+    pass
+
 
 spiceql_mission_map = {
     "APOLLO_METRIC" : "apollo15_metric", 

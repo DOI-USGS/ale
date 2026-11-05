@@ -41,12 +41,17 @@ release.
 
 ### Fixed
 - The installed CMake package config now finds its nlohmann_json dependency, so `find_package(ale)` works without a prior `find_package(nlohmann_json)`. [#748](https://github.com/DOI-USGS/ale/pull/748)
+- Fixed MEX HRSC SRC detector center to match latest IAK. [#753](https://github.com/DOI-USGS/ale/pull/753)
+- Fixed Messenger MDIS to include Taylor distortion to match ISIS' implementation. [#757](https://github.com/DOI-USGS/ale/pull/757)
 - `evaluateCubicHermiteFirstDeriv` now checks that `y` has as many points as the derivatives and times, instead of reading past the end of `y`. [#749](https://github.com/DOI-USGS/ale/pull/749)
 - Cassini ISS drivers now produce a CSM camera that matches ISIS (ASP cam_test on a NAC image shows the ISIS-SPICE, NAIF-SPICE and PDS3 drivers agree with ISIS to ~5e-4 px). Fixes:
   - ISIS-SPICE driver: emit the radial optical distortion (was none).
   - ISIS-SPICE and NAIF-SPICE drivers: subtract 0.5 from the detector center (ISIS 0.5-based to CSM 0-based).
   - NAIF-SPICE driver: `focal_length` no longer raises `AttributeError` when `INS_FOCAL_LENGTH` is defined.
   - NAIF-SPICE driver: `ephemeris_start_time` uses the scalar from `utcToEt` (was a tuple). [#739](https://github.com/DOI-USGS/ale/pull/739)
+- `isd_generate` now fails with an error instead of writing an ISD with null required fields. [#754](https://github.com/DOI-USGS/ale/pull/754)
+- Fixed kernel quality check to allow quality keys from different missions [#758](https://github.com/DOI-USGS/ale/pull/758)
+
 
 ### Changed
 - `isd_generate`: default `--reduction` to `linear` (sampling every 10th line for line-scan images with >= 1000 lines). This avoids creating oversized ISDs (tens of thousands of pose samples) for long line-scan sensors such as LRO NAC, MRO CTX, and HRSC. Pass `--reduction none` to disable reduction and restore per-line sampling. [#744](https://github.com/DOI-USGS/ale/pull/744)

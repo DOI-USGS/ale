@@ -748,8 +748,8 @@ class MexHrscIsisLabelNaifSpiceDriver(LineScanner, IsisLabel, NaifSpice, NoDisto
 
 SRC_FOCAL2PIXEL = {"lines": [0.0, 0.0, 111.111111111111],
                    "samples": [0.0, 111.111111111111, 0.0]}
-SRC_DETECTOR_CENTER = {"line": 512.0,
-                       "sample": 512.0}
+SRC_DETECTOR_CENTER = {"line": 512.5,
+                       "sample": 512.5}
 
 class MexSrcPds3LabelNaifSpiceDriver(Framer, Pds3Label, NaifSpice, NoDistortion, Driver):
     """

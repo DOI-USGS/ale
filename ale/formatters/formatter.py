@@ -5,6 +5,7 @@ import json
 import logging
 
 from ale.base.type_sensor import LineScanner, Framer, Radar, PushFrame
+from ale.base import InvalidISDError
 from ale import logger
 
 def to_isd(driver):
@@ -170,6 +171,14 @@ def to_isd(driver):
         isd['starting_detector_line'] = driver_data["detector_start_line"]
         isd['starting_detector_sample'] = driver_data["detector_start_sample"]
 
+        # these interior-orientation fields are required for any CSM model
+        io_required = ['focal_length', 'detector_center_line', 'detector_center_sample',
+                       'focal2pixel_lines', 'focal2pixel_samples']
+        io_null = [k for k in io_required if driver_data.get(k) is None]
+        if io_null:
+            raise InvalidISDError("Could not generate a valid ISD. Required field(s) "
+                                  "are null: " + ", ".join(io_null))
+
     j2000_rotation = frame_chain.compute_rotation(target_frame, J2000)
 
     instrument_position = {}
@@ -218,13 +227,15 @@ def to_isd(driver):
     if 'kernels' in driver_data and isinstance(driver.kernels, dict):
         for k,v in driver.kernels.items():
             # check that the keys are valid kernel types or quality types
-            if k not in ["ck", "spk", "tspk", "fk", "ik", "iak", "pck", "lsk", "sclk", "misc", driver.spiceql_mission+"_spk_quality", driver.spiceql_mission+"_ck_quality"]:
+            # accept any <mission>_spk_quality / <mission>_ck_quality key.
+            is_quality_key = k.endswith("_spk_quality") or k.endswith("_ck_quality")
+            if k not in ["ck", "spk", "tspk", "fk", "ik", "iak", "pck", "lsk", "sclk", "misc"] and not is_quality_key:
                 raise ValueError(f"Kernels key [{k}] is not valid.")
             if k in ["ck", "spk", "tspk", "fk", "ik", "iak", "pck", "lsk", "sclk", "misc"]:
                 if not isinstance(v, list):
                     raise ValueError(f"Kernel [{k}] must be set to a list of kernels.")
                 isd["kernels"] = driver.kernels
-            elif k in [driver.spiceql_mission+"_spk_quality", driver.spiceql_mission+"_ck_quality"]:
+            elif is_quality_key:
                 if not isinstance(v, str):
                     raise ValueError(f"Kernel quality type [{k}] must be set to a string.")
         isd["kernels"] = driver.kernels #{k: v for k, v in driver.kernels.items() if not "_quality" in k and not driver.spiceql_mission in k }

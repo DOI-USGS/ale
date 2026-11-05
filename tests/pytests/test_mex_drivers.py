@@ -318,10 +318,10 @@ class test_mex_src_pds3_naif(unittest.TestCase):
                                            [0.0, 111.1111111, 0.0])
 
     def test_detector_center_line(self):
-        assert self.driver.detector_center_line == 512.0
+        assert self.driver.detector_center_line == 512.5
 
     def test_detector_center_sample(self):
-        assert self.driver.detector_center_sample == 512.0
+        assert self.driver.detector_center_sample == 512.5
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 2
@@ -364,10 +364,10 @@ class test_mex_src_isis_naif(unittest.TestCase):
                                            [0.0, 111.1111111, 0.0])
 
     def test_detector_center_line(self):
-        assert self.driver.detector_center_line == 512.0
+        assert self.driver.detector_center_line == 512.5
 
     def test_detector_center_sample(self):
-        assert self.driver.detector_center_sample == 512.0
+        assert self.driver.detector_center_sample == 512.5
 
     def test_sensor_model_version(self):
         assert self.driver.sensor_model_version == 2
