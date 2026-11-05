@@ -41,6 +41,7 @@ release.
 - Quaternion reduction based on the naif spice fortran routine `ck3sdn`. This uses a tolerance to reduce the number of quaternions for ISDs that don't extract the exact CK times from the kernels. [#747](https://github.com/DOI-USGS/ale/pull/747)
 
 ### Fixed
+- The installed CMake package config now finds its nlohmann_json dependency, so `find_package(ale)` works without a prior `find_package(nlohmann_json)`. [#748](https://github.com/DOI-USGS/ale/pull/748)
 - Fixed MEX HRSC SRC detector center to match latest IAK. [#753](https://github.com/DOI-USGS/ale/pull/753)
 - Fixed Messenger MDIS to include Taylor distortion to match ISIS' implementation. [#757](https://github.com/DOI-USGS/ale/pull/757)
 - `evaluateCubicHermiteFirstDeriv` now checks that `y` has as many points as the derivatives and times, instead of reading past the end of `y`. [#749](https://github.com/DOI-USGS/ale/pull/749)
