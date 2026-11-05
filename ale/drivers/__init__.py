@@ -11,7 +11,7 @@ import numpy as np
 import os
 import os.path
 import traceback
-from ale.base import WrongInstrumentException, WrongLabelTypeException
+from ale.base import WrongInstrumentException, WrongLabelTypeException, InvalidISDError
 import logging
 
 from ale.formatters.usgscsm_formatter import to_usgscsm
@@ -204,6 +204,7 @@ def load_from_label(label, props={}, formatter='ale', verbose=False, only_isis_s
 
     parsed_label = pre_parse_label(label)
 
+    invalid_isd_error = None
     for driver in drivers:
         if verbose:
             logger.info(f'Trying {driver.__name__}')
@@ -227,6 +228,13 @@ def load_from_label(label, props={}, formatter='ale', verbose=False, only_isis_s
         except WrongInstrumentException as e:
             if verbose:
                 logger.info(f"Wrong instrument id for driver {driver.__class__.__name__}: {e}. Skipping driver.")
+        except InvalidISDError as e:
+            # the driver produced an invalid ISD (a required field was null).
+            # Keep trying other drivers, but remember this so that if none
+            # succeed we surface this real error instead of a generic one.
+            invalid_isd_error = e
+            if verbose:
+                logger.info(f"Invalid ISD from driver {driver.__class__.__name__}: {e}. Skipping driver.")
         except Exception as e:
             if verbose:
                 traceback.print_exc()
@@ -234,6 +242,8 @@ def load_from_label(label, props={}, formatter='ale', verbose=False, only_isis_s
             logger.info(f'End {driver}\n')
     if verbose:
         logger.setLevel(logger_level)
+    if invalid_isd_error is not None:
+        raise invalid_isd_error
     raise Exception('No viable Driver for Label.')
 
 
