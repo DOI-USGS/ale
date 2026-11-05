@@ -48,6 +48,7 @@ release.
   - ISIS-SPICE and NAIF-SPICE drivers: subtract 0.5 from the detector center (ISIS 0.5-based to CSM 0-based).
   - NAIF-SPICE driver: `focal_length` no longer raises `AttributeError` when `INS_FOCAL_LENGTH` is defined.
   - NAIF-SPICE driver: `ephemeris_start_time` uses the scalar from `utcToEt` (was a tuple). [#739](https://github.com/DOI-USGS/ale/pull/739)
+- Fixed kernel quality check to allow quality keys from different missions [#758](https://github.com/DOI-USGS/ale/pull/758)
 
 ## [1.3.0] - 2026-08-25
 

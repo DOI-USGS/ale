@@ -218,13 +218,15 @@ def to_isd(driver):
     if 'kernels' in driver_data and isinstance(driver.kernels, dict):
         for k,v in driver.kernels.items():
             # check that the keys are valid kernel types or quality types
-            if k not in ["ck", "spk", "tspk", "fk", "ik", "iak", "pck", "lsk", "sclk", "misc", driver.spiceql_mission+"_spk_quality", driver.spiceql_mission+"_ck_quality"]:
+            # accept any <mission>_spk_quality / <mission>_ck_quality key.
+            is_quality_key = k.endswith("_spk_quality") or k.endswith("_ck_quality")
+            if k not in ["ck", "spk", "tspk", "fk", "ik", "iak", "pck", "lsk", "sclk", "misc"] and not is_quality_key:
                 raise ValueError(f"Kernels key [{k}] is not valid.")
             if k in ["ck", "spk", "tspk", "fk", "ik", "iak", "pck", "lsk", "sclk", "misc"]:
                 if not isinstance(v, list):
                     raise ValueError(f"Kernel [{k}] must be set to a list of kernels.")
                 isd["kernels"] = driver.kernels
-            elif k in [driver.spiceql_mission+"_spk_quality", driver.spiceql_mission+"_ck_quality"]:
+            elif is_quality_key:
                 if not isinstance(v, str):
                     raise ValueError(f"Kernel quality type [{k}] must be set to a string.")
         isd["kernels"] = driver.kernels #{k: v for k, v in driver.kernels.items() if not "_quality" in k and not driver.spiceql_mission in k }
