@@ -33,7 +33,7 @@ heading to indicate that only the bug fixes and security fixes are in the bug fi
 release.
 -->
 
-## [Unreleased]
+## [1.4.0] - 2026-11-06
 
 ### Added
 - The NEAR MSI driver now emits the single-parameter radial optical distortion (from the `INS<ikid>_K1` coefficient) that ISIS models, and subtracts 0.5 from the detector center to match the ISIS 0.5-based detector-coordinate convention. The resulting CSM camera agrees with the ISIS camera to sub-pixel (cam_test pixel difference drops from ~0.7 px to ~1e-8 px on a real NEAR MSI image). [#740](https://github.com/DOI-USGS/ale/pull/740)
