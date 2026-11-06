@@ -742,5 +742,52 @@
     "date": {
       "metadataLastUpdated": "2026-08-25"
     }
+  },
+  {
+    "name": "ale",
+    "organization": "U.S. Geological Survey",
+    "description": "GitLab repository for the Abstraction Layer for Ephemerides package",
+    "version": "2.0.0",
+    "status": "Production",
+
+    "permissions": {
+      "usageType": "openSource",
+      "licenses": [
+        {
+          "name": "Public Domain, CC0-1.0",
+          "URL": "https://code.usgs.gov/astrogeology/ale/-/raw/2.0.0/LICENSE.md"
+        }
+      ]
+    },
+
+    "homepageURL": "https://code.usgs.gov/astrogeology/ale/-/tree/2.0.0",
+    "downloadURL": "https://code.usgs.gov/astrogeology/ale/-/archive/2.0.0/ale-2.0.0.zip",
+    "disclaimerURL": "https://code.usgs.gov/astrogeology/ale/-/raw/2.0.0/DISCLAIMER.md",
+    "repositoryURL": "https://code.usgs.gov/astrogeology/ale.git",
+    "vcs": "git",
+
+    "laborHours": 480,
+
+    "tags": [
+      "Planetary",
+      "Remote Sensing",
+      "Data Processing",
+      "Ephemerides",
+      "Community Sensor Model"
+    ],
+
+    "languages": [
+      "C++",
+      "Python"
+    ],
+
+    "contact": {
+      "name": "Christine Kim",
+      "email": "chkim@usgs.gov"
+    },
+
+    "date": {
+      "metadataLastUpdated": "2026-11-06"
+    }
   }
 ]
