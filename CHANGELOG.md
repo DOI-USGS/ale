@@ -35,6 +35,8 @@ release.
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-11-06
+
 ### Added
 - The NEAR MSI driver now emits the single-parameter radial optical distortion (from the `INS<ikid>_K1` coefficient) that ISIS models, and subtracts 0.5 from the detector center to match the ISIS 0.5-based detector-coordinate convention. The resulting CSM camera agrees with the ISIS camera to sub-pixel (cam_test pixel difference drops from ~0.7 px to ~1e-8 px on a real NEAR MSI image). [#740](https://github.com/DOI-USGS/ale/pull/740)
 - The Clementine NIR camera now emits the single-parameter radial optical distortion (k1 = -0.0006364, as in the ISIS `NirCamera` + `RadialDistortionMap`) that ISIS models, and subtracts 0.5 from its detector center to match the ISIS 0.5-based detector-coordinate convention. The resulting CSM camera agrees with the ISIS camera to sub-pixel (cam_test pixel difference drops from ~1.2 px median, ~6 px max to ~1e-7 px on a real Clementine NIR image). The UVVIS, HiRes and LWIR Clementine cameras are unchanged; only NIR is modeled here. [#740](https://github.com/DOI-USGS/ale/pull/740)
@@ -53,9 +55,11 @@ release.
 - `isd_generate` now fails with an error instead of writing an ISD with null required fields. [#754](https://github.com/DOI-USGS/ale/pull/754)
 - Fixed kernel quality check to allow quality keys from different missions [#758](https://github.com/DOI-USGS/ale/pull/758)
 
-
 ### Changed
 - `isd_generate`: default `--reduction` to `linear` (sampling every 10th line for line-scan images with >= 1000 lines). This avoids creating oversized ISDs (tens of thousands of pose samples) for long line-scan sensors such as LRO NAC, MRO CTX, and HRSC. Pass `--reduction none` to disable reduction and restore per-line sampling. [#744](https://github.com/DOI-USGS/ale/pull/744)
+
+### Removed
+- Removed isis_formatter and usgscsm_formatter. Ale formatter will always be used. [#737](https://github.com/DOI-USGS/ale/pull/737)
 
 ## [1.3.0] - 2026-08-25
 
@@ -98,9 +102,6 @@ release.
 - Throw error when input file does not exist. [#692](https://github.com/DOI-USGS/ale/pull/692)
 - Read in ISIS SPICE Tables from GDAL .tiff [#697](https://github.com/DOI-USGS/ale/pull/697)
 - Changed all `spiceql_call` functions to use pyspiceql [#695](https://github.com/DOI-USGS/ale/pull/695)
-
-### Removed
-- Removed isis_formatter and usgscsm_formatter. Ale formatter will always be used. [#737](https://github.com/DOI-USGS/ale/pull/737)
 
 ### Fixed
 - Fixed Eigen 5.x compatibility by removing version constraint in CMakeLists.txt [#677](https://github.com/DOI-USGS/ale/pull/677)
