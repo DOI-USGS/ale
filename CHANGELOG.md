@@ -55,9 +55,11 @@ release.
 - `isd_generate` now fails with an error instead of writing an ISD with null required fields. [#754](https://github.com/DOI-USGS/ale/pull/754)
 - Fixed kernel quality check to allow quality keys from different missions [#758](https://github.com/DOI-USGS/ale/pull/758)
 
-
 ### Changed
 - `isd_generate`: default `--reduction` to `linear` (sampling every 10th line for line-scan images with >= 1000 lines). This avoids creating oversized ISDs (tens of thousands of pose samples) for long line-scan sensors such as LRO NAC, MRO CTX, and HRSC. Pass `--reduction none` to disable reduction and restore per-line sampling. [#744](https://github.com/DOI-USGS/ale/pull/744)
+
+### Removed
+- Removed isis_formatter and usgscsm_formatter. Ale formatter will always be used. [#737](https://github.com/DOI-USGS/ale/pull/737)
 
 ## [1.3.0] - 2026-08-25
 
@@ -100,9 +102,6 @@ release.
 - Throw error when input file does not exist. [#692](https://github.com/DOI-USGS/ale/pull/692)
 - Read in ISIS SPICE Tables from GDAL .tiff [#697](https://github.com/DOI-USGS/ale/pull/697)
 - Changed all `spiceql_call` functions to use pyspiceql [#695](https://github.com/DOI-USGS/ale/pull/695)
-
-### Removed
-- Removed isis_formatter and usgscsm_formatter. Ale formatter will always be used. [#737](https://github.com/DOI-USGS/ale/pull/737)
 
 ### Fixed
 - Fixed Eigen 5.x compatibility by removing version constraint in CMakeLists.txt [#677](https://github.com/DOI-USGS/ale/pull/677)
