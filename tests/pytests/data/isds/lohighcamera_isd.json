@@ -267,7 +267,9 @@
       "perspective_x": -3e-06,
       "perspective_y": 8e-07,
       "center_point_x": -1.11,
-      "center_point_y": 0.3
+      "center_point_y": 0.3,
+      "k0": 2.7963e-04,
+      "k1": -2.869e-08
     }
   },
   "starting_detector_line": 0,

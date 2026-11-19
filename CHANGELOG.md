@@ -35,6 +35,9 @@ release.
 
 ## [Unreleased]
 
+### Added
+- Adds radial coefficients OD_K (k0, k1) to Lunar Orbiter high-resolution camera. [#729](https://github.com/DOI-USGS/ale/issues/729)
+
 ## [2.0.0] - 2026-11-06
 
 ### Added
