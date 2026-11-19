@@ -221,12 +221,16 @@ class LoDistortion():
         # center (point of symmetry of distortion)
         perspective_key = 'INS{}_PERSPECTIVE_FACTORS'.format(self.ikid)
         center_key = 'INS{}_POINT_OF_SYMMETRY'.format(self.ikid)
-        
-        
+        od_k_key = 'INS{}_OD_K'.format(self.ikid)
+
         perspective_x = float(self.naif_keywords[perspective_key][0])
         perspective_y = float(self.naif_keywords[perspective_key][1])
         center_point_x = float(self.naif_keywords[center_key][0])
         center_point_y = float(self.naif_keywords[center_key][1])
+        
+        od_k = self.naif_keywords[od_k_key]
+        k0 = float(od_k[0])
+        k1 = float(od_k[1])
 
         # Get the distortion coefficients
         # CameraDistortionMap::SetDistortion(naifIkCode);
@@ -235,7 +239,9 @@ class LoDistortion():
                 "perspective_x" : perspective_x,
                 "perspective_y" : perspective_y,
                 "center_point_x" : center_point_x,
-                "center_point_y" : center_point_y
+                "center_point_y" : center_point_y,
+                "k0" : k0,
+                "k1" : k1
             }
         }
     

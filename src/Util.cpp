@@ -524,15 +524,23 @@ std::vector<double> getDistortionCoeffs(json isd) {
                                  .at("lunarorbiter")
                                  .at("center_point_y")
                                  .get<double>();
+        double k0 = isd.at("optical_distortion")
+                       .at("lunarorbiter")
+                       .at("k0")
+                       .get<double>();
+        double k1 = isd.at("optical_distortion")
+                       .at("lunarorbiter")
+                       .at("k1")
+                       .get<double>();
 
-        coefficients = {perspectiveX, perspectiveY, centerPointX, centerPointY};
+        coefficients = {perspectiveX, perspectiveY, centerPointX, centerPointY, k0, k1};
         return coefficients;
       }
       catch (...)
       {
         throw std::runtime_error(
           "Could not parse the Lunar Orbiter distortion model coefficients.");
-        coefficients = std::vector<double>(4, 0.0);
+        coefficients = std::vector<double>(6, 0.0);
       }
     } break;
     case DistortionType::RADTAN: {
