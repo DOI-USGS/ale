@@ -23,7 +23,7 @@ from abc import ABC
 
 # Explicit list of disabled drivers
 
-__disabled_drivers__ = ["osirisrex_drivers"]
+__disabled_drivers__ = []
 
 # dynamically load drivers
 __all__ = [os.path.splitext(os.path.basename(d))[0] for d in glob(os.path.join(os.path.dirname(__file__), '*_drivers.py'))]

@@ -34,6 +34,7 @@ release.
 -->
 
 ## [Unreleased]
+- Re-enabled OSIRIS REx drivers [#763](https://github.com/DOI-USGS/ale/pull/763)
 
 ### Added
 - Adds radial coefficients OD_K (k0, k1) to Lunar Orbiter high-resolution camera. [#729](https://github.com/DOI-USGS/ale/issues/729)
