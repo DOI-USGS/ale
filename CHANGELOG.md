@@ -34,6 +34,7 @@ release.
 -->
 
 ## [Unreleased]
+- Re-enabled OSIRIS REx drivers [#763](https://github.com/DOI-USGS/ale/pull/763)
 
 ## [2.0.0] - 2026-11-06
 
