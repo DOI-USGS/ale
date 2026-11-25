@@ -142,7 +142,7 @@ class OsirisRexCameraIsisLabelNaifSpiceDriver(Framer, IsisLabel, NaifSpice, Radi
           Dictionary of keywords and values that ISIS creates and attaches to the label
         """
         if not hasattr(self, "_naif_keywords"):
-          keywords = pyspiceql.findMissionKeywords(key=str(self.polyCamFocusPositionNaifId), mission=self.spiceql_mission, searchKernels=self.search_kernels, useWeb=self.use_web)[0]
+          keywords = pyspiceql.findMissionKeywords(key=f"*{self.polyCamFocusPositionNaifId}*", mission=self.spiceql_mission, searchKernels=self.search_kernels, useWeb=self.use_web)[0]
           self._naif_keywords = super().naif_keywords
           if keywords: 
             self._naif_keywords = self._naif_keywords | keywords 
